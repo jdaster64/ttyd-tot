@@ -1,0 +1,178 @@
+# Code created by PistonMiner and Zephiles
+
+# 8006FE38 - Address to hook for this code
+
+# Static values used for addresses/pointers
+li r16,0 # Used to check if a REL file is loaded or not
+lis r20,0x802A
+lis r21,0x802B
+lis r22,0x8000
+lis r23,0x8003
+lis r24,0x8029
+
+# Check if a Memory Card is present
+ori r3,r20,0xF594 # CARDProbeEx
+mtlr r3
+li r3,0 # Memory Card Slot A
+li r4,0 # Pointer to Memory Size (Not needed, so NULL)
+li r5,0 # Pointer to Sector Size (Not needed, so NULL)
+blrl
+cmpwi r3,0 # Make sure nothing is wrong with the card
+bne- Exit
+
+# Mount the Memory Card
+ori r3,r20,0xFC9C # CARDMountAsync
+mtlr r3
+li r3,0 # Memory Card Slot A
+lwz r4,0x1B98(r13)
+lwz r4,0x4(r4) # Pointer to Work Area
+li r5,0 # Detach Callback Function (Want to avoid using, so NULL)
+li r6,0 # Attach Callback Function (Want to avoid using, so NULL)
+blrl
+cmpwi r3,0 # Check if Mounting failed or not
+bne- Exit
+bl CallCARDGetResultCode
+cmpwi r3,0 # Check if something went wrong
+bne- Exit
+
+# Open the file
+ori r3,r21,0x0BDC # CARDOpen
+mtlr r3
+li r3,0 # Memory Card Slot A
+ori r4,r22,0x40DC # Pointer to File Name
+addi r5,r4,0x10 # Pointer to Card File Info
+blrl
+cmpwi r3,0 # Check For Exception
+bne- UnmountCard
+
+# Allocate 512 bytes of memory, as the read size must be in multiples of 512 bytes
+li r4,512 # Bytes to allocate
+bl AllocateMemory
+
+# Read from the Card
+li r5,512 # Amount of bytes to read
+li r6,0x2000 # Offset in file to start reading from
+bl CallCARDReadAsync
+cmpwi r3,0 # Check if something went wrong
+bne- FreeCurrentArea
+
+# Get File Size, and adjust to be in multiples of 512 bytes
+lwz r15,0x40(r14) # File Size
+addi r15,r15,511
+rlwinm r15,r15,0,0,22 # Adjusted File Size
+
+# Free the 512 bytes from earlier
+mr r4,r14 # Address of allocated bytes
+bl FreeMemory
+
+# Allocate more bytes based on the Adjusted File Size
+mr r4,r15 # Adjusted File Size
+bl AllocateMemory
+
+# Read REL Area of the file
+mr r5,r15 # Adjusted File Size
+li r6,0x2200 # Offset in file to start reading from
+bl CallCARDReadAsync
+cmpwi r3,0 # Check if something went wrong
+bne- FreeCurrentArea
+
+# Get BSS Size
+lwz r4,0x20(r14) # BSS Size
+
+# Allocate more bytes based on the BSS Size
+bl AllocateMemory
+
+# Link the functions in the REL
+mr r4,r3 # Pointer to BSS Area (Address of allocated bytes)
+mr r15,r3 # Backup of the Address to use for later
+ori r3,r24,0xA8E4 # OSLink
+mtlr r3
+mr r3,r14 # Pointer to Module (File Buffer)
+blrl
+cmpwi r3,1 # Check if something went wrong
+bne- FreeRemainingRAM
+
+# Store BSS Buffer and File Buffer
+stw r15,0x414C(r22) # BSS Buffer
+stw r14,0x4150(r22) # File Buffer
+
+# Load REL Prolog Pointer
+lwz r16,0x34(r14) # Prolog Pointer
+
+# Done, so Close Card and Unmount
+b CloseCard
+
+FreeMemory:
+ori r3,r23,0x00C4 # __memFree
+b AllocateOrFreeMemory
+
+AllocateMemory:
+ori r3,r23,0x00F0 # __memAlloc
+
+AllocateOrFreeMemory:
+mtctr r3
+li r3,0 # Heap to use
+bctr
+
+# CARDGetResultCode needs to be called every time an Async function runs
+CallCARDGetResultCode:
+mflr r17
+
+CallCARDGetResultCodeMain:
+ori r3,r20,0xC744 # CARDGetResultCode
+mtlr r3
+li r3,0 # Memory Card Slot A
+blrl
+cmpwi r3,-1 # CARD_ERROR_BUSY
+beq+ CallCARDGetResultCodeMain
+mtlr r17
+blr
+
+CallCARDReadAsync:
+mflr r17
+mr r4,r3 # Pointer to Buffer Address (Address of allocated bytes)
+mr r14,r3 # Backup of the Address to use for later
+ori r3,r21,0x138C # CARDReadAsync
+mtlr r3
+ori r3,r22,0x40EC # Pointer to Card File Info
+li r7,0 # Read Callback Function (Want to avoid using, so NULL)
+blrl
+cmpwi r3,0 # Check if something went wrong
+bne- FreeCurrentArea
+b CallCARDGetResultCodeMain
+
+FreeRemainingRAM:
+ori r3,r24,0xAB40 # OSUnlink
+mtlr r3
+mr r3,r14 # Pointer to Module (File Buffer)
+blrl
+
+# Free BSS Buffer and File Buffer
+mr r4,r15 # BSS Buffer
+bl FreeMemory
+
+FreeCurrentArea:
+mr r4,r14 # File Buffer (512 Area or BSS Area if branched to)
+bl FreeMemory
+
+CloseCard:
+ori r3,r21,0x0CF8 # CARDClose
+mtlr r3
+ori r3,r22,0x40EC # Pointer to Card File Info
+blrl
+
+UnmountCard:
+ori r3,r20,0xFED8 # CARDUnmount
+mtlr r3
+li r3,0 # Memory Card Slot A
+blrl
+
+# Run REL Prolog if load was successful
+cmpwi r16,0
+beq- Exit
+mtlr r16
+blrl
+
+Exit:
+# Add back in overwritten instruction
+li r3,0

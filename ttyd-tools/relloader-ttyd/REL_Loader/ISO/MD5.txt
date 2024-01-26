@@ -1,0 +1,10 @@
+The following lists the MD5s of the patched ISOs:
+
+JP:
+8d980ec77a815b672950d12b838633b0
+
+US:
+9983ddfea3bde74f9234cb2e3db468d0
+
+EU:
+d097aa21821d097772663532ce5dabe3

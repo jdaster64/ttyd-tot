@@ -1,0 +1,2690 @@
+// __mem.c
+800050b4:memset
+//800050e4:__fill_mem
+8000519c:memcpy
+
+// system.o
+// unused:memcmp_as4
+// unused:memset_as4
+80005634:memcpy_as4
+// unused:LZ77Decode
+// unused:mtxGetScaleElement
+80005654:mtxGetRotationElement
+// unused:mtx_set_col_vec
+// unused:mtx_set_row_vec
+// unused:mtx_col_vec
+// unused:mtx_row_vec
+// unused:sysOSReport
+// unused:sysFrame2MsecFloat
+// unused:sysFrame2Msec
+8000598c:sysMsec2FrameFloat
+800059cc:sysMsec2Frame
+800059f4:sysFrame2SecFloat
+// unused:sysFrame2Sec
+// unused:sysSec2FrameFloat
+// unused:sysSec2Frame
+80005a00:getV60FPS
+80005ad8:sysDummyDraw
+80005ce4:sysWaitDrawSync
+80005d90:sysGetToken
+80005da0:irand
+// unused:movePos3
+// unused:movePos2
+80005de4:movePos
+80005e8c:sincosf
+80005f04:padGetRumbleStatus
+80005f14:padRumbleHardOff
+80005f28:padRumbleOff
+80005f3c:padRumbleOn
+// unused:keyGetTriggerR
+// unused:keyGetTriggerL
+80005f50:keyGetSubStickY
+// unused:keyGetSubStickX
+80005f60:keyGetStickY
+80005f70:keyGetStickX
+80005f80:keyGetButtonTrg
+80005f94:keyGetDirTrg
+80005fa8:keyGetButtonRep
+80005fbc:keyGetDirRep
+80005fd0:keyGetButton
+80005fe4:keyGetDir
+80005ff8:makeKey
+800064fc:qqsort
+// 80006680:fsort
+// unused:intplStringToEnum
+80006c8c:intplGetValue
+8000703c:angleABf
+800071f0:compAngle
+8000722c:distABf
+80007328:reviseAngle
+// unused:roundi
+// unused:__assert2
+// unused:__assert
+80007388:getMarioStDvdRoot
+
+// seq_mapchange.o
+// .text
+// 80007574:_relUnLoad
+800075E0:_load
+80007AB4:_unload
+80007C2C:seq_mapChangeMain
+// 80008724:seq_mapChangeExit
+// 8000874C:seq_mapChangeInit
+// .data
+803C8460:rel_bss
+8041E5A8:NextBero
+8041E5C8:NextMap
+8041E5E8:NextArea
+
+// seq_title.o
+// .text
+// 80008888:pressStartGX
+// 80008D30:disp2
+// 80009098:disp1
+// 80009224:titleMain
+// 80009AE8:L_titleInit
+// 80009CCC:N_getDebugMode
+// 80009CD8:seq_titleMain
+// 80009CF8:seq_titleExit
+// 80009D30:seq_titleInit
+// 80009D90:DbgBtlSel_GetMsgDataPtr
+// .data
+80414FA0:seqTitleWorkPointer2
+
+// camdrv.o
+8000f2fc:camGetPtr
+
+// fadedrv.o
+80010d94:fadeIsFinish
+
+// dispdrv.o
+// unused:dispGetEntNum
+80010864:dispGetCurWork
+8001086c:dispCalcZ
+80010900:dispDraw
+80010b5c:dispSort
+// 80010b90:_sort
+80010bc4:dispEntry
+80010c64:dispReInit
+80010c70:dispInit
+
+// icondrv.o
+80019120:iconNumberDispGx
+8001a29c:iconGetTexObj
+8001a4bc:iconDispGxCol
+8001a918:iconDispGx
+8001a93c:iconDispGxAlpha
+
+// seqdrv.o
+8002e1e4:seqCheckSeq
+8002e200:seqGetNextSeq
+8002e208:seqGetPrevSeq
+8002e210:seqGetSeq
+8002e218:seqSetSeq
+8002e228:seqMain
+8002e304:seqInit_MARIOSTORY
+
+// memory.o
+// .text
+// unused:smartGetWorkPtr
+8002f33c:smartTexObj
+8002f378:smartGarbage
+8002f540:smartAlloc
+8002f878:smartFree
+8002f9cc:smartAutoFree
+8002fa70:smartReInit
+8002fbe0:smartInit
+// unused:_mapAllocDump
+8002fdc4:_mapFree
+8002fe60:_mapAllocTail
+8002ff58:_mapAlloc
+// 80030048:unk_US_PAL_01_80030048
+// 80030078:unk_US_PAL_02_80030078
+800300c4:__memFree
+800300f0:__memAlloc
+80030154:memClear
+80030218:memInit
+// .data
+8041e808:mapalloc_base_ptr
+
+// evtmgr_cmd.o
+800304bc:evtSetFloat
+80030840:evtGetFloat
+80030cfc:evtSetValue
+800310fc:evtGetNumber
+80031260:evtGetValue
+
+// evtmgr.o
+80035a28:evtGetPtrID
+80035a88:evtGetPtr
+80035ac4:evtStartOther
+80035b4c:evtStopOther
+80035bd4:evtStartAll
+80035c68:evtStopAll
+80035cfc:evtStartID
+80035d9c:evtStopID
+80035e3c:evtStart
+80036210:evtStop
+800365e4:evtSetType
+800365ec:evtSetSpeed
+800365fc:evtSetPri
+80036604:evtCheckID
+80036664:evtDeleteID
+80036700:evtDelete
+800368d0:evtmgrMain
+80036abc:evtRestart
+80036c04:evtBrotherEntry
+80036eec:evtChildEntry
+80037220:evtEntryType
+800374ac:evtEntry
+// 80037738:evtEntryRunCheck
+800377b0:evtmgrReInit
+8003781c:evtmgrInit
+// 80037934:make_pri_table
+80037a60:evtGetWork
+
+// evt_map.o
+80037c8c:evt_mapdisp_onoff
+80037ccc:evt_map_replace_mapobj
+80037da4:evt_map_entry_airport_harbor
+80037f40:check2
+80037fcc:check
+80038058:evt_map_get_flush_color
+800380ec:evt_map_set_flush_color
+800381b4:evt_map_set_flush_onoff
+80038250:evt_map_set_tevcallback
+800382b0:evt_mapobj_get_position
+8003837c:evt_mapobj_clear_offscreen
+800383e0:evt_mapobj_set_offscreen
+80038468:evt_mapobj_flag_onoff
+80038510:evt_map_set_playrate
+80038568:evt_map_replayanim
+800385cc:evt_map_pauseanim
+80038630:evt_map_checkanim
+800386a8:evt_map_playanim
+80038724:evt_mapobj_color
+80038814:evt_map_blend_set_mobj_flag
+800388b0:evt_map_blend_set_flag
+80038a88:evt_map_blend_off
+80038ac8:evt_map_set_blend
+80038b9c:evt_map_fog_onoff
+80038bdc:evt_map_get_fog
+80038c88:evt_map_set_fog
+80038d68:evt_mapobj_scale
+80038e38:evt_mapobj_rotate
+80038f08:evt_mapobj_trans
+
+// mapdata.o
+80038fd8:relSetBtlAddr
+80039088:relSetEvtAddr
+800391e0:areaDataPtr
+80039278:mapDataPtr
+
+// npcdrv.o
+// .text
+80042f38:fbatPreventMarioEventChk
+80042f6c:npcCheckBlow
+800430ac:npcCalcScore
+800431b4:fbatSandersBombTriggerOn
+800431c8:npcKoopaModeMobjBoundDeadCheck
+80043290:npcKoopaModeEncountCheck
+8004340c:npcClearDeadInfo
+80043440:npcGetBackItemEntry
+// 800434dc:_majinai_effect
+// 80043594:_check
+80043604:npcExecAllReglEvt
+800436c4:npcWaitAllInitEvtEnd
+80043798:npcExecAllInitEvt
+80043864:dbGetDefData
+800438d4:npcSetLink
+800438e0:npcSetSlave
+800438f4:npcSetBtlSetupWork
+80043904:npcGetBtlSetupWork
+80043914:npcBlurOff
+800439b8:npcBlurOn
+80043ad4:npcSetColor
+80043b60:npcStartForOneEvent
+80043bc8:npcStartForEvent
+80043c78:npcStopForOneEvent
+80043cd8:npcStopForEvent
+80043d80:npcSetBattleInfo
+80043e78:npcSetupBattleInfo
+800440f8:npcCheckInterrupt
+// 8004432c:_npcHitCheckHammerAllMotion
+// 800446b4:_npcHitCheckSphere
+8004482c:fbatHitCheck
+80046604:fbatHitCheckAll
+8004662c:fbatNpcTalkCheck
+8004668c:npcGroupDead
+// 800466d0:_npcGroupDead
+// 80046a2c:_npcDead
+80046a78:fbatBattleMode
+800470dc:fbatTalkMode
+8004727c:fbatEncountCheck
+// 80047dfc:_fbatFirstAttackAnnouceDisp
+80048180:fbatSetAttackAnnounceEnable
+80048194:fbatSetAttackAnnounce
+8004828c:fbatChangeMode
+8004829c:fbatGetPointer
+800482a8:npcNearDistCheck
+80048418:npcHitCheckSide
+80048d30:npcTransRytoFaceDir
+80048d6c:npcTuningRy
+// 80048d9c:npcMoveG
+// 800490cc:npcCheckHitMarioSide
+80049644:npcSetStayPose
+8004979c:npcSetTalkPose
+800498f4:npcSetMarioAutoTalkPose
+80049934:npcNameToPtr_NoAssert
+800499e0:npcNameToPtr
+80049a7c:npcMain
+8004b420:npcDeleteGroup
+// 8004b464:_npcDeleteGroup
+8004b708:npcDelete
+8004b828:npcGetTribe
+8004b894:npcEntry
+8004bae4:npcGetReactionOfLivingBody
+8004bafc:npcReset
+8004bb70:npcInit
+// 8004bc3c:npcDisp_blur
+// 8004bf28:npcDisp_offscreen
+// 8004c234:npcDisp_offscreen_xlu
+// 8004c50c:npcDisp
+// 8004c7e0:npcDisp_xlu
+// 8004ca80:mtx_setup
+8004cd38:npcRecoveryFiledNpc
+8004ce58:npcReleaseFiledNpc
+8004cf6c:npcGetWorkPtr
+// .data
+80306768:evt_majinai_effect_se_fld
+80306874:evt_majinai_effect_se_btl
+80306980:_evt_majinai_coin_up_effect
+
+// evt_npc.o
+8004cf88:evt_npc_release_filednpc
+8004cfe8:evt_npc_sound_data_set
+8004d0f4:evt_npc_sound_data_reset
+// 8004d180:unk_US_PAL_01_8004d180
+8004d3cc:evt_fbat_trans_floor_position
+8004d514:evt_npc_kamek_kemuri2
+8004d614:evt_npc_kamek_kemuri1
+8004d6a8:evt_npc_kamek_move_position
+// 8004ddc8:_kamek_houki_kemuri
+8004decc:evt_npc_calc_score
+8004df18:evt_npc_get_kpencount_type
+8004df74:evt_npc_majo_disp_off
+8004e1ac:evt_npc_majo_disp_on
+8004e508:evt_npc_set_autotalkpose
+8004e5c0:evt_npc_set_tribe
+8004e6c4:evt_npc_set_balloontype
+8004e720:evt_npc_wait_msec
+8004e7f4:evt_npc_set_unitwork
+8004e868:evt_npc_get_unitwork
+8004e8d8:evt_npc_getback_item_entry
+8004e924:evt_npc_get_drop_coin
+// 8004e9b4:_npc_check_coin_group
+// 8004ea2c:_npc_check_coin
+8004ea40:evt_npc_get_drop_flower
+8004eb00:evt_npc_get_drop_heart
+8004ebc0:evt_npc_get_drop_item
+8004ec34:evt_npc_get_drop_fixitem
+8004ec8c:evt_npc_set_link
+8004ed0c:evt_npc_set_btlsetup_work
+8004ed88:evt_npc_get_btlsetup_work
+8004ee00:evt_npc_get_battle_rule_keep_result
+8004ee4c:evt_npc_check_escape_battle
+8004ee88:evt_npc_get_battle_result
+8004eed8:evt_npc_wait_battle_end
+8004ef54:evt_npc_battle_start
+8004f00c:evt_npc_set_battle_rule
+8004f090:evt_npc_set_battle_info
+8004f0f4:evt_npc_set_attack_mode
+8004f150:evt_npc_check
+8004f1b8:evt_npc_blur_onoff
+8004f228:evt_npc_set_color
+8004f2dc:evt_npc_set_offscreen
+8004f35c:evt_npc_change_fbat_mode
+8004f390:evt_npc_start_for_one_event
+8004f3dc:evt_npc_stop_for_one_event
+8004f428:evt_npc_start_for_event
+8004f44c:evt_npc_stop_for_event
+8004f470:evtNpcNameToPtr_NoAssert
+8004f5d8:evtNpcNameToPtr
+8004f740:evt_npc_facedirection_add
+8004f83c:evt_npc_restart_regular_event
+8004f894:evt_npc_get_reglid
+8004f8ec:evt_npc_change_interrupt
+8004f99c:evt_npc_get_loiter_dir
+8004fa88:evt_npc_add_dirdist
+8004fb98:evt_set_dir_to_home
+8004fc08:evt_set_dir_to_target
+8004fc80:evt_get_target_dir
+// 8004fcfc:_get_target_dir
+8004fdc0:evt_npc_set_camid
+8004fe1c:evt_npc_pera_onoff
+8004fea0:evt_npc_status_check
+8004ff0c:evt_npc_status_onoff
+8004ffa8:evt_npc_reaction_flag_onoff
+80050044:evt_npc_flag_check
+800500b0:evt_npc_flag_onoff
+8005014c:evt_npc_wait_anim
+800501c8:evt_npc_wait_pera
+80050224:evt_npc_set_force_regl_anim
+800502a0:evt_npc_clear_paper
+800502f8:evt_npc_set_paper_anim
+80050364:evt_npc_set_paper
+800503dc:evt_npc_set_run_anim
+80050458:evt_npc_set_walk_anim
+800504d4:evt_npc_set_talk_anim
+80050550:evt_npc_set_stay_anim
+800505cc:evt_npc_set_stop_anim
+80050648:evt_npc_set_confuse_anim
+800506c4:evt_npc_set_damage_anim
+80050740:evt_npc_set_anim
+800507c8:evt_npc_get_dir
+8005082c:evt_npc_reverse_ry
+8005088c:evt_npc_set_ry_lr
+80050988:evt_npc_set_ry
+800509ec:_intplGetFloat
+80050bcc:evt_npc_homing_target
+80051268:evt_npc_return_interrupt
+800512bc:evt_npc_glide_position
+80051868:evt_npc_jump_position_nohit
+80051bcc:evt_npc_jump_position
+80052254:evt_npc_move_position
+800528e4:evt_npc_set_rotate_offset
+80052a30:evt_npc_add_rotate
+80052b5c:evt_npc_set_rotate
+80052ca8:evt_npc_get_rotate
+80052d2c:evt_npc_set_home_position
+80052e14:evt_npc_get_home_position
+80052e98:evt_npc_get_position
+80052f1c:evt_npc_get_scale
+80052fa0:evt_npc_set_scale
+80053034:evt_npc_get_height
+80053090:evt_npc_set_height
+800530f4:evt_npc_set_width
+80053158:evt_npc_set_position
+8005323c:evt_npc_setup
+800534c4:evt_npc_get_ReactionOfLivingBody
+80053518:evt_npc_check_delete
+8005356c:evt_npc_delete
+800535b8:evt_npc_slave_entry
+800536e4:evt_npc_entry
+
+// evt_sub.o
+80053764:mail_evt_gor_04_keyoff_check
+800537c4:irai_mail_check
+80053c4c:evt_sub_check_intersect
+80053f10:unk_80053f10
+80053fd8:bgm_start_wait
+80054010:get_stop
+80054040:set_stop
+80054070:stageclear_wait
+800540b0:stone_bg_open
+800540e8:stone_bg
+800541bc:stone_ry
+80054280:evt_sub_get_coin
+80054778:coingetDisp
+800548a4:evt_sub_countdown_set_restart_time
+800548d4:evt_sub_countdown_flag_onoff
+80054940:evt_sub_countdown_end
+80054964:evt_sub_countdown_get_status
+800549b0:evt_sub_countdown_start
+80054a10:evt_sub_animgroup_async
+80054a68:evt_sub_get_language
+80054a9c:evt_sub_load_progresstime
+80054bdc:evt_sub_save_playtime
+80054ca0:N_evt_sub_status_gauge_force_update
+80054cc4:evt_sub_status_gauge_check_update
+80054d2c:evt_sub_status_gauge_force_close
+80054d50:evt_sub_status_gauge_force_open
+80054d74:evt_sub_get_areaname
+80054da8:evt_sub_get_mapname
+80054ddc:evt_key_get_buttontrg
+80054e30:evt_key_get_button
+80054e84:evt_key_get_dir
+80054ed8:evt_sub_system_flag_onoff
+80054f3c:evt_sub_get_system_flag
+80054f70:evt_sub_get_dir
+800550ac:evt_sub_get_dist
+800551e8:evt_sub_area_check
+800553f8:evt_sub_get_stopwatch
+8005548c:evt_sub_random
+800554f8:evt_sub_rumble_onoff
+80055580:evt_sub_get_sincos
+80055648:evt_sub_spline_free
+80055698:evt_sub_spline_get_value_manual
+800557e4:evt_sub_spline_get_value
+80055a20:evt_sub_spline_init
+80055b24:evt_sub_intpl_msec_get_value_para
+80055c40:evt_sub_intpl_msec_get_value
+80055d1c:evt_sub_intpl_msec_init
+80055dbc:evt_sub_intpl_get_float
+80055eac:evt_sub_intpl_init_float
+80055f90:evt_sub_intpl_get_value_para
+80056064:evt_sub_intpl_get_value
+80056120:evt_sub_intpl_init
+
+// mario.o
+800561b8:toFrontPose
+800566cc:toRearPose
+80056be0:marioDisp
+8005710c:marioDispBlur
+80057290:marioDispBlurSub
+80057878:marioPreDisp
+80057cfc:marioRearAnime
+800583a8:marioMakeDispDir
+80058908:marioGetScale
+80058928:marioChkInScreen
+80058960:marioGetScreenPos
+800589e4:marioPaperLightOff
+// unused:marioPaperLightOn
+80058a10:marioPaperOff
+80058a90:marioPaperOn
+80058ba8:marioSetPaperAnimeLocalTime
+80058c68:marioChgPaper
+80058cf0:marioChgPoseTime
+80058d84:marioChgPose
+80058f9c:toDotMarioPose
+80059124:marioChgEvtPose
+// 800591b4:unk_JP_US_006_800591b4
+800593fc:marioAnimeId
+8005942c:marioChkPushAnime
+800594a8:marioMoveMain
+80059a78:marioMove
+8005a634:marioCtrlOff2Main
+8005a7e0:marioMain
+8005b1d8:marioReInit
+8005b5c8:marioInit
+8005ba50:marioPoseInit
+8005bae8:marioSoundInit
+8005bb08:marioOfsRotReset
+8005bb78:marioReset
+8005bda0:marioResetHitObj
+8005bf3c:marioChkSts
+8005bfdc:marioBgmodeOff
+8005c0a0:marioBgmodeOn
+8005c164:marioBgmodeChk
+8005c174:marioSetMutekiTime
+8005c1c0:marioKeyOn
+8005c1f4:marioKeyOff
+8005c21c:marioCtrlOn2
+8005c25c:marioCtrlOff2
+8005c290:marioCtrlOn
+8005c2c4:marioCtrlOff
+8005c2ec:marioKeyOffChk
+8005c2fc:marioCtrlOffChk
+8005c30c:marioFBattlePost
+8005c3cc:marioFBattlePrepare
+// 8005c438:unk_JP_US_007_8005c438
+8005c464:marioChkCtrl
+8005c47c:marioChkKey
+8005c5b8:marioCheckMenuDisable
+// 8005ca2c:unk_JP_US_008_8005ca2c
+8005ca58:marioCaseEventValidChk
+8005ca98:marioItemGetOk
+8005caac:marioItemGetChk
+8005cae8:marioItemGetDisable
+8005cb04:marioEntry
+8005cda8:marioSetSpec
+8005ce40:marioSetFamicomMode
+8005d740:marioSetCharMode
+8005e0b0:marioGetColor
+8005e0c0:marioGetPtr
+
+// evt_mobj.o
+// .text
+80067878:evt_mobj_signboard
+8006b948:evt_mobj_wait_animation_end
+8006c03c:evt_mobj_get_position
+// .data
+8030b4ec:mobj_save_blk_sysevt
+
+// evt_eff.o
+8006c3c4:evt_eff_fukidashi
+8006c6d8:evt_eff_delete_ptr
+8006c708:evt_eff_softdelete_ptr
+8006c738:evt_eff_delete
+8006c76c:evt_eff_softdelete
+8006c7a0:evt_eff64
+8006d970:evt_eff
+
+// mariost.o
+// .text
+// unused:gcResetDone
+// unused:gcResetCheck
+8006eed8:gcRumbleCheck
+// unused:gcDvdCheckCancel
+// unused:gcDvdCheckInit
+8006f1e0:gcDvdCheckThread
+8006f404:viPostCallback
+8006f7bc:marioStGetSystemLevel
+8006f7c8:marioStSystemLevel
+8006f8dc:marioStDisp
+8006f904:marioStMain
+8006fb3c:marioStInit
+// .data
+80415fd0:g_MarioSt
+
+// seq_battle.o
+800736ec:battle_exit
+800738ac:battle_init
+80073b24:seq_battleMain
+80073f00:seq_battleExit
+80073f20:seq_battleInit
+
+// fontmgr.o
+// unused:JUTFont_Draw
+// unused:JUTFont_DrawPos
+80074720:_JUTFont_DrawPos
+80074bfc:JUTFont_DrawStart
+// unused:JUTFont_GetWidth
+// unused:JUTFont_GetWidthEntry
+80074e90:JUTFont_CodeToGlyph
+// unused:JUTFont_Free
+80075004:JUTFontSetup
+// unused:JUTFont_SetWidth
+800752fc:HSV2RGB
+80075528:FontGetMessageWidth
+8007554c:FontGetMessageWidthLine
+8007586c:kanjiGetWidth
+800758e4:kanjiSearch
+80075904:hankakuSearch
+80075928:FontDrawMessageMtx
+80075fcc:FontDrawMessage
+800766e0:FontDrawStringShake
+80076a10:FontDrawStringCenterMtx
+// unused:FontDrawStringCenter
+80076cdc:FontDrawStringMtx
+80077034:FontDrawStringVecPitch
+80077368:FontDrawStringPitch
+// unused:FontDrawStringVec
+800773d0:FontDrawString
+80077438:FontDrawCodeMtx
+80077594:FontDrawCode
+8007773c:FontDrawScaleVec
+80077758:FontDrawScale
+8007776c:FontGetDrawColor
+80077774:FontDrawColor_
+800777e0:FontDrawColor
+80077844:FontDrawColorIDX
+800778b4:FontDrawNoiseOff
+800778e0:FontDrawNoise
+800779e4:FontDrawRainbowColorOff
+80077a08:FontDrawRainbowColor
+80077aa8:FontDrawEdgeOff
+80077ab4:FontDrawEdge
+80077ac0:FontDrawStart_alpha
+80077b4c:FontDrawStart
+80077bdc:fontmgrTexSetup
+80077c08:fontmgrInit
+
+// evt_bero.o
+// .text
+8007a50c:evt_bero_get_info
+8007a9c0:evt_bero_exec_wait
+8007aa34:evt_bero_exec_onoff
+8007aad0:evt_bero_mapchange
+// .data
+80416060:default_entevt
+80416074:default_outevt
+8030cd78:bero_null
+8030cdb4:evt_bero_nonride_check
+8030ce48:bero_open_door_play_se
+8030d138:bero_close_door_play_se
+8030d428:bero_play_enter_anime
+8030d674:bero_play_out_anime
+8030d888:bero_case_init_check
+8030da14:bero_case_exec_none
+8030dac8:bero_case_exec_road
+8030dbf4:bero_case_exec_door
+8030dd58:bero_case_exec_pipe_sub
+8030e28c:bero_case_exec_pipe
+8030e554:bero_case_exec_gate
+8030e608:bero_case_entry
+8030e798:bero_case_entry_sub
+8030e8b4:bero_case_switch_on
+8030e900:bero_case_switch_off
+80416088:evt_bero_info_run_none
+8030e97c:evt_bero_info_run_road
+8030ea20:evt_bero_info_run_door
+8030eadc:evt_bero_info_run_pipe_sub00
+8030eba8:evt_bero_info_run_pipe
+8041609c:evt_bero_info_run_gate
+8030ec7c:evt_bero_info_run
+8030f060:evt_bero_initial_pos
+8030f2d8:evt_bero_mario_enter
+// .bss
+803dc110:BeroINFOARR
+
+// windowdrv.o
+// 8007AD30:getWakuTexObj
+// 8007AD40:windowGetPointer
+// 8007AD50:windowCheckID
+// 8007AD68:windowDispGX2_Waku_col
+8007B44C:windowDispGX_Waku_col
+// 8007BAD8:windowDispGX_Message
+// 8007BDA8:_windowDispGX_Message
+// 8007D994:windowDispGX_System
+// 8007E9F0:windowDispGX_Kanban
+// 8007F9EC:windowMain
+// 8007FA54:windowDeleteID
+// 8007FAC0:windowDelete
+// 8007FB0C:windowEntry
+// 8007FB94:windowReInit
+// 8007FBD8:windowTexSetup
+// 8007FCF0:unk_JP_US_PAL_012
+// 8007FD84:windowInit
+
+// msgdrv.o
+// 8007fdf4:selectWindow_Disp
+// 8007ff3c:selectWindow_Main
+// 80080260:msgWindow_Disp
+// 8008093c:msgWindow_Clear_Main
+// 80080c20:msgWindow_Main
+// 80081424:msgWindow_ForceClose
+// 800814f4:msgWindow_Repeat
+// 8008156c:msgWindow_Continue
+// 800815bc:msgWindow_Add
+// 80081630:msgWindow_Delete
+// 80081688:msgWindow_Entry
+// 80081a1c:msgIconStr2ID
+// 80081aa0:msgGetCommand
+// 80081b40:_ismbblead
+80081b8c:msgSearch
+// 80081c6c:msg_compare
+// 80081cb4:?msgGetWork
+// 80081cbc:msgAnalize
+// 80083360:msgDispKeyWait_render
+// 800833e0:msgDisp
+// 80083f34:msgMain
+// 8008465c:msgLoad
+// 80084938:msgInit
+
+// database.o
+80084f24:setupDataBase
+8008558c:setupDataCheck
+80085648:setupDataLoad
+
+// swdrv.o
+8008582c:swByteGet
+80085850:swByteSet
+80085874:swClear
+800858b4:swGet
+800858fc:swSet
+80085980:swInit
+
+// seq_logo.o
+// 800859f8:progDisp
+// unused:arcLoad
+// unused:arcPreLoad
+// 80085f28:dummy_draw
+// 80085fe0:logoDisp
+80086d6c:seq_logoMain
+8008746c:seq_logoExit
+800874b0:seq_logoInit
+
+// evt_cam.o
+800a9620:evt_cam_ctrl_onoff
+
+// evt_item.o
+800a9f98:evt_item_get_item
+800aa400:evt_item_entry
+
+// cardmgr.o
+800b2388:cardCopy2Main
+800b2b80:cardGetCode
+800b2b8c:cardIsExec
+
+// evt_msg.o
+800d0998:evt_msg_fill_num
+800d12b0:evt_msg_fill_item
+800d1ed4:evt_msg_npc
+800d1f34:evt_msg_pri
+800d1f70:evt_msg_togelr
+800d2008:evt_msg_toge
+800d2090:evt_msg_select
+800d2178:evt_msg_close
+800d21a8:evt_msg_repeat
+800d21fc:evt_msg_continue
+800d2250:evt_msg_print_add_insert
+800d23c4:evt_msg_print_add
+800d2460:evt_msg_print_insert
+800d25ec:evt_msg_print_battle_party
+800d26bc:evt_msg_print_party_add
+800d2790:evt_msg_print_party
+800d284c:evt_msg_print
+800d2db0:evt_msg_init
+
+// mario_pouch.o
+// .text
+800d2e28:pouchSetPartyColor
+800d2e44:pouchGetPartyColor
+800d328c:pouchEquipBadgeID
+800d3300:pouchEquipCheckBadge
+800d35a8:pouchReviseMarioParam
+800d3bb8:pouchGetMaxAP
+800d3c00:pouchAddAP
+800d3c44:pouchGetAP
+800d3c50:pouchSetMaxFP
+800d3c68:pouchSetFP
+800d3c8c:pouchGetMaxFP
+800d3c98:pouchGetFP
+800d3ca4:pouchSetPartyHP
+800d3cd4:pouchGetPartyHP
+800d3ce8:pouchSetMaxHP
+800d3d00:pouchSetHP
+800d3d24:pouchGetMaxHP
+800d3d30:pouchGetHP
+800d3dd4:pouchSetCoin
+800d3e18:pouchAddCoin
+800d4c38:pouchRemoveItem
+800d4ed4:pouchCheckItem
+800d50cc:pouchGetItem
+800d5738:pouchGetHaveBadgeCnt
+800d59c8:pouchInit
+800d5eb0:pouchGetPtr
+// .data
+80315380:_party_max_hp_table
+
+// pmario_sound.o
+800daf24:psndBGMOn_f_d
+800dc214:psndStopAllFadeOut
+
+// sound.o
+800e0ca0:SoundEfxPlayEx
+
+// evt_mario.o
+800e2e0c:evt_mario_kill_party
+800e2e78:evt_mario_goodbye_party
+800e3120:evt_mario_set_party_pos
+800e6498:evt_mario_normalize
+800e7474:evt_mario_key_onoff
+
+// evt_party.o
+800eae70:evt_party_run
+800eb3f8:evt_party_get_pos
+800eb87c:evt_party_set_camid
+
+// event.o
+800ee688:stg0_00_init
+
+// evt_shop.o
+800eecd0:sell_pouchcheck_func
+800eed08:name_price
+
+// evt_pouch.o
+800f07d0:evt_pouch_get_yoshiname
+800f0928:evt_pouch_get_havebadgecnt
+800f0a8c:evt_pouch_party_join
+800f0d0c:N_evt_pouch_remove_item_index
+800f0e20:evt_pouch_add_item
+800f0fe8:evt_pouch_add_coin
+800f1018:evt_pouch_get_coin
+
+// npc_event.o
+// .text
+// 800f347c:mahoon_get_groupname
+// .data
+8033efc0:enemy_common_dead_event
+8033f230:enemy_event_dead_event_sub
+804165f0:enemy_event_dead_event 
+80416618:enemy_slave_common_dead_event
+8033f2c0:enemy_common_blow_event
+8033f2f4:enemy_2d_common_dead_event
+8033f970:_2d_dead_rotate_event
+8033f9b0:unk_0x8033f9b0
+80416638:enemy_common_flag_init_event
+80416668:testenemynpc_init_event
+80416678:npc_urouro_init_event
+8033f9e4:npc_urouro_move_event
+8033fa38:npc_urouro_return_event
+804166a8:kuriboo_init_event
+8033facc:kuriboo_move_event
+8033fb68:kuriboo_find_event
+8033fc40:kuriboo_lost_event
+8033fcbc:kuriboo_return_event
+804166b8:patakuri_init_event
+8033fd50:patakuri_move_event
+8033ffa0:patakuri_find_event
+80340108:patakuri_lost_event
+80340184:patakuri_return_event
+8034042c:nokonoko_shell_return_event
+803404f4:nokonoko_init_event
+80340564:nokonoko_move_event
+8034064c:nokonoko_find_event
+803408fc:nokonoko_lost_event
+803409b4:nokonoko_return_event
+80340a90:togenoko_shell_return_event
+80340b58:togenoko_init_event
+80340bc8:togenoko_move_event
+80340cb0:togenoko_find_event
+80340f60:togenoko_lost_event
+80341018:togenoko_return_event
+804166e8:patapata_init_event
+803410f4:patapata_move_event
+803412e0:patapata_find_event
+803414ec:patapata_lost_event
+8034159c:patapata_return_event
+803417b8:met_init_event_common
+8034180c:met_set_anim_wait_event
+803418cc:met_set_anim_walk_event
+8034198c:met_init_event
+803419d8:met_init_event_ceil
+80341a10:togemet_init_event
+80341a5c:togemet_init_event_ceil
+80341a94:met_move_event
+80341b6c:met_find_event
+80341fa0:met_lost_event
+8034204c:met_return_event
+80416718:patamet_init_event
+80342118:patamet_move_event
+80342374:patamet_find_event
+80342524:patamet_lost_event
+803425ac:patamet_return_event
+80416748:chorobon_init_event
+803427e8:chorobon_move_event
+80342904:chorobon_find_event
+80342a00:chorobon_lost_event
+80342a38:chorobon_return_event
+80416778:pansy_init_event
+80342ae4:pansy_move_event
+80342b8c:pansy_find_event
+80342c44:pansy_lost_event
+80342cd0:pansy_return_event
+80416788:twinkling_pansy_init_event
+80342d84:twinkling_pansy_move_event
+80342e2c:twinkling_pansy_find_event
+80342f04:twinkling_pansy_lost_event
+80342f90:twinkling_pansy_return_event
+80343044:karon_init_event
+803430d4:karon_move_event
+80416798:karon_dead_event
+803431b8:karon_find_event
+80343410:karon_lost_event
+80343458:karon_return_event
+803434ec:karon_blow_event
+80343538:honenoko2_init_event
+80343580:honenoko2_move_event
+80343644:honenoko2_find_event
+8034372c:honenoko2_lost_event
+803437bc:honenoko2_return_event
+80343874:killer_init_event
+803438c0:killer_move_event
+803439fc:killer_dead_event
+80343c6c:killer_cannon_init_event
+80343ca0:killer_cannon_move_event
+804167bc:sambo_init_event
+80343f14:sambo_move_event
+80343f6c:sambo_find_event
+80343ff0:sambo_lost_event
+80344048:sambo_return_event
+803440c0:sinnosuke_init_event
+80344128:sinnosuke_move_event
+8034417c:sinnosuke_find_event
+803443c4:sinnosuke_lost_event
+80344454:sinnosuke_return_event
+803445cc:sinemon_init_event
+80344634:sinemon_move_event
+8034469c:sinemon_find_event
+803448e4:sinemon_lost_event
+80344974:sinemon_return_event
+804167ec:togedaruma_init_event
+80344aec:togedaruma_move_event
+80344bb0:togedaruma_find_event
+80344ca4:togedaruma_lost_event
+80344d3c:togedaruma_return_event
+80344dec:barriern_init_event
+80344e80:barriern_move_event
+80344fe8:barriern2_move_event
+80345150:barriern_dead_event
+80345194:barriern_find_event
+80345488:barriern_lost_event
+803454cc:barriern_return_event
+80345578:barriern_blow_event
+804167fc:piders_init_event
+803455e4:piders_move_event
+803457a0:piders_find_event
+80345ad8:piders_blow_event
+80345b0c:pakkun_attack_event 
+80345c34:pakkun_init_event
+80345cbc:pakkun_move_event
+80345d00:pakkun_find_event
+80345ea8:pakkun_return_event
+80345fec:dokugassun_init_event
+80346024:dokugassun_move_event
+80346288:dokugassun_find_event
+8034639c:dokugassun_lost_event
+80346408:dokugassun_return_event
+80346680:basabasa_init_event
+803466c4:basabasa_move_event
+803467e4:basabasa_find_event
+803468f8:basabasa_lost_event
+80346974:basabasa_return_event
+80416820:basabasa_dead_event
+80416830:basabasa2_init_event
+80346a24:basabasa2_move_event
+80346c74:basabasa2_find_event
+80346d64:basabasa2_lost_event
+80346de0:basabasa2_return_event
+80416860:basabasa2_dead_event
+80416870:teresa_init_event
+80347010:teresa_move_event
+803472a4:teresa_find_event
+80347394:teresa_lost_event
+80347410:teresa_return_event
+804168a0:teresa_dead_event
+804168b0:bubble_init_event
+803475b0:bubble_move_event
+8034782c:bubble_find_event
+80347928:bubble_lost_event
+803479b0:bubble_return_event
+804168e0:hbom_init_event
+80347c0c:hbom_move_event
+80347cb0:hbom_find_event
+80347d88:hbom_lost_event
+80347e04:hbom_return_event
+80347e98:zakowiz_init_event
+80347f30:zakowiz_move_event
+804168f0:zakowiz_dead_event
+80348048:zakowiz_find_event
+803482c4:zakowiz_lost_event
+8034830c:zakowiz_return_event
+803483a0:zakowiz_blow_event
+80416914:hannya_init_event
+803483ec:hannya_move_event
+80348480:hannya_find_event
+803485d8:hannya_lost_event
+80348634:hannya_return_event
+803486a8:mahoon_init_event
+80348888:mahoon_move_event
+80348c94:mahoon_dead_event
+80348cf4:mahoon_find_event
+80348fb8:mahoon_lost_event
+803491f0:mahoon_return_event
+803495dc:kamec_init_event
+803496b4:kamec_move_event
+80349978:kamec_find_event
+80349bd0:kamec_lost_event
+80349c4c:kamec_return_event
+80416938:kamec_dead_event
+80349ea4:kamec_blow_event
+80349ef0:kamec2_init_event
+80349fc8:kamec2_move_event
+8034a0b0:kamec2_find_event
+8034a314:kamec2_lost_event
+8034a390:kamec2_return_event
+8041695c:kamec2_dead_event
+8034a424:kamec2_blow_event
+8034a470:hbross_init_event
+8034a500:hbross_move_event
+80416980:hbross_dead_event
+8034a5e4:hbross_find_event
+8034a818:hbross_lost_event
+8034a860:hbross_return_event
+8034a8f4:hbross_blow_event
+8034a940:wanwan_init_event
+8034aa40:wanwan_init_event_sub
+8034ab40:wanwan_move_event
+8034ad9c:wanwan_find_event
+8034af04:kuriboo2D_init_event
+8034af5c:kuriboo2D_move_event
+8034b07c:kuriboo2D_find_event
+8034b194:zako2D_init_event
+8034b200:zako2D_move_event
+8034b5d0:zako2D_find_event
+8034b6f8:dokan2D_init_event
+8034b744:dokan2D_regl_event
+8034b804:fall2D_init_event
+8034b850:fall2D_regl_event
+8034b8d8:zakoM2D_init_event
+8034b96c:zakoM2D_move_event
+8034bae8:zakoM2D_find_event
+8034bdb4:unk_0x8034bdb4
+804169a4:zakoM2D_dead_event
+8034bf14:gesso2D_init_event
+8034bf9c:gesso2D_move_event
+
+// battle.o
+// .text
+800f831c:BtlUnit_EquipItem
+800f8728:BattleGetPartyPtr
+800f87a8:BattleGetMarioPtr
+800f8874:BattleGetUnitPartsPtr
+800f88cc:BattleGetUnitPtr
+800f8f04:BattleInit
+// .data
+8041eb90:g_BattleWork
+
+// battle_ac.o
+// .text
+800fa1a0:BattleACPadCheckRecordTrigger
+800fa1b8:BattleActionCommandCheckDefence
+// .data
+802ee018:guard_frames
+802ee020:superguard_frames
+
+// battle_damage.o
+// 800fa678:BattleCheckCounter
+// 800fac1c:BattleInitCounterPreCheckWork
+// 800fac58:BattleAttackDeclareAll
+// 800fad70:__declare
+// 800faecc:BattleAttackDeclare
+// 800fb01c:BattleCheckDamage
+// 800fba1c:_checkDamageCode_EmergencyRevival
+// 800fbadc:BattlePreCheckDamage
+// 800fbd8c:BattleSetStatusDamageFromWeapon
+800fbed8:BattleSetStatusDamage
+// 800fcf54:_getRegistStatus
+800fd030:_getSickStatusParam
+// 800fd490:_getSickStatusRate
+800fd680:BattleCalculateFpDamage
+800fd790:BattleCalculateDamage
+// 800fde2c:BattleCheckPikkyoro
+800fdfd4:BattleDamageDirect
+
+// battle_event_cmd.o
+80103d14:btlevtcmd_ftof
+80103dc0:btlevtcmd_ftomsec
+80103e10:btlevtcmd_StageDispellFog
+80103e34:btlevtcmd_StatusWindowOnOff
+80103eb0:btlevtcmd_BtlStageObjGetRotate
+80103f9c:btlevtcmd_BtlStageObjSetRotate
+801040f4:btlevtcmd_BtlStageObjFlagOnOff
+801041b8:btlevtcmd_SacBgsetMove
+8010436c:btlevtcmd_InviteApInfoReport
+801043b8:btlevtcmd_PadCheckNow
+80104428:btlevtcmd_PadCheckTrigger
+80104498:btlevtcmd_EnemyItemUseCheck
+80104508:btlevtcmd_snd_voice
+801045e0:btlevtcmd_snd_se_offset
+80104700:btlevtcmd_snd_se
+80104a78:btlevtcmd_SetPartsJumpSound
+80104b08:btlevtcmd_SetJumpSound
+80104b88:btlevtcmd_SetPartsDiveSound
+80104c54:btlevtcmd_SetDiveSound
+80104d10:btlevtcmd_SetPartsWalkSound
+80104ddc:btlevtcmd_SetWalkSound
+80104e98:btlevtcmd_SetPartsRunSound
+80104f64:btlevtcmd_SetRunSound
+80105020:btlevtcmd_SetMoveSoundDataWork
+8010510c:btlevtcmd_TransStageFloorPosition
+801051cc:btlevtcmd_GetStageAudienceAreaSize
+80105284:btlevtcmd_GetStageSize
+8010533c:btlevtcmd_SortPhaseMoveTable
+80105368:btlevtcmd_InterruptStop
+801053e0:btlevtcmd_GetGuardKouraId
+8010546c:btlevtcmd_SetGuard
+801054e8:btlevtcmd_WeaponAftereffect
+801056f4:btlevtcmd_GetItemRecoverParam
+80105798:btlevtcmd_CommandGetWeaponItemId
+801057e8:btlevtcmd_CommandGetWeaponAddress
+80105890:btlevtcmd_CommandGetWeaponActionLv
+801058e0:btlevtcmd_GetWeaponActionLv
+80105928:btlevtcmd_CommandPayWeaponCost
+801059a0:btlevtcmd_PayWeaponCost
+80105a14:btlevtcmd_CheckWeaponPluralTarget
+80105a78:btlevtcmd_AfterReactionEntry
+80105ae0:btlevtcmd_OffUnitFlag
+80105b40:btlevtcmd_OnUnitFlag
+80105ba0:btlevtcmd_CheckUnitFlag
+80105c30:btlevtcmd_GetACPossibility
+80105cb4:btlevtcmd_CheckActStatus
+80105d38:btlevtcmd_OffStatusFlag
+80105d98:btlevtcmd_OnStatusFlag
+80105df8:btlevtcmd_ClearAllStatus
+80105e50:btlevtcmd_OnOffStatus
+80105f0c:btlevtcmd_CheckStatus
+80105fa0:btlevtcmd_CheckGuardMotionEnable
+801060a0:btlevtcmd_AnimeFlagOnOff
+80106140:btlevtcmd_AnimeChangePaperAnime
+801061c8:btlevtcmd_AnimeChangePaperGroup
+80106264:btlevtcmd_AnimeSetMotionSpeed
+801062e0:btlevtcmd_CheckDefinePosetype
+801063f4:btlevtcmd_AnimeSetPoseSoundTable
+80106468:btlevtcmd_AnimeSetPoseTable
+801064d8:btlevtcmd_AnimeChangePoseFromTable
+80106544:btlevtcmd_AnimeCmpPoseType
+80106618:btlevtcmd_SetStayPoseType
+801066a8:btlevtcmd_SetTalkPoseType
+80106738:btlevtcmd_SetStayPose
+80106790:btlevtcmd_SetTalkPose
+801067e8:btlevtcmd_SetTalkBodyId
+80106854:btlevtcmd_AnimeWaitPlayLoopTiming
+80106980:btlevtcmd_AnimeWaitPlayComplete
+80106a34:btlevtcmd_AnimeChangePoseDirect
+80106b20:btlevtcmd_AnimeChangePoseType
+80106bb8:btlevtcmd_AnimeChangePose
+80106c40:btlevtcmd_AnimeChangeGroup
+80106d18:btlevtcmd_AudienceAppeal
+80106d7c:btlevtcmd_ACRGetResult
+80106dfc:btlevtcmd_ACRStart
+80106eb4:btlevtcmd_ACHelpSet
+80106ef0:btlevtcmd_ac_timing_get_success_frame
+80106f40:btlevtcmd_ac_timing_flag_onoff
+80106fa0:btlevtcmd_ACSuccessEffect
+801072e4:btlevtcmd_AudienceDeclareAcrobatResult
+8010749c:btlevtcmd_AudienceDeclareACResult
+80107548:btlevtcmd_GetResultCountAC
+8010757c:btlevtcmd_GetResultACDefence
+801075c4:btlevtcmd_GetResultPrizeLv
+80107660:btlevtcmd_GetResultAC
+80107694:btlevtcmd_ResultACDefence
+80107708:btlevtcmd_ResultAC
+80107758:btlevtcmd_StopAC
+80107788:btlevtcmd_StartAC
+801077ec:btlevtcmd_SetupAC
+80107884:btlevtcmd_AcSetOutputParam
+801078dc:btlevtcmd_AcGetOutputParam
+8010793c:btlevtcmd_AcSetGaugeParam
+801079ac:btlevtcmd_AcGetParam
+80107a0c:btlevtcmd_AcSetParam
+80107a64:btlevtcmd_AcSetParamAll
+80107ad4:btlevtcmd_AcSetFlag
+80107aec:btlevtcmd_AcGetDifficulty
+80107b38:btlevtcmd_AcSetDifficulty
+80107bb8:btlevtcmd_DivePartsPosition
+80108504:btlevtcmd_FallPartsPosition
+80108864:btlevtcmd_JumpPartsContinue
+8010899c:btlevtcmd_JumpPartsSetting
+80108a58:btlevtcmd_JumpPartsPosition
+80108f34:btlevtcmd_SetPartsFallAccel
+80108fc4:btlevtcmd_SetPartsMoveSpeed
+80109054:btlevtcmd_GetTakeoffPosition
+801093a8:btlevtcmd_MarioJumpPosition
+80109c68:btlevtcmd_MarioJumpParam
+80109e04:btlevtcmd_GetConfuseActEvent
+80109ea8:btlevtcmd_PhaseEventStartDeclare
+80109f00:btlevtcmd_GetDataFromDataTable
+80109f88:btlevtcmd_CheckDataOfDataTable
+8010a010:btlevtcmd_RunDataEventChild
+8010a0b0:btlevtcmd_WaitAttackEndCheck
+8010a154:btlevtcmd_WaitAttackEnd
+8010a1c8:btlevtcmd_WaitGuardMove
+8010a1e4:btlevtcmd_GuardMoveEnd
+8010a1fc:btlevtcmd_StopWaitEvent
+8010a26c:btlevtcmd_StartWaitEvent
+8010a2d0:btlevtcmd_SetEventCeilFall
+8010a32c:btlevtcmd_SetEventConfusion
+8010a388:btlevtcmd_SetEventAttack
+8010a3ec:btlevtcmd_SetEventUnisonPhase
+8010a448:btlevtcmd_SetEventPhase
+8010a4a4:btlevtcmd_SetEventEntry
+8010a500:btlevtcmd_SetEventWait
+8010a55c:btlevtcmd_SetEventDamage
+8010a5b8:btlevtcmd_DamageDirect
+8010a688:btlevtcmd_CommandCheckDamage
+8010a78c:btlevtcmd_CheckDamage
+8010a88c:btlevtcmd_CommandPreCheckCounter
+8010a998:btlevtcmd_PreCheckCounter
+8010aaa8:btlevtcmd_CommandPreCheckDamage
+8010abac:btlevtcmd_PreCheckDamage
+8010acac:btlevtcmd_AttackDeclareAll
+8010ad00:btlevtcmd_AttackDeclare
+8010adac:btlevtcmd_ConsumeItemReserve
+8010af58:btlevtcmd_ConsumeItem
+8010b0c4:btlevtcmd_CommandFlyItem
+8010b2b8:btlevtcmd_DispItemIcon
+8010b3d4:btlevtcmd_GetConsumeItem
+8010b418:btlevtcmd_GetFirstAttackTarget
+8010b490:btlevtcmd_GetSelectNextEnemy
+8010b540:btlevtcmd_GetSelectEnemy
+8010b5e4:btlevtcmd_ChoiceSamplingEnemy
+8010b664:btlevtcmd_SamplingEnemy
+8010b714:btlevtcmd_PartsFaceDirectionSub
+8010b7c4:btlevtcmd_FaceDirectionSub
+8010b85c:btlevtcmd_FaceDirectionAdd
+8010b8f4:btlevtcmd_MoveDirectionAdd
+8010b9a4:btlevtcmd_EllipseMovePosition
+8010bf8c:btlevtcmd_DivePosition
+8010c8c0:btlevtcmd_GetMoveFrame
+8010ca74:btlevtcmd_MovePosition
+8010cda8:btlevtcmd_FallPosition
+8010d0f0:btlevtcmd_JumpContinue
+8010d208:btlevtcmd_JumpPosition
+8010d6cc:btlevtcmd_JumpSetting
+8010d770:btlevtcmd_SetFallAccel
+8010d7e8:btlevtcmd_SetJumpSpeed
+8010d860:btlevtcmd_SetMoveSpeed
+8010d8d8:btlevtcmd_StoreCoin
+8010d914:btlevtcmd_GetCoin
+8010d980:btlevtcmd_StoreExp
+8010d9bc:btlevtcmd_GetExp
+8010da28:btlevtcmd_GetBackItem
+8010dae0:btlevtcmd_ChangeDataTable
+8010db3c:btlevtcmd_SetPartsDefenceAttrTable
+8010dbc0:btlevtcmd_SetPartsDefenceTable
+8010dc44:btlevtcmd_ChangeKind
+8010dcb0:btlevtcmd_CheckCommandUnit
+8010dd40:btlevtcmd_SetRegistStatus
+8010ddac:btlevtcmd_CheckToken
+8010de30:btlevtcmd_OffToken
+8010de94:btlevtcmd_OnToken
+8010def8:btlevtcmd_SetPartsBlur
+801e008:btlevtcmd_OffPartsCounterAttribute
+8010e08c:btlevtcmd_OnPartsCounterAttribute
+8010e110:btlevtcmd_CheckPartsCounterAttribute
+8010e1b8:btlevtcmd_OffPartsAttribute
+8010e23c:btlevtcmd_OnPartsAttribute
+8010e2c0:btlevtcmd_CheckPartsAttribute
+8010e368:btlevtcmd_OffAttribute
+8010e3cc:btlevtcmd_OnAttribute
+8010e430:btlevtcmd_CheckAttribute
+8010e4bc:btlevtcmd_ResetFaceDirection
+8010e52c:btlevtcmd_ChangePartsFaceDirection
+8010e5a8:btlevtcmd_ChangeFaceDirection
+8010e614:btlevtcmd_GetFaceDirection
+8010e684:btlevtcmd_CalculateFaceDirection
+8010e99c:btlevtcmd_GetPartyTechLv
+8010ea34:btlevtcmd_GetUnitId
+8010ead8:btlevtcmd_GetBodyId
+8010eb4c:btlevtcmd_GetPartyId
+8010ec24:btlevtcmd_GetMarioId
+8010ecf4:btlevtcmd_GetPartnerId
+8010ed8c:btlevtcmd_GetUnitKind
+8010edf8:btlevtcmd_GetProtectId
+8010ee64:btlevtcmd_GetFriendBelong
+8010eed4:btlevtcmd_GetEnemyBelong
+8010ef44:btlevtcmd_CheckSpace
+8010f0e8:btlevtcmd_CheckDamagePattern
+8010f174:btlevtcmd_RunHitEventDirect
+8010f200:btlevtcmd_StartAvoid
+8010f2e8:btlevtcmd_CheckDamageCode
+8010f374:btlevtcmd_GetDamageCode
+8010f3e4:btlevtcmd_GetTotalDamage
+8010f458:btlevtcmd_GetDamage
+8010f4cc:btlevtcmd_SetPartsWork
+8010f568:btlevtcmd_GetPartsWork
+8010f604:btlevtcmd_SetUnitWorkFloat
+8010f690:btlevtcmd_GetUnitWorkFloat
+8010f718:btlevtcmd_AddUnitWork
+8010f7a4:btlevtcmd_SetUnitWork
+8010f828:btlevtcmd_GetUnitWork
+8010f8ac:btlevtcmd_SetOverTurnCount
+8010f918:btlevtcmd_GetOverTurnCount
+8010f988:btlevtcmd_RecoverFp
+8010fa1c:btlevtcmd_RecoverHp
+8010faf0:btlevtcmd_GetHpDamageCount
+8010fb68:btlevtcmd_GetFpDamage
+8010fbe4:btlevtcmd_GetHpDamage
+8010fc60:btlevtcmd_GetDamagePartsId
+8010fce0:btlevtcmd_SetMaxMoveCount
+8010fd78:btlevtcmd_SetSwallowAttribute
+8010fdf0:btlevtcmd_SetSwallowParam
+8010fe64:btlevtcmd_SetMaxFp
+8010feec:btlevtcmd_SetFp
+8010ff74:btlevtcmd_SetHp
+8011004c:btlevtcmd_GetMaxFp
+801100cc:btlevtcmd_GetMaxHp
+80110144:btlevtcmd_GetFp
+801101c4:btlevtcmd_GetHp
+8011023c:btlevtcmd_AddPartsScale
+8011030c:btlevtcmd_SetPartsScale
+801103dc:btlevtcmd_AddScale
+8011049c:btlevtcmd_SetScale
+8011055c:btlevtcmd_GetScale
+80110634:btlevtcmd_SetPartsBaseScale
+80110704:btlevtcmd_SetBaseScale
+801107c8:btlevtcmd_SetPossessionItemOffset
+801108ec:btlevtcmd_SetCutHeight
+80110978:btlevtcmd_SetCutWidth
+80110a04:btlevtcmd_SetKissHitOffset
+80110b28:btlevtcmd_SetBintaHitOffset
+80110c4c:btlevtcmd_SetCutBaseOffset
+80110d70:btlevtcmd_SetRotateOffsetFromCenterOffset
+80110dd4:btlevtcmd_AddPartsRotateOffset
+80110eb8:btlevtcmd_SetPartsRotateOffset
+80110f9c:btlevtcmd_SetRotateOffset
+801110c4:btlevtcmd_SetPartsBaseRotate
+801111e4:btlevtcmd_SetBaseRotate
+80111358:btlevtcmd_AddPartsRotate
+8011143c:btlevtcmd_SetPartsRotate
+80111520:btlevtcmd_GetPartsRotate
+801115f8:btlevtcmd_AddRotate
+80111720:btlevtcmd_SetRotate
+80111894:btlevtcmd_GetRotate
+8011197c:btlevtcmd_SetRGB
+80111a18:btlevtcmd_GetRGB
+80111ab8:btlevtcmd_SetAlpha
+80111b2c:btlevtcmd_GetHpGaugeOffset
+80111bc4:btlevtcmd_SetHpGaugeOffset
+80111c5c:btlevtcmd_SetStatusIconOffset
+80111cf4:btlevtcmd_GetStatusMg
+80111d60:btlevtcmd_SetHeight
+80111dd0:btlevtcmd_GetHeight
+80111e40:btlevtcmd_GetWidth
+80111eb0:btlevtcmd_SetHitCursorOffset
+80111fac:btlevtcmd_SetHitOffset
+801120a8:btlevtcmd_GetHitPos
+801121c4:btlevtcmd_SetPartsHomePos
+801122a8:btlevtcmd_AddHomePos
+801123d0:btlevtcmd_SetHomePos
+801124f8:btlevtcmd_GetHomePos
+801125bc:btlevtcmd_SetTogeOffset
+801126f0:btlevtcmd_AddPartsDispOffset
+80112834:btlevtcmd_SetPartsDispOffset
+80112978:btlevtcmd_SetDispOffset
+80112aa0:btlevtcmd_AddPartsPos
+80112bf8:btlevtcmd_SetPartsPos
+80112d98:btlevtcmd_GetPartsPos
+80112ea4:btlevtcmd_AddPos
+80112fcc:btlevtcmd_SetPos
+80113140:btlevtcmd_ChangeParty
+8011319c:btlevtcmd_ReplaceParts
+80113304:btlevtcmd_KillUnit
+801133bc:btlevtcmd_SpawnUnit
+80113430:btlevtcmd_DrawLots
+8011350c:btlevtcmd_GetRandomValue
+8011355c:btlevtcmd_GetPosFloat
+80113620:btlevtcmd_GetPos
+80113708:btlevtcmd_CheckPhase
+80113778:btlevtcmd_reset_move_color_lv_all
+801137a0:btlevtcmd_reset_turn
+801137b8:btlevtcmd_get_turn
+801137ec:btlevtcmd_onoff_battleflag
+8011384c:btlevtcmd_check_battleflag
+8011389c:btlevtcmd_WaitEventEnd
+
+// battle_event_default.o
+// .text
+801138d8:_get_flower_suitoru_point
+80113950:_get_heart_suitoru_point
+// .data
+8034f2e4:btldefaultevt_SuitoruBadgeEffect
+
+// battle_event_subset.o
+// .text
+// 80113d4c:_binta_effect
+// .data
+803537c4:unk_evt_803537c4
+
+// battle_information.o
+801141bc:BattleInformationSetDropMaterial
+80114500:BattleInformationGetResult
+80114508:BattleInformationSetResult
+80114510:BattleInfomationSetBattleSetupInfo
+80114518:BattleInformationInit
+80114588:BattleInformationSetFirstAttack
+80114590:BattleInformationSetParty
+80114598:BattleInformationSetMode
+
+// battle_mario.o
+// .text
+801145a0:_paper_light_off
+80114614:_battle_majinai_effect
+801146c4:_majinai_powerup_check
+80114744:_fire_wave
+8011489c:_mario_fire_ball_controll
+8011497c:_kaiten_hammer_acrobat_rotate
+80114b54:_hammer_star_effect
+80114d48:mario_get_renzoku_count_max
+80114e50:_record_renzoku_count
+80114ec4:_tatsumaki_effect
+801152a0:_wait_jyabara_hit_iron_frame
+80115388:_bgset_iron_frame_check
+801153d8:_jump_star_effect
+80115588:_whirlwind_effect
+80115648:_get_mario_hammer_lv
+// .data
+803538a8:marioDefaultWeapon_Jump
+80353968:marioWeapon_KururinJump
+80353a28:marioWeapon_KururinJump2
+80353ae8:marioWeapon_JyabaraJump
+80353ba8:marioWeapon_JyabaraJumpFailed
+80353c68:marioDefaultWeapon_FirstAttackKaitenHammer
+80353d28:marioDefaultWeapon_FirstAttackUltraHammer
+80353de8:marioDefaultWeapon_Hammer
+80353ea8:marioWeapon_KaitenHammer
+80353f68:marioWeapon_KaitenHammerInvolved
+80354028:marioWeapon_UltraHammer
+803540e8:marioWeapon_UltraHammerInvolved
+803541a8:marioWeapon_UltraHammerFinish
+80354268:badgeWeapon_TugitugiJump
+80354328:badgeWeapon_GatsunJump
+803543e8:badgeWeapon_DokanJump
+803544a8:badgeWeapon_RenzokuJump
+80354568:badgeWeapon_TatsumakiJump
+80354628:badgeWeapon_TatsumakiJumpInvolved
+803546e8:badgeWeapon_MiniminiFumi
+803547a8:badgeWeapon_NemuraseFumi
+80354868:badgeWeapon_FunyafunyaJump
+80354928:badgeWeapon_GatsunHammer
+803549e8:badgeWeapon_DokanHammer
+80354aa8:badgeWeapon_JishinHammer
+80354b68:badgeWeapon_UltraJishinHammer
+80354c28:badgeWeapon_HammerNageru
+80354ce8:badgeWeapon_TsuranukiNaguri
+80354da8:badgeWeapon_ConfuseHammer
+80354e68:badgeWeapon_FireNaguri
+80354f28:badgeWeapon_FireNaguriFailed
+80354fe8:badgeWeapon_IceNaguri
+803550a8:badgeWeapon_Charge
+80355168:badgeWeapon_ChargeP
+80355228:badgeWeapon_SuperCharge
+803552e8:badgeWeapon_SuperChargeP
+803553a8:badgeWeapon_2KaiItem
+80355468:badgeWeapon_3KaiItem
+80355528:badgeWeapon_DefenceCommand
+803555e8:badgeWeapon_DefenceCommandP
+803556a8:marioWeapon_BakuGame
+80355768:marioWeapon_Scissor
+80355828:marioWeapon_ZubaStar
+803558e8:marioWeapon_Genki0
+803559a8:marioWeapon_Genki1
+80355a68:marioWeapon_Deka
+80355b28:marioWeapon_Muki
+80355be8:marioWeapon_Suki
+80355ca8:superActionTable
+80355cf0:marioAttackEvent_NormalJump
+80356bfc:marioAttackEvent_KururinJump
+80357ee4:marioAttackEvent_JyabaraJump
+80359964:marioAttackEvent_GatsuDokaJump
+80416bd8:marioAttackEvent_GatsunJump
+80416bf4:marioAttackEvent_DokanJump
+8035a35c:marioAttackEvent_TatsumakiJump
+80416c10:marioAttackEvent_MiniminiFumi
+80416c20:marioAttackEvent_NemuraseFumi
+80416c30:marioAttackEvent_FunyafunyaJump
+8035bd98:marioAttackEvent_RenzokuJump
+8035cab8:marioAttackEvent_TugiTugiJump
+80416c40:marioAttackEvent_NormalHammer
+80416c5c:marioAttackEvent_GatsunHammer
+80416c78:marioAttackEvent_IceNaguri
+80416c94:marioAttackEvent_TsuranukiHammer
+8035d6d4:marioAttackEvent_NormalHammer_Core
+8035eba8:marioAttackEvent_KaitenHammer
+8035fc38:marioAttackEvent_FirstAttackKaitenHammer
+8035fc84:marioAttackEvent_JishinHammer
+803609b8:marioAttackEvent_UltraJishinHammer
+8036141c:marioAttackEvent_HammerRotate
+80361480:marioAttackEvent_HammerNageru
+80361ba4:marioAttackEvent_HammerNageru_object
+80361f80:marioAttackEvent_FireNaguri
+80362a78:marioAttackEvent_FireNaguri_object
+80363050:_NormalCharge_core
+80416cb0:marioAttackEvent_NormalCharge
+80416ccc:marioAttackEvent_NormalChargeP
+803631ec:_SuperCharge_core
+80416ce8:marioAttackEvent_SuperCharge
+80416d04:marioAttackEvent_SuperChargeP
+80363388:marioAttackEvent_MajinaiPowerUpCheck
+80363414:marioAttackEvent_MajinaiJump
+803634c0:_MajinaiPoseReset
+803634f8:marioAttackEvent_MajinaiDefenceUp
+8036356c:marioAttackEvent_MajinaiExpUp
+
+// battle_menu_disp.o
+80115b30:DrawOperationWin
+80115dac:DrawWeaponWin
+
+// battle_seq.o
+8011aa34:BattleCheckConcluded
+8011c350:_rule_disp
+8011edb8:_GetFirstAttackWeapon
+
+// battle_seq_command.o
+// .text
+8011f29c:_check_weapon_type_attack
+8011f488:_get_msg
+8011f524:BattleCommandAttackAudienceCheck
+8011f5f0:_commandRestoreRec
+8011f62c:BattleSetConfuseAct
+8011fc3c:BattleDrawEnemyHPBar
+8011fde0:BattleDrawEnemyHP
+80120024:_check_present_item
+8012021c:BattleGetSelectWeapon
+80120268:_btlcmd_SetAttackEvent
+8012081c:BattleCommandDisplay_AllEnd
+80120834:BattleCommandDisplay_ProtectPartnerSelectMenuEnd
+80120844:BattleCommandDisplay_ProtectPartnerSelectMenuDisp
+80120990:BattleCommandDisplay_ProtectPartnerSelectMenuSetup
+801209e8:BattleCommandDisplay_TargetSelectMenuEnd
+80120a44:BattleCommandDisplay_TargetSelectMenuDisp
+80120fe4:BattleCommandDisplay_TargetSelectMenuSetup
+8012103c:BattleCommandDisplay_ChangePartySelectMenuEnd
+80121074:BattleCommandDisplay_ChangePartySelectMenuDisp
+80121098:BattleCommandDisplay_ChangePartySelectMenuMain
+801212bc:BattleCommandDisplay_ChangePartySelectMenuSetup
+801212f8:BattleCommandDisplay_MultiItemMenuEnd
+80121330:BattleCommandDisplay_MultiItemMenuDisp
+80121354:BattleCommandDisplay_MultiItemMenuMain
+801215b8:BattleCommandDisplay_MultiItemMenuSetup
+80121600:BattleCommandDisplay_OperationMenuEnd
+80121638:BattleCommandDisplay_OperationMenuDisp
+8012165c:BattleCommandDisplay_OperationMenuMain
+80121928:BattleCommandDisplay_OperationMenuSetup
+80121974:BattleCommandDisplay_WeaponMultiItemCancelCheckDisp
+80121af4:BattleCommandDisplay_WeaponMultiItemCancelCheckMain
+80121c98:BattleCommandDisplay_WeaponMultiItemCancelCheckSetup
+80121cb0:BattleCommandDisplay_WeaponSelectMenuEnd
+80121ce8:BattleCommandDisplay_WeaponSelectMenuDisp
+80121d0c:BattleCommandDisplay_WeaponSelectMenuMain
+80122068:BattleCommandDisplay_WeaponSelectMenuSetup
+801220d4:BattleCommandDisplay_ActMenuEnd
+8012210c:BattleCommandDisplay_ActMenuDisp
+8012214c:BattleCommandCheckChangePositionEnable
+8012230c:BattleCommandDisplay_ActMenuMain
+80122794:BattleCommandDisplay_ActMenuSetup
+80122860:_cursor_init
+80122870:BattleCommandDisplay
+801229d8:BattleCommandInput
+80123210:_btlcmd_SelectWeaponDecide
+80123360:_btlcmd_MakePartyTable
+80123524:_battleGetPartyIcon
+801235e8:_btlcmd_MakeMultiItemTable
+801238b8:_btlcmd_MakeOperationTable
+80123d00:_btlcmd_CheckWeaponTargetNum
+80123db0:_btlcmd_UpdateSelectWeaponTable
+80123ec0:_btlcmd_MakeSelectWeaponTable
+80124c10:_getHammerIconId
+80124c64:_getJumpIconId
+80124cb8:_btlcmd_GetCursorPtr
+80124dc8:_btlcmd_MakeActClassTable
+80125380:BattleCommandInit
+// .data
+80363e60:defaultWeapon_Dummy_NoItem
+
+// battle_sub.o
+801253ec:BattleTransID
+
+// battle_unit.o
+80126840:BtlUnit_PayWeaponCost
+80126968:BtlUnit_GetWeaponCost
+80126c10:BtlUnit_SetFp
+80126c64:BtlUnit_GetFp
+80126fe8:BtlUnit_ReviseHpFp
+8012733c:BtlUnit_GetData
+801277ac:BtlUnit_OffUnitFlag
+801277bc:BtlUnit_OnUnitFlag
+801277cc:BtlUnit_CheckUnitFlag
+80127814:BtlUnit_CheckStatus
+80128fe0:BtlUnit_Entry
+
+// battle_monosiri.o
+8012ed2c:battleSetUnitMonosiriFlag
+8012ee3c:battleCheckUnitMonosiriFlag
+8012ef20:battleGetUnitMonosiriPtr
+
+// battle_camera.o
+8012b06c:evt_btl_camera_wait_move_end
+8012b0a8:evt_btl_camera_off_posoffset_manual
+// 8012b0d8:btl_camera_off_posoffset_manual
+8012b108:evt_btl_camera_set_posoffset
+// 8012b198:btl_camera_set_posoffset
+8012b1c4:evt_btl_camera_nomove_z_onoff
+// 8012b21c:btl_camera_nomove_z_onoff
+8012b254:evt_btl_camera_nomove_y_onoff
+// 8012b2ac:btl_camera_nomove_y_onoff
+8012b2e4:evt_btl_camera_nomove_x_onoff
+// 8012b33c:btl_camera_nomove_x_onoff
+8012b374:evt_btl_camera_noshake
+// 8012b3a4:btl_camera_noshake
+8012b3d0:evt_btl_camera_shake_h
+// 8012b4c0:btl_camera_shake_h
+8012b520:evt_btl_camera_shake_w
+// 8012b610:btl_camera_shake_w
+8012b670:evt_btl_camera_set_moveto
+// 8012b760:btl_camera_set_moveto
+8012b874:evt_btl_camera_set_zoomSpeedLv
+8012b8cc:evt_btl_camera_set_moveSpeedLv
+// 8012b924:btl_camera_set_zoomSpeedLv
+// 8012b958:btl_camera_set_moveSpeedLv
+8012b994:evt_btl_camera_add_zoom
+8012ba14:evt_btl_camera_set_zoom
+// 8012ba94:btl_camera_add_zoom
+// 8012bab4:btl_camera_set_zoom
+8012bacc:evt_btl_camera_set_homing_unit_audience
+8012bc70:evt_btl_camera_set_homing_unitparts
+8012be38:evt_btl_camera_set_homing_unit
+8012bfd0:evt_btl_camera_set_mode
+// 8012c028:btl_camera_set_mode
+8012c0ac:evt_btl_camera_set_prilimit
+// 8012c0dc:btl_camera_set_prilimit
+// 8012c0e8:battleCameraGetPosMoveSpeed
+// 8012c128:battleCameraMoveTo
+// 8012c8b0:battleCameraMain
+// 8012dee8:battleCameraInit
+
+// evt_fade.o
+80135b44:evt_fade_reset
+80135b74:evt_fade_softfocus_onoff
+80135bb4:evt_fade_tec_onoff
+80135c38:evt_fade_set_mapchange_type
+80135d3c:evt_fade_set_anim_virtual_pos
+80135dc0:evt_fade_set_anim_ofs_pos
+80135e28:evt_fade_set_spot_pos
+80135fa4:evt_fade_end_wait
+80135fdc:evt_fade_entry
+80136080:evt_fade_out
+801360ec:evt_fade_in
+
+// evt_audience.o
+80139874:evt_audience_joy_ending
+80139898:evt_audience_acrobat_notry
+801398bc:evt_audience_num_updown_in_event
+801398f8:evt_audience_sound_cheer
+80139958:evt_audience_abnormal_natural_all
+80139a2c:evt_audience_reflesh_natural_all
+80139af4:evt_audience_ap_recovery
+80139afc:evt_audience_delete
+80139b2c:evt_audience_entry
+80139ba4:evt_audience_set_animpose
+80139c20:evt_audience_jump_position_gravity
+80139e30:evt_audience_jump_position_firstsp
+8013a048:evt_audience_move_position_speed
+8013a284:evt_audience_move_position_frame
+8013a474:evt_audience_set_rotate_offset
+8013a514:evt_audience_set_rotate
+8013a5b4:evt_audience_get_position
+8013a634:evt_audience_set_position
+8013a6d4:evt_audience_flag_off
+8013a744:evt_audience_flag_on
+8013a7b4:evt_audience_flag_check
+8013a850:evt_audience_base_flag_on
+
+// statuswindow.o
+// .text
+8013c110:statusWinForceUpdate
+8013cb24:statusWinDisp
+8013d440:gaugeDisp
+// .data
+8041768c:gauge_back
+8041769c:gauge_wakka
+8041ebec:g_StatusWindowWork
+
+// mario_party.o
+801410e8:marioGetParty
+
+// battle_stage_object.o
+80148374:_nozzle_type_init
+
+// evt_snd.o
+80151d2c:evt_snd_sfx_all_stop
+80151d50:evt_snd_set_rev_mode
+80151d7c:evt_snd_env_lpf
+80151dc0:evt_snd_envoff_f
+80151e0c:evt_snd_envoff
+80151e38:evt_snd_envon_f
+80151e94:evt_snd_envon
+80151ec4:evt_snd_sfx_dist
+80151f20:evt_snd_sfx_pos
+80151fa8:evt_snd_sfx_vol
+80152008:evt_snd_sfx_pit
+80152068:evt_snd_sfxchk
+801520bc:evt_snd_sfxoff
+801520ec:evt_snd_sfxon_3d_ex
+801521dc:evt_snd_sfxon_3d
+80152290:evt_snd_sfxon_
+801522f4:evt_snd_sfxon__
+8015235c:evt_snd_sfxon
+801523c0:evt_snd_bgm_scope
+80152408:evt_snd_bgm_freq
+80152450:evt_snd_bgmoff_f
+8015249c:evt_snd_bgmoff
+801524c8:unk_801524c8
+80152548:evt_snd_bgmon_f
+801525a4:evt_snd_bgmon
+
+// win_root.o
+// .text
+// 80152f00:winMailDisp
+// .data
+80377218:enemy_monoshiri_sort_table
+
+// win_party.o
+// .text
+// 80167848:winPartyInit
+// .data
+803773d8:g_winPartyDt
+
+// evt_win.o
+80177b28:unitwin_get_work_ptr
+
+// win_main.o
+8017d28c:winFontSetEdge
+8017d52c:winFontSetPitch
+8017d6ac:winFontSet
+8017ebd4:winGetPtr
+
+// unit_party_clauda.o
+// .text
+8017f5d8:_make_kumoguard_weapon
+8017f670:_get_clauda_kiss_hit_position
+8017f804:_make_kiss_weapon
+8017f8ac:_make_breath_weapon
+8017f944:_clauda_breath_effect_fire
+8017fab0:_clauda_breath_effect_ready
+8017fbe8:_check_blow_rate
+8017fc68:__makeTechMenuFunc_clauda
+8017ff44:_clauda_make_extra_work_area
+// .data
+80378da0:partyWeapon_ClaudaNormalAttack
+80378e60:partyWeapon_ClaudaBreathAttack
+80378f20:partyWeapon_ClaudaLipLockAttack
+80378fe0:partyWeapon_ClaudaKumogakureAttack
+80418108:defence
+80418110:defence_attr
+80418118:regist
+803790a0:pose_table_clauda_stay
+80379168:data_table
+803791a8:unitpartsdata_Party_Clauda
+803791f4:unitdata_Party_Clauda
+803792b8:battle_entry_event
+803793a4:init_event
+80379494:damage_event
+80418130:attack_event
+80418138:wait_event
+803794d4:partyClaudaAttack_NormalAttack
+80379fc4:partyClaudaAttack_BreathAttack
+8037a7e4:partyClaudaAttack_LipLockAttack
+8037b590:partyClaudaAttack_KumoGuard
+8037ba18:clauda_appeal_event
+80418150:party_win_reaction
+8037bb34:attack_audience_event
+8037bb70:attack_bad_audience_event
+8037c0e0:attack_good_audience_event
+
+// unit_party_yoshi.o
+// .text
+8017ff98:_btlYoshiDisp
+80180008:_gundan_yoshi_run_effect
+801804cc:_wait_yoshig_complete
+80180534:_wait_yoshig_run
+801805b8:_check_swallow_attribute
+8018065c:_get_swallow_param
+801806e0:_get_nomikomi_hit_position
+8018081c:_yoshi_slide_move_sound
+80180870:btl_yoshi_yoroyoro_jump_move
+80180c84:btl_yoshi_yoroyoro_jump_calc_param
+80180f34:__makeTechMenuFunc_yoshi
+80181210:yoshi_original_color_anim_set
+// .data
+80418180:defence
+80418188:defence_attr
+80418190:regist
+8037c480:pose_table_yoshi_stay
+804181a8:pose_table_egg_g
+804181c8:pose_table_egg_y
+804181e8:pose_table_egg_p
+8037c548:data_table
+8037c588:unitpartsdata_Party_Yoshi
+8037c79c:unitdata_Party_Yoshi
+8037c860:battle_entry_event
+8037c94c:init_event
+8037ca24:damage_event
+80418208:attack_event
+80418210:wait_event
+80418228:_yoshig_tpl_no_tbl
+8037ca64:partyWeapon_YoshiNormalAttack
+8037cb24:partyWeapon_YoshiNomikomi_Shot
+8037cbe4:partyWeapon_YoshiNomikomi_Spew
+8037cca4:partyWeapon_YoshiNomikomi_Dmg0
+8037cd64:partyWeapon_YoshiNomikomi_Fire
+8037ce24:partyWeapon_YoshiNomikomi_Involved
+8037cee4:partyWeapon_YoshiEggAttack_Minimini
+8037cfa4:partyWeapon_YoshiCallGuard
+8037d064:posesound_normal_attack
+8037d29c:partyYoshiAttack_NormalAttack
+8037e194:partyYoshiAttack_Nomikomi
+8037f134:partyYoshiAttack_EggAttack
+803804fc:_egg_attack_event
+80380808:partyYoshiAttack_CallGuard
+803810ac:yoshi_appeal_event
+80381148:party_win_reaction
+803811ac:attack_audience_event
+
+// unit_party_chuchurina.o
+// .text
+80181370:mono_off
+801813f4:mono_on
+80181430:mono_capture_event
+80181498:mono_main
+801814ec:mono_disp
+80181814:mono_capture
+801818c4:_chuchu_item_steal
+80181b24:_get_itemsteal_param
+80181bdc:_make_madowase_weapon
+80181c74:_get_binta_hit_position
+80181db0:__makeTechMenuFunc_chuchurina
+8018208c:_chuchu_make_extra_work_area
+// .data
+80418230:defence
+80418238:defence_attr
+80418240:regist
+80381690:pose_table_chuchurina_stay
+80381750:data_table
+80381790:unitpartsdata_Party_Chuchurina
+803818c0:unitdata_Party_Chuchurina
+80381984:battle_entry_event
+80381a70:init_event
+80381b30:damage_event
+80418258:attack_event
+80418260:wait_event
+80381b70:partyWeapon_ChuchurinaNormalAttackLeft
+80381c30:partyWeapon_ChuchurinaNormalAttackRight
+80381cf0:partyWeapon_ChuchurinaNormalAttackLeftLast
+80381db0:partyWeapon_ChuchurinaNormalAttackRightLast
+80381e70:partyWeapon_ChuchurinaMadowaseAttack
+80381f30:partyWeapon_ChuchurinaItemSteal
+80381ff0:partyWeapon_ChuchurinaKiss
+803820b0:partyChuchurinaAttack_NormalAttack
+80418278:main_evt
+80383988:partyChuchurinaAttack_MadowaseAttack
+80385918:partyChuchurinaAttack_ItemSteal
+8038681c:partyChuchurinaAttack_Kiss
+803870fc:chuchurina_appeal_event
+80387254:party_win_reaction
+8038729c:attack_audience_event
+
+// unit_party_sanders.o
+// .text
+801820e0:_judge_on_stage
+801821b0:_shot_move
+8018242c:_make_counterset_weapon
+801824c4:_get_bomb_hit_position
+80182600:__makeTechMenuFunc_sanders
+801828dc:_sanders_make_extra_work_area
+// .data
+80418288:defence
+80418290:defence_attr
+80418298:regist
+80387610:pose_table_sanders_stay
+803876d8:pose_table_counter_sanders
+80387778:data_table
+803877c0:unitpartsdata_Party_Sanders
+8038780c:unitdata_Party_Sanders
+803878d0:battle_entry_event
+803879bc:init_event
+80387ab8:damage_event
+804182b0:attack_event
+80387af8:wait_event
+80387b60:partyWeapon_SandersFirstAttack
+80387c20:partyWeapon_SandersNormalAttack
+80387ce0:partyWeapon_SandersTimeBombSet
+80387da0:partyWeapon_SandersCounterSet
+80387e60:partyWeapon_SandersSuperBombAttack
+80387f20:partySandersAttack_FirstAttack
+80388424:partySandersAttack_NormalAttack
+8038934c:partySandersAttack_SuperBombAttack
+8038a4c4:partySandersAttack_CounterSet
+804182b8:entry_bomzou
+8038a88c:partySandersAttack_TimeBombSet
+8038adb8:_shot_bomb_event
+8038b024:sanders_appeal_event
+804182e8:party_win_reaction
+8038b208:attack_audience_event
+8038b678:UNKNOWN_MS_z0x8038b678
+
+// unit_party_vivian.o
+// .text
+80182930:_disp_heart_entry_stop_check
+80182960:_disp_heart_entry_stop
+80182998:_disp_heart
+80182b00:_disp_heart_entry
+80182c2c:_make_kagenuke_weapon
+80182cc4:unk_JP_US_EU_52_80182cc4
+80182f24:_get_move_frame
+8018303c:__makeTechMenuFunc_vivian
+80183318:_vivian_make_extra_work_area
+8018336c:battle_evt_majo_disp_off
+80183644:battle_evt_majo_disp_on
+// .data
+80418310:defence
+80418318:defence_attr
+80418320:regist
+8038b6f0:pose_table_vivian_stay
+8038b7b0:data_table
+8038b850:unitpartsdata_Party_Vivian
+8038b89c:unitdata_Party_Vivian
+8038b960:battle_entry_event
+8038ba4c:init_event
+8038bb5c:damage_event
+8038bb9c:vivian_hide_event
+80418338:attack_event
+80418340:wait_event
+8038bee0:partyWeapon_VivianNormalAttack
+8038bfa0:partyWeapon_VivianShadowGuard
+8038c060:partyWeapon_VivianMagicalPowder
+8038c120:partyWeapon_VivianCharmKissAttack
+8038c1e0:partyVivianAttack_NormalAttack
+8038caf4:partyVivianAttack_ShadowGuard
+8038d1ac:partyVivianAttack_MagicalPowder
+8038d8ac:partyVivianAttack_CharmKissAttack
+8038dfec:vivian_shadow_tail_event
+8038e124:vivian_counter_damage_event
+8038e3e8:vivian_appeal_event
+8038e528:party_win_reaction
+8038e570:attack_audience_event
+
+// unit_party_nokotarou.o
+// .text
+80188d44:_check_guard_koura
+80188e04:_tsuranuki_effect_control
+80188fa8:_color_lv_set
+80189044:_check_mario_move_count
+801890a0:__makeTechMenuFunc_nokotarou
+// .data
+804183a8:defence
+804183b0:defence_attr
+804183b8:defence_turn
+804183c0:regist
+8038ed58:pose_table_nokotarou_stay
+8038ee28:pose_table_nokotarou_turn
+8038ee88:data_table
+8038eee8:unitpartsdata_Party_Nokotarou
+8038ef34:unitdata_Party_Nokotarou
+8038eff8:battle_entry_event
+8038f0e4:init_event
+804183d8:damage_event
+8038f21c:change_party_spawn_init_event
+8038f28c:dmg_turn_event
+8038f390:wakeup_event
+80418400:attack_event
+80418408:wait_event
+8038f49c:partyWeapon_NokotarouFirstAttack
+8038f55c:partyWeapon_NokotarouKouraAttack
+8038f61c:partyWeapon_NokotarouSyubibinKoura
+8038f6dc:partyWeapon_NokotarouKouraGuard
+8038f79c:partyWeapon_NokotarouTsuranukiKoura
+8038f85c:_change_koura_pose
+8038f8e4:_change_koura_pose_fast
+8038fa1c:_restore_koura_pose
+8038fad8:_koura_rotate_start
+8038fdf4:_koura_rotate_stop
+8038fe28:partyNokotarouAttack_FirstAttack
+803901d8:partyNokotarouAttack_NormalAttack
+80390e68:partyNokotarouAttack_SyubibinKoura
+80418420:entry_koura
+80391960:partyNokotarouAttack_KouraGuard
+80392678:partyNokotarouAttack_TsuranukiKoura
+80393530:nokotarou_appeal_event
+803935b8:party_win_reaction
+803935f8:attack_audience_event
+80393a14:UNKNOWN_MS_z0x80393a14
+
+// unit_party_christine.o
+// .text
+80189374:_set_hustle
+8018943c:_dictionary
+8018956c:_monosiri_flag_on
+801895b0:btlevtcmd_get_monosiri_msg_no
+80189634:__makeTechMenuFunc_christine
+80189910:krb_get_dir
+// .data
+80418450:defence
+80418458:defence_attr
+80418460:regist
+80393a98:pose_table_christine_stay
+80393b60:data_table
+80393ba0:unitpartsdata_Party_Christine
+80393bec:unitdata_Party_Christine
+80393cb0:battle_entry_event
+80393d9c:init_event
+80393e68:damage_event
+80418478:attack_event
+80418480:wait_event
+80393ea8:partyWeapon_ChristineNormalAttack
+80393f68:partyWeapon_ChristineMonosiri
+80394028:partyWeapon_ChristineRenzokuAttack
+803940e8:partyWeapon_ChristineKiss
+803941a8:partyChristineAttack_NormalAttack
+80394e88:christine_dictionary_event
+80394ef0:partyChristineAttack_Monosiri
+80395524:partyChristineAttack_RenzokuAttack
+803965fc:partyChristineAttack_Kiss
+80396e84:christine_appeal_event
+80396fa0:party_win_reaction
+80396fd8:attack_audience_event
+
+// battle_weapon_power.o
+80189a28:weaponGetPowerTatsumaki
+80189a74:weaponGetFPPowerFPHalf
+80189aa0:weaponGetPowerHPHalf2
+80189ab0:weaponGetPowerHPHalf
+80189adc:weaponGetACOutputParam
+80189b04:weaponGetPowerFromGulliblePartyAttackLv
+80189b50:weaponGetPowerFromPartyAttackLv
+80189bb0:weaponGetPowerOverlapHammer1
+80189bf4:weaponGetPowerOverlapJump1
+80189c38:weaponGetPowerFromMarioHammerLv
+80189cb0:weaponGetPowerFromMarioJumpLv
+80189d28:weaponGetFPPowerDefault
+80189d30:weaponGetPowerDefault
+
+// filemgr.o
+8018a0e8:fileAsyncf
+8018a260:fileFree
+8018a61c:fileAllocf
+
+// battle_actrecord.o
+8018ef8c:BtlActRec_JudgeRuleKeep
+8018f77c:BtlActRec_JudgeTurnRuleKeep
+8018f96c:BtlActRec_AddPoint
+8018f990:BtlActRec_AddCount
+
+// eff_updown.o
+// .text
+80193ce8:polygon
+// .data
+80418560:icon_id
+
+// evt_env.o
+80199098:evt_env_blur_on
+
+// battle_audience.o
+801a5a0c:BattleAudienceSetThrowItemMax
+
+// battle_icon.o
+801a9888:btlevtcmd_BtlIconJumpPosition
+801a9c60:btlevtcmd_BtlIconSetFallAccel
+801a9cb0:btlevtcmd_BtlIconSetPosition
+801a9d38:btlevtcmd_BtlIconDelete
+801a9d6c:btlevtcmd_BtlIconEntryItemId
+801a9e8c:btlevtcmd_BtlIconEntry
+801a9f9c:BtlIcon_Delete
+801a9fe8:BtlIcon_Entry
+801aa118:BattleIconEnd
+801aa168:BattleIconMain
+801aa228:BattleIconInit
+801aa25c:BtlIconGetPtr
+
+// battle_message.h
+801abc10:btlevtcmd_AnnounceSetParam
+801abc70:_disp
+801abdd0:btlevtcmd_AnnounceMessage
+
+// battle_enemy_item.o
+801f8dd0:_check_status_recover_item
+801f8fa8:_check_status_support_item
+801f9160:_check_status_attack_item
+801f9338:_check_attack_item
+801f9474:_check_fp_recover_item
+801f956c:_check_hp_recover_item
+801f9658:BattleEnemyUseItemCheck
+
+// evt_badgeshop.o
+// .text
+801fad00:badgeShop_init
+// 801fae60:getBadgeBottakuru100TableMaxCount
+// .data
+80419d90:badge_special_table
+80419db8:badge_special_table_stage_1_clear
+80419dc8:badge_special_table_stage_2_clear
+80419dd8:badge_special_table_stage_3_clear
+80419de8:badge_special_table_stage_4_clear
+80419df8:badge_special_table_stage_5_clear
+80419e08:badge_special_table_stage_6_clear
+803ad038:badge_starmaniac_table
+803ad078:badge_bottakuru_table
+80419e18:badge_bottakuru100_table
+80419e34:badge_bteresa_table
+80419e48:badge_bteresa_table_card_special
+80419e5c:badge_bteresa_table_card_silver
+80419e70:badge_bteresa_table_card_gold
+80419e84:badge_bteresa_table_card_platinum
+
+// evt_johoya.o
+801fb068:johoya_init
+
+// evt_window.o
+80209a0c:evt_win_coin_wait
+80209aac:evt_win_coin_off
+80209b5c:evt_win_coin_on
+8020a2c4:evt_win_other_select
+8020a374:evt_win_item_select
+
+// battle_seq_end.o
+// .text
+// 80212740:_get_rank_up_msg
+802166a4:BattleGetRankNameLabel
+// .data
+803afc10:_rank_up_data
+
+
+// evt_yuugijou.o
+80229bcc:yuugijou_init
+
+// sac_bakugame.o
+8022f990:bakuGameDecideWeapon
+
+// sac_zubastar.o
+// .text
+80235c7c:weaponGetPower_ZubaStar
+// .data
+803b5980:weapon_zubastar
+8041db20:nice_event
+803b5a40:marioAttackEvent_ZubaStar
+
+// sac_genki.o
+// .text
+80245a50:get_score
+8024678c:end_genki
+80248738:main_genki
+// .data
+803b68b8:genki_evt_common
+803b6e1c:status_recover_evt
+
+// sac_common.o
+802489c8:sac_enemy_slide_return
+80248d70:sac_wao
+
+// sac_deka.o
+80249048:weaponGetPower_Deka
+
+// sac_suki.o
+8024fa74:sac_suki_set_weapon
+
+// sac_muki.o
+// .text
+8024ee50:main_muki
+// .data
+803b7f80:weapon_muki
+803b8040:marioAttackEvent_Muki
+804285b0:_sac_muki_power_per_arrow
+
+// evt_memcard.o
+// .text 
+8025c0b8:memcard_write
+// 8025c2bc:memcard_create
+8025c454:memcard_code
+// .data
+803b9b38:evt_memcard_nosave
+803b9b84:evt_memcard_check
+803ba08c:evt_memcard_start
+803ba10c:evt_memcard_delete
+803ba24c:evt_memcard_copy
+803ba444:evt_memcard_save
+803bac3c:unk_0x803bac3c
+
+// runtime.c
+802648BC:_savefpr_14
+802648C0:_savefpr_15
+802648C4:_savefpr_16
+802648C8:_savefpr_17
+802648CC:_savefpr_18
+802648D0:_savefpr_19
+802648D4:_savefpr_20
+802648D8:_savefpr_21
+802648DC:_savefpr_22
+802648E0:_savefpr_23
+802648E4:_savefpr_24
+802648E8:_savefpr_25
+802648EC:_savefpr_26
+802648F0:_savefpr_27
+802648F4:_savefpr_28
+802648F8:_savefpr_29
+802648FC:_savefpr_30
+80264900:_savefpr_31
+80264954:_savegpr_14
+80264958:_savegpr_15
+8026495C:_savegpr_16
+80264960:_savegpr_17
+80264964:_savegpr_18
+80264968:_savegpr_19
+8026496C:_savegpr_20
+80264970:_savegpr_21
+80264974:_savegpr_22
+80264978:_savegpr_23
+8026497C:_savegpr_24
+80264980:_savegpr_25
+80264984:_savegpr_26
+80264988:_savegpr_27
+8026498C:_savegpr_28
+80264990:_savegpr_29
+80264994:_savegpr_30
+80264998:_savegpr_31
+
+// printf.c
+8026a0b8:sprintf
+// unused:snprintf
+8026a198:vsprintf
+// unused:vsnprintf
+// unused:vfprintf
+8026a210:vprintf
+// unused:fprintf
+8026a2a8:printf
+8026a390:__StringWrite
+8026a3fc:__FileWrite
+// 8026a454:__pformatter
+// 8026abc8:float2str
+// 8026b2e4:round_decimal
+// 8026b410:double2hex
+// 8026b748:longlong2str
+// 8026ba5c:long2str
+// 8026bcb4:parse_format
+
+// scanf.c
+8026c344:sscanf
+// 8026c408:__StringRead
+// 8026c498:__sformatter
+// 8026ce44:parse_format
+
+// string.c
+8026d38c:strstr
+8026d3f4:strchr
+8026d424:strncmp
+8026d464:strcmp
+8026d58c:strcat
+8026d5b8:strncpy
+8026d5fc:strcpy
+8026d6b4:strlen
+
+// os.a
+// OSAlloc.c
+// text
+// 80296400:DLInsert
+802964ac:OSAllocFromHeap
+802965a8:OSFreeToHeap
+80296624:OSSetCurrentHeap
+80296634:OSInitAlloc
+802966a4:OSCreateHeap
+80296710:OSDestroyHeap
+// data
+8041f070:OSAlloc_HeapArray
+8041f074:OSAlloc_NumHeaps
+
+// OSCache.c
+// 80296A14:DCEnable
+// 80296A28:DCInvalidateRange
+80296A54:DCFlushRange
+// 80296A84:DCStoreRange
+// 80296AB4:DCFlushRangeNoSync
+// 80296AE0:DCStoreRangeNoSync
+// unused:DCZeroRange
+80296B0C:ICInvalidateRange
+// 80296B40:ICFlashInvalidate
+// 80296B50:ICEnable
+// unused:__LCEnable
+// unused:LCEnable
+// 80296B64:LCDisable
+// unused:LCStoreBlocks
+// unused:LCStoreData
+// unused:LCQueueWait
+// 80296B8C:L2GlobalInvalidate
+// 80296C24:DMAErrorHandler
+// 80296D84:__OSCacheInit
+
+// mtx.a mtx.c
+8029dd04:PSMTXIdentity
+8029dd30:PSMTXCopy
+8029dd64:PSMTXConcat
+8029e230:PSMTXTrans
+8029e2b0:PSMTXScale
+
+// os.a OSLink.c
+8029A340:OSNotifyLink
+8029A344:OSNotifyUnlink
+8029A348:Relocate
+8029A604:Link
+8029A8E4:OSLink
+8029A908:Undo
+8029AB40:OSUnlink
+8029AD14:__OSModuleInit
+
+// os.a OSTime.c
+8029d84c:OSGetTime
+8029d864:OSGetTick
+8029d86c:__OSGetSystemTime
+8029d8d0:GetDates
+8029da6c:OSTicksToCalendarTime
+
+// gx.a GXAttr.c
+802b3c08:GXSetVtxDesc
+802b4520:GXClearVtxDesc
+802b4558:GXSetVtxAttrFmt
+802b4db0:GXSetArray
+802b4e04:GXSetTexCoordGen2
+802b5084:GXSetNumTexGens
+
+// gx.a GXLight.c
+802b6d6c:GXSetChanAmbColor
+802b6e54:GXSetChanMatColor
+802b6f3c:GXSetNumChans
+
+// gx.a GXTexture.c
+802b7880:GXLoadTexObj
+
+// gx.a GXTev.c
+802b88d4:GXSetTevOp
+802b89e8:GXSetTevColorOp
+802b8a50:GXSetTevAlphaOp
+802b8e30:GXSetTevOrder
+802b8fcc:GXSetNumTevStages
+
+// gx.a GXPixel.c
+802b8ff4:GXSetFog
+802b932c:GXSetBlendMode
+802b9380:GXSetColorUpdate
+802b93ac:GXSetAlphaUpdate
+802b93d8:GXSetZMode
+802b940c:GXSetZCompLoc
+
+// gx.a GXDisplayList.c
+802b9fa0:GXCallDisplayList
+
+// gx.a GXTransform.c
+802ba2fc:GXLoadPosMtxImm
+
+// si.a
+802bd7b8:SIBusy
+802bd7d8:SIIsChanBusy
+802bd814:CompleteTransfer
+802bdb10:SIInterruptHandler
+802bde54:SIEnablePollingInterrupt
+802bdeec:SIRegisterPollingHandler
+802bdfb8:SIUnregisterPollingHandler
+802be0ac:SIInit
+802be160:__SITransfer
+802be36c:SIGetStatus
+802be3e8:SISetCommand
+802be3fc:SITransferCommands
+802be40c:SISetXY
+802be478:SIEnablePolling
+802be514:SIDisablePolling
+802be580:SIGetResponseRaw
+802be654:SIGetResponse
+802be718:AlarmHandler
+802be7a4:SITransfer
+802be910:GetTypeCallback
+802beba8:SIGetType
+802bed6c:SIGetTypeAsync
+802beea8:SIDecodeType
+802beff4:SIProbe
+802bf018:SISetSamplingRate
+802bf0fc:SIRefreshSamplingRate
+
+// item_data.o
+// .data
+803108a8:itemDataTable
+
+// npc_data.o
+// .data
+803316d0:npcTribe
+80338270:npc_ai_type_table
+80416580:npc_define_territory_type
+
+// battle_item_data.o
+// .data
+80364998:_return_home_event
+80364a48:ItemEvent_Automatic_Target
+80364ae0:ItemEvent_Recovery_Core_Effect
+80364cd4:ItemEvent_Recovery_Core
+80364d2c:ItemEvent_Recovery
+80364f20:ItemEvent_Support_Sub_UseDeclere
+80365078:ItemEvent_GetTarget
+80365188:ItemEvent_Support_Sub_Effect
+803652a4:ItemEvent_Support_NoEffect
+803652f4:ItemEvent_Support_RefreshEffect
+80365c08:ItemEvent_Pow_Block
+80366350:ItemEvent_Fire_Flower_Core
+80366650:ItemEvent_Fire_Flower
+8036678c:ItemEvent_Kaminari_Core
+80366afc:ItemEvent_Kaminari
+80366dc8:ItemEvent_Kirakira_Otoshi_Core
+803674d4:ItemEvent_Kirakira_Otoshi
+80367608:ItemEvent_Koorino_Ibuki
+80367ba0:ItemEvent_Yurayura_Jishin
+803681b8:ItemEvent_Teresano_Fuku
+80368628:ItemEvent_Biribiri_Kinoko_Core
+8036865c:ItemEvent_Biribiri_Kinoko
+80368754:ItemEvent_Teki_Yokeeru_Core
+80368788:ItemEvent_Teki_Yokeeru
+80368940:ItemEvent_Nemure_Yoikoyo
+80368b6c:ItemEvent_Stop_Watch_Core
+80368da8:ItemEvent_Stop_Watch
+80368fc0:ItemEvent_Guruguru_Memawashi
+8036928c:ItemEvent_Suitooru
+803697b0:ItemEvent_Teki_Kyouka
+80369e60:ItemEvent_Jiwajiwa_Kinoko_Core
+80369e94:ItemEvent_Jiwajiwa_Kinoko
+80369f8c:ItemEvent_Jiwajiwa_Syrup_Core
+80369fc0:ItemEvent_Jiwajiwa_Syrup
+8036a0b8:ItemEvent_Irekaeeru
+8036a3ec:ItemEvent_Attiike_Shisshi
+8036a748:ItemEvent_Naniga_Okorukana
+8036acfc:ItemEvent_RecoveryAndStatus
+8036bf14:ItemEvent_ThrowAttack
+8036c8d4:ItemEvent_Poison_Kinoko
+8036caec:ItemEvent_LastDinner
+80416e38:ItemEvent_Kaminari_Dokkan
+80416e54:ItemEvent_Kaminari_Gorogoro
+80416e70:ItemEvent_Madowaseno_Kona
+80416e8c:ItemEvent_Dekadeka_Drink
+80416ea8:ItemEvent_Katikati_Koura
+80416ec4:ItemEvent_Minimini_Kun
+80416ee0:ItemEvent_Funyafunya_Kun
+80416efc:ItemEvent_Sukkiri_Drink
+80416f18:ItemEvent_Shikaeshino_Kona
+80416f34:ItemEvent_Kameno_Noroi
+8036ab44:mystery_item_table
+80365488:ItemWeaponData_CookingItem
+80365548:ItemWeaponData_Kinoko
+80365608:ItemWeaponData_Kinkyuu_Kinoko
+803656c8:ItemWeaponData_Super_Kinoko
+80365788:ItemWeaponData_Ultra_Kinoko
+80365848:ItemWeaponData_Sinabita_Kinoko
+80365908:ItemWeaponData_Honey_Syrup
+803659c8:ItemWeaponData_Maple_Syrup
+80365a88:ItemWeaponData_Royal_Jelly
+80365b48:ItemWeaponData_Tankobu
+80366290:ItemWeaponData_Pow_Block
+803666cc:ItemWeaponData_Fire_Flower
+80366c48:ItemWeaponData_Kaminari_Dokkan
+80366d08:ItemWeaponData_Kaminari_Gorogoro
+80367548:ItemWeaponData_Kirakira_Otoshi
+80367ae0:ItemWeaponData_Koorino_Ibuki
+803680f8:ItemWeaponData_Yurayura_Jishin
+80368568:ItemWeaponData_Teresano_Fuku
+80368694:ItemWeaponData_Biribiri_Kinoko
+803687c0:ItemWeaponData_Teki_Yokeeru
+80368880:ItemWeaponData_Madowaseno_Kona
+80368aac:ItemWeaponData_Nemure_Yoikoyo
+80368f00:ItemWeaponData_Stop_Watch
+8036904c:ItemWeaponData_Guruguru_Memawashi
+8036910c:ItemWeaponData_Dekadeka_Drink
+803691cc:ItemWeaponData_Katikati_Koura
+803696f0:ItemWeaponData_Suitooru
+80369b60:ItemWeaponData_Teki_Kyouka
+80369c20:ItemWeaponData_Minimini_Kun
+80369ce0:ItemWeaponData_Funyafunya_Kun
+80369da0:ItemWeaponData_Sukkiri_Drink
+80369ecc:ItemWeaponData_Jiwajiwa_Kinoko
+80369ff8:ItemWeaponData_Jiwajiwa_Syrup
+8036a32c:ItemWeaponData_Irekaeeru
+8036a688:ItemWeaponData_Attiike_Shisshi
+8036aa84:ItemWeaponData_Naniga_Okorukana
+8036ab7c:ItemWeaponData_Shikaeshino_Kona
+8036ac3c:ItemWeaponData_Kameno_Noroi
+8036b0d4:ItemWeaponData_SpaceFood
+8036b194:ItemWeaponData_IceCandy
+8036b254:ItemWeaponData_NancyFrappe
+8036b314:ItemWeaponData_SnowRabbit
+8036b3d4:ItemWeaponData_TeaKinoko
+8036b494:ItemWeaponData_FirstLovePuddingBiribiri
+8036b554:ItemWeaponData_FirstLovePuddingTrans
+8036b614:ItemWeaponData_FirstLovePuddingSleep
+8036b6d4:ItemWeaponData_StarryDinner
+8036b794:ItemWeaponData_KararinaPasta
+8036b854:ItemWeaponData_MeromeroCake
+8036b914:ItemWeaponData_PeachTaltBiribiri
+8036b9d4:ItemWeaponData_PeachTaltDodge
+8036ba94:ItemWeaponData_PeachTaltSleep
+8036bb54:ItemWeaponData_BiribiriCandy
+8036bc14:ItemWeaponData_HealthySalad
+8036bcd4:ItemWeaponData_FreshJuice
+8036bd94:ItemWeaponData_RedKararing
+8036be54:ItemWeaponData_FutarideForever
+8036c5d4:ItemWeaponData_NancyDynamite
+8036c694:ItemWeaponData_CoconutsBomb
+8036c754:ItemWeaponData_KachikachiDish
+8036c814:ItemWeaponData_BomberEgg
+8036ca2c:ItemWeaponData_PoisonKinoko
+8036ce7c:ItemWeaponData_LastDinner
+
+// battle_database_common.o
+// .data
+804176f0:battle_item_NONE
+8036ee88:battle_item_gundan_zako
+8036eed8:battle_item_gundan_zako_magician
+8036ef28:battle_item_gundan_zako_elite
+8036ef78:battle_item_hinnya
+8036efc8:battle_item_hannya
+8036f018:battle_item_hennya
+8036f068:battle_item_kuriboo
+8036f0b8:battle_item_togekuri
+8036f108:battle_item_patakuri
+8036f158:battle_item_hyper_kuriboo
+8036f1a8:battle_item_hyper_togekuri
+8036f1f8:battle_item_hyper_patakuri
+8036f248:battle_item_yami_kuriboo
+8036f298:battle_item_yami_togekuri
+8036f2e8:battle_item_yami_patakuri
+8036f338:battle_item_nokonoko
+8036f388:battle_item_patapata
+804176f8:battle_item_nokonoko_fighter
+80417700:battle_item_patapata_fighter
+8036f3d8:battle_item_yami_noko
+8036f428:battle_item_ura_noko
+8036f478:battle_item_ura_pata
+8036f4c8:battle_item_togenoko
+8036f518:battle_item_togenoko_ace
+8036f568:battle_item_hammer_bros
+80417708:battle_item_boomerang_bros
+80417710:battle_item_fire_bros
+8036f5b8:battle_item_met
+8036f608:battle_item_togemet
+8036f658:battle_item_patamet
+8036f6a8:battle_item_patatogemet
+8036f6f8:battle_item_hyper_togemet
+8036f730:battle_item_jyugem
+8036f780:battle_item_hyper_jyugem
+8036f7d0:battle_item_togezo
+8036f810:battle_item_kamec
+8036f860:battle_item_chorobon
+8036f8a8:battle_item_green_chorobon
+8036f8f0:battle_item_flower_chorobon
+8036f938:battle_item_honenoko
+80417718:battle_item_red_honenoko
+8036f980:battle_item_karon
+8036f9c8:battle_item_monochrome_kurokumorn
+8036fa10:battle_item_kurokumorn
+8036fa58:battle_item_bllizard
+8036faa0:battle_item_dokugassun
+8036fae8:battle_item_pakkun_flower
+80417720:battle_item_poison_pakkun
+80417748:battle_item_ice_pakkun
+80417770:battle_item_monochrome__pakkun
+80417798:battle_item_piders
+804177b8:battle_item_churantalar
+804177e8:battle_item_barriern
+804177f0:battle_item_barriern_z
+804177f8:battle_item_barriern_custom
+8036fb20:battle_item_monochrome_sinemon
+8036fb60:battle_item_sinemon
+8036fba0:battle_item_hyper_sinnosuke
+8036fbd8:battle_item_hyper_sinemon
+80417800:battle_item_iron_sinemon
+80417808:battle_item_iron_sinemon2
+8036fc20:battle_item_basabasa
+8036fc70:battle_item_basabasa_chururu
+8036fcc0:battle_item_basabasa_green
+8036fd10:battle_item_teresa
+8036fd60:battle_item_purple_teresa
+80417810:battle_item_atmic_teresa
+8036fdb0:battle_item_sambo
+8036fde8:battle_item_sambo_mummy
+80417818:battle_item_killer
+80417820:battle_item_super_killer
+80417828:battle_item_killer_cannon
+80417850:battle_item_super_killer_cannon
+8036fe28:battle_item_bomhei
+8036fe78:battle_item_heavy_bom
+8036fec0:battle_item_giant_bomb
+8036ff08:battle_item_borodo
+80417878:battle_item_borodo_king
+8036ff58:battle_item_badge_borodo
+8036ffa8:battle_item_mahorn
+8036fff0:battle_item_super_mahorn
+80370038:battle_item_mahorn_custom
+80370080:battle_item_wanwan
+803700b8:battle_item_burst_wanwan
+803700f0:battle_item_bubble
+80370130:battle_item_hermos
+80370170:battle_item_phantom
+803701b0:battle_item_pansy
+80370200:battle_item_twinkling_pansy
+80370250:battle_item_dark_keeper
+80417880:battle_item_monban
+80417888:battle_item_gold_chorobon
+80417890:battle_item_sinnosuke
+80417898:battle_item_togedaruma
+804178a0:battle_item_yamitogedaruma
+804178c8:battle_item_vivian1
+804178d0:battle_item_gesso
+804178d8:battle_item_gonbaba
+804178e0:battle_item_moamoa
+804178e8:battle_item_rampell
+804178f0:battle_item_faker_mario
+804178f8:battle_item_cortez
+80417900:battle_item_kurikuri
+80417908:battle_item_magnum_battender
+80417910:battle_item_macho_gance
+80417918:battle_item_champion
+80417920:battle_item_kanbu1
+80417928:battle_item_zonbaba
+80417930:battle_item_default_param_list
+803702a0:battle_heart_drop_param_default
+803705c0:battle_heart_drop_param_default2
+80370890:battle_heart_drop_param_default3
+80370b10:battle_heart_drop_param_default4
+80370d40:battle_heart_drop_param_default5
+80370f20:battle_flower_drop_param_default
+803710b0:battle_flower_drop_param_default2
+803711f0:battle_flower_drop_param_default3
+803712e0:battle_flower_drop_param_default4
+80371380:battle_flower_drop_param_default5
+
+// unit_bomzou.o
+// .data
+8039b088:unit_bomzou
+8039b14c:weapon_bomzou_explosion
+80418858:defence
+80418860:defence_attr
+80418868:regist
+80418880:pose_table_3
+804188a0:pose_table_2
+804188c0:pose_table_1
+804188e0:data_table
+8039b20c:parts
+8039b258:init_event
+80418900:damage_event
+8039b370:phase_event
+80418928:attack_event
+8039b47c:wait_event
+8041893c:dead_event
+8039b560:end_battle_evt
+8039b5ac:explosion_event
+
+// unit_koura.o
+// .data
+8039bc20:unit_koura
+80418958:defence
+80418960:defence_attr
+80418968:regist
+80418980:pose_table
+804189a8:pose_table_crack_lv1
+804189d0:pose_table_crack_lv2
+8039bce4:data_table
+8039bd1c:parts
+8039bdb4:init_event
+804189f8:damage_event
+8039be6c:phase_event
+8039bf04:koura_open
+8039c024:koura_close
+80418a20:wait_event
+80418a38:attack_event
+8039c160:damage_core
+8039c2d0:pose_tbl_reset
+8039c3b8:dead_event
+8039c784:destroy_event
