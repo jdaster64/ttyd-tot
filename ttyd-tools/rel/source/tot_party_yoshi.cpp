@@ -2,14 +2,19 @@
 
 #include "evt_cmd.h"
 
+#include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
+#include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_env.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/icondrv.h>
+#include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_yoshi.h>
 
 namespace mod::tot::party_yoshi {
@@ -18,8 +23,10 @@ namespace {
     
 // Including entire namespaces for convenience.
 using namespace ::ttyd::battle_camera;
+using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_env;
@@ -27,7 +34,43 @@ using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_yoshi;
 
+namespace IconType = ::ttyd::icondrv::IconType;
+
 }  // namespace
+
+// Declaration of weapon structs.
+extern BattleWeapon customWeapon_YoshiGroundPound;
+extern BattleWeapon customWeapon_YoshiGulp_Shot;
+extern BattleWeapon customWeapon_YoshiGulp_Spew;
+extern BattleWeapon customWeapon_YoshiGulp_Dmg0;
+extern BattleWeapon customWeapon_YoshiGulp_Fire;
+extern BattleWeapon customWeapon_YoshiGulp_Recoil;
+extern BattleWeapon customWeapon_YoshiMiniEgg;
+extern BattleWeapon customWeapon_YoshiStampede;
+
+BattleWeapon* g_WeaponTable[] = {
+    &customWeapon_YoshiGroundPound, &customWeapon_YoshiGulp_Shot, 
+    &customWeapon_YoshiMiniEgg, &customWeapon_YoshiStampede, 
+    &customWeapon_YoshiGroundPound, &customWeapon_YoshiGroundPound
+};
+
+void MakeSelectWeaponTable(
+    ttyd::battle::BattleWorkCommand* command_work, int32_t* num_options) {
+    for (int32_t i = 0; i < 6; ++i) {
+        auto& weapon_entry = command_work->weapon_table[*num_options];
+        BattleWeapon* weapon = g_WeaponTable[i];
+        
+        weapon_entry.index = -1;
+        weapon_entry.item_id = 0;
+        weapon_entry.weapon = weapon;
+        weapon_entry.icon = weapon->icon;
+        weapon_entry.unk_04 = 0;
+        weapon_entry.unk_18 = 0;
+        weapon_entry.name = ttyd::msgdrv::msgSearch(weapon->name);
+        
+        ++*num_options;
+    }
+}
 
 EVT_BEGIN(partyYoshiAttack_NormalAttack)
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -421,13 +464,13 @@ EVT_BEGIN(partyYoshiAttack_Nomikomi)
     WAIT_FRM(7)
     USER_FUNC(_get_swallow_param, LW(3), LW(7))
     IF_EQUAL(LW(7), -1)
-        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&partyWeapon_YoshiNomikomi_Dmg0), int(0x80000100U), LW(5))
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
         WAIT_FRM(43)
         GOTO(90)
     END_IF()
     USER_FUNC(btlevtcmd_GetResultAC, LW(0))
     IF_NOT_FLAG(LW(0), 0x2)
-        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&partyWeapon_YoshiNomikomi_Dmg0), int(0x80000100U), LW(5))
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
         WAIT_FRM(43)
         GOTO(90)
     END_IF()
@@ -470,9 +513,9 @@ EVT_BEGIN(partyYoshiAttack_Nomikomi)
             USER_FUNC(btlevtcmd_OffAttribute, LW(3), 16777216)
             USER_FUNC(_check_swallow_attribute, LW(3), 2, LW(0))
             IF_EQUAL(LW(0), 0)
-                USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&partyWeapon_YoshiNomikomi_Spew), int(0x80000100U), LW(5))
+                USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Spew), int(0x80000100U), LW(5))
             ELSE()
-                USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&partyWeapon_YoshiNomikomi_Shot), int(0x80000100U), LW(5))
+                USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Shot), int(0x80000100U), LW(5))
             END_IF()
             USER_FUNC(btlevtcmd_GetResultAC, LW(0))
             IF_FLAG(LW(0), 0x2)
@@ -544,13 +587,13 @@ EVT_BEGIN(partyYoshiAttack_Nomikomi)
     USER_FUNC(evt_eff, PTR("eff"), PTR("breath_fire"), 1, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 1, 2, 60, FLOAT(0.5), FLOAT(30.0))
     WAIT_FRM(60)
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&partyWeapon_YoshiNomikomi_Fire))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiGulp_Fire))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
     LBL(10)
     IF_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF()
-    USER_FUNC(btlevtcmd_CheckDamage, -2, LW(10), LW(11), PTR(&partyWeapon_YoshiNomikomi_Fire), int(0x80000100U), LW(5))
+    USER_FUNC(btlevtcmd_CheckDamage, -2, LW(10), LW(11), PTR(&customWeapon_YoshiGulp_Fire), int(0x80000100U), LW(5))
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
     GOTO(10)
     LBL(90)
@@ -662,44 +705,44 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
     USER_FUNC(btlevtcmd_RunDataEventChild, -2, 7)
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&partyWeapon_YoshiEggAttack_Minimini))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&partyWeapon_YoshiEggAttack_Minimini), LW(3), LW(4))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(3), LW(4))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 3, LW(3))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 4, LW(4))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 7, 0)
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&partyWeapon_YoshiEggAttack_Minimini))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&partyWeapon_YoshiEggAttack_Minimini), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 7, 0)
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&partyWeapon_YoshiEggAttack_Minimini))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&partyWeapon_YoshiEggAttack_Minimini), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 7, 0)
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&partyWeapon_YoshiEggAttack_Minimini))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&partyWeapon_YoshiEggAttack_Minimini), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 7, 0)
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&partyWeapon_YoshiEggAttack_Minimini))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&partyWeapon_YoshiEggAttack_Minimini), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 7, 0)
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&partyWeapon_YoshiEggAttack_Minimini))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&partyWeapon_YoshiEggAttack_Minimini), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 3, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 3, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 3, 5, 0)
@@ -759,7 +802,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
                 ADD(LW(13), 1)
                 GOTO(25)
             ELSE()
-                USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&partyWeapon_YoshiEggAttack_Minimini), -1)
+                USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&customWeapon_YoshiMiniEgg), -1)
                 USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_A_5"))
                 WAIT_FRM(54)
                 USER_FUNC(evt_audience_ap_recovery)
@@ -784,7 +827,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
     USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&partyWeapon_YoshiEggAttack_Minimini), LW(6))
+    USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&customWeapon_YoshiMiniEgg), LW(6))
     LBL(10)
     USER_FUNC(evt_sub_random, 2, LW(0))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 0, LW(0))
@@ -798,7 +841,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     END_SWITCH()
     USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, LW(12), 69)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 1, 4)
-    USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 2, PTR(&partyWeapon_YoshiEggAttack_Minimini))
+    USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 2, PTR(&customWeapon_YoshiMiniEgg))
     LBL(20)
     USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(6))
     USER_FUNC(btlevtcmd_SetPartsScale, -2, LW(12), FLOAT(1.0), FLOAT(1.0), FLOAT(1.0))
@@ -992,7 +1035,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
 EVT_END()
 
 EVT_BEGIN(partyYoshiAttack_CallGuard)
-    SET(LW(12), PTR(&partyWeapon_YoshiCallGuard))
+    SET(LW(12), PTR(&customWeapon_YoshiStampede))
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1167,5 +1210,466 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
     RETURN()
 EVT_END()
+
+BattleWeapon customWeapon_YoshiGroundPound = {
+    .name = "btl_wn_pys_normal",
+    .icon = IconType::PARTNER_MOVE_0,
+    .item_id = 0,
+    .description = "msg_pys_hip_drop",
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 1, 1, 1, 1, 1, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::JUMPLIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_hip_drop",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED |
+        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyYoshiAttack_NormalAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 10,
+    .bg_a2_fall_weight = 10,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 10,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 5,
+};
+
+BattleWeapon customWeapon_YoshiGulp_Shot = {
+    .name = "btl_wn_pys_lv1",
+    .icon = IconType::PARTNER_MOVE_1,
+    .item_id = 0,
+    .description = "msg_pys_nomikomi",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 2, 4, 3, 5, 3, 6, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::ONLY_FRONT |
+        AttackTargetProperty_Flags::HAMMERLIKE,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 6,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_nomikomi",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyYoshiAttack_Nomikomi,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_YoshiGulp_Spew = {
+    .name = "btl_wn_pys_lv1",
+    .icon = IconType::PARTNER_MOVE_1,
+    .item_id = 0,
+    .description = "msg_pys_nomikomi",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 2, 4, 3, 5, 3, 6, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::ONLY_FRONT |
+        AttackTargetProperty_Flags::HAMMERLIKE,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 5,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_nomikomi",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyYoshiAttack_Nomikomi,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_YoshiGulp_Dmg0 = {
+    .name = "btl_wn_pys_lv1",
+    .icon = IconType::PARTNER_MOVE_1,
+    .item_id = 0,
+    .description = "msg_pys_nomikomi",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::ONLY_FRONT |
+        AttackTargetProperty_Flags::HAMMERLIKE,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_nomikomi",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyYoshiAttack_Nomikomi,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_YoshiGulp_Fire = {
+    .name = "btl_wn_pys_lv1",
+    .icon = IconType::PARTNER_MOVE_1,
+    .item_id = 0,
+    .description = "msg_pys_nomikomi",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::FIRE,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_nomikomi",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyYoshiAttack_Nomikomi,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_YoshiGulp_Recoil = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 0.0,
+    .stylish_multiplier = 0,
+    .unk_19 = 0,
+    .bingo_card_chance = 0,
+    .unk_1b = 0,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 4, 2, 5, 3, 6, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::RECOIL_DAMAGE |
+        AttackTargetProperty_Flags::HAMMERLIKE,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags = AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_YoshiMiniEgg = {
+    .name = "btl_wn_pys_lv2",
+    .icon = IconType::PARTNER_MOVE_2,
+    .item_id = 0,
+    .description = "msg_pys_wonder_egg",
+    .base_accuracy = 100,
+    .base_fp_cost = 3,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 1, 1, 1, 1, 1, 1, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_wonder_egg",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::BADGE_BUFFABLE |
+        AttackSpecialProperty_Flags::STATUS_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000,
+        
+    // status chances
+    .size_change_chance = 100,
+    .size_change_time = 3,
+    .size_change_strength = -2,
+    
+    .attack_evt_code = (void*)partyYoshiAttack_EggAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 6,
+    .nozzle_fire_chance = 3,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_YoshiStampede = {
+    .name = "btl_wn_pys_lv3",
+    .icon = IconType::PARTNER_MOVE_3,
+    .item_id = 0,
+    .description = "msg_pys_taigun_yoshi",
+    .base_accuracy = 100,
+    .base_fp_cost = 6,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 1, 1, 1, 1, 1, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_taigun_yoshi",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyYoshiAttack_CallGuard,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 20,
+    .bg_a2_fall_weight = 20,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 20,
+    .nozzle_turn_chance = 40,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 20,
+};
 
 }  // namespace mod::tot::party_yoshi

@@ -44,7 +44,7 @@ extern battle_database_common::BattleWeapon partyWeapon_SandersSuperBombAttack;
 // partySandersAttack_NormalAttack
 // partySandersAttack_SuperBombAttack
 // partySandersAttack_CounterSet
-battle_database_common::BattleUnitSetup entry_bomzou;
+extern battle_database_common::BattleUnitSetup entry_bomzou;
 // partySandersAttack_TimeBombSet
 // _shot_bomb_event
 // sanders_appeal_event

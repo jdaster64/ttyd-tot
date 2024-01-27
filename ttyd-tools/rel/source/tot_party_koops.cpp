@@ -2,13 +2,17 @@
 
 #include "evt_cmd.h"
 
+#include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/icondrv.h>
+#include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_nokotarou.h>
 
 namespace mod::tot::party_koops {
@@ -20,15 +24,49 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_nokotarou;
 
+namespace IconType = ::ttyd::icondrv::IconType;
+
 }  // namespace
 
+// Declaration of weapon structs.
+extern BattleWeapon customWeapon_KoopsShellTossFS;
+extern BattleWeapon customWeapon_KoopsShellToss;
+extern BattleWeapon customWeapon_KoopsPowerShell;
+extern BattleWeapon customWeapon_KoopsShellShield;
+extern BattleWeapon customWeapon_KoopsShellSlam;
+
+BattleWeapon* g_WeaponTable[] = {
+    &customWeapon_KoopsShellToss, &customWeapon_KoopsPowerShell, 
+    &customWeapon_KoopsShellShield, &customWeapon_KoopsShellSlam, 
+    &customWeapon_KoopsShellToss, &customWeapon_KoopsShellToss
+};
+
+void MakeSelectWeaponTable(
+    ttyd::battle::BattleWorkCommand* command_work, int32_t* num_options) {
+    for (int32_t i = 0; i < 6; ++i) {
+        auto& weapon_entry = command_work->weapon_table[*num_options];
+        BattleWeapon* weapon = g_WeaponTable[i];
+        
+        weapon_entry.index = -1;
+        weapon_entry.item_id = 0;
+        weapon_entry.weapon = weapon;
+        weapon_entry.icon = weapon->icon;
+        weapon_entry.unk_04 = 0;
+        weapon_entry.unk_18 = 0;
+        weapon_entry.name = ttyd::msgdrv::msgSearch(weapon->name);
+        
+        ++*num_options;
+    }
+}
+
 BattleWeapon* GetFirstAttackWeapon() {
-    return &partyWeapon_NokotarouFirstAttack;
+    return &customWeapon_KoopsShellTossFS;
 }
 
 EVT_BEGIN(partyNokotarouAttack_FirstAttack)
@@ -37,7 +75,7 @@ EVT_BEGIN(partyNokotarouAttack_FirstAttack)
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
-    USER_FUNC(btlevtcmd_WeaponAftereffect, PTR(&partyWeapon_NokotarouFirstAttack))
+    USER_FUNC(btlevtcmd_WeaponAftereffect, PTR(&customWeapon_KoopsShellTossFS))
     USER_FUNC(evt_btl_camera_set_mode, 0, 7)
     USER_FUNC(evt_btl_camera_set_homing_unit, 0, LW(3), -1)
     USER_FUNC(evt_btl_camera_set_zoom, 0, 300)
@@ -57,8 +95,8 @@ EVT_BEGIN(partyNokotarouAttack_FirstAttack)
     USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
     RUN_CHILD_EVT(PTR(&_koura_rotate_stop))
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
-    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), PTR(&partyWeapon_NokotarouFirstAttack))
-    USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&partyWeapon_NokotarouFirstAttack), 131328, LW(5))
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), PTR(&customWeapon_KoopsShellTossFS))
+    USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_KoopsShellTossFS), 131328, LW(5))
     SET(LW(0), 45)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, 1, 45)
     RUN_CHILD_EVT(PTR(&_koura_rotate_start))
@@ -1046,5 +1084,298 @@ EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
     RETURN()
 EVT_END()
+
+BattleWeapon customWeapon_KoopsShellToss = {
+    .name = "btl_wn_pnk_normal",
+    .icon = IconType::PARTNER_MOVE_0,
+    .item_id = 0,
+    .description = "msg_pnk_normal_attack",
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 2, 2, 3, 3, 5, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::ONLY_FRONT |
+        AttackTargetProperty_Flags::SHELL_TOSS_LIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 8,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_hammer",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::PAYBACK,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyNokotarouAttack_NormalAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 4,
+    .nozzle_fire_chance = 2,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_KoopsShellTossFS = {
+    .name = nullptr,
+    .icon = IconType::PARTNER_MOVE_0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 1,
+    .unk_1b = 1,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 2, 2, 3, 3, 5, 5, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::ONLY_FRONT |
+        AttackTargetProperty_Flags::SHELL_TOSS_LIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 8,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::CANNOT_MISS |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyNokotarouAttack_FirstAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_KoopsPowerShell = {
+    .name = "btl_wn_pnk_lv1",
+    .icon = IconType::PARTNER_MOVE_1,
+    .item_id = 0,
+    .description = "msg_pnk_syubibin_koura",
+    .base_accuracy = 100,
+    .base_fp_cost = 3,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 2, 2, 3, 3, 5, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::SHELL_TOSS_LIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 8,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_koura_shubibin",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = 
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::PAYBACK,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyNokotarouAttack_SyubibinKoura,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_KoopsShellShield = {
+    .name = "btl_wn_pnk_lv2",
+    .icon = IconType::PARTNER_MOVE_2,
+    .item_id = 0,
+    .description = "msg_pnk_koura_no_mamori",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 2, 2, 3, 3, 4, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::ONLY_TARGET_MARIO |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_SAME_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_koura_no_mamori",
+    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyNokotarouAttack_KouraGuard,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_KoopsShellSlam = {
+    .name = "btl_wn_pnk_lv3_tsuranuki",
+    .icon = IconType::PARTNER_MOVE_3,
+    .item_id = 0,
+    .description = "msg_pnk_koura_tsuranuki",
+    .base_accuracy = 100,
+    .base_fp_cost = 6,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetACOutputParam,
+    .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::SHELL_TOSS_LIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_tsuranuki_koura",
+    .special_property_flags = 
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::PAYBACK,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyNokotarouAttack_TsuranukiKoura,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
 
 }  // namespace mod::tot::party_koops

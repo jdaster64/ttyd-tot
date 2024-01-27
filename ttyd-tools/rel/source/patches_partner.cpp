@@ -8,6 +8,13 @@
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_battle.h"
+#include "tot_party_bobbery.h"
+#include "tot_party_flurrie.h"
+#include "tot_party_goombella.h"
+#include "tot_party_koops.h"
+#include "tot_party_mowz.h"
+#include "tot_party_vivian.h"
+#include "tot_party_yoshi.h"
 
 #include <gc/types.h>
 #include <ttyd/battle.h>
@@ -85,6 +92,13 @@ extern const int32_t g_koura_damage_core_Patch_HeavyDmg;
 extern const int32_t g_koura_damage_core_Patch_LightDmg;
 extern const int32_t g_subsetevt_blow_dead_Patch_GetRewards;
 extern const int32_t g_BattleSetStatusDamage_Patch_GaleLevelFactor;
+extern const int32_t g_partyClauda_makeTechMenuFuncPtr;
+extern const int32_t g_partyYoshi_makeTechMenuFuncPtr;
+extern const int32_t g_partyChuchurina_makeTechMenuFuncPtr;
+extern const int32_t g_partySanders_makeTechMenuFuncPtr;
+extern const int32_t g_partyVivian_makeTechMenuFuncPtr;
+extern const int32_t g_partyNokotarou_makeTechMenuFuncPtr;
+extern const int32_t g_partyChristine_makeTechMenuFuncPtr;
 extern const int32_t g_partyClaudaAttack_KumoGuard_Patch_UseOnSelf;
 extern const int32_t g_partyVivianAttack_MagicalPowder_Patch_ChangeButtons;
 extern const int32_t g_partyVivianAttack_CharmKissAttack_Patch_DisableNext;
@@ -617,6 +631,29 @@ void ApplyFixedPatches() {
         target_class_flags |= 0x10;
     ttyd::unit_party_vivian::partyWeapon_VivianShadowGuard.
         target_class_flags |= 0x10;
+        
+    // TOT: Replace party member weapon selection functions.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_partyChristine_makeTechMenuFuncPtr),
+        reinterpret_cast<int32_t>(tot::party_goombella::MakeSelectWeaponTable));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_partyNokotarou_makeTechMenuFuncPtr),
+        reinterpret_cast<int32_t>(tot::party_koops::MakeSelectWeaponTable));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_partyClauda_makeTechMenuFuncPtr),
+        reinterpret_cast<int32_t>(tot::party_flurrie::MakeSelectWeaponTable));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_partyYoshi_makeTechMenuFuncPtr),
+        reinterpret_cast<int32_t>(tot::party_yoshi::MakeSelectWeaponTable));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_partyVivian_makeTechMenuFuncPtr),
+        reinterpret_cast<int32_t>(tot::party_vivian::MakeSelectWeaponTable));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_partySanders_makeTechMenuFuncPtr),
+        reinterpret_cast<int32_t>(tot::party_bobbery::MakeSelectWeaponTable));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_partyChuchurina_makeTechMenuFuncPtr),
+        reinterpret_cast<int32_t>(tot::party_mowz::MakeSelectWeaponTable));
 }
 
 void DisplayTattleStats(

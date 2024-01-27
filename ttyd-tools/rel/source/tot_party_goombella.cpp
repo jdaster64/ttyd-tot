@@ -2,36 +2,75 @@
 
 #include "evt_cmd.h"
 
+#include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
+#include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
 #include <ttyd/battle_event_subset.h>
 #include <ttyd/battle_mario.h>
 #include <ttyd/battle_message.h>
+#include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_snd.h>
+#include <ttyd/icondrv.h>
+#include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_christine.h>
 
 namespace mod::tot::party_goombella {
 
 namespace {
-    
+
 // Including entire namespaces for convenience.
 using namespace ::ttyd::battle_camera;
+using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
 using namespace ::ttyd::battle_event_subset;
 using namespace ::ttyd::battle_mario;
 using namespace ::ttyd::battle_message;
+using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::unit_party_christine;
 
+namespace IconType = ::ttyd::icondrv::IconType;
+
 }  // namespace
+
+// Declaration of weapon structs.
+extern BattleWeapon customWeapon_GoombellaHeadbonk;
+extern BattleWeapon customWeapon_GoombellaTattle;
+extern BattleWeapon customWeapon_GoombellaMultibonk;
+extern BattleWeapon customWeapon_GoombellaRallyWink;
+
+BattleWeapon* g_WeaponTable[] = {
+    &customWeapon_GoombellaHeadbonk, &customWeapon_GoombellaTattle, 
+    &customWeapon_GoombellaMultibonk, &customWeapon_GoombellaRallyWink, 
+    &customWeapon_GoombellaHeadbonk, &customWeapon_GoombellaHeadbonk
+};
+
+void MakeSelectWeaponTable(
+    ttyd::battle::BattleWorkCommand* command_work, int32_t* num_options) {
+    for (int32_t i = 0; i < 6; ++i) {
+        auto& weapon_entry = command_work->weapon_table[*num_options];
+        BattleWeapon* weapon = g_WeaponTable[i];
+        
+        weapon_entry.index = -1;
+        weapon_entry.item_id = 0;
+        weapon_entry.weapon = weapon;
+        weapon_entry.icon = weapon->icon;
+        weapon_entry.unk_04 = 0;
+        weapon_entry.unk_18 = 0;
+        weapon_entry.name = ttyd::msgdrv::msgSearch(weapon->name);
+        
+        ++*num_options;
+    }
+}
 
 EVT_BEGIN(partyChristineAttack_NormalAttack)
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
@@ -772,12 +811,12 @@ EVT_BEGIN(partyChristineAttack_Kiss)
             USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BTL_KURI_CHEER_KISS1"), LW(0), LW(1), LW(2), 0)
             WAIT_FRM(40)
             USER_FUNC(btlevtcmd_GetResultPrizeLv, -5, 0, LW(6))
-            USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&partyWeapon_ChristineKiss), LW(6))
+            USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&customWeapon_GoombellaRallyWink), LW(6))
             USER_FUNC(_set_hustle, LW(3))
         ELSE()
             WAIT_FRM(40)
-            USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&partyWeapon_ChristineKiss), -1)
-            USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&partyWeapon_ChristineKiss), 536871168, LW(5))
+            USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&customWeapon_GoombellaRallyWink), -1)
+            USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_GoombellaRallyWink), 536871168, LW(5))
         END_IF()
     END_INLINE()
     USER_FUNC(btlevtcmd_ftof, 24, LW(0))
@@ -818,5 +857,236 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
     RETURN()
 EVT_END()
+
+BattleWeapon customWeapon_GoombellaHeadbonk = {
+    .name = "btl_wn_pkr_normal",
+    .icon = IconType::PARTNER_MOVE_0,
+    .item_id = 0,
+    .description = "msg_pkr_normal_jump",
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::JUMPLIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_zutsuki",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED |
+        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyChristineAttack_NormalAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 4,
+    .nozzle_fire_chance = 2,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_GoombellaTattle = {
+    .name = "btl_wn_pkr_lv1",
+    .icon = IconType::PARTNER_MOVE_1,
+    .item_id = 0,
+    .description = "msg_pkr_monosiri",
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::TATTLE_LIKE,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_monoshiri",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::CANNOT_MISS,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyChristineAttack_Monosiri,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_GoombellaMultibonk = {
+    .name = "btl_wn_pkr_lv2",
+    .icon = IconType::PARTNER_MOVE_2,
+    .item_id = 0,
+    .description = "msg_pkr_renzoku_zutsuki",
+    .base_accuracy = 100,
+    .base_fp_cost = 3,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::JUMPLIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_zutsuki",
+    .special_property_flags = 
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED |
+        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyChristineAttack_RenzokuAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_GoombellaRallyWink = {
+    .name = "btl_wn_pkr_lv3",
+    .icon = IconType::PARTNER_MOVE_3,
+    .item_id = 0,
+    .description = "msg_pkr_nage_kiss",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_OPPOSING_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_SAME_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_kiss",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE |
+        AttackSpecialProperty_Flags::CANNOT_MISS,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags = 0,
+        
+    // status chances (not used?)
+    .fast_chance = 100,
+    .fast_time = 2,
+    
+    .attack_evt_code = (void*)partyChristineAttack_Kiss,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
 
 }  // namespace mod::tot::party_goombella

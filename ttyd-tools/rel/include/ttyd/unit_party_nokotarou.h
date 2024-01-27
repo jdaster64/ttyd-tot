@@ -51,7 +51,7 @@ extern int32_t _koura_rotate_stop[1];
 // partyNokotarouAttack_FirstAttack
 // partyNokotarouAttack_NormalAttack
 // partyNokotarouAttack_SyubibinKoura
-ttyd::battle_database_common::BattleUnitSetup entry_koura;
+extern ttyd::battle_database_common::BattleUnitSetup entry_koura;
 // partyNokotarouAttack_KouraGuard
 // partyNokotarouAttack_TsuranukiKoura
 // nokotarou_appeal_event

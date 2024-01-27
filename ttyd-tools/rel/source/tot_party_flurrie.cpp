@@ -2,13 +2,18 @@
 
 #include "evt_cmd.h"
 
+#include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
+#include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/icondrv.h>
+#include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_clauda.h>
 
 namespace mod::tot::party_flurrie {
@@ -17,15 +22,49 @@ namespace {
     
 // Including entire namespaces for convenience.
 using namespace ::ttyd::battle_camera;
+using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_clauda;
 
+namespace IconType = ::ttyd::icondrv::IconType;
+
 }  // namespace
+
+// Declaration of weapon structs.
+extern BattleWeapon customWeapon_FlurrieBodySlam;
+extern BattleWeapon customWeapon_FlurrieGaleForce;
+extern BattleWeapon customWeapon_FlurrieLipLock;
+extern BattleWeapon customWeapon_FlurrieDodgyFog;
+
+BattleWeapon* g_WeaponTable[] = {
+    &customWeapon_FlurrieBodySlam, &customWeapon_FlurrieGaleForce, 
+    &customWeapon_FlurrieLipLock, &customWeapon_FlurrieDodgyFog, 
+    &customWeapon_FlurrieBodySlam, &customWeapon_FlurrieBodySlam
+};
+
+void MakeSelectWeaponTable(
+    ttyd::battle::BattleWorkCommand* command_work, int32_t* num_options) {
+    for (int32_t i = 0; i < 6; ++i) {
+        auto& weapon_entry = command_work->weapon_table[*num_options];
+        BattleWeapon* weapon = g_WeaponTable[i];
+        
+        weapon_entry.index = -1;
+        weapon_entry.item_id = 0;
+        weapon_entry.weapon = weapon;
+        weapon_entry.icon = weapon->icon;
+        weapon_entry.unk_04 = 0;
+        weapon_entry.unk_18 = 0;
+        weapon_entry.name = ttyd::msgdrv::msgSearch(weapon->name);
+        
+        ++*num_options;
+    }
+}
 
 EVT_BEGIN(partyClaudaAttack_NormalAttack)
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
@@ -306,7 +345,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     USER_FUNC(btlevtcmd_SetRotate, -2, 0, 0, 0)
     USER_FUNC(btlevtcmd_StopAC)
     SET(LW(11), 99)
-    SET(LW(12), PTR(&partyWeapon_ClaudaBreathAttack))
+    SET(LW(12), PTR(&customWeapon_FlurrieGaleForce))
     USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
     USER_FUNC(_make_breath_weapon, LW(12), LW(0))
     WAIT_FRM(60)
@@ -712,5 +751,237 @@ EVT_BEGIN(partyClaudaAttack_KumoGuard)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
     RETURN()
 EVT_END()
+
+BattleWeapon customWeapon_FlurrieBodySlam = {
+    .name = "btl_wn_pwd_normal",
+    .icon = IconType::PARTNER_MOVE_0,
+    .item_id = 0,
+    .description = "msg_pwd_body_press",
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0xa,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_body_press",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED |
+        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyClaudaAttack_NormalAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 20,
+    .bg_a2_fall_weight = 20,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 20,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 2,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 10,
+};
+
+BattleWeapon customWeapon_FlurrieGaleForce = {
+    .name = "btl_wn_pwd_lv1",
+    .icon = IconType::PARTNER_MOVE_1,
+    .item_id = 0,
+    .description = "msg_pwd_breath",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0x19,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_breath",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::UNKNOWN_GALE_FORCE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    .gale_force_chance = 100,
+    
+    .attack_evt_code = (void*)partyClaudaAttack_BreathAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_FlurrieLipLock = {
+    .name = "btl_wn_pwd_lv2",
+    .icon = IconType::PARTNER_MOVE_2,
+    .item_id = 0,
+    .description = "msg_pwd_sexy_kiss",
+    .base_accuracy = 100,
+    .base_fp_cost = 3,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetACOutputParam,
+    .damage_function_params = { 0, 1, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 3, 3, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_sexy_kiss",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::TOP_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyClaudaAttack_PredationAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_FlurrieDodgyFog = {
+    .name = "btl_wn_pwd_lv3",
+    .icon = IconType::PARTNER_MOVE_3,
+    .item_id = 0,
+    .description = "msg_pwd_kumogakure",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_OPPOSING_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_SAME_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_kumogakure",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::CANNOT_MISS,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    .dodgy_chance = 100,
+    .dodgy_time = 2,
+    
+    .attack_evt_code = (void*)partyClaudaAttack_KumoGuard,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
 
 }  // namespace mod::tot::party_flurrie
