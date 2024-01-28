@@ -6,6 +6,7 @@
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_battle.h"
+#include "tot_move_manager.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
@@ -81,7 +82,6 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Function hooks.
 extern int32_t (*g_BtlUnit_GetWeaponCost_trampoline)(BattleWorkUnit*, BattleWeapon*);
-extern int32_t (*g_pouchEquipCheckBadge_trampoline)(int16_t);
 extern void (*g_DrawOperationWin_trampoline)();
 extern void (*g_DrawWeaponWin_trampoline)();
 extern int32_t (*g_sac_genki_get_score_trampoline)(EvtEntry*, bool);
@@ -116,20 +116,11 @@ namespace {
     
 // Global variables and constants.
 bool                g_InBattle = false;
-int8_t              g_MaxMoveBadgeCounts[18];
-int8_t              g_CurMoveBadgeCounts[18];
-int8_t              g_MaxSpecialMoveLvls[8];
-int8_t              g_CurSpecialMoveLvls[8];
+int8_t              g_MaxMoveBadgeCounts[4];
+int8_t              g_CurMoveBadgeCounts[4];
 char                g_MoveBadgeTextBuffer[24];
-const char*         kMoveBadgeAbbreviations[18] = {
-    "Power J.", "Multib.", "Power B.", "Tor. J.", "Shrink S.",
-    "Sleep S.", "Soft S.", "Power S.", "Quake H.", "H. Throw",
-    "Pier. B.", "H. Rattle", "Fire Drive", "Ice Smash",
+const char*         kMoveBadgeAbbreviations[4] = {
     "Charge", "Charge", "Tough. Up", "Tough. Up"
-};
-const char*         kSpecialMoveAbbreviations[8] = {
-    "Sweet Tr.", "Earth Tr.", "Clock Out", "Power Lift",
-    "Art Attack", "Sweet F.", "Showst.", "Supernova"
 };
 const int8_t        kSpCostLevels[] = {
     1, 3, 5,    1, 2, 3,    2, 3, 5,    3, 4, 6,
@@ -171,29 +162,27 @@ int32_t MaxLevelForMoveBadges(int32_t badge_count) {
 // If the badge is one that can have its power level selected, returns the
 // index of the value controlling its level; otherwise, returns -1.
 int32_t GetWeaponLevelSelectionIndex(int16_t badge_id) {
-    if (badge_id >= ItemType::POWER_JUMP && badge_id <= ItemType::ICE_SMASH) {
-        return badge_id - ItemType::POWER_JUMP;
-    }
     switch (badge_id) {
-        case ItemType::CHARGE: return 14;
-        case ItemType::CHARGE_P: return 15;
-        case ItemType::SUPER_CHARGE: return 16;
-        case ItemType::SUPER_CHARGE_P: return 17;
+        case ItemType::CHARGE: return 0;
+        case ItemType::CHARGE_P: return 1;
+        case ItemType::SUPER_CHARGE: return 2;
+        case ItemType::SUPER_CHARGE_P: return 3;
     }
     return -1;
 }
 
-// Gets the cost of badge moves that can have their power level selected.
-// Returns -1 if the weapon is not one of these moves.
-int32_t GetSelectedLevelWeaponCost(BattleWorkUnit* unit, BattleWeapon* weapon) {
-    if (!weapon || !g_InBattle) return -1;
+// Gets the FP cost of a move, factoring in stackability of Charge / Toughen Up
+// and Flower Savers if necessary.
+int32_t GetWeaponCost(BattleWorkUnit* unit, BattleWeapon* weapon) {
+    int32_t cost = weapon->base_fp_cost;
     if (int32_t idx = GetWeaponLevelSelectionIndex(weapon->item_id); idx >= 0) {
-        const int32_t fp_cost =
-            weapon->base_fp_cost * g_CurMoveBadgeCounts[idx] -
-            unit->badges_equipped.flower_saver;
-        return fp_cost < 1 ? 1 : fp_cost;
+        cost *= g_CurMoveBadgeCounts[idx];
     }
-    return -1;
+    if (cost > 0) {
+        cost -= unit->badges_equipped.flower_saver;
+        if (cost < 1) cost = 1;
+    }
+    return cost;
 }
 
 // Extra code for the battle menus that allows selecting level of badge moves.
@@ -212,6 +201,8 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
     void** win_data = reinterpret_cast<void**>(
         ttyd::battle::g_BattleWork->command_work.window_work);
     if (!win_data || !win_data[0]) return;
+    
+    auto& move_manager = g_Mod->move_manager_;
     
     auto* cursor = reinterpret_cast<BattleWorkCommandCursor*>(win_data[0]);
     if (is_strategies_menu) {
@@ -263,7 +254,7 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                     itemDataTable[weapon->item_id].name);
             }
             
-            strats[i].cost = GetSelectedLevelWeaponCost(unit, weapon);
+            strats[i].cost = GetWeaponCost(unit, weapon);
             strats[i].enabled =
                 strats[i].cost <= ttyd::battle_unit::BtlUnit_GetFp(unit);
             strats[i].unk_08 = !strats[i].enabled;  // 1 if disabled: "no FP" msg
@@ -286,77 +277,64 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
         auto* weapons = reinterpret_cast<BattleWorkCommandWeapon*>(win_data[2]);
         if (!weapons) return;
         for (int32_t i = 0; i < cursor->num_options; ++i) {
-            if (!weapons[i].weapon) continue;
+            // Skip non-weapon selections / items.
+            if (!weapons[i].weapon || weapons[i].item_id) continue;
+            
             auto* weapon = weapons[i].weapon;
+            int32_t move_type = weapons[i].index;
             
             // Handle Special moves.
             if (weapon->base_sp_cost) {
-                // Match the Star Power by its icon.
-                int32_t idx = 0;
-                switch (weapon->icon) {
-                    case 0x19f: { idx = 1; break; }
-                    case 0x1a0: { idx = 2; break; }
-                    case 0x1a2: { idx = 3; break; }
-                    case 0x1a4: { idx = 4; break; }
-                    case 0x1a5: { idx = 5; break; }
-                    case 0x1a1: { idx = 6; break; }
-                    case 0x1a3: { idx = 7; break; }
-                }
-                
                 // If current selection, and L/R pressed, change power level.
                 if (i == cursor->abs_position) {
-                    if (left_press && g_CurSpecialMoveLvls[idx] > 1) {
-                        --g_CurSpecialMoveLvls[idx];
+                    if (left_press && 
+                        move_manager.ChangeSelectedLevel(move_type, -1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     } else if (
                         right_press &&
-                        g_CurSpecialMoveLvls[idx] < g_MaxSpecialMoveLvls[idx]) {
-                        ++g_CurSpecialMoveLvls[idx];
+                        move_manager.ChangeSelectedLevel(move_type, 1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     }
                     
                     // Overwrite default text based on current power level.
-                    sprintf(
-                        g_MoveBadgeTextBuffer, "%s Lv. %" PRId8,
-                        kSpecialMoveAbbreviations[idx],
-                        g_CurSpecialMoveLvls[idx]);
+                    move_manager.GetCurrentSelectionString(
+                        move_type, g_MoveBadgeTextBuffer);
                     weapons[i].name = g_MoveBadgeTextBuffer;
                 } else {
                     weapons[i].name = ttyd::msgdrv::msgSearch(weapon->name);
                 }
                 
                 // Update actual SP cost.
-                int8_t new_cost = 
-                    kSpCostLevels[idx * 3 + g_CurSpecialMoveLvls[idx] - 1];
+                int32_t idx = move_type - tot::MoveType::SP_SWEET_TREAT;
+                int8_t new_cost = move_manager.GetMoveCost(move_type);
                 mod::patch::writePatch(
                     &ttyd::battle_mario::superActionTable[idx]->base_sp_cost,
                     &new_cost, sizeof(new_cost));
-            }
-            
-            // Otherwise, must be an FP-costing move (assuming a badge move).
-            const int32_t idx = GetWeaponLevelSelectionIndex(weapon->item_id);
-            if (idx < 0 || g_MaxMoveBadgeCounts[idx] <= 1) continue;
-            
-            // If current selection, and L/R pressed, change power level.
-            if (i == cursor->abs_position) {
-                if (left_press && g_CurMoveBadgeCounts[idx] > 1) {
-                    --g_CurMoveBadgeCounts[idx];
-                    ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
-                } else if (
-                    right_press && 
-                    g_CurMoveBadgeCounts[idx] < g_MaxMoveBadgeCounts[idx]) {
-                    ++g_CurMoveBadgeCounts[idx];
-                    ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
+            } else {
+                // Otherwise, must be a free / FP-costing move.            
+                // If current selection, and L/R pressed, change power level.
+                if (i == cursor->abs_position) {
+                    if (left_press && 
+                        move_manager.ChangeSelectedLevel(move_type, -1)) {
+                        ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
+                    } else if (
+                        right_press && 
+                        move_manager.ChangeSelectedLevel(move_type, 1)) {
+                        ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
+                    }
+                    
+                    // Overwrite default text based on current power level.
+                    move_manager.GetCurrentSelectionString(
+                        move_type, g_MoveBadgeTextBuffer);
+                    weapons[i].name = g_MoveBadgeTextBuffer;
+                } else {
+                    weapons[i].name = ttyd::msgdrv::msgSearch(weapon->name);
                 }
                 
-                // Overwrite default text based on current power level.
-                sprintf(
-                    g_MoveBadgeTextBuffer, "%s Lv. %" PRId8,
-                    kMoveBadgeAbbreviations[idx], g_CurMoveBadgeCounts[idx]);
-                weapons[i].name = g_MoveBadgeTextBuffer;
-            } else {
-                weapons[i].name = ttyd::msgdrv::msgSearch(
-                    itemDataTable[weapon->item_id].name);
+                // Update actual FP cost.
+                int8_t new_cost = move_manager.GetMoveCost(move_type);
+                mod::patch::writePatch(
+                    &weapon->base_fp_cost, &new_cost, sizeof(new_cost));
             }
         }
     }
@@ -460,23 +438,11 @@ EVT_DEFINE_USER_FUNC(SetSweetFeastWeapon) {
 }
     
 void ApplyFixedPatches() {
-    g_pouchEquipCheckBadge_trampoline = patch::hookFunction(
-        ttyd::mario_pouch::pouchEquipCheckBadge, [](int16_t badge_id) {
-            if (g_InBattle) {
-                int32_t idx = GetWeaponLevelSelectionIndex(badge_id);
-                if (idx >= 0) {
-                    return static_cast<int32_t>(g_CurMoveBadgeCounts[idx]);
-                }
-            }
-            return g_pouchEquipCheckBadge_trampoline(badge_id);
-        });
-
     g_BtlUnit_GetWeaponCost_trampoline = patch::hookFunction(
         ttyd::battle_unit::BtlUnit_GetWeaponCost,
         [](BattleWorkUnit* unit, BattleWeapon* weapon) {
-            int32_t cost = GetSelectedLevelWeaponCost(unit, weapon);
-            if (cost >= 0) return cost;
-            return g_BtlUnit_GetWeaponCost_trampoline(unit, weapon);
+            // Replaces existing logic.
+            return GetWeaponCost(unit, weapon);
         });
 
     g_DrawOperationWin_trampoline = patch::hookFunction(
@@ -562,7 +528,10 @@ void ApplyFixedPatches() {
             BattleWorkUnit*, BattleWorkUnitPart*) {
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
             int32_t bars_full = *reinterpret_cast<int32_t*>(sac_work_addr + 0x44);
-            return static_cast<uint32_t>(g_CurSpecialMoveLvls[1] + bars_full);
+            return static_cast<uint32_t>(
+                g_Mod->move_manager_.GetSelectedLevel(
+                    tot::MoveType::SP_EARTH_TREMOR)
+                + bars_full);
         });
         
     // Change Clock Out's turn count based on power level.
@@ -577,7 +546,10 @@ void ApplyFixedPatches() {
                 *reinterpret_cast<BattleWeapon*>(sac_work_addr + 0xf8);
             // Modify turn count (-1 for level 1, +1 for level 3; min 1 turn).
             if (weapon.stop_chance) {
-                weapon.stop_time += (g_CurSpecialMoveLvls[2] - 2);
+                weapon.stop_time += (
+                    g_Mod->move_manager_.GetSelectedLevel(
+                        tot::MoveType::SP_CLOCK_OUT)
+                    - 2);
                 if (weapon.stop_time < 1) weapon.stop_time = 1;
             }
             return 2;
@@ -589,7 +561,9 @@ void ApplyFixedPatches() {
             // Change the amount of power gained per arrow hit on startup.
             if (isFirstCall) {
                 float arrow_power = 0.20001;
-                switch (g_CurSpecialMoveLvls[3]) {
+                switch (
+                    g_Mod->move_manager_.GetSelectedLevel(
+                        tot::MoveType::SP_POWER_LIFT)) {
                     case 2: arrow_power = 0.25001; break;
                     case 3: arrow_power = 0.33334; break;
                 }
@@ -619,7 +593,8 @@ void ApplyFixedPatches() {
             BattleWeapon& weapon = 
                 *reinterpret_cast<BattleWeapon*>(sac_work_addr + 0x284);
             int32_t bars_full = evtGetValue(evt, evt->evtArguments[0]) - 1;
-            switch (g_CurSpecialMoveLvls[6]) {
+            switch (g_Mod->move_manager_.GetSelectedLevel(
+                tot::MoveType::SP_SHOWSTOPPER)) {
                 case 1: weapon.ohko_chance = 30 + bars_full * 7;  break;
                 case 2: weapon.ohko_chance = 45 + bars_full * 9;  break;
                 case 3: weapon.ohko_chance = 60 + bars_full * 11; break;
@@ -635,7 +610,8 @@ void ApplyFixedPatches() {
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
             int32_t level = *reinterpret_cast<int32_t*>(sac_work_addr + 0x10);
             int32_t multiplier = 3;
-            switch (g_CurSpecialMoveLvls[7]) {
+            switch (g_Mod->move_manager_.GetSelectedLevel(
+                tot::MoveType::SP_SUPERNOVA)) {
                 case 2: multiplier = 5;     break;
                 case 3: multiplier = 10;    break;
             }
@@ -647,28 +623,17 @@ void OnEnterExitBattle(bool is_start) {
     if (is_start) {
         int8_t badge_count;
         int32_t max_level;
-        for (int32_t i = 0; i < 14; ++i) {
-            badge_count = ttyd::mario_pouch::pouchEquipCheckBadge(
-                ItemType::POWER_JUMP + i);
-            max_level = MaxLevelForMoveBadges(badge_count);
-            g_MaxMoveBadgeCounts[i] = max_level;
-            g_CurMoveBadgeCounts[i] = max_level < 99 ? max_level : 1;
-        }
         for (int32_t i = 0; i < 2; ++i) {
             badge_count = ttyd::mario_pouch::pouchEquipCheckBadge(
                 ItemType::CHARGE + i);
             max_level = MaxLevelForMoveBadges(badge_count);
-            g_MaxMoveBadgeCounts[14 + i] = max_level;
-            g_CurMoveBadgeCounts[14 + i] = max_level < 99 ? max_level : 1;
+            g_MaxMoveBadgeCounts[i] = max_level;
+            g_CurMoveBadgeCounts[i] = max_level < 99 ? max_level : 1;
             badge_count = ttyd::mario_pouch::pouchEquipCheckBadge(
                 ItemType::SUPER_CHARGE + i);
             max_level = MaxLevelForMoveBadges(badge_count);
-            g_MaxMoveBadgeCounts[16 + i] = max_level;
-            g_CurMoveBadgeCounts[16 + i] = max_level < 99 ? max_level : 1;
-        }
-        for (int32_t i = 0; i < 8; ++i) {
-            g_MaxSpecialMoveLvls[i] = g_Mod->state_.GetStarPowerLevel(i);
-            g_CurSpecialMoveLvls[i] = g_MaxSpecialMoveLvls[i];
+            g_MaxMoveBadgeCounts[2 + i] = max_level;
+            g_CurMoveBadgeCounts[2 + i] = max_level < 99 ? max_level : 1;
         }
         g_InBattle = true;
     } else {
@@ -676,8 +641,8 @@ void OnEnterExitBattle(bool is_start) {
     }
 }
 
-int8_t GetToughenUpLevel(bool is_mario) {
-    return g_CurMoveBadgeCounts[17 - is_mario];
+int8_t GetStrategyBadgeLevel(bool is_charge, bool is_mario) {
+    return g_CurMoveBadgeCounts[!is_charge * 2 + !is_mario];
 }
 
 bool CanUnlockNextLevel(int32_t star_power) {
@@ -715,9 +680,13 @@ void SweetTreatSetUpTargets() {
     // Select which set of target counts to use.
     int32_t start_idx;
     if (is_feast) {
-        start_idx = kNumTargetTypes * (g_CurSpecialMoveLvls[5] + 2);
+        start_idx = kNumTargetTypes * (
+            g_Mod->move_manager_.GetSelectedLevel(tot::MoveType::SP_SWEET_FEAST) 
+            + 2);
     } else {
-        start_idx = kNumTargetTypes * (g_CurSpecialMoveLvls[0] - 1);
+        start_idx = kNumTargetTypes * (
+            g_Mod->move_manager_.GetSelectedLevel(tot::MoveType::SP_SWEET_TREAT) 
+            - 1);
     }
     
     // Determine whether Mario's partner is dead or nonexistent.
@@ -779,13 +748,15 @@ void SweetTreatBlinkNumbers() {
 
 int32_t GetEarthTremorNumberOfBars() {
     // The level 1 and 2 versions have shorter minigames, at 3 and 4 bars.
-    return g_CurSpecialMoveLvls[1] + 2;
+    return g_Mod->move_manager_.GetSelectedLevel(tot::MoveType::SP_EARTH_TREMOR)
+        + 2;
 }
 
 int32_t GetArtAttackPower(int32_t circled_percent) {
     // Like vanilla, circling 90% or more = full damage;
     // the damage dealt is up to 2, 3, or 4 based on the level.
-    return (g_CurSpecialMoveLvls[4] + 1) * circled_percent / 90;
+    return (g_Mod->move_manager_.GetSelectedLevel(tot::MoveType::SP_ART_ATTACK) 
+        + 1) * circled_percent / 90;
 }
 
 }  // namespace mario_move

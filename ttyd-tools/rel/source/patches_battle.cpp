@@ -49,6 +49,7 @@ using ::ttyd::battle_unit::BattleWorkUnit;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
+namespace StatusEffectType = ::ttyd::battle_database_common::StatusEffectType;
 
 }
 
@@ -66,6 +67,172 @@ extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
 
 namespace battle {
+    
+void GetStatusParams(
+    BattleWorkUnit* unit, BattleWeapon* weapon, int32_t status_type,
+    int8_t* turn_count, int8_t* strength) {
+    int32_t turns_temporary = 0;
+    int32_t strength_temporary = 0;
+    
+    switch (status_type) {
+        case StatusEffectType::ALLERGIC:
+            turns_temporary = weapon->allergic_time;
+            break;
+        case StatusEffectType::SLEEP:
+            turns_temporary = weapon->sleep_time;
+            break;
+        case StatusEffectType::STOP:
+            turns_temporary = weapon->stop_time;
+            break;
+        case StatusEffectType::DIZZY:
+            turns_temporary = weapon->dizzy_time;
+            break;
+        case StatusEffectType::POISON:
+            turns_temporary = weapon->poison_time;
+            strength_temporary = weapon->poison_strength;
+            break;
+        case StatusEffectType::CONFUSE:
+            turns_temporary = weapon->confuse_time;
+            break;
+        case StatusEffectType::ELECTRIC:
+            turns_temporary = weapon->electric_time;
+            break;
+        case StatusEffectType::DODGY:
+            turns_temporary = weapon->dodgy_time;
+            break;
+        case StatusEffectType::BURN:
+            turns_temporary = weapon->burn_time;
+            break;
+        case StatusEffectType::FREEZE:
+            turns_temporary = weapon->freeze_time;
+            break;
+        case StatusEffectType::HUGE:
+            if (weapon->size_change_strength > 0) {
+                turns_temporary = weapon->size_change_time;
+                strength_temporary = weapon->size_change_strength;
+            }
+            break;
+        case StatusEffectType::TINY:
+            if (weapon->size_change_strength < 0) {
+                turns_temporary = weapon->size_change_time;
+                strength_temporary = weapon->size_change_strength;
+            }
+            break;
+        case StatusEffectType::ATTACK_UP:
+            if (weapon->atk_change_strength > 0) {
+                turns_temporary = weapon->atk_change_time;
+                strength_temporary = weapon->atk_change_strength;
+            }
+            break;
+        case StatusEffectType::ATTACK_DOWN:
+            if (weapon->atk_change_strength < 0) {
+                turns_temporary = weapon->atk_change_time;
+                strength_temporary = weapon->atk_change_strength;
+            }
+            break;
+        case StatusEffectType::DEFENSE_UP:
+            if (weapon->def_change_strength > 0) {
+                turns_temporary = weapon->def_change_time;
+                strength_temporary = weapon->def_change_strength;
+            }
+            break;
+        case StatusEffectType::DEFENSE_DOWN:
+            if (weapon->def_change_strength < 0) {
+                turns_temporary = weapon->def_change_time;
+                strength_temporary = weapon->def_change_strength;
+            }
+            break;
+        case StatusEffectType::CHARGE:
+            strength_temporary = weapon->charge_strength;
+            break;
+        case StatusEffectType::INVISIBLE:
+            turns_temporary = weapon->invisible_time;
+            break;
+        case StatusEffectType::FAST:
+            turns_temporary = weapon->fast_time;
+            break;
+        case StatusEffectType::SLOW:
+            turns_temporary = weapon->slow_time;
+            break;
+        case StatusEffectType::PAYBACK:
+            turns_temporary = weapon->payback_time;
+            break;
+        case StatusEffectType::HOLD_FAST:
+            turns_temporary = weapon->hold_fast_time;
+            break;
+        case StatusEffectType::HP_REGEN:
+            turns_temporary = weapon->hp_regen_time;
+            strength_temporary = weapon->hp_regen_strength;
+            break;
+        case StatusEffectType::FP_REGEN:
+            turns_temporary = weapon->fp_regen_time;
+            strength_temporary = weapon->fp_regen_strength;
+            break;
+        case StatusEffectType::OHKO:
+            turns_temporary = weapon->ohko_chance;
+            break;
+    }
+    
+    auto& move_manager = g_Mod->move_manager_;
+    
+    switch (weapon->item_id) {
+        case ItemType::POWER_JUMP:
+            if (status_type == StatusEffectType::DEFENSE_DOWN) {
+                turns_temporary += move_manager.GetSelectedLevel(
+                    tot::MoveType::JUMP_POWER_JUMP) * 2 - 2;
+            }
+            break;
+        case ItemType::SLEEPY_STOMP:
+            if (status_type == StatusEffectType::SLEEP) {
+                turns_temporary += move_manager.GetSelectedLevel(
+                    tot::MoveType::JUMP_SLEEPY_STOMP) * 2 - 2;
+            }
+            break;
+        case ItemType::HEAD_RATTLE:
+            if (status_type == StatusEffectType::TINY) {
+                turns_temporary += move_manager.GetSelectedLevel(
+                    tot::MoveType::HAMMER_SHRINK_SMASH) * 2 - 2;
+            }
+            break;
+        case ItemType::ICE_SMASH:
+            if (status_type == StatusEffectType::FREEZE) {
+                turns_temporary += move_manager.GetSelectedLevel(
+                    tot::MoveType::HAMMER_ICE_SMASH) * 2 - 2;
+            }
+            break;
+        case ItemType::CHARGE:
+        case ItemType::CHARGE_P:
+            if (status_type == StatusEffectType::CHARGE) {
+                strength_temporary += mario_move::GetStrategyBadgeLevel(
+                    /* is_charge = */ true,
+                    unit->current_kind == BattleUnitType::MARIO) - 1;
+            }
+            break;
+        case ItemType::SUPER_CHARGE:
+        case ItemType::SUPER_CHARGE_P:
+            if (status_type == StatusEffectType::DEFENSE_UP) {
+                strength_temporary += mario_move::GetStrategyBadgeLevel(
+                    /* is_charge = */ false,
+                    unit->current_kind == BattleUnitType::MARIO) - 1;
+            }
+            break;
+    }
+
+    // If unit is an enemy and status is Charge (and not an item),
+    // change its power in the same way as ATK / FP damage.
+    if (status_type == StatusEffectType::CHARGE && !weapon->item_id &&
+        unit->current_kind <= BattleUnitType::BONETAIL) {
+        int32_t altered_charge;
+        GetEnemyStats(
+            unit->current_kind, nullptr, &altered_charge,
+            nullptr, nullptr, nullptr, strength_temporary);
+        if (altered_charge > 99) altered_charge = 99;
+        strength_temporary = altered_charge;
+    }
+    
+    *turn_count = turns_temporary;
+    *strength = strength_temporary;
+}         
     
 void ApplyFixedPatches() {
     g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
@@ -111,29 +278,8 @@ void ApplyFixedPatches() {
         ttyd::battle_damage::_getSickStatusParam, [](
             BattleWorkUnit* unit, BattleWeapon* weapon, int32_t status_type,
             int8_t* turn_count, int8_t* strength) {
-                // Run vanilla logic.
-                g__getSickStatusParam_trampoline(
-                    unit, weapon, status_type, turn_count, strength);
-                // If badge type and status type (DEF-Up) are correct,
-                // change the effect strength based on the badges equipped.
-                if (status_type == 14 && (
-                    weapon->item_id == ItemType::SUPER_CHARGE ||
-                    weapon->item_id == ItemType::SUPER_CHARGE_P)) {
-                    bool is_mario = unit->current_kind == BattleUnitType::MARIO;
-                    int8_t badges = mario_move::GetToughenUpLevel(is_mario);
-                    *strength = badges + 1;
-                }
-                // If unit is an enemy and status is Charge (and not an item),
-                // change its power in the same way as ATK / FP damage.
-                if (status_type == 16 && !weapon->item_id &&
-                    unit->current_kind <= BattleUnitType::BONETAIL) {
-                    int32_t altered_charge;
-                    GetEnemyStats(
-                        unit->current_kind, nullptr, &altered_charge,
-                        nullptr, nullptr, nullptr, *strength);
-                    if (altered_charge > 99) altered_charge = 99;
-                    *strength = altered_charge;
-                }
+                // Replaces vanilla logic completely.
+                GetStatusParams(unit, weapon, status_type, turn_count, strength);
             });
         
     // Increase all forms of Payback-esque status returned damage to 1x.

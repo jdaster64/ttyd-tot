@@ -38,8 +38,6 @@ void (*g_seq_battleInit_trampoline)(void) = nullptr;
 const char* (*g_msgSearch_trampoline)(const char*) = nullptr;
 // cardmgr.o  800b2388
 void (*g_cardCopy2Main_trampoline)(int32_t) = nullptr;
-// mario_pouch.o  800d3300
-int32_t (*g_pouchEquipCheckBadge_trampoline)(int16_t) = nullptr;
 // mario_pouch.o  800d35a8
 void (*g_pouchReviseMarioParam_trampoline)() = nullptr;
 // mario_pouch.o 800d3e18

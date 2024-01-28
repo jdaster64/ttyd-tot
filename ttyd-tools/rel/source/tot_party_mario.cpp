@@ -1,6 +1,7 @@
 #include "tot_party_mario.h"
 
 #include "evt_cmd.h"
+#include "tot_move_manager.h"
 #include "tot_party_bobbery.h"
 #include "tot_party_koops.h"
 
@@ -119,25 +120,14 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
             for (int32_t i = 0; i < 8; ++i) {
                 auto& weapon_entry = command_work.weapon_table[num_options];
                 BattleWeapon* weapon = g_CustomJumpWeapons[i];
-                int32_t item_id = weapon->item_id;
                 
-                weapon_entry.index = -1;
+                weapon_entry.index = MoveType::JUMP_BASE + i;
+                weapon_entry.item_id = 0;
                 weapon_entry.unk_04 = 0;
                 weapon_entry.unk_18 = 0;
                 weapon_entry.weapon = weapon;
-                weapon_entry.item_id = item_id;
-                
-                if (weapon->icon == 0) {
-                    weapon_entry.icon = itemDataTable[item_id].icon_id;
-                } else {
-                    weapon_entry.icon = weapon->icon;
-                }
-                
-                if (weapon->name) {
-                     weapon_entry.name = msgSearch(weapon->name);
-                } else {
-                     weapon_entry.name = msgSearch(itemDataTable[item_id].name);
-                }
+                weapon_entry.icon = weapon->icon;
+                weapon_entry.name = msgSearch(weapon->name);
                 
                 ++num_options;
             }
@@ -147,25 +137,14 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
             for (int32_t i = 0; i < 8; ++i) {
                 auto& weapon_entry = command_work.weapon_table[num_options];
                 BattleWeapon* weapon = g_CustomHammerWeapons[i];
-                int32_t item_id = weapon->item_id;
                 
-                weapon_entry.index = -1;
+                weapon_entry.index = MoveType::HAMMER_BASE + i;
+                weapon_entry.item_id = 0;
                 weapon_entry.unk_04 = 0;
                 weapon_entry.unk_18 = 0;
                 weapon_entry.weapon = weapon;
-                weapon_entry.item_id = item_id;
-                
-                if (weapon->icon == 0) {
-                    weapon_entry.icon = itemDataTable[item_id].icon_id;
-                } else {
-                    weapon_entry.icon = weapon->icon;
-                }
-                
-                if (weapon->name) {
-                     weapon_entry.name = msgSearch(weapon->name);
-                } else {
-                     weapon_entry.name = msgSearch(itemDataTable[item_id].name);
-                }
+                weapon_entry.icon = weapon->icon;
+                weapon_entry.name = msgSearch(weapon->name);
                 
                 ++num_options;
             }
@@ -229,7 +208,7 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
                 auto& weapon_entry = command_work.weapon_table[num_options];
                 BattleWeapon* weapon = superActionTable[i];
                 
-                weapon_entry.index = -1;
+                weapon_entry.index = MoveType::SP_SWEET_TREAT + i;
                 weapon_entry.item_id = 0;
                 weapon_entry.unk_04 = 0;
                 weapon_entry.unk_18 = 0;
@@ -4744,8 +4723,8 @@ BattleWeapon customWeapon_FSUltraHammer = {
 };
 
 BattleWeapon customWeapon_PowerSoftStomp = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_gatsun_jump",
+    .icon = IconType::POWER_JUMP,
     .item_id = ItemType::POWER_JUMP,
     .description = nullptr,
     .base_accuracy = 100,
@@ -4808,8 +4787,8 @@ BattleWeapon customWeapon_PowerSoftStomp = {
 };
 
 BattleWeapon customWeapon_Multibounce = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_tugitugi_jump",
+    .icon = IconType::MULTIBOUNCE,
     .item_id = ItemType::MULTIBOUNCE,
     .description = nullptr,
     .base_accuracy = 100,
@@ -4870,8 +4849,8 @@ BattleWeapon customWeapon_Multibounce = {
 };
 
 BattleWeapon customWeapon_PowerBounce = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_renzoku_jump",
+    .icon = IconType::POWER_BOUNCE,
     .item_id = ItemType::POWER_BOUNCE,
     .description = nullptr,
     .base_accuracy = 100,
@@ -4932,8 +4911,8 @@ BattleWeapon customWeapon_PowerBounce = {
 };
 
 BattleWeapon customWeapon_SleepyStomp = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_nemurase_fumi",
+    .icon = IconType::SLEEPY_STOMP,
     .item_id = ItemType::SLEEPY_STOMP,
     .description = nullptr,
     .base_accuracy = 100,
@@ -4995,8 +4974,8 @@ BattleWeapon customWeapon_SleepyStomp = {
 };
 
 BattleWeapon customWeapon_TornadoJump = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_tamatsuki_jump",
+    .icon = IconType::TORNADO_JUMP,
     .item_id = ItemType::TORNADO_JUMP,
     .description = nullptr,
     .base_accuracy = 100,
@@ -5111,8 +5090,8 @@ BattleWeapon customWeapon_TornadoJumpRecoil = {
 };
 
 BattleWeapon customWeapon_PowerPiercingSmash = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_gatsun_naguri",
+    .icon = IconType::POWER_SMASH,
     .item_id = ItemType::POWER_SMASH,
     .description = nullptr,
     .base_accuracy = 100,
@@ -5172,8 +5151,8 @@ BattleWeapon customWeapon_PowerPiercingSmash = {
 };
 
 BattleWeapon customWeapon_ShrinkSmash = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_konran_hammer",
+    .icon = IconType::HEAD_RATTLE,
     .item_id = ItemType::HEAD_RATTLE,
     .description = nullptr,
     .base_accuracy = 100,
@@ -5235,8 +5214,8 @@ BattleWeapon customWeapon_ShrinkSmash = {
 };
 
 BattleWeapon customWeapon_IceSmash = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_ice_naguri",
+    .icon = IconType::ICE_SMASH,
     .item_id = ItemType::ICE_SMASH,
     .description = nullptr,
     .base_accuracy = 100,
@@ -5296,8 +5275,8 @@ BattleWeapon customWeapon_IceSmash = {
 };
 
 BattleWeapon customWeapon_QuakeHammer = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_jishin_attack",
+    .icon = IconType::QUAKE_HAMMER,
     .item_id = ItemType::QUAKE_HAMMER,
     .description = nullptr,
     .base_accuracy = 100,
@@ -5357,8 +5336,8 @@ BattleWeapon customWeapon_QuakeHammer = {
 };
 
 BattleWeapon customWeapon_FireDrive = {
-    .name = nullptr,
-    .icon = 0,
+    .name = "in_fire_naguri",
+    .icon = IconType::FIRE_DRIVE,
     .item_id = ItemType::FIRE_DRIVE,
     .description = nullptr,
     .base_accuracy = 100,

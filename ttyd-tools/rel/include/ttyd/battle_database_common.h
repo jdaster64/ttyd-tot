@@ -6,6 +6,39 @@
 
 namespace ttyd::battle_database_common {
     
+namespace StatusEffectType {
+    enum e {
+        ALLERGIC = 0,
+        SLEEP,
+        STOP,
+        DIZZY,
+        POISON,
+        CONFUSE,
+        ELECTRIC,
+        DODGY,
+        BURN,
+        FREEZE,
+        HUGE,
+        TINY,
+        ATTACK_UP,
+        ATTACK_DOWN,
+        DEFENSE_UP,
+        DEFENSE_DOWN,
+        CHARGE,
+        FLIPPED,
+        INVISIBLE,
+        FAST,
+        SLOW,
+        PAYBACK,
+        HOLD_FAST,
+        HP_REGEN,
+        FP_REGEN,
+        FRIGHT,
+        GALE_FORCE,
+        OHKO,
+    };
+}
+    
 namespace BattleUnitType {
     enum e {
         INVALID_UNIT_TYPE,

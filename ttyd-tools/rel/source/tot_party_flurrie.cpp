@@ -1,6 +1,7 @@
 #include "tot_party_flurrie.h"
 
 #include "evt_cmd.h"
+#include "tot_move_manager.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
@@ -41,11 +42,13 @@ extern BattleWeapon customWeapon_FlurrieBodySlam;
 extern BattleWeapon customWeapon_FlurrieGaleForce;
 extern BattleWeapon customWeapon_FlurrieLipLock;
 extern BattleWeapon customWeapon_FlurrieDodgyFog;
+extern BattleWeapon customWeapon_FlurrieMove5;
+extern BattleWeapon customWeapon_FlurrieMove6;
 
 BattleWeapon* g_WeaponTable[] = {
     &customWeapon_FlurrieBodySlam, &customWeapon_FlurrieGaleForce, 
     &customWeapon_FlurrieLipLock, &customWeapon_FlurrieDodgyFog, 
-    &customWeapon_FlurrieBodySlam, &customWeapon_FlurrieBodySlam
+    &customWeapon_FlurrieMove5, &customWeapon_FlurrieMove6
 };
 
 void MakeSelectWeaponTable(
@@ -54,7 +57,7 @@ void MakeSelectWeaponTable(
         auto& weapon_entry = command_work->weapon_table[*num_options];
         BattleWeapon* weapon = g_WeaponTable[i];
         
-        weapon_entry.index = -1;
+        weapon_entry.index = MoveType::FLURRIE_BASE + i;
         weapon_entry.item_id = 0;
         weapon_entry.weapon = weapon;
         weapon_entry.icon = weapon->icon;
@@ -982,6 +985,126 @@ BattleWeapon customWeapon_FlurrieDodgyFog = {
     .nozzle_fire_chance = 5,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
+};
+
+BattleWeapon customWeapon_FlurrieMove5 = {
+    .name = "btl_wn_pwd_normal",
+    .icon = IconType::PARTNER_MOVE_0,
+    .item_id = 0,
+    .description = "msg_pwd_body_press",
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0xa,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_body_press",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED |
+        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyClaudaAttack_NormalAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 20,
+    .bg_a2_fall_weight = 20,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 20,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 2,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 10,
+};
+
+BattleWeapon customWeapon_FlurrieMove6 = {
+    .name = "btl_wn_pwd_normal",
+    .icon = IconType::PARTNER_MOVE_0,
+    .item_id = 0,
+    .description = "msg_pwd_body_press",
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)weaponGetPowerFromPartyAttackLv,
+    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0xa,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_body_press",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED |
+        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = (void*)partyClaudaAttack_NormalAttack,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 20,
+    .bg_a2_fall_weight = 20,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 20,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 2,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 10,
 };
 
 }  // namespace mod::tot::party_flurrie
