@@ -338,13 +338,5 @@ double ApplySpRegenMultiplier(double base_regen) {
         g_Mod->state_.GetOptionNumericValue(OPTNUM_SP_REGEN_MODIFIER) / 20.0;
 }
 
-EVT_DEFINE_USER_FUNC(AwardStarPowerAndResetFaceDirection) {
-    // Declare Star Power / bonuses earned via this attack.
-    ttyd::battle_event_cmd::btlevtcmd_InviteApInfoReport(evt, isFirstCall);
-    // Reset facing direction as usual.
-    ttyd::battle_event_cmd::btlevtcmd_ResetFaceDirection(evt, isFirstCall);
-    return 2;
-}
-
 }  // namespace battle
 }  // namespace mod::infinite_pit

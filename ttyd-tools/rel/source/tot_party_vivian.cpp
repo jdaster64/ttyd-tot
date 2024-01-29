@@ -5,17 +5,23 @@
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
+#include <ttyd/battle_damage.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_sub.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_vivian.h>
+
+#include <cstring>
 
 namespace mod::tot::party_vivian {
 
@@ -33,7 +39,12 @@ using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_vivian;
 
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
+
+namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace IconType = ::ttyd::icondrv::IconType;
+namespace StatusEffectType = ::ttyd::battle_database_common::StatusEffectType;
 
 }  // namespace
 
@@ -67,6 +78,53 @@ void MakeSelectWeaponTable(
         
         ++*num_options;
     }
+}
+
+// If Infatuate lands successfully, changes the target's alliance permanently.
+EVT_DECLARE_USER_FUNC(evtTot_InfatuateChangeAlliance, 2)
+EVT_DEFINE_USER_FUNC(evtTot_InfatuateChangeAlliance) {
+    int32_t unit_idx = ttyd::battle_sub::BattleTransID(
+        evt, evtGetValue(evt, evt->evtArguments[0]));
+    int32_t part_idx = evtGetValue(evt, evt->evtArguments[1]);
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
+    auto* part = ttyd::battle::BattleGetUnitPartsPtr(unit_idx, part_idx);
+    
+    // If not a boss enemy or Yux, undo Confusion status and change alliance.
+    switch (unit->current_kind) {
+        case BattleUnitType::BONETAIL:
+        case BattleUnitType::ATOMIC_BOO:
+        case BattleUnitType::YUX:
+        case BattleUnitType::Z_YUX:
+        case BattleUnitType::X_YUX:
+        case BattleUnitType::MINI_YUX:
+        case BattleUnitType::MINI_Z_YUX:
+        case BattleUnitType::MINI_X_YUX:
+            break;
+            
+        default: {
+            uint32_t dummy = 0;
+            ttyd::battle_damage::BattleSetStatusDamage(
+                &dummy, unit, part, 0x100 /* ignore status vulnerability */,
+                StatusEffectType::CONFUSE, 100, 0, 0, 0);
+            unit->alliance = 0;
+            
+            // Unqueue the status message for inflicting confusion.
+            static constexpr const uint32_t kNoStatusMsg[] = {
+                0xff000000U, 0, 0
+            };
+            memcpy(
+                reinterpret_cast<void*>(
+                    reinterpret_cast<uintptr_t>(battleWork) + 0x18ddc),
+                kNoStatusMsg, sizeof(kNoStatusMsg));
+            memcpy(
+                reinterpret_cast<void*>(
+                    reinterpret_cast<uintptr_t>(unit) + 0xae8),
+                kNoStatusMsg, sizeof(kNoStatusMsg));
+        }
+    }
+    
+    return 2;
 }
 
 EVT_BEGIN(partyVivianAttack_NormalAttack)
@@ -335,23 +393,28 @@ EVT_BEGIN(partyVivianAttack_MagicalPowder)
     USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
     USER_FUNC(btlevtcmd_AcGetDifficulty, LW(0))
     SUB(LW(0), 3)
+    // Number of frames per button.
     SWITCH(LW(0))
         CASE_SMALL_EQUAL(-3)
-            SET(LW(0), 360)
+            SET(LW(0), 72)
         CASE_EQUAL(-2)
-            SET(LW(0), 270)
+            SET(LW(0), 54)
         CASE_EQUAL(-1)
-            SET(LW(0), 210)
+            SET(LW(0), 42)
         CASE_EQUAL(0)
-            SET(LW(0), 180)
+            SET(LW(0), 36)
         CASE_EQUAL(1)
-            SET(LW(0), 160)
+            SET(LW(0), 32)
         CASE_EQUAL(2)
-            SET(LW(0), 140)
+            SET(LW(0), 28)
         CASE_ETC()
-            SET(LW(0), 120)
+            SET(LW(0), 24)
     END_SWITCH()
-    USER_FUNC(btlevtcmd_AcSetParamAll, LW(0), 1, 5, -3, 1, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_FIERY_JINX, LW(1))
+    // Number of buttons (4, 5, 6 at level 1, 2, 3).
+    ADD(LW(1), 3)
+    MUL(LW(0), LW(1))
+    USER_FUNC(btlevtcmd_AcSetParamAll, LW(0), 1, LW(1), -3, 1, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_AcSetFlag, 7)
     USER_FUNC(btlevtcmd_SetupAC, -2, 10, 1, 0)
     WAIT_FRM(22)
@@ -569,6 +632,8 @@ EVT_BEGIN(partyVivianAttack_CharmKissAttack)
             USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
             USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
             USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+            // Apply Infatuate effect.
+            USER_FUNC(evtTot_InfatuateChangeAlliance, LW(3), LW(4))
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
         ELSE()
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
@@ -587,11 +652,12 @@ EVT_BEGIN(partyVivianAttack_CharmKissAttack)
     END_IF()
     WAIT_FRM(5)
     LBL(50)
-    USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
-    IF_NOT_EQUAL(LW(3), -1)
-        ADD(LW(10), 1)
-        GOTO(10)
-    END_IF()
+    // Disable checking next enemy for Infatuate.
+    // USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    // IF_NOT_EQUAL(LW(3), -1)
+    //    ADD(LW(10), 1)
+    //    GOTO(10)
+    // END_IF()
     LBL(80)
     USER_FUNC(btlevtcmd_StopAC)
     USER_FUNC(evt_audience_ap_recovery)
@@ -690,7 +756,9 @@ BattleWeapon customWeapon_VivianVeil = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_OPPOSING_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        // Explicitly add this to exclude Infatuated targets.
+        AttackTargetClass_Flags::ONLY_TARGET_MARIO,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_SAME_ALLIANCE_DIR |
         AttackTargetProperty_Flags::UNKNOWN_0x2,
@@ -798,7 +866,8 @@ BattleWeapon customWeapon_VivianInfatuate = {
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        // Single-target instead of multiple.
+        AttackTargetClass_Flags::SINGLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |

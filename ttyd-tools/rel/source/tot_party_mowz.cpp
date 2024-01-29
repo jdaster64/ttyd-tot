@@ -1,6 +1,8 @@
 #include "tot_party_mowz.h"
 
+#include "custom_item.h"
 #include "evt_cmd.h"
+#include "mod_state.h"
 #include "tot_move_manager.h"
 
 #include <ttyd/battle.h>
@@ -12,12 +14,18 @@
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/battle_icon.h>
 #include <ttyd/battle_message.h>
+#include <ttyd/battle_sub.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
+#include <ttyd/item_data.h>
+#include <ttyd/mario_pouch.h>
 #include <ttyd/msgdrv.h>
+#include <ttyd/npcdrv.h>
 #include <ttyd/unit_party_chuchurina.h>
 
 namespace mod::tot::party_mowz {
@@ -39,7 +47,12 @@ using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_chuchurina;
 
+using ::mod::infinite_pit::PickRandomItem;
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
+
 namespace IconType = ::ttyd::icondrv::IconType;
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 }  // namespace
 
@@ -76,6 +89,65 @@ void MakeSelectWeaponTable(
         
         ++*num_options;
     }
+}
+
+// Replaces vanilla logic for choosing items to steal.
+// TODO: Rework as appropriate for TOT.
+EVT_DECLARE_USER_FUNC(evtTot_GetKissThiefResult, 3)
+EVT_DEFINE_USER_FUNC(evtTot_GetKissThiefResult) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    id = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    uint32_t ac_result = evtGetValue(evt, evt->evtArguments[2]);
+    
+    int32_t item = unit->held_item;
+    // No held item; pick a random item to steal;
+    // 30% chance of item (20% normal, 10% recipe), 10% badge, 60% coin.
+    if (!item) {
+        item = PickRandomItem(infinite_pit::RNG_KISS_THIEF, 20, 10, 10, 60);
+        if (!item) item = ItemType::COIN;
+    }
+    if ((ac_result & 2) == 0 || item == ItemType::GOLD_BAR_X3 ||
+        !ttyd::mario_pouch::pouchGetItem(item)) {
+        // Action command unsuccessful, item = Shine Sprite (can't be stolen),
+        // or the player's inventory cannot hold the item.
+        evtSetValue(evt, evt->evtArguments[1], 0);
+    } else {
+        // Remove the unit's held item.
+        unit->held_item = 0;
+        
+        // Remove the corresponding held/stolen item from the NPC setup,
+        // if this was one of the initial enemies in the loadout.
+        if (!ttyd::battle_unit::BtlUnit_CheckUnitFlag(unit, 0x40000000)) {
+            if (unit->group_index >= 0) {
+                battleWork->fbat_info->wBattleInfo->wHeldItems
+                    [unit->group_index] = 0;
+            }
+        } else {
+            ttyd::battle_unit::BtlUnit_OffUnitFlag(unit, 0x40000000);
+            if (unit->group_index >= 0) {
+                auto* npc_battle_info = battleWork->fbat_info->wBattleInfo;
+                npc_battle_info->wHeldItems[unit->group_index] = 0;
+                npc_battle_info->wStolenItems[unit->group_index] = 0;
+            }
+        }
+        
+        // If a badge was stolen, re-equip the target unit's remaining badges.
+        if (item >= ItemType::POWER_JUMP && item < ItemType::MAX_ITEM_TYPE) {
+            int32_t kind = unit->current_kind;
+            if (kind == BattleUnitType::MARIO) {
+                ttyd::battle::BtlUnit_EquipItem(unit, 3, 0);
+            } else if (kind >= BattleUnitType::GOOMBELLA) {
+                ttyd::battle::BtlUnit_EquipItem(unit, 5, 0);
+            } else {
+                ttyd::battle::BtlUnit_EquipItem(unit, 1, 0);
+            }
+        }
+        
+        evtSetValue(evt, evt->evtArguments[1], item);
+    }
+    return 2;
 }
 
 EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
@@ -152,22 +224,21 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
                 SET(LW(1), 12)
                 SET(LW(2), 30)
         END_SWITCH()
-        // Change gauge parameters based on move level.
-        USER_FUNC(evt_GetMoveSelectedLevel, MoveType::MOWZ_BASE, LW(0))
+        // Change gauge parameters based on move level (up to 2-4 extra hits).
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_BASE, LW(0))
         SWITCH(LW(0))
-            CASE_EQUAL(3)
-                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 34, 35, EVT_NULLPTR)
-                USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
-                USER_FUNC(btlevtcmd_AcSetFlag, 64)
+            CASE_EQUAL(1)
+                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 50, 50, EVT_NULLPTR)
+                USER_FUNC(btlevtcmd_AcSetGaugeParam, 50, 100, 100, 100)
             CASE_EQUAL(2)
-                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 50, 51, EVT_NULLPTR)
-                USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
-                USER_FUNC(btlevtcmd_AcSetFlag, 64)
+                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 34, 34, EVT_NULLPTR)
+                USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 67, 100, 100)
             CASE_ETC()
-                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 100, 100, EVT_NULLPTR)
-                USER_FUNC(btlevtcmd_AcSetGaugeParam, 100, 100, 100, 100)
-                USER_FUNC(btlevtcmd_AcSetFlag, 64)
+                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 25, 25, EVT_NULLPTR)
+                USER_FUNC(btlevtcmd_AcSetGaugeParam, 25, 50, 75, 100)
         END_SWITCH()
+        // Start with 1 base hit.
+        USER_FUNC(btlevtcmd_AcSetFlag, 64)
         USER_FUNC(btlevtcmd_SetupAC, -2, 6, 1, 0)
         WAIT_FRM(1)
         USER_FUNC(btlevtcmd_StartAC, 1)
@@ -207,15 +278,9 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
     USER_FUNC(btlevtcmd_ResultAC)
     DELETE_EVT(LW(14))
     DELETE_EVT(LW(15))
-    USER_FUNC(evt_GetMoveSelectedLevel, MoveType::MOWZ_BASE, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(3)
-            USER_FUNC(btlevtcmd_SetUnitWork, -2, 5, 4)
-        CASE_EQUAL(2)
-            USER_FUNC(btlevtcmd_SetUnitWork, -2, 5, 3)
-        CASE_ETC()
-            USER_FUNC(btlevtcmd_SetUnitWork, -2, 5, 2)
-    END_SWITCH()
+    // Number of hits based on AC output param 2, rather than move level.
+    USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, 5, LW(0))
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
     USER_FUNC(evt_btl_camera_set_zoom, 0, 300)
     USER_FUNC(btlevtcmd_SetRGB, -2, 1, 255, 255, 255)
@@ -286,8 +351,7 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         USER_FUNC(btlevtcmd_SetRotate, -2, 0, 0, 0)
         USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PCH_A2_4"))
         WAIT_FRM(52)
-        USER_FUNC(evt_audience_ap_recovery)
-        USER_FUNC(btlevtcmd_InviteApInfoReport)
+        // USER_FUNC(btlevtcmd_InviteApInfoReport)
         GOTO(95)
     END_IF()
     SET(LW(0), LW(10))
@@ -396,7 +460,8 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
     USER_FUNC(btlevtcmd_GetResultAC, LW(6))
     IF_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
-        SUB(LW(0), 2)
+        // Changed Nice / Good / Great thresholds to 3, 4, 5 hits.
+        SUB(LW(0), 3)
         IF_LARGE_EQUAL(LW(0), 0)
             USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), LW(0), LW(11))
             USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -530,8 +595,7 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PCH_X_1"))
         WAIT_FRM(60)
         USER_FUNC(btlevtcmd_StopAC)
-        USER_FUNC(evt_audience_ap_recovery)
-        USER_FUNC(btlevtcmd_InviteApInfoReport)
+        // USER_FUNC(btlevtcmd_InviteApInfoReport)
         GOTO(95)
     END_IF()
     MUL(LW(13), -1)
@@ -541,8 +605,7 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
     END_IF()
     LBL(90)
     USER_FUNC(btlevtcmd_StopAC)
-    USER_FUNC(evt_audience_ap_recovery)
-    USER_FUNC(btlevtcmd_InviteApInfoReport)
+    // USER_FUNC(btlevtcmd_InviteApInfoReport)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PCH_A1_3"))
     WAIT_FRM(40)
     LBL(95)
@@ -590,6 +653,8 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         USER_FUNC(btlevtcmd_WaitEventEnd, LW(15))
     END_IF()
     LBL(99)
+    // Move Star Power generation to the end so Stylishes affect it.
+    USER_FUNC(btlevtcmd_InviteApInfoReport)
     USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
     RUN_CHILD_EVT(PTR(&btldefaultevt_SuitoruBadgeEffect))
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
@@ -759,7 +824,7 @@ EVT_BEGIN(partyChuchurinaAttack_ItemSteal)
     USER_FUNC(btlevtcmd_SetFallAccel, -2, FLOAT(0.70))
     USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 16, -1)
     USER_FUNC(btlevtcmd_GetResultAC, LW(6))
-    USER_FUNC(_chuchu_item_steal, LW(3), LW(14), LW(6))
+    USER_FUNC(evtTot_GetKissThiefResult, LW(3), LW(14), LW(6))
     IF_EQUAL(LW(14), 0)
         USER_FUNC(btlevtcmd_JumpContinue, -2)
         USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PCH_F_1"))
@@ -1331,9 +1396,22 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
             SET(LW(1), 12)
             SET(LW(2), 30)
     END_SWITCH()
-    USER_FUNC(btlevtcmd_AcSetParamAll, 11, LW(0), 178, LW(1), LW(2), 12, 37, EVT_NULLPTR)
-    USER_FUNC(btlevtcmd_AcSetGaugeParam, 36, 72, 100, 100)
-    USER_FUNC(btlevtcmd_AcSetFlag, 64)
+    // Change gauge parameters based on move level.
+    // Heal up to 5, 10, 15 HP with a full bar.
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_SMOOCH, LW(6))
+    SWITCH(LW(6))
+        CASE_EQUAL(1)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 11, LW(0), 178, LW(1), LW(2), 20, 100, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetGaugeParam, 100, 100, 100, 100)
+        CASE_EQUAL(2)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 11, LW(0), 178, LW(1), LW(2), 10, 50, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetGaugeParam, 50, 100, 100, 100)
+        CASE_ETC()
+            USER_FUNC(btlevtcmd_AcSetParamAll, 11, LW(0), 178, LW(1), LW(2), 7, 36, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetGaugeParam, 35, 70, 100, 100)
+    END_SWITCH()
+    // Disable the vanilla 1 HP base.
+    USER_FUNC(btlevtcmd_AcSetFlag, 1)
     USER_FUNC(btlevtcmd_SetupAC, -2, 6, 1, 0)
     WAIT_FRM(22)
     USER_FUNC(btlevtcmd_StartAC, 1)
@@ -1352,12 +1430,13 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
     END_BROTHER()
     USER_FUNC(btlevtcmd_ResultAC)
     USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(5))
+    // Action command success: 5 - Nice, 10 - Good, 15 - Great.
     SWITCH(LW(5))
-        CASE_LARGE_EQUAL(10)
+        CASE_LARGE_EQUAL(15)
             SET(LW(5), 2)
-        CASE_LARGE_EQUAL(7)
+        CASE_LARGE_EQUAL(10)
             SET(LW(5), 1)
-        CASE_LARGE_EQUAL(4)
+        CASE_LARGE_EQUAL(5)
             SET(LW(5), 0)
         CASE_ETC()
             SET(LW(5), -1)
@@ -1451,8 +1530,8 @@ BattleWeapon customWeapon_MowzLoveSlapL = {
     .unk_19 = 1,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = nullptr,
-    .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1476,10 +1555,13 @@ BattleWeapon customWeapon_MowzLoveSlapL = {
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags =
         AttackCounterResistance_Flags::TOP_SPIKY |
-        AttackCounterResistance_Flags::PAYBACK,
+        // Additional resistances (and removed Payback).
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::FIERY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1513,8 +1595,8 @@ BattleWeapon customWeapon_MowzLoveSlapR = {
     .unk_19 = 1,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = nullptr,
-    .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1538,10 +1620,13 @@ BattleWeapon customWeapon_MowzLoveSlapR = {
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags =
         AttackCounterResistance_Flags::TOP_SPIKY |
-        AttackCounterResistance_Flags::PAYBACK,
+        // Additional resistances (and removed Payback).
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::FIERY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1575,8 +1660,8 @@ BattleWeapon customWeapon_MowzLoveSlapLFinal = {
     .unk_19 = 1,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)weaponGetACOutputParam,
-    .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1600,9 +1685,13 @@ BattleWeapon customWeapon_MowzLoveSlapLFinal = {
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags =
-        AttackCounterResistance_Flags::TOP_SPIKY,
+        AttackCounterResistance_Flags::TOP_SPIKY |
+        // Additional resistances.
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::FIERY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1636,8 +1725,8 @@ BattleWeapon customWeapon_MowzLoveSlapRFinal = {
     .unk_19 = 1,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)weaponGetACOutputParam,
-    .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1661,9 +1750,13 @@ BattleWeapon customWeapon_MowzLoveSlapRFinal = {
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags =
-        AttackCounterResistance_Flags::TOP_SPIKY,
+        AttackCounterResistance_Flags::TOP_SPIKY |
+        // Additional resistances.
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::FIERY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1709,9 +1802,9 @@ BattleWeapon customWeapon_MowzKissThief = {
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
+        // Removed Hammer-like range check.
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::ONLY_FRONT |
-        AttackTargetProperty_Flags::HAMMERLIKE,
+        AttackTargetProperty_Flags::ONLY_FRONT,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0x14,
     .weapon_ac_level = 3,
@@ -1719,8 +1812,9 @@ BattleWeapon customWeapon_MowzKissThief = {
     .ac_help_msg = "msg_ac_heart_catch",
     .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
     .counter_resistance_flags =
-        AttackCounterResistance_Flags::TOP_SPIKY |
-        AttackCounterResistance_Flags::PAYBACK,
+        // Ignores all contact hazards, aside from lit Bob-ombs.
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::VOLATILE_EXPLOSIVE,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1771,7 +1865,7 @@ BattleWeapon customWeapon_MowzTease = {
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_mahou_no_kona",
+    .ac_help_msg = "msg_ac_madowaseru",
     .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
@@ -1819,7 +1913,9 @@ BattleWeapon customWeapon_MowzSmooch = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_OPPOSING_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        // Explicitly add this to exclude Infatuated targets.
+        AttackTargetClass_Flags::ONLY_TARGET_MARIO,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_SAME_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
@@ -1866,8 +1962,8 @@ BattleWeapon customWeapon_MowzMove5 = {
     .unk_19 = 1,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)weaponGetACOutputParam,
-    .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1891,9 +1987,13 @@ BattleWeapon customWeapon_MowzMove5 = {
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags =
-        AttackCounterResistance_Flags::TOP_SPIKY,
+        AttackCounterResistance_Flags::TOP_SPIKY |
+        // Additional resistances.
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::FIERY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1927,8 +2027,8 @@ BattleWeapon customWeapon_MowzMove6 = {
     .unk_19 = 1,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)weaponGetACOutputParam,
-    .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1952,9 +2052,13 @@ BattleWeapon customWeapon_MowzMove6 = {
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags =
-        AttackCounterResistance_Flags::TOP_SPIKY,
+        AttackCounterResistance_Flags::TOP_SPIKY |
+        // Additional resistances.
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::FIERY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |

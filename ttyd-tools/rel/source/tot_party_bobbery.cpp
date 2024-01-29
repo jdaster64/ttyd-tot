@@ -685,12 +685,12 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
             SET(LW(2), 28)
     END_SWITCH()
     // Change gauge parameters and difficulty based on move level.
-    USER_FUNC(evt_GetMoveSelectedLevel, MoveType::BOBBERY_BOBOMBAST, LW(5))
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::BOBBERY_BOBOMBAST, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(1)
             ADD(LW(0), 2)
             SUB(LW(1), 2)
-            USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 178, LW(1), LW(2), 34, 61, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 178, LW(1), LW(2), 34, 100, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 100, 100, 100, 100)
         CASE_EQUAL(2)
             ADD(LW(0), 1)
@@ -973,7 +973,7 @@ BattleWeapon customWeapon_BobberyBomb = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 4, 2, 5, 3, 6, 0, MoveType::BOBBERY_BASE },
+    .damage_function_params = { 1, 3, 2, 5, 3, 7, 0, MoveType::BOBBERY_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1035,8 +1035,8 @@ BattleWeapon customWeapon_BobberyBombFS = {
     .unk_19 = 1,
     .bingo_card_chance = 1,
     .unk_1b = 50,
-    .damage_function = (void*)weaponGetPowerDefault,
-    .damage_function_params = { 4, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = (void*)GetWeaponPowerFromMaxLevel,
+    .damage_function_params = { 3, 3, 5, 5, 7, 7, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =

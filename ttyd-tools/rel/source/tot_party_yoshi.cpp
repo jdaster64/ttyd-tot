@@ -132,7 +132,7 @@ EVT_BEGIN(partyYoshiAttack_NormalAttack)
     BROTHER_EVT_ID(LW(15))
         USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(15))
         USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(15))
-        USER_FUNC(evt_GetMoveSelectedLevel, MoveType::YOSHI_BASE, LW(0))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_BASE, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(3)
                 USER_FUNC(btlevtcmd_AcSetParamAll, 5, 180, 178, 23, 25, 20, 61, 1)
@@ -258,7 +258,7 @@ EVT_BEGIN(partyYoshiAttack_NormalAttack)
         ELSE()
             USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131072, LW(5))
         END_IF()
-        USER_FUNC(evt_GetMoveSelectedLevel, MoveType::YOSHI_BASE, LW(0))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_BASE, LW(0))
         // Set AC result based on number of hits, regardless of level.
         USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
         SWITCH(LW(0))
@@ -735,7 +735,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     USER_FUNC(evt_btl_camera_set_zoom, 0, 300)
     USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
-    USER_FUNC(evt_GetMoveSelectedLevel, MoveType::YOSHI_MINI_EGG, LW(0))
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_MINI_EGG, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
             SET(LW(1), 3)
@@ -1065,7 +1065,7 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
             SET(LW(1), 14)
             SET(LW(2), 30)
     END_SWITCH()
-    USER_FUNC(evt_GetMoveSelectedLevel, MoveType::YOSHI_STAMPEDE, LW(6))
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_STAMPEDE, LW(6))
     SWITCH(LW(6))
         CASE_EQUAL(1)
             USER_FUNC(btlevtcmd_AcSetParamAll, 15, LW(0), 178, LW(1), LW(2), 34, 100, EVT_NULLPTR)
@@ -1513,7 +1513,7 @@ BattleWeapon customWeapon_YoshiGulp_Recoil = {
     .bingo_card_chance = 0,
     .unk_1b = 0,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 4, 2, 5, 3, 6, 0, MoveType::YOSHI_GULP },
+    .damage_function_params = { 2, 2, 3, 3, 4, 4, 0, MoveType::YOSHI_GULP },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1527,7 +1527,8 @@ BattleWeapon customWeapon_YoshiGulp_Recoil = {
         AttackTargetProperty_Flags::RECOIL_DAMAGE |
         AttackTargetProperty_Flags::HAMMERLIKE,
     .element = AttackElement::NORMAL,
-    .damage_pattern = 0,
+    // Cascading knockback effect
+    .damage_pattern = 6,
     .weapon_ac_level = 3,
     .unk_6f = 2,
     .ac_help_msg = nullptr,
@@ -1635,7 +1636,9 @@ BattleWeapon customWeapon_YoshiStampede = {
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        // Cannot target flying enemies.
+        AttackTargetProperty_Flags::HAMMERLIKE,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0,
     .weapon_ac_level = 3,

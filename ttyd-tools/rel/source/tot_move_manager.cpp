@@ -67,7 +67,7 @@ const MoveData g_MoveData[] = {
     
     { "Shell Toss", { 0, 2, 4, }, },
     { "Power Sh.",  { 2, 4, 6, }, },
-    { "Shell Shield", { 4, 4, 4, }, },
+    { "Shell Shield", { 4, 6, 8, }, },
     { "Shell Slam", { 4, 6, 8, }, },
     { "Move 5",     { 1, 1, 1, }, },
     { "Move 6",     { 1, 1, 1, }, },
@@ -89,7 +89,7 @@ const MoveData g_MoveData[] = {
     { "Shade Fist", { 0, 2, 4, }, },
     { "Veil",       { 1, 1, 1, }, },
     { "Fiery Jinx", { 3, 5, 7, }, },
-    { "Infatuate",  { 3, 5, 7, }, },
+    { "Infatuate",  { 5, 5, 5, }, },
     { "Move 5",     { 1, 1, 1, }, },
     { "Move 6",     { 1, 1, 1, }, },
     
@@ -101,7 +101,7 @@ const MoveData g_MoveData[] = {
     { "Move 6",     { 1, 1, 1, }, },
     
     { "Love Slap",  { 0, 2, 4, }, },
-    { "Kiss Thief", { 4, 4, 4, }, },
+    { "Kiss Thief", { 5, 5, 5, }, },
     { "Tease",      { 4, 4, 4, }, },
     { "Smooch",     { 3, 5, 7, }, },
     { "Move 5",     { 1, 1, 1, }, },
@@ -179,7 +179,24 @@ uint32_t GetWeaponPowerFromSelectedLevel(
     return power;
 }
 
-EVT_DEFINE_USER_FUNC(evt_GetMoveSelectedLevel) {
+uint32_t GetWeaponPowerFromMaxLevel(
+    BattleWorkUnit* unit1, BattleWeapon* weapon, BattleWorkUnit* unit2,
+    BattleWorkUnitPart* part) {
+    const int32_t move = weapon->damage_function_params[7];
+    const int32_t level = MoveManager::GetUnlockedLevel(move);
+    const int32_t ac_success =
+        g_BattleWork->ac_manager_work.ac_result == 2 ? 1 : 0;
+        
+    int32_t power = weapon->damage_function_params[level * 2 - 2 + ac_success];
+    if ((move & ~7) == MoveType::JUMP_BASE) {
+        power += unit1->badges_equipped.jumpman;
+    } else if ((move & ~7) == MoveType::HAMMER_BASE) {
+        power += unit1->badges_equipped.hammerman;
+    }
+    return power;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetMoveSelectedLevel) {
     int32_t move = evtGetValue(evt, evt->evtArguments[0]);
     evtSetValue(
         evt, evt->evtArguments[1], MoveManager::GetSelectedLevel(move));

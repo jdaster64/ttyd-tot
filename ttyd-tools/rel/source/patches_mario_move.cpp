@@ -95,13 +95,6 @@ extern int32_t (*g_sac_suki_set_weapon_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_weaponGetPower_ZubaStar_trampoline)(
     BattleWorkUnit*, BattleWeapon*, BattleWorkUnit*, BattleWorkUnitPart*);
 // Patch addresses.
-extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_GetSp1;
-extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_GetSp2;
-extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_GetSp3;
-extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_GetSp4;
-extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_PrizeTier1;
-extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_PrizeTier2;
-extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_ResetFace;
 extern const int32_t g_subsetevt_shot_damage_Patch_SuperInvolvedWeapon;
 extern const int32_t g_subsetevt_shot_damage_Patch_UltraInvolvedWeapon;
 extern const int32_t g_subsetevt_swallow_shot_damage_Patch_InvolvedWeapon;
@@ -459,31 +452,6 @@ void ApplyFixedPatches() {
             CheckForSelectingWeaponLevel(/* is_strategies_menu = */ false);
             g_DrawWeaponWin_trampoline();
         });
-        
-    // Increase Spring Jump's AC prize level by 1 to make it more desirable.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(
-            g_marioAttackEvent_JyabaraJump_Patch_PrizeTier1), 1);
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(
-            g_marioAttackEvent_JyabaraJump_Patch_PrizeTier2), 2);
-    // Move SP calculation to the end of the attack so the Stylish matters.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_marioAttackEvent_JyabaraJump_Patch_GetSp1),
-        DeclareStarPowerPatch, sizeof(DeclareStarPowerPatch));
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_marioAttackEvent_JyabaraJump_Patch_GetSp2),
-        DeclareStarPowerPatch, sizeof(DeclareStarPowerPatch));
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_marioAttackEvent_JyabaraJump_Patch_GetSp3),
-        DeclareStarPowerPatch, sizeof(DeclareStarPowerPatch));
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_marioAttackEvent_JyabaraJump_Patch_GetSp4),
-        DeclareStarPowerPatch, sizeof(DeclareStarPowerPatch));
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_marioAttackEvent_JyabaraJump_Patch_ResetFace),
-        reinterpret_cast<uint32_t>(
-            battle::AwardStarPowerAndResetFaceDirection));
             
     // Change "involved" weapons for Super/Ultra Hammer and Yoshi's Gulp.
     mod::patch::writePatch(

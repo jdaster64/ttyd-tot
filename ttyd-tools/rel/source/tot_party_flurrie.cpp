@@ -471,7 +471,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             SET(LW(1), 2)
     END_SWITCH()
     // Change gauge parameters based on move level.
-    USER_FUNC(evt_GetMoveSelectedLevel, MoveType::FLURRIE_LIP_LOCK, LW(5))
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::FLURRIE_LIP_LOCK, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(1)
             USER_FUNC(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 3, 2, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
@@ -725,6 +725,8 @@ EVT_BEGIN(partyClaudaAttack_KumoGuard)
     USER_FUNC(evt_audience_ap_recovery)
     USER_FUNC(btlevtcmd_InviteApInfoReport)
     USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
+    // Also apply Dodgy status to Flurrie herself.
+    USER_FUNC(btlevtcmd_CheckDamage, -2, -2, 1, LW(12), 256, LW(5))
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
     RETURN()
 EVT_END()
@@ -744,7 +746,7 @@ BattleWeapon customWeapon_FlurrieBodySlam = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::FLURRIE_BASE },
+    .damage_function_params = { 1, 3, 2, 5, 3, 7, 0, MoveType::FLURRIE_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -884,7 +886,11 @@ BattleWeapon customWeapon_FlurrieLipLock = {
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags = AttackCounterResistance_Flags::TOP_SPIKY,
+    .counter_resistance_flags = 
+        AttackCounterResistance_Flags::TOP_SPIKY |
+        // Additional resistances.
+        AttackCounterResistance_Flags::FRONT_SPIKY |
+        AttackCounterResistance_Flags::FIERY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -928,7 +934,9 @@ BattleWeapon customWeapon_FlurrieDodgyFog = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_OPPOSING_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        // Explicitly add this to exclude Infatuated targets.
+        AttackTargetClass_Flags::ONLY_TARGET_MARIO,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_SAME_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,

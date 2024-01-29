@@ -8,10 +8,13 @@
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_sub.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_nokotarou.h>
@@ -30,6 +33,9 @@ using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_nokotarou;
+
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 
@@ -70,6 +76,46 @@ void MakeSelectWeaponTable(
 
 BattleWeapon* GetFirstAttackWeapon() {
     return &customWeapon_KoopsShellTossFS;
+}
+
+// Sets the initial HP for Shell Shield based on the AC result + move level.
+EVT_DECLARE_USER_FUNC(evtTot_ShellShieldSetInitialHp, 2)
+EVT_DEFINE_USER_FUNC(evtTot_ShellShieldSetInitialHp) {
+    int32_t unit_idx = ttyd::battle_sub::BattleTransID(
+        evt, evtGetValue(evt, evt->evtArguments[0]));
+    int32_t ac_level = evtGetValue(evt, evt->evtArguments[1]);
+    int32_t starting_hp = 0;
+    int32_t max_hp = 0;
+    
+    // Action command rating ranges from 0 - 8.
+    switch (MoveManager::GetSelectedLevel(MoveType::KOOPS_SHELL_SHIELD)) {
+        case 3:
+            starting_hp = ac_level / 2;     // Nice = 2, Good = 3, Super = 4
+            max_hp = 4;
+            break;
+        case 2:
+            starting_hp = ac_level / 2 - 1; // Nice = 1, Good = 2, Super = 3
+            max_hp = 3;
+            break;
+        default:
+            starting_hp = ac_level / 3;     // Nice = 1, Good = 2, Super = 2
+            max_hp = 2;
+    }
+    if (starting_hp < 1) starting_hp = 1;
+    
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
+    
+    // Set unit's maximum HP.
+    unit->max_hp = max_hp;
+    // Set unit's current HP.
+    evtSetValue(evt, evt->evtArguments[1], starting_hp);
+    btlevtcmd_SetHp(evt, isFirstCall);
+    
+    // Reset variable 1 to the action command level before exiting
+    // (since it also controls the visuals of the shell's cracks).
+    evtSetValue(evt, evt->evtArguments[1], ac_level);
+    return 2;
 }
 
 EVT_BEGIN(partyNokotarouAttack_FirstAttack)
@@ -736,7 +782,7 @@ EVT_BEGIN(partyNokotarouAttack_KouraGuard)
         ELSE()
             USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
         END_IF()
-        USER_FUNC(btlevtcmd_SetHp, LW(10), LW(0))
+        USER_FUNC(evtTot_ShellShieldSetInitialHp, LW(10), LW(0))
         USER_FUNC(btlevtcmd_RunDataEventChild, LW(10), 61)
         USER_FUNC(btlevtcmd_AnimeChangePoseType, LW(10), 1, 43)
         USER_FUNC(btlevtcmd_OnPartsAttribute, LW(3), 1, 16777216)
@@ -860,12 +906,12 @@ EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
             SET(LW(1), 30)
     END_SWITCH()
     // Change gauge parameters and difficulty based on move level.
-    USER_FUNC(evt_GetMoveSelectedLevel, MoveType::KOOPS_SHELL_SLAM, LW(5))
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::KOOPS_SHELL_SLAM, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(1)
             ADD(LW(0), 3)
             SUB(LW(1), 3)
-            USER_FUNC(btlevtcmd_AcSetParamAll, 7, 200, 178, LW(0), LW(1), 34, 61, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 7, 200, 178, LW(0), LW(1), 34, 100, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 100, 100, 100, 100)
         CASE_EQUAL(2)
             ADD(LW(0), 2)
@@ -873,7 +919,7 @@ EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
             USER_FUNC(btlevtcmd_AcSetParamAll, 7, 200, 178, LW(0), LW(1), 20, 61, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 60, 100, 100, 100)
         CASE_ETC()
-            USER_FUNC(btlevtcmd_AcSetParamAll, 7, 200, 178, LW(0), LW(1), 15, 61, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 7, 200, 178, LW(0), LW(1), 15, 43, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 42, 71, 100, 100)
     END_SWITCH()
     USER_FUNC(btlevtcmd_AcSetFlag, 0)
@@ -1120,7 +1166,7 @@ BattleWeapon customWeapon_KoopsShellToss = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 3, 3, 5, 0, MoveType::KOOPS_BASE },
+    .damage_function_params = { 1, 3, 2, 5, 3, 7, 0, MoveType::KOOPS_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1180,8 +1226,8 @@ BattleWeapon customWeapon_KoopsShellTossFS = {
     .unk_19 = 1,
     .bingo_card_chance = 1,
     .unk_1b = 1,
-    .damage_function = (void*)weaponGetPowerDefault,
-    .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = (void*)GetWeaponPowerFromMaxLevel,
+    .damage_function_params = { 3, 3, 5, 5, 7, 7, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1352,6 +1398,7 @@ BattleWeapon customWeapon_KoopsShellSlam = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)weaponGetACOutputParam,
+    // Maximum damage: 4, 6, 8
     .damage_function_params = { 2, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },

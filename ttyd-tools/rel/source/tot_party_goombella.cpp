@@ -932,7 +932,8 @@ BattleWeapon customWeapon_GoombellaTattle = {
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
-    .stylish_multiplier = 1,
+    // Additional Stylish power to give some incentive to use the move again.
+    .stylish_multiplier = 3,
     .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
@@ -1061,7 +1062,9 @@ BattleWeapon customWeapon_GoombellaRallyWink = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_OPPOSING_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        // Explicitly add this to exclude Infatuated targets.
+        AttackTargetClass_Flags::ONLY_TARGET_MARIO,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_SAME_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
