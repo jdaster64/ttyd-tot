@@ -7,6 +7,8 @@
 #include "patch.h"
 #include "patches_battle.h"
 #include "tot_move_manager.h"
+#include "tot_party_mario.h"
+#include "tot_party_yoshi.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
@@ -100,6 +102,9 @@ extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_GetSp4;
 extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_PrizeTier1;
 extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_PrizeTier2;
 extern const int32_t g_marioAttackEvent_JyabaraJump_Patch_ResetFace;
+extern const int32_t g_subsetevt_shot_damage_Patch_SuperInvolvedWeapon;
+extern const int32_t g_subsetevt_shot_damage_Patch_UltraInvolvedWeapon;
+extern const int32_t g_subsetevt_swallow_shot_damage_Patch_InvolvedWeapon;
 extern const int32_t g_sac_genki_main_base_BlinkNumbers_BH;
 extern const int32_t g_sac_genki_main_base_BlinkNumbers_EH;
 extern const int32_t g_sac_genki_main_base_SetupTargets_BH;
@@ -479,6 +484,23 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_marioAttackEvent_JyabaraJump_Patch_ResetFace),
         reinterpret_cast<uint32_t>(
             battle::AwardStarPowerAndResetFaceDirection));
+            
+    // Change "involved" weapons for Super/Ultra Hammer and Yoshi's Gulp.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(
+            g_subsetevt_shot_damage_Patch_SuperInvolvedWeapon),
+        reinterpret_cast<uint32_t>(
+            &tot::party_mario::customWeapon_SuperHammerRecoil));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(
+            g_subsetevt_shot_damage_Patch_UltraInvolvedWeapon),
+        reinterpret_cast<uint32_t>(
+            &tot::party_mario::customWeapon_UltraHammerRecoil));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(
+            g_subsetevt_swallow_shot_damage_Patch_InvolvedWeapon),
+        reinterpret_cast<uint32_t>(
+            &tot::party_yoshi::customWeapon_YoshiGulp_Recoil));
     
     // Change the Sweet Treat/Feast target type counts based on level.
     mod::patch::writeBranchPair(

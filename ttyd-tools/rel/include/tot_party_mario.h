@@ -10,6 +10,9 @@ struct BattleWeapon;
 }
 
 namespace mod::tot::party_mario {
+    
+extern ttyd::battle_database_common::BattleWeapon customWeapon_SuperHammerRecoil;
+extern ttyd::battle_database_common::BattleWeapon customWeapon_UltraHammerRecoil;
 
 // Custom function to populate the weapon selection dialog.
 int32_t MakeSelectWeaponTable(
