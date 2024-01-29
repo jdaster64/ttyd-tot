@@ -202,8 +202,6 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
         ttyd::battle::g_BattleWork->command_work.window_work);
     if (!win_data || !win_data[0]) return;
     
-    auto& move_manager = g_Mod->move_manager_;
-    
     auto* cursor = reinterpret_cast<BattleWorkCommandCursor*>(win_data[0]);
     if (is_strategies_menu) {
         auto* battleWork = ttyd::battle::g_BattleWork;
@@ -288,16 +286,16 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 // If current selection, and L/R pressed, change power level.
                 if (i == cursor->abs_position) {
                     if (left_press && 
-                        move_manager.ChangeSelectedLevel(move_type, -1)) {
+                        tot::MoveManager::ChangeSelectedLevel(move_type, -1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     } else if (
                         right_press &&
-                        move_manager.ChangeSelectedLevel(move_type, 1)) {
+                        tot::MoveManager::ChangeSelectedLevel(move_type, 1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     }
                     
                     // Overwrite default text based on current power level.
-                    move_manager.GetCurrentSelectionString(
+                    tot::MoveManager::GetCurrentSelectionString(
                         move_type, g_MoveBadgeTextBuffer);
                     weapons[i].name = g_MoveBadgeTextBuffer;
                 } else {
@@ -306,7 +304,7 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 
                 // Update actual SP cost.
                 int32_t idx = move_type - tot::MoveType::SP_SWEET_TREAT;
-                int8_t new_cost = move_manager.GetMoveCost(move_type);
+                int8_t new_cost = tot::MoveManager::GetMoveCost(move_type);
                 mod::patch::writePatch(
                     &ttyd::battle_mario::superActionTable[idx]->base_sp_cost,
                     &new_cost, sizeof(new_cost));
@@ -315,16 +313,16 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 // If current selection, and L/R pressed, change power level.
                 if (i == cursor->abs_position) {
                     if (left_press && 
-                        move_manager.ChangeSelectedLevel(move_type, -1)) {
+                        tot::MoveManager::ChangeSelectedLevel(move_type, -1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     } else if (
                         right_press && 
-                        move_manager.ChangeSelectedLevel(move_type, 1)) {
+                        tot::MoveManager::ChangeSelectedLevel(move_type, 1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     }
                     
                     // Overwrite default text based on current power level.
-                    move_manager.GetCurrentSelectionString(
+                    tot::MoveManager::GetCurrentSelectionString(
                         move_type, g_MoveBadgeTextBuffer);
                     weapons[i].name = g_MoveBadgeTextBuffer;
                 } else {
@@ -332,7 +330,7 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 }
                 
                 // Update actual FP cost.
-                int8_t new_cost = move_manager.GetMoveCost(move_type);
+                int8_t new_cost = tot::MoveManager::GetMoveCost(move_type);
                 mod::patch::writePatch(
                     &weapon->base_fp_cost, &new_cost, sizeof(new_cost));
             }
@@ -529,7 +527,7 @@ void ApplyFixedPatches() {
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
             int32_t bars_full = *reinterpret_cast<int32_t*>(sac_work_addr + 0x44);
             return static_cast<uint32_t>(
-                g_Mod->move_manager_.GetSelectedLevel(
+                tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::SP_EARTH_TREMOR)
                 + bars_full);
         });
@@ -547,7 +545,7 @@ void ApplyFixedPatches() {
             // Modify turn count (-1 for level 1, +1 for level 3; min 1 turn).
             if (weapon.stop_chance) {
                 weapon.stop_time += (
-                    g_Mod->move_manager_.GetSelectedLevel(
+                    tot::MoveManager::GetSelectedLevel(
                         tot::MoveType::SP_CLOCK_OUT)
                     - 2);
                 if (weapon.stop_time < 1) weapon.stop_time = 1;
@@ -562,7 +560,7 @@ void ApplyFixedPatches() {
             if (isFirstCall) {
                 float arrow_power = 0.20001;
                 switch (
-                    g_Mod->move_manager_.GetSelectedLevel(
+                    tot::MoveManager::GetSelectedLevel(
                         tot::MoveType::SP_POWER_LIFT)) {
                     case 2: arrow_power = 0.25001; break;
                     case 3: arrow_power = 0.33334; break;
@@ -593,7 +591,7 @@ void ApplyFixedPatches() {
             BattleWeapon& weapon = 
                 *reinterpret_cast<BattleWeapon*>(sac_work_addr + 0x284);
             int32_t bars_full = evtGetValue(evt, evt->evtArguments[0]) - 1;
-            switch (g_Mod->move_manager_.GetSelectedLevel(
+            switch (tot::MoveManager::GetSelectedLevel(
                 tot::MoveType::SP_SHOWSTOPPER)) {
                 case 1: weapon.ohko_chance = 30 + bars_full * 7;  break;
                 case 2: weapon.ohko_chance = 45 + bars_full * 9;  break;
@@ -610,7 +608,7 @@ void ApplyFixedPatches() {
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
             int32_t level = *reinterpret_cast<int32_t*>(sac_work_addr + 0x10);
             int32_t multiplier = 3;
-            switch (g_Mod->move_manager_.GetSelectedLevel(
+            switch (tot::MoveManager::GetSelectedLevel(
                 tot::MoveType::SP_SUPERNOVA)) {
                 case 2: multiplier = 5;     break;
                 case 3: multiplier = 10;    break;
@@ -681,11 +679,11 @@ void SweetTreatSetUpTargets() {
     int32_t start_idx;
     if (is_feast) {
         start_idx = kNumTargetTypes * (
-            g_Mod->move_manager_.GetSelectedLevel(tot::MoveType::SP_SWEET_FEAST) 
+            tot::MoveManager::GetSelectedLevel(tot::MoveType::SP_SWEET_FEAST) 
             + 2);
     } else {
         start_idx = kNumTargetTypes * (
-            g_Mod->move_manager_.GetSelectedLevel(tot::MoveType::SP_SWEET_TREAT) 
+            tot::MoveManager::GetSelectedLevel(tot::MoveType::SP_SWEET_TREAT) 
             - 1);
     }
     
@@ -748,14 +746,14 @@ void SweetTreatBlinkNumbers() {
 
 int32_t GetEarthTremorNumberOfBars() {
     // The level 1 and 2 versions have shorter minigames, at 3 and 4 bars.
-    return g_Mod->move_manager_.GetSelectedLevel(tot::MoveType::SP_EARTH_TREMOR)
+    return tot::MoveManager::GetSelectedLevel(tot::MoveType::SP_EARTH_TREMOR)
         + 2;
 }
 
 int32_t GetArtAttackPower(int32_t circled_percent) {
     // Like vanilla, circling 90% or more = full damage;
     // the damage dealt is up to 2, 3, or 4 based on the level.
-    return (g_Mod->move_manager_.GetSelectedLevel(tot::MoveType::SP_ART_ATTACK) 
+    return (tot::MoveManager::GetSelectedLevel(tot::MoveType::SP_ART_ATTACK) 
         + 1) * circled_percent / 90;
 }
 

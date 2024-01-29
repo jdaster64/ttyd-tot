@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mod_state.h"
-#include "tot_move_manager.h"
+#include "tot_state.h"
 
 #include <cstdint>
 
@@ -20,9 +20,8 @@ public:
     
     // Holds state specific to the Infinite Pit mod.
     StateManager_v2 state_;
-    
-    // TOT; holds state related to move levels.
-    tot::MoveManager move_manager_;
+    // Holds state specific to the Tower of Trials mod.
+    tot::State tot_state_;
 };
 
 extern Mod* g_Mod;

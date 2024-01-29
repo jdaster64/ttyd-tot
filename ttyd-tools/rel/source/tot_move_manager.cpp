@@ -1,10 +1,30 @@
 #include "tot_move_manager.h"
 
+#include "evt_cmd.h"
+#include "mod.h"
+
+#include <ttyd/battle.h>
+#include <ttyd/battle_database_common.h>
+#include <ttyd/battle_unit.h>
+#include <ttyd/evtmgr_cmd.h>
+
 #include <cinttypes>
 #include <cstdio>
 #include <cstring>
 
 namespace mod::tot {
+    
+namespace {
+    
+using ::mod::infinite_pit::g_Mod;
+using ::ttyd::battle::g_BattleWork;
+using ::ttyd::battle_database_common::BattleWeapon;
+using ::ttyd::battle_unit::BattleWorkUnit;
+using ::ttyd::battle_unit::BattleWorkUnitPart;
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
+    
+}
     
 struct MoveData {
     const char* name_abbreviated;
@@ -91,39 +111,39 @@ const MoveData g_MoveData[] = {
 void MoveManager::Init() {
     // TODO: Implement.
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
-        level_unlocked_[i] = 3;
-        level_selected_[i] = 1;
+        g_Mod->tot_state_.level_unlocked_[i] = 3;
+        g_Mod->tot_state_.level_selected_[i] = 1;
     }
 }
 
-int32_t MoveManager::GetUnlockedLevel(int32_t move_type) const {
-    return level_unlocked_[move_type];
+int32_t MoveManager::GetUnlockedLevel(int32_t move_type) {
+    return g_Mod->tot_state_.level_unlocked_[move_type];
 }
 
-int32_t MoveManager::GetSelectedLevel(int32_t move_type) const {
-    return level_selected_[move_type];
+int32_t MoveManager::GetSelectedLevel(int32_t move_type) {
+    return g_Mod->tot_state_.level_selected_[move_type];
 }
 
-int32_t MoveManager::GetMoveCost(int32_t move_type) const {
-    return g_MoveData[move_type].move_cost[level_selected_[move_type]-1];
+int32_t MoveManager::GetMoveCost(int32_t move_type) {
+    return g_MoveData[move_type].move_cost[
+        g_Mod->tot_state_.level_selected_[move_type]-1];
 }
 
-void MoveManager::GetCurrentSelectionString(
-    int32_t move_type, char* out_buf) const {
+void MoveManager::GetCurrentSelectionString(int32_t move_type, char* out_buf) {
     sprintf(
         out_buf, "%s Lv. %" PRId8,
-        g_MoveData[move_type].name_abbreviated, level_selected_[move_type]);
+        g_MoveData[move_type].name_abbreviated, GetSelectedLevel(move_type));
 }
 
 bool MoveManager::ChangeSelectedLevel(int32_t move_type, int32_t change) {
-    int32_t old_level = level_selected_[move_type];
+    int32_t old_level = g_Mod->tot_state_.level_selected_[move_type];
     int32_t new_level = old_level + change;
     
     // TODO: Implement maxes.
     if (new_level < 1) new_level = 1;
     if (new_level > 3) new_level = 3;
     
-    level_selected_[move_type] = new_level;
+    g_Mod->tot_state_.level_selected_[move_type] = new_level;
     return new_level != old_level;
 }
 
@@ -132,14 +152,38 @@ void MoveManager::ResetSelectedLevels() {
     MoveManager::Init();
 }
 
-bool MoveManager::IsUnlockable(int32_t move_type) const {
+bool MoveManager::IsUnlockable(int32_t move_type) {
     // TODO: Implement dependencies.
     return false;
 }
 
-bool MoveManager::IsUpgradable(int32_t move_type) const {
+bool MoveManager::IsUpgradable(int32_t move_type) {
     // TODO: Implement maxes.
     return false;
+}
+
+uint32_t GetWeaponPowerFromSelectedLevel(
+    BattleWorkUnit* unit1, BattleWeapon* weapon, BattleWorkUnit* unit2,
+    BattleWorkUnitPart* part) {
+    const int32_t move = weapon->damage_function_params[7];
+    const int32_t level = MoveManager::GetSelectedLevel(move);
+    const int32_t ac_success =
+        g_BattleWork->ac_manager_work.ac_result == 2 ? 1 : 0;
+        
+    int32_t power = weapon->damage_function_params[level * 2 - 2 + ac_success];
+    if ((move & ~7) == MoveType::JUMP_BASE) {
+        power += unit1->badges_equipped.jumpman;
+    } else if ((move & ~7) == MoveType::HAMMER_BASE) {
+        power += unit1->badges_equipped.hammerman;
+    }
+    return power;
+}
+
+EVT_DEFINE_USER_FUNC(evt_GetMoveSelectedLevel) {
+    int32_t move = evtGetValue(evt, evt->evtArguments[0]);
+    evtSetValue(
+        evt, evt->evtArguments[1], MoveManager::GetSelectedLevel(move));
+    return 2;
 }
 
 }  // namespace mod::tot

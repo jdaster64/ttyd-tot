@@ -6,6 +6,7 @@
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_mario_move.h"
+#include "tot_move_manager.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_ac.h>
@@ -173,30 +174,28 @@ void GetStatusParams(
             break;
     }
     
-    auto& move_manager = g_Mod->move_manager_;
-    
     switch (weapon->item_id) {
         case ItemType::POWER_JUMP:
             if (status_type == StatusEffectType::DEFENSE_DOWN) {
-                turns_temporary += move_manager.GetSelectedLevel(
+                turns_temporary += tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::JUMP_POWER_JUMP) * 2 - 2;
             }
             break;
         case ItemType::SLEEPY_STOMP:
             if (status_type == StatusEffectType::SLEEP) {
-                turns_temporary += move_manager.GetSelectedLevel(
+                turns_temporary += tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::JUMP_SLEEPY_STOMP) * 2 - 2;
             }
             break;
         case ItemType::HEAD_RATTLE:
             if (status_type == StatusEffectType::TINY) {
-                turns_temporary += move_manager.GetSelectedLevel(
+                turns_temporary += tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::HAMMER_SHRINK_SMASH) * 2 - 2;
             }
             break;
         case ItemType::ICE_SMASH:
             if (status_type == StatusEffectType::FREEZE) {
-                turns_temporary += move_manager.GetSelectedLevel(
+                turns_temporary += tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::HAMMER_ICE_SMASH) * 2 - 2;
             }
             break;

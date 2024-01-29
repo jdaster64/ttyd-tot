@@ -49,8 +49,9 @@ void Mod::Init() {
     
     // Clear the mod's state completely.
     memset(&state_, 0, sizeof(state_));
+    memset(&tot_state_, 0, sizeof(tot_state_));
     // Initialize managers.
-    move_manager_.Init();
+    tot::MoveManager::Init();
 	
     // Hook the game's main function, so Update runs exactly once per frame.
 	marioStMain_trampoline_ = patch::hookFunction(

@@ -1,6 +1,19 @@
 #pragma once
 
+#include "evt_cmd.h"
+
+#include <ttyd/evtmgr.h>
+
 #include <cstdint>
+
+namespace ttyd::battle_database_common {
+struct BattleWeapon;
+}
+
+namespace ttyd::battle_unit {
+struct BattleWorkUnit;
+struct BattleWorkUnitPart;
+}
 
 namespace mod::tot {
 
@@ -88,24 +101,29 @@ namespace MoveType {
 
 class MoveManager {
 public:
-    void Init();
+    static void Init();
 
+    static int32_t GetUnlockedLevel(int32_t move_type);
+    static int32_t GetSelectedLevel(int32_t move_type);
+    static int32_t GetMoveCost(int32_t move_type);
 
-    int32_t GetUnlockedLevel(int32_t move_type) const;
-    int32_t GetSelectedLevel(int32_t move_type) const;
-    int32_t GetMoveCost(int32_t move_type) const;
-
-    void GetCurrentSelectionString(int32_t move_type, char* out_buf) const;
+    static void GetCurrentSelectionString(int32_t move_type, char* out_buf);
     
-    bool ChangeSelectedLevel(int32_t move_type, int32_t change);
-    void ResetSelectedLevels();
+    static bool ChangeSelectedLevel(int32_t move_type, int32_t change);
+    static void ResetSelectedLevels();
     
-    bool IsUnlockable(int32_t move_type) const;
-    bool IsUpgradable(int32_t move_type) const;
-    
-private:
-    int8_t level_unlocked_[MoveType::MOVE_TYPE_MAX];
-    int8_t level_selected_[MoveType::MOVE_TYPE_MAX];
+    static bool IsUnlockable(int32_t move_type);
+    static bool IsUpgradable(int32_t move_type);
 };
+
+// battle_weapon_power-like interface for scaling ATK based on a move.
+uint32_t GetWeaponPowerFromSelectedLevel(
+    ttyd::battle_unit::BattleWorkUnit* unit1,
+    ttyd::battle_database_common::BattleWeapon* weapon,
+    ttyd::battle_unit::BattleWorkUnit* unit2,
+    ttyd::battle_unit::BattleWorkUnitPart* part);
+
+// Returns the current level of move arg0, storing the result in arg1.
+EVT_DECLARE_USER_FUNC(evt_GetMoveSelectedLevel, 2)
 
 }

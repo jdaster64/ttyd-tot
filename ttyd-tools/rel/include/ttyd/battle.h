@@ -144,6 +144,43 @@ struct BattleWorkCommand {
 
 static_assert(sizeof(BattleWorkCommand) == 0x574);
 
+struct BattleWorkActionCommandManager {
+    battle_unit::BattleWorkUnit*    ac_unit;
+    uint32_t    unk_004;
+    uint32_t    unk_008;
+    uint32_t    ac_state;
+    void*       ac_main_function;
+    void*       ac_result_function;
+    void*       ac_disp_function;
+    void*       ac_delete_function;
+    int32_t     ac_defense_result;
+    int32_t     ac_result_count;
+    uint32_t    ac_result;
+    int8_t      base_ac_difficulty;  // ?
+    int8_t      ac_difficulty;
+    int8_t      pad_02e[2];
+    uint32_t    unk_030;
+    uint32_t    ac_flag;
+    uint32_t    ac_params[8];
+    uint32_t    ac_output_params[8];  // ?
+    uint32_t    ac_gauge_params[4];
+    int16_t     unk_088;
+    int8_t      pad_08a[2];
+    int8_t      ac_manager_pad_work[0x1fc];
+    int8_t      pad_288[8];
+    int8_t      ac_disp_params[0x2c];
+    int8_t      extra_work[2000];
+    uint32_t    stylish_current_frame;
+    uint32_t    stylish_window_start;
+    uint32_t    stylish_window_end;
+    uint32_t    stylish_end_frame;
+    uint32_t    stylish_unit_idx;
+    int32_t     stylish_result;
+    uint32_t    stylish_early_frames;
+} __attribute__((__packed__));
+
+static_assert(sizeof(BattleWorkActionCommandManager) == 0xaa8);
+
 struct BattleWorkActRecord {
     uint8_t mario_times_jump_moves_used;
     uint8_t mario_times_hammer_moves_used;
@@ -244,7 +281,7 @@ struct BattleWork {
     void*           battle_end_work;  // ptr to struct of length 0x2ac
     int8_t          pad_work[0x1fc * 4];
     BattleWorkCommand command_work;
-    int8_t          ac_manager_work[0xaa8];
+    BattleWorkActionCommandManager ac_manager_work;
     npcdrv::FbatBattleInformation* fbat_info;
     int8_t          status_window_related[0x14];
     int8_t          unk_02750[4];
