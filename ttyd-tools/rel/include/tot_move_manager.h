@@ -123,6 +123,7 @@ uint32_t GetWeaponPowerFromSelectedLevel(
     ttyd::battle_unit::BattleWorkUnit* unit2,
     ttyd::battle_unit::BattleWorkUnitPart* part);
 
+// Same, but using the maximum unlocked level; used for partner first strikes.
 uint32_t GetWeaponPowerFromMaxLevel(
     ttyd::battle_unit::BattleWorkUnit* unit1,
     ttyd::battle_database_common::BattleWeapon* weapon,
