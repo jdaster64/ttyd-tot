@@ -548,6 +548,16 @@ struct StatusVulnerability {
 
 static_assert(sizeof(StatusVulnerability) == 0x16);
 
+struct PoseTableEntry {
+    uint32_t    id;
+    const char* name;
+} __attribute__((__packed__));
+
+struct DataTableEntry {
+    uint32_t    id;
+    void*       data;
+} __attribute__((__packed__));
+
 struct BattleUnitKindPart {
     int32_t     index;  // one-indexed
     const char* name;
@@ -564,7 +574,7 @@ struct BattleUnitKindPart {
     int8_t*     defense_attr;
     uint32_t    attribute_flags;
     uint32_t    counter_attribute_flags;
-    void*       pose_table;
+    PoseTableEntry* pose_table;
 } __attribute__((__packed__));
 
 static_assert(sizeof(BattleUnitKindPart) == 0x4c);
@@ -618,7 +628,7 @@ struct BattleUnitKind {
     int8_t      pad_b5[3];
     BattleUnitKindPart* parts;
     void*       init_evt_code;
-    void*       data_table;
+    DataTableEntry* data_table;
 } __attribute__((__packed__));
 
 static_assert(sizeof(BattleUnitKind) == 0xc4);

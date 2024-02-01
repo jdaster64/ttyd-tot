@@ -23,7 +23,19 @@ EVT_DECLARE_USER_FUNC(_get_heart_suitoru_point, 2);
 // _backfire
 
 // .data
+extern int32_t btldefaultevt_Damage[1];
+extern int32_t btldefaultevt_ChangeParty[1];
+extern int32_t btldefaultevt_BiribiriMove[1];
+extern int32_t btldefaultevt_guard_move[1];
+extern int32_t btldefaultevt_guard_return[1];
+extern int32_t btldefaultevt_Appeal[1];
+extern int32_t btldefaultevt_Escape[1];
+extern int32_t btldefaultevt_Confuse[1];
+extern int32_t btldefaultevt_CantMoveZeroGravity[1];
 extern int32_t btldefaultevt_SuitoruBadgeEffect[1];
+extern int32_t btldefaultevt_avoid_counter_event[1];
+
+
 
 }
 

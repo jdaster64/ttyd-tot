@@ -1391,7 +1391,17 @@
 801138d8:_get_flower_suitoru_point
 80113950:_get_heart_suitoru_point
 // .data
+8034cc60:btldefaultevt_Damage
+8034de14:btldefaultevt_ChangeParty
+8034e0cc:btldefaultevt_BiribiriMove
+8034e140:btldefaultevt_guard_move
+8034e294:btldefaultevt_guard_return
+8034e41c:btldefaultevt_Appeal
+8034e7a4:btldefaultevt_Escape
+8034f1e8:btldefaultevt_Confuse
+8034f234:btldefaultevt_CantMoveZeroGravity
 8034f2e4:btldefaultevt_SuitoruBadgeEffect
+8034f4cc:btldefaultevt_avoid_counter_event
 
 // battle_event_subset.o
 // .text

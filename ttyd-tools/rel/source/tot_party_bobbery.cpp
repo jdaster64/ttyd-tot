@@ -74,6 +74,312 @@ BattleWeapon* GetFirstAttackWeapon() {
     return &customWeapon_BobberyBombFS;
 }
 
+// Including definition of Bomb Squad bomb entry here, that way it's easier
+// to add changes for variants of the Bomb Squad attack.
+
+
+BattleWeapon unitBombzo_weapon = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 0.0,
+    .stylish_multiplier = 0,
+    .unk_19 = 0,
+    .bingo_card_chance = 0,
+    .unk_1b = 0,
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 3, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags = 
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_SELECT_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::EXPLOSION,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        // Made defense-piercing by default.
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags = AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // .status_chances = all 0,
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 10,
+    .bg_a2_fall_weight = 10,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 30,
+    .nozzle_turn_chance = 5,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 5,
+};
+
+PoseTableEntry unitBombzo_pose_table_1[] = {
+    28, "B_4",
+    31, "B_4",
+    39, "B_4",
+    69, "B_4",
+};
+
+PoseTableEntry unitBombzo_pose_table_2[] = {
+    28, "B_3",
+    31, "B_3",
+    39, "B_3",
+    69, "B_3",
+};
+
+PoseTableEntry unitBombzo_pose_table_3[] = {
+    28, "B_2",
+    31, "B_2",
+    39, "B_2",
+    69, "B_2",
+};
+
+EVT_BEGIN(unitBombzo_explosion_event)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(evt_snd_sfxoff, LW(0))
+        USER_FUNC(btlevtcmd_SetUnitWork, -2, 1, 0)
+    END_IF()
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(evt_eff, PTR(""), PTR("hibashira"), 2, LW(0), LW(1), LW(2), LW(0), LW(1), LW(2), 1, FLOAT(1.0), 60, 0, 0)
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_THUNDERS_BOMB2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_StageDispellFog)
+    USER_FUNC(btlevtcmd_OnAttribute, -2, 16777216)
+    USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, 50331648)
+    USER_FUNC(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("B_2"))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, 1, PTR(&unitBombzo_weapon))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&unitBombzo_weapon), LW(3), LW(4))
+    IF_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF()
+    SET(LW(10), 0)
+    LBL(10)
+    USER_FUNC(btlevtcmd_GetUnitId, -2, LW(0))
+    IF_EQUAL(LW(0), LW(3))
+        GOTO(80)
+    END_IF()
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), EVT_NULLPTR, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(1), EVT_NULLPTR, EVT_NULLPTR)
+    SUB(LW(0), LW(1))
+    IF_SMALL_EQUAL(LW(0), -1)
+        MUL(LW(0), -1)
+    END_IF()
+    IF_LARGE(LW(0), 50)
+        GOTO(80)
+    END_IF()
+    USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&unitBombzo_weapon), 256, LW(5))
+    IF_EQUAL(LW(5), 1)
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&unitBombzo_weapon), 256, LW(5))
+    END_IF()
+    LBL(80)
+    USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_NOT_EQUAL(LW(3), -1)
+        ADD(LW(10), 1)
+        GOTO(10)
+    END_IF()
+    LBL(99)
+    USER_FUNC(btlevtcmd_KillUnit, -2, 0)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitBombzo_phase_event)
+    USER_FUNC(btlevtcmd_CheckPhase, LW(0), 0x4000001)
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        SUB(LW(0), 1)
+        USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, LW(0))
+        SWITCH(LW(0))
+            CASE_LARGE_EQUAL(3)
+                USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBombzo_pose_table_3))
+            CASE_LARGE_EQUAL(2)
+                USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBombzo_pose_table_2))
+            CASE_LARGE_EQUAL(1)
+                USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBombzo_pose_table_1))
+        END_SWITCH()
+        IF_SMALL_EQUAL(LW(0), 0)
+            USER_FUNC(btlevtcmd_PhaseEventStartDeclare, -2)
+            USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("B_2"))
+            WAIT_FRM(36)
+            RUN_CHILD_EVT(PTR(&unitBombzo_explosion_event))
+        ELSE()
+            USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+        END_IF()
+    END_IF()
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitBombzo_wait_event)
+    USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    LBL(0)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    IF_LARGE(LW(0), 1)
+        WAIT_FRM(1)
+        GOTO(0)
+    END_IF()
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ADD(LW(1), 10)
+    USER_FUNC(evt_eff64, 0, PTR("sweat_n64"), 1, LW(0), LW(1), LW(2), 15, -45, 15, 0, 0, 0, 0, 0)
+    USER_FUNC(evt_sub_random, 45, LW(0))
+    ADD(LW(0), 45)
+    WAIT_FRM(LW(0))
+    GOTO(0)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitBombzo_damage_event)
+    SET(LW(10), -2)
+    SET(LW(11), 1)
+    RUN_CHILD_EVT(PTR(&btldefaultevt_Damage))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitBombzo_attack_event)
+    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitBombzo_init_event)
+    USER_FUNC(btlevtcmd_SetEventWait, -2, PTR(&unitBombzo_wait_event))
+    USER_FUNC(btlevtcmd_SetEventPhase, -2, PTR(&unitBombzo_phase_event))
+    USER_FUNC(btlevtcmd_SetEventAttack, -2, PTR(&unitBombzo_attack_event))
+    USER_FUNC(btlevtcmd_SetEventDamage, -2, PTR(&unitBombzo_damage_event))
+    USER_FUNC(btlevtcmd_SetEventConfusion, -2, PTR(&btldefaultevt_Confuse))
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, 2)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, 1, 0)
+    USER_FUNC(btlevtcmd_SetMaxMoveCount, -2, 0)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    SWITCH(LW(0))
+        CASE_LARGE_EQUAL(3)
+            USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBombzo_pose_table_3))
+        CASE_LARGE_EQUAL(2)
+            USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBombzo_pose_table_2))
+        CASE_LARGE_EQUAL(1)
+            USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBombzo_pose_table_1))
+    END_SWITCH()
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("B_1"))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitBombzo_dead_event)
+    USER_FUNC(btlevtcmd_AfterReactionEntry, -2, 53)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitBombzo_end_battle_evt)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(evt_snd_sfxoff, LW(0))
+        USER_FUNC(btlevtcmd_SetUnitWork, -2, 1, 0)
+    END_IF()
+    RETURN()
+EVT_END()
+
+int8_t unitBombzo_defense[] = { 0, 0, 0, 0, 0 };
+int8_t unitBombzo_defense_attr[] = { 0, 0, 0, 0, 0 };
+
+StatusVulnerability unitBombzo_status = {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+        
+DataTableEntry unitBombzo_data_table[] = {
+    49, (void*)unitBombzo_dead_event,
+    53, (void*)unitBombzo_explosion_event,
+    63, (void*)unitBombzo_end_battle_evt,
+    0, 0,
+};
+
+BattleUnitKindPart unitBombzo_parts = {
+    .index = 1,
+    .name = "btl_un_bomzou",
+    .model_name = "c_bakudan",
+    .part_offset_pos = { 0.0f, 0.0f, 0.0f },
+    .part_hit_base_offset = { 15.0f, 25.0f, 0.0f },
+    .part_hit_cursor_base_offset = { 0.0f, 30.0f, 0.0f },
+    .unk_30 = 20,
+    .unk_32 = 30,
+    .base_alpha = 255,
+    .defense = unitBombzo_defense,
+    .defense_attr = unitBombzo_defense_attr,
+    .attribute_flags = 0x00080009,
+    .counter_attribute_flags = 0,
+    .pose_table = unitBombzo_pose_table_3,
+};
+
+BattleUnitKind unitBombzo_unit = {
+    .unit_type = BattleUnitType::BOMB_SQUAD_BOMB,
+    .unit_name = "btl_un_bomzou",
+    .max_hp = 1,
+    .max_fp = 0,
+    .danger_hp = 1,
+    .peril_hp = 1,
+    .level = 1,
+    .bonus_exp = 0,
+    .bonus_coin = 0,
+    .bonus_coin_rate = 0,
+    .base_coin = 0,
+    .run_rate = 64,
+    .pb_soft_cap = 9,
+    .width = 24,
+    .height = 24,
+    .hit_offset = { 0, 20 },
+    .center_offset = { 0.0f, 0.0f, 0.0f },
+    .hp_gauge_offset = { 0, 0 },
+    .talk_toge_base_offset = { 0.0f, 0.0f, 0.0f },
+    .held_item_base_offset = { 0.0f, 0.0f, 0.0f },
+    .burn_flame_offset = { 0.0f, 0.0f, 0.0f },
+    .binta_hit_offset = { 12.0f, 0.0f, 0.0f },
+    .kiss_hit_offset = { 12.0f, 15.6f, 0.0f },
+    .cut_base_offset = { 0.0f, 0.0f, 0.0f },
+    .cut_width = 0.0f,
+    .cut_height = 0.0f,
+    .turn_order = 0,
+    .turn_order_variance = 0,
+    .swallow_chance = -1,
+    .swallow_attributes = 0,
+    .hammer_knockback_chance = 100,
+    .itemsteal_param = 20,
+    .star_point_disp_offset = { 0.0f, 0.0f, 0.0f },
+    .damage_sfx_name = "SFX_BTL_DAMAGE1",
+    .fire_damage_sfx_name = "SFX_BTL_DAMAGE_FIRE1",
+    .ice_damage_sfx_name = "SFX_BTL_DAMAGE_ICE1",
+    .explosion_damage_sfx_name = "SFX_BTL_DAMAGE_BIRIBIRI1",
+    .attribute_flags = 0x12400000,
+    .status_vulnerability = &unitBombzo_status,
+    .num_parts = 1,
+    .parts = &unitBombzo_parts,
+    .init_evt_code = (void*)unitBombzo_init_event,
+    .data_table = unitBombzo_data_table,
+};
+
+BattleUnitSetup unitBombzo_entry = {
+    .unit_kind_params = &unitBombzo_unit,
+    .alliance = 2,
+    .attack_phase = 0x04000001,
+    .position = { 1000.0f, 0.0f, 1000.0f },
+    .addl_target_offset_x = 0,
+    .unit_work = { 0, 0, 0, 0 },
+    .item_drop_table = nullptr,
+};
+
 EVT_BEGIN(partySandersAttack_FirstAttack)
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
     USER_FUNC(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -458,17 +764,17 @@ EVT_END()
 
 EVT_BEGIN(partySandersAttack_TimeBombSet)
     USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
-    USER_FUNC(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_bomzou), 0)
+    USER_FUNC(btlevtcmd_SpawnUnit, LW(3), PTR(&unitBombzo_entry), 0)
     USER_FUNC(btlevtcmd_OnAttribute, LW(3), 16777216)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     SET(LW(10), LW(3))
-    USER_FUNC(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_bomzou), 0)
+    USER_FUNC(btlevtcmd_SpawnUnit, LW(3), PTR(&unitBombzo_entry), 0)
     USER_FUNC(btlevtcmd_OnAttribute, LW(3), 16777216)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     SET(LW(11), LW(3))
-    USER_FUNC(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_bomzou), 0)
+    USER_FUNC(btlevtcmd_SpawnUnit, LW(3), PTR(&unitBombzo_entry), 0)
     USER_FUNC(btlevtcmd_OnAttribute, LW(3), 16777216)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
