@@ -97,7 +97,7 @@ const MoveData g_MoveData[] = {
     { "Bomb Sq.",   { 2, 4, 6, }, },
     { "Hold Fast",  { 4, 4, 4, }, },
     { "Bob-ombast", { 4, 6, 8, }, },
-    { "Move 5",     { 1, 1, 1, }, },
+    { "Move 5",     { 2, 4, 6, }, },
     { "Move 6",     { 1, 1, 1, }, },
     
     { "Love Slap",  { 0, 2, 4, }, },

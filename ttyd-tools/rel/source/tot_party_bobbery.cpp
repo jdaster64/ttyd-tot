@@ -129,6 +129,59 @@ BattleWeapon unitBombzo_weapon = {
     .ceiling_fall_chance = 5,
     .object_fall_chance = 5,
 };
+BattleWeapon unitBombzo_weapon_Poison = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 0.0,
+    .stylish_multiplier = 0,
+    .unk_19 = 0,
+    .bingo_card_chance = 0,
+    .unk_1b = 0,
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags = 
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_SELECT_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::EXPLOSION,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        // Made defense-piercing by default.
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags = AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    .poison_chance = 100,
+    .poison_time = 5,
+    .poison_strength = 1,
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 10,
+    .bg_a2_fall_weight = 10,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 30,
+    .nozzle_turn_chance = 5,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 5,
+};
 
 PoseTableEntry unitBombzo_pose_table_1[] = {
     28, "B_4",
@@ -165,8 +218,15 @@ EVT_BEGIN(unitBombzo_explosion_event)
     USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, 50331648)
     USER_FUNC(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("B_2"))
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, 1, PTR(&unitBombzo_weapon))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&unitBombzo_weapon), LW(3), LW(4))
+    // Set weapon based on the type of bomb.
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, 2, LW(8))
+    IF_EQUAL(LW(8), 0)
+        SET(LW(8), PTR(&unitBombzo_weapon))
+    ELSE()
+        SET(LW(8), PTR(&unitBombzo_weapon_Poison))
+    END_IF()
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, 1, LW(8))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(8), LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
@@ -185,9 +245,9 @@ EVT_BEGIN(unitBombzo_explosion_event)
     IF_LARGE(LW(0), 50)
         GOTO(80)
     END_IF()
-    USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&unitBombzo_weapon), 256, LW(5))
+    USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(8), 256, LW(5))
     IF_EQUAL(LW(5), 1)
-        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&unitBombzo_weapon), 256, LW(5))
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(8), 256, LW(5))
     END_IF()
     LBL(80)
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -765,15 +825,27 @@ EVT_END()
 
 EVT_BEGIN(partySandersAttack_TimeBombSet)
     USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(7))
     
     // Spawn a different number of bombs (2 - 4) based on move level.
-    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::BOBBERY_BOMB_SQUAD, LW(4))
+    IF_EQUAL(LW(7), PTR(&customWeapon_BobberyBombSquad))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::BOBBERY_BOMB_SQUAD, LW(4))
+    ELSE()
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::BOBBERY_5, LW(4))
+    END_IF()
     ADD(LW(4), 1)
     SET(LW(5), 0)
     SET(LW(6), LW(4))
     DO(LW(6))
         USER_FUNC(btlevtcmd_SpawnUnit, LW(3), PTR(&unitBombzo_entry), 0)
         USER_FUNC(btlevtcmd_OnAttribute, LW(3), 16777216)
+        // Switch what kind of bomb to deploy based on the move used.
+        IF_EQUAL(LW(7), PTR(&customWeapon_BobberyMove5))
+            USER_FUNC(btlevtcmd_SetUnitWork, LW(3), 2, 1)
+            USER_FUNC(
+                btlevtcmd_OnOffStatus, LW(3), StatusEffectType::POISON,
+                /* turns */ 100, /* strength */ 0, /* enabled */ 1)
+        END_IF()
         USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
         USER_FUNC(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
         ADD(LW(5), 1)
@@ -1563,49 +1635,39 @@ BattleWeapon customWeapon_BobberyBobombast = {
 };
 
 BattleWeapon customWeapon_BobberyMove5 = {
-    .name = "btl_wn_pbm_normal",
+    .name = "btl_wn_pbm_lv1",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pbm_bakuhatsu",
+    .description = "msg_pbm_jigen_bakudan",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 3,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 4, 2, 5, 3, 6, 0, MoveType::BOBBERY_5 },
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::ONLY_FRONT |
-        AttackTargetProperty_Flags::HAMMERLIKE,
-    .element = AttackElement::EXPLOSION,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_bakuhatsu",
-    .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::FLIPS_BOMB |
-        AttackSpecialProperty_Flags::FREEZE_BREAK |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::ALL &
-        ~AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .ac_help_msg = "msg_ac_jigen_bakudan",
+    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1613,16 +1675,16 @@ BattleWeapon customWeapon_BobberyMove5 = {
         
     // status chances
     
-    .attack_evt_code = (void*)partySandersAttack_NormalAttack,
+    .attack_evt_code = (void*)partySandersAttack_TimeBombSet,
     .bg_a1_a2_fall_weight = 0,
-    .bg_a1_fall_weight = 10,
-    .bg_a2_fall_weight = 10,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
-    .bg_b_fall_weight = 10,
-    .nozzle_turn_chance = 10,
-    .nozzle_fire_chance = 10,
-    .ceiling_fall_chance = 5,
-    .object_fall_chance = 10,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
 };
 
 BattleWeapon customWeapon_BobberyMove6 = {
