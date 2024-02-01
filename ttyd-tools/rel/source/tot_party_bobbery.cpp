@@ -74,7 +74,7 @@ BattleWeapon* GetFirstAttackWeapon() {
     return &customWeapon_BobberyBombFS;
 }
 
-// Including definition of Bomb Squad bomb entry here, that way it's easier
+// Including definition of Bomb Squad bomb actor here, that way it's easier
 // to add changes for variants of the Bomb Squad attack.
 // TODO: There's a kind of awful hitch the first time you spawn the actor;
 // see if the original game has it too / if there's a way to pre-load it once?

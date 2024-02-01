@@ -27,6 +27,13 @@ extern "C" {
     // audience_level_patches.s
     void StartSetTargetAudienceCount();
     void BranchBackSetTargetAudienceCount();
+    // permanent_status_patches.s
+    void StartCheckRecoveryStatus();
+    void BranchBackCheckRecoveryStatus();
+    void ConditionalBranchCheckRecoveryStatus();
+    void StartStatusIconDisplay();
+    void BranchBackStatusIconDisplay();
+    void ConditionalBranchStatusIconDisplay();
     // star_power_patches.s
     void StartApplySpRegenMultiplierNoBingo();
     void BranchBackApplySpRegenMultiplierNoBingo();
@@ -66,6 +73,12 @@ extern const int32_t g_BattleCheckDamage_Patch_ReturnPostageDivisor;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
+extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_BH;
+extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_EH;
+extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_CH1;
+extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_BH;
+extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_EH;
+extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_CH1;
 
 namespace battle {
     
@@ -280,6 +293,34 @@ void ApplyFixedPatches() {
                 // Replaces vanilla logic completely.
                 GetStatusParams(unit, weapon, status_type, turn_count, strength);
             });
+            
+    // Add support for "permanent statuses" (turn count >= 100).
+    // Don't tick down turn count if 100 or over:
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(
+            g_BtlUnit_CheckRecoveryStatus_PermanentStatus_BH),
+        reinterpret_cast<void*>(StartCheckRecoveryStatus));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(BranchBackCheckRecoveryStatus),
+        reinterpret_cast<void*>(
+            g_BtlUnit_CheckRecoveryStatus_PermanentStatus_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ConditionalBranchCheckRecoveryStatus),
+        reinterpret_cast<void*>(
+            g_BtlUnit_CheckRecoveryStatus_PermanentStatus_CH1));
+    // Skip drawing status icon if 100 or over:
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(
+            g_battle_status_icon_SkipIconForPermanentStatus_BH),
+        reinterpret_cast<void*>(StartStatusIconDisplay));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(BranchBackStatusIconDisplay),
+        reinterpret_cast<void*>(
+            g_battle_status_icon_SkipIconForPermanentStatus_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ConditionalBranchStatusIconDisplay),
+        reinterpret_cast<void*>(
+            g_battle_status_icon_SkipIconForPermanentStatus_CH1));
         
     // Increase all forms of Payback-esque status returned damage to 1x.
     mod::patch::writePatch(
