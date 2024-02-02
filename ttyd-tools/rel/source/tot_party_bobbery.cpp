@@ -1887,8 +1887,6 @@ BattleWeapon customWeapon_BobberyMove6 = {
     .target_class_flags =
         AttackTargetClass_Flags::MULTIPLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
-        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
-        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
