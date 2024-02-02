@@ -24,6 +24,12 @@
 
 // Assembly patch functions.
 extern "C" {
+    // action_command_patches.s
+    void StartButtonDownChooseButtons();
+    void BranchBackButtonDownChooseButtons();
+    void StartButtonDownCheckComplete();
+    void BranchBackButtonDownCheckComplete();
+    void ConditionalBranchButtonDownCheckComplete();
     // audience_level_patches.s
     void StartSetTargetAudienceCount();
     void BranchBackSetTargetAudienceCount();
@@ -73,6 +79,11 @@ extern const int32_t g_BattleCheckDamage_Patch_ReturnPostageDivisor;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
+extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_BH;
+extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_EH;
+extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_BH;
+extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_EH;
+extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_CH1;
 extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_BH;
 extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_EH;
 extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_CH1;
@@ -293,6 +304,26 @@ void ApplyFixedPatches() {
                 // Replaces vanilla logic completely.
                 GetStatusParams(unit, weapon, status_type, turn_count, strength);
             });
+            
+    // Add support for Snow Whirled-like variant of button pressing AC.
+    // Override choosing buttons:
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_battleAcMain_ButtonDown_ChooseButtons_BH),
+        reinterpret_cast<void*>(StartButtonDownChooseButtons),
+        reinterpret_cast<void*>(BranchBackButtonDownChooseButtons));
+    // Reset buttons instead of ending attack when completed:
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(
+            g_battleAcMain_ButtonDown_CheckComplete_BH),
+        reinterpret_cast<void*>(StartButtonDownCheckComplete));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(BranchBackButtonDownCheckComplete),
+        reinterpret_cast<void*>(
+            g_battleAcMain_ButtonDown_CheckComplete_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ConditionalBranchButtonDownCheckComplete),
+        reinterpret_cast<void*>(
+            g_battleAcMain_ButtonDown_CheckComplete_CH1));
             
     // Add support for "permanent statuses" (turn count >= 100).
     // Don't tick down turn count if 100 or over:
