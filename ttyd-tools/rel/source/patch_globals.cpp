@@ -272,6 +272,7 @@ extern const int32_t g_partySanders_makeTechMenuFuncPtr = 0x8038778c;
 extern const int32_t g_partyVivian_makeTechMenuFuncPtr = 0x8038b7cc;
 extern const int32_t g_partyNokotarou_makeTechMenuFuncPtr = 0x8038eeac;
 extern const int32_t g_partyChristine_makeTechMenuFuncPtr = 0x80393b74;
+extern const int32_t g_partyNokotarou_Patch_InitWaitPhase = 0x8038f0e4;
 extern const int32_t g_koura_damage_core_Patch_HeavyDmg = 0x8039c190;
 extern const int32_t g_koura_damage_core_Patch_LightDmg = 0x8039c1ec;
 extern const int32_t g_koura_pose_tbl_reset_Patch_HeavyDmg = 0x8039c2ec;

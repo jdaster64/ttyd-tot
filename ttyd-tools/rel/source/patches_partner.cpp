@@ -62,7 +62,11 @@ extern "C" {
 namespace mod::infinite_pit {
 
 namespace {
+    
+// Include whole namespace for convenience.
+using namespace ::ttyd::battle_event_cmd;
 
+using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::battle_weapon_power::weaponGetPowerDefault;
@@ -98,10 +102,47 @@ extern const int32_t g_partySanders_makeTechMenuFuncPtr;
 extern const int32_t g_partyVivian_makeTechMenuFuncPtr;
 extern const int32_t g_partyNokotarou_makeTechMenuFuncPtr;
 extern const int32_t g_partyChristine_makeTechMenuFuncPtr;
+extern const int32_t g_partyNokotarou_Patch_InitWaitPhase;
 
 namespace partner {
     
 namespace {
+    
+EVT_BEGIN(KoopsCustomInitEvt)
+// Select idle pose based on whether in 'invincible' state from Withdraw.
+USER_FUNC(btlevtcmd_CheckPartsAttribute, -2, 1, int(0xe0000000), LW(0))
+IF_EQUAL(LW(0), 0)
+    USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+ELSE()
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PNK_A_1"))
+END_IF()
+RETURN()
+EVT_END()
+
+EVT_BEGIN(KoopsCustomPhaseEvt)
+// Break out of 'invincible' state at beginning of player movement phase.
+USER_FUNC(btlevtcmd_CheckPhase, LW(0), 0x4000002)
+IF_EQUAL(LW(0), 1)
+    USER_FUNC(btlevtcmd_CheckPartsAttribute, -2, 1, int(0xe0000000), LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+        USER_FUNC(btlevtcmd_OffPartsAttribute, -2, 1, int(0xe0000000))
+        USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, int(0x1000))
+    END_IF()
+END_IF()
+RETURN()
+EVT_END()
+    
+EVT_BEGIN(KoopsInitWaitPhase)
+USER_FUNC(btlevtcmd_SetEventWait, -2, PTR(&KoopsCustomInitEvt))
+USER_FUNC(btlevtcmd_SetEventPhase, -2, PTR(&KoopsCustomPhaseEvt))
+RETURN()
+EVT_END()
+
+EVT_BEGIN(KoopsInitWaitPhaseHook)
+RUN_CHILD_EVT(KoopsInitWaitPhase) DEBUG_REM(0)
+EVT_PATCH_END()
+static_assert(sizeof(KoopsInitWaitPhaseHook) == 0x10);
 
 // Patch to disable the coins / EXP from Gale Force for most enemies.
 // (Replaces the code with no-ops).  Needs to be patched into enemies' specific
@@ -152,6 +193,11 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleDrawEnemyHP_DrawEnemyHPText_BH),
         reinterpret_cast<void*>(StartDispTattleStats),
         reinterpret_cast<void*>(BranchBackDispTattleStats));
+        
+    // Replace Koops' init and phase scripts to handle Withdraw status.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_partyNokotarou_Patch_InitWaitPhase),
+        KoopsInitWaitPhaseHook, sizeof(KoopsInitWaitPhaseHook));
         
     // Set HP thresholds for different Shell Shield disrepair animation states:
     // - On initialization (pose_tbl_reset)

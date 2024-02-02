@@ -1430,14 +1430,15 @@ EVT_BEGIN(customAttack_Withdraw)
         WAIT_FRM(LW(13))
         // TODO: Change text to indicate Koops is invincible until next turn.
         USER_FUNC(btlevtcmd_AnnounceMessage, 0, 0, 0, PTR("btl_msg_defend_command_exec"), 60)
+        
+        // Disable all damage and status.
+        USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, int(0xe0000000))
+        // Turn off ability to be flipped by jumps, etc.
+        USER_FUNC(btlevtcmd_OffPartsAttribute, -2, 1, int(0x1000))
     END_IF()
     
     // Kill invisible Shell Shield actor.
     USER_FUNC(btlevtcmd_KillUnit, LW(10), 0)
-    
-    // TODO: A lot. Just testing that this much works for now.
-    // - Make sure animation persists after attack and status resets next turn.
-    //   (override wait event, add new phase event that resets in next phase 2?)
     
     USER_FUNC(evt_audience_ap_recovery)
     USER_FUNC(btlevtcmd_InviteApInfoReport)
