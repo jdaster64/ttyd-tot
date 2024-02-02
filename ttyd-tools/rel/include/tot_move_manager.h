@@ -130,6 +130,13 @@ uint32_t GetWeaponPowerFromMaxLevel(
     ttyd::battle_unit::BattleWorkUnit* unit2,
     ttyd::battle_unit::BattleWorkUnitPart* part);
 
+// Uses unit work variable #arg0 for damage.
+uint32_t GetWeaponPowerFromUnitWorkVariable(
+    ttyd::battle_unit::BattleWorkUnit* unit1,
+    ttyd::battle_database_common::BattleWeapon* weapon,
+    ttyd::battle_unit::BattleWorkUnit* unit2,
+    ttyd::battle_unit::BattleWorkUnitPart* part);
+
 // Returns the current level of move arg0, storing the result in arg1.
 EVT_DECLARE_USER_FUNC(evtTot_GetMoveSelectedLevel, 2)
 

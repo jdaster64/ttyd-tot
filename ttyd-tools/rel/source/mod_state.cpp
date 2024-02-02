@@ -261,6 +261,9 @@ void StateManager_v2::SetDefaultOptions() {
     SetOption(OPTNUM_ENEMY_HP, 100);
     SetOption(OPTNUM_ENEMY_ATK, 100);
     SetOption(OPTNUM_SP_REGEN_MODIFIER, 20);  // 1.00x
+    
+    // TOT: For ease of testing.
+    SetOption(OPTVAL_PARTNERS_ALL_START);
 }
 
 void StateManager_v2::ChangeOption(int32_t option, int32_t change) {

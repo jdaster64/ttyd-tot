@@ -98,7 +98,7 @@ const MoveData g_MoveData[] = {
     { "Hold Fast",  { 4, 4, 4, }, },
     { "Bob-ombast", { 4, 6, 8, }, },
     { "Move 5",     { 2, 4, 6, }, },
-    { "Move 6",     { 1, 1, 1, }, },
+    { "Move 6",     { 10, 10, 10, }, },
     
     { "Love Slap",  { 0, 2, 4, }, },
     { "Kiss Thief", { 5, 5, 5, }, },
@@ -194,6 +194,14 @@ uint32_t GetWeaponPowerFromMaxLevel(
         power += unit1->badges_equipped.hammerman;
     }
     return power;
+}
+
+uint32_t GetWeaponPowerFromUnitWorkVariable(
+    ttyd::battle_unit::BattleWorkUnit* unit1,
+    ttyd::battle_database_common::BattleWeapon* weapon,
+    ttyd::battle_unit::BattleWorkUnit* unit2,
+    ttyd::battle_unit::BattleWorkUnitPart* part) {
+    return unit1->unit_work[weapon->damage_function_params[0]];
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_GetMoveSelectedLevel) {

@@ -129,6 +129,7 @@ BattleWeapon unitBombzo_weapon = {
     .ceiling_fall_chance = 5,
     .object_fall_chance = 5,
 };
+
 BattleWeapon unitBombzo_weapon_Poison = {
     .name = nullptr,
     .icon = 0,
@@ -182,6 +183,56 @@ BattleWeapon unitBombzo_weapon_Poison = {
     .ceiling_fall_chance = 5,
     .object_fall_chance = 5,
 };
+BattleWeapon unitBombzo_weapon_Megaton = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 0.0,
+    .stylish_multiplier = 0,
+    .unk_19 = 0,
+    .bingo_card_chance = 0,
+    .unk_1b = 0,
+    .damage_function = (void*)GetWeaponPowerFromUnitWorkVariable,
+    .damage_function_params = { 3, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags = 
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_SELECT_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::EXPLOSION,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        // Made defense-piercing by default.
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags = AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // .status_chances = all 0,
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 10,
+    .bg_a2_fall_weight = 10,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 30,
+    .nozzle_turn_chance = 5,
+    .nozzle_fire_chance = 5,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 5,
+};
 
 PoseTableEntry unitBombzo_pose_table_1[] = {
     28, "B_4",
@@ -210,21 +261,31 @@ EVT_BEGIN(unitBombzo_explosion_event)
         USER_FUNC(evt_snd_sfxoff, LW(0))
         USER_FUNC(btlevtcmd_SetUnitWork, -2, 1, 0)
     END_IF()
+    // Set weapon and range based on the type of bomb.
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, 2, LW(8))
+    SWITCH(LW(8))
+        CASE_EQUAL(0)
+            SET(LW(8), PTR(&unitBombzo_weapon))
+            SET(LW(9), 50)
+            SET(LW(7), FLOAT(1.0))
+        CASE_EQUAL(1)
+            SET(LW(8), PTR(&unitBombzo_weapon_Poison))
+            SET(LW(9), 50)
+            SET(LW(7), FLOAT(1.0))
+        CASE_ETC()
+            SET(LW(8), PTR(&unitBombzo_weapon_Megaton))
+            SET(LW(9), 500)
+            SET(LW(7), FLOAT(5.0))
+    END_SWITCH()
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    USER_FUNC(evt_eff, PTR(""), PTR("hibashira"), 2, LW(0), LW(1), LW(2), LW(0), LW(1), LW(2), 1, FLOAT(1.0), 60, 0, 0)
+    // TODO: Punchier effects for Megaton bomb!
+    USER_FUNC(evt_eff, PTR(""), PTR("hibashira"), 2, LW(0), LW(1), LW(2), LW(0), LW(1), LW(2), 1, LW(7), 60, 0, 0)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_THUNDERS_BOMB2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_StageDispellFog)
     USER_FUNC(btlevtcmd_OnAttribute, -2, 16777216)
     USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, 50331648)
     USER_FUNC(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("B_2"))
-    // Set weapon based on the type of bomb.
-    USER_FUNC(btlevtcmd_GetUnitWork, -2, 2, LW(8))
-    IF_EQUAL(LW(8), 0)
-        SET(LW(8), PTR(&unitBombzo_weapon))
-    ELSE()
-        SET(LW(8), PTR(&unitBombzo_weapon_Poison))
-    END_IF()
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, 1, LW(8))
     USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(8), LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
@@ -242,7 +303,7 @@ EVT_BEGIN(unitBombzo_explosion_event)
     IF_SMALL_EQUAL(LW(0), -1)
         MUL(LW(0), -1)
     END_IF()
-    IF_LARGE(LW(0), 50)
+    IF_LARGE(LW(0), LW(9))
         GOTO(80)
     END_IF()
     USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(8), 256, LW(5))
@@ -1347,6 +1408,124 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(customAttack_MegatonBomb)
+    USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    
+    USER_FUNC(btlevtcmd_SpawnUnit, LW(9), PTR(&unitBombzo_entry), 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, LW(9), 2, 2)
+    USER_FUNC(btlevtcmd_SetScale, LW(9), FLOAT(3.0), FLOAT(3.0), FLOAT(3.0))
+    USER_FUNC(btlevtcmd_SetPos, LW(9), FLOAT(0.0), FLOAT(400.0), FLOAT(-30.0))
+
+    // Play falling sound, set up Stylish command right as the bomb lands.
+    BROTHER_EVT()
+        WAIT_FRM(45)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("S_1"))
+        USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_SAC_TIME3"), LW(6))
+        WAIT_FRM(39)
+        USER_FUNC(evt_snd_sfxoff, LW(6))
+        USER_FUNC(btlevtcmd_ACRStart, -2, 0, 12, 12, 0)
+        USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
+        SWITCH(LW(6))
+            CASE_LARGE_EQUAL(2)
+                USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+                USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
+                USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("Y_1"))
+                WAIT_FRM(50)
+            CASE_ETC()
+                USER_FUNC(evt_audience_acrobat_notry)
+        END_SWITCH()
+    END_BROTHER()
+    
+    USER_FUNC(btlevtcmd_SetFallAccel, LW(9), FLOAT(0.4))
+    USER_FUNC(btlevtcmd_FallPosition, LW(9), FLOAT(0.0), FLOAT(0.0), FLOAT(-30.0), 90)
+    USER_FUNC(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
+    USER_FUNC(btlevtcmd_snd_se, LW(9), PTR("SFX_BOSS_GNB_APPEAR1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    
+    // Mario gets jumpscared as the bomb lands.
+    BROTHER_EVT()
+        USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_B_3"))
+        USER_FUNC(btlevtcmd_snd_se, -3, PTR("SFX_VOICE_MARIO_SURPRISED2_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_JumpSetting, -3, 24, FLOAT(0.0), FLOAT(0.7))
+        USER_FUNC(btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_JumpPosition, -3, LW(0), LW(1), LW(2), 0, -1)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_S_1"))
+    END_BROTHER()
+
+    WAIT_FRM(45)
+    
+    // Do Kiss Thief command 4 times with progressively tighter timing.
+    USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(14))
+    USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(14))
+    USER_FUNC(btlevtcmd_AcGetDifficulty, LW(14))
+    // Difficulty parameter (based on Kiss Thief _get_itemsteal_param)
+    MUL(LW(14), -20)
+    ADD(LW(14), 140)
+    // Initial success threshold (fullness%)
+    SET(LW(15), 72)
+    SET(LW(11), -1)
+    SET(LW(13), 4)
+    DO(LW(13))
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("S_1"))
+        IF_EQUAL(LW(11), 1)
+            // Have bomb fuse light and Mario start panicking on the third bar.
+            USER_FUNC(btlevtcmd_AnimeChangePose, LW(9), 1, PTR("B_2"))
+            USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_THUNDERS_BOMB1"), LW(0))
+            USER_FUNC(btlevtcmd_SetUnitWork, LW(9), 1, LW(0))
+            
+            USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_N_7"))
+            USER_FUNC(btlevtcmd_snd_se, -3, PTR("SFX_VOICE_MARIO_SURPRISED1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        END_IF()
+        USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(14), 2, 2, LW(15), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_AcSetFlag, 0)
+        USER_FUNC(btlevtcmd_SetupAC, -2, 15, 1, 0)
+        WAIT_FRM(22)
+        USER_FUNC(btlevtcmd_StartAC, 1)
+        USER_FUNC(btlevtcmd_ResultAC)
+        USER_FUNC(btlevtcmd_GetResultAC, LW(6))
+        IF_FLAG(LW(6), 0x2)
+            USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("Y_1"))
+            ADD(LW(15), 8)
+            ADD(LW(11), 1)
+            USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(11))
+            SET(LW(10), LW(11))
+            ADD(LW(10), 2)
+            USER_FUNC(btlevtcmd_ACSuccessEffect, LW(10), FLOAT(20.0), FLOAT(30.0), FLOAT(0.0))
+            USER_FUNC(btlevtcmd_snd_se, LW(9), PTR("SFX_CONDITION_DEKADEKA1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            DO(50)
+                USER_FUNC(btlevtcmd_AddScale, LW(9), FLOAT(0.01), FLOAT(0.01), FLOAT(0.01))
+                WAIT_FRM(1)
+            WHILE()
+        ELSE()
+            USER_FUNC(btlevtcmd_InviteApInfoReport)
+            USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
+            USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+            USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+            DO_BREAK()
+        END_IF()
+    WHILE()
+        
+    USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_S_1"))
+    IF_SMALL(LW(11), 1)
+        // Have bomb fuse light if not already lit.
+        USER_FUNC(btlevtcmd_AnimeChangePose, LW(9), 1, PTR("B_2"))
+        USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_THUNDERS_BOMB1"), LW(0))
+        USER_FUNC(btlevtcmd_SetUnitWork, LW(9), 1, LW(0))
+    END_IF()
+    IF_EQUAL(LW(11), 3)
+        USER_FUNC(btlevtcmd_InviteApInfoReport)
+    END_IF()
+    WAIT_FRM(30)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("S_1"))
+    
+    // Set final damage value - 4 x (number of completed bars + 1).
+    ADD(LW(11), 2)
+    MUL(LW(11), 4)
+    USER_FUNC(btlevtcmd_SetUnitWork, LW(9), 3, LW(11))
+    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+
 BattleWeapon customWeapon_BobberyBomb = {
     .name = "btl_wn_pbm_normal",
     .icon = IconType::PARTNER_MOVE_0,
@@ -1688,49 +1867,39 @@ BattleWeapon customWeapon_BobberyMove5 = {
 };
 
 BattleWeapon customWeapon_BobberyMove6 = {
-    .name = "btl_wn_pbm_normal",
+    .name = "btl_wn_pbm_lv1",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pbm_bakuhatsu",
+    .description = "msg_pbm_jigen_bakudan",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 3,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 4, 2, 5, 3, 6, 0, MoveType::BOBBERY_6 },
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::ONLY_FRONT |
-        AttackTargetProperty_Flags::HAMMERLIKE,
-    .element = AttackElement::EXPLOSION,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_bakuhatsu",
-    .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::FLIPS_BOMB |
-        AttackSpecialProperty_Flags::FREEZE_BREAK |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::ALL &
-        ~AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .ac_help_msg = "msg_ac_heart_catch",
+    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1738,16 +1907,16 @@ BattleWeapon customWeapon_BobberyMove6 = {
         
     // status chances
     
-    .attack_evt_code = (void*)partySandersAttack_NormalAttack,
+    .attack_evt_code = (void*)customAttack_MegatonBomb,
     .bg_a1_a2_fall_weight = 0,
-    .bg_a1_fall_weight = 10,
-    .bg_a2_fall_weight = 10,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
-    .bg_b_fall_weight = 10,
-    .nozzle_turn_chance = 10,
-    .nozzle_fire_chance = 10,
-    .ceiling_fall_chance = 5,
-    .object_fall_chance = 10,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
 };
 
 }  // namespace mod::tot::party_bobbery
