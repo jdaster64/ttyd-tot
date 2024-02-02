@@ -69,8 +69,8 @@ const MoveData g_MoveData[] = {
     { "Power Sh.",  { 2, 4, 6, }, },
     { "Shell Shield", { 4, 6, 8, }, },
     { "Shell Slam", { 4, 6, 8, }, },
-    { "Move 5",     { 1, 1, 1, }, },
-    { "Move 6",     { 1, 1, 1, }, },
+    { "Move 5",     { 3, 5, 7, }, },
+    { "Move 6",     { 5, 5, 5, }, },
     
     { "Body Slam",  { 0, 2, 4, }, },
     { "Gale Force", { 4, 4, 4, }, },
