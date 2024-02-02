@@ -679,51 +679,52 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
-    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
-    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(0))
+    // LW(9) = always weapon address for rest of script.
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(9))
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(9))
     USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     USER_FUNC(btlevtcmd_WaitGuardMove)
     USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
     USER_FUNC(btlevtcmd_RunDataEventChild, -2, 7)
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(3), LW(4))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 3, LW(3))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 4, LW(4))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 2, 7, 0)
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 7, 7, 0)
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 6, 7, 0)
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 5, 7, 0)
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 5, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 6, 0)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 4, 7, 0)
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&customWeapon_YoshiMiniEgg))
-    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&customWeapon_YoshiMiniEgg), LW(10), LW(11))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(10), LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 3, 3, LW(10))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 3, 4, LW(11))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, 3, 5, 0)
@@ -733,35 +734,39 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     USER_FUNC(evt_btl_camera_set_homing_unitparts, 0, -2, 1, -1, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
     USER_FUNC(evt_btl_camera_set_zoom, 0, 300)
+    
+    // Set # of eggs based on move used (2-4 for Mini-Egg, 3-5 for Egg Barrage).
+    IF_EQUAL(LW(9), PTR(&customWeapon_YoshiMiniEgg))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_MINI_EGG, LW(0))
+        SET(LW(1), 1)
+    ELSE()
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_5, LW(0))
+        SET(LW(1), 2)
+    END_IF()
+    ADD(LW(1), LW(0))
+
     USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
-    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_MINI_EGG, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(1)
-            SET(LW(1), 3)
-        CASE_EQUAL(2)
-            SET(LW(1), 4)
-        CASE_ETC()
-            SET(LW(1), 5)
-    END_SWITCH()
     USER_FUNC(btlevtcmd_AcGetDifficulty, LW(0))
     SUB(LW(0), 3)
     SWITCH(LW(0))
         CASE_SMALL_EQUAL(-3)
-            SET(LW(0), 480)
-        CASE_EQUAL(-2)
-            SET(LW(0), 360)
-        CASE_EQUAL(-1)
-            SET(LW(0), 240)
-        CASE_EQUAL(0)
-            SET(LW(0), 180)
-        CASE_EQUAL(1)
-            SET(LW(0), 150)
-        CASE_EQUAL(2)
             SET(LW(0), 100)
-        CASE_ETC()
+        CASE_EQUAL(-2)
+            SET(LW(0), 80)
+        CASE_EQUAL(-1)
             SET(LW(0), 60)
+        CASE_EQUAL(0)
+            SET(LW(0), 45)
+        CASE_EQUAL(1)
+            SET(LW(0), 35)
+        CASE_EQUAL(2)
+            SET(LW(0), 25)
+        CASE_ETC()
+            SET(LW(0), 15)
     END_SWITCH()
+    // Set timer based on number of eggs.
+    MUL(LW(0), LW(1))
     USER_FUNC(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_AcSetFlag, 0)
     USER_FUNC(btlevtcmd_AcSetOutputParam, 1, 0)
@@ -785,7 +790,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
                 ADD(LW(13), 1)
                 GOTO(25)
             ELSE()
-                USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&customWeapon_YoshiMiniEgg), -1)
+                USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(9), -1)
                 USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_A_5"))
                 WAIT_FRM(54)
                 USER_FUNC(evt_audience_ap_recovery)
@@ -810,7 +815,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
     USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    USER_FUNC(btlevtcmd_AudienceDeclareACResult, PTR(&customWeapon_YoshiMiniEgg), LW(6))
+    USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(9), LW(6))
     LBL(10)
     USER_FUNC(evt_sub_random, 2, LW(0))
     USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 0, LW(0))
@@ -824,7 +829,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     END_SWITCH()
     USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, LW(12), 69)
     USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 1, 4)
-    USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 2, PTR(&customWeapon_YoshiMiniEgg))
+    USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 2, LW(9))
     LBL(20)
     USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(6))
     USER_FUNC(btlevtcmd_SetPartsScale, -2, LW(12), FLOAT(1.0), FLOAT(1.0), FLOAT(1.0))
@@ -1566,7 +1571,7 @@ BattleWeapon customWeapon_YoshiMiniEgg = {
     .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
+    .damage_function = nullptr,
     .damage_function_params = { 1, 1, 1, 1, 1, 1, 0, MoveType::YOSHI_MINI_EGG },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -1669,66 +1674,58 @@ BattleWeapon customWeapon_YoshiStampede = {
 };
 
 BattleWeapon customWeapon_YoshiMove5 = {
-    .name = "btl_wn_pys_normal",
+    .name = "btl_wn_pys_lv2",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pys_hip_drop",
+    .description = "msg_pys_wonder_egg",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 3,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 1, 1, 1, 1, 0, MoveType::YOSHI_5 },
+    .damage_function_params = { 2, 2, 2, 2, 2, 2, 0, MoveType::YOSHI_5 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::JUMPLIKE |
-        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_hip_drop",
+    .ac_help_msg = "msg_ac_wonder_egg",
     .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::FLIPS_SHELLED |
-        AttackSpecialProperty_Flags::FREEZE_BREAK |
-        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+        AttackSpecialProperty_Flags::BADGE_BUFFABLE |
+        AttackSpecialProperty_Flags::STATUS_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
-        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
-        AttackTargetWeighting_Flags::PREFER_FRONT,
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000,
         
     // status chances
     
-    .attack_evt_code = (void*)partyYoshiAttack_NormalAttack,
+    .attack_evt_code = (void*)partyYoshiAttack_EggAttack,
     .bg_a1_a2_fall_weight = 0,
-    .bg_a1_fall_weight = 10,
-    .bg_a2_fall_weight = 10,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
-    .bg_b_fall_weight = 10,
-    .nozzle_turn_chance = 10,
-    .nozzle_fire_chance = 5,
-    .ceiling_fall_chance = 5,
-    .object_fall_chance = 5,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 6,
+    .nozzle_fire_chance = 3,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
 };
 
 BattleWeapon customWeapon_YoshiMove6 = {
