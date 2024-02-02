@@ -8,6 +8,7 @@
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_message.h>
 #include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
@@ -28,6 +29,7 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_message;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_snd;
@@ -1272,6 +1274,174 @@ EVT_BEGIN(customAttack_BulkUp)
     END_INLINE()
     WAIT_FRM(80)
     LBL(99)
+    USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
+    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(customAttack_Withdraw)
+    SET(LW(12), PTR(&customWeapon_KoopsMove6))
+    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    IF_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF()
+    USER_FUNC(btlevtcmd_RunDataEventChild, -2, 7)
+    USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 7)
+    USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -2)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 200)
+    USER_FUNC(evt_btl_camera_set_posoffset, 0, 20, 0, 0)
+    USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PNK_A_2"))
+    WAIT_FRM(30)
+    // Spawn an invisible Shell Shield for the AC????
+    USER_FUNC(btlevtcmd_SpawnUnit, LW(10), PTR(&entry_koura), 0)
+    USER_FUNC(btlevtcmd_OnAttribute, LW(10), 16777216)
+    USER_FUNC(btlevtcmd_GetBodyId, LW(10), LW(11))
+    USER_FUNC(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    ADD(LW(2), 5)
+    ADD(LW(1), 240)
+    USER_FUNC(btlevtcmd_SetPos, LW(10), LW(0), LW(1), LW(2))
+    
+    USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(0))
+    USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
+    USER_FUNC(btlevtcmd_AcGetDifficulty, LW(0))
+    SUB(LW(0), 3)
+    SWITCH(LW(0))
+        CASE_SMALL_EQUAL(-3)
+            SET(LW(0), 360)
+            SET(LW(1), 480)
+        CASE_EQUAL(-2)
+            SET(LW(0), 180)
+            SET(LW(1), 360)
+        CASE_EQUAL(-1)
+            SET(LW(0), 120)
+            SET(LW(1), 300)
+        CASE_EQUAL(0)
+            SET(LW(0), 90)
+            SET(LW(1), 240)
+        CASE_EQUAL(1)
+            SET(LW(0), 70)
+            SET(LW(1), 200)
+        CASE_EQUAL(2)
+            SET(LW(0), 40)
+            SET(LW(1), 120)
+        CASE_ETC()
+            SET(LW(0), 20)
+            SET(LW(1), 80)
+    END_SWITCH()
+    USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(10), LW(11), 30, LW(0), LW(1), EVT_NULLPTR, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_AcSetFlag, 0)
+    USER_FUNC(btlevtcmd_SetupAC, -2, 12, 1, 0)
+    
+    WAIT_FRM(30)
+    
+    USER_FUNC(btlevtcmd_StartAC, 1)
+    USER_FUNC(btlevtcmd_ResultAC)
+    USER_FUNC(btlevtcmd_GetResultAC, LW(6))
+    
+    // Considered success if the gauge is manually stopped in the pink/red area.
+    SET(LW(7), 0)
+    IF_FLAG(LW(6), 0x2)
+        USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(6))
+        IF_LARGE_EQUAL(LW(6), 6)
+            SET(LW(7), 1)
+            // Set up Stylish for toward end of spinning animation, if success.
+            USER_FUNC(btlevtcmd_SetUnitWork, -2, 5, 0)
+            BROTHER_EVT()
+                WAIT_FRM(2)
+                USER_FUNC(btlevtcmd_ACRStart, -2, 35, 55, 55, 0)
+                USER_FUNC(btlevtcmd_ACRGetResult, LW(14), LW(15))
+                IF_EQUAL(LW(14), 2)
+                    USER_FUNC(btlevtcmd_SetUnitWork, -2, 5, 1)
+                END_IF()
+            END_BROTHER()
+        END_IF()
+    END_IF()
+    USER_FUNC(btlevtcmd_StopAC)
+
+    // Spin with hands above head.
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PNK_I_1"))
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_MARIO_DEFENCE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    SET(LW(8), 31)
+    DO(60)
+        SET(LW(9), LW(8))
+        DIV(LW(9), 2)
+        ADD(LW(8), 1)
+        USER_FUNC(btlevtcmd_AddRotate, -2, 0, LW(9), 0)
+        WAIT_FRM(1)
+    WHILE()
+
+    IF_EQUAL(LW(7), 0)
+        // Failure; slowly spin to a stop and get in dizzy animation.
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PNK_X_1"))
+        SET(LW(8), 90)
+        DO(96)
+            SET(LW(9), LW(8))
+            DIV(LW(9), 2)
+            IF_LARGE(LW(8), 18)
+                SUB(LW(8), 1)
+            END_IF()
+            USER_FUNC(btlevtcmd_AddRotate, -2, 0, LW(9), 0)
+            WAIT_FRM(1)
+        WHILE()
+        WAIT_FRM(30)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PNK_S_1"))
+        USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
+        WAIT_FRM(20)
+    ELSE()
+        USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(7))
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_ACSuccessEffect, LW(7), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(7))
+        
+        // Success; enter shell. If Stylish, keep spinning for a bit longer.
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PNK_A_1"))
+        
+        USER_FUNC(btlevtcmd_GetUnitWork, -2, 5, LW(5))
+        IF_EQUAL(LW(5), 1)
+            SET(LW(6), 90)
+            SET(LW(7), 1)
+            SET(LW(8), 60)
+            SET(LW(13), 20)
+            BROTHER_EVT()
+                WAIT_FRM(5)
+                USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
+            END_BROTHER()
+        ELSE()
+            SET(LW(6), 90)
+            SET(LW(7), 4)
+            SET(LW(8), 10)
+            SET(LW(13), 40)
+            USER_FUNC(evt_audience_acrobat_notry)
+        END_IF()
+        
+        DO(LW(8))
+            SET(LW(9), LW(6))
+            DIV(LW(9), 2)
+            SUB(LW(6), LW(7))
+            USER_FUNC(btlevtcmd_AddRotate, -2, 0, LW(9), 0)
+            WAIT_FRM(1)
+        WHILE()
+            
+        WAIT_FRM(LW(13))
+        // TODO: Change text to indicate Koops is invincible until next turn.
+        USER_FUNC(btlevtcmd_AnnounceMessage, 0, 0, 0, PTR("btl_msg_defend_command_exec"), 60)
+    END_IF()
+    
+    // Kill invisible Shell Shield actor.
+    USER_FUNC(btlevtcmd_KillUnit, LW(10), 0)
+    
+    // TODO: A lot. Just testing that this much works for now.
+    // - Make sure animation persists after attack and status resets next turn.
+    //   (override wait event, add new phase event that resets in next phase 2?)
+    
+    USER_FUNC(evt_audience_ap_recovery)
+    USER_FUNC(btlevtcmd_InviteApInfoReport)
+    USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
     RETURN()
 EVT_END()
@@ -1669,7 +1839,7 @@ BattleWeapon customWeapon_KoopsMove6 = {
         
     // status chances
     
-    .attack_evt_code = (void*)partyNokotarouAttack_KouraGuard,
+    .attack_evt_code = (void*)customAttack_Withdraw,
     .bg_a1_a2_fall_weight = 0,
     .bg_a1_fall_weight = 0,
     .bg_a2_fall_weight = 0,
