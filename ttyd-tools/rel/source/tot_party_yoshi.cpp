@@ -1,6 +1,8 @@
 #include "tot_party_yoshi.h"
 
+#include "custom_item.h"
 #include "evt_cmd.h"
+#include "mod_state.h"
 #include "tot_move_manager.h"
 
 #include <ttyd/battle.h>
@@ -8,14 +10,22 @@
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_icon.h>
+#include <ttyd/battle_message.h>
+#include <ttyd/battle_sub.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_env.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
+#include <ttyd/item_data.h>
+#include <ttyd/mario_pouch.h>
 #include <ttyd/msgdrv.h>
+#include <ttyd/npcdrv.h>
 #include <ttyd/unit_party_yoshi.h>
 
 namespace mod::tot::party_yoshi {
@@ -27,6 +37,8 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_icon;
+using namespace ::ttyd::battle_message;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_eff;
@@ -35,7 +47,12 @@ using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_yoshi;
 
+using ::mod::infinite_pit::PickRandomItem;
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
+
 namespace IconType = ::ttyd::icondrv::IconType;
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 }  // namespace
 
@@ -73,6 +90,70 @@ void MakeSelectWeaponTable(
         
         ++*num_options;
     }
+}
+
+EVT_DECLARE_USER_FUNC(evtTot_GetEggLayItem, 2)
+EVT_DEFINE_USER_FUNC(evtTot_GetEggLayItem) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    id = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    
+    int32_t item = unit->held_item;
+    // No held item; pick a random item to get;
+    // 30% chance of item (20% normal, 10% recipe), 10% badge, 60% coin.
+    if (!item) {
+        item = PickRandomItem(infinite_pit::RNG_KISS_THIEF, 20, 10, 10, 60);
+        if (!item) item = ItemType::COIN;
+    }
+    if (item == ItemType::GOLD_BAR_X3 || !ttyd::mario_pouch::pouchGetItem(item)) {
+        // Item = Shine Sprite (can't be stolen), or player's inventory is full.
+        evtSetValue(evt, evt->evtArguments[1], ItemType::COIN);
+    } else {
+        // Remove the corresponding held/stolen item from the NPC setup,
+        // if this was one of the initial enemies in the loadout.
+        if (!ttyd::battle_unit::BtlUnit_CheckUnitFlag(unit, 0x40000000)) {
+            if (unit->group_index >= 0) {
+                battleWork->fbat_info->wBattleInfo->wHeldItems
+                    [unit->group_index] = 0;
+            }
+        } else {
+            ttyd::battle_unit::BtlUnit_OffUnitFlag(unit, 0x40000000);
+            if (unit->group_index >= 0) {
+                auto* npc_battle_info = battleWork->fbat_info->wBattleInfo;
+                npc_battle_info->wHeldItems[unit->group_index] = 0;
+                npc_battle_info->wStolenItems[unit->group_index] = 0;
+            }
+        }
+        
+        evtSetValue(evt, evt->evtArguments[1], item);
+    }
+    return 2;
+}
+
+
+
+EVT_DECLARE_USER_FUNC(evtTot_SetGulpStruggleParam, 2)
+EVT_DEFINE_USER_FUNC(evtTot_SetGulpStruggleParam) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    id = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    
+    int32_t param = evtGetValue(evt, evt->evtArguments[1]);
+    
+    if (unit->size_change_strength < 0 && unit->size_change_turns > 0) {
+        // Enemy struggles considerably less if Tiny.
+        param /= 2;
+    } else {
+        // Enemy struggles more at high HP.
+        float factor = (float)unit->current_hp / unit->max_hp;
+        if (factor < 0.5f) factor = 0.5f;
+        param *= (factor * 2);
+    }
+        
+    evtSetValue(evt, evt->evtArguments[1], param);
+    return 2;
 }
 
 EVT_BEGIN(partyYoshiAttack_NormalAttack)
@@ -1209,6 +1290,305 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(customAttack_Gulp)
+    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    IF_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF()
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, 1, 0)
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
+    USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_WaitGuardMove)
+    USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
+    USER_FUNC(btlevtcmd_RunDataEventChild, -2, 7)    
+    USER_FUNC(evt_btl_camera_set_mode, 0, 10)
+    USER_FUNC(evt_btl_camera_set_homing_unitparts, 0, -2, 1, -1, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 250)
+    WAIT_FRM(22)
+    LBL(5)
+    
+    USER_FUNC(btlevtcmd_CommandPreCheckDamage, -2, LW(3), LW(4), 256, LW(5))
+    USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(6))
+    MULF(LW(6), 40)
+    USER_FUNC(_get_nomikomi_hit_position, -2, LW(3), LW(4), LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
+    USER_FUNC(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(0), LW(2), 1, LW(15))
+    USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(5.0))
+    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 50, -1, 0)
+    IF_EQUAL(LW(5), 5)
+        // Handle counterattacks.
+        USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
+    END_IF()
+    USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))    
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_A_2"))
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_YOSHI_SWALLOW1"), 0)
+    IF_NOT_EQUAL(LW(5), 1)
+        IF_EQUAL(LW(5), 3)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 38)
+        END_IF()
+        IF_EQUAL(LW(5), 6)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 39)
+        END_IF()
+        IF_EQUAL(LW(5), 2)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 40)
+        END_IF()
+        WAIT_FRM(50)
+        GOTO(90)
+    END_IF()
+    WAIT_FRM(7)
+
+    // If not swallowable at all, fails automatically.
+    USER_FUNC(_get_swallow_param, LW(3), LW(7))
+    IF_EQUAL(LW(7), -1)
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
+        WAIT_FRM(43)
+        GOTO(90)
+    END_IF()
+        
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_YOSHI_SWALLOW2"), 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 350)
+    USER_FUNC(btlevtcmd_DamageDirect, LW(3), LW(4), 0, 0, 2, 1)
+    WAIT_FRM(3)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_FaceDirectionAdd, -2, LW(0), 12)
+    USER_FUNC(btlevtcmd_DivePosition, LW(3), LW(0), LW(1), LW(2), 5, 0, 0, 0, -1)
+    USER_FUNC(btlevtcmd_OnAttribute, LW(3), 16777216)
+    // Suprress drawing enemy held item.
+    USER_FUNC(btlevtcmd_OnUnitFlag, LW(3), 0x8000000)
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_YOSHI_SWALLOW3"), 0)
+    
+    // New AC: Stampede-style L & R mashing once enemy is in Yoshi's mouth.
+    USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(0))
+    USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
+    USER_FUNC(btlevtcmd_AcGetDifficulty, LW(0))
+    SUB(LW(0), 3)
+    SWITCH(LW(0))
+        CASE_SMALL_EQUAL(-3)
+            SET(LW(1), 25)
+        CASE_EQUAL(-2)
+            SET(LW(1), 22)
+        CASE_EQUAL(-1)
+            SET(LW(1), 19)
+        CASE_EQUAL(0)
+            SET(LW(1), 16)
+        CASE_EQUAL(1)
+            SET(LW(1), 15)
+        CASE_EQUAL(2)
+            SET(LW(1), 14)
+        CASE_ETC()
+            SET(LW(1), 13)
+    END_SWITCH()
+    SET(LW(0), 150)
+    // Fight-back param scales further up at enemy HP, down for Tiny status.
+    SET(LW(2), 50)
+    USER_FUNC(evtTot_SetGulpStruggleParam, LW(3), LW(2))
+    
+    USER_FUNC(btlevtcmd_AcSetParamAll, 15, LW(0), 178, LW(1), LW(2), 1, 100, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_AcSetGaugeParam, 100, 100, 100, 100)
+    USER_FUNC(btlevtcmd_AcSetFlag, 1)
+    USER_FUNC(btlevtcmd_SetupAC, -2, 6, 1, 0)
+    WAIT_FRM(6)
+    // Start flutter kick animation a second before timer elapses.
+    SET(LW(7), LW(0))
+    SUB(LW(7), 60)
+    BROTHER_EVT()
+        WAIT_FRM(LW(7))
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_A_3"))
+    END_BROTHER()
+    USER_FUNC(btlevtcmd_StartAC, 1)
+    USER_FUNC(btlevtcmd_ResultAC)
+    
+    WAIT_FRM(7)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    // Acts as a success percentage of swallowing the enemy.
+    USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(7))
+    USER_FUNC(evt_sub_random, 99, LW(0))
+    IF_LARGE_EQUAL(LW(0), LW(7))
+        // If failed, drop enemy on floor for 1 damage.        
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_A_4"))
+        USER_FUNC(btlevtcmd_ftomsec, 22, LW(0))
+        WAIT_MSEC(LW(0))
+        INLINE_EVT_ID(LW(15))
+            USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_YOSHI_NOMIKOMI6"), 0)
+            USER_FUNC(btlevtcmd_OffAttribute, LW(3), 16777216)
+            USER_FUNC(btlevtcmd_OffUnitFlag, LW(3), 0x8000000)
+            USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiMove6), int(0x80000100U), LW(5))
+            USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
+            USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+        END_INLINE()
+        USER_FUNC(btlevtcmd_WaitEventEnd, LW(15))
+        GOTO(90)
+    ELSE()
+        USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
+        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
+    END_IF()
+        
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, 1, 1)
+    BROTHER_EVT()
+        USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
+        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+    END_BROTHER()
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_YOSHI_SWALLOW5"), 0)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_A_7"))
+    WAIT_FRM(26)
+    USER_FUNC(_check_swallow_attribute, LW(3), 1, LW(1))
+    USER_FUNC(_check_swallow_attribute, LW(3), 4, LW(2))
+    USER_FUNC(evtTot_GetEggLayItem, LW(3), LW(14))
+    USER_FUNC(btlevtcmd_GetExp, LW(3), LW(0))
+    USER_FUNC(btlevtcmd_StoreExp, LW(0))
+    USER_FUNC(btlevtcmd_KillUnit, LW(3), 0)
+    WAIT_FRM(8)
+    
+    // Spawn egg.
+    SET(LW(12), 2)
+    USER_FUNC(evt_sub_random, 2, LW(0))
+    USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 0, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(1)
+            USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, LW(12), PTR(&pose_table_egg_y))
+        CASE_EQUAL(2)
+            USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, LW(12), PTR(&pose_table_egg_p))
+        CASE_ETC()
+            USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, LW(12), PTR(&pose_table_egg_g))
+    END_SWITCH()
+    USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, LW(12), 69)
+    USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 1, 4)
+    USER_FUNC(btlevtcmd_SetPartsWork, -2, LW(12), 2, LW(9))
+    USER_FUNC(btlevtcmd_SetPartsScale, -2, LW(12), FLOAT(1.0), FLOAT(1.0), FLOAT(1.0))
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_A_8"))
+    WAIT_FRM(10)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_A_12"))
+    USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(5))
+    MULF(LW(5), 10)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(5))
+    ADD(LW(1), LW(5))
+    USER_FUNC(btlevtcmd_SetPartsPos, -2, LW(12), LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_SetPartsDispOffset, -2, LW(12), 0, 0, 0)
+    USER_FUNC(btlevtcmd_SetPartsRotate, -2, LW(12), 0, 0, 0)
+    USER_FUNC(btlevtcmd_SetPartsRotateOffset, -2, LW(12), 0, 0, 0)
+    USER_FUNC(btlevtcmd_OffPartsAttribute, -2, LW(12), 50331648)
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_YOSHI_EGG1"), 0)
+    
+    // Spinning / flying egg animations.
+    BROTHER_EVT()
+        USER_FUNC(btlevtcmd_SetPartsRotateOffset, -2, LW(12), 0, 6, 0)
+        DO(30)
+            USER_FUNC(btlevtcmd_AddPartsRotate, -2, LW(12), 0, 0, 48)
+            WAIT_FRM(1)
+        WHILE()
+        USER_FUNC(btlevtcmd_SetPartsRotate, -2, LW(12), 0, 0, 0)
+    END_BROTHER()
+    BROTHER_EVT()
+        SET(LW(5), 25)
+        USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(0))
+        MULF(LW(5), LW(0))
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(5))
+        USER_FUNC(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_SetPartsFallAccel, -2, LW(12), FLOAT(0.20))
+        USER_FUNC(btlevtcmd_JumpPartsPosition, -2, LW(12), LW(0), LW(1), LW(2), 30, -1)
+    END_BROTHER()
+    WAIT_FRM(20)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_S_1"))
+    
+    // Stylish command when egg hits ground.
+    BROTHER_EVT_ID(LW(15))
+        WAIT_FRM(5)
+        USER_FUNC(btlevtcmd_ACRStart, -2, 0, 15, 15, 0)
+        USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
+        SWITCH(LW(6))
+            CASE_LARGE_EQUAL(2)
+                USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+                USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
+                USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_Y_1"))
+                USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+                USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_Y_1"))
+                USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+                USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_S_1"))
+            CASE_ETC()
+                USER_FUNC(evt_audience_acrobat_notry)
+        END_SWITCH()
+    END_BROTHER()
+    
+    // Hatch egg.
+    WAIT_FRM(25)
+    USER_FUNC(btlevtcmd_OnPartsAttribute, -2, LW(12), 50331648)
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_YOSHI_EGG2"), 0)
+    USER_FUNC(evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(0.60), 0, 0, 0, 0, 0, 0, 0)
+    WAIT_FRM(25)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_GetHeight, -2, LW(5))
+    ADD(LW(1), LW(5))
+    ADD(LW(1), 5)
+    USER_FUNC(btlevtcmd_BtlIconEntryItemId, LW(14), LW(0), LW(1), LW(2), LW(8))
+    USER_FUNC(btlevtcmd_AnnounceSetParam, 0, LW(14))
+    USER_FUNC(btlevtcmd_AnnounceMessage, 1, 0, 0, PTR("btl_msg_steal_item_get"), 90)
+    USER_FUNC(btlevtcmd_BtlIconDelete, LW(8))
+    
+    IF_NOT_EQUAL(LW(15), 0)
+        USER_FUNC(btlevtcmd_WaitEventEnd, LW(15))
+    END_IF()
+    
+    LBL(90)
+    USER_FUNC(btlevtcmd_StopAC)
+    USER_FUNC(evt_audience_ap_recovery)
+    USER_FUNC(btlevtcmd_InviteApInfoReport)
+    LBL(95)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0))
+    USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, 1, LW(5))
+    IF_EQUAL(LW(5), 0)
+        USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+        GOTO(99)
+    END_IF()
+    USER_FUNC(btlevtcmd_GetMoveFrame, -2, LW(0), LW(1), LW(2), FLOAT(4.0), LW(5))
+    IF_SMALL_EQUAL(LW(5), 20)
+        USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+        GOTO(99)
+    END_IF()
+    BROTHER_EVT_ID(LW(15))
+        SUB(LW(5), 1)
+        SET(LW(6), LW(5))
+        SUB(LW(6), 10)
+        USER_FUNC(btlevtcmd_ACRStart, -2, LW(6), LW(5), LW(5), 0)
+    END_BROTHER()
+    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), LW(5), -1, 0)
+    USER_FUNC(btlevtcmd_WaitEventEnd, LW(15))
+    USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
+    IF_EQUAL(LW(6), 2)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_O_1"))
+        USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
+        WAIT_FRM(20)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PYS_J_1B"))
+        USER_FUNC(evt_sub_intpl_init, 4, 0, 360, 30)
+        DO(30)
+            USER_FUNC(evt_sub_intpl_get_value)
+            USER_FUNC(btlevtcmd_SetRotate, -2, 0, LW(0), 0)
+            WAIT_FRM(1)
+        WHILE()
+    END_IF()
+    LBL(99)
+    USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
+    RUN_CHILD_EVT(PTR(&btldefaultevt_SuitoruBadgeEffect))
+    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+
 BattleWeapon customWeapon_YoshiGroundPound = {
     .name = "btl_wn_pys_normal",
     .icon = IconType::PARTNER_MOVE_0,
@@ -1729,49 +2109,46 @@ BattleWeapon customWeapon_YoshiMove5 = {
 };
 
 BattleWeapon customWeapon_YoshiMove6 = {
-    .name = "btl_wn_pys_normal",
+    .name = "btl_wn_pys_lv1",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pys_hip_drop",
+    .description = "msg_pys_nomikomi",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 4,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 1, 1, 1, 1, 0, MoveType::YOSHI_6 },
+    .damage_function_params = { 1, 4, 2, 5, 3, 6, 0, MoveType::YOSHI_6 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
         AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::JUMPLIKE |
-        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+        AttackTargetProperty_Flags::ONLY_FRONT |
+        AttackTargetProperty_Flags::HAMMERLIKE,
     .element = AttackElement::NORMAL,
-    .damage_pattern = 0,
+    .damage_pattern = 5,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_hip_drop",
+    .ac_help_msg = "msg_ac_taigun_yoshi",
     .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::FLIPS_SHELLED |
-        AttackSpecialProperty_Flags::FREEZE_BREAK |
-        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags =
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1779,16 +2156,16 @@ BattleWeapon customWeapon_YoshiMove6 = {
         
     // status chances
     
-    .attack_evt_code = (void*)partyYoshiAttack_NormalAttack,
+    .attack_evt_code = (void*)customAttack_Gulp,
     .bg_a1_a2_fall_weight = 0,
-    .bg_a1_fall_weight = 10,
-    .bg_a2_fall_weight = 10,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
-    .bg_b_fall_weight = 10,
+    .bg_b_fall_weight = 0,
     .nozzle_turn_chance = 10,
     .nozzle_fire_chance = 5,
     .ceiling_fall_chance = 5,
-    .object_fall_chance = 5,
+    .object_fall_chance = 0,
 };
 
 }  // namespace mod::tot::party_yoshi
