@@ -50,6 +50,7 @@ using namespace ::ttyd::unit_party_chuchurina;
 using ::mod::infinite_pit::PickRandomItem;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
@@ -89,6 +90,39 @@ void MakeSelectWeaponTable(
         
         ++*num_options;
     }
+}
+
+// Gets an enemy's item held position.
+EVT_DECLARE_USER_FUNC(evtTot_GetHeldItemPosition, 4)
+EVT_DEFINE_USER_FUNC(evtTot_GetHeldItemPosition) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    id = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    
+    evtSetValue(evt, evt->evtArguments[1], 
+        unit->position.x + unit->held_item_base_offset.x);
+    evtSetValue(evt, evt->evtArguments[2], 
+        unit->position.y + unit->held_item_base_offset.y);
+    evtSetValue(evt, evt->evtArguments[3], 
+        unit->position.z + unit->held_item_base_offset.z);
+    
+    return 2;
+}
+
+// Removes item from enemy and gets item id.
+EVT_DECLARE_USER_FUNC(evtTot_ConfiscateItem, 2)
+EVT_DEFINE_USER_FUNC(evtTot_ConfiscateItem) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    id = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    
+    int32_t item = unit->held_item;
+    unit->held_item = 0;
+    evtSetValue(evt, evt->evtArguments[1], item);
+    
+    return 2;
 }
 
 // Replaces vanilla logic for choosing items to steal.
@@ -962,8 +996,13 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
             SET(LW(1), 130)
             USER_FUNC(btlevtcmd_AcSetFlag, 49)
     END_SWITCH()
+    
     USER_FUNC(btlevtcmd_AcSetParamAll, 1, 240, 178, LW(0), LW(1), 100, 1, EVT_NULLPTR)
-    USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
+    IF_EQUAL(LW(12), PTR(&customWeapon_MowzMove5))
+        USER_FUNC(btlevtcmd_AcSetGaugeParam, 80, 100, 100, 100)
+    ELSE()
+        USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
+    END_IF()
     USER_FUNC(btlevtcmd_SetupAC, -2, 6, 1, 0)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(evt_btl_camera_set_mode, 0, 3)
@@ -1247,7 +1286,13 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
         GOTO(50)
     END_IF()
     USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(0))
-    USER_FUNC(_make_madowase_weapon, LW(12), LW(0))
+
+    // Only dynamically change weapon params for Tease.
+    // TODO: Make into custom evt in this file.
+    IF_EQUAL(LW(12), PTR(&customWeapon_MowzTease))
+        USER_FUNC(_make_madowase_weapon, LW(12), LW(0))
+    END_IF()
+
     USER_FUNC(btlevtcmd_GetResultAC, LW(0))
     IF_FLAG(LW(0), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
@@ -1257,6 +1302,46 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
             USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
             ADD(LW(15), 1)
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
+        END_IF()
+            
+        // If the enemy has an item, have it get tossed away in a random dir.
+        IF_EQUAL(LW(12), PTR(&customWeapon_MowzMove5))
+            USER_FUNC(evtTot_ConfiscateItem, LW(3), LW(14))
+            IF_NOT_EQUAL(LW(14), 0)
+                BROTHER_EVT()
+                    WAIT_FRM(1)
+                    
+                    // TODO: Figure out why this freezes; 
+                    // ideally the enemies should be able to react.
+                    // USER_FUNC(btlevtcmd_DamageDirect, LW(3), LW(4), 0, 0, 2, 0)
+                    
+                    USER_FUNC(evtTot_GetHeldItemPosition, LW(3), LW(0), LW(1), LW(2))
+                    USER_FUNC(btlevtcmd_BtlIconEntryItemId, LW(14), LW(0), LW(1), LW(2), LW(8))
+
+                    // Initial movement vector.
+                    USER_FUNC(evt_sub_random, 200, LW(5))
+                    SUB(LW(5), 100)
+                    DIVF(LW(5), FLOAT(50.0))
+                    USER_FUNC(evt_sub_random, 17, LW(6))
+                    ADD(LW(6), 36)
+                    DIVF(LW(6), FLOAT(10.0))
+                    
+                    // Update movement.
+                    DO(75)
+                        ADDF(LW(0), LW(5))
+                        ADDF(LW(1), LW(6))
+                        ADDF(LW(6), FLOAT(-0.1))
+                        WAIT_FRM(1)
+                        USER_FUNC(btlevtcmd_BtlIconSetPosition, LW(8), LW(0), LW(1), LW(2))
+                    WHILE()
+                    
+                    // Puff of smoke on disappearing.
+                    WAIT_FRM(1)
+                    USER_FUNC(btlevtcmd_BtlIconDelete, LW(8))
+                    USER_FUNC(evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0), 0, 0, 0, 0, 0, 0, 0)
+                    // USER_FUNC(btlevtcmd_StartWaitEvent, LW(3))
+                END_BROTHER()
+            END_IF()
         END_IF()
     ELSE()
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
@@ -1949,51 +2034,39 @@ BattleWeapon customWeapon_MowzSmooch = {
 };
 
 BattleWeapon customWeapon_MowzMove5 = {
-    .name = "btl_wn_pcr_normal",
+    .name = "btl_wn_pcr_madowase",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pch_binta",
+    .description = "msg_pch_madowaseru",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 3,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)weaponGetPowerDefault,
-    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::ONLY_FRONT |
-        AttackTargetProperty_Flags::HAMMERLIKE,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
-    .damage_pattern = 0x17,
+    .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_binta",
-    .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
-        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::TOP_SPIKY |
-        // Additional resistances.
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::FIERY,
+    .ac_help_msg = "msg_ac_madowaseru",
+    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -2001,14 +2074,14 @@ BattleWeapon customWeapon_MowzMove5 = {
         
     // status chances
     
-    .attack_evt_code = (void*)partyChuchurinaAttack_NormalAttack,
+    .attack_evt_code = (void*)partyChuchurinaAttack_MadowaseAttack,
     .bg_a1_a2_fall_weight = 0,
     .bg_a1_fall_weight = 0,
     .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
     .bg_b_fall_weight = 0,
-    .nozzle_turn_chance = 4,
-    .nozzle_fire_chance = 2,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 5,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };

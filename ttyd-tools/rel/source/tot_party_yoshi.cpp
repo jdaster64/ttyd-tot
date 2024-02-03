@@ -131,8 +131,6 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEggLayItem) {
     return 2;
 }
 
-
-
 EVT_DECLARE_USER_FUNC(evtTot_SetGulpStruggleParam, 2)
 EVT_DEFINE_USER_FUNC(evtTot_SetGulpStruggleParam) {
     auto* battleWork = ttyd::battle::g_BattleWork;
