@@ -1693,6 +1693,16 @@
 8013a7b4:evt_audience_flag_check
 8013a850:evt_audience_base_flag_on
 
+// evt_batstage.o
+8013b8ec:evt_batstage_light_set_player_off
+8013b988:evt_batstage_light_set_player_on
+8013bd14:evt_batstage_return_aud_dark_base
+8013bd74:evt_batstage_set_aud_dark_base
+8013bdf0:evt_batstage_set_aud_dark
+8013be6c:evt_batstage_return_stg_dark_base
+8013becc:evt_batstage_set_stg_dark_base
+8013bf48:evt_batstage_set_stg_dark
+
 // statuswindow.o
 // .text
 8013c110:statusWinForceUpdate
