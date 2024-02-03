@@ -10,6 +10,7 @@
 #include <ttyd/battle_event_default.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
+#include <ttyd/evt_batstage.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
@@ -28,6 +29,7 @@ using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
+using namespace ::ttyd::evt_batstage;
 using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
@@ -69,7 +71,7 @@ void MakeSelectWeaponTable(
     }
 }
 
-EVT_BEGIN(partyClaudaAttack_NormalAttack)
+EVT_BEGIN(partyClaudaAttack_NormalAttack)    
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)

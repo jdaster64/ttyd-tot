@@ -1,8 +1,10 @@
 #include "tot_party_koops.h"
 
 #include "evt_cmd.h"
+#include "patch.h"
 #include "tot_move_manager.h"
 
+#include <ttyd/ac_pendulum_crane_timing.h>
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
 #include <ttyd/battle_database_common.h>
@@ -78,6 +80,30 @@ void MakeSelectWeaponTable(
 
 BattleWeapon* GetFirstAttackWeapon() {
     return &customWeapon_KoopsShellTossFS;
+}
+
+// Sets the gauge colors for Shell Shield / Withdraw to show success window.
+EVT_DECLARE_USER_FUNC(evtTot_SetPendulumAcParams, 1)
+EVT_DEFINE_USER_FUNC(evtTot_SetPendulumAcParams) {
+    static constexpr int16_t g_ShellShieldGaugeParams[] = {
+        20, 2, 35, 4, 45, 6, 55, 8, 65, 6, 80, 4, 100, 2
+    };
+    static constexpr int16_t g_WithdrawGaugeParams[] = {
+        35, 2, 36, 4, 65, 6, 65, 8, 65, 6, 66, 4, 100, 2
+    };
+
+    const int32_t move_type = evtGetValue(evt, evt->evtArguments[0]);
+    if (move_type == MoveType::KOOPS_SHELL_SHIELD) {
+        mod::patch::writePatch(
+            ttyd::ac_pendulum_crane_timing::pendulumCrane_hp_tbl,
+            g_ShellShieldGaugeParams, sizeof(g_ShellShieldGaugeParams));
+    } else {
+        mod::patch::writePatch(
+            ttyd::ac_pendulum_crane_timing::pendulumCrane_hp_tbl,
+            g_WithdrawGaugeParams, sizeof(g_WithdrawGaugeParams));
+    }
+    
+    return 2;
 }
 
 // Sets the status parameters for Bulk Up based on the AC success + move level.
@@ -644,6 +670,8 @@ EVT_BEGIN(partyNokotarouAttack_SyubibinKoura)
 EVT_END()
 
 EVT_BEGIN(partyNokotarouAttack_KouraGuard)
+    // Set gauge color parameters.
+    USER_FUNC(evtTot_SetPendulumAcParams, MoveType::KOOPS_SHELL_SHIELD)
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
         GOTO(99)
@@ -1280,6 +1308,8 @@ EVT_BEGIN(customAttack_BulkUp)
 EVT_END()
 
 EVT_BEGIN(customAttack_Withdraw)
+    // Set gauge color parameters.
+    USER_FUNC(evtTot_SetPendulumAcParams, MoveType::KOOPS_6)
     SET(LW(12), PTR(&customWeapon_KoopsMove6))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)

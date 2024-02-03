@@ -2154,6 +2154,12 @@
 8020a2c4:evt_win_other_select
 8020a374:evt_win_item_select
 
+// ac_pendulum_crane_timing.o
+// .text
+// 8020a874:battleAcMain_PendulumCraneTiming
+// .data
+8041a070:pendulumCrane_hp_tbl
+
 // battle_seq_end.o
 // .text
 // 80212740:_get_rank_up_msg
