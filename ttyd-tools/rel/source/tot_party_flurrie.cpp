@@ -8,6 +8,8 @@
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_sub.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_batstage.h>
@@ -75,21 +77,46 @@ void MakeSelectWeaponTable(
     }
 }
 
-// Dynamically sets the damage and Freeze chance parameters based on AC success.
-EVT_DECLARE_USER_FUNC(evtTot_MakeBlizzardWeapon, 3)
-EVT_DEFINE_USER_FUNC(evtTot_MakeBlizzardWeapon) {
+// Check whether enemies should shake during wind attacks.
+EVT_DECLARE_USER_FUNC(evtTot_CheckEnemyShake, 3)
+EVT_DEFINE_USER_FUNC(evtTot_CheckEnemyShake) {
+    int32_t unit_idx = ttyd::battle_sub::BattleTransID(
+        evt, evtGetValue(evt, evt->evtArguments[0]));
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
+    auto* weapon = (BattleWeapon*)evtGetValue(evt, evt->evtArguments[1]);
+    
+    bool should_shake = true;
+    if (weapon == &customWeapon_FlurrieGaleForce && 
+        unit->status_vulnerability->gale_force <= 0) {
+        should_shake = false;
+    }
+    
+    evtSetValue(evt, evt->evtArguments[2], should_shake);
+    
+    return 2;
+}
+
+// Dynamically sets the damage and status chance parameters based on AC success.
+EVT_DECLARE_USER_FUNC(evtTot_MakeBreathWeapon, 3)
+EVT_DEFINE_USER_FUNC(evtTot_MakeBreathWeapon) {
     auto* weapon = (BattleWeapon*)evtGetValue(evt, evt->evtArguments[0]);
     int32_t ac_result = evtGetValue(evt, evt->evtArguments[1]);
-    int32_t move_level = evtGetValue(evt, evt->evtArguments[2]);
+    int32_t move_type = evtGetValue(evt, evt->evtArguments[2]);
+    int32_t move_level = MoveManager::GetSelectedLevel(move_type);
     
     // Make changes in place, since the parameters are unchanged between uses.
-    if (ac_result >= 75) {
-        weapon->freeze_chance = ac_result * 1.05;
-        weapon->freeze_time = move_level;
-        weapon->damage_function_params[0] = move_level + 2;
-    } else {
-        weapon->freeze_chance = 0;
-        weapon->damage_function_params[0] = move_level + 1;
+    if (move_type == MoveType::FLURRIE_GALE_FORCE) {
+        weapon->gale_force_chance = ac_result;
+    } else {  // Blizzard
+        if (ac_result >= 75) {
+            weapon->freeze_chance = ac_result * 1.05;
+            weapon->freeze_time = move_level;
+            weapon->damage_function_params[0] = move_level + 2;
+        } else {
+            weapon->freeze_chance = 0;
+            weapon->damage_function_params[0] = move_level + 1;
+        }
     }
     
     return 2;
@@ -320,61 +347,135 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             // Snow Whirled action command; 1 damage per cycle.
             SUB(LW(1), 3)
             MUL(LW(1), 10)
-            ADD(LW(1), 180)
+            ADD(LW(1), 150)
             USER_FUNC(btlevtcmd_AcSetParamAll, LW(1), 1, 4, -3, -417, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetFlag, 7)
-            USER_FUNC(btlevtcmd_SetupAC, -2, 10, 1, 0)
     END_SWITCH()
-        
-    // TODO: Different effects based on which move was used.
        
-    USER_FUNC(_clauda_breath_effect_ready)
-    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_1"))
-    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_BREATH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
-    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_2"))
-    USER_FUNC(evt_btl_camera_nomove_x_onoff, 0, 1)
-    USER_FUNC(evt_btl_camera_nomove_y_onoff, 0, 1)
-    USER_FUNC(evt_btl_camera_nomove_z_onoff, 0, 1)
-    USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
-    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
-    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    USER_FUNC(evt_btl_camera_set_zoom, 0, 0)
-    USER_FUNC(evt_btl_camera_nomove_x_onoff, 0, 0)
-    USER_FUNC(evt_btl_camera_nomove_y_onoff, 0, 0)
-    USER_FUNC(evt_btl_camera_nomove_z_onoff, 0, 0)
-    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_3"))    
-    INLINE_EVT()
-        WAIT_MSEC(500)
-        USER_FUNC(btlevtcmd_StageDispellFog)
-    END_INLINE()
-    USER_FUNC(_clauda_breath_effect_fire, LW(13))
-    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_BREATH2"), EVT_NULLPTR, 0, LW(14))
-    // Does this control the volume of the breath sfx?
-    BROTHER_EVT_ID(LW(15))
-        SET(LW(14), -1)
-        LBL(5)
-        USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(0))
-        WAIT_FRM(1)
-        GOTO(5)
-    END_BROTHER()
+    SET(LW(15), -1)
+    IF_NOT_EQUAL(LW(12), PTR(&customWeapon_FlurrieMove6))
+        IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieGaleForce))
+            USER_FUNC(_clauda_breath_effect_ready)
+        END_IF()
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_1"))
+        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_BREATH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_2"))
+        USER_FUNC(evt_btl_camera_nomove_x_onoff, 0, 1)
+        USER_FUNC(evt_btl_camera_nomove_y_onoff, 0, 1)
+        USER_FUNC(evt_btl_camera_nomove_z_onoff, 0, 1)
+        USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+        USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+        USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+        USER_FUNC(evt_btl_camera_set_zoom, 0, 0)
+        USER_FUNC(evt_btl_camera_nomove_x_onoff, 0, 0)
+        USER_FUNC(evt_btl_camera_nomove_y_onoff, 0, 0)
+        USER_FUNC(evt_btl_camera_nomove_z_onoff, 0, 0)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_3"))
+        INLINE_EVT()
+            WAIT_MSEC(500)
+            USER_FUNC(btlevtcmd_StageDispellFog)
+        END_INLINE()
+        
+        IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieGaleForce))
+            USER_FUNC(_clauda_breath_effect_fire, LW(13))
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_BREATH2"), EVT_NULLPTR, 0, LW(14))
+            BROTHER_EVT_ID(LW(15))
+                SET(LW(14), -1)
+                LBL(5)
+                USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(0))
+                WAIT_FRM(1)
+                GOTO(5)
+            END_BROTHER()
+        ELSE()
+            // Ice Storm effect.
+            USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_ITEM_ICE_WIND1"), LW(0), LW(1), LW(2), LW(14))
+            USER_FUNC(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+            USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(3))
+            USER_FUNC(btlevtcmd_GetFaceDirection, -2, LW(4))
+            SET(LW(5), LW(3))
+            MUL(LW(5), 10)
+            ADD(LW(1), LW(5))
+            MUL(LW(5), LW(4))
+            MUL(LW(5), 2)
+            ADD(LW(0), LW(5))
+            ADD(LW(2), 20)
+            IF_LARGE(LW(4), 0)
+                SET(LW(5), 0)
+            ELSE()
+                SET(LW(5), 1)
+            END_IF()
+            USER_FUNC(evt_eff, 0, PTR("ibuki"), LW(5), LW(0), LW(1), LW(2), 400, 0, 0, 0, 0, 0, 0, 0)
+        
+            BROTHER_EVT()
+                WAIT_FRM(400)
+                USER_FUNC(evt_snd_sfxoff, LW(14))
+            END_BROTHER()
+            
+            // Would be cool to have an effect to turn the enemies blue, but
+            // it's not worth the extra complexity / space for now.
+        END_IF()
+    ELSE()
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_1"))
+        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_BREATH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        USER_FUNC(evt_btl_camera_nomove_x_onoff, 0, 1)
+        USER_FUNC(evt_btl_camera_nomove_y_onoff, 0, 1)
+        USER_FUNC(evt_btl_camera_nomove_z_onoff, 0, 1)
+        USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+        WAIT_FRM(30)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A4_2"))
+        USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+        USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+        USER_FUNC(evt_btl_camera_set_zoom, 0, 0)
+        USER_FUNC(evt_btl_camera_nomove_x_onoff, 0, 0)
+        USER_FUNC(evt_btl_camera_nomove_y_onoff, 0, 0)
+        USER_FUNC(evt_btl_camera_nomove_z_onoff, 0, 0)
+        
+        WAIT_FRM(10)
+        USER_FUNC(evt_snd_sfxon, PTR("SFX_ITEM_QUAKE1"), LW(14))
+        USER_FUNC(btlevtcmd_SetupAC, -2, 10, 1, 0)
+        WAIT_FRM(20)
+        
+        // TODO: Light screen shaking?
+        USER_FUNC(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
+        
+        BROTHER_EVT_ID(LW(15))
+            LBL(6)
+            USER_FUNC(evt_batstage_set_stg_dark, 80, 35, 0)
+            WAIT_FRM(35)
+            USER_FUNC(evt_batstage_set_stg_dark, 20, 35, 0)
+            WAIT_FRM(35)
+            GOTO(6)
+        END_BROTHER()
+    END_IF()
     
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LBL(8)
     IF_NOT_EQUAL(LW(3), -1)
-        USER_FUNC(_check_blow_rate, LW(3), LW(0))
+        // Determine whether enemies should shake.
+        USER_FUNC(evtTot_CheckEnemyShake, LW(3), LW(12), LW(0))
         IF_LARGE_EQUAL(LW(0), 1)
             USER_FUNC(btlevtcmd_DamageDirect, LW(3), LW(4), 0, 0, 3, 1)
         END_IF()
         USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         GOTO(8)
-    END_IF() 
+    END_IF()
     
     USER_FUNC(btlevtcmd_StartAC, 1)
     USER_FUNC(btlevtcmd_ResultAC)
-    DELETE_EVT(LW(15))
+    
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieMove6))
+        // Get rid of effects.
+        USER_FUNC(evt_snd_sfxoff, LW(14))
+        USER_FUNC(evt_batstage_return_stg_dark_base, 60, 0)
+        USER_FUNC(evt_btl_camera_noshake, 0)
+    END_IF()
+    IF_NOT_EQUAL(LW(15), -1)
+        DELETE_EVT(LW(15))
+    END_IF()
     
     USER_FUNC(btlevtcmd_SetRotate, -2, 0, 0, 0)
     USER_FUNC(btlevtcmd_StopAC)
@@ -385,13 +486,12 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     SET(LW(8), -1)
     SWITCH(LW(12))
         CASE_EQUAL(PTR(&customWeapon_FlurrieGaleForce))
-            USER_FUNC(_make_breath_weapon, LW(12), LW(0))
+            USER_FUNC(evtTot_MakeBreathWeapon, LW(12), LW(0), MoveType::FLURRIE_GALE_FORCE)
             IF_LARGE_EQUAL(LW(0), 1)
                 SET(LW(8), 0)
             END_IF()
         CASE_EQUAL(PTR(&customWeapon_FlurrieMove5))
-            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::FLURRIE_5, LW(1))
-            USER_FUNC(evtTot_MakeBlizzardWeapon, LW(12), LW(0), LW(1))
+            USER_FUNC(evtTot_MakeBreathWeapon, LW(12), LW(0), MoveType::FLURRIE_5)
             IF_LARGE_EQUAL(LW(0), 75)
                 SET(LW(8), 0)
             END_IF()
@@ -409,11 +509,37 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     END_SWITCH()
     
     WAIT_FRM(60)
+    
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieMove6))
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A4_3"))
+    END_IF()
+    
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET(LW(10), 0)
     LBL(10)
+    
+    // Thunderbolt effect.
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieMove6))
+        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_GetWidth, LW(3), LW(5))
+        USER_FUNC(btlevtcmd_GetHeight, LW(3), LW(6))
+        USER_FUNC(evt_sub_random, 2, LW(7))
+        ADD(LW(7), 3)
+        USER_FUNC(
+            evt_eff64, PTR(""), PTR("thunder_n64"), 
+            LW(7), LW(0), LW(1), LW(2), LW(5), LW(6), 0, 0, 0, 0, 0, 0)
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_ITEM_ICE_THUNDER_FALL1"), LW(0), LW(1), LW(2), 0)
+        USER_FUNC(evt_btl_camera_shake_h, 0, 3, 0, 25, 13)
+        USER_FUNC(evt_sub_rumble_onoff, 0, 0)
+        WAIT_MSEC(83)
+        BROTHER_EVT()
+            WAIT_MSEC(167)
+            USER_FUNC(evt_sub_rumble_onoff, 1, 0)
+        END_BROTHER()
+    END_IF()
+    
     USER_FUNC(btlevtcmd_SetDispOffset, LW(3), 0, 0, 0)
     USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(6))
     IF_NOT_EQUAL(LW(6), 1)
@@ -470,15 +596,18 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         END_IF()
     END_IF()
     LBL(80)
-    WAIT_MSEC(1500)
+    // Got rid of wait here so new attacks end a bit earlier.
     LBL(90)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
     
-    // TODO: Only needed for breath attacks.
-    USER_FUNC(evt_snd_sfxoff, LW(14))
-    USER_FUNC(evt_eff_delete_ptr, LW(13))
-    
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieGaleForce))
+        // Retained wait after Gale Force, but made it a bit shorter.
+        WAIT_MSEC(1000)
+        USER_FUNC(evt_snd_sfxoff, LW(14))
+        USER_FUNC(evt_eff_delete_ptr, LW(13))
+    END_IF()
+        
     USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
     USER_FUNC(btlevtcmd_ACRStart, -2, 0, 25, 25, 20)
     USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
