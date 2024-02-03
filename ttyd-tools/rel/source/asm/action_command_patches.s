@@ -26,10 +26,13 @@ b 0
 
 # Reset buttons rather than ending command if using custom mode...
 StartButtonDownCheckComplete:
-# If AC param 4 = -417...
+# If AC param 4 = -417 and AC output param 0 is 4 (completed set of buttons)...
 lwz %r3, 0x1cd8 (%r22)
 cmpwi %r3, -417
-beq- 0xc
+bne+ 0x10
+lwz %r3, 0x1ce8 (%r22)
+cmpwi %r3, 4
+beq+ 0xc
 # Restore original opcode if not.
 lwz	%r3, 0x1cb8 (%r22)
 BranchBackButtonDownCheckComplete:

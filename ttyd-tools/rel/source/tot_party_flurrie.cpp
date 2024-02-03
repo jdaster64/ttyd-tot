@@ -14,6 +14,7 @@
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_clauda.h>
@@ -34,6 +35,9 @@ using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_clauda;
+
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 
@@ -69,6 +73,26 @@ void MakeSelectWeaponTable(
         
         ++*num_options;
     }
+}
+
+// Dynamically sets the damage and Freeze chance parameters based on AC success.
+EVT_DECLARE_USER_FUNC(evtTot_MakeBlizzardWeapon, 3)
+EVT_DEFINE_USER_FUNC(evtTot_MakeBlizzardWeapon) {
+    auto* weapon = (BattleWeapon*)evtGetValue(evt, evt->evtArguments[0]);
+    int32_t ac_result = evtGetValue(evt, evt->evtArguments[1]);
+    int32_t move_level = evtGetValue(evt, evt->evtArguments[2]);
+    
+    // Make changes in place, since the parameters are unchanged between uses.
+    if (ac_result >= 75) {
+        weapon->freeze_chance = ac_result * 1.05;
+        weapon->freeze_time = move_level;
+        weapon->damage_function_params[0] = move_level + 2;
+    } else {
+        weapon->freeze_chance = 0;
+        weapon->damage_function_params[0] = move_level + 1;
+    }
+    
+    return 2;
 }
 
 EVT_BEGIN(partyClaudaAttack_NormalAttack)    
@@ -280,29 +304,30 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -2)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
     USER_FUNC(evt_btl_camera_set_zoom, 0, 300)
+    
+    // Set Action Command based on weapon used.
     USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
     USER_FUNC(btlevtcmd_AcGetDifficulty, LW(1))
-    SUB(LW(1), 3)
-    SWITCH(LW(1))
-        CASE_SMALL_EQUAL(-3)
-            SET(LW(0), 300)
-        CASE_EQUAL(-2)
-            SET(LW(0), 300)
-        CASE_EQUAL(-1)
-            SET(LW(0), 300)
-        CASE_EQUAL(0)
-            SET(LW(0), 300)
-        CASE_EQUAL(1)
-            SET(LW(0), 300)
-        CASE_EQUAL(2)
-            SET(LW(0), 300)
+    SWITCH(LW(12))
+        CASE_EQUAL(PTR(&customWeapon_FlurrieGaleForce))
+            USER_FUNC(btlevtcmd_AcSetParamAll, 1, 300, 4, 40, 60, 80, 100, LW(1))
+            USER_FUNC(btlevtcmd_SetupAC, -2, 14, 1, 0)
+        CASE_EQUAL(PTR(&customWeapon_FlurrieMove5))
+            USER_FUNC(btlevtcmd_AcSetParamAll, 1, 300, 4, 75, 100, 100, 100, LW(1))
+            USER_FUNC(btlevtcmd_SetupAC, -2, 14, 1, 0)
         CASE_ETC()
-            SET(LW(0), 300)
+            // Snow Whirled action command; 1 damage per cycle.
+            SUB(LW(1), 3)
+            MUL(LW(1), 10)
+            ADD(LW(1), 180)
+            USER_FUNC(btlevtcmd_AcSetParamAll, LW(1), 1, 4, -3, -417, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetFlag, 7)
+            USER_FUNC(btlevtcmd_SetupAC, -2, 10, 1, 0)
     END_SWITCH()
-    USER_FUNC(btlevtcmd_AcGetDifficulty, LW(1))
-    USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 4, 40, 60, 80, 100, LW(1))
-    USER_FUNC(btlevtcmd_SetupAC, -2, 14, 1, 0)
+        
+    // TODO: Different effects based on which move was used.
+       
     USER_FUNC(_clauda_breath_effect_ready)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_1"))
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_BREATH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -318,13 +343,14 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     USER_FUNC(evt_btl_camera_nomove_x_onoff, 0, 0)
     USER_FUNC(evt_btl_camera_nomove_y_onoff, 0, 0)
     USER_FUNC(evt_btl_camera_nomove_z_onoff, 0, 0)
-    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_3"))
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A2_3"))    
     INLINE_EVT()
         WAIT_MSEC(500)
         USER_FUNC(btlevtcmd_StageDispellFog)
     END_INLINE()
     USER_FUNC(_clauda_breath_effect_fire, LW(13))
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_BREATH2"), EVT_NULLPTR, 0, LW(14))
+    // Does this control the volume of the breath sfx?
     BROTHER_EVT_ID(LW(15))
         SET(LW(14), -1)
         LBL(5)
@@ -332,6 +358,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         WAIT_FRM(1)
         GOTO(5)
     END_BROTHER()
+    
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -343,16 +370,44 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         END_IF()
         USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         GOTO(8)
-    END_IF()
+    END_IF() 
+    
     USER_FUNC(btlevtcmd_StartAC, 1)
     USER_FUNC(btlevtcmd_ResultAC)
     DELETE_EVT(LW(15))
+    
     USER_FUNC(btlevtcmd_SetRotate, -2, 0, 0, 0)
     USER_FUNC(btlevtcmd_StopAC)
-    SET(LW(11), 99)
-    SET(LW(12), PTR(&customWeapon_FlurrieGaleForce))
+    SET(LW(11), 99)    
+    
+    // Make weapon structs / set AC prize level based on AC output params.
     USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
-    USER_FUNC(_make_breath_weapon, LW(12), LW(0))
+    SET(LW(8), -1)
+    SWITCH(LW(12))
+        CASE_EQUAL(PTR(&customWeapon_FlurrieGaleForce))
+            USER_FUNC(_make_breath_weapon, LW(12), LW(0))
+            IF_LARGE_EQUAL(LW(0), 1)
+                SET(LW(8), 0)
+            END_IF()
+        CASE_EQUAL(PTR(&customWeapon_FlurrieMove5))
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::FLURRIE_5, LW(1))
+            USER_FUNC(evtTot_MakeBlizzardWeapon, LW(12), LW(0), LW(1))
+            IF_LARGE_EQUAL(LW(0), 75)
+                SET(LW(8), 0)
+            END_IF()
+        CASE_ETC()
+            USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(0))
+            IF_LARGE_EQUAL(LW(0), 4)
+                // Prize level = Nice for 4, Good for 6, Great for 8...
+                SET(LW(8), LW(0))
+                SUB(LW(8), 4)
+                DIV(LW(8), 2)
+                IF_LARGE(LW(8), 4)
+                    SET(LW(8), 4)
+                END_IF()
+            END_IF()
+    END_SWITCH()
+    
     WAIT_FRM(60)
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
@@ -376,12 +431,24 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         END_IF()
         GOTO(50)
     END_IF()
-    USER_FUNC(btlevtcmd_GetResultAC, LW(0))
-    IF_FLAG(LW(0), 0x2)
+    
+    IF_LARGE_EQUAL(LW(8), 0)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
-        USER_FUNC(btlevtcmd_GetDamageCode, LW(3), LW(0))
-        IF_EQUAL(LW(0), 29)
-            USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
+        
+        // Only show 'Nice' effect for Gale Force if the status procs.
+        IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieGaleForce))
+            USER_FUNC(btlevtcmd_GetDamageCode, LW(3), LW(0))
+            IF_EQUAL(LW(0), 29)
+                SET(LW(0), 0)
+            ELSE()
+                SET(LW(0), -1)
+            END_IF()
+        ELSE()
+            SET(LW(0), LW(8))
+        END_IF()
+
+        IF_LARGE_EQUAL(LW(0), 0)
+            USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), LW(0), LW(6))
             USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
             USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
@@ -407,8 +474,11 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     LBL(90)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    
+    // TODO: Only needed for breath attacks.
     USER_FUNC(evt_snd_sfxoff, LW(14))
     USER_FUNC(evt_eff_delete_ptr, LW(13))
+    
     USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
     USER_FUNC(btlevtcmd_ACRStart, -2, 0, 25, 25, 20)
     USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
@@ -972,106 +1042,103 @@ BattleWeapon customWeapon_FlurrieDodgyFog = {
 };
 
 BattleWeapon customWeapon_FlurrieMove5 = {
-    .name = "btl_wn_pwd_normal",
+    .name = "btl_wn_pwd_lv1",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pwd_body_press",
+    .description = "msg_pwd_breath",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 4,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::FLURRIE_5 },
+    // Will be overridden by evtTot_MakeBlizzardWeapon.
+    .damage_function = (void*)weaponGetPowerDefault,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
-    .element = AttackElement::NORMAL,
-    .damage_pattern = 0xa,
+    .element = AttackElement::ICE,
+    .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_body_press",
+    .ac_help_msg = "msg_ac_breath",
     .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::FLIPS_SHELLED |
-        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances
+    .freeze_chance = 100,
+    .freeze_time = 1,
     
-    .attack_evt_code = (void*)partyClaudaAttack_NormalAttack,
+    .attack_evt_code = (void*)partyClaudaAttack_BreathAttack,
     .bg_a1_a2_fall_weight = 0,
-    .bg_a1_fall_weight = 20,
-    .bg_a2_fall_weight = 20,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
-    .bg_b_fall_weight = 20,
-    .nozzle_turn_chance = 10,
-    .nozzle_fire_chance = 2,
-    .ceiling_fall_chance = 5,
-    .object_fall_chance = 10,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 20,
+    .nozzle_fire_chance = 10,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
 };
 
 BattleWeapon customWeapon_FlurrieMove6 = {
-    .name = "btl_wn_pwd_normal",
+    .name = "btl_wn_pwd_lv1",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pwd_body_press",
+    .description = "msg_pwd_breath",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 4,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::FLURRIE_6 },
+    // Use AC output param 1 (number of Snow Whirled rotations).
+    .damage_function = (void*)weaponGetACOutputParam,
+    .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
-    .element = AttackElement::NORMAL,
-    .damage_pattern = 0xa,
+    .element = AttackElement::ELECTRIC,
+    .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_body_press",
+    .ac_help_msg = "msg_ac_mahou_no_kona",
     .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1079,15 +1146,15 @@ BattleWeapon customWeapon_FlurrieMove6 = {
         
     // status chances
     
-    .attack_evt_code = (void*)partyClaudaAttack_NormalAttack,
+    .attack_evt_code = (void*)partyClaudaAttack_BreathAttack,
     .bg_a1_a2_fall_weight = 0,
-    .bg_a1_fall_weight = 20,
-    .bg_a2_fall_weight = 20,
+    .bg_a1_fall_weight = 10,
+    .bg_a2_fall_weight = 10,
     .bg_no_a_fall_weight = 100,
-    .bg_b_fall_weight = 20,
-    .nozzle_turn_chance = 10,
-    .nozzle_fire_chance = 2,
-    .ceiling_fall_chance = 5,
+    .bg_b_fall_weight = 10,
+    .nozzle_turn_chance = 20,
+    .nozzle_fire_chance = 10,
+    .ceiling_fall_chance = 0,
     .object_fall_chance = 10,
 };
 
