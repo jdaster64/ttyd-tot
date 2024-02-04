@@ -1644,17 +1644,37 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
     USER_FUNC(evt_eff, 0, PTR("kiss"), 0, LW(0), LW(1), LW(2), LW(6), 0, 0, 0, 0, 0, 0, 0)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CHURINA_KISS1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRM(40)
+    DIV(LW(6), 5)
+    
+    // Heal target (Mario).
     USER_FUNC(btlevtcmd_GetPartsPos, LW(3), LW(4), LW(12), LW(13), LW(14))
     USER_FUNC(btlevtcmd_GetHeight, LW(3), LW(5))
-    USER_FUNC(btlevtcmd_GetStatusMg, LW(3), LW(6))
-    MULF(LW(5), LW(6))
+    USER_FUNC(btlevtcmd_GetStatusMg, LW(3), LW(7))
+    MULF(LW(5), LW(7))
     ADD(LW(13), LW(5))
+    SUB(LW(12), LW(6))  // move hearts apart in X dir; only if healing both
     USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(5))
     USER_FUNC(evt_eff, PTR("eff"), PTR("recovery"), 0, LW(12), LW(13), LW(14), LW(5), 0, 0, 0, 0, 0, 0, 0)
     INLINE_EVT_ID(LW(15))
         WAIT_FRM(120)
         USER_FUNC(btlevtcmd_RecoverHp, LW(3), LW(4), LW(5))
     END_INLINE()
+    
+    // Also heal self.
+    USER_FUNC(btlevtcmd_GetPartsPos, -2, 1, LW(12), LW(13), LW(14))
+    USER_FUNC(btlevtcmd_GetHeight, LW(3), LW(5))
+    USER_FUNC(btlevtcmd_GetStatusMg, LW(3), LW(7))
+    MULF(LW(5), LW(7))
+    ADD(LW(13), LW(5))
+    SUB(LW(14), 10)     // to prevent z-fighting
+    ADD(LW(12), LW(6))  // move hearts apart in X dir; only if healing both
+    USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(5))
+    USER_FUNC(evt_eff, PTR("eff"), PTR("recovery"), 0, LW(12), LW(13), LW(14), LW(5), 0, 0, 0, 0, 0, 0, 0)
+    INLINE_EVT_ID(LW(15))
+        WAIT_FRM(120)
+        USER_FUNC(btlevtcmd_RecoverHp, -2, 1, LW(5))
+    END_INLINE()
+    
     USER_FUNC(btlevtcmd_ACRStart, -2, 0, 15, 15, 20)
     USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
     SWITCH(LW(6))
