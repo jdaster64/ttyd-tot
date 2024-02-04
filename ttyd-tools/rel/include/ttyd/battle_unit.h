@@ -387,10 +387,10 @@ void BtlUnit_OffUnitFlag(BattleWorkUnit* unit, uint32_t flag);
 void BtlUnit_OnUnitFlag(BattleWorkUnit* unit, uint32_t flag);
 uint32_t BtlUnit_CheckUnitFlag(BattleWorkUnit* unit, uint32_t flag);
 // BtlUnit_OffStatusFlag
-// BtlUnit_OnStatusFlag
+void BtlUnit_OnStatusFlag(BattleWorkUnit* unit, uint32_t flag);
 // BtlUnit_CheckStatusFlag
 uint32_t BtlUnit_CheckStatus(BattleWorkUnit* unit, int8_t status_type);
-// BtlUnit_CheckRecoveryStatus
+int32_t BtlUnit_CheckRecoveryStatus(BattleWorkUnit* unit, int8_t status_type);
 // BtlUnit_ClearStatus
 // BtlUnit_SetStatus
 // BtlUnit_GetStatus
@@ -443,14 +443,15 @@ uint32_t BtlUnit_CheckStatus(BattleWorkUnit* unit, int8_t status_type);
 // BtlUnit_GetHomePos
 // BtlUnit_SetHitCursorOffset
 // BtlUnit_SetHitOffset
-// BtlUnit_GetHitPos
+void BtlUnit_GetHitPos(
+    BattleWorkUnit* unit, BattleWorkUnitPart* part, float* x, float* y, float* z);
 // BtlUnit_GetPartsWorldPos
 // BtlUnit_AddPartsPos
 // BtlUnit_SetPartsPos
 // BtlUnit_GetPartsPos
 // BtlUnit_AddPos
 // BtlUnit_SetPos
-// BtlUnit_GetPos
+void BtlUnit_GetPos(BattleWorkUnit* unit, float* x, float* y, float* z);
 // BtlUnit_GetBodyPartsId
 // BtlUnit_GetPartsPtr
 // BtlUnit_GetUnitId

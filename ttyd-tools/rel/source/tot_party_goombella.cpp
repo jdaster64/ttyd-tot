@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "patch.h"
+#include "patches_battle.h"
 #include "tot_move_manager.h"
 
 #include <gc/types.h>
@@ -29,7 +30,7 @@ extern const int32_t g_ac_monosiri_target_WhiteReticleScale;
 extern const int32_t g_ac_monosiri_target_GreyReticleScale;
 extern const int32_t g_ac_monosiri_target_ReticleZoomSpeed;
 
-}
+}  // namespace mod::infinite_pit
 
 namespace mod::tot::party_goombella {
 
@@ -992,6 +993,7 @@ EVT_BEGIN(customAttack_ScopeOut)
         USER_FUNC(evt_btl_camera_set_posoffset, 0, 0, 0, 0)
     END_BROTHER()
     
+    SET(LW(15), 0)
     USER_FUNC(btlevtcmd_GetResultAC, LW(6))
     IF_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_GetResultPrizeLv, -5, 0, LW(6))
@@ -999,10 +1001,25 @@ EVT_BEGIN(customAttack_ScopeOut)
         USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
         USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+        
+        // Fake a damage state + apply custom "Scoped" status.
+        // TODO: Params are all placeholder, for testing purposes!
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        SET(LW(15), 1)
+        USER_FUNC(infinite_pit::battle::evtTot_ApplyCustomStatus,
+            LW(3), LW(4), 0x400, 0xdcdc00, 0x0000dc,
+            PTR("SFX_CONDITION_BIRIBIRI1"), PTR("btl_wn_pkr_lv1"))
     ELSE()
         USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
         USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
     END_IF()
+
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    USER_FUNC(evt_btl_camera_off_posoffset_manual, 0)
+    
+    // TODO: Disappointed sound / animation if missed.
+    WAIT_FRM(60)
         
     // USER_FUNC(btlevtcmd_GetResultAC, LW(6))
     // IF_NOT_FLAG(LW(6), 0x2)
@@ -1065,10 +1082,13 @@ EVT_BEGIN(customAttack_ScopeOut)
         // GOTO(20)
     // END_IF()
     // LBL(90)
-
-    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
-    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    USER_FUNC(evt_btl_camera_off_posoffset_manual, 0)
+    
+    
+    // End enemy fake damage state.
+    IF_EQUAL(LW(15), 1)
+        USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, LW(3), 1)
+    END_IF()
+        
     USER_FUNC(evt_audience_ap_recovery)
     USER_FUNC(btlevtcmd_InviteApInfoReport)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)

@@ -36,6 +36,8 @@ namespace StatusEffectType {
         FRIGHT,
         GALE_FORCE,
         OHKO,
+        
+        STATUS_MAX,
     };
 }
     

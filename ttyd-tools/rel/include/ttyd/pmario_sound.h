@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gc/types.h>
+
 #include <cstdint>
 
 namespace ttyd::pmario_sound {
@@ -21,7 +23,7 @@ extern "C" {
 // psndSFX_pit
 // psndSFX_vol
 // psndSFXOnEx_3D
-// psndSFXOn_3D
+uint32_t psndSFXOn_3D(const char* id, gc::vec3* position);
 // psndSFXOnVol
 // psndSFXOn
 // psndSFXOn_

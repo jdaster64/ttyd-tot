@@ -52,9 +52,10 @@ void (*g_stg0_00_init_trampoline)(void) = nullptr;
 // battle_ac.o  800fa1b8
 int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*) = nullptr;
-// battle_damage.o  800fd030
-void (*g__getSickStatusParam_trampoline)(
-    BattleWorkUnit*, BattleWeapon*, int32_t, int8_t*, int8_t*) = nullptr;
+// battle_damage.o  800fbd8c
+uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
+    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
+    BattleWeapon*, uint32_t) = nullptr;
 // battle_damage.o  800fd680
 int32_t (*g_BattleCalculateFpDamage_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,

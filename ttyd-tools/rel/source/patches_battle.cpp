@@ -13,11 +13,18 @@
 #include <ttyd/battle_actrecord.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_damage.h>
+#include <ttyd/battle_disp.h>
 #include <ttyd/battle_event_cmd.h>
+#include <ttyd/battle_status_effect.h>
+#include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
+#include <ttyd/eff_stamp_n64.h>
+#include <ttyd/effdrv.h>
 #include <ttyd/evtmgr.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
+#include <ttyd/pmario_sound.h>
 
 #include <cstdint>
 #include <cstring>
@@ -60,6 +67,9 @@ namespace {
 
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::battle_unit::BattleWorkUnit;
+using ::ttyd::battle_unit::BattleWorkUnitPart;
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
@@ -70,8 +80,9 @@ namespace StatusEffectType = ::ttyd::battle_database_common::StatusEffectType;
 // Function hooks.
 extern int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
-extern void (*g__getSickStatusParam_trampoline)(
-    BattleWorkUnit*, BattleWeapon*, int32_t, int8_t*, int8_t*);
+extern uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
+    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
+    BattleWeapon*, uint32_t);
 // Patch addresses.
 extern const int32_t g_BattleCheckDamage_Patch_PaybackDivisor;
 extern const int32_t g_BattleCheckDamage_Patch_HoldFastDivisor;
@@ -95,138 +106,169 @@ namespace battle {
     
 void GetStatusParams(
     BattleWorkUnit* unit, BattleWeapon* weapon, int32_t status_type,
-    int8_t* turn_count, int8_t* strength) {
-    int32_t turns_temporary = 0;
-    int32_t strength_temporary = 0;
+    int32_t& chance, int32_t& turns, int32_t& strength) {
+    chance = 0;
+    turns = 0;
+    strength = 0;
     
     switch (status_type) {
         case StatusEffectType::ALLERGIC:
-            turns_temporary = weapon->allergic_time;
+            chance = weapon->allergic_chance;
+            turns = weapon->allergic_time;
             break;
         case StatusEffectType::SLEEP:
-            turns_temporary = weapon->sleep_time;
+            chance = weapon->sleep_chance;
+            turns = weapon->sleep_time;
             break;
         case StatusEffectType::STOP:
-            turns_temporary = weapon->stop_time;
+            chance = weapon->stop_chance;
+            turns = weapon->stop_time;
             break;
         case StatusEffectType::DIZZY:
-            turns_temporary = weapon->dizzy_time;
+            chance = weapon->dizzy_chance;
+            turns = weapon->dizzy_time;
             break;
         case StatusEffectType::POISON:
-            turns_temporary = weapon->poison_time;
-            strength_temporary = weapon->poison_strength;
+            chance = weapon->poison_chance;
+            turns = weapon->poison_time;
+            strength = weapon->poison_strength;
             break;
         case StatusEffectType::CONFUSE:
-            turns_temporary = weapon->confuse_time;
+            chance = weapon->confuse_chance;
+            turns = weapon->confuse_time;
             break;
         case StatusEffectType::ELECTRIC:
-            turns_temporary = weapon->electric_time;
+            chance = weapon->electric_chance;
+            turns = weapon->electric_time;
             break;
         case StatusEffectType::DODGY:
-            turns_temporary = weapon->dodgy_time;
+            chance = weapon->dodgy_chance;
+            turns = weapon->dodgy_time;
             break;
         case StatusEffectType::BURN:
-            turns_temporary = weapon->burn_time;
+            chance = weapon->burn_chance;
+            turns = weapon->burn_time;
             break;
         case StatusEffectType::FREEZE:
-            turns_temporary = weapon->freeze_time;
+            chance = weapon->freeze_chance;
+            turns = weapon->freeze_time;
             break;
         case StatusEffectType::HUGE:
             if (weapon->size_change_strength > 0) {
-                turns_temporary = weapon->size_change_time;
-                strength_temporary = weapon->size_change_strength;
+                chance = weapon->size_change_chance;
+                turns = weapon->size_change_time;
+                strength = weapon->size_change_strength;
             }
             break;
         case StatusEffectType::TINY:
             if (weapon->size_change_strength < 0) {
-                turns_temporary = weapon->size_change_time;
-                strength_temporary = weapon->size_change_strength;
+                chance = weapon->size_change_chance;
+                turns = weapon->size_change_time;
+                strength = weapon->size_change_strength;
             }
             break;
         case StatusEffectType::ATTACK_UP:
             if (weapon->atk_change_strength > 0) {
-                turns_temporary = weapon->atk_change_time;
-                strength_temporary = weapon->atk_change_strength;
+                chance = weapon->atk_change_chance;
+                turns = weapon->atk_change_time;
+                strength = weapon->atk_change_strength;
             }
             break;
         case StatusEffectType::ATTACK_DOWN:
             if (weapon->atk_change_strength < 0) {
-                turns_temporary = weapon->atk_change_time;
-                strength_temporary = weapon->atk_change_strength;
+                chance = weapon->atk_change_chance;
+                turns = weapon->atk_change_time;
+                strength = weapon->atk_change_strength;
             }
             break;
         case StatusEffectType::DEFENSE_UP:
             if (weapon->def_change_strength > 0) {
-                turns_temporary = weapon->def_change_time;
-                strength_temporary = weapon->def_change_strength;
+                chance = weapon->def_change_chance;
+                turns = weapon->def_change_time;
+                strength = weapon->def_change_strength;
             }
             break;
         case StatusEffectType::DEFENSE_DOWN:
             if (weapon->def_change_strength < 0) {
-                turns_temporary = weapon->def_change_time;
-                strength_temporary = weapon->def_change_strength;
+                chance = weapon->def_change_chance;
+                turns = weapon->def_change_time;
+                strength = weapon->def_change_strength;
             }
             break;
         case StatusEffectType::CHARGE:
-            strength_temporary = weapon->charge_strength;
+            chance = weapon->charge_strength ? 100 : 0;
+            strength = weapon->charge_strength;
             break;
         case StatusEffectType::INVISIBLE:
-            turns_temporary = weapon->invisible_time;
+            chance = weapon->invisible_chance;
+            turns = weapon->invisible_time;
             break;
         case StatusEffectType::FAST:
-            turns_temporary = weapon->fast_time;
+            chance = weapon->fast_chance;
+            turns = weapon->fast_time;
             break;
         case StatusEffectType::SLOW:
-            turns_temporary = weapon->slow_time;
+            chance = weapon->slow_chance;
+            turns = weapon->slow_time;
             break;
         case StatusEffectType::PAYBACK:
-            turns_temporary = weapon->payback_time;
+            chance = weapon->payback_time ? 100 : 0;
+            turns = weapon->payback_time;
             break;
         case StatusEffectType::HOLD_FAST:
-            turns_temporary = weapon->hold_fast_time;
+            chance = weapon->hold_fast_time ? 100 : 0;
+            turns = weapon->hold_fast_time;
             break;
         case StatusEffectType::HP_REGEN:
-            turns_temporary = weapon->hp_regen_time;
-            strength_temporary = weapon->hp_regen_strength;
+            chance = weapon->hp_regen_time ? 100 : 0;
+            turns = weapon->hp_regen_time;
+            strength = weapon->hp_regen_strength;
             break;
         case StatusEffectType::FP_REGEN:
-            turns_temporary = weapon->fp_regen_time;
-            strength_temporary = weapon->fp_regen_strength;
+            chance = weapon->fp_regen_time ? 100 : 0;
+            turns = weapon->fp_regen_time;
+            strength = weapon->fp_regen_strength;
+            break;
+        case StatusEffectType::FRIGHT:
+            chance = weapon->fright_chance;
+            break;
+        case StatusEffectType::GALE_FORCE:
+            chance = weapon->gale_force_chance;
             break;
         case StatusEffectType::OHKO:
-            turns_temporary = weapon->ohko_chance;
+            chance = weapon->ohko_chance;
             break;
     }
     
     switch (weapon->item_id) {
         case ItemType::POWER_JUMP:
             if (status_type == StatusEffectType::DEFENSE_DOWN) {
-                turns_temporary += tot::MoveManager::GetSelectedLevel(
+                turns += tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::JUMP_POWER_JUMP) * 2 - 2;
             }
             break;
         case ItemType::SLEEPY_STOMP:
             if (status_type == StatusEffectType::SLEEP) {
-                turns_temporary += tot::MoveManager::GetSelectedLevel(
+                turns += tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::JUMP_SLEEPY_STOMP) * 2 - 2;
             }
             break;
         case ItemType::HEAD_RATTLE:
             if (status_type == StatusEffectType::TINY) {
-                turns_temporary += tot::MoveManager::GetSelectedLevel(
+                turns += tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::HAMMER_SHRINK_SMASH) * 2 - 2;
             }
             break;
         case ItemType::ICE_SMASH:
             if (status_type == StatusEffectType::FREEZE) {
-                turns_temporary += tot::MoveManager::GetSelectedLevel(
+                turns += tot::MoveManager::GetSelectedLevel(
                     tot::MoveType::HAMMER_ICE_SMASH) * 2 - 2;
             }
             break;
         case ItemType::CHARGE:
         case ItemType::CHARGE_P:
             if (status_type == StatusEffectType::CHARGE) {
-                strength_temporary += mario_move::GetStrategyBadgeLevel(
+                strength += mario_move::GetStrategyBadgeLevel(
                     /* is_charge = */ true,
                     unit->current_kind == BattleUnitType::MARIO) - 1;
             }
@@ -234,7 +276,7 @@ void GetStatusParams(
         case ItemType::SUPER_CHARGE:
         case ItemType::SUPER_CHARGE_P:
             if (status_type == StatusEffectType::DEFENSE_UP) {
-                strength_temporary += mario_move::GetStrategyBadgeLevel(
+                strength += mario_move::GetStrategyBadgeLevel(
                     /* is_charge = */ false,
                     unit->current_kind == BattleUnitType::MARIO) - 1;
             }
@@ -248,15 +290,65 @@ void GetStatusParams(
         int32_t altered_charge;
         GetEnemyStats(
             unit->current_kind, nullptr, &altered_charge,
-            nullptr, nullptr, nullptr, strength_temporary);
+            nullptr, nullptr, nullptr, strength);
         if (altered_charge > 99) altered_charge = 99;
-        strength_temporary = altered_charge;
+        strength = altered_charge;
     }
-    
-    *turn_count = turns_temporary;
-    *strength = strength_temporary;
-}         
-    
+}
+
+uint32_t GetStatusDamageFromWeapon(
+    BattleWorkUnit* attacker, BattleWorkUnit* target, BattleWorkUnitPart* part,
+    BattleWeapon* weapon, uint32_t extra_params) {
+    uint32_t result = 0;
+    if ((extra_params & 0x2000'0000) == 0) {
+        for (int32_t type = 0; type < StatusEffectType::STATUS_MAX; ++type) {
+            int32_t chance, turns, strength;
+            GetStatusParams(
+                attacker, weapon, type, chance, turns, strength);
+
+            bool always_update = true;
+            switch (type) {
+                case StatusEffectType::GALE_FORCE: {
+                    // Modify rate based on enemy HP and Huge/Tiny status.
+                    if (target->size_change_turns > 0) {
+                        if (target->size_change_strength > 0) {
+                            chance = 0;
+                        } else {
+                            chance *= 1.5;
+                        }
+                    } else {
+                        // Rate ranges from 70% at max health to 100% at half.
+                        float factor =
+                            1.3f - 0.6f * target->current_hp / target->max_hp;
+                        if (factor > 1.0f) factor = 1.0f;
+                        chance *= factor;
+                    }
+                    break;
+                }
+                case StatusEffectType::HUGE:
+                case StatusEffectType::ATTACK_UP:
+                case StatusEffectType::DEFENSE_UP:
+                    // Should not update status if turns and strength = 0
+                    // (e.g. a Tasty Tonic was used).
+                    always_update = false;
+                    break;
+            }
+
+            if (always_update || turns != 0 || strength != 0) {
+                int32_t damage_result = 
+                    ttyd::battle_damage::BattleSetStatusDamage(
+                        &result, target, part, weapon->special_property_flags,
+                        type, chance, /* gale_factor */ 0, turns, strength);
+
+                if (damage_result && type == StatusEffectType::INVISIBLE) {
+                    ttyd::battle_disp::btlDispPoseAnime(part);
+                }
+            }
+        }
+    }
+    return result;
+}
+
 void ApplyFixedPatches() {
     g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
         ttyd::battle_ac::BattleActionCommandCheckDefence,
@@ -296,13 +388,16 @@ void ApplyFixedPatches() {
             }
             return defense_result;
         });
-            
-    g__getSickStatusParam_trampoline = patch::hookFunction(
-        ttyd::battle_damage::_getSickStatusParam, [](
-            BattleWorkUnit* unit, BattleWeapon* weapon, int32_t status_type,
-            int8_t* turn_count, int8_t* strength) {
+    
+    // Replacing several core damage / status infliction functions.
+    g_BattleSetStatusDamageFromWeapon_trampoline = patch::hookFunction(
+        ttyd::battle_damage::BattleSetStatusDamageFromWeapon, [](
+            BattleWorkUnit* attacker, BattleWorkUnit* target, 
+            BattleWorkUnitPart* part, BattleWeapon* weapon, 
+            uint32_t extra_params) {
                 // Replaces vanilla logic completely.
-                GetStatusParams(unit, weapon, status_type, turn_count, strength);
+                return GetStatusDamageFromWeapon(
+                    attacker, target, part, weapon, extra_params);
             });
             
     // Add support for Snow Whirled-like variant of button pressing AC.
@@ -408,6 +503,71 @@ void SetTargetAudienceAmount() {
 double ApplySpRegenMultiplier(double base_regen) {
     return base_regen * 
         g_Mod->state_.GetOptionNumericValue(OPTNUM_SP_REGEN_MODIFIER) / 20.0;
+}
+
+
+
+// Applies a custom status effect to the target.
+// Params: unit, part, status_flag, color1, color2, sfx_name, announce_msg
+EVT_DEFINE_USER_FUNC(evtTot_ApplyCustomStatus) {
+    int32_t unit_idx = ttyd::battle_sub::BattleTransID(
+        evt, evtGetValue(evt, evt->evtArguments[0]));
+    int32_t part_idx = evtGetValue(evt, evt->evtArguments[1]);
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
+    auto* part = ttyd::battle::BattleGetUnitPartsPtr(unit_idx, part_idx);
+    
+    uint32_t status_flag = evtGetValue(evt, evt->evtArguments[2]);
+    uint32_t color1 = evtGetValue(evt, evt->evtArguments[3]);
+    uint32_t color2 = evtGetValue(evt, evt->evtArguments[4]);
+    const char* sfx_name = (const char*)evtGetValue(evt, evt->evtArguments[5]);
+    const char* announce_msg = (const char*)evtGetValue(evt, evt->evtArguments[6]);
+    
+    // Apply status flag.
+    unit->status_flags |= status_flag;
+    
+    // Spawn splash effect.
+    gc::vec3 pos;
+    ttyd::battle_unit::BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+    // Adjust position for center point based on whether on ceiling.
+    if ((unit->attribute_flags & 2) == 0) {
+        pos.y += unit->height / 2;
+    } else {
+        pos.y -= unit->height / 2;
+    }
+    switch (unit->current_kind) {
+        case BattleUnitType::HOOKTAIL:
+        case BattleUnitType::GLOOMTAIL:
+        case BattleUnitType::BONETAIL:
+            pos.x -= 300;
+            pos.z += 30;
+            break;
+        case BattleUnitType::SHADOW_QUEEN_PHASE_2:
+            pos.z += 40;
+            break;
+    }
+    auto* eff = ttyd::eff_stamp_n64::effStampN64Entry(
+        pos.x, pos.y, pos.z + 10.0f, 2);
+    // Apply user-determined colors to effect.
+    ((char*)eff->eff_work)[0x38] = color1 >> 16;
+    ((char*)eff->eff_work)[0x39] = (color1 >> 8) & 0xff;
+    ((char*)eff->eff_work)[0x3a] = color1        & 0xff;
+    ((char*)eff->eff_work)[0x3b] = color2 >> 16;
+    ((char*)eff->eff_work)[0x3c] = (color2 >> 8) & 0xff;
+    ((char*)eff->eff_work)[0x3d] = color2        & 0xff;
+    
+    // Play sound effect.
+    ttyd::battle_unit::BtlUnit_GetHitPos(unit, part, &pos.x, &pos.y, &pos.z);
+    ttyd::pmario_sound::psndSFXOn_3D(sfx_name, &pos);
+    
+    // Queue custom message, using status 1 (Stop)'s unused no-effect entry.
+    ttyd::battle_status_effect::_st_chg_msg_data[2].msg_no_effect = announce_msg;
+    ttyd::battle_status_effect::BattleStatusChangeInfoSetAnnouce(
+        unit, /* placeholder status + turns */ 1, 1, /* no effect */ 0);
+    ttyd::battle_status_effect::BattleStatusChangeMsgSetAnnouce(
+        unit, /* placeholder status */ 1, /* no effect */ 0);
+    
+    return 2;
 }
 
 }  // namespace battle

@@ -789,6 +789,7 @@
 80315380:_party_max_hp_table
 
 // pmario_sound.o
+800d9848:psndSFXOn_3D
 800daf24:psndBGMOn_f_d
 800dc214:psndStopAllFadeOut
 
@@ -1073,8 +1074,8 @@
 // 800faecc:BattleAttackDeclare
 // 800fb01c:BattleCheckDamage
 // 800fba1c:_checkDamageCode_EmergencyRevival
-// 800fbadc:BattlePreCheckDamage
-// 800fbd8c:BattleSetStatusDamageFromWeapon
+800fbadc:BattlePreCheckDamage
+800fbd8c:BattleSetStatusDamageFromWeapon
 800fbed8:BattleSetStatusDamage
 // 800fcf54:_getRegistStatus
 800fd030:_getSickStatusParam
@@ -1083,6 +1084,9 @@
 800fd790:BattleCalculateDamage
 // 800fde2c:BattleCheckPikkyoro
 800fdfd4:BattleDamageDirect
+
+// battle_disp.o
+801010f4:btlDispPoseAnime
 
 // battle_event_cmd.o
 80103d14:btlevtcmd_ftof
@@ -1608,7 +1612,11 @@
 801277ac:BtlUnit_OffUnitFlag
 801277bc:BtlUnit_OnUnitFlag
 801277cc:BtlUnit_CheckUnitFlag
+801277e8:BtlUnit_OnStatusFlag
 80127814:BtlUnit_CheckStatus
+80127890:BtlUnit_CheckRecoveryStatus
+801289ec:BtlUnit_GetHitPos
+80128c7c:BtlUnit_GetPos
 80128fe0:BtlUnit_Entry
 
 // battle_monosiri.o
@@ -2089,6 +2097,13 @@
 // .data
 80418560:icon_id
 
+// battle_status_effect.o
+// .text
+80195a14:BattleStatusChangeMsgSetAnnouce
+80195b5c:BattleStatusChangeInfoSetAnnouce
+// .data
+80397bd8:_st_chg_msg_data
+
 // evt_env.o
 80199098:evt_env_blur_on
 
@@ -2109,10 +2124,13 @@
 801aa228:BattleIconInit
 801aa25c:BtlIconGetPtr
 
-// battle_message.h
+// battle_message.o
 801abc10:btlevtcmd_AnnounceSetParam
 801abc70:_disp
 801abdd0:btlevtcmd_AnnounceMessage
+
+// eff_stamp_n64.o
+801eaf74:effStampN64Entry
 
 // battle_enemy_item.o
 801f8dd0:_check_status_recover_item
