@@ -85,7 +85,6 @@ bool g_JustPressedZ = false;
 }
 
 // Function hooks.
-extern int32_t (*g__make_madowase_weapon_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_get_monosiri_msg_no_trampoline)(EvtEntry*, bool);
 // Patch addresses.
 extern const int32_t g_BattleDrawEnemyHP_DrawEnemyHPText_BH;
@@ -219,23 +218,6 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_BattleSetStatusDamage_Patch_GaleLevelFactor),
         0x60000000U /* nop */);
-        
-    // Increase Tease's base status rate to 1.27x and make it inflict Confuse.
-    g__make_madowase_weapon_trampoline = mod::patch::hookFunction(
-        ttyd::unit_party_chuchurina::_make_madowase_weapon,
-        [](EvtEntry* evt, bool isFirstCall) {
-            g__make_madowase_weapon_trampoline(evt, isFirstCall);
-            BattleWeapon& weapon = 
-                *reinterpret_cast<BattleWeapon*>(evt->lwData[12]);
-            weapon.confuse_chance = weapon.dizzy_chance * 1.27;
-            weapon.confuse_time = 3;
-            weapon.dizzy_chance = 0;
-            weapon.dizzy_time = 0;
-            return 2;
-        });
-    
-    // Bomb Squad explosions pierce Defense.
-    ttyd::unit_bomzou::weapon_bomzou_explosion.special_property_flags |= 0x40;
         
     // TOT: Replace party member weapon selection functions.
     mod::patch::writePatch(

@@ -104,8 +104,8 @@ const MoveData g_MoveData[] = {
     { "Kiss Thief", { 5, 5, 5, }, },
     { "Tease",      { 4, 4, 4, }, },
     { "Smooch",     { 3, 5, 7, }, },
-    { "Move 5",     { 1, 1, 1, }, },
-    { "Move 6",     { 1, 1, 1, }, },
+    { "Move 5",     { 5, 5, 5, }, },
+    { "Move 6",     { 3, 5, 7, }, },
 }; 
 
 void MoveManager::Init() {

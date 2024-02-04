@@ -125,6 +125,28 @@ EVT_DEFINE_USER_FUNC(evtTot_ConfiscateItem) {
     return 2;
 }
 
+// Dynamically sets the damage and status chance parameters based on AC success.
+EVT_DECLARE_USER_FUNC(evtTot_MakeTeaseWeapon, 3)
+EVT_DEFINE_USER_FUNC(evtTot_MakeTeaseWeapon) {
+    auto* weapon = (BattleWeapon*)evtGetValue(evt, evt->evtArguments[0]);
+    int32_t ac_result = evtGetValue(evt, evt->evtArguments[1]);
+    int32_t move_type = evtGetValue(evt, evt->evtArguments[2]);
+    int32_t move_level = MoveManager::GetSelectedLevel(move_type);
+    
+    // Make changes in place, since the parameters are unchanged between uses.
+    if (move_type == MoveType::MOWZ_TEASE) {
+        weapon->confuse_chance = ac_result * 1.27;
+        weapon->confuse_time = 3;
+    } else {  // Smoke Bomb
+        int32_t success_level = 1 + (move_level + 2) * ac_result / 100;
+        weapon->damage_function_params[0] = success_level;
+        weapon->dizzy_chance = 20 * success_level;
+        weapon->dizzy_time = 1;
+    }
+    
+    return 2;
+}
+
 // Replaces vanilla logic for choosing items to steal.
 // TODO: Rework as appropriate for TOT.
 EVT_DECLARE_USER_FUNC(evtTot_GetKissThiefResult, 3)
@@ -998,11 +1020,23 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     END_SWITCH()
     
     USER_FUNC(btlevtcmd_AcSetParamAll, 1, 240, 178, LW(0), LW(1), 100, 1, EVT_NULLPTR)
-    IF_EQUAL(LW(12), PTR(&customWeapon_MowzMove5))
-        USER_FUNC(btlevtcmd_AcSetGaugeParam, 80, 100, 100, 100)
-    ELSE()
-        USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
-    END_IF()
+    SWITCH(LW(12))
+        CASE_EQUAL(PTR(&customWeapon_MowzMove6))
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_6, LW(1))
+            SWITCH(LW(1))
+                CASE_EQUAL(1)
+                    USER_FUNC(btlevtcmd_AcSetGaugeParam, 67, 100, 100, 100)
+                CASE_EQUAL(2)
+                    USER_FUNC(btlevtcmd_AcSetGaugeParam, 50, 75, 100, 100)
+                CASE_ETC()
+                    USER_FUNC(btlevtcmd_AcSetGaugeParam, 40, 60, 80, 100)
+            END_SWITCH()
+        CASE_EQUAL(PTR(&customWeapon_MowzMove5))
+            USER_FUNC(btlevtcmd_AcSetGaugeParam, 80, 100, 100, 100)
+        CASE_ETC()
+            USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
+    END_SWITCH()
+    
     USER_FUNC(btlevtcmd_SetupAC, -2, 6, 1, 0)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(evt_btl_camera_set_mode, 0, 3)
@@ -1270,8 +1304,17 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     END_IF()
     USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_CHURINA_CONFUSE1"), 0)
     SET(LW(10), 0)
+    // Count total number of enemies hit successfully.
     SET(LW(15), 0)
     LBL(10)
+    
+    // Clear fog and have bigger smoke effect than usual.
+    IF_EQUAL(LW(12), PTR(&customWeapon_MowzMove6))
+        USER_FUNC(btlevtcmd_StageDispellFog)
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(4.0), 0, 0, 0, 0, 0, 0, 0)
+    END_IF()
+    
     USER_FUNC(btlevtcmd_CommandPreCheckDamage, -2, LW(3), LW(4), 256, LW(6))
     IF_NOT_EQUAL(LW(6), 1)
         IF_EQUAL(LW(6), 3)
@@ -1285,36 +1328,52 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
         END_IF()
         GOTO(50)
     END_IF()
+
+    // Make weapons and set AC success level.
+    SET(LW(13), -1)
     USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(0))
-
-    // Only dynamically change weapon params for Tease.
-    // TODO: Make into custom evt in this file.
-    IF_EQUAL(LW(12), PTR(&customWeapon_MowzTease))
-        USER_FUNC(_make_madowase_weapon, LW(12), LW(0))
-    END_IF()
-
-    USER_FUNC(btlevtcmd_GetResultAC, LW(0))
-    IF_FLAG(LW(0), 0x2)
-        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
-        USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        IF_LARGE_EQUAL(LW(6), 0)
-            USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-            ADD(LW(15), 1)
-            USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
+    SWITCH(LW(12))
+        CASE_EQUAL(PTR(&customWeapon_MowzMove6))
+            USER_FUNC(evtTot_MakeTeaseWeapon, LW(12), LW(0), MoveType::MOWZ_6)
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_6, LW(1))
+            ADD(LW(1), 2)
+            MUL(LW(0), LW(1))
+            DIV(LW(0), 100)
+            SUB(LW(0), 2)
+            IF_SMALL(LW(0), 0)
+                SET(LW(0), -1)
+            END_IF()
+            SET(LW(13), LW(0))
+        CASE_EQUAL(PTR(&customWeapon_MowzTease))
+            USER_FUNC(evtTot_MakeTeaseWeapon, LW(12), LW(0), MoveType::MOWZ_TEASE)
+            IF_LARGE(LW(0), 0)
+                SET(LW(13), 0)
+            END_IF()
+        CASE_ETC()
+            IF_LARGE_EQUAL(LW(0), 80)
+                SET(LW(13), 0)
+            END_IF()
+    END_SWITCH()
+    
+    // By default, consider action unsuccessful.
+    SET(LW(11), -1)
+    
+    IF_NOT_EQUAL(LW(12), PTR(&customWeapon_MowzMove5))
+        IF_LARGE_EQUAL(LW(13), 0)
+            USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
+            // Only considered successful if damaged or status procs.
+            USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), LW(13), LW(11))
+        ELSE()
+            GOTO(30)
         END_IF()
-            
-        // If the enemy has an item, have it get tossed away in a random dir.
-        IF_EQUAL(LW(12), PTR(&customWeapon_MowzMove5))
+    ELSE()
+        IF_LARGE_EQUAL(LW(13), 0)
+            // For Embargo, mark as successful if the enemy had an item.
             USER_FUNC(evtTot_ConfiscateItem, LW(3), LW(14))
             IF_NOT_EQUAL(LW(14), 0)
-                BROTHER_EVT()
-                    WAIT_FRM(1)
-                    
-                    // TODO: Figure out why this freezes; 
-                    // ideally the enemies should be able to react.
-                    // USER_FUNC(btlevtcmd_DamageDirect, LW(3), LW(4), 0, 0, 2, 0)
-                    
+                SET(LW(11), 0)
+                // If the enemy has an item, have it get tossed away in a random dir.
+                BROTHER_EVT()          
                     USER_FUNC(evtTot_GetHeldItemPosition, LW(3), LW(0), LW(1), LW(2))
                     USER_FUNC(btlevtcmd_BtlIconEntryItemId, LW(14), LW(0), LW(1), LW(2), LW(8))
 
@@ -1339,22 +1398,49 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
                     WAIT_FRM(1)
                     USER_FUNC(btlevtcmd_BtlIconDelete, LW(8))
                     USER_FUNC(evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0), 0, 0, 0, 0, 0, 0, 0)
-                    // USER_FUNC(btlevtcmd_StartWaitEvent, LW(3))
                 END_BROTHER()
+                
+                // Have enemy react with "damaged" animation.
+                BROTHER_EVT()
+                    WAIT_FRM(1)
+                    USER_FUNC(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+                    WAIT_FRM(100)
+                    USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, LW(3), 1)
+                END_BROTHER()
+            ELSE()
+                GOTO(30)
             END_IF()
+        ELSE()
+            GOTO(30)
         END_IF()
-    ELSE()
-        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
     END_IF()
+    GOTO(40)
+        
+    LBL(30)
+    USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    LBL(40)
+    
+    // Increment number of successful hits if appropriate.
+    IF_LARGE_EQUAL(LW(11), 0)
+        ADD(LW(15), 1)
+    END_IF()
+    
     LBL(50)
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_NOT_EQUAL(LW(3), -1)
         ADD(LW(10), 1)
         GOTO(10)
     END_IF()
-    IF_EQUAL(LW(15), 0)
+    // If there were any successful hits, give the appropriate reward.
+    IF_LARGE(LW(15), 0)
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_GetResultPrizeLv, -1, LW(13), LW(11))
+        USER_FUNC(btlevtcmd_ACSuccessEffect, LW(11), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(11))
+    ELSE()
         USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
     END_IF()
+        
     LBL(80)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1959,8 +2045,8 @@ BattleWeapon customWeapon_MowzTease = {
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances
-    .dizzy_chance = 100,
-    .dizzy_time = 3,
+    .confuse_chance = 100,
+    .confuse_time = 1,
     
     .attack_evt_code = (void*)partyChuchurinaAttack_MadowaseAttack,
     .bg_a1_a2_fall_weight = 0,
@@ -2081,23 +2167,23 @@ BattleWeapon customWeapon_MowzMove5 = {
     .bg_no_a_fall_weight = 100,
     .bg_b_fall_weight = 0,
     .nozzle_turn_chance = 0,
-    .nozzle_fire_chance = 5,
+    .nozzle_fire_chance = 0,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
 
 BattleWeapon customWeapon_MowzMove6 = {
-    .name = "btl_wn_pcr_normal",
+    .name = "btl_wn_pcr_madowase",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pch_binta",
+    .description = "msg_pch_madowaseru",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 3,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)weaponGetPowerDefault,
@@ -2105,48 +2191,40 @@ BattleWeapon customWeapon_MowzMove6 = {
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::ONLY_FRONT |
-        AttackTargetProperty_Flags::HAMMERLIKE,
-    .element = AttackElement::NORMAL,
-    .damage_pattern = 0x17,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::EXPLOSION,
+    .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_binta",
-    .special_property_flags =
+    .ac_help_msg = "msg_ac_madowaseru",
+    .special_property_flags = 
         AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
-        AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::TOP_SPIKY |
-        // Additional resistances.
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::FIERY,
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances
+    .dizzy_chance = 60,
+    .dizzy_time = 1,
     
-    .attack_evt_code = (void*)partyChuchurinaAttack_NormalAttack,
+    .attack_evt_code = (void*)partyChuchurinaAttack_MadowaseAttack,
     .bg_a1_a2_fall_weight = 0,
-    .bg_a1_fall_weight = 0,
-    .bg_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 10,
+    .bg_a2_fall_weight = 10,
     .bg_no_a_fall_weight = 100,
-    .bg_b_fall_weight = 0,
-    .nozzle_turn_chance = 4,
-    .nozzle_fire_chance = 2,
+    .bg_b_fall_weight = 10,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 10,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
