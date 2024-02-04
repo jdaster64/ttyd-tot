@@ -1,8 +1,10 @@
 #include "tot_party_goombella.h"
 
 #include "evt_cmd.h"
+#include "patch.h"
 #include "tot_move_manager.h"
 
+#include <gc/types.h>
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
 #include <ttyd/battle_database_common.h>
@@ -16,9 +18,18 @@
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_snd.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_christine.h>
+
+namespace mod::infinite_pit {
+
+extern const int32_t g_ac_monosiri_target_WhiteReticleScale;
+extern const int32_t g_ac_monosiri_target_GreyReticleScale;
+extern const int32_t g_ac_monosiri_target_ReticleZoomSpeed;
+
+}
 
 namespace mod::tot::party_goombella {
 
@@ -39,7 +50,11 @@ using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::unit_party_christine;
 
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
+
 namespace IconType = ::ttyd::icondrv::IconType;
+namespace StatusEffectType = ::ttyd::battle_database_common::StatusEffectType;
 
 }  // namespace
 
@@ -73,6 +88,39 @@ void MakeSelectWeaponTable(
         
         ++*num_options;
     }
+}
+
+// Changes the Tattle action command's reticle size to fit the camera view.
+EVT_DECLARE_USER_FUNC(evtTot_SetReticleParams, 1)
+EVT_DEFINE_USER_FUNC(evtTot_SetReticleParams) {
+    static const gc::vec3 k_TattleScale = { 1.0f, 1.0f, 1.0f };
+    static const gc::vec3 k_ScopeOutScale = { 2.5f, 2.5f, 2.5f };
+    static const float k_TattleZoomSpeed = 0.01f;
+    static const float k_ScopeOutZoomSpeed = 0.025f;
+    
+    int32_t move_type = evtGetValue(evt, evt->evtArguments[0]);
+    if (move_type == MoveType::GOOMBELLA_TATTLE) {
+        mod::patch::writePatch(
+            (void*)mod::infinite_pit::g_ac_monosiri_target_WhiteReticleScale,
+            &k_TattleScale, sizeof(k_TattleScale));
+        mod::patch::writePatch(
+            (void*)mod::infinite_pit::g_ac_monosiri_target_GreyReticleScale,
+            &k_TattleScale, sizeof(k_TattleScale));
+        mod::patch::writePatch(
+            (void*)mod::infinite_pit::g_ac_monosiri_target_ReticleZoomSpeed,
+            &k_TattleZoomSpeed, sizeof(float));
+    } else {  // Scope Out
+        mod::patch::writePatch(
+            (void*)mod::infinite_pit::g_ac_monosiri_target_WhiteReticleScale,
+            &k_ScopeOutScale, sizeof(k_ScopeOutScale));
+        mod::patch::writePatch(
+            (void*)mod::infinite_pit::g_ac_monosiri_target_GreyReticleScale,
+            &k_ScopeOutScale, sizeof(k_ScopeOutScale));
+        mod::patch::writePatch(
+            (void*)mod::infinite_pit::g_ac_monosiri_target_ReticleZoomSpeed,
+            &k_ScopeOutZoomSpeed, sizeof(float));
+    }
+    return 2;
 }
 
 EVT_BEGIN(partyChristineAttack_NormalAttack)
@@ -305,6 +353,7 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
 EVT_END()
 
 EVT_BEGIN(partyChristineAttack_Monosiri)
+    USER_FUNC(evtTot_SetReticleParams, MoveType::GOOMBELLA_TATTLE)
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
@@ -861,6 +910,171 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(customAttack_ScopeOut)
+    USER_FUNC(evtTot_SetReticleParams, MoveType::GOOMBELLA_5)
+    USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
+    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    IF_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF()
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
+    USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
+    USER_FUNC(btlevtcmd_RunDataEventChild, -2, 7)
+    
+    // Hard zoom in on Goombella (similar to the one from Appeal).
+    USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    SET(LW(5), LW(1))
+    SET(LW(6), LW(2))
+    ADD(LW(1), 43)
+    ADD(LW(5), 25)
+    ADD(LW(2), 250)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 3)
+    USER_FUNC(evt_btl_camera_set_moveto, 0, LW(0), LW(1), LW(2), LW(0), LW(5), LW(6), 30, 11)
+    WAIT_FRM(30)
+    
+    // Eye glint (might be a less ominous SFX choice but I'm drawing a blank)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_CheckStatus, -2, 10, LW(6))
+    USER_FUNC(btlevtcmd_CheckStatus, -2, 11, LW(7))
+    ADD(LW(2), 10)  // Render in front of character
+    IF_NOT_EQUAL(LW(6), 0)
+        ADD(LW(0), 12)
+        ADD(LW(1), 35)
+    ELSE()
+        IF_EQUAL(LW(7), 0)
+            ADD(LW(0), 7)
+            ADD(LW(1), 20)
+        ELSE()
+            ADD(LW(0), 3)
+            ADD(LW(1), 10)
+        END_IF()
+    END_IF()
+    USER_FUNC(evt_eff, PTR(""), PTR("toge_flush"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_QWEN_EYE_SHINE1"), LW(0), LW(1), LW(2), 0)
+    // Stylish command a bit after glint
+    WAIT_FRM(2)
+    USER_FUNC(btlevtcmd_ACRStart, -2, 13, 23, 23, 0)
+    USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
+    IF_LARGE_EQUAL(LW(6), 2)
+        USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+    ELSE()
+        USER_FUNC(evt_audience_acrobat_notry)
+    END_IF()
+    WAIT_FRM(50)
+    
+    // Hard cut to zoomed in view of target until AC is finished.
+    BROTHER_EVT()
+        WAIT_FRM(5)
+        USER_FUNC(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+        SET(LW(5), LW(1))
+        SET(LW(6), LW(2))
+        ADD(LW(1), 43)
+        ADD(LW(5), 25)
+        ADD(LW(2), 250)
+        USER_FUNC(evt_btl_camera_set_mode, 0, 3)
+        USER_FUNC(evt_btl_camera_set_moveto, 0, LW(0), LW(1), LW(2), LW(0), LW(5), LW(6), 1, 11)
+    END_BROTHER()
+    
+    USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(0))
+    USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
+    USER_FUNC(btlevtcmd_AcSetParamAll, LW(3), LW(4), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_AcSetFlag, 0)
+    USER_FUNC(btlevtcmd_SetupAC, -2, 21, 1, 0)
+    WAIT_FRM(22)
+    USER_FUNC(btlevtcmd_StartAC, 1)
+    USER_FUNC(btlevtcmd_ResultAC)
+    
+    BROTHER_EVT()
+        USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+        USER_FUNC(evt_btl_camera_set_posoffset, 0, 0, 0, 0)
+    END_BROTHER()
+    
+    USER_FUNC(btlevtcmd_GetResultAC, LW(6))
+    IF_FLAG(LW(6), 0x2)
+        USER_FUNC(btlevtcmd_GetResultPrizeLv, -5, 0, LW(6))
+        USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+        USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
+        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+    ELSE()
+        USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+        USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
+    END_IF()
+        
+    // USER_FUNC(btlevtcmd_GetResultAC, LW(6))
+    // IF_NOT_FLAG(LW(6), 0x2)
+        // USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        // USER_FUNC(evt_eff_fukidashi, 2, PTR(""), 0, 2, 0, LW(0), LW(1), LW(2), 30, 0, 56)
+        // USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_KURI_FAIL_LEARNED1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        // USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PKR_2A_4"))
+        // WAIT_FRM(56)
+        // GOTO(90)
+    // END_IF()
+    // USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_KURI_LEARNED2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    // USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PKR_2A_4"))
+    // WAIT_FRM(3)
+    // BROTHER_EVT_ID(LW(15))
+        // WAIT_FRM(53)
+    // END_BROTHER()
+    // USER_FUNC(btlevtcmd_ftof, 0, LW(0))
+    // USER_FUNC(btlevtcmd_ftof, 53, LW(1))
+    
+    // USER_FUNC(btlevtcmd_WaitEventEnd, LW(15))
+    
+    // USER_FUNC(btlevtcmd_ACRStart, -2, LW(0), LW(1), LW(1), 0)
+    // USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
+    // IF_LARGE_EQUAL(LW(6), 2)
+        // DELETE_EVT(LW(15))
+        // USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
+        // USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PKR_Y_1"))
+        // USER_FUNC(btlevtcmd_ftomsec, 28, LW(0))
+        // WAIT_MSEC(LW(0))
+    // ELSE()
+        // USER_FUNC(evt_audience_acrobat_notry)
+        // USER_FUNC(btlevtcmd_WaitEventEnd, LW(15))
+    // END_IF()
+        
+    // USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("PKR_2A_5"))
+    // USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("PKR_2A_5"))
+    // USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, 0)
+    // RUN_EVT(PTR(&christine_dictionary_event))
+    // USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, 1)
+    // USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    // USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    // USER_FUNC(evt_btl_camera_off_posoffset_manual, 0)
+    // LBL(10)
+    // USER_FUNC(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    // IF_NOT_EQUAL(LW(0), 3)
+        // WAIT_FRM(1)
+        // GOTO(10)
+    // END_IF()
+    // USER_FUNC(btlevtcmd_get_monosiri_msg_no, LW(3), LW(4), LW(0))
+    // USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+    // USER_FUNC(_monosiri_flag_on, LW(3))
+    // USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("PKR_T_1"))
+    // USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("PKR_S_1"))
+    // USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, 4)
+    // LBL(20)
+    // USER_FUNC(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    // IF_NOT_EQUAL(LW(0), 0)
+        // WAIT_FRM(1)
+        // GOTO(20)
+    // END_IF()
+    // LBL(90)
+
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    USER_FUNC(evt_btl_camera_off_posoffset_manual, 0)
+    USER_FUNC(evt_audience_ap_recovery)
+    USER_FUNC(btlevtcmd_InviteApInfoReport)
+    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+
 BattleWeapon customWeapon_GoombellaHeadbonk = {
     .name = "btl_wn_pkr_normal",
     .icon = IconType::PARTNER_MOVE_0,
@@ -1096,62 +1310,55 @@ BattleWeapon customWeapon_GoombellaRallyWink = {
 };
 
 BattleWeapon customWeapon_GoombellaMove5 = {
-    .name = "btl_wn_pkr_normal",
+    .name = "btl_wn_pkr_lv1",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_pkr_normal_jump",
+    .description = "msg_pkr_monosiri",
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::GOOMBELLA_5 },
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
         AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::JUMPLIKE |
-        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_zutsuki",
+    .ac_help_msg = "msg_ac_monoshiri",
     .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED |
-        AttackSpecialProperty_Flags::FLIPS_SHELLED |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+        AttackSpecialProperty_Flags::CANNOT_MISS,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
-        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
-        AttackTargetWeighting_Flags::PREFER_FRONT,
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000,
         
     // status chances
     
-    .attack_evt_code = (void*)partyChristineAttack_NormalAttack,
+    .attack_evt_code = (void*)customAttack_ScopeOut,
     .bg_a1_a2_fall_weight = 0,
     .bg_a1_fall_weight = 0,
     .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
     .bg_b_fall_weight = 0,
-    .nozzle_turn_chance = 4,
-    .nozzle_fire_chance = 2,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
