@@ -25,10 +25,6 @@
 
 // Assembly patch functions.
 extern "C" {
-    // evasion_badge_patches.s
-    void StartCheckBadgeEvasion();
-    void ConditionalBranchCheckBadgeEvasion();
-    void BranchBackCheckBadgeEvasion();
     // rush_badge_patches.s
     void StartGetDangerStrength();
     void BranchBackGetDangerStrength();
@@ -46,9 +42,6 @@ extern "C" {
             mod::infinite_pit::g_Mod->state_.GetOptionNumericValue(
                 mod::infinite_pit::OPT_WEAKER_RUSH_BADGES);
         return num_badges * (weaker_rush_badges ? 2 : 5);
-    }
-    bool checkBadgeEvasion(ttyd::battle_unit::BattleWorkUnit* unit) {
-        return mod::infinite_pit::item::CheckEvasionBadges(unit);
     }
 }
 
@@ -94,9 +87,6 @@ extern const int32_t g_btlevtcmd_ConsumeItemReserve_Patch_RefundBase;
 extern const int32_t g_BattleDamageDirect_Patch_AddTotalDamage;
 extern const int32_t g_BattleCalculateDamage_MegaRushStrength_BH;
 extern const int32_t g_BattleCalculateDamage_PowerRushStrength_BH;
-extern const int32_t g_BattlePreCheckDamage_CheckEvasion_BH;
-extern const int32_t g_BattlePreCheckDamage_CheckEvasion_EH;
-extern const int32_t g_BattlePreCheckDamage_CheckEvasion_CH1;
 
 namespace item {
     
@@ -542,17 +532,6 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleCalculateDamage_MegaRushStrength_BH),
         reinterpret_cast<void*>(StartGetPerilStrength),
         reinterpret_cast<void*>(BranchBackGetPerilStrength));
-        
-    // Add code that puts a cap on the evasion from badges if the option is set.
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(g_BattlePreCheckDamage_CheckEvasion_BH),
-        reinterpret_cast<void*>(StartCheckBadgeEvasion));
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(BranchBackCheckBadgeEvasion),
-        reinterpret_cast<void*>(g_BattlePreCheckDamage_CheckEvasion_EH));
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(ConditionalBranchCheckBadgeEvasion),
-        reinterpret_cast<void*>(g_BattlePreCheckDamage_CheckEvasion_CH1));
             
     g_btlevtcmd_GetItemRecoverParam_trampoline = patch::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_GetItemRecoverParam,
@@ -561,38 +540,6 @@ void ApplyFixedPatches() {
             // Run custom behavior to replace the recovery params in some cases.
             return GetAlteredItemRestorationParams(evt, isFirstCall);
         });
-}
-
-bool CheckEvasionBadges(BattleWorkUnit* unit) {
-    if (g_Mod->state_.GetOptionNumericValue(OPT_EVASION_BADGES_CAP)) {
-        float hit_chance = 100.f;
-        for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
-            hit_chance *= 0.90f;
-        }
-        for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
-            hit_chance *= 0.75f;
-        }
-        if (unit->current_hp <= unit->unit_kind_params->danger_hp) {
-            for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
-                hit_chance *= 0.67f;
-            }
-        }
-        if (hit_chance < 20.f) hit_chance = 20.f;
-        return ttyd::system::irand(100) >= hit_chance;
-    } else {
-        for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
-            if (ttyd::system::irand(100) >= 90) return true;
-        }
-        for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
-            if (ttyd::system::irand(100) >= 75) return true;
-        }
-        if (unit->current_hp <= unit->unit_kind_params->danger_hp) {
-            for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
-                if (ttyd::system::irand(100) >= 67) return true;
-            }
-        }
-    }
-    return false;
 }
 
 int32_t GetBonusCakeRestoration() {

@@ -7,7 +7,117 @@
 #include <cstdint>
 
 namespace ttyd::battle_unit {
-    
+
+namespace BattleUnitAttribute_Flags {
+    enum e {
+        UNK_1                       = 0x1U,
+        OUT_OF_REACH                = 0x2U,     // usually on the ceiling
+        UNQUAKEABLE                 = 0x4U,
+        UNK_8                       = 0x8U,     // invisible-like state?
+        VEILED                      = 0x10U,
+        SHELL_SHIELDED              = 0x20U,
+        UNTARGETABLE_40             = 0x40U,
+        UNK_100                     = 0x100U,
+        DISABLE_ZERO_G_FLOATING     = 0x1000U,
+        DISABLE_ZERO_G_IMMOBILITY   = 0x2000U,
+        PREVENT_SPIN_KNOCKBACK      = 0x4000U,
+        UNDEAD                      = 0x10000U, // always set Red/Dry/Dark Bones
+        INACTIVE                    = 0x20000U,
+        UNK_40000                   = 0x40000U,
+        UNK_80000                   = 0x80000U,
+        UNK_20_0000                 = 0x20'0000U,
+        UNK_40_0000                 = 0x40'0000U,
+        UNK_100_0000                = 0x100'0000U,
+        UNK_200_0000                = 0x200'0000U,
+        UNK_400_0000                = 0x400'0000U,
+        UNK_1000_0000               = 0x1000'0000U,
+        UNK_2000_0000               = 0x2000'0000U,
+        UNK_4000_0000               = 0x4000'0000U,  // prevents damage?
+    };
+}
+
+namespace PartsAttribute_Flags {
+    enum e {
+        // Different tiers of preference for moves that target one actor part:
+        // - Freely-selectable attacks like jump can target anything regardless
+        //   of whether any of 0x1, 0x2, 0x4 are set
+        // - Forced-selection attacks like Shade Fist or Shell Toss will target
+        //   parts w/ 0x1 set if reachable, then 0x2 parts otherwise
+        // - Bomb Squad targets parts with at least one of 0x1, 0x2, 0x4 set
+        MAIN_TARGET                 = 0x1U,
+        PREFERRED_TARGET            = 0x2U,
+        SELECT_TARGET               = 0x4U,
+        
+        UNK_8                       = 0x8U,
+        UNK_10                      = 0x10U,
+        UNK_40                      = 0x40U,
+        WEAK_TO_ATTACK_FX_R         = 0x80U,
+        WEAK_TO_ICE_POWER           = 0x100U,
+        WINGED                      = 0x800U,
+        SHELLED                     = 0x1000U,
+        BOMB_FLIPPABLE              = 0x2000U,
+        UNK_MISS_4000               = 0x4000U,
+        UNK_8000                    = 0x8000U,
+        NEVER_TARGETABLE            = 0x10000U,
+        UNK_20000                   = 0x20000U,
+        UNK_40000                   = 0x40000U,
+        UNTATTLEABLE                = 0x80000U,
+        JUMPLIKE_CANNOT_TARGET      = 0x10'0000U,
+        HAMMERLIKE_CANNOT_TARGET    = 0x20'0000U,
+        SHELLTOSSLIKE_CANNOT_TARGET = 0x40'0000U,
+        DISABLE_HP_REDUCTION        = 0x80'0000U,  // damage still visible
+        UNK_100_0000                = 0x100'0000U,
+        UNK_200_0000                = 0x200'0000U,
+        UNK_400_0000                = 0x400'0000U,
+        UNK_800_0000                = 0x800'0000U,
+        UNK_1000_0000               = 0x1000'0000U,
+        UNK_2000_0000               = 0x2000'0000U,  // immune to damage/status?
+        UNK_4000_0000               = 0x4000'0000U,  // immune to ohko?
+        UNK_8000_0000               = 0x8000'0000U,  // immune to status?
+    };
+}
+
+namespace PartsCounterAttribute_Flags {
+    enum e {
+        TOP_SPIKY               = 0x1U,
+        PREEMPTIVE_SPIKY        = 0x2U,
+        FRONT_SPIKY             = 0x4U,
+        FIERY                   = 0x10U,
+        FIERY_STATUS            = 0x20U,
+        ICY                     = 0x40U,
+        ICY_STATUS              = 0x80U,
+        POISON                  = 0x100U,
+        POISON_STATUS           = 0x200U,
+        ELECTRIC                = 0x400U,
+        ELECTRIC_STATUS         = 0x800U,
+        EXPLOSIVE               = 0x1000U,
+        VOLATILE_EXPLOSIVE      = 0x2000U,    
+    };
+}
+
+namespace BattleUnitToken_Flags {
+    enum e {
+        UNK_1                   = 0x1U,
+        UNK_2                   = 0x2U,
+        UNK_4                   = 0x4U,
+        CHARGE_EXPENDED         = 0x8U,
+        CONFUSE_PROC            = 0x10U,
+        ACTIVE_MOVE_STATE       = 0x1000U,
+        HUSTLE_MOVE_STATE       = 0x2000U,  // Rally Wink
+        UNK_8000_0000           = 0x8000'0000U,
+    };
+}
+
+namespace BattleUnitStatus_Flags {
+    enum e {
+        CAN_ACT                 = 0x1U,
+        DEFENDING               = 0x100'0000U,  // 'Defend' state
+        HAS_MOVES_REMAINING     = 0x200'0000U,
+        IN_DANGER               = 0x1000'0000U,
+        IN_PERIL                = 0x2000'0000U,
+    };
+}
+
 struct MovementSoundControl {
     const char*     sound_name_left;
     const char*     sound_name_right;

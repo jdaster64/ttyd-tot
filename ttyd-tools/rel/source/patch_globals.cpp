@@ -52,6 +52,10 @@ void (*g_stg0_00_init_trampoline)(void) = nullptr;
 // battle_ac.o  800fa1b8
 int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*) = nullptr;
+// battle_damage.o  800fbadc
+int32_t (*g_BattlePreCheckDamage_trampoline)(
+    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
+    BattleWeapon*, uint32_t) = nullptr;
 // battle_damage.o  800fbd8c
 uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
@@ -166,9 +170,6 @@ extern const int32_t g_loadMain_Patch_SkipZeroingGswfs = 0x800f6358;
 extern const int32_t g_BattleCheckDamage_Patch_PaybackDivisor = 0x800fb7dc;
 extern const int32_t g_BattleCheckDamage_Patch_HoldFastDivisor = 0x800fb800;
 extern const int32_t g_BattleCheckDamage_Patch_ReturnPostageDivisor = 0x800fb824;
-extern const int32_t g_BattlePreCheckDamage_CheckEvasion_BH = 0x800fbbec;
-extern const int32_t g_BattlePreCheckDamage_CheckEvasion_CH1 = 0x800fbc8c;
-extern const int32_t g_BattlePreCheckDamage_CheckEvasion_EH = 0x800fbca0;
 extern const int32_t g_BattleSetStatusDamage_Patch_GaleLevelFactor = 0x800fc0a8;
 extern const int32_t g_BattleCalculateDamage_MegaRushStrength_BH = 0x800fd91c;
 extern const int32_t g_BattleCalculateDamage_PowerRushStrength_BH = 0x800fd93c;

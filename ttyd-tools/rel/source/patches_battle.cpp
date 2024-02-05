@@ -25,6 +25,7 @@
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/pmario_sound.h>
+#include <ttyd/system.h>
 
 #include <cstdint>
 #include <cstring>
@@ -65,21 +66,23 @@ namespace mod::infinite_pit {
 
 namespace {
 
-using ::ttyd::battle_database_common::BattleWeapon;
-using ::ttyd::battle_unit::BattleWorkUnit;
-using ::ttyd::battle_unit::BattleWorkUnitPart;
+// For convenience.
+using namespace ::ttyd::battle_database_common;
+using namespace ::ttyd::battle_unit;
+
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 
-namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
-namespace StatusEffectType = ::ttyd::battle_database_common::StatusEffectType;
 
 }
 
 // Function hooks.
 extern int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
+extern int32_t (*g_BattlePreCheckDamage_trampoline)(
+    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
+    BattleWeapon*, uint32_t);
 extern uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
     BattleWeapon*, uint32_t);
@@ -384,6 +387,98 @@ uint32_t StatusEffectTick(BattleWorkUnit* unit, int8_t status_type) {
     return result;
 }
 
+// Handles Lucky chance from evasion badges.
+bool CheckEvasionBadges(BattleWorkUnit* unit) {
+    if (g_Mod->state_.GetOptionNumericValue(OPT_EVASION_BADGES_CAP)) {
+        float hit_chance = 100.f;
+        for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
+            hit_chance *= 0.90f;
+        }
+        for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
+            hit_chance *= 0.75f;
+        }
+        if (unit->current_hp <= unit->unit_kind_params->danger_hp) {
+            for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
+                hit_chance *= 0.67f;
+            }
+        }
+        if (hit_chance < 20.f) hit_chance = 20.f;
+        return ttyd::system::irand(100) >= hit_chance;
+    } else {
+        for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
+            if (ttyd::system::irand(100) < 10) return true;
+        }
+        for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
+            if (ttyd::system::irand(100) < 25) return true;
+        }
+        if (unit->current_hp <= unit->unit_kind_params->danger_hp) {
+            for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
+                if (ttyd::system::irand(100) < 33) return true;
+            }
+        }
+    }
+    return false;
+}
+
+// Checks whether an attack should connect, or what caused it to miss.
+int32_t PreCheckDamage(
+    BattleWorkUnit* attacker, BattleWorkUnit* target, BattleWorkUnitPart* part,
+    BattleWeapon* weapon, uint32_t extra_params) {
+        
+    if (!target || !part) return 1;
+    
+    // Expend charge for chargeable attacks, whether attack lands or not.
+    if (weapon->special_property_flags & 
+        AttackSpecialProperty_Flags::CHARGE_BUFFABLE) {
+        attacker->token_flags |= BattleUnitToken_Flags::CHARGE_EXPENDED;
+    }
+    
+    if ((part->part_attribute_flags & PartsAttribute_Flags::UNK_MISS_4000) &&
+        !(weapon->special_property_flags & 
+          AttackSpecialProperty_Flags::UNKNOWN_0x40000)) {
+        return 2;
+    }
+    if (weapon->special_property_flags & 
+        AttackSpecialProperty_Flags::CANNOT_MISS) {
+        return 1;
+    }
+    // TODO: Add check for Scoped status.
+    
+    if (BtlUnit_CheckStatus(target, StatusEffectType::INVISIBLE) ||
+        (target->attribute_flags & BattleUnitAttribute_Flags::UNK_8) ||
+        (target->attribute_flags & BattleUnitAttribute_Flags::VEILED)) {
+        return 4;
+    }
+    if ((part->counter_attribute_flags & 
+         PartsCounterAttribute_Flags::PREEMPTIVE_SPIKY) &&
+        !((weapon->counter_resistance_flags & 
+           AttackCounterResistance_Flags::PREEMPTIVE_SPIKY) ||
+          attacker->badges_equipped.spike_shield)) {
+        return 5;
+    }
+    if (part->part_attribute_flags & PartsAttribute_Flags::UNK_40) {
+        return 4;
+    }
+    if (extra_params & 0x10'0000) {
+        return 1;
+    }
+    if (CheckEvasionBadges(target)) {
+        return 3;
+    }
+    
+    if (BtlUnit_CheckStatus(target, StatusEffectType::DODGY) &&
+        !BtlUnit_CheckStatus(target, StatusEffectType::SLEEP) &&
+        !BtlUnit_CheckStatus(target, StatusEffectType::STOP) &&
+        ttyd::system::irand(100) < 50) {
+        return 6;
+    }
+    
+    float accuracy = weapon->base_accuracy;
+    if (BtlUnit_CheckStatus(attacker, StatusEffectType::DIZZY)) accuracy /= 2;
+    if (ttyd::battle::g_BattleWork->stage_hazard_work.fog_active) accuracy /= 2;
+    return ttyd::system::irand(100) < accuracy ? 1 : 2;
+}
+
 void ApplyFixedPatches() {
     g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
         ttyd::battle_ac::BattleActionCommandCheckDefence,
@@ -425,6 +520,15 @@ void ApplyFixedPatches() {
         });
     
     // Replacing several core damage / status infliction functions.
+    g_BattlePreCheckDamage_trampoline = patch::hookFunction(
+        ttyd::battle_damage::BattlePreCheckDamage, [](
+            BattleWorkUnit* attacker, BattleWorkUnit* target, 
+            BattleWorkUnitPart* part, BattleWeapon* weapon, 
+            uint32_t extra_params) {
+                // Replaces vanilla logic completely.
+                return PreCheckDamage(
+                    attacker, target, part, weapon, extra_params);
+            });
     g_BattleSetStatusDamageFromWeapon_trampoline = patch::hookFunction(
         ttyd::battle_damage::BattleSetStatusDamageFromWeapon, [](
             BattleWorkUnit* attacker, BattleWorkUnit* target, 
