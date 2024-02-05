@@ -83,6 +83,8 @@ extern int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
 extern uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
     BattleWeapon*, uint32_t);
+extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
+    BattleWorkUnit*, int8_t);
 // Patch addresses.
 extern const int32_t g_BattleCheckDamage_Patch_PaybackDivisor;
 extern const int32_t g_BattleCheckDamage_Patch_HoldFastDivisor;
@@ -103,7 +105,8 @@ extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_EH;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_CH1;
 
 namespace battle {
-    
+
+// Fetches the base parameters for a given status from a weapon.
 void GetStatusParams(
     BattleWorkUnit* unit, BattleWeapon* weapon, int32_t status_type,
     int32_t& chance, int32_t& turns, int32_t& strength) {
@@ -296,6 +299,7 @@ void GetStatusParams(
     }
 }
 
+// Processes all statuses given a weapon.
 uint32_t GetStatusDamageFromWeapon(
     BattleWorkUnit* attacker, BattleWorkUnit* target, BattleWorkUnitPart* part,
     BattleWeapon* weapon, uint32_t extra_params) {
@@ -349,6 +353,37 @@ uint32_t GetStatusDamageFromWeapon(
     return result;
 }
 
+// Ticks down the turn count for a given status, and returns whether it expired.
+uint32_t StatusEffectTick(BattleWorkUnit* unit, int8_t status_type) {
+    uint32_t result = false;
+    
+    if (unit == nullptr)
+        return result;
+    if (ttyd::battle_unit::BtlUnit_CheckStatus(unit, StatusEffectType::OHKO))
+        return result;
+    if (unit->current_hp < 1)
+        return result;
+    
+    int8_t turns, strength;
+    ttyd::battle_unit::BtlUnit_GetStatus(unit, status_type, &turns, &strength);
+    
+    if (turns <= 0) return result;
+    --turns;
+    
+    if (turns == 0) {
+        // If expired, reset the effect strength to 0.
+        strength = 0;
+        result = 1;
+    } else if (status_type == StatusEffectType::POISON && strength < 5) {
+        // Poison strengthens every turn it remains active.
+        ++strength;
+    }
+    
+    BtlUnit_SetStatus(unit, status_type, turns, strength);
+    
+    return result;
+}
+
 void ApplyFixedPatches() {
     g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
         ttyd::battle_ac::BattleActionCommandCheckDefence,
@@ -398,6 +433,12 @@ void ApplyFixedPatches() {
                 // Replaces vanilla logic completely.
                 return GetStatusDamageFromWeapon(
                     attacker, target, part, weapon, extra_params);
+            });
+    g_BtlUnit_CheckRecoveryStatus_trampoline = patch::hookFunction(
+        ttyd::battle_unit::BtlUnit_CheckRecoveryStatus, [](
+            BattleWorkUnit* unit, int8_t status_type) {
+                // Replaces vanilla logic completely.
+                return StatusEffectTick(unit, status_type);
             });
             
     // Add support for Snow Whirled-like variant of button pressing AC.

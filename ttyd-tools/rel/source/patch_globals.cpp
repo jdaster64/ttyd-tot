@@ -105,6 +105,8 @@ void (*g_BtlUnit_PayWeaponCost_trampoline)(
 // battle_unit.o  80126968
 int32_t (*g_BtlUnit_GetWeaponCost_trampoline)(
     BattleWorkUnit*, BattleWeapon*) = nullptr;
+// battle_unit.o  80127890
+uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(BattleWorkUnit*, int8_t) = nullptr;
 // battle_unit.o  80128fe0
 BattleWorkUnit* (*g_BtlUnit_Entry_trampoline)(BattleUnitSetup*) = nullptr;
 // statuswindow.o  8013cb24

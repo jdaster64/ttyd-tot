@@ -390,10 +390,12 @@ uint32_t BtlUnit_CheckUnitFlag(BattleWorkUnit* unit, uint32_t flag);
 void BtlUnit_OnStatusFlag(BattleWorkUnit* unit, uint32_t flag);
 // BtlUnit_CheckStatusFlag
 uint32_t BtlUnit_CheckStatus(BattleWorkUnit* unit, int8_t status_type);
-int32_t BtlUnit_CheckRecoveryStatus(BattleWorkUnit* unit, int8_t status_type);
+uint32_t BtlUnit_CheckRecoveryStatus(BattleWorkUnit* unit, int8_t status_type);
 // BtlUnit_ClearStatus
-// BtlUnit_SetStatus
-// BtlUnit_GetStatus
+uint32_t BtlUnit_SetStatus(
+    BattleWorkUnit* unit, int8_t status_type, int8_t turns, int8_t strength);
+void BtlUnit_GetStatus(
+    BattleWorkUnit* unit, int8_t status_type, int8_t* turns, int8_t* strength);
 // _CheckMoveCount
 // BtlUnit_GetBelong
 // BtlUnit_SetJumpSpeed
