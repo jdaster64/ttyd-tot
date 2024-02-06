@@ -8,6 +8,7 @@
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
@@ -26,6 +27,7 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_unit;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_eff;
@@ -72,6 +74,13 @@ void MakeSelectWeaponTable(
 
 BattleWeapon* GetFirstAttackWeapon() {
     return &customWeapon_BobberyBombFS;
+}
+
+uint32_t GetPoisonBombPower(
+    BattleWorkUnit* attacker, BattleWeapon* weapon,
+    BattleWorkUnit* target, BattleWorkUnitPart* part) {
+    // Deals 1 damage to bombs so they can chain, but 0 to everything else.
+    return target->current_kind == BattleUnitType::BOMB_SQUAD_BOMB;
 }
 
 // Including definition of Bomb Squad bomb actor here, that way it's easier
@@ -144,7 +153,8 @@ BattleWeapon unitBombzo_weapon_Poison = {
     .unk_19 = 0,
     .bingo_card_chance = 0,
     .unk_1b = 0,
-    .damage_function = nullptr,
+    // Can only damage other Bomb Squad bombs.
+    .damage_function = (void*)GetPoisonBombPower,
     .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },

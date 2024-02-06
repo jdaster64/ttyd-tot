@@ -23,28 +23,6 @@
 #include <cstdint>
 #include <cstring>
 
-// Assembly patch functions.
-extern "C" {
-    // rush_badge_patches.s
-    void StartGetDangerStrength();
-    void BranchBackGetDangerStrength();
-    void StartGetPerilStrength();
-    void BranchBackGetPerilStrength();
-    
-    int32_t getDangerStrength(int32_t num_badges) {
-        bool weaker_rush_badges =
-            mod::infinite_pit::g_Mod->state_.GetOptionNumericValue(
-                mod::infinite_pit::OPT_WEAKER_RUSH_BADGES);
-        return num_badges * (weaker_rush_badges ? 1 : 2);
-    }
-    int32_t getPerilStrength(int32_t num_badges) {
-        bool weaker_rush_badges =
-            mod::infinite_pit::g_Mod->state_.GetOptionNumericValue(
-                mod::infinite_pit::OPT_WEAKER_RUSH_BADGES);
-        return num_badges * (weaker_rush_badges ? 2 : 5);
-    }
-}
-
 namespace mod::infinite_pit {
 
 namespace {
@@ -71,22 +49,18 @@ extern const int32_t g_ItemEvent_LastDinner_Weapon;
 extern const int32_t g_ItemEvent_Teki_Kyouka_ApplyStatusHook;
 extern const int32_t g_ItemEvent_Support_NoEffect_TradeOffJumpPoint;
 extern const int32_t g_ItemEvent_Poison_Kinoko_PoisonChance;
-extern const int32_t g__getSickStatusParam_Patch_CheckChargeCap;
-extern const int32_t g__getSickStatusParam_Patch_SetChargeCap;
 extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge1;
 extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge2;
 extern const int32_t g_btlseqTurn_Patch_HappyFlowerReductionAtMax;
 extern const int32_t g_btlseqTurn_Patch_HappyFlowerBaseRate;
 extern const int32_t g_btlseqTurn_Patch_HappyHeartReductionAtMax;
 extern const int32_t g_btlseqTurn_Patch_HappyHeartBaseRate;
-extern const int32_t g_BattleDamageDirect_Patch_PityFlowerChance;
 extern const int32_t g_btlevtcmd_ConsumeItem_Patch_RefundPer;
 extern const int32_t g_btlevtcmd_ConsumeItemReserve_Patch_RefundPer;
 extern const int32_t g_btlevtcmd_ConsumeItem_Patch_RefundBase;
 extern const int32_t g_btlevtcmd_ConsumeItemReserve_Patch_RefundBase;
 extern const int32_t g_BattleDamageDirect_Patch_AddTotalDamage;
-extern const int32_t g_BattleCalculateDamage_MegaRushStrength_BH;
-extern const int32_t g_BattleCalculateDamage_PowerRushStrength_BH;
+extern const int32_t g_BattleDamageDirect_Patch_PityFlowerChance;
 
 namespace item {
     
@@ -453,14 +427,6 @@ void ApplyFixedPatches() {
     ttyd::battle_mario::badgeWeapon_IceNaguri.base_fp_cost = 2;
     ttyd::battle_mario::badgeWeapon_TatsumakiJump.base_fp_cost = 2;
     
-    // Make per-turn Charge / Toughen Up cap at 99 instead of 9.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g__getSickStatusParam_Patch_CheckChargeCap),
-        0x2c1e0064U /* cmpwi r30, 100 */);
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g__getSickStatusParam_Patch_SetChargeCap),
-        0x3bc00063U /* li r30, 99 */);
-    
     // Double Pain doubles coin drops instead of Money Money.
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_fbatBattleMode_Patch_DoubleCoinsBadge1),
@@ -522,16 +488,6 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_BattleDamageDirect_Patch_AddTotalDamage),
         0x60000000U /* nop */);
-        
-    // Add code that weakens Power / Mega Rush badges if the option is set.
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_BattleCalculateDamage_PowerRushStrength_BH),
-        reinterpret_cast<void*>(StartGetDangerStrength),
-        reinterpret_cast<void*>(BranchBackGetDangerStrength));
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_BattleCalculateDamage_MegaRushStrength_BH),
-        reinterpret_cast<void*>(StartGetPerilStrength),
-        reinterpret_cast<void*>(BranchBackGetPerilStrength));
             
     g_btlevtcmd_GetItemRecoverParam_trampoline = patch::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_GetItemRecoverParam,

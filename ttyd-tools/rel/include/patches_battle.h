@@ -6,6 +6,19 @@
 
 #include <cstdint>
 
+
+namespace ttyd::battle_database_common {
+
+struct BattleWeapon;
+
+}
+namespace ttyd::battle_unit {
+
+struct BattleWorkUnit;
+struct BattleWorkUnitPart;
+
+}
+
 namespace mod::infinite_pit::battle {
 
 // Apply patches to various battle features.
@@ -15,6 +28,14 @@ void ApplyFixedPatches();
 void SetTargetAudienceAmount();
 // Applies the option to change the SP amount regained from attacks.
 double ApplySpRegenMultiplier(double base_regen);
+
+// Calculates the base damage for an attack, replacing the original TTYD func.
+int32_t CalculateBaseDamage(
+    ttyd::battle_unit::BattleWorkUnit* attacker, 
+    ttyd::battle_unit::BattleWorkUnit* target, 
+    ttyd::battle_unit::BattleWorkUnitPart* part,
+    ttyd::battle_database_common::BattleWeapon* weapon, 
+    uint32_t* unk0, uint32_t unk1);
 
 // Applies a custom status effect to the target.
 // Params: unit, part, status_flag, color1 & color2 (rgb), sfx, announce_msg

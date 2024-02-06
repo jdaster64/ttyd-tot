@@ -75,6 +75,9 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace ItemType = ::ttyd::item_data::ItemType;
 
+using WeaponDamageFn = uint32_t (*) (
+    BattleWorkUnit*, BattleWeapon*, BattleWorkUnit*, BattleWorkUnitPart*);
+
 }
 
 // Function hooks.
@@ -289,16 +292,17 @@ void GetStatusParams(
             break;
     }
 
-    // If unit is an enemy and status is Charge (and not an item),
-    // change its power in the same way as ATK / FP damage.
-    if (status_type == StatusEffectType::CHARGE && !weapon->item_id &&
-        unit->current_kind <= BattleUnitType::BONETAIL) {
-        int32_t altered_charge;
-        GetEnemyStats(
-            unit->current_kind, nullptr, &altered_charge,
-            nullptr, nullptr, nullptr, strength);
-        if (altered_charge > 99) altered_charge = 99;
-        strength = altered_charge;
+    if (status_type == StatusEffectType::CHARGE) {
+        // Scale Charge attacks in the same way as ATK and FP damage.
+        if (!weapon->item_id && unit->current_kind <= BattleUnitType::BONETAIL) {
+            int32_t altered_charge;
+            GetEnemyStats(
+                unit->current_kind, nullptr, &altered_charge,
+                nullptr, nullptr, nullptr, strength);
+            strength = altered_charge;
+        }
+        // Cap max Charge at 99.
+        if (strength > 99) strength = 99;
     }
 }
 
@@ -332,6 +336,13 @@ uint32_t GetStatusDamageFromWeapon(
                     }
                     break;
                 }
+                case StatusEffectType::POISON:
+                    // Each new infliction increases power by 1.
+                    if (target->poison_turns > 0) {
+                        strength = target->poison_strength + 1;
+                    }
+                    if (strength > 5) strength = 5;
+                    break;
                 case StatusEffectType::HUGE:
                 case StatusEffectType::ATTACK_UP:
                 case StatusEffectType::DEFENSE_UP:
@@ -371,7 +382,9 @@ uint32_t StatusEffectTick(BattleWorkUnit* unit, int8_t status_type) {
     ttyd::battle_unit::BtlUnit_GetStatus(unit, status_type, &turns, &strength);
     
     if (turns <= 0) return result;
-    --turns;
+    
+    // 100+ turn (permanent) statuses should not tick down.
+    if (turns <= 99) --turns;
     
     if (turns == 0) {
         // If expired, reset the effect strength to 0.
@@ -477,6 +490,233 @@ int32_t PreCheckDamage(
     if (BtlUnit_CheckStatus(attacker, StatusEffectType::DIZZY)) accuracy /= 2;
     if (ttyd::battle::g_BattleWork->stage_hazard_work.fog_active) accuracy /= 2;
     return ttyd::system::irand(100) < accuracy ? 1 : 2;
+}
+
+// Replaces the original damage function used by TTYD, for ease of editing.
+// Called by Alter(Fp)DamageCalculation in patches_enemy.
+int32_t CalculateBaseDamage(
+    BattleWorkUnit* attacker, BattleWorkUnit* target, BattleWorkUnitPart* part,
+    BattleWeapon* weapon, uint32_t* unk0, uint32_t unk1) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    // For shorter / more readable code lines, lol.
+    const auto& sp = weapon->special_property_flags;
+    
+    if (target->token_flags & BattleUnitToken_Flags::UNK_2) {
+        unk1 |= 0x1000;
+    }
+    
+    int32_t element = weapon->element;
+    if (attacker &&
+        (sp & AttackSpecialProperty_Flags::IGNITES_IF_BURNED) &&
+        BtlUnit_CheckStatus(attacker, StatusEffectType::BURN)) {
+        element = AttackElement::FIRE;
+    }
+    *unk0 = unk1 | 0x1e;
+    
+    if (!weapon->damage_function) {
+        return 0;
+    }
+    if (attacker &&
+        (sp & AttackSpecialProperty_Flags::BADGE_BUFFABLE) &&
+        attacker->badges_equipped.all_or_nothing > 0 &&
+        !(battleWork->ac_manager_work.ac_result & 2) &&
+        !(unk1 & 0x20000)) {
+        return 0;
+    }
+    // TODO: Maybe override if Scoped?
+    if (part->part_attribute_flags & PartsAttribute_Flags::UNK_2000_0000) {
+        return 0;
+    }
+    
+    int32_t atk = weapon->damage_function_params[0];
+    
+    auto weapon_fn = (WeaponDamageFn)weapon->damage_function;
+    if (weapon_fn) atk = weapon_fn(attacker, weapon, target, part);
+    
+    // Positive attack modifiers (badges and statuses).
+    if (sp & AttackSpecialProperty_Flags::BADGE_BUFFABLE) {
+        atk += attacker->badges_equipped.all_or_nothing;
+        atk += attacker->badges_equipped.power_plus;
+        atk += attacker->badges_equipped.p_up_d_down;
+        
+        // TODO: Infinite Pit options.
+        const bool weaker_rush_badges =
+            g_Mod->state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES);
+        
+        if (attacker->current_hp <= attacker->unit_kind_params->danger_hp) {
+            const int32_t power = weaker_rush_badges ? 1 : 2;
+            atk += power * attacker->badges_equipped.power_rush;
+        }
+        if (attacker->current_hp <= attacker->unit_kind_params->peril_hp) {
+            const int32_t power = weaker_rush_badges ? 2 : 5;
+            atk += power * attacker->badges_equipped.mega_rush;
+        }
+        if (part->part_attribute_flags & PartsAttribute_Flags::WEAK_TO_ICE_POWER) {
+            atk += attacker->badges_equipped.ice_power;
+        }
+    }
+    if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
+        int8_t strength = 0;
+        BtlUnit_GetStatus(
+            attacker, StatusEffectType::ATTACK_UP, nullptr, &strength);
+        atk += strength;
+        // ATK spell activated (doesn't check if Mario is attacker!)
+        if (battleWork->impending_merlee_spell_type == 1) {
+            atk += 3;
+        }
+    }
+    if (sp & AttackSpecialProperty_Flags::CHARGE_BUFFABLE) {
+        if (BtlUnit_CheckStatus(attacker, StatusEffectType::CHARGE)) {
+            int8_t strength = 0;
+            BtlUnit_GetStatus(
+                attacker, StatusEffectType::CHARGE, nullptr, &strength);
+            atk += strength;
+            attacker->token_flags |= BattleUnitToken_Flags::CHARGE_EXPENDED;
+        }
+    }
+    
+    // Negative attack modifiers (badges and statuses).
+    if (sp & AttackSpecialProperty_Flags::BADGE_BUFFABLE) {
+        atk -= attacker->badges_equipped.p_down_d_up;
+        atk -= attacker->badges_equipped.hp_drain;
+        atk -= attacker->badges_equipped.fp_drain;
+    }
+    if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
+        int8_t strength = 0;
+        BtlUnit_GetStatus(
+            attacker, StatusEffectType::ATTACK_DOWN, nullptr, &strength);
+        atk += strength;
+        
+        if (BtlUnit_CheckStatus(attacker, StatusEffectType::BURN)) {
+            atk -= 1;
+        }
+    }
+    if (atk < 0) atk = 0;
+    
+    // Attack multiplier statuses.
+    if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
+        if (BtlUnit_CheckStatus(attacker, StatusEffectType::HUGE)) {
+            // Round up.
+            atk = ((atk * 3) + 1) / 2;
+        } else if (atk > 1 &&
+            BtlUnit_CheckStatus(attacker, StatusEffectType::TINY)) {
+            // Round down (unless base is 1).
+            atk /= 2;
+        }
+    }
+    
+    int32_t def = part->defense[element];
+    int32_t def_attr = part->defense_attr[element];
+    switch (element) {
+        case AttackElement::NORMAL:
+            *unk0 = unk1 | 0x17;
+            break;
+        case AttackElement::FIRE:
+            *unk0 = unk1 | 0x18;
+            break;
+        case AttackElement::ICE:
+            *unk0 = unk1 | 0x1a;
+            break;
+        case AttackElement::EXPLOSION:
+            *unk0 = unk1 | 0x19;
+            break;
+        case AttackElement::ELECTRIC:
+            *unk0 = unk1 | 0x1b;
+            break;
+    }
+    
+    // Defense modifiers.
+    // If defense-piercing or elemental healing, set DEF to 0.
+    if (sp & AttackSpecialProperty_Flags::DEFENSE_PIERCING or def_attr == 3) {
+        def = 0;
+    } else {
+        def += target->badges_equipped.defend_plus;
+        if (unk1 & 0x40000) {  // successful guard
+            def += target->badges_equipped.damage_dodge;
+        }
+        if (target->status_flags & BattleUnitStatus_Flags::DEFENDING) {
+            def += 1;
+        }
+        
+        int8_t strength = 0;
+        BtlUnit_GetStatus(
+            target, StatusEffectType::DEFENSE_UP, nullptr, &strength);
+        def += strength;
+        BtlUnit_GetStatus(
+            target, StatusEffectType::DEFENSE_DOWN, nullptr, &strength);
+        def += strength;
+        if (def < 0) def = 0;
+        
+        if (battleWork->impending_merlee_spell_type == 2 &&
+            target->current_kind == BattleUnitType::MARIO) {
+            def += 3;
+        }
+        
+        if (part->part_attribute_flags & 
+            PartsAttribute_Flags::WEAK_TO_ATTACK_FX_R) {
+            def += target->unit_work[1];
+            if (def < 0) def = 0;
+        }
+    }
+    
+    int32_t damage = atk - def;
+    
+    damage += target->badges_equipped.p_up_d_down;
+    if (damage > 0) {
+        if (sp & AttackSpecialProperty_Flags::DIMINISHING_BY_HIT) {
+            damage -= target->hp_damaging_hits_dealt;
+        }
+        if (sp & AttackSpecialProperty_Flags::DIMINISHING_BY_TARGET) {
+            damage -= attacker->hits_dealt_this_attack;
+        }
+        if (damage < 1) damage = 1;
+    }
+    if (unk1 & 0x40000) {  // guarding
+        damage -= 1;
+    }
+    if (element == AttackElement::FIRE) {
+        damage -= target->badges_equipped.ice_power;
+    }
+    damage -= target->badges_equipped.p_down_d_up;
+    damage *= (target->badges_equipped.double_pain + 1);
+    
+    int32_t last_stands = target->badges_equipped.last_stand;
+    if (target->current_hp <= target->unit_kind_params->danger_hp && 
+        last_stands > 0) {
+        damage = (damage + last_stands) / (last_stands + 1);
+    }
+    
+    if (BtlUnit_CheckStatus(target, StatusEffectType::FREEZE) &&
+        element != AttackElement::ICE) {
+        damage *= 2;
+    }
+    
+    switch (def_attr) {
+        case 1:
+            damage += 1;
+            break;
+        case 2:
+            damage = 0;
+            break;
+        case 4:
+            if (!(unk1 & 0x8000'0000)) damage = 0;
+            break;
+    }
+    
+    if (def_attr == 3) {
+        damage *= -1;
+        *unk0 |= 0x2000;
+    } else if (damage < 1) {
+        damage = 0;
+        *unk0 = unk1 | 0x1e;
+    } else if (
+        (unk1 & 0x100) &&
+        (sp & AttackSpecialProperty_Flags::UNKNOWN_0x8000 ||
+         !(target->attribute_flags & BattleUnitAttribute_Flags::UNK_100))) {
+        *unk0 |= 0x10000;
+    }
+    
+    return damage;
 }
 
 void ApplyFixedPatches() {

@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
+#include "patches_battle.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_damage.h>
@@ -123,8 +124,8 @@ int32_t AlterDamageCalculation(
         def_ptr[weapon->element] = altered_def;
     }
     
-    // Run vanilla damage calculation.
-    int32_t damage = g_BattleCalculateDamage_trampoline(
+    // Run base damage calculation (similar to vanilla BattleCalculateDamage).
+    int32_t damage = battle::CalculateBaseDamage(
         attacker, target, target_part, weapon, unk0, unk1);
         
     // Set Shell Shield max damage to 1 (essentially making its HP hit-based).
