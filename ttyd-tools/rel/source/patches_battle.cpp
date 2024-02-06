@@ -53,6 +53,9 @@ extern "C" {
     void BranchBackApplySpRegenMultiplierNoBingo();
     void StartApplySpRegenMultiplierBingo();
     void BranchBackApplySpRegenMultiplierBingo();
+    // status_effect_patches.s
+    void StartFreezeBreakOnAllAttacks();
+    void BranchBackFreezeBreakOnAllAttacks();
     
     void setTargetAudienceCount() {
         mod::infinite_pit::battle::SetTargetAudienceAmount();
@@ -92,9 +95,11 @@ extern uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
 // Patch addresses.
+extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH;
 extern const int32_t g_BattleCheckDamage_Patch_PaybackDivisor;
 extern const int32_t g_BattleCheckDamage_Patch_HoldFastDivisor;
 extern const int32_t g_BattleCheckDamage_Patch_ReturnPostageDivisor;
+extern const int32_t g_BattleCheckDamage_Patch_SkipHugeTinyArrows;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
@@ -539,7 +544,6 @@ int32_t CalculateBaseDamage(
         atk += attacker->badges_equipped.power_plus;
         atk += attacker->badges_equipped.p_up_d_down;
         
-        // TODO: Infinite Pit options.
         const bool weaker_rush_badges =
             g_Mod->state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES);
         
@@ -805,20 +809,7 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(
             g_battleAcMain_ButtonDown_CheckComplete_CH1));
             
-    // Add support for "permanent statuses" (turn count >= 100).
-    // Don't tick down turn count if 100 or over:
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(
-            g_BtlUnit_CheckRecoveryStatus_PermanentStatus_BH),
-        reinterpret_cast<void*>(StartCheckRecoveryStatus));
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(BranchBackCheckRecoveryStatus),
-        reinterpret_cast<void*>(
-            g_BtlUnit_CheckRecoveryStatus_PermanentStatus_EH));
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(ConditionalBranchCheckRecoveryStatus),
-        reinterpret_cast<void*>(
-            g_BtlUnit_CheckRecoveryStatus_PermanentStatus_CH1));
+    // Add support for "permanent statuses" (turn count >= 100):
     // Skip drawing status icon if 100 or over:
     mod::patch::writeBranch(
         reinterpret_cast<void*>(
@@ -832,6 +823,17 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(ConditionalBranchStatusIconDisplay),
         reinterpret_cast<void*>(
             g_battle_status_icon_SkipIconForPermanentStatus_CH1));
+            
+    // Always freeze-break effect if a Frozen enemy is hit by a non-Ice attack.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_BattleCheckDamage_AlwaysFreezeBreak_BH),
+        reinterpret_cast<void*>(StartFreezeBreakOnAllAttacks),
+        reinterpret_cast<void*>(BranchBackFreezeBreakOnAllAttacks));
+            
+    // Skip drawing Huge / Tiny status arrows when inflicted.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_BattleCheckDamage_Patch_SkipHugeTinyArrows),
+        0x2c19000cU /* cmpwi r25, 12 */);
         
     // Increase all forms of Payback-esque status returned damage to 1x.
     mod::patch::writePatch(
