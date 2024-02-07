@@ -14,6 +14,7 @@
 #include <ttyd/battle_event_subset.h>
 #include <ttyd/battle_mario.h>
 #include <ttyd/battle_message.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
@@ -152,6 +153,17 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
     USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), LW(14), -1, 0)
     USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    
+    // For Ironbonk, show an arc of orange stars to signify that it pierces.
+    IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaMove6))
+        BROTHER_EVT()
+            SET(LW(13), 2)
+            USER_FUNC(_jump_star_effect, -2, LW(13))
+            USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_MARIO_HAMMER_SHINE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        END_BROTHER()
+    END_IF()
+    
     USER_FUNC(btlevtcmd_StartAC, 1)
     SET(LW(10), 0)
     LBL(10)
@@ -274,16 +286,24 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
     WAIT_FRM(LW(0))
     USER_FUNC(btlevtcmd_ac_timing_flag_onoff, 0, 1)
     USER_FUNC(btlevtcmd_ResultAC)
-    USER_FUNC(btlevtcmd_SetScale, -2, FLOAT(1.0), FLOAT(1.0), FLOAT(1.0))
+    USER_FUNC(btlevtcmd_SetScale, -2, FLOAT(1.0), FLOAT(1.0), FLOAT(1.0))    
     USER_FUNC(btlevtcmd_GetResultAC, LW(6))
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
+    
+        // Layer Piercing Blow sound effect, if move had an effect.
+        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaMove6))
+            IF_EQUAL(LW(5), 18)
+                USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_MARIO_HAMMER_TURANUKI1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            END_IF()
+        END_IF()
+        
         IF_EQUAL(LW(10), 0)
             USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
         END_IF()
         GOTO(90)
-    END_IF()
+    END_IF()    
     USER_FUNC(btlevtcmd_GetResultCountAC, LW(6))
     IF_SMALL_EQUAL(LW(6), 1)
         INLINE_EVT()
@@ -294,6 +314,14 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
             USER_FUNC(evt_btl_camera_set_zoom, 0, 250)
         END_INLINE()
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131072, LW(5))
+
+        // Layer Piercing Blow sound effect, if move had an effect.
+        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaMove6))
+            IF_EQUAL(LW(5), 18)
+                USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_MARIO_HAMMER_TURANUKI1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            END_IF()
+        END_IF()
+        
         USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
         USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
@@ -305,6 +333,13 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
         USER_FUNC(evt_btl_camera_set_mode, 0, 0)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
         USER_FUNC(btlevtcmd_GetResultAC, LW(0))
+
+        // Layer Piercing Blow sound effect, if move had an effect.
+        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaMove6))
+            IF_EQUAL(LW(5), 18)
+                USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_MARIO_HAMMER_TURANUKI1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            END_IF()
+        END_IF()
     END_IF()
     LBL(90)
     USER_FUNC(btlevtcmd_StopAC)
@@ -1002,12 +1037,12 @@ EVT_BEGIN(customAttack_ScopeOut)
         USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
         
-        // Fake a damage state + apply custom "Scoped" status.
-        // TODO: Use non-placeholder string.
+        // Fake a damaged state + apply the custom "Scoped" status.
         USER_FUNC(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
         SET(LW(15), 1)
         USER_FUNC(infinite_pit::battle::evtTot_ApplyCustomStatus,
-            LW(3), LW(4), 0x400, /* splash colors */ 0xdcdcdc, 0x605000,
+            LW(3), LW(4), ttyd::battle_unit::BattleUnitStatus_Flags::SCOPED,
+            /* splash colors */ 0xdcdcdc, 0x605000,
             PTR("SFX_CONDITION_COUNTER1"), 
             PTR("tot_ptr1_scope_out_effect_msg"))
     ELSE()
@@ -1363,10 +1398,9 @@ BattleWeapon customWeapon_GoombellaMove6 = {
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags =
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
