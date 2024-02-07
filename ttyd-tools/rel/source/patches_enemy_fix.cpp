@@ -72,6 +72,7 @@ namespace mod::infinite_pit {
 namespace {
     
 using ::ttyd::battle::BattleWork;
+using ::ttyd::battle_database_common::BattleUnitKind;
 using ::ttyd::battle_database_common::BattleUnitKindPart;
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::battle_unit::BtlUnit_CheckStatus;
@@ -124,6 +125,9 @@ extern const int32_t g_custom_XNautAttackEvt_NormalAttackReturnLblOffset;
 extern const int32_t g_custom_XNautAttackEvt_JumpAttackReturnLblOffset;
 extern const int32_t g_custom_EliteXNautAttackEvt_NormalAttackReturnLblOffset;
 extern const int32_t g_custom_EliteXNautAttackEvt_JumpAttackReturnLblOffset;
+extern const int32_t g_custom_ZYux_UnitKindOffset;
+extern const int32_t g_custom_XYux_UnitKindOffset;
+extern const int32_t g_custom_Yux_UnitKindOffset;
 extern const int32_t g_custom_ZYux_PrimaryKindPartOffset;
 extern const int32_t g_custom_XYux_PrimaryKindPartOffset;
 extern const int32_t g_custom_Yux_PrimaryKindPartOffset;
@@ -544,18 +548,31 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
                 g_custom_EliteXNautAttackEvt_JumpAttackReturnLblOffset), 98);
         // Make all varieties of Yux able to be hit by grounded attacks,
         // that way any partner is able to attack them.
-        auto* z_yux =
+        auto* z_yux_part =
             reinterpret_cast<BattleUnitKindPart*>(
                 module_start + g_custom_ZYux_PrimaryKindPartOffset);
-        auto* x_yux =
+        auto* x_yux_part =
             reinterpret_cast<BattleUnitKindPart*>(
                 module_start + g_custom_XYux_PrimaryKindPartOffset);
-        auto* yux =
+        auto* yux_part =
             reinterpret_cast<BattleUnitKindPart*>(
                 module_start + g_custom_Yux_PrimaryKindPartOffset);
-        z_yux->attribute_flags  &= ~0x600000;
-        x_yux->attribute_flags  &= ~0x600000;
-        yux->attribute_flags    &= ~0x600000;
+        z_yux_part->attribute_flags  &= ~0x600000;
+        x_yux_part->attribute_flags  &= ~0x600000;
+        yux_part->attribute_flags    &= ~0x600000;
+        // Make all varieties of Yux unable to be swallowed.
+        auto* z_yux_unit =
+            reinterpret_cast<BattleUnitKind*>(
+                module_start + g_custom_ZYux_UnitKindOffset);
+        auto* x_yux_unit =
+            reinterpret_cast<BattleUnitKind*>(
+                module_start + g_custom_XYux_UnitKindOffset);
+        auto* yux_unit =
+            reinterpret_cast<BattleUnitKind*>(
+                module_start + g_custom_Yux_UnitKindOffset);
+        z_yux_unit->swallow_chance  = -1;
+        x_yux_unit->swallow_chance  = -1;
+        yux_unit->swallow_chance    = -1;
         // Give Green Magikoopas nonzero DEF so they can have 1 DEF in the mod.
         const int8_t kDefenseArr[5] = { 1, 1, 1, 1, 1 };
         mod::patch::writePatch(

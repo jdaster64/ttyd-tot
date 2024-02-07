@@ -115,6 +115,9 @@ namespace BattleUnitStatus_Flags {
         HAS_MOVES_REMAINING     = 0x200'0000U,
         IN_DANGER               = 0x1000'0000U,
         IN_PERIL                = 0x2000'0000U,
+        
+        // Custom statuses for ToT.
+        SCOPED                  = 0x400U,
     };
 }
 

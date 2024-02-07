@@ -54,14 +54,20 @@ extern "C" {
     void StartApplySpRegenMultiplierBingo();
     void BranchBackApplySpRegenMultiplierBingo();
     // status_effect_patches.s
-    void StartFreezeBreakOnAllAttacks();
-    void BranchBackFreezeBreakOnAllAttacks();
+    void StartToggleScopedAndCheckFreezeBreak();
+    void BranchBackToggleScopedAndCheckFreezeBreak();
     
     void setTargetAudienceCount() {
         mod::infinite_pit::battle::SetTargetAudienceAmount();
     }
     double applySpRegenMultiplier(double base_regen) {
         return mod::infinite_pit::battle::ApplySpRegenMultiplier(base_regen);
+    }
+    void toggleOffScopedStatus(
+        ttyd::battle_unit::BattleWorkUnit* attacker,
+        ttyd::battle_unit::BattleWorkUnit* target,
+        ttyd::battle_database_common::BattleWeapon* weapon) {
+        mod::infinite_pit::battle::ToggleScopedStatus(attacker, target, weapon);
     }
 }
 
@@ -108,9 +114,6 @@ extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_EH;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_BH;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_EH;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_CH1;
-extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_BH;
-extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_EH;
-extern const int32_t g_BtlUnit_CheckRecoveryStatus_PermanentStatus_CH1;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_BH;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_EH;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_CH1;
@@ -356,6 +359,11 @@ uint32_t GetStatusDamageFromWeapon(
                     always_update = false;
                     break;
             }
+            
+            // Statuses are more likely to land.
+            if (target->status_flags & BattleUnitStatus_Flags::SCOPED) {
+                chance *= 1.5;
+            }
 
             if (always_update || turns != 0 || strength != 0) {
                 int32_t damage_result = 
@@ -456,11 +464,15 @@ int32_t PreCheckDamage(
           AttackSpecialProperty_Flags::UNKNOWN_0x40000)) {
         return 2;
     }
+    
+    // Scoped status guarantees a hit.
+    if (target->status_flags & BattleUnitStatus_Flags::SCOPED) {
+        return 1;
+    }
     if (weapon->special_property_flags & 
         AttackSpecialProperty_Flags::CANNOT_MISS) {
         return 1;
     }
-    // TODO: Add check for Scoped status.
     
     if (BtlUnit_CheckStatus(target, StatusEffectType::INVISIBLE) ||
         (target->attribute_flags & BattleUnitAttribute_Flags::UNK_8) ||
@@ -528,7 +540,7 @@ int32_t CalculateBaseDamage(
         !(unk1 & 0x20000)) {
         return 0;
     }
-    // TODO: Maybe override if Scoped?
+    // Immune to damage/status.
     if (part->part_attribute_flags & PartsAttribute_Flags::UNK_2000_0000) {
         return 0;
     }
@@ -823,12 +835,13 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(ConditionalBranchStatusIconDisplay),
         reinterpret_cast<void*>(
             g_battle_status_icon_SkipIconForPermanentStatus_CH1));
-            
-    // Always freeze-break effect if a Frozen enemy is hit by a non-Ice attack.
+    
+    // Toggle off Scoped status, and force freeze-break anytime a Frozen enemy
+    // is hit by a non-Ice attack.
     mod::patch::writeBranchPair(
         reinterpret_cast<void*>(g_BattleCheckDamage_AlwaysFreezeBreak_BH),
-        reinterpret_cast<void*>(StartFreezeBreakOnAllAttacks),
-        reinterpret_cast<void*>(BranchBackFreezeBreakOnAllAttacks));
+        reinterpret_cast<void*>(StartToggleScopedAndCheckFreezeBreak),
+        reinterpret_cast<void*>(BranchBackToggleScopedAndCheckFreezeBreak));
             
     // Skip drawing Huge / Tiny status arrows when inflicted.
     mod::patch::writePatch(
@@ -892,6 +905,37 @@ double ApplySpRegenMultiplier(double base_regen) {
         g_Mod->state_.GetOptionNumericValue(OPTNUM_SP_REGEN_MODIFIER) / 20.0;
 }
 
+void ToggleScopedStatus(
+    BattleWorkUnit* attacker, BattleWorkUnit* target, BattleWeapon* weapon) {
+    if (attacker->current_kind <= BattleUnitType::BONETAIL) return;
+    
+    // If the player attempted to land damage or a negative/neutral status.
+    bool player_attempted_attack = false;
+    if (weapon->damage_function) {
+        player_attempted_attack = true;
+    } else {
+        if (weapon->sleep_time || 
+            weapon->stop_time ||
+            weapon->dizzy_time ||
+            weapon->poison_time ||
+            weapon->confuse_time ||
+            weapon->burn_time ||
+            weapon->freeze_time ||
+            weapon->size_change_time ||
+            weapon->atk_change_time ||
+            weapon->def_change_time ||
+            weapon->slow_time ||
+            weapon->allergic_time ||
+            weapon->fright_chance ||
+            weapon->gale_force_chance ||
+            weapon->ohko_chance) {
+            player_attempted_attack = true;
+        }
+    }
+    if (player_attempted_attack) {
+        target->status_flags &= ~BattleUnitStatus_Flags::SCOPED;
+    }
+}
 
 
 // Applies a custom status effect to the target.

@@ -28,6 +28,11 @@ void ApplyFixedPatches();
 void SetTargetAudienceAmount();
 // Applies the option to change the SP amount regained from attacks.
 double ApplySpRegenMultiplier(double base_regen);
+// Toggles off "Scoped" status for the target if attacked by the player.
+void ToggleScopedStatus(
+    ttyd::battle_unit::BattleWorkUnit* attacker, 
+    ttyd::battle_unit::BattleWorkUnit* target,
+    ttyd::battle_database_common::BattleWeapon* weapon);
 
 // Calculates the base damage for an attack, replacing the original TTYD func.
 int32_t CalculateBaseDamage(

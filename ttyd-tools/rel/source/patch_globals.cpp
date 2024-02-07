@@ -331,10 +331,13 @@ extern const int32_t g_tik_06_RightBeroEntryOffset = 0x1f2f4;
 // CUSTOM
 extern const int32_t g_custom_XNautAttackEvt_NormalAttackReturnLblOffset = 0x14f0c;
 extern const int32_t g_custom_XNautAttackEvt_JumpAttackReturnLblOffset = 0x153a4;
+extern const int32_t g_custom_ZYux_UnitKindOffset = 0x15fd0;
 extern const int32_t g_custom_ZYux_PrimaryKindPartOffset = 0x160a4;
 extern const int32_t g_custom_EliteXNautAttackEvt_NormalAttackReturnLblOffset = 0x19b5c;
 extern const int32_t g_custom_EliteXNautAttackEvt_JumpAttackReturnLblOffset = 0x19ff4;
+extern const int32_t g_custom_XYux_UnitKindOffset = 0x1ca90;
 extern const int32_t g_custom_XYux_PrimaryKindPartOffset = 0x1cb64;
+extern const int32_t g_custom_Yux_UnitKindOffset = 0x200f0;
 extern const int32_t g_custom_Yux_PrimaryKindPartOffset = 0x201c4;
 extern const int32_t g_custom_AtomicBoo_BreathWeapon_Offset = 0x2a048;
 extern const int32_t g_custom_AtomicBooBreathSubEvt_Offset = 0x2b62c;
