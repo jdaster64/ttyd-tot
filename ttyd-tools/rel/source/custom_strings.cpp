@@ -120,6 +120,7 @@ namespace MsgKey {
         RIPPO_YES_NO,
         TIK_06_02,
         TOT_PTR1_SCOPE_OUT_EFFECT_MSG,
+        TOT_PTR5_INFATUATE_EFFECT_MSG,
         x83x70x83x8f_CHET_RIPPO_TATTLE,
     };
 }
@@ -230,6 +231,7 @@ constexpr const char* kKeyLookups[] = {
     "rippo_yes_no",
     "tik_06_02",
     "tot_ptr1_scope_out_effect_msg",
+    "tot_ptr5_infatuate_effect_msg",
     "\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae",  // Chet Rippo
 };
 
@@ -668,6 +670,9 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::TOT_PTR1_SCOPE_OUT_EFFECT_MSG:
             return "Scoped! Your next attack is\n"
                    "guaranteed to connect!";
+        case MsgKey::TOT_PTR5_INFATUATE_EFFECT_MSG:
+            return "Infatuated! The enemy will\n"
+                   "fight for your side now!";
     }
     // Should not be reached.
     return nullptr;

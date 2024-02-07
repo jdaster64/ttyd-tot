@@ -77,6 +77,8 @@ using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::item_data::itemDataTable;
 
+namespace AttackTargetClass_Flags =
+    ::ttyd::battle_database_common::AttackTargetClass_Flags;
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
@@ -325,6 +327,24 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                     weapons[i].name = g_MoveBadgeTextBuffer;
                 } else {
                     weapons[i].name = ttyd::msgdrv::msgSearch(weapon->name);
+                }
+                
+                // Update single / multi-target for Vivian's extra moves.
+                if (move_type == tot::MoveType::VIVIAN_5 ||
+                    move_type == tot::MoveType::VIVIAN_6) {
+                    int32_t move_level = 
+                        tot::MoveManager::GetSelectedLevel(move_type);
+                    if (move_level == 1) {
+                        weapons[i].weapon->target_class_flags &=
+                            ~AttackTargetClass_Flags::MULTIPLE_TARGET;
+                        weapons[i].weapon->target_class_flags |=
+                            AttackTargetClass_Flags::SINGLE_TARGET;
+                    } else {
+                        weapons[i].weapon->target_class_flags &=
+                            ~AttackTargetClass_Flags::SINGLE_TARGET;
+                        weapons[i].weapon->target_class_flags |=
+                            AttackTargetClass_Flags::MULTIPLE_TARGET;
+                    }
                 }
                 
                 // Update actual FP cost.

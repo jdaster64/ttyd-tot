@@ -41,6 +41,10 @@ int32_t CalculateBaseDamage(
     ttyd::battle_unit::BattleWorkUnitPart* part,
     ttyd::battle_database_common::BattleWeapon* weapon, 
     uint32_t* unk0, uint32_t unk1);
+    
+// Queues a custom status announcement message.
+void QueueCustomStatusMessage(
+    ttyd::battle_unit::BattleWorkUnit* unit, const char* announce_msg);
 
 // Applies a custom status effect to the target.
 // Params: unit, part, status_flag, color1 & color2 (rgb), sfx, announce_msg

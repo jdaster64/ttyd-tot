@@ -937,6 +937,14 @@ void ToggleScopedStatus(
     }
 }
 
+void QueueCustomStatusMessage(BattleWorkUnit* unit, const char* announce_msg) {
+    // Queue custom message, using status 1 (Stop)'s unused no-effect entry.
+    ttyd::battle_status_effect::_st_chg_msg_data[2].msg_no_effect = announce_msg;
+    ttyd::battle_status_effect::BattleStatusChangeInfoSetAnnouce(
+        unit, /* placeholder status + turns */ 1, 1, /* no effect */ 0);
+    ttyd::battle_status_effect::BattleStatusChangeMsgSetAnnouce(
+        unit, /* placeholder status */ 1, /* no effect */ 0);
+}
 
 // Applies a custom status effect to the target.
 // Params: unit, part, status_flag, color1, color2, sfx_name, announce_msg
@@ -991,12 +999,8 @@ EVT_DEFINE_USER_FUNC(evtTot_ApplyCustomStatus) {
     ttyd::battle_unit::BtlUnit_GetHitPos(unit, part, &pos.x, &pos.y, &pos.z);
     ttyd::pmario_sound::psndSFXOn_3D(sfx_name, &pos);
     
-    // Queue custom message, using status 1 (Stop)'s unused no-effect entry.
-    ttyd::battle_status_effect::_st_chg_msg_data[2].msg_no_effect = announce_msg;
-    ttyd::battle_status_effect::BattleStatusChangeInfoSetAnnouce(
-        unit, /* placeholder status + turns */ 1, 1, /* no effect */ 0);
-    ttyd::battle_status_effect::BattleStatusChangeMsgSetAnnouce(
-        unit, /* placeholder status */ 1, /* no effect */ 0);
+    // Queue custom status message.
+    QueueCustomStatusMessage(unit, announce_msg);
     
     return 2;
 }

@@ -1,6 +1,7 @@
 #include "tot_party_vivian.h"
 
 #include "evt_cmd.h"
+#include "patches_battle.h"
 #include "tot_move_manager.h"
 
 #include <ttyd/battle.h>
@@ -121,6 +122,10 @@ EVT_DEFINE_USER_FUNC(evtTot_InfatuateChangeAlliance) {
                 reinterpret_cast<void*>(
                     reinterpret_cast<uintptr_t>(unit) + 0xae8),
                 kNoStatusMsg, sizeof(kNoStatusMsg));
+                
+            // Queue a custom message instead.
+            mod::infinite_pit::battle::QueueCustomStatusMessage(
+                unit, "tot_ptr5_infatuate_effect_msg");
         }
     }
     
@@ -628,12 +633,15 @@ EVT_BEGIN(partyVivianAttack_CharmKissAttack)
         IF_FLAG(LW(7), 0x2)
             USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
             ADD(LW(2), 10)
-            USER_FUNC(evt_eff, 0, PTR("kiss"), 5, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
             USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
             USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
             USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-            // Apply Infatuate effect.
-            USER_FUNC(evtTot_InfatuateChangeAlliance, LW(3), LW(4))
+            IF_EQUAL(LW(12), PTR(&customWeapon_VivianInfatuate))
+                // Only show heart effects for Infatuate.
+                USER_FUNC(evt_eff, 0, PTR("kiss"), 5, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+                // Apply Infatuate effect.
+                USER_FUNC(evtTot_InfatuateChangeAlliance, LW(3), LW(4))
+            END_IF()
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
         ELSE()
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
@@ -652,12 +660,23 @@ EVT_BEGIN(partyVivianAttack_CharmKissAttack)
     END_IF()
     WAIT_FRM(5)
     LBL(50)
-    // Disable checking next enemy for Infatuate.
-    // USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
-    // IF_NOT_EQUAL(LW(3), -1)
-    //    ADD(LW(10), 1)
-    //    GOTO(10)
-    // END_IF()
+    
+    SWITCH(LW(12))
+        CASE_EQUAL(PTR(&customWeapon_VivianInfatuate))
+            SET(LW(0), 1)
+        CASE_EQUAL(PTR(&customWeapon_VivianMove5))
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_5, LW(0))
+        CASE_EQUAL(PTR(&customWeapon_VivianMove6))
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_6, LW(0))
+    END_SWITCH()
+    // If Infatuate, or level 1 version of Curse / Neutralize, don't check next.
+    IF_LARGE(LW(0), 1)
+        USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+        IF_NOT_EQUAL(LW(3), -1)
+           ADD(LW(10), 1)
+           GOTO(10)
+        END_IF()
+    END_IF()
     LBL(80)
     USER_FUNC(btlevtcmd_StopAC)
     USER_FUNC(evt_audience_ap_recovery)
@@ -902,25 +921,27 @@ BattleWeapon customWeapon_VivianInfatuate = {
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
+
 BattleWeapon customWeapon_VivianMove5 = {
-    .name = "btl_wn_ptr_normal",
+    .name = "btl_wn_ptr_lv3",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_ptr_kagenuke",
+    .description = "msg_ptr_meromero_kiss",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 4,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 3, 3, 4, 4, 5, 5, 0, MoveType::VIVIAN_5 },
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
+        // Single-target or multiple depending on level.
         AttackTargetClass_Flags::SINGLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
@@ -933,52 +954,50 @@ BattleWeapon customWeapon_VivianMove5 = {
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_kagenuke",
-    .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags = AttackCounterResistance_Flags::TOP_SPIKY,
+    .ac_help_msg = "msg_ac_meromero_kiss",
+    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances
-    .burn_chance = 100,
-    .burn_time = 2,
+    .slow_chance = 100,
+    .slow_time = 3,
     
-    .attack_evt_code = (void*)partyVivianAttack_NormalAttack,
+    .attack_evt_code = (void*)partyVivianAttack_CharmKissAttack,
     .bg_a1_a2_fall_weight = 0,
     .bg_a1_fall_weight = 0,
     .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
     .bg_b_fall_weight = 0,
-    .nozzle_turn_chance = 4,
-    .nozzle_fire_chance = 2,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
 
 BattleWeapon customWeapon_VivianMove6 = {
-    .name = "btl_wn_ptr_normal",
+    .name = "btl_wn_ptr_lv3",
     .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
-    .description = "msg_ptr_kagenuke",
+    .description = "msg_ptr_meromero_kiss",
     .base_accuracy = 100,
-    .base_fp_cost = 0,
+    .base_fp_cost = 4,
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
-    .unk_19 = 1,
+    .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,
-    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 3, 3, 4, 4, 5, 5, 0, MoveType::VIVIAN_6 },
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
+        // Single-target or multiple depending on level.
         AttackTargetClass_Flags::SINGLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
@@ -991,29 +1010,26 @@ BattleWeapon customWeapon_VivianMove6 = {
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_kagenuke",
-    .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags = AttackCounterResistance_Flags::TOP_SPIKY,
+    .ac_help_msg = "msg_ac_meromero_kiss",
+    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances
-    .burn_chance = 100,
-    .burn_time = 2,
+    .allergic_chance = 100,
+    .allergic_time = 3,
     
-    .attack_evt_code = (void*)partyVivianAttack_NormalAttack,
+    .attack_evt_code = (void*)partyVivianAttack_CharmKissAttack,
     .bg_a1_a2_fall_weight = 0,
     .bg_a1_fall_weight = 0,
     .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
     .bg_b_fall_weight = 0,
-    .nozzle_turn_chance = 4,
-    .nozzle_fire_chance = 2,
+    .nozzle_turn_chance = 10,
+    .nozzle_fire_chance = 5,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
