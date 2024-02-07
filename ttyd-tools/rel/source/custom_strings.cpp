@@ -119,6 +119,7 @@ namespace MsgKey {
         RIPPO_WHICH_STAT,
         RIPPO_YES_NO,
         TIK_06_02,
+        TOT_PTR1_SCOPE_OUT_EFFECT_MSG,
         x83x70x83x8f_CHET_RIPPO_TATTLE,
     };
 }
@@ -228,6 +229,7 @@ constexpr const char* kKeyLookups[] = {
     "rippo_which_stat",
     "rippo_yes_no",
     "tik_06_02",
+    "tot_ptr1_scope_out_effect_msg",
     "\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae",  // Chet Rippo
 };
 
@@ -663,6 +665,9 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                    "It may be never-ending, but that\n"
                    "doesn't mean we can't give it\n"
                    "our best effort, right, Mario?\n<k>";
+        case MsgKey::TOT_PTR1_SCOPE_OUT_EFFECT_MSG:
+            return "Scoped! Your next attack is\n"
+                   "guaranteed to connect!";
     }
     // Should not be reached.
     return nullptr;
