@@ -50,13 +50,13 @@ extern BattleWeapon customWeapon_FlurrieBodySlam;
 extern BattleWeapon customWeapon_FlurrieGaleForce;
 extern BattleWeapon customWeapon_FlurrieLipLock;
 extern BattleWeapon customWeapon_FlurrieDodgyFog;
-extern BattleWeapon customWeapon_FlurrieMove5;
-extern BattleWeapon customWeapon_FlurrieMove6;
+extern BattleWeapon customWeapon_FlurrieBlizzard;
+extern BattleWeapon customWeapon_FlurrieThunderStorm;
 
 BattleWeapon* g_WeaponTable[] = {
     &customWeapon_FlurrieBodySlam, &customWeapon_FlurrieGaleForce, 
-    &customWeapon_FlurrieLipLock, &customWeapon_FlurrieDodgyFog, 
-    &customWeapon_FlurrieMove5, &customWeapon_FlurrieMove6
+    &customWeapon_FlurrieDodgyFog, &customWeapon_FlurrieLipLock,
+    &customWeapon_FlurrieBlizzard, &customWeapon_FlurrieThunderStorm
 };
 
 void MakeSelectWeaponTable(
@@ -340,7 +340,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         CASE_EQUAL(PTR(&customWeapon_FlurrieGaleForce))
             USER_FUNC(btlevtcmd_AcSetParamAll, 1, 300, 4, 40, 60, 80, 100, LW(1))
             USER_FUNC(btlevtcmd_SetupAC, -2, 14, 1, 0)
-        CASE_EQUAL(PTR(&customWeapon_FlurrieMove5))
+        CASE_EQUAL(PTR(&customWeapon_FlurrieBlizzard))
             USER_FUNC(btlevtcmd_AcSetParamAll, 1, 300, 4, 75, 100, 100, 100, LW(1))
             USER_FUNC(btlevtcmd_SetupAC, -2, 14, 1, 0)
         CASE_ETC()
@@ -353,7 +353,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     END_SWITCH()
        
     SET(LW(15), -1)
-    IF_NOT_EQUAL(LW(12), PTR(&customWeapon_FlurrieMove6))
+    IF_NOT_EQUAL(LW(12), PTR(&customWeapon_FlurrieThunderStorm))
         IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieGaleForce))
             USER_FUNC(_clauda_breath_effect_ready)
         END_IF()
@@ -467,7 +467,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     USER_FUNC(btlevtcmd_StartAC, 1)
     USER_FUNC(btlevtcmd_ResultAC)
     
-    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieMove6))
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieThunderStorm))
         // Get rid of effects.
         USER_FUNC(evt_snd_sfxoff, LW(14))
         USER_FUNC(evt_batstage_return_stg_dark_base, 60, 0)
@@ -490,8 +490,8 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             IF_LARGE_EQUAL(LW(0), 1)
                 SET(LW(8), 0)
             END_IF()
-        CASE_EQUAL(PTR(&customWeapon_FlurrieMove5))
-            USER_FUNC(evtTot_MakeBreathWeapon, LW(12), LW(0), MoveType::FLURRIE_5)
+        CASE_EQUAL(PTR(&customWeapon_FlurrieBlizzard))
+            USER_FUNC(evtTot_MakeBreathWeapon, LW(12), LW(0), MoveType::FLURRIE_BLIZZARD)
             IF_LARGE_EQUAL(LW(0), 75)
                 SET(LW(8), 0)
             END_IF()
@@ -510,7 +510,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     
     WAIT_FRM(60)
     
-    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieMove6))
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieThunderStorm))
         USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A4_3"))
     END_IF()
     
@@ -521,7 +521,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     LBL(10)
     
     // Thunderbolt effect.
-    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieMove6))
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieThunderStorm))
         USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         USER_FUNC(btlevtcmd_GetWidth, LW(3), LW(5))
         USER_FUNC(btlevtcmd_GetHeight, LW(3), LW(6))
@@ -1052,7 +1052,7 @@ BattleWeapon customWeapon_FlurrieGaleForce = {
 
 BattleWeapon customWeapon_FlurrieLipLock = {
     .name = "btl_wn_pwd_lv2",
-    .icon = IconType::PARTNER_MOVE_2,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pwd_sexy_kiss",
     .base_accuracy = 100,
@@ -1113,7 +1113,7 @@ BattleWeapon customWeapon_FlurrieLipLock = {
 
 BattleWeapon customWeapon_FlurrieDodgyFog = {
     .name = "btl_wn_pwd_lv3",
-    .icon = IconType::PARTNER_MOVE_3,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pwd_kumogakure",
     .base_accuracy = 100,
@@ -1170,9 +1170,9 @@ BattleWeapon customWeapon_FlurrieDodgyFog = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_FlurrieMove5 = {
+BattleWeapon customWeapon_FlurrieBlizzard = {
     .name = "btl_wn_pwd_lv1",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_pwd_breath",
     .base_accuracy = 100,
@@ -1229,9 +1229,9 @@ BattleWeapon customWeapon_FlurrieMove5 = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_FlurrieMove6 = {
+BattleWeapon customWeapon_FlurrieThunderStorm = {
     .name = "btl_wn_pwd_lv1",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_3,
     .item_id = 0,
     .description = "msg_pwd_breath",
     .base_accuracy = 100,

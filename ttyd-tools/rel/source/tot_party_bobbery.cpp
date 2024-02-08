@@ -45,13 +45,13 @@ extern BattleWeapon customWeapon_BobberyBomb;
 extern BattleWeapon customWeapon_BobberyBombSquad;
 extern BattleWeapon customWeapon_BobberyHoldFast;
 extern BattleWeapon customWeapon_BobberyBobombast;
-extern BattleWeapon customWeapon_BobberyMove5;
-extern BattleWeapon customWeapon_BobberyMove6;
+extern BattleWeapon customWeapon_BobberyPoisonBomb;
+extern BattleWeapon customWeapon_BobberyMegatonBomb;
 
 BattleWeapon* g_WeaponTable[] = {
     &customWeapon_BobberyBomb, &customWeapon_BobberyBombSquad, 
-    &customWeapon_BobberyHoldFast, &customWeapon_BobberyBobombast, 
-    &customWeapon_BobberyMove5, &customWeapon_BobberyMove6
+    &customWeapon_BobberyHoldFast, &customWeapon_BobberyPoisonBomb, 
+    &customWeapon_BobberyBobombast, &customWeapon_BobberyMegatonBomb
 };
 
 void MakeSelectWeaponTable(
@@ -903,7 +903,7 @@ EVT_BEGIN(partySandersAttack_TimeBombSet)
     IF_EQUAL(LW(7), PTR(&customWeapon_BobberyBombSquad))
         USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::BOBBERY_BOMB_SQUAD, LW(4))
     ELSE()
-        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::BOBBERY_5, LW(4))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::BOBBERY_POISON_BOMB, LW(4))
     END_IF()
     ADD(LW(4), 1)
     SET(LW(5), 0)
@@ -912,7 +912,7 @@ EVT_BEGIN(partySandersAttack_TimeBombSet)
         USER_FUNC(btlevtcmd_SpawnUnit, LW(3), PTR(&unitBombzo_entry), 0)
         USER_FUNC(btlevtcmd_OnAttribute, LW(3), 16777216)
         // Switch what kind of bomb to deploy based on the move used.
-        IF_EQUAL(LW(7), PTR(&customWeapon_BobberyMove5))
+        IF_EQUAL(LW(7), PTR(&customWeapon_BobberyPoisonBomb))
             USER_FUNC(btlevtcmd_SetUnitWork, LW(3), 2, 1)
             USER_FUNC(
                 btlevtcmd_OnOffStatus, LW(3), StatusEffectType::POISON,
@@ -1717,7 +1717,7 @@ BattleWeapon customWeapon_BobberyBombSquad = {
 
 BattleWeapon customWeapon_BobberyHoldFast = {
     .name = "btl_wn_pbm_lv2",
-    .icon = IconType::PARTNER_MOVE_2,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pbm_counter",
     .base_accuracy = 100,
@@ -1768,7 +1768,7 @@ BattleWeapon customWeapon_BobberyHoldFast = {
 
 BattleWeapon customWeapon_BobberyBobombast = {
     .name = "btl_wn_pbm_lv3",
-    .icon = IconType::PARTNER_MOVE_3,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_pbm_sungoi_bakuhatsu",
     .base_accuracy = 100,
@@ -1824,9 +1824,9 @@ BattleWeapon customWeapon_BobberyBobombast = {
     .object_fall_chance = 10,
 };
 
-BattleWeapon customWeapon_BobberyMove5 = {
+BattleWeapon customWeapon_BobberyPoisonBomb = {
     .name = "btl_wn_pbm_lv1",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_pbm_jigen_bakudan",
     .base_accuracy = 100,
@@ -1877,9 +1877,9 @@ BattleWeapon customWeapon_BobberyMove5 = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_BobberyMove6 = {
+BattleWeapon customWeapon_BobberyMegatonBomb = {
     .name = "btl_wn_pbm_lv1",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_3,
     .item_id = 0,
     .description = "msg_pbm_jigen_bakudan",
     .base_accuracy = 100,

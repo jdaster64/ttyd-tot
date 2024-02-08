@@ -54,13 +54,13 @@ extern BattleWeapon customWeapon_VivianShadeFist;
 extern BattleWeapon customWeapon_VivianVeil;
 extern BattleWeapon customWeapon_VivianFieryJinx;
 extern BattleWeapon customWeapon_VivianInfatuate;
-extern BattleWeapon customWeapon_VivianMove5;
-extern BattleWeapon customWeapon_VivianMove6;
+extern BattleWeapon customWeapon_VivianCurse;
+extern BattleWeapon customWeapon_VivianNeutralize;
 
 BattleWeapon* g_WeaponTable[] = {
-    &customWeapon_VivianShadeFist, &customWeapon_VivianVeil, 
-    &customWeapon_VivianFieryJinx, &customWeapon_VivianInfatuate, 
-    &customWeapon_VivianMove5, &customWeapon_VivianMove6
+    &customWeapon_VivianShadeFist, &customWeapon_VivianVeil,  
+    &customWeapon_VivianCurse, &customWeapon_VivianNeutralize,
+    &customWeapon_VivianFieryJinx, &customWeapon_VivianInfatuate
 };
 
 void MakeSelectWeaponTable(
@@ -664,10 +664,10 @@ EVT_BEGIN(partyVivianAttack_CharmKissAttack)
     SWITCH(LW(12))
         CASE_EQUAL(PTR(&customWeapon_VivianInfatuate))
             SET(LW(0), 1)
-        CASE_EQUAL(PTR(&customWeapon_VivianMove5))
-            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_5, LW(0))
-        CASE_EQUAL(PTR(&customWeapon_VivianMove6))
-            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_6, LW(0))
+        CASE_EQUAL(PTR(&customWeapon_VivianCurse))
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_CURSE, LW(0))
+        CASE_EQUAL(PTR(&customWeapon_VivianNeutralize))
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_NEUTRALIZE, LW(0))
     END_SWITCH()
     // If Infatuate, or level 1 version of Curse / Neutralize, don't check next.
     IF_LARGE(LW(0), 1)
@@ -922,9 +922,9 @@ BattleWeapon customWeapon_VivianInfatuate = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_VivianMove5 = {
+BattleWeapon customWeapon_VivianCurse = {
     .name = "btl_wn_ptr_lv3",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_ptr_meromero_kiss",
     .base_accuracy = 100,
@@ -978,9 +978,9 @@ BattleWeapon customWeapon_VivianMove5 = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_VivianMove6 = {
+BattleWeapon customWeapon_VivianNeutralize = {
     .name = "btl_wn_ptr_lv3",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_ptr_meromero_kiss",
     .base_accuracy = 100,

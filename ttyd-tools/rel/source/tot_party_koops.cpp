@@ -51,13 +51,13 @@ extern BattleWeapon customWeapon_KoopsShellToss;
 extern BattleWeapon customWeapon_KoopsPowerShell;
 extern BattleWeapon customWeapon_KoopsShellShield;
 extern BattleWeapon customWeapon_KoopsShellSlam;
-extern BattleWeapon customWeapon_KoopsMove5;
-extern BattleWeapon customWeapon_KoopsMove6;
+extern BattleWeapon customWeapon_KoopsBulkUp;
+extern BattleWeapon customWeapon_KoopsWithdraw;
 
 BattleWeapon* g_WeaponTable[] = {
     &customWeapon_KoopsShellToss, &customWeapon_KoopsPowerShell, 
-    &customWeapon_KoopsShellShield, &customWeapon_KoopsShellSlam, 
-    &customWeapon_KoopsMove5, &customWeapon_KoopsMove6
+    &customWeapon_KoopsShellShield, &customWeapon_KoopsWithdraw,
+    &customWeapon_KoopsBulkUp, &customWeapon_KoopsShellSlam
 };
 
 void MakeSelectWeaponTable(
@@ -1207,7 +1207,7 @@ EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
 EVT_END()
 
 EVT_BEGIN(customAttack_BulkUp)
-    SET(LW(12), PTR(&customWeapon_KoopsMove5))
+    SET(LW(12), PTR(&customWeapon_KoopsBulkUp))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
         GOTO(99)
@@ -1262,7 +1262,7 @@ EVT_BEGIN(customAttack_BulkUp)
     END_SWITCH()
     USER_FUNC(btlevtcmd_AcGetOutputParam, 0, LW(6))
     ADD(LW(6), 1)
-    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::KOOPS_5, LW(7))
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::KOOPS_BULK_UP, LW(7))
     
     INLINE_EVT()
         WAIT_FRM(30)
@@ -1309,8 +1309,8 @@ EVT_END()
 
 EVT_BEGIN(customAttack_Withdraw)
     // Set gauge color parameters.
-    USER_FUNC(evtTot_SetPendulumAcParams, MoveType::KOOPS_6)
-    SET(LW(12), PTR(&customWeapon_KoopsMove6))
+    USER_FUNC(evtTot_SetPendulumAcParams, MoveType::KOOPS_WITHDRAW)
+    SET(LW(12), PTR(&customWeapon_KoopsWithdraw))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
         GOTO(99)
@@ -1660,7 +1660,7 @@ BattleWeapon customWeapon_KoopsPowerShell = {
 
 BattleWeapon customWeapon_KoopsShellShield = {
     .name = "btl_wn_pnk_lv2",
-    .icon = IconType::PARTNER_MOVE_2,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pnk_koura_no_mamori",
     .base_accuracy = 100,
@@ -1771,9 +1771,9 @@ BattleWeapon customWeapon_KoopsShellSlam = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_KoopsMove5 = {
+BattleWeapon customWeapon_KoopsBulkUp = {
     .name = "btl_wn_pnk_lv2",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_pnk_koura_no_mamori",
     .base_accuracy = 100,
@@ -1831,9 +1831,9 @@ BattleWeapon customWeapon_KoopsMove5 = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_KoopsMove6 = {
+BattleWeapon customWeapon_KoopsWithdraw = {
     .name = "btl_wn_pnk_lv2",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_pnk_koura_no_mamori",
     .base_accuracy = 100,

@@ -65,13 +65,13 @@ extern BattleWeapon customWeapon_MowzLoveSlapRFinal;
 extern BattleWeapon customWeapon_MowzKissThief;
 extern BattleWeapon customWeapon_MowzTease;
 extern BattleWeapon customWeapon_MowzSmooch;
-extern BattleWeapon customWeapon_MowzMove5;
-extern BattleWeapon customWeapon_MowzMove6;
+extern BattleWeapon customWeapon_MowzEmbargo;
+extern BattleWeapon customWeapon_MowzSmokeBomb;
 
 BattleWeapon* g_WeaponTable[] = {
     &customWeapon_MowzLoveSlapLFinal, &customWeapon_MowzKissThief, 
-    &customWeapon_MowzTease, &customWeapon_MowzSmooch, 
-    &customWeapon_MowzMove5, &customWeapon_MowzMove6
+    &customWeapon_MowzTease, &customWeapon_MowzEmbargo,
+    &customWeapon_MowzSmokeBomb, &customWeapon_MowzSmooch
 };
 
 void MakeSelectWeaponTable(
@@ -1021,8 +1021,8 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     
     USER_FUNC(btlevtcmd_AcSetParamAll, 1, 240, 178, LW(0), LW(1), 100, 1, EVT_NULLPTR)
     SWITCH(LW(12))
-        CASE_EQUAL(PTR(&customWeapon_MowzMove6))
-            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_6, LW(1))
+        CASE_EQUAL(PTR(&customWeapon_MowzSmokeBomb))
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_SMOKE_BOMB, LW(1))
             SWITCH(LW(1))
                 CASE_EQUAL(1)
                     USER_FUNC(btlevtcmd_AcSetGaugeParam, 67, 100, 100, 100)
@@ -1031,7 +1031,7 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
                 CASE_ETC()
                     USER_FUNC(btlevtcmd_AcSetGaugeParam, 40, 60, 80, 100)
             END_SWITCH()
-        CASE_EQUAL(PTR(&customWeapon_MowzMove5))
+        CASE_EQUAL(PTR(&customWeapon_MowzEmbargo))
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 80, 100, 100, 100)
         CASE_ETC()
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
@@ -1309,7 +1309,7 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     LBL(10)
     
     // Clear fog and have bigger smoke effect than usual.
-    IF_EQUAL(LW(12), PTR(&customWeapon_MowzMove6))
+    IF_EQUAL(LW(12), PTR(&customWeapon_MowzSmokeBomb))
         USER_FUNC(btlevtcmd_StageDispellFog)
         USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
         USER_FUNC(evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(4.0), 0, 0, 0, 0, 0, 0, 0)
@@ -1333,9 +1333,9 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     SET(LW(13), -1)
     USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(0))
     SWITCH(LW(12))
-        CASE_EQUAL(PTR(&customWeapon_MowzMove6))
-            USER_FUNC(evtTot_MakeTeaseWeapon, LW(12), LW(0), MoveType::MOWZ_6)
-            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_6, LW(1))
+        CASE_EQUAL(PTR(&customWeapon_MowzSmokeBomb))
+            USER_FUNC(evtTot_MakeTeaseWeapon, LW(12), LW(0), MoveType::MOWZ_SMOKE_BOMB)
+            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_SMOKE_BOMB, LW(1))
             ADD(LW(1), 2)
             MUL(LW(0), LW(1))
             DIV(LW(0), 100)
@@ -1358,7 +1358,7 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     // By default, consider action unsuccessful.
     SET(LW(11), -1)
     
-    IF_NOT_EQUAL(LW(12), PTR(&customWeapon_MowzMove5))
+    IF_NOT_EQUAL(LW(12), PTR(&customWeapon_MowzEmbargo))
         IF_LARGE_EQUAL(LW(13), 0)
             USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
             // Only considered successful if damaged or status procs.
@@ -2027,7 +2027,7 @@ BattleWeapon customWeapon_MowzKissThief = {
 
 BattleWeapon customWeapon_MowzTease = {
     .name = "btl_wn_pcr_madowase",
-    .icon = IconType::PARTNER_MOVE_2,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pch_madowaseru",
     .base_accuracy = 100,
@@ -2139,9 +2139,9 @@ BattleWeapon customWeapon_MowzSmooch = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_MowzMove5 = {
+BattleWeapon customWeapon_MowzEmbargo = {
     .name = "btl_wn_pcr_madowase",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pch_madowaseru",
     .base_accuracy = 100,
@@ -2192,9 +2192,9 @@ BattleWeapon customWeapon_MowzMove5 = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_MowzMove6 = {
+BattleWeapon customWeapon_MowzSmokeBomb = {
     .name = "btl_wn_pcr_madowase",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_pch_madowaseru",
     .base_accuracy = 100,

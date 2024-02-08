@@ -65,13 +65,13 @@ extern BattleWeapon customWeapon_GoombellaHeadbonk;
 extern BattleWeapon customWeapon_GoombellaTattle;
 extern BattleWeapon customWeapon_GoombellaMultibonk;
 extern BattleWeapon customWeapon_GoombellaRallyWink;
-extern BattleWeapon customWeapon_GoombellaMove5;
-extern BattleWeapon customWeapon_GoombellaMove6;
+extern BattleWeapon customWeapon_GoombellaScopeOut;
+extern BattleWeapon customWeapon_GoombellaIronbonk;
 
 BattleWeapon* g_WeaponTable[] = {
-    &customWeapon_GoombellaHeadbonk, &customWeapon_GoombellaTattle, 
-    &customWeapon_GoombellaMultibonk, &customWeapon_GoombellaRallyWink, 
-    &customWeapon_GoombellaMove5, &customWeapon_GoombellaMove6
+    &customWeapon_GoombellaHeadbonk, &customWeapon_GoombellaTattle,
+    &customWeapon_GoombellaIronbonk, &customWeapon_GoombellaScopeOut,
+    &customWeapon_GoombellaMultibonk, &customWeapon_GoombellaRallyWink
 };
 
 void MakeSelectWeaponTable(
@@ -155,7 +155,7 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
     USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     
     // For Ironbonk, show an arc of orange stars to signify that it pierces.
-    IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaMove6))
+    IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaIronbonk))
         BROTHER_EVT()
             SET(LW(13), 2)
             USER_FUNC(_jump_star_effect, -2, LW(13))
@@ -292,7 +292,7 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
     
         // Layer Piercing Blow sound effect, if move had an effect.
-        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaMove6))
+        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaIronbonk))
             IF_EQUAL(LW(5), 18)
                 USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_MARIO_HAMMER_TURANUKI1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             END_IF()
@@ -316,7 +316,7 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131072, LW(5))
 
         // Layer Piercing Blow sound effect, if move had an effect.
-        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaMove6))
+        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaIronbonk))
             IF_EQUAL(LW(5), 18)
                 USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_MARIO_HAMMER_TURANUKI1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             END_IF()
@@ -335,7 +335,7 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
         USER_FUNC(btlevtcmd_GetResultAC, LW(0))
 
         // Layer Piercing Blow sound effect, if move had an effect.
-        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaMove6))
+        IF_EQUAL(LW(12), PTR(&customWeapon_GoombellaIronbonk))
             IF_EQUAL(LW(5), 18)
                 USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_MARIO_HAMMER_TURANUKI1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             END_IF()
@@ -947,7 +947,7 @@ EVT_BEGIN(partyChristineAttack_Kiss)
 EVT_END()
 
 EVT_BEGIN(customAttack_ScopeOut)
-    USER_FUNC(evtTot_SetReticleParams, MoveType::GOOMBELLA_5)
+    USER_FUNC(evtTot_SetReticleParams, MoveType::GOOMBELLA_SCOPE_OUT)
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
@@ -1135,7 +1135,7 @@ BattleWeapon customWeapon_GoombellaHeadbonk = {
 
 BattleWeapon customWeapon_GoombellaTattle = {
     .name = "btl_wn_pkr_lv1",
-    .icon = IconType::PARTNER_MOVE_1,
+    .icon = IconType::PARTNER_MOVE_0,
     .item_id = 0,
     .description = "msg_pkr_monosiri",
     .base_accuracy = 100,
@@ -1306,9 +1306,9 @@ BattleWeapon customWeapon_GoombellaRallyWink = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_GoombellaMove5 = {
+BattleWeapon customWeapon_GoombellaScopeOut = {
     .name = "btl_wn_pkr_lv1",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pkr_monosiri",
     .base_accuracy = 100,
@@ -1360,9 +1360,9 @@ BattleWeapon customWeapon_GoombellaMove5 = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_GoombellaMove6 = {
+BattleWeapon customWeapon_GoombellaIronbonk = {
     .name = "btl_wn_pkr_normal",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pkr_normal_jump",
     .base_accuracy = 100,
@@ -1375,7 +1375,7 @@ BattleWeapon customWeapon_GoombellaMove6 = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::GOOMBELLA_6 },
+    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::GOOMBELLA_IRONBONK },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =

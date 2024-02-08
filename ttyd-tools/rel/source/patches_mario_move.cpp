@@ -295,9 +295,10 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                     }
                     
                     // Overwrite default text based on current power level.
-                    tot::MoveManager::GetCurrentSelectionString(
-                        move_type, g_MoveBadgeTextBuffer);
-                    weapons[i].name = g_MoveBadgeTextBuffer;
+                    if (tot::MoveManager::GetCurrentSelectionString(
+                        move_type, g_MoveBadgeTextBuffer)) {
+                        weapons[i].name = g_MoveBadgeTextBuffer;
+                    }
                 } else {
                     weapons[i].name = ttyd::msgdrv::msgSearch(weapon->name);
                 }
@@ -322,16 +323,17 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                     }
                     
                     // Overwrite default text based on current power level.
-                    tot::MoveManager::GetCurrentSelectionString(
-                        move_type, g_MoveBadgeTextBuffer);
-                    weapons[i].name = g_MoveBadgeTextBuffer;
+                    if (tot::MoveManager::GetCurrentSelectionString(
+                        move_type, g_MoveBadgeTextBuffer)) {
+                        weapons[i].name = g_MoveBadgeTextBuffer;
+                    }
                 } else {
                     weapons[i].name = ttyd::msgdrv::msgSearch(weapon->name);
                 }
                 
                 // Update single / multi-target for Vivian's extra moves.
-                if (move_type == tot::MoveType::VIVIAN_5 ||
-                    move_type == tot::MoveType::VIVIAN_6) {
+                if (move_type == tot::MoveType::VIVIAN_CURSE ||
+                    move_type == tot::MoveType::VIVIAN_NEUTRALIZE) {
                     int32_t move_level = 
                         tot::MoveManager::GetSelectedLevel(move_type);
                     if (move_level == 1) {

@@ -29,89 +29,90 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 struct MoveData {
     const char* name_abbreviated;
     int8_t move_cost[3];
+    int8_t max_level;
 };
 const MoveData g_MoveData[] = {
-    { "Jump",       { 0, 2, 4, }, },
-    { "Spin Jump",  { 2, 4, 6, }, },
-    { "Spring J.",  { 4, 6, 8, }, },
-    { "Power J.",   { 2, 4, 6, }, },
-    { "Multib.",    { 2, 4, 6, }, },
-    { "Power B.",   { 3, 5, 7, }, },
-    { "Sleep S.",   { 2, 4, 6, }, },
-    { "Tor. J.",    { 2, 4, 6, }, },
+    { "Jump",       { 0, 2, 4, }, 3, },
+    { "Spin Jump",  { 2, 4, 6, }, 3, },
+    { "Spring J.",  { 4, 6, 8, }, 3, },
+    { "Power J.",   { 2, 4, 6, }, 3, },
+    { "Multib.",    { 2, 4, 6, }, 3, },
+    { "Power B.",   { 3, 5, 7, }, 3, },
+    { "Sleep S.",   { 2, 4, 6, }, 3, },
+    { "Tor. J.",    { 2, 4, 6, }, 3, },
     
-    { "Hammer",     { 0, 2, 4, }, },
-    { "Super H.",   { 2, 4, 6, }, },
-    { "Ultra H.",   { 4, 6, 8, }, },
-    { "Power S.",   { 2, 4, 6, }, },
-    { "H. Rattle",  { 2, 4, 6, }, },
-    { "Ice Smash",  { 2, 4, 6, }, },
-    { "Quake H.",   { 3, 5, 7, }, },
-    { "Fire Drive", { 3, 5, 7, }, },
+    { "Hammer",     { 0, 2, 4, }, 3, },
+    { "Super H.",   { 2, 4, 6, }, 3, },
+    { "Ultra H.",   { 4, 6, 8, }, 3, },
+    { "Power S.",   { 2, 4, 6, }, 3, },
+    { "H. Rattle",  { 2, 4, 6, }, 3, },
+    { "Ice Smash",  { 2, 4, 6, }, 3, },
+    { "Quake H.",   { 3, 5, 7, }, 3, },
+    { "Fire Drive", { 3, 5, 7, }, 3, },
     
-    { "Sweet Tr.",  { 1, 2, 3, }, },
-    { "Earth Tr.",  { 1, 2, 3, }, },
-    { "Clock Out",  { 2, 3, 4, }, },
-    { "Power Lift", { 2, 3, 4, }, },
-    { "Art Attack", { 3, 4, 5, }, },
-    { "Sweet F.",   { 2, 3, 4, }, },
-    { "Showst.",    { 3, 4, 5, }, },
-    { "Supernova",  { 4, 5, 6, }, },
+    { "Sweet Tr.",  { 1, 2, 3, }, 3, },
+    { "Earth Tr.",  { 1, 2, 3, }, 3, },
+    { "Clock Out",  { 2, 3, 4, }, 3, },
+    { "Power Lift", { 2, 3, 4, }, 3, },
+    { "Art Attack", { 3, 4, 5, }, 3, },
+    { "Sweet F.",   { 2, 3, 4, }, 3, },
+    { "Showst.",    { 3, 4, 5, }, 3, },
+    { "Supernova",  { 4, 5, 6, }, 3, },
     
-    { "Headbonk",   { 0, 2, 4, }, },
-    { "Tattle",     { 0, 0, 0, }, },
-    { "Multibonk",  { 3, 5, 7, }, },
-    { "Rally Wink", { 4, 4, 4, }, },
-    { "Move 5",     { 5, 5, 5, }, },
-    { "Move 6",     { 2, 4, 6, }, },
+    { "Headbonk",   { 0, 2, 4, }, 3, },
+    { "Tattle",     { 0, 0, 0, }, 1, },
+    { "Ironbonk",   { 2, 4, 6, }, 3, },
+    { "Scope Out",  { 5, 5, 5, }, 1, },
+    { "Multibonk",  { 3, 5, 7, }, 3, },
+    { "Rally Wink", { 4, 4, 4, }, 1, },
     
-    { "Shell Toss", { 0, 2, 4, }, },
-    { "Power Sh.",  { 2, 4, 6, }, },
-    { "Shell Shield", { 4, 6, 8, }, },
-    { "Shell Slam", { 4, 6, 8, }, },
-    { "Move 5",     { 3, 5, 7, }, },
-    { "Move 6",     { 5, 5, 5, }, },
+    { "Shell Toss", { 0, 2, 4, }, 3, },
+    { "Power Shell", { 2, 4, 6, }, 3, },
+    { "Shell Shield", { 4, 6, 8, }, 3, },
+    { "Withdraw",   { 5, 5, 5, }, 1, },
+    { "Bulk Up",    { 3, 5, 7, }, 3, },
+    { "Shell Slam", { 4, 6, 8, }, 3, },
     
-    { "Body Slam",  { 0, 2, 4, }, },
-    { "Gale Force", { 4, 4, 4, }, },
-    { "Lip Lock",   { 3, 5, 7, }, },
-    { "Dodgy Fog",  { 4, 4, 4, }, },
-    { "Move 5",     { 3, 5, 7, }, },
-    { "Move 6",     { 9, 9, 9, }, },
+    { "Body Slam",  { 0, 2, 4, }, 3, },
+    { "Gale Force", { 4, 4, 4, }, 1, },
+    { "Dodgy Fog",  { 4, 4, 4, }, 1, },
+    { "Lip Lock",   { 3, 5, 7, }, 3, },
+    { "Blizzard",   { 3, 5, 7, }, 3, },
+    { "Thunder Storm", { 9, 9, 9, }, 1, },
     
-    { "Ground P.",  { 0, 2, 4, }, },
-    { "Gulp",       { 3, 5, 7, }, },
-    { "Mini-Egg",   { 3, 5, 7, }, },
-    { "Stampede",   { 4, 6, 8, }, },
-    { "Move 5",     { 3, 5, 7, }, },
-    { "Move 6",     { 5, 5, 5, }, },
+    { "Ground P.",  { 0, 2, 4, }, 3, },
+    { "Egg Barr.",  { 3, 5, 7, }, 3, },
+    { "Lickety Spit", { 3, 5, 7, }, 3, },
+    { "Mini-Egg",   { 3, 5, 7, }, 3, },
+    { "Gulp",       { 5, 5, 5, }, 1, },
+    { "Stampede",   { 4, 6, 8, }, 3, },
     
-    { "Shade Fist", { 0, 2, 4, }, },
-    { "Veil",       { 1, 1, 1, }, },
-    { "Fiery Jinx", { 3, 5, 7, }, },
-    { "Infatuate",  { 5, 5, 5, }, },
-    { "Move 5",     { 2, 5, 5, }, },
-    { "Move 6",     { 2, 5, 5, }, },
+    { "Shade Fist", { 0, 2, 4, }, 3, },
+    { "Veil",       { 1, 1, 1, }, 1, },
+    { "Curse",      { 2, 5, 5, }, 2, },
+    { "Neutralize", { 2, 5, 5, }, 2, },
+    { "Fiery Jinx", { 3, 5, 7, }, 3, },
+    { "Infatuate",  { 5, 5, 5, }, 1, },
     
-    { "Bomb",       { 0, 2, 4, }, },
-    { "Bomb Sq.",   { 2, 4, 6, }, },
-    { "Hold Fast",  { 4, 4, 4, }, },
-    { "Bob-ombast", { 4, 6, 8, }, },
-    { "Move 5",     { 2, 4, 6, }, },
-    { "Move 6",     { 10, 10, 10, }, },
+    { "Bomb",       { 0, 2, 4, }, 3, },
+    { "Bomb Sq.",   { 2, 4, 6, }, 3, },
+    { "Hold Fast",  { 4, 4, 4, }, 1, },
+    { "Poison B.",  { 2, 4, 6, }, 3, },
+    { "Bob-ombast", { 4, 6, 8, }, 3, },
+    { "Megaton Bomb", { 10, 10, 10, }, 1, },
     
-    { "Love Slap",  { 0, 2, 4, }, },
-    { "Kiss Thief", { 5, 5, 5, }, },
-    { "Tease",      { 4, 4, 4, }, },
-    { "Smooch",     { 3, 5, 7, }, },
-    { "Move 5",     { 5, 5, 5, }, },
-    { "Move 6",     { 3, 5, 7, }, },
+    { "Love Slap",  { 0, 2, 4, }, 3, },
+    { "Kiss Thief", { 5, 5, 5, }, 1, },
+    { "Tease",      { 4, 4, 4, }, 1, },
+    { "Embargo",    { 5, 5, 5, }, 1, },
+    { "Smoke Bomb", { 3, 5, 7, }, 3, },
+    { "Smooch",     { 3, 5, 7, }, 3, },
 }; 
 
 void MoveManager::Init() {
     // TODO: Implement.
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
-        g_Mod->tot_state_.level_unlocked_[i] = 3;
+        g_Mod->tot_state_.level_unlocked_[i] = g_MoveData[i].max_level;
         g_Mod->tot_state_.level_selected_[i] = 1;
     }
 }
@@ -129,19 +130,21 @@ int32_t MoveManager::GetMoveCost(int32_t move_type) {
         g_Mod->tot_state_.level_selected_[move_type]-1];
 }
 
-void MoveManager::GetCurrentSelectionString(int32_t move_type, char* out_buf) {
+bool MoveManager::GetCurrentSelectionString(int32_t move_type, char* out_buf) {
+    if (GetUnlockedLevel(move_type) == 1) return false;
     sprintf(
         out_buf, "%s Lv. %" PRId8,
         g_MoveData[move_type].name_abbreviated, GetSelectedLevel(move_type));
+    return true;
 }
 
 bool MoveManager::ChangeSelectedLevel(int32_t move_type, int32_t change) {
     int32_t old_level = g_Mod->tot_state_.level_selected_[move_type];
     int32_t new_level = old_level + change;
+    int32_t max_level = g_MoveData[move_type].max_level;
     
-    // TODO: Implement maxes.
     if (new_level < 1) new_level = 1;
-    if (new_level > 3) new_level = 3;
+    if (new_level > max_level) new_level = max_level;
     
     g_Mod->tot_state_.level_selected_[move_type] = new_level;
     return new_level != old_level;

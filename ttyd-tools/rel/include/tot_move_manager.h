@@ -48,52 +48,52 @@ namespace MoveType {
         
         GOOMBELLA_BASE,
         GOOMBELLA_TATTLE,
+        GOOMBELLA_IRONBONK,
+        GOOMBELLA_SCOPE_OUT,
         GOOMBELLA_MULTIBONK,
         GOOMBELLA_RALLY_WINK,
-        GOOMBELLA_5,
-        GOOMBELLA_6,
         
         KOOPS_BASE,
         KOOPS_POWER_SHELL,
         KOOPS_SHELL_SHIELD,
+        KOOPS_WITHDRAW,
+        KOOPS_BULK_UP,
         KOOPS_SHELL_SLAM,
-        KOOPS_5,
-        KOOPS_6,
         
         FLURRIE_BASE,
         FLURRIE_GALE_FORCE,
-        FLURRIE_LIP_LOCK,
         FLURRIE_DODGY_FOG,
-        FLURRIE_5,
-        FLURRIE_6,
+        FLURRIE_LIP_LOCK,
+        FLURRIE_BLIZZARD,
+        FLURRIE_THUNDER_STORM,
         
         YOSHI_BASE,
+        YOSHI_EGG_BARRAGE,
         YOSHI_GULP,
         YOSHI_MINI_EGG,
+        YOSHI_SWALLOW,
         YOSHI_STAMPEDE,
-        YOSHI_5,
-        YOSHI_6,
         
         VIVIAN_BASE,
         VIVIAN_VEIL,
+        VIVIAN_CURSE,
+        VIVIAN_NEUTRALIZE,
         VIVIAN_FIERY_JINX,
         VIVIAN_INFATUATE,
-        VIVIAN_5,
-        VIVIAN_6,
         
         BOBBERY_BASE,
         BOBBERY_BOMB_SQUAD,
         BOBBERY_HOLD_FAST,
+        BOBBERY_POISON_BOMB,
         BOBBERY_BOBOMBAST,
-        BOBBERY_5,
-        BOBBERY_6,
+        BOBBERY_MEGATON_BOMB,
         
         MOWZ_BASE,
         MOWZ_KISS_THIEF,
         MOWZ_TEASE,
+        MOWZ_EMBARGO,
+        MOWZ_SMOKE_BOMB,
         MOWZ_SMOOCH,
-        MOWZ_5,
-        MOWZ_6,
         
         MOVE_TYPE_MAX,
     };
@@ -107,7 +107,8 @@ public:
     static int32_t GetSelectedLevel(int32_t move_type);
     static int32_t GetMoveCost(int32_t move_type);
 
-    static void GetCurrentSelectionString(int32_t move_type, char* out_buf);
+    // Returns whether or not the move name should be overridden.
+    static bool GetCurrentSelectionString(int32_t move_type, char* out_buf);
     
     static bool ChangeSelectedLevel(int32_t move_type, int32_t change);
     static void ResetSelectedLevels();

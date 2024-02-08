@@ -65,13 +65,13 @@ extern BattleWeapon customWeapon_YoshiGulp_Fire;
 extern BattleWeapon customWeapon_YoshiGulp_Recoil;
 extern BattleWeapon customWeapon_YoshiMiniEgg;
 extern BattleWeapon customWeapon_YoshiStampede;
-extern BattleWeapon customWeapon_YoshiMove5;
-extern BattleWeapon customWeapon_YoshiMove6;
+extern BattleWeapon customWeapon_YoshiEggBarrage;
+extern BattleWeapon customWeapon_YoshiSwallow;
 
 BattleWeapon* g_WeaponTable[] = {
-    &customWeapon_YoshiGroundPound, &customWeapon_YoshiGulp_Shot, 
-    &customWeapon_YoshiMiniEgg, &customWeapon_YoshiStampede, 
-    &customWeapon_YoshiMove5, &customWeapon_YoshiMove6
+    &customWeapon_YoshiGroundPound, &customWeapon_YoshiEggBarrage,
+    &customWeapon_YoshiGulp_Shot, &customWeapon_YoshiMiniEgg,
+    &customWeapon_YoshiSwallow, &customWeapon_YoshiStampede
 };
 
 void MakeSelectWeaponTable(
@@ -819,7 +819,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
         USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_MINI_EGG, LW(0))
         SET(LW(1), 1)
     ELSE()
-        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_5, LW(0))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::YOSHI_EGG_BARRAGE, LW(0))
         SET(LW(1), 2)
     END_IF()
     ADD(LW(1), LW(0))
@@ -1418,7 +1418,7 @@ EVT_BEGIN(customAttack_Gulp)
             USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_YOSHI_NOMIKOMI6"), 0)
             USER_FUNC(btlevtcmd_OffAttribute, LW(3), 16777216)
             USER_FUNC(btlevtcmd_OffUnitFlag, LW(3), 0x8000000)
-            USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiMove6), int(0x80000100U), LW(5))
+            USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiSwallow), int(0x80000100U), LW(5))
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
             USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
         END_INLINE()
@@ -2051,9 +2051,9 @@ BattleWeapon customWeapon_YoshiStampede = {
     .object_fall_chance = 20,
 };
 
-BattleWeapon customWeapon_YoshiMove5 = {
+BattleWeapon customWeapon_YoshiEggBarrage = {
     .name = "btl_wn_pys_lv2",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pys_wonder_egg",
     .base_accuracy = 100,
@@ -2066,7 +2066,7 @@ BattleWeapon customWeapon_YoshiMove5 = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 2, 2, 2, 2, 2, 2, 0, MoveType::YOSHI_5 },
+    .damage_function_params = { 2, 2, 2, 2, 2, 2, 0, MoveType::YOSHI_EGG_BARRAGE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -2106,9 +2106,9 @@ BattleWeapon customWeapon_YoshiMove5 = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon customWeapon_YoshiMove6 = {
+BattleWeapon customWeapon_YoshiSwallow = {
     .name = "btl_wn_pys_lv1",
-    .icon = IconType::PARTNER_MOVE_0,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_pys_nomikomi",
     .base_accuracy = 100,
@@ -2121,7 +2121,7 @@ BattleWeapon customWeapon_YoshiMove6 = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 4, 2, 5, 3, 6, 0, MoveType::YOSHI_6 },
+    .damage_function_params = { 1, 4, 2, 5, 3, 6, 0, MoveType::YOSHI_SWALLOW },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =

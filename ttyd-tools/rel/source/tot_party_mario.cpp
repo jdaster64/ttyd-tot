@@ -2593,7 +2593,6 @@ EVT_BEGIN(marioAttackEvent_NormalHammer)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
         RETURN()
     END_IF()
-    // TODO: Piercing Blow-related; remove?
     IF_EQUAL(LW(12), PTR(&customWeapon_PowerPiercingSmash))
         USER_FUNC(_get_mario_hammer_lv, LW(0))
         SWITCH(LW(0))
@@ -5576,7 +5575,6 @@ BattleWeapon customWeapon_HammerThrow = {
     .ac_help_msg = "msg_ac_hammer_nageru",
     .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
-        // TODO: Does this work correctly in Confusion?
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
