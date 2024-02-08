@@ -122,8 +122,8 @@ namespace battle {
 
 // Fetches the base parameters for a given status from a weapon.
 void GetStatusParams(
-    BattleWorkUnit* unit, BattleWeapon* weapon, int32_t status_type,
-    int32_t& chance, int32_t& turns, int32_t& strength) {
+    BattleWorkUnit* attacker, BattleWorkUnit* target, BattleWeapon* weapon,
+    int32_t status_type, int32_t& chance, int32_t& turns, int32_t& strength) {
     chance = 0;
     turns = 0;
     strength = 0;
@@ -282,12 +282,22 @@ void GetStatusParams(
                     tot::MoveType::HAMMER_ICE_SMASH) * 2 - 2;
             }
             break;
+        case ItemType::TORNADO_JUMP:
+            if (status_type == StatusEffectType::DIZZY) {
+                // If not a floating enemy, don't inflict Dizzy status.
+                if (!(target->attribute_flags & 
+                      BattleUnitAttribute_Flags::UNQUAKEABLE)) {
+                    turns = 0;
+                    chance = 0;
+                }
+            }
+            break;
         case ItemType::CHARGE:
         case ItemType::CHARGE_P:
             if (status_type == StatusEffectType::CHARGE) {
                 strength += mario_move::GetStrategyBadgeLevel(
                     /* is_charge = */ true,
-                    unit->current_kind == BattleUnitType::MARIO) - 1;
+                    attacker->current_kind == BattleUnitType::MARIO) - 1;
             }
             break;
         case ItemType::SUPER_CHARGE:
@@ -295,17 +305,18 @@ void GetStatusParams(
             if (status_type == StatusEffectType::DEFENSE_UP) {
                 strength += mario_move::GetStrategyBadgeLevel(
                     /* is_charge = */ false,
-                    unit->current_kind == BattleUnitType::MARIO) - 1;
+                    attacker->current_kind == BattleUnitType::MARIO) - 1;
             }
             break;
     }
 
     if (status_type == StatusEffectType::CHARGE) {
         // Scale Charge attacks in the same way as ATK and FP damage.
-        if (!weapon->item_id && unit->current_kind <= BattleUnitType::BONETAIL) {
+        if (!weapon->item_id &&
+            attacker->current_kind <= BattleUnitType::BONETAIL) {
             int32_t altered_charge;
             GetEnemyStats(
-                unit->current_kind, nullptr, &altered_charge,
+                attacker->current_kind, nullptr, &altered_charge,
                 nullptr, nullptr, nullptr, strength);
             strength = altered_charge;
         }
@@ -323,7 +334,7 @@ uint32_t GetStatusDamageFromWeapon(
         for (int32_t type = 0; type < StatusEffectType::STATUS_MAX; ++type) {
             int32_t chance, turns, strength;
             GetStatusParams(
-                attacker, weapon, type, chance, turns, strength);
+                attacker, target, weapon, type, chance, turns, strength);
 
             bool always_update = true;
             switch (type) {

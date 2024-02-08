@@ -48,6 +48,7 @@ using ::ttyd::item_data::itemDataTable;
 using ::ttyd::mario_pouch::PouchData;
 using ::ttyd::msgdrv::msgSearch;
 
+namespace BattleUnitToken_Flags = ::ttyd::battle_unit::BattleUnitToken_Flags;
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
@@ -86,11 +87,11 @@ extern BattleWeapon customWeapon_QuakeHammer;
 extern BattleWeapon customWeapon_FireDrive;
 extern BattleWeapon customWeapon_FireDriveFailed;
 
-// TODO: Use throw variants of single-hit Hammer moves if Hammerman is active.
+// Thrown variants of single-target hammer moves, for if Hammerman is equipped.
 extern BattleWeapon customWeapon_HammerThrow;
-// extern BattleWeapon customWeapon_PowerPiercingSmashThrow;
-// extern BattleWeapon customWeapon_ShrinkSmashThrow;
-// extern BattleWeapon customWeapon_IceSmashThrow;
+extern BattleWeapon customWeapon_PowerPiercingSmashThrow;
+extern BattleWeapon customWeapon_ShrinkSmashThrow;
+extern BattleWeapon customWeapon_IceSmashThrow;
 
 BattleWeapon* g_CustomJumpWeapons[] = {
     &customWeapon_Jump, &customWeapon_SpinJump, 
@@ -102,6 +103,12 @@ BattleWeapon* g_CustomHammerWeapons[] = {
     &customWeapon_Hammer, &customWeapon_SuperHammer,
     &customWeapon_UltraHammer, &customWeapon_PowerPiercingSmash,
     &customWeapon_ShrinkSmash, &customWeapon_IceSmash,
+    &customWeapon_QuakeHammer, &customWeapon_FireDrive
+};
+BattleWeapon* g_CustomHammerThrowWeapons[] = {
+    &customWeapon_HammerThrow, &customWeapon_SuperHammer,
+    &customWeapon_UltraHammer, &customWeapon_PowerPiercingSmashThrow,
+    &customWeapon_ShrinkSmashThrow, &customWeapon_IceSmashThrow,
     &customWeapon_QuakeHammer, &customWeapon_FireDrive
 };
 
@@ -136,7 +143,13 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
         case 1: {  // Hammer
             for (int32_t i = 0; i < 8; ++i) {
                 auto& weapon_entry = command_work.weapon_table[num_options];
-                BattleWeapon* weapon = g_CustomHammerWeapons[i];
+                BattleWeapon* weapon;
+                if (unit->badges_equipped.hammerman == 0 ||
+                    (unit->token_flags & BattleUnitToken_Flags::CONFUSE_PROC)) {
+                    weapon = g_CustomHammerWeapons[i];
+                } else {
+                    weapon = g_CustomHammerThrowWeapons[i];
+                }
                 
                 weapon_entry.index = MoveType::HAMMER_BASE + i;
                 weapon_entry.item_id = 0;
@@ -2283,6 +2296,11 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
             WAIT_FRM(1)
             GOTO(62)
         END_IF()
+        // Clear fog before tornadoes hit.
+        BROTHER_EVT()
+            WAIT_FRM(30)
+            USER_FUNC(btlevtcmd_StageDispellFog)
+        END_BROTHER()
         BROTHER_EVT()
             SET(LW(6), LW(3))
             USER_FUNC(_tatsumaki_effect, -2)
@@ -2475,7 +2493,7 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
     RETURN()
 EVT_END()
 
-EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
+EVT_BEGIN(marioAttackEvent_NormalHammer)
     USER_FUNC(btlevtcmd_check_battleflag, LW(0), 2)
     IF_NOT_EQUAL(LW(0), 0)
         SET(LW(12), PTR(&customWeapon_Hammer))
@@ -2512,12 +2530,10 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
         USER_FUNC(btlevtcmd_GetWeaponActionLv, LW(12), LW(0))
         USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
         SWITCH(LW(12))
-            CASE_EQUAL(PTR(&customWeapon_Hammer))
-                USER_FUNC(btlevtcmd_AcSetParamAll, 4, 25, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-            CASE_EQUAL(PTR(&customWeapon_ShrinkSmash))
-                USER_FUNC(btlevtcmd_AcSetParamAll, 4, 30, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-            CASE_ETC()
+            CASE_EQUAL(PTR(&customWeapon_PowerPiercingSmash))
                 USER_FUNC(btlevtcmd_AcSetParamAll, 4, 40, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+            CASE_ETC()
+                USER_FUNC(btlevtcmd_AcSetParamAll, 4, 25, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
         END_SWITCH()
         USER_FUNC(btlevtcmd_AcSetFlag, 0)
         USER_FUNC(btlevtcmd_SetupAC, -2, 3, 1, 0)
@@ -2549,12 +2565,10 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
             USER_FUNC(btlevtcmd_GetWeaponActionLv, LW(12), LW(0))
             USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
             SWITCH(LW(12))
-                CASE_EQUAL(PTR(&customWeapon_Hammer))
-                    USER_FUNC(btlevtcmd_AcSetParamAll, 4, 25, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-                CASE_EQUAL(PTR(&customWeapon_ShrinkSmash))
-                    USER_FUNC(btlevtcmd_AcSetParamAll, 4, 30, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-                CASE_ETC()
+                CASE_EQUAL(PTR(&customWeapon_PowerPiercingSmash))
                     USER_FUNC(btlevtcmd_AcSetParamAll, 4, 40, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+                CASE_ETC()
+                    USER_FUNC(btlevtcmd_AcSetParamAll, 4, 25, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
             END_SWITCH()
             USER_FUNC(btlevtcmd_AcSetFlag, 0)
             USER_FUNC(btlevtcmd_SetupAC, -2, 3, 1, 0)
@@ -2580,7 +2594,7 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
         RETURN()
     END_IF()
     // TODO: Piercing Blow-related; remove?
-    IF_EQUAL(LW(12), PTR(&badgeWeapon_TsuranukiNaguri))
+    IF_EQUAL(LW(12), PTR(&customWeapon_PowerPiercingSmash))
         USER_FUNC(_get_mario_hammer_lv, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(2)
@@ -2629,15 +2643,12 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     BROTHER_EVT()
         SET(LW(13), -1)
         SWITCH(LW(12))
-            CASE_OR(PTR(&customWeapon_ShrinkSmash))
+            CASE_EQUAL(PTR(&customWeapon_ShrinkSmash))
                 SET(LW(13), 4)
-                CASE_END()
-            CASE_OR(PTR(&customWeapon_IceSmash))
+            CASE_EQUAL(PTR(&customWeapon_IceSmash))
                 SET(LW(13), 1)
-                CASE_END()
-            CASE_OR(PTR(&customWeapon_PowerPiercingSmash))
+            CASE_EQUAL(PTR(&customWeapon_PowerPiercingSmash))
                 SET(LW(13), 2)
-                CASE_END()
         END_SWITCH()
         IF_NOT_EQUAL(LW(13), -1)
             USER_FUNC(btlevtcmd_ftomsec, 9, LW(0))
@@ -2709,6 +2720,14 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     END_IF()
     USER_FUNC(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
+    
+    // Determine whether to use four Stylish commands.
+    IF_EQUAL(LW(12), PTR(&customWeapon_Hammer))
+        SET(LW(14), 0)
+    ELSE()
+        SET(LW(14), 1)
+    END_IF()
+    
     USER_FUNC(btlevtcmd_ACRStart, -2, 0, 12, 60, 0)
     USER_FUNC(btlevtcmd_ACRGetResult, LW(15), LW(13))
     IF_EQUAL(LW(15), 1)
@@ -2725,10 +2744,10 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     IF_LARGE_EQUAL(LW(0), 1)
         WAIT_FRM(LW(0))
     END_IF()
-    IF_EQUAL(LW(12), PTR(&badgeWeapon_TsuranukiNaguri))
-        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("M_H_16"))
-    ELSE()
+    IF_EQUAL(LW(12), PTR(&customWeapon_Hammer))
         USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("M_S_1"))
+    ELSE()
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("M_H_16"))
     END_IF()
     WAIT_FRM(10)
     GOTO(95)
@@ -2856,30 +2875,6 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
     RUN_CHILD_EVT(PTR(&btldefaultevt_SuitoruBadgeEffect))
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
-    RETURN()
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_NormalHammer)
-    SET(LW(14), 0)
-    RUN_CHILD_EVT(PTR(&marioAttackEvent_NormalHammer_Core))
-    RETURN()
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_IceNaguri)
-    SET(LW(14), 0)
-    RUN_CHILD_EVT(PTR(&marioAttackEvent_NormalHammer_Core))
-    RETURN()
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_GatsunHammer)
-    SET(LW(14), 1)
-    RUN_CHILD_EVT(PTR(&marioAttackEvent_NormalHammer_Core))
-    RETURN()
-EVT_END()
-
-EVT_BEGIN(marioAttackEvent_TsuranukiHammer)
-    SET(LW(14), 1)
-    RUN_CHILD_EVT(PTR(&marioAttackEvent_NormalHammer_Core))
     RETURN()
 EVT_END()
 
@@ -3313,7 +3308,13 @@ EVT_BEGIN(marioAttackEvent_HammerNageru)
     RUN_CHILD_EVT(PTR(&marioAttackEvent_MajinaiPowerUpCheck))
     USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
-    USER_FUNC(btlevtcmd_AcSetParamAll, 5, 40, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    
+    IF_EQUAL(LW(12), PTR(&customWeapon_PowerPiercingSmashThrow))
+        USER_FUNC(btlevtcmd_AcSetParamAll, 4, 40, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    ELSE()
+        USER_FUNC(btlevtcmd_AcSetParamAll, 4, 30, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    END_IF()
+
     USER_FUNC(btlevtcmd_AcSetFlag, 0)
     USER_FUNC(btlevtcmd_SetupAC, -2, 3, 1, 0)
     USER_FUNC(evt_btl_camera_set_mode, 0, 7)
@@ -3354,6 +3355,29 @@ EVT_BEGIN(marioAttackEvent_HammerNageru)
         CASE_ETC()
             USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_MARIO_HAMMER_HOLD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SWITCH()
+    
+    // Add star effect for variant moves.
+    BROTHER_EVT()
+        // Delay slightly to get a better arc.
+        WAIT_FRM(5)
+        SET(LW(13), -1)
+        SWITCH(LW(12))
+            CASE_EQUAL(PTR(&customWeapon_ShrinkSmashThrow))
+                SET(LW(13), 4)
+            CASE_EQUAL(PTR(&customWeapon_IceSmashThrow))
+                SET(LW(13), 1)
+            CASE_EQUAL(PTR(&customWeapon_PowerPiercingSmashThrow))
+                SET(LW(13), 2)
+        END_SWITCH()
+        IF_NOT_EQUAL(LW(13), -1)
+            USER_FUNC(btlevtcmd_ftomsec, 9, LW(0))
+            WAIT_MSEC(LW(0))
+            USER_FUNC(_hammer_star_effect, -2, LW(13))
+            USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_MARIO_HAMMER_SHINE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        END_IF()
+    END_BROTHER()
+
     WAIT_FRM(30)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, LW(1))
     USER_FUNC(btlevtcmd_StartAC, 1)
@@ -5101,8 +5125,8 @@ BattleWeapon customWeapon_TornadoJump = {
 
 BattleWeapon customWeapon_TornadoJumpRecoil = {
     .name = nullptr,
-    .icon = 0,
-    .item_id = 0,
+    .icon = IconType::TORNADO_JUMP,
+    .item_id = ItemType::TORNADO_JUMP,
     .description = nullptr,
     .base_accuracy = 100,
     .base_fp_cost = 0,
@@ -5125,8 +5149,8 @@ BattleWeapon customWeapon_TornadoJumpRecoil = {
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
+        // Can hit all enemies, including grounded.
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
-        // | AttackTargetProperty_Flags::CANNOT_TARGET_GROUNDED,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0,
     .weapon_ac_level = 3,
@@ -5138,9 +5162,9 @@ BattleWeapon customWeapon_TornadoJumpRecoil = {
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags = 0,
         
-    // status chances
+    // status chances (only for flying enemies)
     .dizzy_chance = 75,
-    .dizzy_time = 3,
+    .dizzy_time = 2,
     
     .attack_evt_code = nullptr,
     .bg_a1_a2_fall_weight = 0,
@@ -5203,7 +5227,7 @@ BattleWeapon customWeapon_PowerPiercingSmash = {
         
     // .status_chances = all 0,
     
-    .attack_evt_code = (void*)marioAttackEvent_GatsunHammer,
+    .attack_evt_code = (void*)marioAttackEvent_NormalHammer,
     .bg_a1_a2_fall_weight = 0,
     .bg_a1_fall_weight = 25,
     .bg_a2_fall_weight = 25,
@@ -5327,7 +5351,7 @@ BattleWeapon customWeapon_IceSmash = {
     .freeze_chance = 100,
     .freeze_time = 2,
     
-    .attack_evt_code = (void*)marioAttackEvent_IceNaguri,
+    .attack_evt_code = (void*)marioAttackEvent_NormalHammer,
     .bg_a1_a2_fall_weight = 0,
     .bg_a1_fall_weight = 5,
     .bg_a2_fall_weight = 5,
@@ -5517,6 +5541,8 @@ BattleWeapon customWeapon_FireDriveFailed = {
     .object_fall_chance = 5,
 };
 
+// Throw variants of single-target Hammer moves, if Hammerman is equipped.
+
 BattleWeapon customWeapon_HammerThrow = {
     .name = "btl_wn_mario_normal_hammer",
     .icon = IconType::HAMMER,
@@ -5550,6 +5576,7 @@ BattleWeapon customWeapon_HammerThrow = {
     .ac_help_msg = "msg_ac_hammer_nageru",
     .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
+        // TODO: Does this work correctly in Confusion?
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
@@ -5574,14 +5601,177 @@ BattleWeapon customWeapon_HammerThrow = {
     .object_fall_chance = 0,
 };
 
-/*
+BattleWeapon customWeapon_PowerPiercingSmashThrow = {
+    .name = "in_gatsun_naguri",
+    .icon = IconType::POWER_SMASH,
+    .item_id = ItemType::POWER_SMASH,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 2,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
+    .damage_function_params = { 3, 4, 4, 6, 5, 8, 0, MoveType::HAMMER_POWER_SMASH },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags = 
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_hammer_nageru",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // .status_chances = all 0,
+    
+    .attack_evt_code = (void*)marioAttackEvent_HammerNageru,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
 
-// TODO: Throw variants of single-hit Hammer moves.
-BattleWeapon customWeapon_HammerThrow;
-BattleWeapon customWeapon_PowerPiercingSmashThrow;
-BattleWeapon customWeapon_ShrinkSmashThrow;
-BattleWeapon customWeapon_IceSmashThrow;
+BattleWeapon customWeapon_ShrinkSmashThrow = {
+    .name = "in_konran_hammer",
+    .icon = IconType::HEAD_RATTLE,
+    .item_id = ItemType::HEAD_RATTLE,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 2,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
+    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_SHRINK_SMASH },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags = 
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_hammer_nageru",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    .size_change_chance = 100,
+    .size_change_time = 3,
+    .size_change_strength = -2,
+    
+    .attack_evt_code = (void*)marioAttackEvent_HammerNageru,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
 
-*/
+BattleWeapon customWeapon_IceSmashThrow = {
+    .name = "in_ice_naguri",
+    .icon = IconType::ICE_SMASH,
+    .item_id = ItemType::ICE_SMASH,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 3,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
+    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_ICE_SMASH },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags = 
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::ICE,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_hammer_nageru",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    .freeze_chance = 100,
+    .freeze_time = 2,
+    
+    .attack_evt_code = (void*)marioAttackEvent_HammerNageru,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
 
 }  // namespace mod::tot::party_mario

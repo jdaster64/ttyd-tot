@@ -12,7 +12,7 @@ namespace BattleUnitAttribute_Flags {
     enum e {
         UNK_1                       = 0x1U,
         OUT_OF_REACH                = 0x2U,     // usually on the ceiling
-        UNQUAKEABLE                 = 0x4U,
+        UNQUAKEABLE                 = 0x4U,     // aerial or hovering
         UNK_8                       = 0x8U,     // invisible-like state?
         VEILED                      = 0x10U,
         SHELL_SHIELDED              = 0x20U,
