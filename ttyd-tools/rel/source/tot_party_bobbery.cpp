@@ -1152,16 +1152,16 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
         CASE_EQUAL(1)
             ADD(LW(0), 2)
             SUB(LW(1), 2)
-            USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 178, LW(1), LW(2), 34, 100, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 178, LW(1), LW(2), 25, 100, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 100, 100, 100, 100)
         CASE_EQUAL(2)
             ADD(LW(0), 1)
             SUB(LW(1), 1)
-            USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 178, LW(1), LW(2), 20, 61, EVT_NULLPTR)
-            USER_FUNC(btlevtcmd_AcSetGaugeParam, 60, 100, 100, 100)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 178, LW(1), LW(2), 17, 69, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetGaugeParam, 68, 100, 100, 100)
         CASE_ETC()
-            USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 178, LW(1), LW(2), 15, 43, EVT_NULLPTR)
-            USER_FUNC(btlevtcmd_AcSetGaugeParam, 42, 71, 100, 100)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 1, LW(0), 178, LW(1), LW(2), 13, 53, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetGaugeParam, 52, 78, 100, 100)
     END_SWITCH()
     USER_FUNC(btlevtcmd_AcSetFlag, 64)
     USER_FUNC(btlevtcmd_SetupAC, -2, 6, 1, 0)
@@ -1281,11 +1281,11 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     IF_FLAG(LW(0), 0x2)
         USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
         SWITCH(LW(0))
-            CASE_SMALL_EQUAL(3)
+            CASE_SMALL_EQUAL(4)
                 SET(LW(0), -1)
-            CASE_SMALL_EQUAL(5)
+            CASE_SMALL_EQUAL(6)
                 SET(LW(0), 0)
-            CASE_SMALL_EQUAL(7)
+            CASE_SMALL_EQUAL(8)
                 SET(LW(0), 1)
             CASE_ETC()
                 SET(LW(0), 2)
@@ -1552,7 +1552,7 @@ BattleWeapon customWeapon_BobberyBomb = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 3, 2, 5, 3, 7, 0, MoveType::BOBBERY_BASE },
+    .damage_function_params = { 2, 3, 3, 5, 4, 8, 0, MoveType::BOBBERY_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1615,7 +1615,7 @@ BattleWeapon customWeapon_BobberyBombFS = {
     .bingo_card_chance = 1,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromMaxLevel,
-    .damage_function_params = { 3, 3, 5, 5, 7, 7, 0, 0 },
+    .damage_function_params = { 3, 3, 3, 3, 3, 3, 0, 0 },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =

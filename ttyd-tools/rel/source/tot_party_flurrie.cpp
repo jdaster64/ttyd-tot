@@ -111,7 +111,7 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeBreathWeapon) {
         weapon->gale_force_chance = ac_result;
     } else {  // Blizzard
         if (ac_result >= 75) {
-            weapon->freeze_chance = ac_result * 1.05;
+            weapon->freeze_chance = ac_result * 0.9f;
             weapon->freeze_time = move_level;
             weapon->damage_function_params[0] = move_level + 2;
             battleWork->ac_manager_work.ac_result |= 2;
@@ -949,7 +949,7 @@ BattleWeapon customWeapon_FlurrieBodySlam = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 3, 2, 5, 3, 7, 0, MoveType::FLURRIE_BASE },
+    .damage_function_params = { 2, 3, 3, 5, 4, 8, 0, MoveType::FLURRIE_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =

@@ -416,8 +416,9 @@ EVT_BEGIN(partyVivianAttack_MagicalPowder)
             SET(LW(0), 24)
     END_SWITCH()
     USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_FIERY_JINX, LW(1))
-    // Number of buttons (4, 5, 6 at level 1, 2, 3).
-    ADD(LW(1), 3)
+    // Number of buttons (3, 5, 7 at level 1, 2, 3).
+    MUL(LW(1), 2)
+    ADD(LW(1), 1)
     MUL(LW(0), LW(1))
     USER_FUNC(btlevtcmd_AcSetParamAll, LW(0), 1, LW(1), -3, 1, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_AcSetFlag, 7)
@@ -708,7 +709,7 @@ BattleWeapon customWeapon_VivianShadeFist = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 3, 3, 4, 4, 5, 5, 0, MoveType::VIVIAN_BASE },
+    .damage_function_params = { 3, 3, 4, 4, 6, 6, 0, MoveType::VIVIAN_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
