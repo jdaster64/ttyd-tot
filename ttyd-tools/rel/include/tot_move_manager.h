@@ -62,16 +62,16 @@ namespace MoveType {
         
         FLURRIE_BASE,
         FLURRIE_GALE_FORCE,
-        FLURRIE_DODGY_FOG,
         FLURRIE_LIP_LOCK,
+        FLURRIE_DODGY_FOG,
         FLURRIE_BLIZZARD,
         FLURRIE_THUNDER_STORM,
         
         YOSHI_BASE,
-        YOSHI_EGG_BARRAGE,
         YOSHI_GULP,
-        YOSHI_MINI_EGG,
+        YOSHI_EGG_BARRAGE,
         YOSHI_SWALLOW,
+        YOSHI_MINI_EGG,
         YOSHI_STAMPEDE,
         
         VIVIAN_BASE,

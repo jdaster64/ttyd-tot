@@ -69,9 +69,9 @@ extern BattleWeapon customWeapon_YoshiEggBarrage;
 extern BattleWeapon customWeapon_YoshiSwallow;
 
 BattleWeapon* g_WeaponTable[] = {
-    &customWeapon_YoshiGroundPound, &customWeapon_YoshiEggBarrage,
-    &customWeapon_YoshiGulp_Shot, &customWeapon_YoshiMiniEgg,
-    &customWeapon_YoshiSwallow, &customWeapon_YoshiStampede
+    &customWeapon_YoshiGroundPound, &customWeapon_YoshiGulp_Shot,
+    &customWeapon_YoshiEggBarrage, &customWeapon_YoshiSwallow,
+    &customWeapon_YoshiMiniEgg, &customWeapon_YoshiStampede
 };
 
 void MakeSelectWeaponTable(
@@ -522,12 +522,21 @@ EVT_BEGIN(partyYoshiAttack_Nomikomi)
         GOTO(90)
     END_IF()
     WAIT_FRM(7)
+
+    // If not swallowable, or Huge, move fails entirely.
+    USER_FUNC(btlevtcmd_CheckStatus, LW(3), 10, LW(7))
+    IF_NOT_EQUAL(LW(7), 0)
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
+        WAIT_FRM(43)
+        GOTO(90)
+    END_IF()
     USER_FUNC(_get_swallow_param, LW(3), LW(7))
     IF_EQUAL(LW(7), -1)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
         WAIT_FRM(43)
         GOTO(90)
     END_IF()
+        
     USER_FUNC(btlevtcmd_GetResultAC, LW(0))
     IF_NOT_FLAG(LW(0), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
@@ -1341,7 +1350,13 @@ EVT_BEGIN(customAttack_Gulp)
     END_IF()
     WAIT_FRM(7)
 
-    // If not swallowable at all, fails automatically.
+    // If not swallowable at all / Huge status, fails automatically.
+    USER_FUNC(btlevtcmd_CheckStatus, LW(3), 10, LW(7))
+    IF_NOT_EQUAL(LW(7), 0)
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
+        WAIT_FRM(43)
+        GOTO(90)
+    END_IF()
     USER_FUNC(_get_swallow_param, LW(3), LW(7))
     IF_EQUAL(LW(7), -1)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))

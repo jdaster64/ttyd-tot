@@ -284,13 +284,13 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_BASE, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(1)
-                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 50, 50, EVT_NULLPTR)
+                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 50, 51, EVT_NULLPTR)
                 USER_FUNC(btlevtcmd_AcSetGaugeParam, 50, 100, 100, 100)
             CASE_EQUAL(2)
-                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 34, 34, EVT_NULLPTR)
+                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 34, 35, EVT_NULLPTR)
                 USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 67, 100, 100)
             CASE_ETC()
-                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 25, 25, EVT_NULLPTR)
+                USER_FUNC(btlevtcmd_AcSetParamAll, 14, 210, 178, LW(1), LW(2), 25, 26, EVT_NULLPTR)
                 USER_FUNC(btlevtcmd_AcSetGaugeParam, 25, 50, 75, 100)
         END_SWITCH()
         // Start with 1 base hit.
@@ -516,7 +516,10 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
     USER_FUNC(btlevtcmd_GetResultAC, LW(6))
     IF_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
-        // Changed Nice / Good / Great thresholds to 3, 4, 5 hits.
+        // Changed Nice / Good / Great thresholds to 2, 4, 5 hits.
+        IF_EQUAL(LW(0), 2)
+            ADD(LW(0), 1)
+        END_IF()
         SUB(LW(0), 3)
         IF_LARGE_EQUAL(LW(0), 0)
             USER_FUNC(btlevtcmd_GetResultPrizeLv, LW(3), LW(0), LW(11))
@@ -1019,23 +1022,29 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
             USER_FUNC(btlevtcmd_AcSetFlag, 49)
     END_SWITCH()
     
-    USER_FUNC(btlevtcmd_AcSetParamAll, 1, 240, 178, LW(0), LW(1), 100, 1, EVT_NULLPTR)
+    // Set gauge colors + success params based on move used.
     SWITCH(LW(12))
         CASE_EQUAL(PTR(&customWeapon_MowzSmokeBomb))
             USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_SMOKE_BOMB, LW(1))
             SWITCH(LW(1))
                 CASE_EQUAL(1)
                     USER_FUNC(btlevtcmd_AcSetGaugeParam, 67, 100, 100, 100)
+                    SET(LW(2), 68)
                 CASE_EQUAL(2)
                     USER_FUNC(btlevtcmd_AcSetGaugeParam, 50, 75, 100, 100)
+                    SET(LW(2), 51)
                 CASE_ETC()
                     USER_FUNC(btlevtcmd_AcSetGaugeParam, 40, 60, 80, 100)
+                    SET(LW(2), 41)
             END_SWITCH()
         CASE_EQUAL(PTR(&customWeapon_MowzEmbargo))
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 80, 100, 100, 100)
+            SET(LW(2), 80)
         CASE_ETC()
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
+            SET(LW(2), 1)
     END_SWITCH()
+    USER_FUNC(btlevtcmd_AcSetParamAll, 1, 240, 178, LW(0), LW(1), 100, LW(2), EVT_NULLPTR)
     
     USER_FUNC(btlevtcmd_SetupAC, -2, 6, 1, 0)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), EVT_NULLPTR, EVT_NULLPTR)
@@ -2224,9 +2233,10 @@ BattleWeapon customWeapon_MowzSmokeBomb = {
     .weapon_ac_level = 3,
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_madowaseru",
-    .special_property_flags = 
+    .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
-        AttackSpecialProperty_Flags::DEFENSE_PIERCING,
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |

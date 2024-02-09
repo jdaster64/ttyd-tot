@@ -55,7 +55,7 @@ extern BattleWeapon customWeapon_FlurrieThunderStorm;
 
 BattleWeapon* g_WeaponTable[] = {
     &customWeapon_FlurrieBodySlam, &customWeapon_FlurrieGaleForce, 
-    &customWeapon_FlurrieDodgyFog, &customWeapon_FlurrieLipLock,
+    &customWeapon_FlurrieLipLock, &customWeapon_FlurrieDodgyFog,
     &customWeapon_FlurrieBlizzard, &customWeapon_FlurrieThunderStorm
 };
 
@@ -100,6 +100,7 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckEnemyShake) {
 // Dynamically sets the damage and status chance parameters based on AC success.
 EVT_DECLARE_USER_FUNC(evtTot_MakeBreathWeapon, 3)
 EVT_DEFINE_USER_FUNC(evtTot_MakeBreathWeapon) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
     auto* weapon = (BattleWeapon*)evtGetValue(evt, evt->evtArguments[0]);
     int32_t ac_result = evtGetValue(evt, evt->evtArguments[1]);
     int32_t move_type = evtGetValue(evt, evt->evtArguments[2]);
@@ -113,9 +114,11 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeBreathWeapon) {
             weapon->freeze_chance = ac_result * 1.05;
             weapon->freeze_time = move_level;
             weapon->damage_function_params[0] = move_level + 2;
+            battleWork->ac_manager_work.ac_result |= 2;
         } else {
             weapon->freeze_chance = 0;
             weapon->damage_function_params[0] = move_level + 1;
+            battleWork->ac_manager_work.ac_result &= ~2;
         }
     }
     
@@ -346,7 +349,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         CASE_ETC()
             // Snow Whirled action command; 1 damage per cycle.
             SUB(LW(1), 3)
-            MUL(LW(1), 10)
+            MUL(LW(1), -10)
             ADD(LW(1), 150)
             USER_FUNC(btlevtcmd_AcSetParamAll, LW(1), 1, 4, -3, -417, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetFlag, 7)
@@ -437,7 +440,6 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         USER_FUNC(btlevtcmd_SetupAC, -2, 10, 1, 0)
         WAIT_FRM(20)
         
-        // TODO: Light screen shaking?
         USER_FUNC(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
         
         BROTHER_EVT_ID(LW(15))
@@ -675,13 +677,13 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
     USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::FLURRIE_LIP_LOCK, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(1)
-            USER_FUNC(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 3, 2, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 3, 3, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 100, 100, 100, 100)
         CASE_EQUAL(2)
             USER_FUNC(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 5, 3, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 60, 100, 100, 100)
         CASE_ETC()
-            USER_FUNC(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 7, 4, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 7, 3, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetGaugeParam, 42, 71, 100, 100)
     END_SWITCH()
     USER_FUNC(btlevtcmd_AcSetFlag, 0)

@@ -234,14 +234,14 @@ BattleWeapon unitBombzo_weapon_Megaton = {
     
     .attack_evt_code = nullptr,
     .bg_a1_a2_fall_weight = 0,
-    .bg_a1_fall_weight = 10,
-    .bg_a2_fall_weight = 10,
+    .bg_a1_fall_weight = 50,
+    .bg_a2_fall_weight = 50,
     .bg_no_a_fall_weight = 100,
-    .bg_b_fall_weight = 30,
+    .bg_b_fall_weight = 50,
     .nozzle_turn_chance = 5,
     .nozzle_fire_chance = 5,
-    .ceiling_fall_chance = 5,
-    .object_fall_chance = 5,
+    .ceiling_fall_chance = 10,
+    .object_fall_chance = 10,
 };
 
 PoseTableEntry unitBombzo_pose_table_1[] = {
@@ -286,9 +286,10 @@ EVT_BEGIN(unitBombzo_explosion_event)
             SET(LW(8), PTR(&unitBombzo_weapon_Megaton))
             SET(LW(9), 500)
             SET(LW(7), FLOAT(5.0))
+            // Also add weapon after-effects.
+            USER_FUNC(btlevtcmd_WeaponAftereffect, LW(8))
     END_SWITCH()
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    // TODO: Punchier effects for Megaton bomb!
     USER_FUNC(evt_eff, PTR(""), PTR("hibashira"), 2, LW(0), LW(1), LW(2), LW(0), LW(1), LW(2), 1, LW(7), 60, 0, 0)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_THUNDERS_BOMB2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_StageDispellFog)
@@ -1498,10 +1499,9 @@ EVT_BEGIN(customAttack_MegatonBomb)
             USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("Y_1"))
             ADD(LW(15), 8)
             ADD(LW(11), 1)
-            USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(11))
-            SET(LW(10), LW(11))
-            ADD(LW(10), 2)
-            USER_FUNC(btlevtcmd_ACSuccessEffect, LW(10), FLOAT(20.0), FLOAT(30.0), FLOAT(0.0))
+            USER_FUNC(btlevtcmd_GetResultPrizeLv, -1, LW(11), LW(6))
+            USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
+            USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), FLOAT(20.0), FLOAT(30.0), FLOAT(0.0))
             USER_FUNC(btlevtcmd_snd_se, LW(9), PTR("SFX_CONDITION_DEKADEKA1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             DO(50)
                 USER_FUNC(btlevtcmd_AddScale, LW(9), FLOAT(0.01), FLOAT(0.01), FLOAT(0.01))

@@ -75,16 +75,16 @@ const MoveData g_MoveData[] = {
     
     { "Body Slam",  { 0, 2, 4, }, 3, },
     { "Gale Force", { 4, 4, 4, }, 1, },
-    { "Dodgy Fog",  { 4, 4, 4, }, 1, },
     { "Lip Lock",   { 3, 5, 7, }, 3, },
+    { "Dodgy Fog",  { 4, 4, 4, }, 1, },
     { "Blizzard",   { 3, 5, 7, }, 3, },
     { "Thunder Storm", { 9, 9, 9, }, 1, },
     
     { "Ground P.",  { 0, 2, 4, }, 3, },
-    { "Egg Barr.",  { 3, 5, 7, }, 3, },
     { "Lickety Sp.", { 3, 5, 7, }, 3, },
-    { "Mini-Egg",   { 3, 5, 7, }, 3, },
+    { "Egg Barr.",  { 3, 5, 7, }, 3, },
     { "Gulp",       { 5, 5, 5, }, 1, },
+    { "Mini-Egg",   { 3, 5, 7, }, 3, },
     { "Stampede",   { 4, 6, 8, }, 3, },
     
     { "Shade Fist", { 0, 2, 4, }, 3, },

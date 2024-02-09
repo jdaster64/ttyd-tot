@@ -1214,6 +1214,7 @@ EVT_BEGIN(customAttack_BulkUp)
     END_IF()
     USER_FUNC(btlevtcmd_RunDataEventChild, -2, 7)
     USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
     USER_FUNC(evt_btl_camera_set_mode, 0, 7)
     USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -2)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -1317,6 +1318,7 @@ EVT_BEGIN(customAttack_Withdraw)
     END_IF()
     USER_FUNC(btlevtcmd_RunDataEventChild, -2, 7)
     USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
     USER_FUNC(evt_btl_camera_set_mode, 0, 7)
     USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -2)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -1825,8 +1827,8 @@ BattleWeapon customWeapon_KoopsBulkUp = {
     .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
     .bg_b_fall_weight = 0,
-    .nozzle_turn_chance = 0,
-    .nozzle_fire_chance = 0,
+    .nozzle_turn_chance = 5,
+    .nozzle_fire_chance = 5,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
@@ -1876,8 +1878,8 @@ BattleWeapon customWeapon_KoopsWithdraw = {
     .bg_a2_fall_weight = 0,
     .bg_no_a_fall_weight = 100,
     .bg_b_fall_weight = 0,
-    .nozzle_turn_chance = 0,
-    .nozzle_fire_chance = 0,
+    .nozzle_turn_chance = 5,
+    .nozzle_fire_chance = 5,
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
