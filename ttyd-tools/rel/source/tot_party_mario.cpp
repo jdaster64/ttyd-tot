@@ -61,6 +61,7 @@ extern BattleWeapon customWeapon_Jump;
 extern BattleWeapon customWeapon_SpinJump;
 extern BattleWeapon customWeapon_SpinJump2;
 extern BattleWeapon customWeapon_SpringJump;
+extern BattleWeapon customWeapon_SpringJump2;
 extern BattleWeapon customWeapon_SpringJumpFailed;
 extern BattleWeapon customWeapon_Hammer;
 extern BattleWeapon customWeapon_SuperHammer;
@@ -1274,6 +1275,7 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
     USER_FUNC(btlevtcmd_ac_timing_flag_onoff, 0, 1)
     USER_FUNC(btlevtcmd_ResultAC)
     USER_FUNC(btlevtcmd_GetResultAC, LW(6))
+    SET(LW(12), PTR(&customWeapon_SpringJump2))
     IF_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
         USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -4061,7 +4063,7 @@ BattleWeapon customWeapon_Jump = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::JUMP_BASE },
+    .damage_function_params = { 2, 2, 3, 3, 4, 4, 0, MoveType::JUMP_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4123,7 +4125,7 @@ BattleWeapon customWeapon_SpinJump = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::JUMP_SPIN },
+    .damage_function_params = { 2, 2, 3, 3, 4, 4, 0, MoveType::JUMP_SPIN },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4184,7 +4186,7 @@ BattleWeapon customWeapon_SpinJump2 = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 3, 4, 5, 6, 0, MoveType::JUMP_SPIN },
+    .damage_function_params = { 2, 4, 3, 6, 4, 8, 0, MoveType::JUMP_SPIN },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4245,7 +4247,68 @@ BattleWeapon customWeapon_SpringJump = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 3, 4, 5, 6, 0, MoveType::JUMP_SPRING },
+    .damage_function_params = { 2, 2, 3, 3, 4, 4, 0, MoveType::JUMP_SPRING },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags = 
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::JUMPLIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = "msg_ac_j_jump",
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED |
+        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
+        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    .counter_resistance_flags = 
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY |
+        AttackCounterResistance_Flags::FRONT_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // .status_chances = all 0,
+    
+    .attack_evt_code = (void*)marioAttackEvent_JyabaraJump,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 5,
+    .bg_a2_fall_weight = 5,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 20,
+    .nozzle_fire_chance = 10,
+    .ceiling_fall_chance = 5,
+    .object_fall_chance = 5,
+};
+
+BattleWeapon customWeapon_SpringJump2 = {
+    .name = "btl_wn_mario_jyabara_jump",
+    .icon = IconType::ULTRA_BOOTS,
+    .item_id = 0,
+    .description = "msg_jyabara_jump",
+    .base_accuracy = 100,
+    .base_fp_cost = 4,
+    .base_sp_cost = 0,
+    .superguards_allowed = 0,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 5,
+    .bingo_card_chance = 100,
+    .unk_1b = 50,
+    .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
+    .damage_function_params = { 2, 4, 3, 6, 4, 8, 0, MoveType::JUMP_SPRING },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4367,7 +4430,7 @@ BattleWeapon customWeapon_Hammer = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_BASE },
+    .damage_function_params = { 2, 4, 3, 6, 4, 8, 0, MoveType::HAMMER_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4428,7 +4491,7 @@ BattleWeapon customWeapon_SuperHammer = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_SUPER },
+    .damage_function_params = { 4, 4, 6, 6, 8, 8, 0, MoveType::HAMMER_SUPER },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4488,7 +4551,7 @@ BattleWeapon customWeapon_SuperHammerRecoil = {
     .bingo_card_chance = 0,
     .unk_1b = 0,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::HAMMER_SUPER },
+    .damage_function_params = { 2, 2, 3, 3, 4, 4, 0, MoveType::HAMMER_SUPER },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4540,7 +4603,7 @@ BattleWeapon customWeapon_UltraHammer = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_ULTRA },
+    .damage_function_params = { 4, 4, 6, 6, 8, 8, 0, MoveType::HAMMER_ULTRA },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -4599,7 +4662,7 @@ BattleWeapon customWeapon_UltraHammerRecoil = {
     .bingo_card_chance = 0,
     .unk_1b = 0,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::HAMMER_ULTRA },
+    .damage_function_params = { 2, 2, 3, 3, 4, 4, 0, MoveType::HAMMER_ULTRA },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4651,7 +4714,7 @@ BattleWeapon customWeapon_UltraHammerFinisher = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_ULTRA },
+    .damage_function_params = { 4, 4, 6, 6, 8, 8, 0, MoveType::HAMMER_ULTRA },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -4707,7 +4770,7 @@ BattleWeapon customWeapon_FSSuperHammer = {
     .bingo_card_chance = 1,
     .unk_1b = 1,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_SUPER },
+    .damage_function_params = { 4, 4, 6, 6, 8, 8, 0, MoveType::HAMMER_SUPER },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4766,7 +4829,7 @@ BattleWeapon customWeapon_FSUltraHammer = {
     .bingo_card_chance = 1,
     .unk_1b = 1,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_ULTRA },
+    .damage_function_params = { 4, 4, 6, 6, 8, 8, 0, MoveType::HAMMER_ULTRA },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -4825,7 +4888,7 @@ BattleWeapon customWeapon_PowerSoftStomp = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 3, 4, 4, 6, 5, 8, 0, MoveType::JUMP_POWER_JUMP },
+    .damage_function_params = { 5, 6, 7, 9, 9, 12, 0, MoveType::JUMP_POWER_JUMP },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -4889,7 +4952,7 @@ BattleWeapon customWeapon_Multibounce = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::JUMP_MULTIBOUNCE },
+    .damage_function_params = { 2, 2, 3, 3, 5, 5, 0, MoveType::JUMP_MULTIBOUNCE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -5013,7 +5076,7 @@ BattleWeapon customWeapon_SleepyStomp = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 1, 2, 2, 3, 3, 0, MoveType::JUMP_SLEEPY_STOMP },
+    .damage_function_params = { 2, 2, 2, 2, 2, 2, 0, MoveType::JUMP_SLEEPY_STOMP },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -5047,7 +5110,7 @@ BattleWeapon customWeapon_SleepyStomp = {
         
     // status chances
     .sleep_chance = 100,
-    .sleep_time = 5,
+    .sleep_time = 3,
     
     .attack_evt_code = (void*)marioAttackEvent_NemuraseFumi,
     .bg_a1_a2_fall_weight = 0,
@@ -5076,7 +5139,7 @@ BattleWeapon customWeapon_TornadoJump = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::JUMP_TORNADO_JUMP },
+    .damage_function_params = { 2, 4, 3, 6, 4, 8, 0, MoveType::JUMP_TORNADO_JUMP },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -5192,7 +5255,7 @@ BattleWeapon customWeapon_PowerPiercingSmash = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 3, 4, 4, 6, 5, 8, 0, MoveType::HAMMER_POWER_SMASH },
+    .damage_function_params = { 5, 6, 7, 9, 9, 12, 0, MoveType::HAMMER_POWER_SMASH },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -5253,7 +5316,7 @@ BattleWeapon customWeapon_ShrinkSmash = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_SHRINK_SMASH },
+    .damage_function_params = { 2, 4, 2, 4, 2, 4, 0, MoveType::HAMMER_SHRINK_SMASH },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -5286,7 +5349,7 @@ BattleWeapon customWeapon_ShrinkSmash = {
         
     // status chances
     .size_change_chance = 100,
-    .size_change_time = 3,
+    .size_change_time = 2,
     .size_change_strength = -2,
     
     .attack_evt_code = (void*)marioAttackEvent_NormalHammer,
@@ -5316,7 +5379,7 @@ BattleWeapon customWeapon_IceSmash = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_ICE_SMASH },
+    .damage_function_params = { 2, 4, 2, 4, 2, 4, 0, MoveType::HAMMER_ICE_SMASH },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -5438,7 +5501,7 @@ BattleWeapon customWeapon_FireDrive = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_FIRE_DRIVE },
+    .damage_function_params = { 3, 3, 5, 5, 7, 7, 0, MoveType::HAMMER_FIRE_DRIVE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -5557,7 +5620,7 @@ BattleWeapon customWeapon_HammerThrow = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_BASE },
+    .damage_function_params = { 2, 4, 3, 6, 4, 8, 0, MoveType::HAMMER_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -5614,7 +5677,7 @@ BattleWeapon customWeapon_PowerPiercingSmashThrow = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 3, 4, 4, 6, 5, 8, 0, MoveType::HAMMER_POWER_SMASH },
+    .damage_function_params = { 5, 6, 7, 9, 9, 12, 0, MoveType::HAMMER_POWER_SMASH },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -5671,7 +5734,7 @@ BattleWeapon customWeapon_ShrinkSmashThrow = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_SHRINK_SMASH },
+    .damage_function_params = { 2, 4, 2, 4, 2, 4, 0, MoveType::HAMMER_SHRINK_SMASH },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 
@@ -5700,7 +5763,7 @@ BattleWeapon customWeapon_ShrinkSmashThrow = {
         
     // status chances
     .size_change_chance = 100,
-    .size_change_time = 3,
+    .size_change_time = 2,
     .size_change_strength = -2,
     
     .attack_evt_code = (void*)marioAttackEvent_HammerNageru,
@@ -5730,7 +5793,7 @@ BattleWeapon customWeapon_IceSmashThrow = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 1, 2, 2, 4, 3, 6, 0, MoveType::HAMMER_ICE_SMASH },
+    .damage_function_params = { 2, 4, 2, 4, 2, 4, 0, MoveType::HAMMER_ICE_SMASH },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags = 

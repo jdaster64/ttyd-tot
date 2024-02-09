@@ -258,12 +258,6 @@ void GetStatusParams(
     }
     
     switch (weapon->item_id) {
-        case ItemType::POWER_JUMP:
-            if (status_type == StatusEffectType::DEFENSE_DOWN) {
-                turns += tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::JUMP_POWER_JUMP) * 2 - 2;
-            }
-            break;
         case ItemType::SLEEPY_STOMP:
             if (status_type == StatusEffectType::SLEEP) {
                 turns += tot::MoveManager::GetSelectedLevel(
@@ -279,7 +273,7 @@ void GetStatusParams(
         case ItemType::ICE_SMASH:
             if (status_type == StatusEffectType::FREEZE) {
                 turns += tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::HAMMER_ICE_SMASH) * 2 - 2;
+                    tot::MoveType::HAMMER_ICE_SMASH) * 1 - 1;
             }
             break;
         case ItemType::TORNADO_JUMP:
