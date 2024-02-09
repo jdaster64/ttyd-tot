@@ -1825,10 +1825,10 @@ BattleWeapon customWeapon_BobberyBobombast = {
 };
 
 BattleWeapon customWeapon_BobberyPoisonBomb = {
-    .name = "btl_wn_pbm_lv1",
+    .name = "tot_ptr6_poisonbomb",
     .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
-    .description = "msg_pbm_jigen_bakudan",
+    .description = "tot_ptr6_poisonbomb_desc",
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
@@ -1878,10 +1878,10 @@ BattleWeapon customWeapon_BobberyPoisonBomb = {
 };
 
 BattleWeapon customWeapon_BobberyMegatonBomb = {
-    .name = "btl_wn_pbm_lv1",
+    .name = "tot_ptr6_megatonbomb",
     .icon = IconType::PARTNER_MOVE_3,
     .item_id = 0,
-    .description = "msg_pbm_jigen_bakudan",
+    .description = "tot_ptr6_megatonbomb_desc",
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,

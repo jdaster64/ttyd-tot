@@ -1171,10 +1171,10 @@ BattleWeapon customWeapon_FlurrieDodgyFog = {
 };
 
 BattleWeapon customWeapon_FlurrieBlizzard = {
-    .name = "btl_wn_pwd_lv1",
+    .name = "tot_ptr3_blizzard",
     .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
-    .description = "msg_pwd_breath",
+    .description = "tot_ptr3_blizzard_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
@@ -1230,10 +1230,10 @@ BattleWeapon customWeapon_FlurrieBlizzard = {
 };
 
 BattleWeapon customWeapon_FlurrieThunderStorm = {
-    .name = "btl_wn_pwd_lv1",
+    .name = "tot_ptr3_thunder",
     .icon = IconType::PARTNER_MOVE_3,
     .item_id = 0,
-    .description = "msg_pwd_breath",
+    .description = "tot_ptr3_thunder_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
@@ -1261,7 +1261,7 @@ BattleWeapon customWeapon_FlurrieThunderStorm = {
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_mahou_no_kona",
+    .ac_help_msg = "tot_ptr3_thunder_ac",
     .special_property_flags =
         AttackSpecialProperty_Flags::UNGUARDABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |

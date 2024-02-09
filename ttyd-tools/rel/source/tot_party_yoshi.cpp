@@ -1651,10 +1651,10 @@ BattleWeapon customWeapon_YoshiGroundPound = {
 };
 
 BattleWeapon customWeapon_YoshiGulp_Shot = {
-    .name = "btl_wn_pys_lv1",
+    .name = "tot_ptr4_spit",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_pys_nomikomi",
+    .description = "tot_ptr4_spit_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
@@ -1711,10 +1711,10 @@ BattleWeapon customWeapon_YoshiGulp_Shot = {
 };
 
 BattleWeapon customWeapon_YoshiGulp_Spew = {
-    .name = "btl_wn_pys_lv1",
+    .name = "tot_ptr4_spit",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_pys_nomikomi",
+    .description = "tot_ptr4_spit_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
@@ -1769,10 +1769,10 @@ BattleWeapon customWeapon_YoshiGulp_Spew = {
 };
 
 BattleWeapon customWeapon_YoshiGulp_Dmg0 = {
-    .name = "btl_wn_pys_lv1",
+    .name = "tot_ptr4_spit",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_pys_nomikomi",
+    .description = "tot_ptr4_spit_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
@@ -1827,10 +1827,10 @@ BattleWeapon customWeapon_YoshiGulp_Dmg0 = {
 };
 
 BattleWeapon customWeapon_YoshiGulp_Fire = {
-    .name = "btl_wn_pys_lv1",
+    .name = "tot_ptr4_spit",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_pys_nomikomi",
+    .description = "tot_ptr4_spit_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
@@ -2052,10 +2052,10 @@ BattleWeapon customWeapon_YoshiStampede = {
 };
 
 BattleWeapon customWeapon_YoshiEggBarrage = {
-    .name = "btl_wn_pys_lv2",
+    .name = "tot_ptr4_egg",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_pys_wonder_egg",
+    .description = "tot_ptr4_egg_desc",
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
@@ -2107,10 +2107,10 @@ BattleWeapon customWeapon_YoshiEggBarrage = {
 };
 
 BattleWeapon customWeapon_YoshiSwallow = {
-    .name = "btl_wn_pys_lv1",
+    .name = "tot_ptr4_gulp",
     .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
-    .description = "msg_pys_nomikomi",
+    .description = "tot_ptr4_gulp_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,

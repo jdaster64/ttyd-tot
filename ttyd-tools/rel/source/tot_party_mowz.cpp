@@ -2140,10 +2140,10 @@ BattleWeapon customWeapon_MowzSmooch = {
 };
 
 BattleWeapon customWeapon_MowzEmbargo = {
-    .name = "btl_wn_pcr_madowase",
+    .name = "tot_ptr7_embargo",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_pch_madowaseru",
+    .description = "tot_ptr7_embargo_desc",
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
@@ -2193,10 +2193,10 @@ BattleWeapon customWeapon_MowzEmbargo = {
 };
 
 BattleWeapon customWeapon_MowzSmokeBomb = {
-    .name = "btl_wn_pcr_madowase",
+    .name = "tot_ptr7_smokebomb",
     .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
-    .description = "msg_pch_madowaseru",
+    .description = "tot_ptr7_smokebomb_desc",
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,

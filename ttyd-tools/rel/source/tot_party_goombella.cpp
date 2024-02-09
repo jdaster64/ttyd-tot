@@ -1307,10 +1307,10 @@ BattleWeapon customWeapon_GoombellaRallyWink = {
 };
 
 BattleWeapon customWeapon_GoombellaScopeOut = {
-    .name = "btl_wn_pkr_lv1",
+    .name = "tot_ptr1_scope_out",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_pkr_monosiri",
+    .description = "tot_ptr1_scope_out_desc",
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
@@ -1361,10 +1361,10 @@ BattleWeapon customWeapon_GoombellaScopeOut = {
 };
 
 BattleWeapon customWeapon_GoombellaIronbonk = {
-    .name = "btl_wn_pkr_normal",
+    .name = "tot_ptr1_ironbonk",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_pkr_normal_jump",
+    .description = "tot_ptr1_ironbonk_desc",
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,

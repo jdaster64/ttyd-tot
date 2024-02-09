@@ -45,7 +45,7 @@ const MoveData g_MoveData[] = {
     { "Super H.",   { 2, 4, 6, }, 3, },
     { "Ultra H.",   { 4, 6, 8, }, 3, },
     { "Power S.",   { 2, 4, 6, }, 3, },
-    { "H. Rattle",  { 2, 4, 6, }, 3, },
+    { "Shrink S.",  { 2, 4, 6, }, 3, },
     { "Ice Smash",  { 2, 4, 6, }, 3, },
     { "Quake H.",   { 3, 5, 7, }, 3, },
     { "Fire Drive", { 3, 5, 7, }, 3, },
@@ -82,7 +82,7 @@ const MoveData g_MoveData[] = {
     
     { "Ground P.",  { 0, 2, 4, }, 3, },
     { "Egg Barr.",  { 3, 5, 7, }, 3, },
-    { "Lickety Spit", { 3, 5, 7, }, 3, },
+    { "Lickety Sp.", { 3, 5, 7, }, 3, },
     { "Mini-Egg",   { 3, 5, 7, }, 3, },
     { "Gulp",       { 5, 5, 5, }, 1, },
     { "Stampede",   { 4, 6, 8, }, 3, },
@@ -105,7 +105,7 @@ const MoveData g_MoveData[] = {
     { "Kiss Thief", { 5, 5, 5, }, 1, },
     { "Tease",      { 4, 4, 4, }, 1, },
     { "Embargo",    { 5, 5, 5, }, 1, },
-    { "Smoke Bomb", { 3, 5, 7, }, 3, },
+    { "Smoke B.",   { 3, 5, 7, }, 3, },
     { "Smooch",     { 3, 5, 7, }, 3, },
 }; 
 

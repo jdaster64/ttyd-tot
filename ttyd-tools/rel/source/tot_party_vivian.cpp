@@ -923,10 +923,10 @@ BattleWeapon customWeapon_VivianInfatuate = {
 };
 
 BattleWeapon customWeapon_VivianCurse = {
-    .name = "btl_wn_ptr_lv3",
+    .name = "tot_ptr5_curse",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_ptr_meromero_kiss",
+    .description = "tot_ptr5_curse_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
@@ -979,10 +979,10 @@ BattleWeapon customWeapon_VivianCurse = {
 };
 
 BattleWeapon customWeapon_VivianNeutralize = {
-    .name = "btl_wn_ptr_lv3",
+    .name = "tot_ptr5_neutralize",
     .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
-    .description = "msg_ptr_meromero_kiss",
+    .description = "tot_ptr5_neutralize_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,

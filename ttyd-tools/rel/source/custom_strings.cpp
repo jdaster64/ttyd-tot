@@ -27,6 +27,7 @@ namespace MsgKey {
         IN_ACH_2,
         IN_ACH_3,
         IN_CAKE,
+        IN_KONRAN_HAMMER,
         IN_SUITORU,
         IN_TOUGHEN_UP,
         IN_TOUGHEN_UP_P,
@@ -62,35 +63,48 @@ namespace MsgKey {
         MSG_DIAMOND_STAR,
         MSG_EMERALD_STAR,
         MSG_GARNET_STAR,
+        MSG_GATSUN_JUMP,
+        MSG_GATSUN_NAGURI,
         MSG_GOLD_STAR,
         MSG_ICE_CANDY,
+        MSG_ICE_NAGURI,
+        MSG_JISHIN_ATTACK,
         MSG_JON_KANBAN_1,
         MSG_JON_KANBAN_2,
         MSG_JON_KANBAN_3,
         MSG_JON_MOVER_SELECT,
+        MSG_KAITEN_HAMMER,
         MSG_KAME_NO_NOROI,
         MSG_KIKEN_DE_POWER,
         MSG_KIKEN_DE_POWER_P,
+        MSG_KONRAN_HAMMER,
         MSG_KURI_MAP,
         MSG_NANCY_FRAPPE,
+        MSG_NEMURASE_FUMI,
+        MSG_PBM_JIGEN_BAKUDAN,
+        MSG_PCH_KISS,
         MSG_PCH_MADOWASERU,
         MSG_PINCH_DE_GANBARU,
         MSG_PINCH_DE_GANBARU_P,
         MSG_PKR_MONOSIRI,
+        MSG_PNK_NORMAL_ATTACK,
+        MSG_PNK_SYUBIBIN_KOURA,
         MSG_PTR_MEROMERO_KISS,
         MSG_PWD_KUMOGAKURE,
-        MSG_PYS_NOMIKOMI,
         MSG_RUBY_STAR,
         MSG_SAPPHIRE_STAR,
         MSG_SHIKAESHI_NO_KONA,
+        MSG_ST_CHG_ALLERGY,
         MSG_SUPER_COIN,
         MSG_SUPER_GENKI,
+        MSG_TAMATSUKI_JUMP,
         MSG_TEKI_KYOUKA,
         MSG_TOUGHEN_UP,
         MSG_TOUGHEN_UP_MENU,
         MSG_TOUGHEN_UP_P,
         MSG_TOUGHEN_UP_P_MENU,
         MSG_TREASURE_MAP,
+        MSG_ULTRA_HAMMER,
         PIT_CHARLIETON_FULL_INV,
         PIT_CHEST_UNCLAIMED,
         PIT_DISABLED_RETURN,
@@ -119,8 +133,39 @@ namespace MsgKey {
         RIPPO_WHICH_STAT,
         RIPPO_YES_NO,
         TIK_06_02,
+        TOT_PTR1_IRONBONK,
+        TOT_PTR1_IRONBONK_DESC,
+        TOT_PTR1_SCOPE_OUT,
+        TOT_PTR1_SCOPE_OUT_DESC,
         TOT_PTR1_SCOPE_OUT_EFFECT_MSG,
+        TOT_PTR2_BULKUP,
+        TOT_PTR2_BULKUP_DESC,
+        TOT_PTR2_WITHDRAW,
+        TOT_PTR2_WITHDRAW_DESC,
+        TOT_PTR3_BLIZZARD,
+        TOT_PTR3_BLIZZARD_DESC,
+        TOT_PTR3_THUNDER,
+        TOT_PTR3_THUNDER_AC,
+        TOT_PTR3_THUNDER_DESC,
+        TOT_PTR4_EGG,
+        TOT_PTR4_EGG_DESC,
+        TOT_PTR4_GULP,
+        TOT_PTR4_GULP_DESC,
+        TOT_PTR4_SPIT,
+        TOT_PTR4_SPIT_DESC,
+        TOT_PTR5_CURSE,
+        TOT_PTR5_CURSE_DESC,
         TOT_PTR5_INFATUATE_EFFECT_MSG,
+        TOT_PTR5_NEUTRALIZE,
+        TOT_PTR5_NEUTRALIZE_DESC,
+        TOT_PTR6_MEGATONBOMB,
+        TOT_PTR6_MEGATONBOMB_DESC,
+        TOT_PTR6_POISONBOMB,
+        TOT_PTR6_POISONBOMB_DESC,
+        TOT_PTR7_EMBARGO,
+        TOT_PTR7_EMBARGO_DESC,
+        TOT_PTR7_SMOKEBOMB,
+        TOT_PTR7_SMOKEBOMB_DESC,
         x83x70x83x8f_CHET_RIPPO_TATTLE,
     };
 }
@@ -138,6 +183,7 @@ constexpr const char* kKeyLookups[] = {
     "in_ach_2",
     "in_ach_3",
     "in_cake",
+    "in_konran_hammer",
     "in_suitoru",
     "in_toughen_up",
     "in_toughen_up_p",
@@ -173,35 +219,48 @@ constexpr const char* kKeyLookups[] = {
     "msg_diamond_star",
     "msg_emerald_star",
     "msg_garnet_star",
+    "msg_gatsun_jump",
+    "msg_gatsun_naguri",
     "msg_gold_star",
     "msg_ice_candy",
+    "msg_ice_naguri",
+    "msg_jishin_attack",
     "msg_jon_kanban_1",
     "msg_jon_kanban_2",
     "msg_jon_kanban_3",
     "msg_jon_mover_select",
+    "msg_kaiten_hammer",
     "msg_kame_no_noroi",
     "msg_kiken_de_power",
     "msg_kiken_de_power_p",
+    "msg_konran_hammer",
     "msg_kuri_map",
     "msg_nancy_frappe",
+    "msg_nemurase_fumi",
+    "msg_pbm_jigen_bakudan",
+    "msg_pch_kiss",
     "msg_pch_madowaseru",
     "msg_pinch_de_ganbaru",
     "msg_pinch_de_ganbaru_p",
     "msg_pkr_monosiri",
+    "msg_pnk_normal_attack",
+    "msg_pnk_syubibin_koura",
     "msg_ptr_meromero_kiss",
     "msg_pwd_kumogakure",
-    "msg_pys_nomikomi",
     "msg_ruby_star",
     "msg_sapphire_star",
     "msg_shikaeshi_no_kona",
+    "msg_st_chg_allergy",
     "msg_super_coin",
     "msg_super_genki",
+    "msg_tamatsuki_jump",
     "msg_teki_kyouka",
     "msg_toughen_up",
     "msg_toughen_up_menu",
     "msg_toughen_up_p",
     "msg_toughen_up_p_menu",
     "msg_treasure_map",
+    "msg_ultra_hammer",
     "pit_charlieton_full_inv",
     "pit_chest_unclaimed",
     "pit_disabled_return",
@@ -230,8 +289,39 @@ constexpr const char* kKeyLookups[] = {
     "rippo_which_stat",
     "rippo_yes_no",
     "tik_06_02",
+    "tot_ptr1_ironbonk",
+    "tot_ptr1_ironbonk_desc",
+    "tot_ptr1_scope_out",
+    "tot_ptr1_scope_out_desc",
     "tot_ptr1_scope_out_effect_msg",
+    "tot_ptr2_bulkup",
+    "tot_ptr2_bulkup_desc",
+    "tot_ptr2_withdraw",
+    "tot_ptr2_withdraw_desc",
+    "tot_ptr3_blizzard",
+    "tot_ptr3_blizzard_desc",
+    "tot_ptr3_thunder",
+    "tot_ptr3_thunder_ac",
+    "tot_ptr3_thunder_desc",
+    "tot_ptr4_egg",
+    "tot_ptr4_egg_desc",
+    "tot_ptr4_gulp",
+    "tot_ptr4_gulp_desc",
+    "tot_ptr4_spit",
+    "tot_ptr4_spit_desc",
+    "tot_ptr5_curse",
+    "tot_ptr5_curse_desc",
     "tot_ptr5_infatuate_effect_msg",
+    "tot_ptr5_neutralize",
+    "tot_ptr5_neutralize_desc",
+    "tot_ptr6_megatonbomb",
+    "tot_ptr6_megatonbomb_desc",
+    "tot_ptr6_poisonbomb",
+    "tot_ptr6_poisonbomb_desc",
+    "tot_ptr7_embargo",
+    "tot_ptr7_embargo_desc",
+    "tot_ptr7_smokebomb",
+    "tot_ptr7_smokebomb_desc",
     "\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae",  // Chet Rippo
 };
 
@@ -426,21 +516,6 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::BTL_HLP_CMD_OPERATION_SUPER_CHARGE:
             return "Briefly increases DEF by\n"
                    "more than Defending.";
-        case MsgKey::MSG_PKR_MONOSIRI:
-            return "A super-stylish move that\n"
-                   "describes an enemy's stats.";
-        case MsgKey::MSG_PTR_MEROMERO_KISS:
-            return "Blow a kiss to an enemy to try\n"
-                   "to win them to your side.";
-        case MsgKey::MSG_PWD_KUMOGAKURE:
-            return "Makes your team dodgy for \n"
-                   "a time so foes frequently miss.";
-        case MsgKey::MSG_PYS_NOMIKOMI:
-            return "Spit the front enemy into all\n"
-                   "ground-bound enemies behind it.";
-        case MsgKey::MSG_PCH_MADOWASERU:
-            return "Tease enemies with some sly\n"
-                   "moves, confusing them.";
         case MsgKey::MSG_SUPER_COIN:
             return "A powerful object that raises\n"
                    "max SP, or ranks up a partner.";
@@ -673,6 +748,143 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::TOT_PTR5_INFATUATE_EFFECT_MSG:
             return "Infatuated! The enemy will\n"
                    "fight for your side now!";
+        case MsgKey::MSG_ST_CHG_ALLERGY:
+            return "Allergic! Status effects\n"
+                   "cannot be changed!";
+        // TOT item name changes.
+        case MsgKey::IN_KONRAN_HAMMER:
+            return "Shrink Smash";
+        case MsgKey::TOT_PTR1_IRONBONK:
+            return "Ironbonk";
+        case MsgKey::TOT_PTR1_SCOPE_OUT:
+            return "Scope Out";
+        case MsgKey::TOT_PTR2_WITHDRAW:
+            return "Withdraw";
+        case MsgKey::TOT_PTR2_BULKUP:
+            return "Bulk Up";
+        case MsgKey::TOT_PTR3_BLIZZARD:
+            return "Blizzard";
+        case MsgKey::TOT_PTR3_THUNDER:
+            return "Thunder Storm";
+        case MsgKey::TOT_PTR4_EGG:
+            return "Egg Barrage";
+        case MsgKey::TOT_PTR4_SPIT:
+            return "Lickety Spit";
+        case MsgKey::TOT_PTR4_GULP:
+            return "Gulp";
+        case MsgKey::TOT_PTR5_CURSE:
+            return "Curse";
+        case MsgKey::TOT_PTR5_NEUTRALIZE:
+            return "Neutralize";
+        case MsgKey::TOT_PTR6_POISONBOMB:
+            return "Poison Bomb";
+        case MsgKey::TOT_PTR6_MEGATONBOMB:
+            return "Megaton Bomb";
+        case MsgKey::TOT_PTR7_EMBARGO:
+            return "Embargo";
+        case MsgKey::TOT_PTR7_SMOKEBOMB:
+            return "Smoke Bomb";
+        // TOT item/move description changes.
+        case MsgKey::MSG_GATSUN_JUMP:
+            return "Attack an enemy with a single\n"
+                   "powerful stomp, softening them.";
+        case MsgKey::MSG_NEMURASE_FUMI:
+            return "Attack an enemy with a stomp\n"
+                   "that can cause drowziness.";
+        case MsgKey::MSG_TAMATSUKI_JUMP:
+            return "Hit all enemies with a gust of\n"
+                   "wind, dizzying aerial foes.";
+        case MsgKey::MSG_KAITEN_HAMMER:
+        case MsgKey::MSG_ULTRA_HAMMER:
+            return "Strike an enemy, knocking it\n"
+                   "into the enemies behind it.";
+        case MsgKey::MSG_GATSUN_NAGURI:
+            return "Pound an enemy with a powerful,\n"
+                   "defense-piercing strike.";
+        case MsgKey::MSG_KONRAN_HAMMER:
+            return "Strike an enemy with a blow\n"
+                   "that may shrink them.";
+        case MsgKey::MSG_ICE_NAGURI:
+            return "Strike an enemy with a blow\n"
+                   "that may freeze them solid.";
+        case MsgKey::MSG_JISHIN_ATTACK:
+            return "Attack all grounded enemies,\n"
+                   "piercing their defense.";
+        case MsgKey::MSG_PKR_MONOSIRI:
+            return "View enemies' descriptions\n"
+                   "and see their stats in battle.";
+        case MsgKey::TOT_PTR1_IRONBONK_DESC:
+            return "Attack with an invulnerable,\n"
+                   "defense-piercing Headbonk.";
+        case MsgKey::TOT_PTR1_SCOPE_OUT_DESC:
+            return "Scope out an enemy, ensuring\n"
+                   "your next attack lands.";
+        case MsgKey::MSG_PNK_NORMAL_ATTACK:
+            return "Attack the front enemy with\n"
+                   "a spinning shell drive.";
+        case MsgKey::MSG_PNK_SYUBIBIN_KOURA:
+            return "Attack all grounded enemies\n"
+                   "with a spinning shell.";
+        case MsgKey::TOT_PTR2_WITHDRAW_DESC:
+            return "Make Koops retreat into his\n"
+                   "shell, impervious to attack.";
+        case MsgKey::TOT_PTR2_BULKUP_DESC:
+            return "Raise an ally's Attack and\n"
+                   "Defense power for a while.";
+        case MsgKey::MSG_PWD_KUMOGAKURE:
+            return "Envelop the party in a fog,\n"
+                   "causing foes to sometimes miss.";
+        case MsgKey::TOT_PTR3_BLIZZARD_DESC:
+            return "Attack all enemies with a\n"
+                   "blast of icy wind.";
+        case MsgKey::TOT_PTR3_THUNDER_DESC:
+            return "Strike all enemies with\n"
+                   "powerful bolts of lightning!";
+        case MsgKey::TOT_PTR4_EGG_DESC:
+            return "Throw a volley of eggs at\n"
+                   "foes, dealing light damage.";
+        case MsgKey::TOT_PTR4_SPIT_DESC:
+            return "Spit the front enemy into all\n"
+                   "ground-bound enemies behind it.";
+        case MsgKey::TOT_PTR4_GULP_DESC:
+            return "Swallow an enemy in one gulp,\n"
+                   "stealing their held item.";
+        case MsgKey::TOT_PTR5_CURSE_DESC:
+            return "Cast a hex on the enemy to\n"
+                   "slow their movements.";
+        case MsgKey::TOT_PTR5_NEUTRALIZE_DESC:
+            return "Make the enemy unable to\n"
+                   "change their status.";
+        case MsgKey::MSG_PTR_MEROMERO_KISS:
+            return "Blow a kiss to an enemy to try\n"
+                   "to win them to your side.";
+        case MsgKey::MSG_PBM_JIGEN_BAKUDAN:
+            return "Throw a volley of time bombs\n"
+                   "that explode on the next turn.";
+        case MsgKey::TOT_PTR6_POISONBOMB_DESC:
+            return "Throw a volley of bombs that\n"
+                   "explode in a noxious blast.";
+        case MsgKey::TOT_PTR6_MEGATONBOMB_DESC:
+            return "Arm a bomb that does massive\n"
+                   "damage to all combatants.";
+        case MsgKey::MSG_PCH_MADOWASERU:
+            return "Tease enemies with some sly\n"
+                   "moves, confusing them.";
+        case MsgKey::TOT_PTR7_EMBARGO_DESC:
+            return "Distract foes and scatter\n"
+                   "their held items and badges.";
+        case MsgKey::TOT_PTR7_SMOKEBOMB_DESC:
+            return "Lightly damage and dizzy foes\n"
+                   "with a burst of smoke.";
+        case MsgKey::MSG_PCH_KISS:
+            return "Replenish the party's HP\n"
+                   "with a friendly kiss.";
+        case MsgKey::TOT_PTR3_THUNDER_AC:
+            return "Press <icon PAD_A 0.6 1 2 6>"
+                   "<icon PAD_B 0.6 1 2 6>"
+                   "<icon PAD_Y 0.6 1 2 6>"
+                   "<icon PAD_X 0.6 1 2 6> repeatedly\n"
+                   "in quick succession!";
     }
     // Should not be reached.
     return nullptr;

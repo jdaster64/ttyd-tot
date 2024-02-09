@@ -1772,10 +1772,10 @@ BattleWeapon customWeapon_KoopsShellSlam = {
 };
 
 BattleWeapon customWeapon_KoopsBulkUp = {
-    .name = "btl_wn_pnk_lv2",
+    .name = "tot_ptr2_bulkup",
     .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
-    .description = "msg_pnk_koura_no_mamori",
+    .description = "tot_ptr2_bulkup_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
@@ -1832,10 +1832,10 @@ BattleWeapon customWeapon_KoopsBulkUp = {
 };
 
 BattleWeapon customWeapon_KoopsWithdraw = {
-    .name = "btl_wn_pnk_lv2",
+    .name = "tot_ptr2_withdraw",
     .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
-    .description = "msg_pnk_koura_no_mamori",
+    .description = "tot_ptr2_withdraw_desc",
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
