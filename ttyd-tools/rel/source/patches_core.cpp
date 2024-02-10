@@ -153,6 +153,13 @@ void OnFileLoad(bool new_file = true) {
             ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_Y);
             ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_R);
         }
+        
+        // TOT: For testing.
+        ttyd::mario_pouch::pouchGetItem(ItemType::HAMMERMAN);
+        ttyd::mario_pouch::pouchGetItem(ItemType::JUMPMAN);
+        ttyd::mario_pouch::pouchGetItem(ItemType::TIMING_TUTOR);
+        ttyd::mario_pouch::pouchEquipBadgeID(ItemType::TIMING_TUTOR);
+        
         ttyd::mario_pouch::pouchGetItem(ItemType::PEEKABOO);
         ttyd::mario_pouch::pouchEquipBadgeID(ItemType::PEEKABOO);
         ttyd::mario_pouch::pouchGetItem(ItemType::FP_PLUS);

@@ -239,6 +239,8 @@ void ApplyFixedPatches() {
     // Make Peekaboo 0 BP, and sort it last, as it's unlikely to be unequipped.
     itemDataTable[ItemType::PEEKABOO].bp_cost = 0;
     itemDataTable[ItemType::PEEKABOO].type_sort_order = 999;
+    // TOT: For testing; make Timing Tutor cost 0 BP.
+    itemDataTable[ItemType::TIMING_TUTOR].bp_cost = 0;
     
     // Set sort order of unused badges to -1 so they don't show up in log.
     itemDataTable[ItemType::TIMING_TUTOR].type_sort_order = -1;

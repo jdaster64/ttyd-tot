@@ -99,7 +99,8 @@ const MoveData g_MoveData[] = {
     { "Hold Fast",  { 4, 4, 4, }, 1, },
     { "Poison B.",  { 3, 5, 7, }, 3, },
     { "Bob-ombast", { 6, 8, 10, }, 3, },
-    { "Megaton Bomb", { 11, 11, 11, }, 1, },
+    // For testing; might very well make this cost more than 10 eventually.
+    { "Megaton Bomb", { 10, 10, 10, }, 1, },
     
     { "Love Slap",  { 0, 2, 4, }, 3, },
     { "Kiss Thief", { 5, 5, 5, }, 1, },
