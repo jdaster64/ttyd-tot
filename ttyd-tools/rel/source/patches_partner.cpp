@@ -94,6 +94,28 @@ extern const int32_t g_koura_damage_core_Patch_HeavyDmg;
 extern const int32_t g_koura_damage_core_Patch_LightDmg;
 extern const int32_t g_subsetevt_blow_dead_Patch_GetRewards;
 extern const int32_t g_BattleSetStatusDamage_Patch_GaleLevelFactor;
+extern const int32_t g_acShot_dispAfterimage_Patch_numBombs;
+extern const int32_t g_acShot_dispAfterimage_Patch_targetVar2_1;
+extern const int32_t g_acShot_dispAfterimage_Patch_targetVar2_2;
+extern const int32_t g_acShot_dispAfterimage_Patch_targetVar3_1;
+extern const int32_t g_acShot_dispAfterimage_Patch_targetVar3_2;
+extern const int32_t g_acShot_dispAfterimage_Patch_targetVar3_3;
+extern const int32_t g_acShot_dispAfterimage_Patch_targetVar3_4;
+extern const int32_t g_acShot_main_Patch_numBombs;
+extern const int32_t g_acShot_main_Patch_targetVar2_1;
+extern const int32_t g_acShot_main_Patch_targetVar2_2;
+extern const int32_t g_acShot_main_Patch_targetVar2_3;
+extern const int32_t g_acShot_main_Patch_targetVar2_4;
+extern const int32_t g_acShot_main_Patch_targetVar2_5;
+extern const int32_t g_acShot_main_Patch_targetVar2_6;
+extern const int32_t g_acShot_main_Patch_targetVar3_1;
+extern const int32_t g_acShot_main_Patch_targetVar3_2;
+extern const int32_t g_acShot_main_Patch_targetVar3_3;
+extern const int32_t g_acShot_main_Patch_targetVar3_4;
+extern const int32_t g_acShot_main_Patch_targetVar3_5;
+extern const int32_t g_acShot_main_Patch_sfxId_1;
+extern const int32_t g_acShot_main_Patch_sfxId_2;
+extern const int32_t g_acShot_main_Patch_sfxId_3;
 extern const int32_t g_partyClauda_makeTechMenuFuncPtr;
 extern const int32_t g_partyYoshi_makeTechMenuFuncPtr;
 extern const int32_t g_partyChuchurina_makeTechMenuFuncPtr;
@@ -218,6 +240,83 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_BattleSetStatusDamage_Patch_GaleLevelFactor),
         0x60000000U /* nop */);
+        
+    // Patch a bunch of Bomb Squad's AC logic that assumes a max of 3 bombs;
+    // all patches are just changing the offset in the AC extra-work struct.
+    constexpr const int8_t k_MaxBombs = 4;
+    constexpr const int8_t k_TargetVar1Offset = 0x40;
+    constexpr const int8_t
+        k_TargetVar2Offset = k_TargetVar1Offset + k_MaxBombs * 4;
+    constexpr const int8_t
+        k_TargetVar3Offset = k_TargetVar1Offset + k_MaxBombs * 8;
+    constexpr const int8_t
+        k_SfxIdOffset = k_TargetVar1Offset + k_MaxBombs * 12;
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_numBombs), 
+        &k_MaxBombs, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar2_1),
+        &k_TargetVar2Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar2_2),
+        &k_TargetVar2Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar3_1),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar3_2),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar3_3),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar3_4),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_numBombs),
+        &k_MaxBombs, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_1),
+        &k_TargetVar2Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_2),
+        &k_TargetVar2Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_3),
+        &k_TargetVar2Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_4),
+        &k_TargetVar2Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_5),
+        &k_TargetVar2Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_6),
+        &k_TargetVar2Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_1),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_2),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_3),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_4),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_5),
+        &k_TargetVar3Offset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_sfxId_1),
+        &k_SfxIdOffset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_sfxId_2),
+        &k_SfxIdOffset, sizeof(int8_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_acShot_main_Patch_sfxId_3),
+        &k_SfxIdOffset, sizeof(int8_t));
         
     // TOT: Replace party member weapon selection functions.
     mod::patch::writePatch(
