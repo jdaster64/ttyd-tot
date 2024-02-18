@@ -33,14 +33,14 @@ bne+ check_end_attack
 lwz %r3, 0x1ce8 (%r22)
 cmpwi %r3, 4
 bne+ check_end_attack
-# Otherwise, increment AC output param 1.
-lwz	%r3, 0x1cec (%r22)
+# Increment AC output param 1.
+lwz %r3, 0x1cec (%r22)
 addi %r3, %r3, 1
 stw %r3, 0x1cec (%r22)
 # If number of bars completed >= 10, then end attack anyway.
 cmpwi %r3, 10
 bge- check_end_attack
-# Otherwise, clear button presses.
+# Otherwise, clear button presses, readying for next bar.
 li %r3, 0
 stw %r3, 0x1f88 (%r22)
 stw %r3, 0x1f8c (%r22)
