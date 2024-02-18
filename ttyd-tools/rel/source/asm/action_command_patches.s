@@ -29,22 +29,27 @@ StartButtonDownCheckComplete:
 # If AC param 4 = -417 and AC output param 0 is 4 (completed set of buttons)...
 lwz %r3, 0x1cd8 (%r22)
 cmpwi %r3, -417
-bne+ 0x10
+bne+ check_end_attack
 lwz %r3, 0x1ce8 (%r22)
 cmpwi %r3, 4
-beq+ 0xc
-# Restore original opcode if not.
-lwz	%r3, 0x1cb8 (%r22)
-BranchBackButtonDownCheckComplete:
-b 0
-# Otherwise, increment AC output param 1, and clear button press history.
+bne+ check_end_attack
+# Otherwise, increment AC output param 1.
 lwz	%r3, 0x1cec (%r22)
 addi %r3, %r3, 1
 stw %r3, 0x1cec (%r22)
+# If number of bars completed >= 10, then end attack anyway.
+cmpwi %r3, 10
+bge- check_end_attack
+# Otherwise, clear button presses.
 li %r3, 0
 stw %r3, 0x1f88 (%r22)
 stw %r3, 0x1f8c (%r22)
 stw %r3, 0x1f90 (%r22)
 stw %r3, 0x1f94 (%r22)
 ConditionalBranchButtonDownCheckComplete:
+b 0
+check_end_attack:
+# Restore original opcode if not.
+lwz	%r3, 0x1cb8 (%r22)
+BranchBackButtonDownCheckComplete:
 b 0

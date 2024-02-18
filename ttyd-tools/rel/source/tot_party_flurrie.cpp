@@ -350,7 +350,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             // Snow Whirled action command; 1 damage per cycle.
             SUB(LW(1), 3)
             MUL(LW(1), -10)
-            ADD(LW(1), 150)
+            ADD(LW(1), 180)
             USER_FUNC(btlevtcmd_AcSetParamAll, LW(1), 1, 4, -3, -417, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AcSetFlag, 7)
     END_SWITCH()
