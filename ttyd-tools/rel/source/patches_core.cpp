@@ -73,6 +73,8 @@ extern uint32_t (*g_psndBGMOn_f_d_trampoline)(
 extern const int32_t g_seq_mapChangeMain_MapLoad_BH;
 extern const int32_t g_seq_mapChangeMain_MapLoad_EH;
 extern const int32_t g_seq_mapChangeMain_OnMapUnload_BH;
+extern const int32_t g_titleMain_Patch_NeverPlayDemo;
+extern const int32_t g_seq_logoMain_Patch_AlwaysSkipIntro;
 
 namespace core {
 
@@ -269,6 +271,15 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_seq_mapChangeMain_OnMapUnload_BH),
         reinterpret_cast<void*>(StartOnMapUnload),
         reinterpret_cast<void*>(BranchBackOnMapUnload));
+        
+    // Patch to skip demo without pressing A/Start.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_seq_logoMain_Patch_AlwaysSkipIntro),
+        0x60000000U /* nop */);
+    // Patch to never autoplay demo, rather than waiting ~19 seconds.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_titleMain_Patch_NeverPlayDemo),
+        0x480001f0 /* unconditional branch 0x1f0 */);
 }
 
 int32_t LoadMap() {
