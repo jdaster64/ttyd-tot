@@ -73,7 +73,8 @@ namespace ModuleId {
         MAX_MODULE_ID,
         
         // Not used in vanilla game.
-        CUSTOM = 40,
+        CUSTOM_TOT = 40,    // Tower of Trials; may not be referenced.
+        CUSTOM = 45,        // Infinite Pit; should eventually be deprecated.
     };
 }
 

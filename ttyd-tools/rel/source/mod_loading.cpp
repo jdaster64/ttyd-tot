@@ -157,7 +157,7 @@ constexpr const uint32_t kMapAllocSize                  = 0xa7800;  // 670 KiB
 
 // REL header and imp table, with precalculated addresses.
 constexpr const uint32_t kCustomRelHeader[] = {
-    0x00000028,                 // id
+    (uint32_t)ModuleId::CUSTOM, // id
     0x00000000, 0x00000000,     // next, prev module
     0x0000000f,                 // number of sections
     0x0000004c,                 // section table offset
