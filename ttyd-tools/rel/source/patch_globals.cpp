@@ -154,7 +154,8 @@ bool (*g_OSLink_trampoline)(OSModuleInfo*, void*) = nullptr;
 
 // Branch / patch addresses (BH / EH / CH# = begin / end / conditional hooks).
 
-extern const int32_t g_seq_mapChangeMain_OnMapUnload_BH = 0x80007e0c;
+extern const int32_t g_seq_mapChangeMain_OnMapUnload_BH = 0x80007e18;
+extern const int32_t g_seq_mapChangeMain_OnMapUnload_EH = 0x80007e68;
 extern const int32_t g_seq_mapChangeMain_MapLoad_BH = 0x80007ef0;
 extern const int32_t g_seq_mapChangeMain_MapLoad_EH = 0x80008148;
 extern const int32_t g_titleMain_Patch_NeverPlayDemo = 0x800096c0;

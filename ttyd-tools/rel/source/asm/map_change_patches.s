@@ -12,10 +12,8 @@ BranchBackMapLoad:
 b 0
 
 StartOnMapUnload:
-# Call C function to perform extra logic immediately before unloading a map.
+# Call C function that replaces the existing logic for unloading map files.
 bl onMapUnload
-# Replace original opcode.
-bl fadeIsFinish
 
 BranchBackOnMapUnload:
 b 0

@@ -73,6 +73,7 @@ extern uint32_t (*g_psndBGMOn_f_d_trampoline)(
 extern const int32_t g_seq_mapChangeMain_MapLoad_BH;
 extern const int32_t g_seq_mapChangeMain_MapLoad_EH;
 extern const int32_t g_seq_mapChangeMain_OnMapUnload_BH;
+extern const int32_t g_seq_mapChangeMain_OnMapUnload_EH;
 extern const int32_t g_titleMain_Patch_NeverPlayDemo;
 extern const int32_t g_seq_logoMain_Patch_AlwaysSkipIntro;
 
@@ -82,8 +83,8 @@ namespace {
 
 // Global variables.
 uintptr_t   g_PitModulePtr = 0;
-char        g_LastModuleLoaded[16] = {0};
-bool        g_WaitingForCustomLoad = false;
+// char        g_LastModuleLoaded[16] = {0};
+// bool        g_WaitingForCustomLoad = false;
 bool        g_PromptSave = false;
 bool        g_CueGameOver = false;
 
@@ -236,7 +237,7 @@ void ApplyFixedPatches() {
                 seq == SeqIndex::kMapChange && !strcmp(mapName, "aaa_00") && 
                 !strcmp(beroName, "prologue")) {
                 // If loading a new file, load the player into the pre-Pit room.
-                mapName = "tik_06";
+                mapName = "gon_00";
                 beroName = "e_bero";
             }
             g_seqSetSeq_trampoline(seq, mapName, beroName);
@@ -269,6 +270,7 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(BranchBackMapLoad));
     mod::patch::writeBranchPair(
         reinterpret_cast<void*>(g_seq_mapChangeMain_OnMapUnload_BH),
+        reinterpret_cast<void*>(g_seq_mapChangeMain_OnMapUnload_EH),
         reinterpret_cast<void*>(StartOnMapUnload),
         reinterpret_cast<void*>(BranchBackOnMapUnload));
         
@@ -294,6 +296,16 @@ int32_t LoadMap() {
             ttyd::seqdrv::SeqIndex::kTitle, nullptr, nullptr);
         return 1;
     }
+    
+    // The main mod rel is also the gon map rel, and is already loaded / linked.
+    if (!strcmp(area, "gon")) {
+        mario_st->pRelFileBase = mario_st->pMapAlloc;
+        ttyd::seq_mapchange::_load(
+            mario_st->currentMapName, ttyd::seq_mapchange::NextMap,
+            ttyd::seq_mapchange::NextBero);
+        return 2;
+    }
+    
     if (!strcmp(area, "tou")) {
         if (ttyd::seqdrv::seqGetSeq() == ttyd::seqdrv::SeqIndex::kTitle) {
             area = "tou2";
@@ -302,6 +314,8 @@ int32_t LoadMap() {
         }
     }
     
+    // Should no longer be needed, since the custom enemy REL is always loaded.
+    /*
     if (g_WaitingForCustomLoad) {
         if (!LoadingManager::HasFinished()) return 1;
     } else {
@@ -316,6 +330,7 @@ int32_t LoadMap() {
             strcpy(g_LastModuleLoaded, "");
         }
     }
+    */
     
     // Start loading the relocatable module associated with the current area.
     if (ttyd::filemgr::fileAsyncf(
@@ -323,15 +338,12 @@ int32_t LoadMap() {
         auto* file = ttyd::filemgr::fileAllocf(
             nullptr, "%s/rel/%s.rel", getMarioStDvdRoot(), area);
         if (file) {
-            if (!strncmp(area, "tst", 3) || !strncmp(area, "jon", 3)) {
-                auto* module_info = reinterpret_cast<OSModuleInfo*>(
-                    ttyd::memory::_mapAlloc(
-                        ttyd::memory::mapalloc_base_ptr,
-                        reinterpret_cast<int32_t>(file->mpFileData[1])));
-                mario_st->pRelFileBase = module_info;
-            } else {
-                mario_st->pRelFileBase = mario_st->pMapAlloc;
-            }
+            // Always load onto heap, since alloc is taken by mod rel.
+            auto* module_info = reinterpret_cast<OSModuleInfo*>(
+                ttyd::memory::_mapAlloc(
+                    ttyd::memory::mapalloc_base_ptr,
+                    reinterpret_cast<int32_t>(file->mpFileData[1])));
+            mario_st->pRelFileBase = module_info;
             memcpy(
                 mario_st->pRelFileBase, *file->mpFileData,
                 reinterpret_cast<int32_t>(file->mpFileData[1]));
@@ -346,11 +358,13 @@ int32_t LoadMap() {
             mario_st->currentMapName, ttyd::seq_mapchange::NextMap,
             ttyd::seq_mapchange::NextBero);
 
-        if (g_PitModulePtr) {
-            SelectEnemies(g_Mod->state_.floor_);
-        }
-        g_WaitingForCustomLoad = false;
-        strcpy(g_LastModuleLoaded, area);
+        // TODO: Move this logic into the gon init evt.
+        // if (g_PitModulePtr) {
+            // SelectEnemies(g_Mod->state_.floor_);
+        // }
+        // g_WaitingForCustomLoad = false;
+        // strcpy(g_LastModuleLoaded, area);
+        
         reinterpret_cast<void(*)(void)>(mario_st->pRelFileBase->prolog)();
         return 2;
     }
@@ -358,13 +372,25 @@ int32_t LoadMap() {
 }
 
 void OnMapUnloaded() {
+    // TODO: Probably won't need this anymore.
     if (g_PitModulePtr) {
         LinkAllCustomEvts(
             reinterpret_cast<void*>(g_PitModulePtr), ModuleId::JON,
             /* link */ false);
         g_PitModulePtr = 0;
     }
-    // Normal unloading logic follows...
+    
+    // If it's not the main REL, run the epilog, and unlink/free it.
+    auto* mario_st = ttyd::mariost::g_MarioSt;
+    if (mario_st->pRelFileBase != nullptr) {
+        if (mario_st->pRelFileBase != mario_st->pMapAlloc) {
+            reinterpret_cast<void(*)(void)>(mario_st->pRelFileBase->epilog)();
+            gc::OSLink::OSUnlink(mario_st->pRelFileBase);
+            ttyd::memory::_mapFree(
+                ttyd::memory::mapalloc_base_ptr, mario_st->pRelFileBase);
+            mario_st->pRelFileBase = nullptr;
+        }
+    }
 }
 
 uintptr_t GetPitModulePtr() { return g_PitModulePtr; }

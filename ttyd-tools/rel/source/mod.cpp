@@ -10,6 +10,7 @@
 #include "mod_title.h"
 #include "patch.h"
 #include "patches_apply.h"
+#include "tot_gon.h"
 
 #include <ttyd/dispdrv.h>
 #include <ttyd/fontmgr.h>
@@ -23,6 +24,7 @@ namespace mod {
 void main() {
 	infinite_pit::Mod* mod = new infinite_pit::Mod();
 	mod->Init();
+    tot::gon::Prolog();
 }
 
 }
