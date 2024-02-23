@@ -5,26 +5,72 @@
 #include "evtmgr.h"
 
 namespace ttyd::evt_bero {
+    
+namespace BeroType {
+
+enum e {
+    ROAD = 0,
+    DOOR,
+    PIPE,
+    GATE,
+    
+    NONE = 0xf00,
+    BACKGROUND = 0x1000,
+    NO_FADE = 0x2000,
+};
+
+}
+
+namespace BeroAnimType {
+
+enum e {
+    NONE = 0,
+    ANIMATION = 1,
+    ROTATION = 2,
+    EVT = 4,
+    REPEATED_EVT = 5,
+};
+
+}
+    
+namespace BeroDirection {
+
+enum e {
+    NORTH = 0,
+    NORTHEAST,
+    EAST,
+    SOUTHEAST,
+    SOUTH,
+    SOUTHWEST,
+    WEST,
+    NORTHWEST,
+    UP,
+    DOWN,
+    
+    INVALID = 10000,
+    AUTO = 20000,
+};
+
+}
 
 extern "C" {
     
 struct BeroEntry {
     const char* name;
-    uint32_t    unk_04;
-    int32_t     unk_08;
-    int32_t     unk_0c;
-    int32_t     unk_10;
-    int32_t     unk_14;
-    int32_t     unk_18;
+    int16_t     type;                   // BeroType
+    int16_t     sfx_id;
+    int32_t     direction;              // BeroDirection
+    int32_t     center_position[3];
+    int32_t     length;
     void*       entry_evt_code;         // default_entevt
-    int32_t     unk_20;
+    int32_t     case_type;
     void*       out_evt_code;           // default_outevt
     const char* target_map;
     const char* target_bero;
-    int16_t     unk_30;
-    int16_t     unk_32;
-    void*       unk_close_evt_code;
-    void*       unk_open_evt_code;
+    int16_t     entry_anim_type;        // BeroAnimType
+    int16_t     out_anim_type;          // BeroAnimType
+    void*       entry_anim_args;
+    void*       out_anim_args;
 } __attribute__((__packed__));
 
 static_assert(sizeof(BeroEntry) == 0x3c);
