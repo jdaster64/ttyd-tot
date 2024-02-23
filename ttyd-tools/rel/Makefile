@@ -15,11 +15,13 @@ include $(DEVKITPPC)/gamecube_rules
 
 export ELF2REL	:=	$(TOT_TTYDTOOLS)/bin/elf2rel
 export GCIPACK	:=	python $(TOT_TTYDTOOLS)/gcipack/gcipack.py
+export DEBUG_SYMBOLS	:=	python $(TOT_TTYDTOOLS)/bin/output_debug_symbols.py
 
 ifeq ($(VERSION),)
 all: us jp eu
 us:
 	@$(MAKE) --no-print-directory VERSION=us
+	@$(MAKE) --no-print-directory debug_symbols VERSION=us
 jp:
 	@$(MAKE) --no-print-directory VERSION=jp
 eu:
@@ -139,7 +141,7 @@ export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
 			-L$(LIBOGC_LIB)
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
-.PHONY: $(BUILD) clean_target
+.PHONY: $(BUILD) clean_target debug_symbols
 
 #---------------------------------------------------------------------------------
 $(BUILD):
@@ -150,6 +152,11 @@ $(BUILD):
 clean_target:
 	@echo clean ... $(VERSION)
 	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol $(OUTPUT).rel $(OUTPUT).gci
+
+#---------------------------------------------------------------------------------
+debug_symbols:
+	@echo processing debug symbols ...
+	@$(DEBUG_SYMBOLS) --in_elf=$(OUTPUT).elf --in_rel=$(OUTPUT).rel --out_dir=$(CURDIR)
 
 #---------------------------------------------------------------------------------
 else
