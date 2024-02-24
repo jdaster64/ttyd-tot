@@ -15,13 +15,16 @@ include $(DEVKITPPC)/gamecube_rules
 
 export ELF2REL	:=	$(TOT_TTYDTOOLS)/bin/elf2rel
 export GCIPACK	:=	python $(TOT_TTYDTOOLS)/gcipack/gcipack.py
-export DEBUG_SYMBOLS	:=	python $(TOT_TTYDTOOLS)/bin/output_debug_symbols.py
+export DEBUG_SYMBOLS	:=	python $(TOT_TTYDTOOLS)/scripts/output_debug_symbols.py
+export UPDATE_STRINGS	:=	python $(TOT_TTYDTOOLS)/scripts/update_text_files.py
 
 ifeq ($(VERSION),)
 all: us jp eu
 us:
 	@$(MAKE) --no-print-directory VERSION=us
 	@$(MAKE) --no-print-directory debug_symbols VERSION=us
+	@$(MAKE) --no-print-directory update_strings VERSION=us
+	@$(MAKE) --no-print-directory copy_files VERSION=us
 jp:
 	@$(MAKE) --no-print-directory VERSION=jp
 eu:
@@ -155,8 +158,18 @@ clean_target:
 
 #---------------------------------------------------------------------------------
 debug_symbols:
-	@echo processing debug symbols ...
+	@echo generating debug symbols ...
 	@$(DEBUG_SYMBOLS) --in_elf=$(OUTPUT).elf --in_rel=$(OUTPUT).rel --out_dir=$(CURDIR)
+
+#---------------------------------------------------------------------------------
+update_strings:
+	@echo updating text strings ...
+	@$(UPDATE_STRINGS) --in_msg_dir=$(TOT_TTYDTOOLS)/bin/backup_files/msg/US --out_msg_dir=$(TOT_TTYDTOOLS)/bin/outputs/msg/US
+
+#---------------------------------------------------------------------------------
+copy_files:
+	@echo copying .rel to output folder ...
+	@cp $(OUTPUT).rel $(TOT_TTYDTOOLS)/bin/outputs/rel/gon.rel -f
 
 #---------------------------------------------------------------------------------
 else
@@ -166,7 +179,7 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-$(OUTPUT).gci: $(OUTPUT).rel $(BANNERFILE) $(ICONFILE)
+# $(OUTPUT).gci: $(OUTPUT).rel $(BANNERFILE) $(ICONFILE)
 $(OUTPUT).rel: $(OUTPUT).elf $(MAPFILE)
 $(OUTPUT).elf: $(LDFILES) $(OFILES)
 
@@ -177,9 +190,9 @@ $(OFILES_SOURCES) : $(HFILES)
 	@echo output ... $(notdir $@)
 	@$(ELF2REL) $< -s $(MAPFILE) --rel-id 8
 	
-%.gci: %.rel
-	@echo packing ... $(notdir $@)
-	@$(GCIPACK) $< "rel" "Paper Mario" "TTYD Tower of Trials" $(BANNERFILE) $(ICONFILE) $(GAMECODE)
+# %.gci: %.rel
+# @echo packing ... $(notdir $@)
+# @$(GCIPACK) $< "rel" "Paper Mario" "TTYD Tower of Trials" $(BANNERFILE) $(ICONFILE) $(GAMECODE)
 	
 #---------------------------------------------------------------------------------
 # This rule links in binary data with the .jpg extension
