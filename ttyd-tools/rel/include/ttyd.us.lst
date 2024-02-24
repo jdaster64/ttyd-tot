@@ -567,12 +567,31 @@
 // .data
 80415fd0:g_MarioSt
 
+// evt_case.o
+8006fe84:evt_set_case_wrk
+8006ff04:evt_del_case_evt
+8006ff88:evt_exit_case_evt
+8006ffb0:evtRunCaseEntry
+80070034:evt_run_case_evt_bero
+80070110:evt_run_case_evt
+
 // seq_battle.o
 800736ec:battle_exit
 800738ac:battle_init
 80073b24:seq_battleMain
 80073f00:seq_battleExit
 80073f20:seq_battleInit
+
+// evt_hit.o
+80074018:evt_hitobj_name_callback
+8007407c:name_callback_sub
+80074324:evt_hitobj_attr_onoff
+800743cc:L_evt_hitobj_flag_onoff
+80074484:evt_hit_get_position
+800744fc:evt_hit_bind_update
+8007452c:evt_hit_bind_mapobj
+8007458c:evt_hit_damage_return_set
+80074664:evt_hitobj_onoff
 
 // fontmgr.o
 // unused:JUTFont_Draw
@@ -1722,6 +1741,10 @@
 8041768c:gauge_back
 8041769c:gauge_wakka
 8041ebec:g_StatusWindowWork
+
+// evt_seq.o
+8013ddc0:evt_seq_wait
+8013de10:evt_seq_set_seq
 
 // mario_party.o
 801410e8:marioGetParty
