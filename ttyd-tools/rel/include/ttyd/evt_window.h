@@ -25,15 +25,6 @@ EVT_DECLARE_USER_FUNC(evt_win_coin_on, 2)
 EVT_DECLARE_USER_FUNC(evt_win_other_select, 1)
 EVT_DECLARE_USER_FUNC(evt_win_item_select, 4)
 
-
-// evt_snd_bgm_scope
-// evt_snd_bgm_freq
-// evt_snd_bgmoff_f
-EVT_DECLARE_USER_FUNC(evt_snd_bgmoff, 1)
-// unk_JP_US_EU_37_801524c8
-EVT_DECLARE_USER_FUNC(evt_snd_bgmon_f, 3)
-EVT_DECLARE_USER_FUNC(evt_snd_bgmon, 2)
-
 }
 
 }
