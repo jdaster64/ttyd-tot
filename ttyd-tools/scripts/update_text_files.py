@@ -378,6 +378,7 @@ g_StringMap = {
             b"Tattled every kind of enemy.",
         
     },
+    
     'gon_13': {
         # 'Pit'-specific text (TODO: move to specific maps or global).
         b"pit_reward_party_join":

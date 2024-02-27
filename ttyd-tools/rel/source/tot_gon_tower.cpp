@@ -63,7 +63,7 @@ const char kMoverNpcName[] = "\x88\xda\x93\xae\x89\xae";  // "idouya"
 extern const BeroEntry normal_room_entry_data[3];
 
 // Script for sign that shows current floor.
-EVT_BEGIN(evt_kanban)
+EVT_BEGIN(Tower_SignEvt)
     USER_FUNC(evt_npc_stop_for_event)
     USER_FUNC(evt_mario_key_onoff, 0)
     SET(LW(0), GSW(1321))
@@ -75,7 +75,7 @@ EVT_BEGIN(evt_kanban)
 EVT_END()
 
 // Setting up loading zones, etc. for regular room.
-EVT_BEGIN(setup_normal)
+EVT_BEGIN(Tower_BeroSetupNormal)
     SET(LW(0), PTR(&normal_room_entry_data))
     USER_FUNC(evt_bero_get_info)
     RUN_CHILD_EVT(PTR(&evt_bero_info_run))
@@ -83,14 +83,14 @@ EVT_BEGIN(setup_normal)
 EVT_END()
 
 // Increment floor number.
-EVT_BEGIN(floor_inc)
+EVT_BEGIN(Tower_IncrementFloor)
     ADD(GSW(1321), 1)
     SET(LW(0), 0)
     RETURN()
 EVT_END()
 
 // TODO: Implement.
-EVT_BEGIN(dokan_open)
+EVT_BEGIN(Tower_SpawnPipe)
     USER_FUNC(evt_mario_key_onoff, 0)
     WAIT_MSEC(1000)
     WAIT_MSEC(1000)
@@ -117,19 +117,19 @@ EVT_END()
 
 // TODO: Implement, based on patches_field::EnemyNpcSetupEvt.
 // (For now, just spawn a consistent fight with two Goombas).
-EVT_BEGIN(npc_setup)
+EVT_BEGIN(Tower_NpcSetup)
     RETURN()
 EVT_END()
 
 // Main room initialization event.
-EVT_BEGIN(jon_init_evt)
-    USER_FUNC(evt_run_case_evt, 9, 1, PTR("a_kanban"), 0, PTR(&evt_kanban), 0)
+EVT_BEGIN(gon_01_InitEvt)
+    USER_FUNC(evt_run_case_evt, 9, 1, PTR("a_kanban"), 0, PTR(Tower_SignEvt), 0)
     
     // Set up enemy NPC (TODO: or Mover, Charlieton, etc.)
-    RUN_CHILD_EVT(PTR(&npc_setup))
+    RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
     
     // TODO: Handle cases for Mover / NPC rooms, boss rooms?
-    RUN_CHILD_EVT(PTR(&setup_normal))
+    RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
     USER_FUNC(evt_npc_check, PTR(kPitNpcName), LW(0))
     IF_NOT_EQUAL(LW(0), 1)
         USER_FUNC(evt_hit_bind_mapobj, PTR("a_dokan_1"), PTR("dokan_1_s"))
@@ -184,7 +184,7 @@ const BeroEntry normal_room_entry_data[3] = {
         .length = -1,
         .entry_evt_code = nullptr,
         .case_type = 6,
-        .out_evt_code = (void*)floor_inc,
+        .out_evt_code = (void*)Tower_IncrementFloor,
         .target_map = "gon_01",
         .target_bero = "dokan_2",
         .entry_anim_type = BeroAnimType::ANIMATION,
@@ -193,5 +193,9 @@ const BeroEntry normal_room_entry_data[3] = {
         .out_anim_args = nullptr,
     }, { /* null-terminator */ },
 };
+
+const int32_t* GetTowerInitEvt() {
+    return gon_01_InitEvt;
+}
 
 }  // namespace mod::tot::gon
