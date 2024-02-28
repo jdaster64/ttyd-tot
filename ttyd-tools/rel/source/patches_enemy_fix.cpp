@@ -6,6 +6,7 @@
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
+#include "tot_custom_rel.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_database_common.h>
@@ -70,6 +71,9 @@ extern "C" {
 namespace mod::infinite_pit {
 
 namespace {
+
+// For convenience.
+using namespace ::mod::tot::custom;
     
 using ::ttyd::battle::BattleWork;
 using ::ttyd::battle_database_common::BattleUnitKind;
@@ -97,41 +101,6 @@ extern const int32_t g_BattleChoiceSamplingEnemy_SumRandWeights_BH;
 extern const int32_t g_BattleChoiceSamplingEnemy_SumRandWeights_EH;
 extern const int32_t g_btlDispMain_DrawNormalHeldItem_BH;
 extern const int32_t g_btlevtcmd_CheckSpace_Patch_CheckEnemyTypes;
-extern const int32_t g_jon_BanditAttackEvt_CheckConfusionOffset;
-extern const int32_t g_jon_DarkKoopatrolAttackEvt_NormalAttackReturnLblOffset;
-extern const int32_t g_jon_DarkWizzerdAttackEvt_CheckEnemyNumOffset;
-extern const int32_t g_jon_DarkWizzerdGaleForceDeathEvt_PatchOffset;
-extern const int32_t g_jon_EliteWizzerdAttackEvt_CheckEnemyNumOffset;
-extern const int32_t g_jon_EliteWizzerdGaleForceDeathEvt_PatchOffset;
-extern const int32_t g_jon_BadgeBanditAttackEvt_CheckConfusionOffset;
-extern const int32_t g_jon_PiderGaleForceDeathEvt_PatchOffset;
-extern const int32_t g_jon_ArantulaGaleForceDeathEvt_PatchOffset;
-extern const int32_t g_custom_AtomicBoo_BreathWeapon_Offset;
-extern const int32_t g_custom_AtomicBooBreathSubEvt_Offset;
-extern const int32_t g_custom_HammerBrosAttackEvt_CheckHpOffset;
-extern const int32_t g_custom_BoomerangBrosAttackEvt_CheckHpOffset;
-extern const int32_t g_custom_FireBrosAttackEvt_CheckHpOffset;
-extern const int32_t g_custom_MagikoopaGaleForceDeathEvt_PatchOffset;
-extern const int32_t g_custom_GrnMagikoopaGaleForceDeathEvt_PatchOffset;
-extern const int32_t g_custom_RedMagikoopaGaleForceDeathEvt_PatchOffset;
-extern const int32_t g_custom_WhtMagikoopaGaleForceDeathEvt_PatchOffset;
-extern const int32_t g_custom_MagikoopaAttackEvt_CheckEnemyNumOffset;
-extern const int32_t g_custom_GrnMagikoopaAttackEvt_CheckEnemyNumOffset;
-extern const int32_t g_custom_RedMagikoopaAttackEvt_CheckEnemyNumOffset;
-extern const int32_t g_custom_WhtMagikoopaAttackEvt_CheckEnemyNumOffset;
-extern const int32_t g_custom_BigBanditAttackEvt_CheckConfusionOffset;
-extern const int32_t g_custom_KoopatrolAttackEvt_NormalAttackReturnLblOffset;
-extern const int32_t g_custom_XNautAttackEvt_NormalAttackReturnLblOffset;
-extern const int32_t g_custom_XNautAttackEvt_JumpAttackReturnLblOffset;
-extern const int32_t g_custom_EliteXNautAttackEvt_NormalAttackReturnLblOffset;
-extern const int32_t g_custom_EliteXNautAttackEvt_JumpAttackReturnLblOffset;
-extern const int32_t g_custom_ZYux_UnitKindOffset;
-extern const int32_t g_custom_XYux_UnitKindOffset;
-extern const int32_t g_custom_Yux_UnitKindOffset;
-extern const int32_t g_custom_ZYux_PrimaryKindPartOffset;
-extern const int32_t g_custom_XYux_PrimaryKindPartOffset;
-extern const int32_t g_custom_Yux_PrimaryKindPartOffset;
-extern const int32_t g_custom_GrnMagikoopa_DefenseOffset;
 
 namespace enemy_fix {
 
@@ -148,8 +117,9 @@ EVT_PATCH_END()
 static_assert(sizeof(GaleForceKillPatch) == 0x38);
 
 // Modified Atomic Boo breath event that checks for both characters' guards.
+// TODO: Incorporate in custom Atomic Boo scripts.
+/*
 EVT_BEGIN(AtomicBooBreathSubEvt)
-
 USER_FUNC(
     ttyd::battle_event_cmd::btlevtcmd_PreCheckDamage, -2, LW(3), LW(4),
     REL_PTR(ModuleId::CUSTOM, g_custom_AtomicBoo_BreathWeapon_Offset), 0, LW(5))
@@ -224,12 +194,7 @@ LBL(91)
 LBL(99)
 RETURN()
 EVT_END()
-
-// Wrapper for modified Atomic Boo breath event.
-EVT_BEGIN(AtomicBooBreathSubEvtHook)
-RUN_CHILD_EVT(AtomicBooBreathSubEvt)
-RETURN()
-EVT_END()
+*/
 
 // A fragment of an event to patch over Hammer/Boomerang/Fire Bros.' HP checks.
 const int32_t HammerBrosHpCheck[] = {
@@ -418,180 +383,106 @@ void ApplyFixedPatches() {
             if (!result) result = CheckIfPlayerDefeated();
             return result;
         });
-}
-
-void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
-    if (!module_ptr) return;
-    const uint32_t module_start = reinterpret_cast<uint32_t>(module_ptr);
+        
+    // Individual enemy behavior, etc. patches.
     
-    if (module_id == ModuleId::JON) {
-        // Patch Gale Force coins / EXP out for Wizzerds & Piders.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_jon_DarkWizzerdGaleForceDeathEvt_PatchOffset),
-            GaleForceKillPatch, sizeof(GaleForceKillPatch));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_jon_EliteWizzerdGaleForceDeathEvt_PatchOffset),
-            GaleForceKillPatch, sizeof(GaleForceKillPatch));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_jon_PiderGaleForceDeathEvt_PatchOffset),
-            GaleForceKillPatch, sizeof(GaleForceKillPatch));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_jon_ArantulaGaleForceDeathEvt_PatchOffset),
-            GaleForceKillPatch, sizeof(GaleForceKillPatch));
-        // Patch over cloning Wizzerds' num enemies check.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_jon_DarkWizzerdAttackEvt_CheckEnemyNumOffset),
-            reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_jon_EliteWizzerdAttackEvt_CheckEnemyNumOffset),
-            reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-        // Patch over Bandit, Badge Bandit confusion check for whether to steal.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_jon_BanditAttackEvt_CheckConfusionOffset),
-            reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_jon_BadgeBanditAttackEvt_CheckConfusionOffset),
-            reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
-        // Fix Dark Koopatrol's normal attack if there are no valid targets.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start +
-                g_jon_DarkKoopatrolAttackEvt_NormalAttackReturnLblOffset), 98);
-    } else if (module_id == ModuleId::CUSTOM) {
-        // Custom logic for Atomic Boo's breath attack that allows guards with
-        // both characters at once.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_AtomicBooBreathSubEvt_Offset),
-            AtomicBooBreathSubEvtHook, sizeof(AtomicBooBreathSubEvtHook));
-        // Patch over Hammer, Boomerang, and Fire Bros.' HP checks.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_HammerBrosAttackEvt_CheckHpOffset),
-            HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_BoomerangBrosAttackEvt_CheckHpOffset),
-            HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_FireBrosAttackEvt_CheckHpOffset),
-            HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
-        // Patch Gale Force coins / EXP out for Magikoopa.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_MagikoopaGaleForceDeathEvt_PatchOffset),
-            GaleForceKillPatch, sizeof(GaleForceKillPatch));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_GrnMagikoopaGaleForceDeathEvt_PatchOffset),
-            GaleForceKillPatch, sizeof(GaleForceKillPatch));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_RedMagikoopaGaleForceDeathEvt_PatchOffset),
-            GaleForceKillPatch, sizeof(GaleForceKillPatch));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_WhtMagikoopaGaleForceDeathEvt_PatchOffset),
-            GaleForceKillPatch, sizeof(GaleForceKillPatch));
-        // Patch over Magikoopa's num enemies check.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_MagikoopaAttackEvt_CheckEnemyNumOffset),
-            reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_GrnMagikoopaAttackEvt_CheckEnemyNumOffset),
-            reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_RedMagikoopaAttackEvt_CheckEnemyNumOffset),
-            reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_WhtMagikoopaAttackEvt_CheckEnemyNumOffset),
-            reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-        // Patch over Big Bandit confusion check for whether to steal items.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_BigBanditAttackEvt_CheckConfusionOffset),
-            reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
-        // Fix Koopatrol's normal attack if there are no valid targets.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start +
-                g_custom_KoopatrolAttackEvt_NormalAttackReturnLblOffset), 98);
-        // Fix X-Naut & Elite X-Nauts' attacks if there are no valid targets.
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start +
-                g_custom_XNautAttackEvt_NormalAttackReturnLblOffset), 98);
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start +
-                g_custom_XNautAttackEvt_JumpAttackReturnLblOffset), 98);
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start +
-                g_custom_EliteXNautAttackEvt_NormalAttackReturnLblOffset), 98);
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start +
-                g_custom_EliteXNautAttackEvt_JumpAttackReturnLblOffset), 98);
-        // Make all varieties of Yux able to be hit by grounded attacks,
-        // that way any partner is able to attack them.
-        auto* z_yux_part =
-            reinterpret_cast<BattleUnitKindPart*>(
-                module_start + g_custom_ZYux_PrimaryKindPartOffset);
-        auto* x_yux_part =
-            reinterpret_cast<BattleUnitKindPart*>(
-                module_start + g_custom_XYux_PrimaryKindPartOffset);
-        auto* yux_part =
-            reinterpret_cast<BattleUnitKindPart*>(
-                module_start + g_custom_Yux_PrimaryKindPartOffset);
-        z_yux_part->attribute_flags  &= ~0x600000;
-        x_yux_part->attribute_flags  &= ~0x600000;
-        yux_part->attribute_flags    &= ~0x600000;
-        // Make all varieties of Yux unable to be swallowed.
-        auto* z_yux_unit =
-            reinterpret_cast<BattleUnitKind*>(
-                module_start + g_custom_ZYux_UnitKindOffset);
-        auto* x_yux_unit =
-            reinterpret_cast<BattleUnitKind*>(
-                module_start + g_custom_XYux_UnitKindOffset);
-        auto* yux_unit =
-            reinterpret_cast<BattleUnitKind*>(
-                module_start + g_custom_Yux_UnitKindOffset);
-        z_yux_unit->swallow_chance  = -1;
-        x_yux_unit->swallow_chance  = -1;
-        yux_unit->swallow_chance    = -1;
-        // Give Green Magikoopas nonzero DEF so they can have 1 DEF in the mod.
-        const int8_t kDefenseArr[5] = { 1, 1, 1, 1, 1 };
-        mod::patch::writePatch(
-            reinterpret_cast<void*>(
-                module_start + g_custom_GrnMagikoopa_DefenseOffset),
-            kDefenseArr, sizeof(kDefenseArr));
-    }
-}
-
-void LinkCustomEvts(void* module_ptr, ModuleId::e module_id, bool link) {
-    if (module_id != ModuleId::CUSTOM || !module_ptr) return;
+    // Patch Gale Force coins / EXP out for enemies that had special logic
+    // for handling it in the original game (mostly cloning enemies).
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_DarkWizzerd_GaleForceDeath_PatchLoc),
+        GaleForceKillPatch, sizeof(GaleForceKillPatch));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_EliteWizzerd_GaleForceDeath_PatchLoc),
+        GaleForceKillPatch, sizeof(GaleForceKillPatch));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_Magikoopa_GaleForceDeath_PatchLoc),
+        GaleForceKillPatch, sizeof(GaleForceKillPatch));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_RedMagikoopa_GaleForceDeath_PatchLoc),
+        GaleForceKillPatch, sizeof(GaleForceKillPatch));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_WhiteMagikoopa_GaleForceDeath_PatchLoc),
+        GaleForceKillPatch, sizeof(GaleForceKillPatch));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_GreenMagikoopa_GaleForceDeath_PatchLoc),
+        GaleForceKillPatch, sizeof(GaleForceKillPatch));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_Pider_GaleForceDeath_PatchLoc),
+        GaleForceKillPatch, sizeof(GaleForceKillPatch));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_Arantula_GaleForceDeath_PatchLoc),
+        GaleForceKillPatch, sizeof(GaleForceKillPatch));
+        
+    // Patch cloning Wizzerds' / Magikoopas' remaining enemies checks
+    // to consider all enemy actors, regardless of alliance.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_DarkWizzerd_CheckNumEnemies_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_EliteWizzerd_CheckNumEnemies_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_Magikoopa_CheckNumEnemies_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_RedMagikoopa_CheckNumEnemies_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_WhiteMagikoopa_CheckNumEnemies_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_GreenMagikoopa_CheckNumEnemies_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
+        
+    // Patch over Bandits' confusion check for whether to steal.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_Bandit_CheckConfusion_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_BigBandit_CheckConfusion_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_BadgeBandit_CheckConfusion_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
+            
+    // Patch over Hammer, Boomerang, and Fire Bros.' low-HP checks.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_HammerBros_CheckHp_PatchLoc),
+        HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_BoomerangBros_CheckHp_PatchLoc),
+        HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_FireBros_CheckHp_PatchLoc),
+        HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
+        
+    // Fix branch labels for attacks that softlock if there are no valid targets.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_Koopatrol_NormalAttackReturnLbl_PatchLoc), 98);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_DarkKoopatrol_NormalAttackReturnLbl_PatchLoc), 98);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_XNaut_NormalAttackReturnLbl_PatchLoc), 98);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_XNaut_JumpAttackReturnLbl_PatchLoc), 98);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_EliteXNaut_NormalAttackReturnLbl_PatchLoc), 98);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(evt_EliteXNaut_JumpAttackReturnLbl_PatchLoc), 98);
+            
+    // Make all varieties of Yux able to be hit by grounded attacks,
+    // that way any partner is able to attack them.
+    part_Yux_Main.attribute_flags   &= ~0x600000;
+    part_ZYux_Main.attribute_flags  &= ~0x600000;
+    part_XYux_Main.attribute_flags  &= ~0x600000;
     
-    if (link) {
-        LinkCustomEvt(
-            module_id, module_ptr, const_cast<int32_t*>(AtomicBooBreathSubEvt));
-    } else {
-        UnlinkCustomEvt(
-            module_id, module_ptr, const_cast<int32_t*>(AtomicBooBreathSubEvt));
-    }
+    // Make all varieties of Yux unable to be swallowed.
+    unit_Yux.swallow_chance     = -1;
+    unit_ZYux.swallow_chance    = -1;
+    unit_XYux.swallow_chance    = -1;
+    
+    // Give Green Magikoopas nonzero base DEF so they can have 1 DEF in the mod.
+    for (int32_t i = 0; i < 5; ++i) defense_GreenMagikoopa[i] = 1;
 }
 
 int32_t SumWeaponTargetRandomWeights(int32_t* weights) {

@@ -338,46 +338,9 @@ extern const int32_t g_jon_bero_return_ReturnBeroEntryOffset = 0x12520;
 extern const int32_t g_jon_zonbaba_first_event_EvtOffset = 0x14570;
 extern const int32_t g_jon_btlsetup_jon_tbl_Offset = 0x1d460;
 extern const int32_t g_jon_unit_boss_zonbaba_battle_entry_event = 0x1ebdc;
-extern const int32_t g_jon_BanditAttackEvt_CheckConfusionOffset = 0x2ffa8;
-extern const int32_t g_jon_DarkKoopatrolAttackEvt_NormalAttackReturnLblOffset = 0x51790;
-extern const int32_t g_jon_DarkWizzerdAttackEvt_CheckEnemyNumOffset = 0x535a4;
-extern const int32_t g_jon_DarkWizzerdGaleForceDeathEvt_PatchOffset = 0x544e4;
-extern const int32_t g_jon_EliteWizzerdAttackEvt_CheckEnemyNumOffset = 0x5cecc;
-extern const int32_t g_jon_EliteWizzerdGaleForceDeathEvt_PatchOffset = 0x5de0c;
-extern const int32_t g_jon_BadgeBanditAttackEvt_CheckConfusionOffset = 0x73e40;
-extern const int32_t g_jon_PiderGaleForceDeathEvt_PatchOffset = 0x760e4;
-extern const int32_t g_jon_ArantulaGaleForceDeathEvt_PatchOffset = 0x79ec4;
 
 // TIK (Rogueport Underground)
 extern const int32_t g_tik_06_PitBeroEntryOffset = 0x1f240;
 extern const int32_t g_tik_06_RightBeroEntryOffset = 0x1f2f4;
-
-// CUSTOM
-extern const int32_t g_custom_XNautAttackEvt_NormalAttackReturnLblOffset = 0x14f0c;
-extern const int32_t g_custom_XNautAttackEvt_JumpAttackReturnLblOffset = 0x153a4;
-extern const int32_t g_custom_ZYux_UnitKindOffset = 0x15fd0;
-extern const int32_t g_custom_ZYux_PrimaryKindPartOffset = 0x160a4;
-extern const int32_t g_custom_EliteXNautAttackEvt_NormalAttackReturnLblOffset = 0x19b5c;
-extern const int32_t g_custom_EliteXNautAttackEvt_JumpAttackReturnLblOffset = 0x19ff4;
-extern const int32_t g_custom_XYux_UnitKindOffset = 0x1ca90;
-extern const int32_t g_custom_XYux_PrimaryKindPartOffset = 0x1cb64;
-extern const int32_t g_custom_Yux_UnitKindOffset = 0x200f0;
-extern const int32_t g_custom_Yux_PrimaryKindPartOffset = 0x201c4;
-extern const int32_t g_custom_AtomicBoo_BreathWeapon_Offset = 0x2a048;
-extern const int32_t g_custom_AtomicBooBreathSubEvt_Offset = 0x2b62c;
-extern const int32_t g_custom_MagikoopaGaleForceDeathEvt_PatchOffset = 0x40f98;
-extern const int32_t g_custom_MagikoopaAttackEvt_CheckEnemyNumOffset = 0x4142c;
-extern const int32_t g_custom_KoopatrolAttackEvt_NormalAttackReturnLblOffset = 0x469d8;
-extern const int32_t g_custom_BoomerangBrosAttackEvt_CheckHpOffset = 0x4ace4;
-extern const int32_t g_custom_FireBrosAttackEvt_CheckHpOffset = 0x4e86c;
-extern const int32_t g_custom_HammerBrosAttackEvt_CheckHpOffset = 0x508dc;
-extern const int32_t g_custom_GrnMagikoopa_DefenseOffset = 0x59b70;
-extern const int32_t g_custom_GrnMagikoopaGaleForceDeathEvt_PatchOffset = 0x5ad00;
-extern const int32_t g_custom_GrnMagikoopaAttackEvt_CheckEnemyNumOffset = 0x5b194;
-extern const int32_t g_custom_RedMagikoopaGaleForceDeathEvt_PatchOffset = 0x5e628;
-extern const int32_t g_custom_RedMagikoopaAttackEvt_CheckEnemyNumOffset = 0x5eabc;
-extern const int32_t g_custom_WhtMagikoopaGaleForceDeathEvt_PatchOffset = 0x61f50;
-extern const int32_t g_custom_WhtMagikoopaAttackEvt_CheckEnemyNumOffset = 0x623e4;
-extern const int32_t g_custom_BigBanditAttackEvt_CheckConfusionOffset = 0x64a18;
 
 }

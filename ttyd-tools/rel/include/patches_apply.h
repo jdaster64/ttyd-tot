@@ -38,7 +38,6 @@ inline void ApplyAllFixedPatches() {
 
 // Applies all patches that need to be applied once per module load.
 inline void ApplyAllModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
-    enemy_fix::ApplyModuleLevelPatches(module_ptr, module_id);
     field::ApplyModuleLevelPatches(module_ptr, module_id);
     field_start::ApplyModuleLevelPatches(module_ptr, module_id);
 }
@@ -46,7 +45,6 @@ inline void ApplyAllModuleLevelPatches(void* module_ptr, ModuleId::e module_id) 
 // Links / unlinks all custom events that rely on code in TTYD's modules.
 // Unlinks if `link` = false.
 inline void LinkAllCustomEvts(void* module_ptr, ModuleId::e module_id, bool link) {
-    enemy_fix::LinkCustomEvts(module_ptr, module_id, link);
     field::LinkCustomEvts(module_ptr, module_id, link);
 }
 

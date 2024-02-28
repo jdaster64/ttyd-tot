@@ -2876,7 +2876,7 @@
 40,5,000773f4:evt_Arantula_GaleForceDeath_PatchLoc
 40,5,00081dd8:evt_Magikoopa_GaleForceDeath_PatchLoc
 40,5,0008226c:evt_Magikoopa_CheckNumEnemies_PatchLoc
-40,5,00085004:evt_Koopatrol_NormalAttackReturnLbl_PatchLoc
+40,5,00085538:evt_Koopatrol_NormalAttackReturnLbl_PatchLoc
 40,5,00086e64:evt_BoomerangBros_CheckHp_PatchLoc
 40,5,00088dbc:evt_FireBros_CheckHp_PatchLoc
 40,5,0008c9e4:evt_HammerBros_CheckHp_PatchLoc
