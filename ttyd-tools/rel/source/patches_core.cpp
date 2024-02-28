@@ -5,7 +5,6 @@
 #include "custom_item.h"
 #include "custom_strings.h"
 #include "mod.h"
-#include "mod_loading.h"
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_apply.h"
@@ -312,24 +311,6 @@ int32_t LoadMap() {
             area = "tou2";
         }
     }
-    
-    // Should no longer be needed, since the custom enemy REL is always loaded.
-    /*
-    if (g_WaitingForCustomLoad) {
-        if (!LoadingManager::HasFinished()) return 1;
-    } else {
-        if (!strcmp(area, "jon") && strcmp(g_LastModuleLoaded, "jon")) {
-            // If loading the Pit after a different area, load custom REL first.
-            LoadingManager::StartLoading();
-            g_WaitingForCustomLoad = true;
-            return 1;
-        } else if (!strcmp(g_LastModuleLoaded, "jon") && strcmp(area, "jon")) {
-            // If unloading the Pit, unlink the custom REL.
-            gc::OSLink::OSUnlink(mario_st->pMapAlloc);
-            strcpy(g_LastModuleLoaded, "");
-        }
-    }
-    */
     
     // Start loading the relocatable module associated with the current area.
     if (ttyd::filemgr::fileAsyncf(

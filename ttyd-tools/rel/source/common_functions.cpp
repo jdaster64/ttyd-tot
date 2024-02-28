@@ -55,7 +55,6 @@ const char* ModuleNameFromId(ModuleId::e module_id) {
         "las", "moo", "mri", "muj", "nok", "pik", "rsh", "sys",
         "tik", "tou", "tou2", "usu", "win", "yuu"
     };
-    if (module_id == ModuleId::CUSTOM) return "custom";
     return kModuleNames[module_id];
 }
     

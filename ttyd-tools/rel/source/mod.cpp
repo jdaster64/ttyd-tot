@@ -5,7 +5,6 @@
 #include "mod_cheats.h"
 #include "mod_debug.h"
 #include "mod_gfxtest.h"
-#include "mod_loading.h"
 #include "mod_menu.h"
 #include "mod_title.h"
 #include "patch.h"
@@ -74,7 +73,6 @@ void Mod::Init() {
 
 void Mod::Update() {
     DebugManager::Update();
-    LoadingManager::Update();
     CheatsManager::Update();
     AchievementsManager::Update();
     TitleScreenManager::Update();
@@ -83,7 +81,6 @@ void Mod::Update() {
 
 void Mod::Draw() {
     RegisterDrawCallback(DebugManager::Draw,        CameraId::kDebug3d);
-    RegisterDrawCallback(LoadingManager::Draw,      CameraId::kDebug3d);
     RegisterDrawCallback(CheatsManager::Draw,       CameraId::kDebug3d);
     RegisterDrawCallback(AchievementsManager::Draw, CameraId::kDebug3d);
     RegisterDrawCallback(TitleScreenManager::Draw,  CameraId::k2d);
