@@ -1,6 +1,8 @@
-#include "tot_gon.h"
+#include "tot_gon_tower.h"
 
 #include "evt_cmd.h"
+#include "tot_generate_enemy.h"
+#include "tot_gon.h"
 
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
@@ -24,6 +26,7 @@
 #include <ttyd/evt_sub.h>
 #include <ttyd/evt_window.h>
 #include <ttyd/mapdata.h>
+#include <ttyd/npcdrv.h>
 
 namespace mod::tot::gon {
 
@@ -50,6 +53,7 @@ using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::evt_window;
 
 using ::ttyd::evt_bero::BeroEntry;
+using ::ttyd::npcdrv::NpcSetupInfo;
 
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
@@ -57,6 +61,12 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 
 const char kPitNpcName[] = "\x93\x47";  // "enemy"
 const char kMoverNpcName[] = "\x88\xda\x93\xae\x89\xae";  // "idouya"
+const char kPiderName[] = "\x83\x70\x83\x43\x83\x5f\x81\x5b\x83\x58";
+const char kArantulaName[] = 
+    "\x83\x60\x83\x85\x83\x89\x83\x93\x83\x5e\x83\x89\x81\x5b";
+
+// Info for custom NPCs.
+NpcSetupInfo g_NpcSetupInfo[2];
 
 }  // namespace
 
@@ -118,6 +128,45 @@ EVT_END()
 // TODO: Implement, based on patches_field::EnemyNpcSetupEvt.
 // (For now, just spawn a consistent fight with two Goombas).
 EVT_BEGIN(Tower_NpcSetup)
+    // TODO: Check for special NPCs (Mover, Charlieton, etc.)...
+    
+    USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
+    SET(LW(1), PTR(g_NpcSetupInfo))
+    
+    // TODO: Implement.
+    // USER_FUNC(evtTot_GetEnemyNpcInfo, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
+    
+    USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
+    USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
+    USER_FUNC(evt_npc_setup, LW(1))
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
+    
+    // TODO: Special initialization for Pider/Arantula:
+    // IF_STR_EQUAL(LW(2), PTR(kPiderName))
+        // USER_FUNC(ttyd::evt_npc::evt_npc_set_home_position,
+            // PTR(kPitNpcName), LW(4), LW(5), LW(6))
+    // END_IF()
+    // IF_STR_EQUAL(LW(2), PTR(kArantulaName))
+        // USER_FUNC(ttyd::evt_npc::evt_npc_set_home_position,
+            // PTR(kPitNpcName), LW(4), LW(5), LW(6))
+    // END_IF()
+    
+    // TODO: Special initialization for bosses...
+    
+    // TODO: Implement.
+    // USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
+    
+    // Wait for the enemy to be defeated, then spawn pipe.
+    INLINE_EVT()
+        LBL(1)
+        WAIT_FRM(1)
+        USER_FUNC(evt_npc_status_check, PTR(kPitNpcName), 4, LW(0))
+        IF_EQUAL(LW(0), 0)
+            GOTO(1)
+        END_IF()
+        RUN_EVT(Tower_SpawnPipe)
+    END_INLINE()
+
     RETURN()
 EVT_END()
 
