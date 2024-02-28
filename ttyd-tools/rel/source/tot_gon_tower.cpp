@@ -25,6 +25,7 @@
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
 #include <ttyd/evt_window.h>
+#include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
 #include <ttyd/npcdrv.h>
 
@@ -58,6 +59,7 @@ using ::ttyd::npcdrv::NpcSetupInfo;
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
 namespace BeroType = ::ttyd::evt_bero::BeroType;
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 const char kPitNpcName[] = "\x93\x47";  // "enemy"
 const char kMoverNpcName[] = "\x88\xda\x93\xae\x89\xae";  // "idouya"
@@ -85,6 +87,20 @@ EVT_BEGIN(Tower_SignEvt)
     RETURN()
 EVT_END()
 
+// Script that runs when opening a chest.
+EVT_BEGIN(Tower_ChestEvt)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mobj_get_position, PTR("box"), LW(10), LW(11), LW(12))
+    USER_FUNC(
+        evt_item_entry, PTR("item"), ItemType::MUSHROOM, 
+        LW(10), LW(11), LW(12), 17, -1, 0)
+    USER_FUNC(evt_mobj_wait_animation_end, PTR("box"))
+    USER_FUNC(evt_item_get_item, PTR("item"))
+    USER_FUNC(evt_mario_key_onoff, 1)
+    SET(GSW(1000), 1)
+    RETURN()
+EVT_END()
+
 // Setting up loading zones, etc. for regular room.
 EVT_BEGIN(Tower_BeroSetupNormal)
     SET(LW(0), PTR(&normal_room_entry_data))
@@ -101,11 +117,30 @@ EVT_BEGIN(Tower_IncrementFloor)
     RETURN()
 EVT_END()
 
-// TODO: Implement.
+// Spawn chests.
+EVT_BEGIN(Tower_SpawnChests)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    WAIT_MSEC(2000)
+    SET(LW(0), 0)
+    SET(LW(1), 50)
+    SET(LW(2), -100)
+    USER_FUNC(
+        evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
+        0, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(
+        evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
+        LW(0), LW(1), LW(2), 0)
+    USER_FUNC(
+        evt_mobj_itembox, PTR("box"), LW(0), LW(1), LW(2), 1, 0, 
+        PTR(&Tower_ChestEvt), GSWF(5075))
+    WAIT_MSEC(1000)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
+// Spawn the exit to the floor.
 EVT_BEGIN(Tower_SpawnPipe)
     USER_FUNC(evt_mario_key_onoff, 0)
-    WAIT_MSEC(1000)
-    WAIT_MSEC(1000)
     WAIT_MSEC(500)
     SET(LW(2), PTR("a_dokan_1"))
     SET(LW(3), PTR("dokan_1_s"))
@@ -127,8 +162,7 @@ EVT_BEGIN(Tower_SpawnPipe)
     RETURN()
 EVT_END()
 
-// TODO: Implement, based on patches_field::EnemyNpcSetupEvt.
-// (For now, just spawn a consistent fight with two Goombas).
+// Set up the battle / enemy NPC, or other NPCs on the floor.
 EVT_BEGIN(Tower_NpcSetup)
     // TODO: Check for special NPCs (Mover, Charlieton, etc.)...
     
@@ -154,13 +188,24 @@ EVT_BEGIN(Tower_NpcSetup)
     // TODO: Swap out battle id as appropriate for special battles?
     USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
     
-    // Wait for the enemy to be defeated, then spawn pipe.
+    // Wait for the enemy to be defeated, then spawn chests.
     INLINE_EVT()
         LBL(1)
         WAIT_FRM(1)
         USER_FUNC(evt_npc_status_check, PTR(kPitNpcName), 4, LW(0))
         IF_EQUAL(LW(0), 0)
             GOTO(1)
+        END_IF()
+        RUN_EVT(Tower_SpawnChests)
+    END_INLINE()
+    
+    // Wait for a chest to be opened, then spawn pipe.
+    INLINE_EVT()
+        LBL(2)
+        WAIT_FRM(1)
+        SET(LW(0), GSW(1000))
+        IF_EQUAL(LW(0), 0)
+            GOTO(2)
         END_IF()
         RUN_EVT(Tower_SpawnPipe)
     END_INLINE()
@@ -170,6 +215,13 @@ EVT_END()
 
 // Main room initialization event.
 EVT_BEGIN(gon_01_InitEvt)
+    // Random unused flag, used to track chest item collection.
+    SET(GSW(1000), 0)
+    // Flags to track chest opening.
+    SET(GSWF(5075), 0)
+    SET(GSWF(5076), 0)
+    SET(GSWF(5077), 0)
+
     USER_FUNC(evt_run_case_evt, 9, 1, PTR("a_kanban"), 0, PTR(Tower_SignEvt), 0)
     
     // Set up enemy NPC (TODO: or Mover, Charlieton, etc.)

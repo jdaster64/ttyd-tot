@@ -536,6 +536,7 @@
 // evt_mobj.o
 // .text
 80067878:evt_mobj_signboard
+80067a4c:evt_mobj_itembox
 8006b948:evt_mobj_wait_animation_end
 8006c03c:evt_mobj_get_position
 // .data
