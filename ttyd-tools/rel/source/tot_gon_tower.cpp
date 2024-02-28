@@ -132,29 +132,25 @@ EVT_BEGIN(Tower_NpcSetup)
     
     USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
     SET(LW(1), PTR(g_NpcSetupInfo))
-    
-    // TODO: Implement.
-    // USER_FUNC(evtTot_GetEnemyNpcInfo, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
+    USER_FUNC(evtTot_GetEnemyNpcInfo, 
+        LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
     
     USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
     USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
     USER_FUNC(evt_npc_setup, LW(1))
     USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
     
-    // TODO: Special initialization for Pider/Arantula:
-    // IF_STR_EQUAL(LW(2), PTR(kPiderName))
-        // USER_FUNC(ttyd::evt_npc::evt_npc_set_home_position,
-            // PTR(kPitNpcName), LW(4), LW(5), LW(6))
-    // END_IF()
-    // IF_STR_EQUAL(LW(2), PTR(kArantulaName))
-        // USER_FUNC(ttyd::evt_npc::evt_npc_set_home_position,
-            // PTR(kPitNpcName), LW(4), LW(5), LW(6))
-    // END_IF()
+    IF_STR_EQUAL(LW(2), PTR(kPiderName))
+        USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
+    END_IF()
+    IF_STR_EQUAL(LW(2), PTR(kArantulaName))
+        USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
+    END_IF()
     
     // TODO: Special initialization for bosses...
     
-    // TODO: Implement.
-    // USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
+    // TODO: Swap out battle id as appropriate for special battles?
+    USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
     
     // Wait for the enemy to be defeated, then spawn pipe.
     INLINE_EVT()

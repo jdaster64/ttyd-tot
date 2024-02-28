@@ -416,7 +416,7 @@ struct BattleWeapon {
     int8_t      base_accuracy;
     int8_t      base_fp_cost;
     int8_t      base_sp_cost;
-    int8_t      superguards_allowed;  // not sure of difference between 1 and 2
+    int8_t      superguards_allowed;  // 1 = recoil, 2 = no recoil
     float       unk_14;
     int8_t      stylish_multiplier;
     int8_t      unk_19;
