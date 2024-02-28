@@ -4,9 +4,11 @@
 #include "tot_generate_enemy.h"
 #include "tot_gon.h"
 
+#include <gc/types.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/database.h>
+#include <ttyd/dispdrv.h>
 #include <ttyd/evt_bero.h>
 #include <ttyd/evt_cam.h>
 #include <ttyd/evt_case.h>
@@ -25,9 +27,13 @@
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
 #include <ttyd/evt_window.h>
+#include <ttyd/evtmgr_cmd.h>
+#include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
 #include <ttyd/npcdrv.h>
+
+#include <cstring>
 
 namespace mod::tot::gon {
 
@@ -53,7 +59,11 @@ using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::evt_window;
 
+using ::ttyd::dispdrv::CameraId;
 using ::ttyd::evt_bero::BeroEntry;
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
+using ::ttyd::item_data::itemDataTable;
 using ::ttyd::npcdrv::NpcSetupInfo;
 
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
@@ -72,6 +82,58 @@ NpcSetupInfo g_NpcSetupInfo[2];
 
 }  // namespace
 
+struct ChestData {
+    gc::vec3    home_pos;
+    int32_t     item;
+};
+ChestData g_Chests[5];
+
+void dispChestIcons(CameraId camera, void* user_data) {
+    auto* chest = (ChestData*)user_data;
+    for (; chest->item; ++chest) {
+        gc::vec3 pos = chest->home_pos;
+        pos.y += 75.f;
+        ttyd::icondrv::iconDispGx(
+            1.0f, &pos, 0, itemDataTable[chest->item].icon_id);
+    }
+}
+
+// Selects chest spawn contents and positions
+// TODO: based on Mario's position
+// TODO: move to tot_generate_rewards file?
+EVT_DECLARE_USER_FUNC(evtTot_SelectChestContents, 0)
+EVT_DEFINE_USER_FUNC(evtTot_SelectChestContents) {
+    memset(g_Chests, 0, sizeof(g_Chests));
+    
+    g_Chests[0].home_pos = { -80.0, 0.0, -100.0 };
+    g_Chests[0].item = ItemType::MUSHROOM;
+    g_Chests[1].home_pos = { 0.0, 0.0, -100.0 };
+    g_Chests[1].item = ItemType::SUPER_SHROOM;
+    g_Chests[2].home_pos = { 80.0, 0.0, -100.0 };
+    g_Chests[2].item = ItemType::ULTRA_SHROOM;
+    
+    return 2;
+}
+
+// Gets chest's XYZ position and contents.
+EVT_DECLARE_USER_FUNC(evtTot_GetChestData, 5)
+EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
+    int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
+    evtSetValue(evt, evt->evtArguments[1], g_Chests[idx].home_pos.x);
+    evtSetValue(evt, evt->evtArguments[2], g_Chests[idx].home_pos.y);
+    evtSetValue(evt, evt->evtArguments[3], g_Chests[idx].home_pos.z);
+    evtSetValue(evt, evt->evtArguments[4], g_Chests[idx].item);
+    return 2;
+}
+
+// Displays item icons above the chests.
+EVT_DECLARE_USER_FUNC(evtTot_DisplayChestItemIcons, 0)
+EVT_DEFINE_USER_FUNC(evtTot_DisplayChestItemIcons) {
+    ttyd::dispdrv::dispEntry(
+        CameraId::k3d, 1, /* order = */ 900.f, dispChestIcons, g_Chests);
+    return 2;
+}
+
 extern const BeroEntry normal_room_entry_data[3];
 
 // Script for sign that shows current floor.
@@ -88,16 +150,40 @@ EVT_BEGIN(Tower_SignEvt)
 EVT_END()
 
 // Script that runs when opening a chest.
-EVT_BEGIN(Tower_ChestEvt)
+EVT_BEGIN(Tower_ChestEvt_Core)
+    // Don't allow getting a reward from more than one chest.
+    IF_EQUAL(GSW(1000), 1)
+        RETURN()
+    END_IF()
     USER_FUNC(evt_mario_key_onoff, 0)
-    USER_FUNC(evt_mobj_get_position, PTR("box"), LW(10), LW(11), LW(12))
+    USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13))
     USER_FUNC(
-        evt_item_entry, PTR("item"), ItemType::MUSHROOM, 
-        LW(10), LW(11), LW(12), 17, -1, 0)
-    USER_FUNC(evt_mobj_wait_animation_end, PTR("box"))
+        evt_item_entry, PTR("item"), LW(13), LW(10), LW(11), LW(12), 17, -1, 0)
+    USER_FUNC(evt_mobj_wait_animation_end, LW(8))
     USER_FUNC(evt_item_get_item, PTR("item"))
     USER_FUNC(evt_mario_key_onoff, 1)
     SET(GSW(1000), 1)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_ChestEvt_0)
+    SET(LW(8), PTR("box_0"))
+    SET(LW(9), 0)
+    RUN_CHILD_EVT(PTR(&Tower_ChestEvt_Core))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_ChestEvt_1)
+    SET(LW(8), PTR("box_1"))
+    SET(LW(9), 1)
+    RUN_CHILD_EVT(PTR(&Tower_ChestEvt_Core))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_ChestEvt_2)
+    SET(LW(8), PTR("box_2"))
+    SET(LW(9), 2)
+    RUN_CHILD_EVT(PTR(&Tower_ChestEvt_Core))
     RETURN()
 EVT_END()
 
@@ -121,19 +207,45 @@ EVT_END()
 EVT_BEGIN(Tower_SpawnChests)
     USER_FUNC(evt_mario_key_onoff, 0)
     WAIT_MSEC(2000)
-    SET(LW(0), 0)
-    SET(LW(1), 50)
-    SET(LW(2), -100)
-    USER_FUNC(
-        evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
-        0, 0, 0, 0, 0, 0, 0)
-    USER_FUNC(
-        evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
-        LW(0), LW(1), LW(2), 0)
-    USER_FUNC(
-        evt_mobj_itembox, PTR("box"), LW(0), LW(1), LW(2), 1, 0, 
-        PTR(&Tower_ChestEvt), GSWF(5075))
+    USER_FUNC(evtTot_SelectChestContents)
+    
+    SET(LW(10), 3)
+    DO(LW(10))
+        // Get contents of next chest, and break from loop if empty.
+        SET(LW(11), 3)
+        SUB(LW(11), LW(10))
+        USER_FUNC(evtTot_GetChestData, LW(11), LW(0), LW(1), LW(2), LW(3))
+        IF_EQUAL(LW(3), 0)
+            DO_BREAK()
+        END_IF()
+            
+        ADD(LW(1), 50)
+        USER_FUNC(
+            evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
+            0, 0, 0, 0, 0, 0, 0)
+        USER_FUNC(
+            evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
+            LW(0), LW(1), LW(2), 0)
+        SUB(LW(1), 25)
+        
+        SWITCH(LW(11))
+            CASE_EQUAL(0)
+                USER_FUNC(
+                    evt_mobj_itembox, PTR("box_0"), LW(0), LW(1), LW(2), 1, 0, 
+                    PTR(&Tower_ChestEvt_0), GSWF(5075))
+            CASE_EQUAL(1)
+                USER_FUNC(
+                    evt_mobj_itembox, PTR("box_1"), LW(0), LW(1), LW(2), 1, 0, 
+                    PTR(&Tower_ChestEvt_1), GSWF(5076))
+            CASE_ETC()
+                USER_FUNC(
+                    evt_mobj_itembox, PTR("box_2"), LW(0), LW(1), LW(2), 1, 0, 
+                    PTR(&Tower_ChestEvt_2), GSWF(5077))
+        END_SWITCH()
+    WHILE()
+
     WAIT_MSEC(1000)
+    SET(GSW(1001), 1)
     USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()
@@ -203,8 +315,13 @@ EVT_BEGIN(Tower_NpcSetup)
     INLINE_EVT()
         LBL(2)
         WAIT_FRM(1)
-        SET(LW(0), GSW(1000))
-        IF_EQUAL(LW(0), 0)
+        IF_EQUAL(GSW(1000), 0)
+            // TODO: Draw icons corresponding to chest contents.
+            IF_EQUAL(GSW(1001), 1)
+                USER_FUNC(evt_mobj_get_position, PTR("box"), LW(10), LW(11), LW(12))
+                ADD(LW(11), 80)
+                USER_FUNC(evtTot_DisplayChestItemIcons)
+            END_IF()
             GOTO(2)
         END_IF()
         RUN_EVT(Tower_SpawnPipe)
@@ -215,8 +332,9 @@ EVT_END()
 
 // Main room initialization event.
 EVT_BEGIN(gon_01_InitEvt)
-    // Random unused flag, used to track chest item collection.
+    // Random unused bytes, used to track chest collection and icon display.
     SET(GSW(1000), 0)
+    SET(GSW(1001), 0)
     // Flags to track chest opening.
     SET(GSWF(5075), 0)
     SET(GSWF(5076), 0)

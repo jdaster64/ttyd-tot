@@ -600,9 +600,9 @@ void iconGetTexObj(void* tex_obj, uint16_t icon_id);
 void iconDispGxCol(
     gc::mtx34* matrix, uint32_t unk0, uint16_t icon, uint32_t* color);
 // iconDispGx2
-void iconDispGx(double unk0, gc::vec3* pos, int16_t unk2, uint16_t icon);
+void iconDispGx(double scale, gc::vec3* pos, int16_t unk2, uint16_t icon);
 void iconDispGxAlpha
-    (double unk0, gc::vec3* pos, int16_t unk2, uint16_t icon, uint8_t alpha);
+    (double scale, gc::vec3* pos, int16_t unk2, uint16_t icon, uint8_t alpha);
 // iconDisp
 // iconChange
 // iconDelete
