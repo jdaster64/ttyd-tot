@@ -321,7 +321,6 @@ extern const int32_t g_jon_yattukeFlag_FuncOffset = 0x3e8;
 extern const int32_t g_jon_evt_raster_FuncOffset = 0x500;
 extern const int32_t g_jon_init_evt_MoverSetupHookOffset = 0xeaa0;
 extern const int32_t g_jon_enemy_100_Offset = 0xef90;
-extern const int32_t g_jon_enemy_setup_EvtOffset = 0x102a4;
 extern const int32_t g_jon_evt_open_box_EvtOffset = 0x11348;
 extern const int32_t g_jon_move_evt_EvtOffset = 0x11400;
 extern const int32_t g_jon_talk_idouya_EvtOffset = 0x11698;

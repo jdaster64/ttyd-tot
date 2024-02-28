@@ -3,7 +3,7 @@
 #include "common_functions.h"
 #include "mod.h"
 #include "mod_state.h"
-#include "custom_enemy.h"
+#include "tot_generate_enemy.h"
 
 #include <ttyd/battle_mario.h>
 #include <ttyd/mario_pouch.h>
@@ -126,7 +126,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
     
     // Handle journal Tattle entries.
     if (strstr(msg_key, "menu_enemy_")) {
-        msg_key = SetCustomMenuTattle(msg_key);
+        msg_key = tot::SetCustomMenuTattle(msg_key);
     }
     
     // Binary search on all possible message replacements.
@@ -157,7 +157,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
     switch (idx) {
         case MsgKey::CUSTOM_TATTLE_BATTLE:
         case MsgKey::CUSTOM_TATTLE_MENU:
-            return GetCustomTattle();
+            return tot::GetCustomTattle();
         case MsgKey::MSG_JON_KANBAN_1: {
             sprintf(buf, "<kanban>\n<pos 150 25>\nFloor %" PRId32 "\n<k>", 
                     g_Mod->state_.floor_ + 1);

@@ -2,7 +2,6 @@
 
 #include "common_functions.h"
 #include "common_types.h"
-#include "custom_enemy.h"
 #include "custom_item.h"
 #include "custom_strings.h"
 #include "mod.h"

@@ -1,5 +1,6 @@
 #include "tot_generate_enemy.h"
 
+#include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_debug.h"
@@ -8,14 +9,19 @@
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_database_common.h>
+#include <ttyd/battle_monosiri.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/evt_npc.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
+#include <ttyd/mario_pouch.h>
+#include <ttyd/msgdrv.h>
 #include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/system.h>
 
+#include <cinttypes>
+#include <cstdio>
 #include <cstring>
 
 namespace mod::tot {
@@ -470,7 +476,7 @@ const PresetLoadoutInfo kPresetLoadouts[] = {
 };
 
 // TODO: Update for TOT.
-// Base weights per floor group (00s, 10s, ...) and level_offset (2, 3, ... 10).
+// Base weights per floor group (00s, 10s, ...) and level (2, 3, ... 10).
 const int8_t kBaseWeights[11][9] = {
     { 10, 10, 5, 3, 2, 0, 0, 0, 0 },
     { 5, 10, 5, 5, 3, 0, 0, 0, 0 },
@@ -484,7 +490,7 @@ const int8_t kBaseWeights[11][9] = {
     { 0, 0, 1, 2, 5, 7, 10, 10, 10 },
     { 0, 0, 1, 2, 5, 7, 10, 10, 10 },
 };
-// The target sum of enemy level_offsets for each floor group.
+// The target sum of enemy levels for each floor group.
 const int8_t kTargetLevelSums[11] = {
     12, 15, 18, 22, 25, 28, 31, 34, 37, 40, 50
 };
@@ -593,9 +599,9 @@ void SelectEnemies(int32_t floor) {
             
             // If enemy does not have a BattleUnitSetup, or is a boss, ignore.
             if (ei.battle_unit_setup_offset >= 0 &&
-                ei.level_offset >= 2 && ei.level_offset <= 10) {
+                ei.level >= 2 && ei.level <= 10) {
                 int32_t floor_group = floor < 110 ? floor / 10 : 10;
-                base_wt = kBaseWeights[floor_group][ei.level_offset - 2];
+                base_wt = kBaseWeights[floor_group][ei.level - 2];
             }
             
             // Halve base rate for all Yux types since they're so centralizing.
@@ -636,7 +642,7 @@ void SelectEnemies(int32_t floor) {
             for (; (weight -= weights[slot][idx]) >= 0; ++idx);
             
             g_Enemies[slot] = idx;
-            level_sum += kEnemyInfo[idx].level_offset;
+            level_sum += kEnemyInfo[idx].level;
             
             // If level_sum is sufficiently high for the floor and not on the
             // fifth enemy, decide whether to add any further enemies.
@@ -879,6 +885,222 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
     // TODO: Set enemy held items, battle conditions.
     
     return 2;
+}
+
+// TODO: Rebalance for TOT.
+// Stat weights as percentages for certain Pit floors (00s, 10s, 20s, ... 90s).
+// After floor 100, HP, ATK and DEF rise by 5% every 10 floors.
+const int8_t kStatPercents[10] = { 20, 25, 35, 40, 50, 55, 65, 75, 90, 100 };
+
+bool GetEnemyStats(
+    int32_t unit_type, int32_t* out_hp, int32_t* out_atk, int32_t* out_def,
+    int32_t* out_level, int32_t* out_coinlvl, int32_t base_attack_power) {
+    // Look up the enemy type info w/matching unit_type.
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0 ||
+        kEnemyInfo[unit_type].base_hp < 0) {
+        // No stats to pull from; just use the original message.
+        return false;
+    }
+    const StateManager_v2& state = mod::infinite_pit::g_Mod->state_;
+    const EnemyTypeInfo& ei = kEnemyInfo[unit_type];
+    
+    int32_t floor_group = state.floor_ / 10;
+    int32_t hp_base_atk =
+        state.GetOptionNumericValue(infinite_pit::OPT_FLOOR_100_SCALING) ? 10 : 5;
+        
+    int32_t base_hp_pct = 
+        floor_group > 9 ?
+            100 + (floor_group - 9) * hp_base_atk : kStatPercents[floor_group];
+    int32_t base_atk_pct = 
+        floor_group > 9 ?
+            100 + (floor_group - 9) * hp_base_atk : kStatPercents[floor_group];
+    int32_t base_def_pct = 
+        floor_group > 9 ?
+            100 + (floor_group - 9) * 5 : kStatPercents[floor_group];
+    
+    int32_t boss_scale_factor = 4;
+    if (unit_type == BattleUnitType::ATOMIC_BOO ||
+        unit_type == BattleUnitType::BONETAIL) {
+        switch (state.GetOptionValue(infinite_pit::OPT_BOSS_SCALING)) {
+            case infinite_pit::OPTVAL_BOSS_SCALING_1_25X: {
+                boss_scale_factor = 5;
+                break;
+            }
+            case infinite_pit::OPTVAL_BOSS_SCALING_1_50X: {
+                boss_scale_factor = 6;
+                break;
+            }
+            case infinite_pit::OPTVAL_BOSS_SCALING_2_00X: {
+                boss_scale_factor = 8;
+                break;
+            }
+        }
+    }
+            
+    if (out_hp) {
+        int32_t hp = Min(ei.base_hp * base_hp_pct, 1000000);
+        hp *= state.GetOptionValue(infinite_pit::OPTNUM_ENEMY_HP);
+        hp = hp * boss_scale_factor / 4;
+        *out_hp = Clamp((hp + 5000) / 10000, 1, 9999);
+    }
+    if (out_atk) {
+        int32_t atk = Min(ei.base_atk * base_atk_pct, 1000000);
+        atk += (base_attack_power - ei.atk_reference) * 100;
+        atk *= state.GetOptionValue(infinite_pit::OPTNUM_ENEMY_ATK);
+        atk = atk * boss_scale_factor / 4;
+        *out_atk = Clamp((atk + 5000) / 10000, 1, 99);
+    }
+    if (out_def) {
+        if (ei.base_def == 0) {
+            *out_def = 0;
+        } else {
+            // Enemies with base_def > 0 should always have at least 1 DEF.
+            int32_t def = (ei.base_def * base_def_pct + 50) / 100;
+            def = def < 1 ? 1 : def;
+            *out_def = def > 99 ? 99 : def;
+        }
+    }
+    if (out_level) {
+        if (ttyd::mario_pouch::pouchGetPtr()->level >= 99) {
+            *out_level = 0;
+        } else if (ei.level == 0) {
+            // Enemies like Mini-Yuxes should never grant EXP.
+            *out_level = 0;
+        } else {
+            // Enemies' level will always be the same relative to than Mario,
+            // typically giving 3 ~ 10 EXP depending on strength and group size.
+            // (The EXP gained will reduce slightly after floor 100.)
+            if (ei.level <= 10) {
+                int32_t level = 
+                    ei.level + (state.floor_ < 100 ? 5 : 2);
+                *out_level =
+                    ttyd::mario_pouch::pouchGetPtr()->level + level;
+            } else {
+                // Bosses / special enemies get fixed bonus Star Points instead.
+                *out_level = -ei.level / 2;
+            }
+        }
+    }
+    if (out_coinlvl) {
+        // "Coin level" = expected number of coins x 2.
+        // Return level for normal enemies (lv 2 ~ 10 / 1 ~ 5 coins),
+        // or 20 (10 coins) for boss / special enemies.
+        *out_coinlvl = ei.level > 10 ? 20 : ei.level;
+    }
+    
+    return true;
+}
+
+char g_TattleTextBuf[512];
+
+const char* GetCustomTattle() { return g_TattleTextBuf; }
+
+const char* SetCustomTattle(
+    BattleWorkUnit* unit, const char* original_tattle_msg) {
+    int32_t unit_type = unit->current_kind;
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0 ||
+        kEnemyInfo[unit_type].base_hp < 0) {
+        // No stats to pull from; just use the original message.
+        return original_tattle_msg;
+    }
+    const EnemyTypeInfo& ei = kEnemyInfo[unit_type];
+    // Take the first paragraph from the original tattle 
+    // (ignore the first few characters in case there's a <p> there).
+    const char* original_tattle = ttyd::msgdrv::msgSearch(original_tattle_msg);
+    const char* p1_end_ptr = strstr(original_tattle + 4, "<p>");
+    int32_t p1_len =
+        p1_end_ptr ? p1_end_ptr - original_tattle : strlen(original_tattle);
+    strncpy(g_TattleTextBuf, original_tattle, p1_len);
+    
+    // Append a paragraph with the enemy's base stats.
+    char* p2_ptr = g_TattleTextBuf + p1_len;
+    char atk_offset_buf[8];
+    sprintf(atk_offset_buf, " (%+" PRId16 ")", ei.atk_offset);
+    sprintf(p2_ptr,
+        "<p>Its base stats are:\n"
+        "Max HP: %" PRId16 ", ATK: %" PRId16 "%s,\n"
+        "DEF: %" PRId16 ", Level: %" PRId16 ".\n<k>",
+        ei.base_hp, ei.base_atk, ei.atk_offset ? atk_offset_buf : "",
+        ei.base_def, ei.level);
+    
+    // Append one more paragraph with the enemy's current stats
+    // (using its standard attack's power as reference for ATK).
+    int32_t hp, atk, def;
+    int32_t base_atk_power = ei.atk_offset + ei.atk_reference;
+    if(GetEnemyStats(
+        unit_type, &hp, &atk, &def, nullptr, nullptr, base_atk_power)) {
+        char* p3_ptr = g_TattleTextBuf + strlen(g_TattleTextBuf);
+        sprintf(p3_ptr,
+            "<p>Currently, its stats are:\n"
+            "Max HP: %" PRId32 ", ATK: %" PRId32 ", DEF: %" PRId32 ".\n<k>",
+            hp, atk, def);
+    }
+    
+    // Return a key that looks up g_TattleTextBuf from custom_strings.
+    return "custom_tattle_battle";
+}
+
+const char* SetCustomMenuTattle(const char* original_tattle_msg) {
+    const auto* kTattleInfo = 
+        ttyd::battle_monosiri::battleGetUnitMonosiriPtr(0);
+        
+    // Look for the enemy type with a matching message name.
+    bool found_match = false;
+    int32_t unit_type = 1;
+    for (; unit_type <= BattleUnitType::BONETAIL; ++unit_type) {
+        const char* tattle = kTattleInfo[unit_type].menu_tattle;
+        if (tattle && !strcmp(tattle, original_tattle_msg)) {
+            found_match = true;
+            break;
+        }
+    }
+    if (!found_match) return original_tattle_msg;
+    
+    // Print a simple base stat string to g_TattleTextBuf.
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0 ||
+        kEnemyInfo[unit_type].base_hp < 0) {
+        // No stats to pull from.
+        sprintf(g_TattleTextBuf, "No info known on this enemy.");
+    } else {
+        const EnemyTypeInfo& ei = kEnemyInfo[unit_type];
+        char atk_offset_buf[8];
+        sprintf(atk_offset_buf, " (%+" PRId16 ")", ei.atk_offset);
+        sprintf(g_TattleTextBuf,
+            "Base HP: %" PRId16 ", Base ATK: %" PRId16 "%s,\n"
+            "Base DEF: %" PRId16 ", Level: %" PRId16 "",
+            ei.base_hp, ei.base_atk, ei.atk_offset ? atk_offset_buf : "",
+            ei.base_def, ei.level);
+    }
+    
+    // Return a key that looks up g_TattleTextBuf from custom_strings.
+    return "custom_tattle_menu";
+}
+
+int8_t GetCustomTattleIndex(int32_t unit_type) {
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0) return -1;
+    return kEnemyInfo[unit_type].tattle_idx;
+}
+
+bool GetTattleDisplayStats(int32_t unit_type, int32_t* atk, int32_t* def) {
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0 ||
+        kEnemyInfo[unit_type].base_hp < 0) {
+        return false;
+    }
+    const EnemyTypeInfo& ei = kEnemyInfo[unit_type];
+    int32_t base_atk_power = ei.atk_offset + ei.atk_reference;
+    return GetEnemyStats(
+        unit_type, nullptr, atk, def, nullptr, nullptr, base_atk_power);
+}
+
+bool IsEligibleLoadoutEnemy(int32_t unit_type) {
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0) return false;
+    return kEnemyInfo[unit_type].kind != nullptr;
+}
+
+bool IsEligibleFrontEnemy(int32_t unit_type) {
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0) return false;
+    return kEnemyInfo[unit_type].ai_type_idx >= 0 &&
+           kEnemyInfo[unit_type].kind != nullptr;
 }
 
 }  // namespace mod::tot

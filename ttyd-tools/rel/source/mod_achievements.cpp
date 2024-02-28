@@ -2,10 +2,10 @@
 
 #include "common_functions.h"
 #include "common_ui.h"
-#include "custom_enemy.h"
 #include "custom_item.h"
 #include "mod.h"
 #include "mod_state.h"
+#include "tot_generate_enemy.h"
 
 #include <ttyd/battle_database_common.h>
 #include <ttyd/item_data.h>
@@ -92,7 +92,7 @@ void AchievementsManager::Update() {
     int32_t num_tattles = 0;
     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
         // Only check for enemies included in the Tattle log.
-        if (GetCustomTattleIndex(i) < 0) continue;
+        if (tot::GetCustomTattleIndex(i) < 0) continue;
         num_tattles += ttyd::swdrv::swGet(0x117a + i);
     }
     if (num_tattles == 94) GetAchievement(kTattleLogItem);

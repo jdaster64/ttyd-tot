@@ -1,11 +1,11 @@
 #include "patches_battle.h"
 
-#include "custom_enemy.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_mario_move.h"
+#include "tot_generate_enemy.h"
 #include "tot_move_manager.h"
 
 #include <ttyd/battle.h>
@@ -309,7 +309,7 @@ void GetStatusParams(
         if (!weapon->item_id &&
             attacker->current_kind <= BattleUnitType::BONETAIL) {
             int32_t altered_charge;
-            GetEnemyStats(
+            tot::GetEnemyStats(
                 attacker->current_kind, nullptr, &altered_charge,
                 nullptr, nullptr, nullptr, strength);
             strength = altered_charge;

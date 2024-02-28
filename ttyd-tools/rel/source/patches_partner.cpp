@@ -1,13 +1,13 @@
 #include "patches_partner.h"
 
 #include "common_functions.h"
-#include "custom_enemy.h"
 #include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_battle.h"
+#include "tot_generate_enemy.h"
 #include "tot_party_bobbery.h"
 #include "tot_party_flurrie.h"
 #include "tot_party_goombella.h"
@@ -203,7 +203,7 @@ void ApplyFixedPatches() {
                 reinterpret_cast<const char*>(
                     evtGetValue(evt, evt->evtArguments[2]));
             // Build a custom tattle, if the enemy has stats to pull from.
-            tattle_msg = SetCustomTattle(unit, tattle_msg);
+            tattle_msg = tot::SetCustomTattle(unit, tattle_msg);
             evtSetValue(evt, evt->evtArguments[2], PTR(tattle_msg));
             return 2;
         });
@@ -374,7 +374,7 @@ void DisplayTattleStats(
     if (show_atk_def) {
         int32_t atk, def;
         // If the enemy's atk and def aren't fetched, just draw HP normally.
-        if (!GetTattleDisplayStats(unit->current_kind, &atk, &def)) {
+        if (!tot::GetTattleDisplayStats(unit->current_kind, &atk, &def)) {
             ttyd::icondrv::iconNumberDispGx(matrix, number, is_small, color);
             return;
         }

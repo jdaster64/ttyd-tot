@@ -1,10 +1,10 @@
 #include "patches_enemy.h"
 
-#include "custom_enemy.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_battle.h"
+#include "tot_generate_enemy.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_damage.h>
@@ -66,7 +66,7 @@ void AlterUnitKindParams(BattleUnitKind* unit) {
     if (unit->unit_type > BattleUnitType::BONETAIL) return;
     
     int32_t hp, level, coinlvl;
-    if (!GetEnemyStats(
+    if (!tot::GetEnemyStats(
         unit->unit_type, &hp, nullptr, nullptr, &level, &coinlvl)) return;
     unit->max_hp = hp;
     
@@ -105,7 +105,7 @@ int32_t AlterDamageCalculation(
     if (attacker->current_kind <= BattleUnitType::BONETAIL
         && !(weapon->target_property_flags & 0x100000)  // not a recoil attack
         && !weapon->item_id && base_atk > 0) {
-        GetEnemyStats(
+        tot::GetEnemyStats(
             attacker->current_kind, nullptr, &altered_atk, nullptr, 
             nullptr, nullptr, base_atk);
         if (altered_atk < 1) altered_atk = 1;
@@ -116,7 +116,7 @@ int32_t AlterDamageCalculation(
     if (target->current_kind <= BattleUnitType::BONETAIL
         && base_def >= 0 && base_def < 99) {
         if (base_def > 0) {
-            GetEnemyStats(
+            tot::GetEnemyStats(
                 target->current_kind, nullptr, nullptr, &altered_def, 
                 nullptr, nullptr);
         }
@@ -164,7 +164,7 @@ int32_t AlterFpDamageCalculation(
     // Alter FP damage for enemy attacks.
     if (attacker->current_kind <= BattleUnitType::BONETAIL
         && !weapon->item_id && base_atk > 0) {
-        GetEnemyStats(
+        tot::GetEnemyStats(
             attacker->current_kind, nullptr, &altered_atk, nullptr,
             nullptr, nullptr, base_atk);
         if (altered_atk < 1) altered_atk = 1;

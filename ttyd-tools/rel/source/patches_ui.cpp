@@ -2,11 +2,11 @@
 
 #include "common_functions.h"
 #include "common_types.h"
-#include "custom_enemy.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_item.h"
+#include "tot_generate_enemy.h"
 
 #include <gc/mtx.h>
 #include <gc/types.h>
@@ -304,7 +304,8 @@ void ApplyFixedPatches() {
     int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
     uint8_t custom_tattle_order[kNumEnemyTypes];
     for (int32_t i = 0; i <= kNumEnemyTypes; ++i) {
-        custom_tattle_order[i] = static_cast<uint8_t>(GetCustomTattleIndex(i));
+        custom_tattle_order[i] = 
+            static_cast<uint8_t>(tot::GetCustomTattleIndex(i));
     }
     mod::patch::writePatch(
         ttyd::win_root::enemy_monoshiri_sort_table,
@@ -560,7 +561,7 @@ void InitializeTattleLog(void* win_log_ptr) {
     int32_t num_enemies = 0;
     // Fill in only the enemy info for enemies appearing in Infinite Pit.
     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
-        const int32_t tattle_idx = GetCustomTattleIndex(i);
+        const int32_t tattle_idx = tot::GetCustomTattleIndex(i);
         if (tattle_idx < 0) continue;
         enemy_info[num_enemies] =
             (static_cast<uint8_t>(tattle_idx) << 8) | static_cast<uint8_t>(i);

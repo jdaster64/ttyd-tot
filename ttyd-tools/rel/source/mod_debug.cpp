@@ -3,10 +3,10 @@
 #include "common_functions.h"
 #include "common_types.h"
 #include "common_ui.h"
-#include "custom_enemy.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patches_field.h"
+#include "tot_generate_enemy.h"
 
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_monosiri.h>
@@ -117,7 +117,7 @@ void DebugManager::Update() {
                 case DEBUG_UNLOCK_TATTLE_LOG: {
                     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
                         // Set Tattle flags for only enemies in Infinite Pit.
-                        if (GetCustomTattleIndex(i) > 0) {
+                        if (tot::GetCustomTattleIndex(i) > 0) {
                             ttyd::swdrv::swSet(0x117a + i);
                         }
                     }
@@ -172,7 +172,7 @@ void DebugManager::Update() {
         do {
             if (g_CursorPos == 0) {
                 // If valid for the front, fill the first 3 slots with the type.
-                if (IsEligibleFrontEnemy(enemy_type)) {
+                if (tot::IsEligibleFrontEnemy(enemy_type)) {
                     const int32_t num_enemies = 
                         enemy_type == BattleUnitType::ATOMIC_BOO ? 1 : 3;
                     for (int32_t i = 0; i < 5; ++i)
@@ -181,7 +181,7 @@ void DebugManager::Update() {
                 }
             } else {
                 // If valid, change the currently selected slot only.
-                if (IsEligibleLoadoutEnemy(enemy_type) || enemy_type == -1) {
+                if (tot::IsEligibleLoadoutEnemy(enemy_type) || enemy_type == -1) {
                     if (enemy_type != BattleUnitType::ATOMIC_BOO) {
                         g_DebugEnemies[g_CursorPos] = enemy_type;
                         // Exception: if type == "None", clear all later slots.

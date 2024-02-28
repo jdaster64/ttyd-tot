@@ -4,7 +4,6 @@
 #include "common_types.h"
 #include "custom_chest_reward.h"
 #include "custom_condition.h"
-#include "custom_enemy.h"
 #include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod.h"
@@ -81,7 +80,6 @@ extern const int32_t g_jon_yattukeFlag_FuncOffset;
 extern const int32_t g_jon_evt_raster_FuncOffset;
 extern const int32_t g_jon_init_evt_MoverSetupHookOffset;
 extern const int32_t g_jon_enemy_100_Offset;
-extern const int32_t g_jon_enemy_setup_EvtOffset;
 extern const int32_t g_jon_evt_open_box_EvtOffset;
 extern const int32_t g_jon_move_evt_EvtOffset;
 extern const int32_t g_jon_talk_idouya_EvtOffset;
@@ -123,8 +121,6 @@ const char kMoverTribeName[] = "\x83\x76\x83\x6a\x8f\xee\x95\xf1\x89\xae";
 ttyd::npcdrv::NpcSetupInfo g_ChetRippoNpcSetupInfo[2];
     
 // Declarations for USER_FUNCs.
-EVT_DECLARE_USER_FUNC(GetEnemyNpcInfo, 7)
-EVT_DECLARE_USER_FUNC(SetEnemyNpcBattleInfo, 2)
 EVT_DECLARE_USER_FUNC(GetNumChestRewards, 1)
 EVT_DECLARE_USER_FUNC(GetChestReward, 1)
 EVT_DECLARE_USER_FUNC(FullyHealParty, 0)
@@ -299,73 +295,6 @@ EVT_END()
 // Wrapper for modified floor-incrementing event.
 EVT_BEGIN(FloorIncrementEvtHook)
 RUN_CHILD_EVT(FloorIncrementEvt)
-RETURN()
-EVT_END()
-
-// Event that sets up a Pit enemy NPC, and opens a pipe when it is defeated.
-EVT_BEGIN(EnemyNpcSetupEvt)
-USER_FUNC(ttyd::evt_npc::evt_npc_check, PTR(kMoverName), LW(0))
-IF_EQUAL(LW(0), 1)
-    // Don't spawn an enemy if there's a Mover on this floor.
-    RETURN()
-END_IF()
-SET(LW(0), GSW(1321))
-ADD(LW(0), 1)
-IF_NOT_EQUAL(LW(0), 100)
-    MOD(LW(0), 10)
-    IF_EQUAL(LW(0), 0)
-        RETURN()
-    END_IF()
-END_IF()
-USER_FUNC(GetEnemyNpcInfo, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
-USER_FUNC(ttyd::evt_npc::evt_npc_entry, PTR(kPitNpcName), LW(0))
-USER_FUNC(ttyd::evt_npc::evt_npc_set_tribe, PTR(kPitNpcName), LW(1))
-USER_FUNC(ttyd::evt_npc::evt_npc_setup, LW(2))
-USER_FUNC(ttyd::evt_npc::evt_npc_set_position, 
-    PTR(kPitNpcName), LW(4), LW(5), LW(6))
-IF_STR_EQUAL(LW(1), PTR(kPiderName))
-    USER_FUNC(ttyd::evt_npc::evt_npc_set_home_position,
-        PTR(kPitNpcName), LW(4), LW(5), LW(6))
-END_IF()
-IF_STR_EQUAL(LW(1), PTR(kArantulaName))
-    USER_FUNC(ttyd::evt_npc::evt_npc_set_home_position,
-        PTR(kPitNpcName), LW(4), LW(5), LW(6))
-END_IF()
-IF_STR_EQUAL(LW(1), PTR(kBonetailName))
-    USER_FUNC(ttyd::evt_npc::evt_npc_set_position, PTR(kPitNpcName), 0, 0, 0)
-    USER_FUNC(ttyd::evt_npc::evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_3"))
-    USER_FUNC(ttyd::evt_npc::evt_npc_flag_onoff, 1, PTR(kPitNpcName), 0x2000040)
-    USER_FUNC(ttyd::evt_npc::evt_npc_pera_onoff, PTR(kPitNpcName), 0)
-    USER_FUNC(ttyd::evt_npc::evt_npc_set_ry, PTR(kPitNpcName), 0)
-    RUN_EVT(REL_PTR(ModuleId::JON, g_jon_zonbaba_first_event_EvtOffset))
-END_IF()
-USER_FUNC(SetEnemyNpcBattleInfo, PTR(kPitNpcName), LW(3))
-UNCHECKED_USER_FUNC(
-    REL_PTR(ModuleId::JON, g_jon_setup_npc_ex_para_FuncOffset),
-    PTR(kPitNpcName))
-UNCHECKED_USER_FUNC(REL_PTR(ModuleId::JON, g_jon_yattukeFlag_FuncOffset))
-INLINE_EVT()
-LBL(1)
-    WAIT_FRM(1)
-    USER_FUNC(ttyd::evt_npc::evt_npc_status_check,
-        PTR(kPitNpcName), 4, LW(0))
-    IF_EQUAL(LW(0), 0)
-        GOTO(1)
-    END_IF()
-    SET(LW(0), GSW(1321))
-    ADD(LW(0), 1)
-    IF_NOT_EQUAL(LW(0), 100)
-        RUN_EVT(REL_PTR(ModuleId::JON, g_jon_dokan_open_PipeOpenEvtOffset))
-    ELSE()
-        SET(GSWF(0x13dd), 1)
-    END_IF()
-END_INLINE()
-RETURN()
-EVT_END()
-
-// Wrapper for modified enemy-setup event.
-EVT_BEGIN(EnemyNpcSetupEvtHook)
-RUN_CHILD_EVT(EnemyNpcSetupEvt)
 RETURN()
 EVT_END()
 
@@ -723,130 +652,6 @@ USER_FUNC(UpdateExitDestinationImpl, LW(0))
 RUN_CHILD_EVT(ttyd::evt_bero::bero_case_switch_on)
 RETURN()
 EVT_END()
-
-// Fetches information required for dynamically spawning an enemy NPC,
-// such as the model name, battle id, and initial position.
-EVT_DEFINE_USER_FUNC(GetEnemyNpcInfo) {
-    ttyd::npcdrv::NpcTribeDescription* npc_tribe_description;
-    ttyd::npcdrv::NpcSetupInfo* npc_setup_info;
-    int32_t lead_enemy_type;
-    BuildBattle(
-        core::GetPitModulePtr(), g_Mod->state_.floor_, &npc_tribe_description, 
-        &npc_setup_info, &lead_enemy_type);
-    int8_t* enemy_100 = reinterpret_cast<int8_t*>(
-        core::GetPitModulePtr() + g_jon_enemy_100_Offset);
-    int8_t battle_setup_idx = enemy_100[g_Mod->state_.floor_ % 100];
-    const int32_t x_sign = ttyd::system::irand(2) ? 1 : -1;
-    const int32_t x_pos = ttyd::system::irand(50) + 80;
-    const int32_t z_pos = ttyd::system::irand(200) - 100;
-    int32_t y_pos = 0;
-    
-    // Select the NPC's y_pos based on the lead enemy type.
-    switch(lead_enemy_type) {
-        case BattleUnitType::DARK_PUFF:
-        case BattleUnitType::RUFF_PUFF:
-        case BattleUnitType::ICE_PUFF:
-        case BattleUnitType::POISON_PUFF:
-            y_pos = 10;
-            break;
-        case BattleUnitType::EMBER:
-        case BattleUnitType::LAVA_BUBBLE:
-        case BattleUnitType::PHANTOM_EMBER:
-        case BattleUnitType::WIZZERD:
-        case BattleUnitType::DARK_WIZZERD:
-        case BattleUnitType::ELITE_WIZZERD:
-        case BattleUnitType::LAKITU:
-        case BattleUnitType::DARK_LAKITU:
-            y_pos = 20;
-            break;
-        case BattleUnitType::BOO:
-        case BattleUnitType::DARK_BOO:
-        case BattleUnitType::ATOMIC_BOO:
-        case BattleUnitType::YUX:
-        case BattleUnitType::Z_YUX:
-        case BattleUnitType::X_YUX:
-            y_pos = 30;
-            break;
-        case BattleUnitType::PARAGOOMBA:
-        case BattleUnitType::PARAGLOOMBA:
-        case BattleUnitType::HYPER_PARAGOOMBA:
-        case BattleUnitType::PARATROOPA:
-        case BattleUnitType::KP_PARATROOPA:
-        case BattleUnitType::SHADY_PARATROOPA:
-        case BattleUnitType::DARK_PARATROOPA:
-        case BattleUnitType::PARABUZZY:
-        case BattleUnitType::SPIKY_PARABUZZY:
-            y_pos = 50;
-            break;
-        case BattleUnitType::SWOOPER:
-        case BattleUnitType::SWOOPULA:
-        case BattleUnitType::SWAMPIRE:
-            y_pos = 80;
-            break;
-        case BattleUnitType::PIDER:
-        case BattleUnitType::ARANTULA:
-            y_pos = 140;
-            break;
-        case BattleUnitType::CHAIN_CHOMP:
-        case BattleUnitType::RED_CHOMP:
-            npc_setup_info->territoryBase = { 
-                static_cast<float>(x_pos * x_sign), 0.f, 
-                static_cast<float>(z_pos) };
-            break;
-    }
-    
-    evtSetValue(evt, evt->evtArguments[0], PTR(npc_tribe_description->modelName));
-    evtSetValue(evt, evt->evtArguments[1], PTR(npc_tribe_description->nameJp));
-    evtSetValue(evt, evt->evtArguments[2], PTR(npc_setup_info));
-    evtSetValue(evt, evt->evtArguments[3], battle_setup_idx);
-    evtSetValue(evt, evt->evtArguments[4], x_pos * x_sign);
-    evtSetValue(evt, evt->evtArguments[5], y_pos);
-    evtSetValue(evt, evt->evtArguments[6], z_pos);
-        
-    return 2;
-}
-
-// Sets final battle info on a Pit enemy, as well as setting any
-// battle conditions.
-EVT_DEFINE_USER_FUNC(SetEnemyNpcBattleInfo) {
-    const char* name = 
-        reinterpret_cast<const char*>(evtGetValue(evt, evt->evtArguments[0]));
-    int32_t battle_id = evtGetValue(evt, evt->evtArguments[1]);
-    NpcEntry* npc = ttyd::evt_npc::evtNpcNameToPtr(evt, name);
-    ttyd::npcdrv::npcSetBattleInfo(npc, battle_id);
-    
-    // If on a Bonetail floor and Bonetail is already defeated,
-    // skip the item / condition generation to keep seeding consistent.
-    if (ttyd::swdrv::swGet(0x13dc)) return 2;
-
-    // Set the enemies' held items, if they get any.
-    const int32_t reward_mode =
-        g_Mod->state_.GetOptionValue(OPT_BATTLE_REWARD_MODE);
-    NpcBattleInfo* battle_info = &npc->battleInfo;
-    if (reward_mode == OPTVAL_DROP_NO_HELD_W_BONUS) {
-        for (int32_t i = 0; i < battle_info->pConfiguration->num_enemies; ++i) {
-            battle_info->wHeldItems[i] = 0;
-        }
-    } else {
-        // If item drops only come from conditions, spawn Shine Sprites
-        // as held items occasionally after floor 30.
-        int32_t shine_rate = 0;
-        if (g_Mod->state_.floor_ >= 30 &&
-            reward_mode == OPTVAL_DROP_HELD_FROM_BONUS) {
-            shine_rate = 13;
-        }
-        for (int32_t i = 0; i < battle_info->pConfiguration->num_enemies; ++i) {
-            int32_t item = PickRandomItem(RNG_ITEM, 40, 20, 40, shine_rate);            
-            if (!item) item = ItemType::GOLD_BAR_X3;  // Shine Sprite
-            battle_info->wHeldItems[i] = item;
-        }
-    }
-    
-    // Occasionally, set a battle condition for an optional bonus reward.
-    SetBattleCondition(&npc->battleInfo);
-    
-    return 2;
-}
 
 // Returns the number of chest rewards to spawn based on the floor number.
 EVT_DEFINE_USER_FUNC(GetNumChestRewards) {
@@ -1288,11 +1093,6 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
     mod::patch::writePatch(
         reinterpret_cast<void*>(module_start + g_jon_floor_inc_EvtOffset),
         FloorIncrementEvtHook, sizeof(FloorIncrementEvtHook));
-       
-    // Update the enemy setup event.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(module_start + g_jon_enemy_setup_EvtOffset),
-        EnemyNpcSetupEvtHook, sizeof(EnemyNpcSetupEvtHook));
         
     // Replace Charlieton talk evt, adding a dialog for buying an item
     // and throwing away an old one if you have a full item/badge inventory.
@@ -1385,8 +1185,6 @@ void LinkCustomEvts(void* module_ptr, ModuleId::e module_id, bool link) {
         LinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(BossSetupEvt));
         LinkCustomEvt(
-            module_id, module_ptr, const_cast<int32_t*>(EnemyNpcSetupEvt));
-        LinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(CharlietonInvFullEvt));
         LinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(ChetRippoMoverSetupEvt));
@@ -1395,8 +1193,6 @@ void LinkCustomEvts(void* module_ptr, ModuleId::e module_id, bool link) {
     } else {
         UnlinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(BossSetupEvt));
-        UnlinkCustomEvt(
-            module_id, module_ptr, const_cast<int32_t*>(EnemyNpcSetupEvt));
         UnlinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(CharlietonInvFullEvt));
         UnlinkCustomEvt(
