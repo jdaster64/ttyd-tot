@@ -47,16 +47,6 @@ const char* GetCurrentMap() {
 const char* GetNextMap() {
     return ttyd::seq_mapchange::NextMap;
 }
-
-const char* ModuleNameFromId(ModuleId::e module_id) {
-    static const char* kModuleNames[] = {
-        nullptr, "aaa", "aji", "bom", "dmo", "dou", "eki", "end",
-        "gon", "gor", "gra", "hei", "hom", "jin", "jon", "kpa",
-        "las", "moo", "mri", "muj", "nok", "pik", "rsh", "sys",
-        "tik", "tou", "tou2", "usu", "win", "yuu"
-    };
-    return kModuleNames[module_id];
-}
     
 void LinkCustomEvt(ModuleId::e module_id, void* module_ptr, int32_t* evt) {
     int32_t op;
