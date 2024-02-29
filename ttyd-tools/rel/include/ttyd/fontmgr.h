@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gc/types.h>
+
 namespace ttyd::fontmgr {
 
 extern "C" {
@@ -19,17 +21,17 @@ void FontDrawColor(uint8_t color[4]);
 void FontDrawColor_();
 uint32_t FontGetDrawColor();
 void FontDrawScale(float scale);
-void FontDrawScaleVec(float scale[3]);
+void FontDrawScaleVec(gc::vec3* scale);
 void FontDrawCode(float x, float y, uint16_t code);
-void FontDrawCodeMtx(float matrix[3][4], uint16_t code);
+void FontDrawCodeMtx(gc::mtx34* mtx, uint16_t code);
 void FontDrawString(float x, float y, const char *text);
 void FontDrawStringPitch(float x, float y, float pitch, const char *text);
-void FontDrawStringVecPitch(float position[3], float pitch, const char *text);
-void FontDrawStringMtx(float matrix[3][4], const char *text);
-void FontDrawStringCenterMtx(float matrix[3][4], const char *text);
+void FontDrawStringVecPitch(gc::vec3* position, float pitch, const char *text);
+void FontDrawStringMtx(gc::mtx34* mtx, const char *text);
+void FontDrawStringCenterMtx(gc::mtx34* mtx, const char *text);
 void FontDrawStringShake(float x, float y, const char *text);
 void FontDrawMessage(int x, int y, const char *message);
-void FontDrawMessageMtx(float matrix[3][4], const char *message);
+void FontDrawMessageMtx(gc::mtx34* mtx, const char *message);
 uint16_t FontGetMessageWidthLine(const char *message, uint16_t *outLines);
 uint16_t FontGetMessageWidth(const char *message);
 

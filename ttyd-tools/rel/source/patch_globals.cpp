@@ -7,6 +7,7 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/seqdrv.h>
+#include <ttyd/winmgr.h>
 
 #include <cstdint>
 
@@ -23,6 +24,7 @@ using ::ttyd::battle_unit::BattleWorkUnitPart;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::npcdrv::FbatBattleInformation;
 using ::ttyd::seqdrv::SeqIndex;
+using ::ttyd::winmgr::WinMgrSelectEntry;
 
 }
 
@@ -136,6 +138,10 @@ int32_t (*g_bakuGameDecideWeapon_trampoline)(EvtEntry*, bool) = nullptr;
 // sac_zubastar.o  80235c7c
 uint32_t (*g_weaponGetPower_ZubaStar_trampoline)(
     BattleWorkUnit*, BattleWeapon*, BattleWorkUnit*, BattleWorkUnitPart*) = nullptr;
+// winmgr.o  8023cf50
+int32_t (*g_winMgrSelectOther_trampoline)(WinMgrSelectEntry*, EvtEntry*) = nullptr;
+// winmgr.o  8023d624
+WinMgrSelectEntry* (*g_winMgrSelectEntry_trampoline)(int32_t, int32_t, int32_t) = nullptr;
 // sac_genki.o  80245a50
 int32_t (*g_sac_genki_get_score_trampoline)(EvtEntry*, bool) = nullptr;
 // sac_deka.o  80249048
@@ -276,6 +282,8 @@ extern const int32_t g_scissor_damage_sub_ArtAttackDamage_BH = 0x80231cc0;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_EH = 0x80231d38;
 extern const int32_t g_select_disp_Patch_PitListPriceHook = 0x8023c120;
 extern const int32_t g_select_disp_Patch_PitItemPriceHook = 0x8023d2e0;
+extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblHi16 = 0x8023d6b6;
+extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblLo16 = 0x8023d6be;
 extern const int32_t g_sac_genki_main_base_BlinkNumbers_BH = 0x80248220;
 extern const int32_t g_sac_genki_main_base_BlinkNumbers_EH = 0x802483b4;
 extern const int32_t g_sac_genki_main_base_SetupTargets_BH = 0x80248430;

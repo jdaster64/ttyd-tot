@@ -11,6 +11,7 @@
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
 #include <ttyd/evt_snd.h>
+#include <ttyd/evt_window.h>
 #include <ttyd/mapdata.h>
 
 namespace mod::tot::gon {
@@ -25,6 +26,7 @@ using namespace ::ttyd::evt_mobj;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
 using namespace ::ttyd::evt_snd;
+using namespace ::ttyd::evt_window;
 
 using ::ttyd::evt_bero::BeroEntry;
 
@@ -51,10 +53,17 @@ EVT_BEGIN(Lobby_ExitPipeReentryRejectEvt)
     RETURN()
 EVT_END()
 
+// TODO: Testing different winSelect stuff.
 EVT_BEGIN(Lobby_FrontSignEvt)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_normalize)
-    USER_FUNC(evt_msg_print, 0, PTR("tik_06_02"), 0, 0)
+    
+    USER_FUNC(evt_win_other_select, 19)
+    USER_FUNC(
+        evt_msg_print_insert, 0, PTR("zz_test_win_select"), 0, 0,
+        LW(1), LW(2), LW(3), LW(4))
+    
+    // USER_FUNC(evt_msg_print, 0, PTR("tik_06_02"), 0, 0)
     USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()

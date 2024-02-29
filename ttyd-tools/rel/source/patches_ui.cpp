@@ -7,6 +7,7 @@
 #include "patch.h"
 #include "patches_item.h"
 #include "tot_generate_enemy.h"
+#include "tot_window_select.h"
 
 #include <gc/mtx.h>
 #include <gc/types.h>
@@ -18,6 +19,7 @@
 #include <ttyd/battle_monosiri.h>
 #include <ttyd/battle_seq_end.h>
 #include <ttyd/eff_updown.h>
+#include <ttyd/evtmgr.h>
 #include <ttyd/fontmgr.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
@@ -29,6 +31,7 @@
 #include <ttyd/win_main.h>
 #include <ttyd/win_party.h>
 #include <ttyd/win_root.h>
+#include <ttyd/winmgr.h>
 
 #include <cinttypes>
 #include <cstdio>
@@ -94,8 +97,10 @@ namespace mod::infinite_pit {
 namespace {
     
 using ::ttyd::battle_database_common::BattleWeapon;
+using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::mario_pouch::PouchData;
 using ::ttyd::win_party::WinPartyData;
+using ::ttyd::winmgr::WinMgrSelectEntry;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
@@ -106,6 +111,8 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 extern void (*g_statusWinDisp_trampoline)(void);
 extern void (*g_gaugeDisp_trampoline)(double, double, int32_t);
 extern const char* (*g_BattleGetRankNameLabel_trampoline)(int32_t);
+extern int32_t (*g_winMgrSelectOther_trampoline)(WinMgrSelectEntry*, EvtEntry*);
+extern WinMgrSelectEntry* (*g_winMgrSelectEntry_trampoline)(int32_t, int32_t, int32_t);
 // Patch addresses.
 extern const int32_t g_effUpdownDisp_TwoDigitSupport_BH;
 extern const int32_t g_effUpdownDisp_TwoDigitSupport_EH;
@@ -127,6 +134,8 @@ extern const int32_t g_winMarioMain_StarPowerDescription_BH;
 extern const int32_t g_winMarioMain_StarPowerDescription_EH;
 extern const int32_t g_winLogInit_Patch_DisableCrystalStarLog;
 extern const int32_t g_winLogInit_InitTattleLog_BH;
+extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblHi16;
+extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblLo16;
 extern const int32_t g__btlcmd_MakeSelectWeaponTable_Patch_GetNameFromItem;
 
 namespace ui {
@@ -310,6 +319,38 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         ttyd::win_root::enemy_monoshiri_sort_table,
         custom_tattle_order, sizeof(custom_tattle_order));
+        
+    // Update winmgr::select_desc_tbl with a larger one to handle custom menus.
+    uintptr_t new_select_desc_tbl = reinterpret_cast<uintptr_t>(
+        tot::window_select::InitNewSelectDescTable());
+    uint16_t new_select_desc_tbl_hi16 = new_select_desc_tbl >> 16;
+    uint16_t new_select_desc_tbl_lo16 = new_select_desc_tbl & 0xffff;
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_winMgrSelectEntry_Patch_SelectDescTblHi16),
+        &new_select_desc_tbl_hi16, sizeof(uint16_t));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_winMgrSelectEntry_Patch_SelectDescTblLo16),
+        &new_select_desc_tbl_lo16, sizeof(uint16_t));
+        
+    // Run custom code after vanilla winMgrSelectEntry / Other for custom menus.
+    g_winMgrSelectEntry_trampoline = patch::hookFunction(
+        ttyd::winmgr::winMgrSelectEntry, [](
+            int32_t type, int32_t new_item, int32_t cancellable) {
+            if (type >= tot::window_select::MenuType::CUSTOM_START) {
+                return tot::window_select::HandleSelectWindowEntry(
+                    type, new_item, cancellable);
+            }
+            return g_winMgrSelectEntry_trampoline(type, new_item, cancellable);
+        });
+    g_winMgrSelectOther_trampoline = patch::hookFunction(
+        ttyd::winmgr::winMgrSelectOther, [](
+            WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
+            if (sel_entry->type >= tot::window_select::MenuType::CUSTOM_START) {
+                return tot::window_select::HandleSelectWindowOther(
+                    sel_entry, evt);
+            }
+            return g_winMgrSelectOther_trampoline(sel_entry, evt);
+        });
 }
 
 void DisplayUpDownNumberIcons(

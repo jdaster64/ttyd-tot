@@ -2226,6 +2226,50 @@
 8041db20:nice_event
 803b5a40:marioAttackEvent_ZubaStar
 
+// winmgr.o
+// .text
+8023976c:select_disp3_mario
+80239880:select_disp3_party
+80239980:select_disp3
+80239a00:select_main3
+80239ae8:select_disp2
+80239e10:select_disp_luigi
+8023a5f0:select_disp_mario
+8023b0e8:select_disp_party
+8023bc74:select_disp
+8023ca6c:select_main
+8023cf04:unk_8023cf04
+8023cf0c:winMgrSelectDelete
+8023cf50:winMgrSelectOther
+8023d4c0:winMgrSelect
+8023d524:unk_8023d524
+8023d59c:unk_8023d59c
+8023d5e4:unk_8023d5e4
+8023d624:winMgrSelectEntry
+8023e53c:winMgrHelpDraw
+8023e9b8:winMgrHelpMain
+8023eaa0:winMgrHelpInit
+8023eab4:winMgrGetPtr
+8023eac8:winMgrSetPriority
+8023eaec:winMgrSetSize
+8023eb1c:winMgrAction
+8023eb34:winMgrDelete
+8023eb50:winMgrCloseAutoDelete
+8023eb8c:winMgrClose
+8023ebbc:winMgrOpen
+8023ebf8:winMgrSetParam
+8023ec1c:winMgrEntry
+8023ecb8:winMgrSeq
+8023f1b0:winMgrMain
+8023f288:winMgrDisp
+8023f70c:winMgrReInit
+8023f740:winMgrInit
+8023f79c:unk_8023f79c
+8023f8d0:unk_8023f8d0
+// .data
+803b6174:select_desc_tbl
+8041db40:winmgr_work
+
 // sac_genki.o
 // .text
 80245a50:get_score

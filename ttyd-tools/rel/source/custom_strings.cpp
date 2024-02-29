@@ -43,6 +43,7 @@ namespace MsgKey {
         MSG_TREASURE_MAP,
         RIPPO_TOP_MENU,
         TIK_06_02,
+        ZZ_TEST_WIN_SELECT,
     };
 }
     
@@ -75,6 +76,7 @@ constexpr const char* kKeyLookups[] = {
     "msg_treasure_map",
     "rippo_top_menu",
     "tik_06_02",
+    "zz_test_win_select",
 };
 
 const char* GetYoshiTextColor() {
@@ -239,6 +241,8 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
             }
             return "<select 0 3 0 40>\nItems\nBadges\nLevel-ups";
         }
+        case MsgKey::ZZ_TEST_WIN_SELECT:
+            return "Selection: %d %d %d %d<k>";
     }
     // Should not be reached.
     return nullptr;
