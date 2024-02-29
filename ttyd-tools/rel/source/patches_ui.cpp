@@ -427,8 +427,8 @@ void StarPowerMenuDisp() {
         // Print attack name.
         const BattleWeapon* sac = ttyd::battle_mario::superActionTable[i];
         const char* name = ttyd::msgdrv::msgSearch(sac->name);
-        ttyd::win_main::winFontSetPitch(
-            180.0, &sac_name_position, &sac_name_scale, &sac_color, name);
+        ttyd::win_main::winFontSetWidth(
+            &sac_name_position, &sac_name_scale, &sac_color, 180.0, name);
         
         // Print mini "Lvl." string.
         ttyd::win_main::winFontSet(

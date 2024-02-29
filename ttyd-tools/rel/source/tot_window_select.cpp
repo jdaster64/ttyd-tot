@@ -4,11 +4,20 @@
 #include <gc/mtx.h>
 #include <ttyd/dispdrv.h>
 #include <ttyd/evtmgr.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/fontmgr.h>
+#include <ttyd/icondrv.h>
+#include <ttyd/item_data.h>
+#include <ttyd/mariost.h>
 #include <ttyd/memory.h>
 #include <ttyd/msgdrv.h>
+#include <ttyd/win_main.h>
 #include <ttyd/winmgr.h>
+#include <ttyd/gx/GXPixel.h>
+#include <ttyd/gx/GXTransform.h>
 
+#include <cinttypes>
+#include <cstdio>
 #include <cstring>
 
 namespace mod::tot::window_select {
@@ -20,9 +29,141 @@ using namespace ::ttyd::winmgr;
 
 using ::ttyd::dispdrv::CameraId;
 using ::ttyd::evtmgr::EvtEntry;
+using ::ttyd::evtmgr_cmd::evtSetValue;
+using ::ttyd::item_data::itemDataTable;
+using ::ttyd::mariost::g_MarioSt;
 
+namespace IconType = ::ttyd::icondrv::IconType;
+
+// TODO: All of this is testing, pretty much.
 void DispMainWindow(WinMgrEntry* entry) {
-    // TODO: Implement.
+    auto* sel_entry = (WinMgrSelectEntry*)entry->param;
+    if ((winmgr_work->entries[sel_entry->entry_indices[0]].flags & 
+        WinMgrEntry_Flags::IN_FADE) != 0) return;
+    
+    uint32_t kWhite = 0xFFFF'FFFFU;
+    uint32_t kOffWhite = 0xF0F0'F0F0U;
+    uint32_t kMedGrey = 0xA0A0'A0FFU;
+    uint32_t kBlack = 0x0000'00FFU;
+    
+    ttyd::gx::GXPixel::GXSetFog(/* GX_FOG_NONE */ 0, 0, 0, 0, 0, &kWhite);
+    // Save previous scissor bounds.
+    int32_t scissor_0, scissor_1, scissor_2, scissor_3;
+    ttyd::gx::GXTransform::GXGetScissor(
+        &scissor_0, &scissor_1, &scissor_2, &scissor_3);
+    ttyd::gx::GXTransform::GXSetScissor(
+        entry->x + 304, 274 - entry->y, entry->width, entry->height - 50);
+    
+    int32_t offset = 0;
+    for (int32_t i = 0; i < sel_entry->num_rows; ++i) {
+        auto& row = sel_entry->row_data[i];
+        float y_trans = sel_entry->list_y_offset + entry->y - 44 - offset;
+        
+        // Only draw info for rows that are visible.
+        if (y_trans - 32 <= entry->y && 
+            entry->y - entry->height <= y_trans + 32) {
+            uint32_t* text_color;
+            if (row.flags & WinMgrSelectEntryRow_Flags::GREYED_OUT) {
+                ttyd::win_main::winIconGrayInit();
+                text_color = &kMedGrey;
+            } else {
+                ttyd::win_main::winIconInit();
+                text_color = &kBlack;
+            }
+            gc::vec3 pos = { entry->x + 35.0f, y_trans, 0.0f };
+            gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
+            ttyd::win_main::winIconSet(
+                itemDataTable[row.value].icon_id, &pos, &scale, &kWhite);
+            
+            ttyd::win_main::winFontInit();
+            gc::vec3 text_pos = { entry->x + 60.0f, y_trans + 12.0f, 0.0f };
+            gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
+            ttyd::win_main::winFontSetWidth(
+                &text_pos, &text_scale, text_color, 185.0,
+                ttyd::msgdrv::msgSearch(itemDataTable[row.value].name));
+        }
+        
+        int32_t value = itemDataTable[row.value].buy_price;
+        if (value > 0) {
+            char buf[8] = { 0 };
+            sprintf(buf, "%" PRId32 "", value);
+            int32_t length = ttyd::fontmgr::FontGetMessageWidth(buf);
+            if (length > 30) length = 30;
+            ttyd::win_main::winFontInit();
+            
+            uint32_t* text_color;
+            if (row.flags & WinMgrSelectEntryRow_Flags::GREYED_OUT) {
+                text_color = &kMedGrey;
+            } else {
+                text_color = &kBlack;
+            }
+            gc::vec3 text_pos = {
+                entry->x + entry->width - 10.0f - length,
+                y_trans + 12.0f,
+                0.0f
+            };
+            gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
+            ttyd::win_main::winFontSetWidth(
+                &text_pos, &text_scale, text_color, 30.0, buf);
+        }
+        
+        offset += 24;
+    }
+    
+    // Restore previous scissor boundaries.
+    ttyd::gx::GXTransform::GXSetScissor(
+        scissor_0, scissor_1, scissor_2, scissor_3);
+    
+    const char* title = ttyd::msgdrv::msgSearch("in_konran_hammer");
+    int32_t length = ttyd::fontmgr::FontGetMessageWidth(title);
+    if (length > 120) length = 120;
+    ttyd::win_main::winFontInit();
+    
+    gc::vec3 text_pos = {
+        entry->x + (entry->width - length) * 0.5f,
+        entry->y + 14.0f,
+        0.0f
+    };
+    gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
+    ttyd::win_main::winFontSetEdgeWidth(
+        &text_pos, &text_scale, &kWhite, 120.0, title);
+        
+    // Draw white circle + currency icon in upper-right corner.
+    gc::mtx34 mtx, mtx2;
+    gc::mtx::PSMTXScale(&mtx2, 0.6f, 0.6f, 0.6f);
+    gc::mtx::PSMTXTrans(&mtx, entry->x + 268.0f, entry->y - 18.0f, 0.0f);
+    gc::mtx::PSMTXConcat(&mtx, &mtx2, &mtx);
+    ttyd::icondrv::iconDispGxCol(
+        &mtx, 0x10, IconType::BLACK_WITH_WHITE_CIRCLE, &kOffWhite);
+
+    gc::vec3 icon_pos = { entry->x + 268.0f, entry->y - 12.0f, 0.0f };
+    ttyd::icondrv::iconDispGx(0.6f, &icon_pos, 0x10, IconType::COIN);
+    
+    // Draw cursor and scrolling arrows, if necessary.
+    gc::vec3 cursor_pos = { sel_entry->cursor_x, sel_entry->cursor_y, 1.0f };
+    ttyd::icondrv::iconDispGx(1.0f, &cursor_pos, 0x14, IconType::GLOVE_POINTER_H);
+    
+    if (sel_entry->num_rows > 8 &&
+        (g_MarioSt->currentRetraceCount & 0x1f) < 20) {
+        if (sel_entry->list_row_offset != 0) {
+            gc::vec3 pos = {
+                entry->width * 0.5f +  entry->x,
+                entry->y - 36.0f,
+                1.0f
+            };
+            ttyd::icondrv::iconDispGx(
+                0.6f, &pos, 0x10, IconType::MENU_UP_POINTER);
+        }
+        if (sel_entry->list_row_offset != sel_entry->num_rows - 8) {
+            gc::vec3 pos = {
+                entry->width * 0.5f +  entry->x,
+                entry->y - entry->height - 12.0f,
+                1.0f
+            };
+            ttyd::icondrv::iconDispGx(
+                0.6f, &pos, 0x10, IconType::MENU_DOWN_POINTER);
+        }
+    }
 }
 
 void DispWindow2(WinMgrEntry* entry) {
@@ -171,8 +312,21 @@ WinMgrSelectEntry* HandleSelectWindowEntry(
     sel_entry->cursor_y = main_desc.y - 54;
     
     // TODO: custom logic for populating rows.
+    sel_entry->num_rows = 10;
     sel_entry->row_data = (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
         0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+    memset(sel_entry->row_data, 0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+    sel_entry->row_data[0].value = 0xf0;
+    sel_entry->row_data[1].value = 0xfb;
+    sel_entry->row_data[2].value = 0xf0;
+    sel_entry->row_data[3].value = 0xfb;
+    sel_entry->row_data[4].value = 0xf0;
+    sel_entry->row_data[5].value = 0xfb;
+    sel_entry->row_data[6].value = 0xfb;
+    sel_entry->row_data[7].value = 0xfb;
+    sel_entry->row_data[8].flags = 3;
+    sel_entry->row_data[8].value = 0xf7;
+    sel_entry->row_data[9].value = 0xfb;
     
     // Shrink the window if it's fewer than eight entries.
     if (sel_entry->num_rows < 8) {
@@ -191,7 +345,9 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
     if (sel_entry->flags & WinMgrSelectEntry_Flags::CANCELLED)
         return -1;
     
-    // TODO: Handle setting relevant fields in the event script.
+    // TODO: Handle setting relevant event script parameters based on selection.
+    int32_t value = sel_entry->row_data[sel_entry->cursor_index].value;
+    evt->lwData[1] = value;
     
     return 1;
 }

@@ -1796,9 +1796,14 @@
 80177b28:unitwin_get_work_ptr
 
 // win_main.o
+8017b8d8:winIconSet
+8017bbcc:winIconGrayInit
+8017bfdc:winIconInit
+8017d10c:winFontSetEdgeWidth
 8017d28c:winFontSetEdge
-8017d52c:winFontSetPitch
+8017d52c:winFontSetWidth
 8017d6ac:winFontSet
+8017d7d0:winFontInit
 8017ebd4:winGetPtr
 
 // unit_party_clauda.o
@@ -2479,6 +2484,8 @@
 
 // gx.a GXTransform.c
 802ba2fc:GXLoadPosMtxImm
+802ba644:GXSetScissor
+802ba6bc:GXGetScissor
 
 // si.a
 802bd7b8:SIBusy

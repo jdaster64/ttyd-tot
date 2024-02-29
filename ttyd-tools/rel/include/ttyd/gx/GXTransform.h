@@ -21,8 +21,8 @@ void GXLoadPosMtxImm(gc::mtx34* mtx, int32_t unk0);
 // GXSetViewport
 // GXGetViewportv
 // GXSetZScaleOffset
-// GXSetScissor
-// GXGetScissor
+void GXSetScissor(int32_t x, int32_t y, int32_t width, int32_t height);
+void GXGetScissor(int32_t* x, int32_t* y, int32_t* width, int32_t* height);
 // GXSetScissorBoxOffset
 // GXSetClipMode
 // __GXSetMatrixIndex
