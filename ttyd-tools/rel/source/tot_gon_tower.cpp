@@ -32,6 +32,7 @@
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
 #include <ttyd/npcdrv.h>
+#include <ttyd/swdrv.h>
 
 #include <cstring>
 
@@ -85,56 +86,46 @@ NpcSetupInfo g_NpcSetupInfo[2];
 struct ChestData {
     gc::vec3    home_pos;
     int32_t     item;
+    void*       pickup_script;
 };
 ChestData g_Chests[5];
+int32_t g_ChestDrawAlpha = 0;
 
 void dispChestIcons(CameraId camera, void* user_data) {
+    // Ideally this would fade, but alpha doesn't seem supported for this cam.
+    int32_t value = ttyd::swdrv::swByteGet(1001);
+    if (g_ChestDrawAlpha < 0xff && value == 1) g_ChestDrawAlpha = 0xff;
+    if (g_ChestDrawAlpha > 0 && value != 1) g_ChestDrawAlpha = 0;
+    
     auto* chest = (ChestData*)user_data;
     for (; chest->item; ++chest) {
         gc::vec3 pos = chest->home_pos;
         pos.y += 75.f;
-        ttyd::icondrv::iconDispGx(
-            1.0f, &pos, 0, itemDataTable[chest->item].icon_id);
+        ttyd::icondrv::iconDispGxAlpha(
+            1.0f, &pos, 0, itemDataTable[chest->item].icon_id, g_ChestDrawAlpha);
     }
 }
 
-// Selects chest spawn contents and positions
-// TODO: based on Mario's position
-// TODO: move to tot_generate_rewards file?
+// USER_FUNC declarations.
 EVT_DECLARE_USER_FUNC(evtTot_SelectChestContents, 0)
-EVT_DEFINE_USER_FUNC(evtTot_SelectChestContents) {
-    memset(g_Chests, 0, sizeof(g_Chests));
-    
-    g_Chests[0].home_pos = { -80.0, 0.0, -100.0 };
-    g_Chests[0].item = ItemType::MUSHROOM;
-    g_Chests[1].home_pos = { 0.0, 0.0, -100.0 };
-    g_Chests[1].item = ItemType::SUPER_SHROOM;
-    g_Chests[2].home_pos = { 80.0, 0.0, -100.0 };
-    g_Chests[2].item = ItemType::ULTRA_SHROOM;
-    
-    return 2;
-}
-
-// Gets chest's XYZ position and contents.
-EVT_DECLARE_USER_FUNC(evtTot_GetChestData, 5)
-EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
-    int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
-    evtSetValue(evt, evt->evtArguments[1], g_Chests[idx].home_pos.x);
-    evtSetValue(evt, evt->evtArguments[2], g_Chests[idx].home_pos.y);
-    evtSetValue(evt, evt->evtArguments[3], g_Chests[idx].home_pos.z);
-    evtSetValue(evt, evt->evtArguments[4], g_Chests[idx].item);
-    return 2;
-}
-
-// Displays item icons above the chests.
+EVT_DECLARE_USER_FUNC(evtTot_GetChestData, 6)
 EVT_DECLARE_USER_FUNC(evtTot_DisplayChestItemIcons, 0)
-EVT_DEFINE_USER_FUNC(evtTot_DisplayChestItemIcons) {
-    ttyd::dispdrv::dispEntry(
-        CameraId::k3d, 1, /* order = */ 900.f, dispChestIcons, g_Chests);
-    return 2;
-}
 
 extern const BeroEntry normal_room_entry_data[3];
+
+EVT_BEGIN(Tower_DummyChestEvt)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    SET(GSW(1000), 1)
+    RETURN()
+EVT_END()
+
+// Dummy script to run for picking up an Ultra Shroom specifically.
+EVT_BEGIN(Tower_DummyChestEvtSpecial)
+    USER_FUNC(evt_msg_print_insert, 0, PTR("msg_jon_kanban_1"), 0, 0, LW(0))
+    USER_FUNC(evt_mario_key_onoff, 1)
+    SET(GSW(1000), 1)
+    RETURN()
+EVT_END()
 
 // Script for sign that shows current floor.
 EVT_BEGIN(Tower_SignEvt)
@@ -155,14 +146,16 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     IF_EQUAL(GSW(1000), 1)
         RETURN()
     END_IF()
+    // Disable drawing item icons above chests.
+    SET(GSW(1001), 2)
     USER_FUNC(evt_mario_key_onoff, 0)
-    USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13))
+    USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13), LW(14))
     USER_FUNC(
-        evt_item_entry, PTR("item"), LW(13), LW(10), LW(11), LW(12), 17, -1, 0)
+        evt_item_entry, PTR("item"), LW(13), LW(10), LW(11), LW(12), 17, -1, LW(14))
     USER_FUNC(evt_mobj_wait_animation_end, LW(8))
     USER_FUNC(evt_item_get_item, PTR("item"))
-    USER_FUNC(evt_mario_key_onoff, 1)
-    SET(GSW(1000), 1)
+    // WARNING: The pickup script for the item should give Mario back control
+    // and set GSW(1000) = 1!
     RETURN()
 EVT_END()
 
@@ -214,7 +207,7 @@ EVT_BEGIN(Tower_SpawnChests)
         // Get contents of next chest, and break from loop if empty.
         SET(LW(11), 3)
         SUB(LW(11), LW(10))
-        USER_FUNC(evtTot_GetChestData, LW(11), LW(0), LW(1), LW(2), LW(3))
+        USER_FUNC(evtTot_GetChestData, LW(11), LW(0), LW(1), LW(2), LW(3), EVT_NULLPTR)
         IF_EQUAL(LW(3), 0)
             DO_BREAK()
         END_IF()
@@ -253,6 +246,8 @@ EVT_END()
 // Spawn the exit to the floor.
 EVT_BEGIN(Tower_SpawnPipe)
     USER_FUNC(evt_mario_key_onoff, 0)
+    
+    // Spawn pipe.
     WAIT_MSEC(500)
     SET(LW(2), PTR("a_dokan_1"))
     SET(LW(3), PTR("dokan_1_s"))
@@ -270,6 +265,26 @@ EVT_BEGIN(Tower_SpawnPipe)
         GOTO(0)
     END_IF()
     USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
+    
+    // Delete chest objects.
+    SET(LW(10), 3)
+    DO(LW(10))
+        SET(LW(11), 3)
+        SUB(LW(11), LW(10))
+        USER_FUNC(evtTot_GetChestData, LW(11), LW(0), LW(1), LW(2), LW(3), EVT_NULLPTR)
+        IF_EQUAL(LW(3), 0)
+            DO_CONTINUE()
+        END_IF()
+        ADD(LW(1), 25)
+        USER_FUNC(
+            evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
+            0, 0, 0, 0, 0, 0, 0)
+    WHILE()
+    USER_FUNC(evt_mobj_delete, PTR("box_0"))
+    USER_FUNC(evt_mobj_delete, PTR("box_1"))
+    USER_FUNC(evt_mobj_delete, PTR("box_2"))
+    USER_FUNC(evt_mobj_delete, PTR("box_3"))
+    
     USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()
@@ -317,9 +332,7 @@ EVT_BEGIN(Tower_NpcSetup)
         WAIT_FRM(1)
         IF_EQUAL(GSW(1000), 0)
             // TODO: Draw icons corresponding to chest contents.
-            IF_EQUAL(GSW(1001), 1)
-                USER_FUNC(evt_mobj_get_position, PTR("box"), LW(10), LW(11), LW(12))
-                ADD(LW(11), 80)
+            IF_LARGE_EQUAL(GSW(1001), 1)
                 USER_FUNC(evtTot_DisplayChestItemIcons)
             END_IF()
             GOTO(2)
@@ -374,6 +387,44 @@ EVT_BEGIN(gon_01_InitEvt)
 
     RETURN()
 EVT_END()
+
+
+// Selects chest spawn contents and positions
+// TODO: based on Mario's position
+// TODO: move to tot_generate_rewards file?
+EVT_DEFINE_USER_FUNC(evtTot_SelectChestContents) {
+    memset(g_Chests, 0, sizeof(g_Chests));
+    
+    g_Chests[0].home_pos = { 0.0, 0.0, -100.0 };
+    g_Chests[0].item = ItemType::SUPER_SHROOM;
+    g_Chests[0].pickup_script = (void*)Tower_DummyChestEvt;
+    g_Chests[1].home_pos = { -80.0, 0.0, -100.0 };
+    g_Chests[1].item = ItemType::MUSHROOM;
+    g_Chests[1].pickup_script = (void*)Tower_DummyChestEvt;
+    g_Chests[2].home_pos = { 80.0, 0.0, -100.0 };
+    g_Chests[2].item = ItemType::ULTRA_SHROOM;
+    g_Chests[2].pickup_script = (void*)Tower_DummyChestEvtSpecial;
+    
+    return 2;
+}
+
+// Gets chest's XYZ position and contents.
+EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
+    int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
+    evtSetValue(evt, evt->evtArguments[1], g_Chests[idx].home_pos.x);
+    evtSetValue(evt, evt->evtArguments[2], g_Chests[idx].home_pos.y);
+    evtSetValue(evt, evt->evtArguments[3], g_Chests[idx].home_pos.z);
+    evtSetValue(evt, evt->evtArguments[4], g_Chests[idx].item);
+    evtSetValue(evt, evt->evtArguments[5], PTR(g_Chests[idx].pickup_script));
+    return 2;
+}
+
+// Displays item icons above the chests.
+EVT_DEFINE_USER_FUNC(evtTot_DisplayChestItemIcons) {
+    ttyd::dispdrv::dispEntry(
+        CameraId::k3d, 1, /* order = */ 900.f, dispChestIcons, g_Chests);
+    return 2;
+}
 
 const BeroEntry normal_room_entry_data[3] = {
     {

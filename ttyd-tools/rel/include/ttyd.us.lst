@@ -539,6 +539,7 @@
 80067a4c:evt_mobj_itembox
 8006b948:evt_mobj_wait_animation_end
 8006c03c:evt_mobj_get_position
+8006c308:evt_mobj_delete
 // .data
 8030b4ec:mobj_save_blk_sysevt
 
