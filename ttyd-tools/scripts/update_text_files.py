@@ -359,6 +359,82 @@ g_StringMap = {
             b"<icon PAD_X 0.6 1 2 6> repeatedly\n"
             b"in quick succession!",
             
+        # Shortened move names
+        
+        b"tot_mj_spring_abb":   b"Spring J.",
+        b"tot_mj_pjump_abb":    b"Power J.",
+        b"tot_mj_multi_abb":    b"Multib.",
+        b"tot_mj_pbounce_abb":  b"Power B.",
+        b"tot_mj_sleep_abb":    b"Sleep S.",
+        b"tot_mj_tjump_abb":    b"Tor. J.",
+        
+        b"tot_mh_super_abb":    b"Super H.",
+        b"tot_mh_ultra_abb":    b"Ultra H.",
+        b"tot_mh_power_abb":    b"Power S.",
+        b"tot_mh_shrink_abb":   b"Shrink S.",
+        b"tot_mh_quake_abb":    b"Quake H.",
+        
+        b"tot_ms_1_abb":        b"Sweet Tr.",
+        b"tot_ms_2_abb":        b"Earth Tr.",
+        b"tot_ms_6_abb":        b"Sweet F.",
+        b"tot_ms_7_abb":        b"Showst.",
+        
+        b"tot_ptr4_norm_abb":   b"Ground P.",
+        b"tot_ptr4_spit_abb":   b"Lickety Sp.",
+        b"tot_ptr4_egg_abb":    b"Egg Barr.",
+        b"tot_ptr6_bsquad_abb": b"Bomb Sq.",
+        b"tot_ptr6_poison_abb": b"Poison B.",
+        b"tot_ptr7_smokeb_abb": b"Smoke B.",
+        
+        # Upgrade descriptions
+        
+        b"tot_upg_none":
+            b"This move can't be upgraded.",
+        
+        b"tot_upg_damage":
+            b"Upgrading this move will\n"
+            b"increase its damage output.",
+            
+        b"tot_upg_status":
+            b"Upgrading this move will\n"
+            b"increase its status duration.",
+            
+        b"tot_upg_statuseffect":
+            b"Upgrading this move will\n"
+            b"increase its status power.",
+            
+        b"tot_upg_statuschance":
+            b"Upgrading this move will\n"
+            b"increase its status chance.",
+        
+        b"tot_upg_blizzard":
+            b"Upgrading this move ups its\n"
+            b"damage and freeze duration.",
+            
+        b"tot_upg_hits":
+            b"Upgrading this move will\n"
+            b"increase the number of hits.",
+            
+        b"tot_upg_shellsh":
+            b"Upgrading this move will\n"
+            b"increase the shield's max HP.",
+            
+        b"tot_upg_multi":
+            b"Upgrading this move will\n"
+            b"allow you to target all foes.",
+            
+        b"tot_upg_bombs":
+            b"Upgrading this move will\n"
+            b"increase the number of bombs.",
+            
+        b"tot_upg_smooch":
+            b"Upgrading this move will\n"
+            b"increase the max HP healed.",
+            
+        b"tot_upg_sac1":
+            b"Upgrading this move will\n"
+            b"increase targets' value.",
+            
         # Achievements (TODO)
         
         b"in_ach_1":    b"Chest Collector",

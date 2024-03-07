@@ -19,6 +19,7 @@
 #include <ttyd/battle_unit.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
+#include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/msgdrv.h>
@@ -80,6 +81,7 @@ using ::ttyd::item_data::itemDataTable;
 namespace AttackTargetClass_Flags =
     ::ttyd::battle_database_common::AttackTargetClass_Flags;
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
+namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 }
@@ -309,7 +311,7 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 mod::patch::writePatch(
                     &ttyd::battle_mario::superActionTable[idx]->base_sp_cost,
                     &new_cost, sizeof(new_cost));
-            } else {
+            } else if (weapons[i].icon != IconType::DO_NOTHING) {
                 // Otherwise, must be a free / FP-costing move.            
                 // If current selection, and L/R pressed, change power level.
                 if (i == cursor->abs_position) {
