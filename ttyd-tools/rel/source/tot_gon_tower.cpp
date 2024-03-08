@@ -121,7 +121,10 @@ EVT_END()
 
 // Dummy script to run for picking up an Ultra Shroom specifically.
 EVT_BEGIN(Tower_DummyChestEvtSpecial)
-    USER_FUNC(evt_msg_print_insert, 0, PTR("msg_jon_kanban_1"), 0, 0, LW(0))
+    USER_FUNC(evt_win_other_select, 19)
+    USER_FUNC(
+        evt_msg_print_insert, 0, PTR("zz_test_win_select"), 0, 0,
+        LW(1), LW(2), LW(3), LW(4))
     USER_FUNC(evt_mario_key_onoff, 1)
     SET(GSW(1000), 1)
     RETURN()

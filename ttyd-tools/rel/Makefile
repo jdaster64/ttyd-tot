@@ -17,13 +17,17 @@ export ELF2REL	:=	$(TOT_TTYDTOOLS)/bin/elf2rel
 export GCIPACK	:=	python $(TOT_TTYDTOOLS)/gcipack/gcipack.py
 export DEBUG_SYMBOLS	:=	python $(TOT_TTYDTOOLS)/scripts/output_debug_symbols.py
 export UPDATE_STRINGS	:=	python $(TOT_TTYDTOOLS)/scripts/update_text_files.py
+export UPDATE_ICON_BIN  :=	python $(TOT_TTYDTOOLS)/scripts/update_icon_bin.py
 
 ifeq ($(VERSION),)
-all: us jp eu
+all: us_full
 us:
+	@$(MAKE) --no-print-directory VERSION=us
+us_full:
 	@$(MAKE) --no-print-directory VERSION=us
 	@$(MAKE) --no-print-directory debug_symbols VERSION=us
 	@$(MAKE) --no-print-directory update_strings VERSION=us
+	@$(MAKE) --no-print-directory update_icon_bin VERSION=us
 	@$(MAKE) --no-print-directory copy_files VERSION=us
 jp:
 	@$(MAKE) --no-print-directory VERSION=jp
@@ -165,6 +169,11 @@ debug_symbols:
 update_strings:
 	@echo updating text strings ...
 	@$(UPDATE_STRINGS) --in_msg_dir=$(TOT_TTYDTOOLS)/bin/backup_files/msg/US --out_msg_dir=$(TOT_TTYDTOOLS)/bin/outputs/msg/US
+
+#---------------------------------------------------------------------------------
+update_icon_bin:
+	@echo updating icon.bin data ...
+	@$(UPDATE_ICON_BIN) --in_icon_bin=$(TOT_TTYDTOOLS)/bin/backup_files/icon.bin --out_dir=$(TOT_TTYDTOOLS)/bin/outputs/
 
 #---------------------------------------------------------------------------------
 copy_files:
