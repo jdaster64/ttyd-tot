@@ -17,6 +17,7 @@
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
+#include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/system.h>
 
@@ -35,6 +36,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::item_data::itemDataTable;
 using ::ttyd::item_data::ItemData;
 
+namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
 
@@ -169,10 +171,6 @@ void ApplyFixedPatches() {
         5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 125, 150, 200, 250
     };
     
-    static const constexpr int16_t kSquareDiamondIconId     =  44;
-    static const constexpr int16_t kSquareDiamondPartnerId  =  87;
-    static const constexpr int16_t kKoopaCurseIconId        = 390;
-    
     // - Set coin buy & sell (for Refund) prices based on above tiers.
     // - Set healing items' weapons to CookingItem if they don't have one.
     // - Fix unused items' and badges' sort order.
@@ -269,6 +267,9 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::SUPER_HAMMER].description = "msg_custom_super_hammer";
     itemDataTable[ItemType::ULTRA_HAMMER].description = "msg_custom_ultra_hammer";
     
+    // Change icon for blue coins.
+    itemDataTable[ItemType::PIANTA].icon_id = IconType::TOT_COIN_BLUE;
+    
     // Change item name / description lookup keys for achievement rewards.
     itemDataTable[AchievementsManager::kChestRewardItem].name = "in_ach_1";
     itemDataTable[AchievementsManager::kChestRewardItem].description = "msg_ach_1";
@@ -282,12 +283,12 @@ void ApplyFixedPatches() {
     
     // New badges (Toughen Up, Toughen Up P); a single-turn +DEF buff.
     itemDataTable[ItemType::SUPER_CHARGE].bp_cost = 1;
-    itemDataTable[ItemType::SUPER_CHARGE].icon_id = kSquareDiamondIconId;
+    itemDataTable[ItemType::SUPER_CHARGE].icon_id = IconType::DEFEND_BADGE;
     itemDataTable[ItemType::SUPER_CHARGE].name = "in_toughen_up";
     itemDataTable[ItemType::SUPER_CHARGE].description = "msg_toughen_up";
     itemDataTable[ItemType::SUPER_CHARGE].menu_description = "msg_toughen_up_menu";
     itemDataTable[ItemType::SUPER_CHARGE_P].bp_cost = 1;
-    itemDataTable[ItemType::SUPER_CHARGE_P].icon_id = kSquareDiamondPartnerId;
+    itemDataTable[ItemType::SUPER_CHARGE_P].icon_id = IconType::DEFEND_BADGE_P;
     itemDataTable[ItemType::SUPER_CHARGE_P].name = "in_toughen_up_p";
     itemDataTable[ItemType::SUPER_CHARGE_P].description = "msg_toughen_up_p";
     itemDataTable[ItemType::SUPER_CHARGE_P].menu_description = "msg_toughen_up_p_menu";
@@ -298,7 +299,7 @@ void ApplyFixedPatches() {
     ttyd::battle_mario::badgeWeapon_SuperCharge.def_change_chance = 100;
     ttyd::battle_mario::badgeWeapon_SuperCharge.def_change_time = 1;
     ttyd::battle_mario::badgeWeapon_SuperCharge.def_change_strength = 2;
-    ttyd::battle_mario::badgeWeapon_SuperCharge.icon = kSquareDiamondIconId;
+    ttyd::battle_mario::badgeWeapon_SuperCharge.icon = IconType::DEFEND_BADGE;
     ttyd::battle_mario::badgeWeapon_SuperCharge.name = "in_toughen_up";
     
     ttyd::battle_mario::badgeWeapon_SuperChargeP.base_fp_cost = 1;
@@ -306,7 +307,7 @@ void ApplyFixedPatches() {
     ttyd::battle_mario::badgeWeapon_SuperChargeP.def_change_chance = 100;
     ttyd::battle_mario::badgeWeapon_SuperChargeP.def_change_time = 1;
     ttyd::battle_mario::badgeWeapon_SuperChargeP.def_change_strength = 2;
-    ttyd::battle_mario::badgeWeapon_SuperChargeP.icon = kSquareDiamondIconId;
+    ttyd::battle_mario::badgeWeapon_SuperChargeP.icon = IconType::DEFEND_BADGE_P;
     ttyd::battle_mario::badgeWeapon_SuperChargeP.name = "in_toughen_up";
     
     // Turn Gold Bars x3 into "Shine Sprites" that can be used from the menu.
@@ -395,7 +396,7 @@ void ApplyFixedPatches() {
     ttyd::battle_item_data::ItemWeaponData_Kameno_Noroi.target_class_flags =
         0x02101260;
     // Give it its correct icon.
-    itemDataTable[ItemType::KOOPA_CURSE].icon_id = kKoopaCurseIconId;
+    itemDataTable[ItemType::KOOPA_CURSE].icon_id = IconType::KOOPA_CURSE;
         
     // Make Hot Sauce charge by +3.
     ttyd::battle_item_data::ItemWeaponData_RedKararing.charge_strength = 3;

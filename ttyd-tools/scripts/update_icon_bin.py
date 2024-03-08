@@ -29,9 +29,8 @@ FLAGS.DefineString("out_dir", "")
 # u16 frame_duration (0 for non-animated)
 
 g_NewIconDefs = [
-    # dummy data for now
-    [(417, 0)],
-    [(0, 3), (1, 3), (2, 3)],
+    # Blue coin
+    [(613, 6), (614, 6), (615, 6), (616, 6)],
 ]
 g_IconDefs = []
 

@@ -580,6 +580,9 @@ namespace IconType {
         BADGES_IT,
         JOURNAL,
         JOURNAL_ES,
+        
+        // Custom icons.
+        TOT_COIN_BLUE,
     };
 }
 
