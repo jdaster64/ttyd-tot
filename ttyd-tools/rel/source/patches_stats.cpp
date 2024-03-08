@@ -92,7 +92,12 @@ void ApplyFixedPatches() {
                 ttyd::swdrv::swSet(0x81 + item_type - ItemType::POWER_JUMP);
             }
             
-            // Run coin increment logic.
+            // Run coin increment logic for custom currency.
+            if (item_type == ItemType::PIANTA) {
+                ttyd::mario_pouch::pouchAddCoin(5);
+                return 1U;
+            }
+            
             return g_pouchGetItem_trampoline(item_type);
         });
 

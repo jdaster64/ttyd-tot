@@ -2,6 +2,7 @@
 
 #include "common_ui.h"
 #include "custom_condition.h"
+#include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
@@ -16,6 +17,8 @@
 #include <ttyd/battle_seq.h>
 #include <ttyd/battle_seq_command.h>
 #include <ttyd/battle_unit.h>
+#include <ttyd/evt_item.h>
+#include <ttyd/item_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/seq_battle.h>
 #include <ttyd/system.h>
@@ -32,6 +35,9 @@ extern "C" {
     void BranchBackGivePlayerInvuln();
     void StartBtlSeqEndJudgeRule();
     void BranchBackBtlSeqEndJudgeRule();
+    // currency_patches.s
+    void StartCheckDeleteFieldItem();
+    void BranchBackCheckDeleteFieldItem();
 }
 
 namespace mod::infinite_pit {
@@ -48,6 +54,7 @@ using ::ttyd::npcdrv::NpcBattleInfo;
 using ::ttyd::npcdrv::NpcEntry;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 }
 
@@ -70,10 +77,41 @@ extern const int32_t g_btlseqTurn_Patch_RuleDispShowLonger;
 extern const int32_t g_btlseqTurn_Patch_RuleDispDismissOnlyWithB;
 extern const int32_t g_btlseqEnd_JudgeRuleEarly_BH;
 extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule;
+extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH;
+extern const int32_t g_itemseq_Bound_Patch_BounceRange;
+extern const int32_t g_enemy_common_dead_event_SpawnCoinsHook;
 
 namespace battle_seq {
     
 namespace {
+
+// Custom evt to spawn different denominations of coins.
+EVT_BEGIN(SpawnCoinsEvt)
+IF_LARGE(LW(3), 100)
+    SET(LW(3), 100)
+END_IF()
+LBL(5)
+IF_LARGE_EQUAL(LW(3), 5)
+    SUB(LW(3), 5)
+    USER_FUNC(
+        ttyd::evt_item::evt_item_entry, 0, ItemType::PIANTA,
+        LW(0), LW(1), LW(2), 10, -1, 0)
+    GOTO(5)
+END_IF()
+IF_LARGE_EQUAL(LW(3), 1)
+    SUB(LW(3), 1)
+    USER_FUNC(
+        ttyd::evt_item::evt_item_entry, 0, ItemType::COIN,
+        LW(0), LW(1), LW(2), 10, -1, 0)
+    GOTO(5)
+END_IF()
+RETURN()
+EVT_END()
+
+EVT_BEGIN(SpawnCoinsEvtHook)
+RUN_CHILD_EVT(SpawnCoinsEvt)
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+EVT_PATCH_END()
 
 // Copies NPC battle information to / from children of a parent NPC
 // (e.g. Piranha Plants, projectiles) when starting or ending a battle.
@@ -342,6 +380,21 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_btlseqTurn_Patch_RuleDispDismissOnlyWithB), 
         0x38600200U /* li r3, 0x200 (B button) */);
+        
+    // Support multiple demonimations of coins dropping at the end of a fight.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_enemy_common_dead_event_SpawnCoinsHook),
+        SpawnCoinsEvtHook, sizeof(SpawnCoinsEvtHook));
+    // Allow big coins to be overridden by other items on the field.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_itemEntry_CheckDeleteFieldItem_BH),
+        reinterpret_cast<void*>(StartCheckDeleteFieldItem),
+        reinterpret_cast<void*>(BranchBackCheckDeleteFieldItem));     
+    // Make bigger coins bounce the same distance as regular coins, not
+    // vanilla Piantas (which have the range of hearts, flowers, or items).
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_itemseq_Bound_Patch_BounceRange),
+        0x2c00007b /* cmpwi r0,0x7b (heart, not Pianta) */);
 }
 
 }  // namespace battle_seq
