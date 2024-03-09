@@ -34,6 +34,8 @@
 #include <ttyd/npcdrv.h>
 #include <ttyd/swdrv.h>
 
+#include <cinttypes>
+#include <cstdio>
 #include <cstring>
 
 namespace mod::tot::gon {
@@ -110,14 +112,9 @@ void dispChestIcons(CameraId camera, void* user_data) {
 EVT_DECLARE_USER_FUNC(evtTot_SelectChestContents, 0)
 EVT_DECLARE_USER_FUNC(evtTot_GetChestData, 6)
 EVT_DECLARE_USER_FUNC(evtTot_DisplayChestItemIcons, 0)
+EVT_DECLARE_USER_FUNC(evtTot_GetUniqueItemName, 1)
 
 extern const BeroEntry normal_room_entry_data[3];
-
-EVT_BEGIN(Tower_DummyChestEvt)
-    USER_FUNC(evt_mario_key_onoff, 1)
-    SET(GSW(1000), 1)
-    RETURN()
-EVT_END()
 
 // Dummy script to run for picking up an Ultra Shroom specifically.
 EVT_BEGIN(Tower_DummyChestEvtSpecial)
@@ -153,13 +150,16 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     SET(GSW(1001), 2)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13), LW(14))
-    // TODO: Generate unique name for item?
+    USER_FUNC(evtTot_GetUniqueItemName, LW(15))
     USER_FUNC(
-        evt_item_entry, PTR("item"), LW(13), LW(10), LW(11), LW(12), 17, -1, LW(14))
+        evt_item_entry, LW(15), LW(13), LW(10), LW(11), LW(12), 17, -1, LW(14))
     USER_FUNC(evt_mobj_wait_animation_end, LW(8))
-    USER_FUNC(evt_item_get_item, PTR("item"))
-    // WARNING: The pickup script for the item should give Mario back control
-    // and set GSW(1000) = 1!
+    USER_FUNC(evt_item_get_item, LW(15))
+    // If no special pickup script, give Mario back control and spawn pipe.
+    IF_EQUAL(LW(14), 0)
+        USER_FUNC(evt_mario_key_onoff, 1)
+        SET(GSW(1000), 1)
+    END_IF()
     RETURN()
 EVT_END()
 
@@ -401,10 +401,10 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectChestContents) {
     
     g_Chests[0].home_pos = { 0.0, 0.0, -100.0 };
     g_Chests[0].item = ItemType::SUPER_SHROOM;
-    g_Chests[0].pickup_script = (void*)Tower_DummyChestEvt;
+    g_Chests[0].pickup_script = nullptr;
     g_Chests[1].home_pos = { -80.0, 0.0, -100.0 };
     g_Chests[1].item = ItemType::MUSHROOM;
-    g_Chests[1].pickup_script = (void*)Tower_DummyChestEvt;
+    g_Chests[1].pickup_script = nullptr;
     g_Chests[2].home_pos = { 80.0, 0.0, -100.0 };
     g_Chests[2].item = ItemType::ULTRA_SHROOM;
     g_Chests[2].pickup_script = (void*)Tower_DummyChestEvtSpecial;
@@ -427,6 +427,17 @@ EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
 EVT_DEFINE_USER_FUNC(evtTot_DisplayChestItemIcons) {
     ttyd::dispdrv::dispEntry(
         CameraId::k3d, 1, /* order = */ 900.f, dispChestIcons, g_Chests);
+    return 2;
+}
+
+// Get unique names for spawning items, to avoid softlocks with full inventory.
+EVT_DEFINE_USER_FUNC(evtTot_GetUniqueItemName) {
+    static int32_t id = 0;
+    static char name[16];
+    
+    id = (id + 1) % 1000;
+    sprintf(name, "item_t%03" PRId32, id);
+    evtSetValue(evt, evt->evtArguments[0], PTR(name));
     return 2;
 }
 
