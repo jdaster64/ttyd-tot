@@ -153,6 +153,7 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     SET(GSW(1001), 2)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13), LW(14))
+    // TODO: Generate unique name for item?
     USER_FUNC(
         evt_item_entry, PTR("item"), LW(13), LW(10), LW(11), LW(12), 17, -1, LW(14))
     USER_FUNC(evt_mobj_wait_animation_end, LW(8))

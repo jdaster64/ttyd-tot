@@ -42,7 +42,7 @@ void DispMainWindow(WinMgrEntry* entry) {
         WinMgrEntry_Flags::IN_FADE) != 0) return;
     
     uint32_t kWhite = 0xFFFF'FFFFU;
-    uint32_t kOffWhite = 0xF0F0'F0F0U;
+    uint32_t kOffWhite = 0xF0F0'F0FFU;
     uint32_t kMedGrey = 0xA0A0'A0FFU;
     uint32_t kBlack = 0x0000'00FFU;
     

@@ -323,14 +323,16 @@ void ApplyFixedPatches() {
     // Update winmgr::select_desc_tbl with a larger one to handle custom menus.
     uintptr_t new_select_desc_tbl = reinterpret_cast<uintptr_t>(
         tot::window_select::InitNewSelectDescTable());
-    uint16_t new_select_desc_tbl_hi16 = new_select_desc_tbl >> 16;
-    uint16_t new_select_desc_tbl_lo16 = new_select_desc_tbl & 0xffff;
+    uint32_t new_select_desc_tbl_hi16 = 
+        (0x3c60'0000U | (new_select_desc_tbl >> 16));
+    uint32_t new_select_desc_tbl_lo16 =
+        (0x6065'0000U | (new_select_desc_tbl & 0xffff));
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_winMgrSelectEntry_Patch_SelectDescTblHi16),
-        &new_select_desc_tbl_hi16, sizeof(uint16_t));
+        new_select_desc_tbl_hi16  /* lis r3, ptr_hi16 */);
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_winMgrSelectEntry_Patch_SelectDescTblLo16),
-        &new_select_desc_tbl_lo16, sizeof(uint16_t));
+        new_select_desc_tbl_lo16  /* ori r5, r3, ptr_lo16 */);
         
     // Run custom code after vanilla winMgrSelectEntry / Other for custom menus.
     g_winMgrSelectEntry_trampoline = patch::hookFunction(

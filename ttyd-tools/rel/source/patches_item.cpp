@@ -47,6 +47,10 @@ extern int32_t (*g__get_flower_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_heart_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_GetItemRecoverParam_trampoline)(EvtEntry*, bool);
 // Patch addresses.
+extern const int32_t g_pouchRemoveItemIndex_CheckMaxInv_BH;
+extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH;
+extern const int32_t g_pouchGetItem_CheckMaxInv_BH;
+extern const int32_t g_pouchGetEmptyHaveItemCnt_CheckMaxInv_BH;
 extern const int32_t g_ItemEvent_LastDinner_Weapon;
 extern const int32_t g_ItemEvent_Teki_Kyouka_ApplyStatusHook;
 extern const int32_t g_ItemEvent_Support_NoEffect_TradeOffJumpPoint;
@@ -63,6 +67,24 @@ extern const int32_t g_btlevtcmd_ConsumeItem_Patch_RefundBase;
 extern const int32_t g_btlevtcmd_ConsumeItemReserve_Patch_RefundBase;
 extern const int32_t g_BattleDamageDirect_Patch_AddTotalDamage;
 extern const int32_t g_BattleDamageDirect_Patch_PityFlowerChance;
+
+// Assembly patch functions.
+extern "C" {
+    // item_inventory_patches.s
+    void StartGetItemMax();
+    void BranchBackGetItemMax();
+    void StartRemoveItemMax();
+    void BranchBackRemoveItemMax();
+    void StartRemoveItemIndexMax();
+    void BranchBackRemoveItemIndexMax();
+    void StartGetEmptyItemSlotsMax();
+    void BranchBackGetEmptyItemSlotsMax();
+    
+    int32_t getTotItemInventorySize() {
+        // TODO: Set max dynamically based on number of sack upgrades.
+        return 3;
+    }
+}
 
 namespace item {
     
@@ -499,6 +521,24 @@ void ApplyFixedPatches() {
             // Run custom behavior to replace the recovery params in some cases.
             return GetAlteredItemRestorationParams(evt, isFirstCall);
         });
+        
+    // Set max inventory size based on number of sack upgrades claimed in ToT.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_pouchGetItem_CheckMaxInv_BH),
+        reinterpret_cast<void*>(StartGetItemMax),
+        reinterpret_cast<void*>(BranchBackGetItemMax));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_pouchRemoveItem_CheckMaxInv_BH),
+        reinterpret_cast<void*>(StartRemoveItemMax),
+        reinterpret_cast<void*>(BranchBackRemoveItemMax));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_pouchRemoveItemIndex_CheckMaxInv_BH),
+        reinterpret_cast<void*>(StartRemoveItemIndexMax),
+        reinterpret_cast<void*>(BranchBackRemoveItemIndexMax));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_pouchGetEmptyHaveItemCnt_CheckMaxInv_BH),
+        reinterpret_cast<void*>(StartGetEmptyItemSlotsMax),
+        reinterpret_cast<void*>(BranchBackGetEmptyItemSlotsMax));
 }
 
 int32_t GetBonusCakeRestoration() {
