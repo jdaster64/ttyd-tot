@@ -24,14 +24,14 @@ extern "C" {
 // evt_party_get_name_hitobj_head
 // evt_party_get_status
 // L_evt_party_dokan
-// evt_party_set_breed_pose
+EVT_DECLARE_USER_FUNC(evt_party_set_breed_pose, 2)
 // evt_party_sleep_off
 // evt_party_sleep_on
 // evt_party_set_pose
 // evt_party_set_homing_dist
 // evt_party_move_beside_mario
 // evt_party_move_behind_mario
-// evt_party_jump_pos
+EVT_DECLARE_USER_FUNC(evt_party_jump_pos, 7)
 // evt_party_wait_landon
 // evt_party_move_pos2
 // evt_party_move_pos

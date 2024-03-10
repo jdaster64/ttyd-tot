@@ -115,7 +115,8 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13), LW(14))
     SWITCH(LW(13))
-        CASE_EQUAL((int32_t)ItemType::COIN)
+        CASE_EQUAL((int32_t)ItemType::COIN)  // coins reward
+        CASE_SMALL_EQUAL(-1)                 // partner reward
         CASE_ETC()
             USER_FUNC(evtTot_GetUniqueItemName, LW(15))
             USER_FUNC(
@@ -127,6 +128,10 @@ EVT_BEGIN(Tower_ChestEvt_Core)
         CASE_EQUAL((int32_t)ItemType::COIN)
             // TODO: Move to tot_generate_reward, parameterize.
             USER_FUNC(evt_sub_get_coin, 64)
+        CASE_SMALL_EQUAL(-1)
+            // Run partner-acquisition / move selection event.
+            RUN_CHILD_EVT(LW(14))
+            SET(LW(14), 0)
         CASE_ETC()
             USER_FUNC(evt_item_get_item, LW(15))
     END_SWITCH()

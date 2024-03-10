@@ -758,6 +758,77 @@
 800b2b80:cardGetCode
 800b2b8c:cardIsExec
 
+// party.o
+// .text
+800b713c:partySetFamicomMode
+800b7530:partyShadowOff
+800b7548:partyUpdateKeyData
+800b7650:L_partyClearCont
+800b7688:partyKeyOff
+800b768c:partyKeyOn
+800b7690:partyDisp
+800b7a98:partyPreDisp
+800b7db0:partyMakeDispDir
+800b80f0:partySetCamId
+800b80f8:partyInitCamId
+800b8128:party_damage_return
+800b865c:partyRideYoshiMain
+800b8b18:party_ride_yoshi_force_move
+800b8ba0:party_force_ride_yoshi
+800b8d38:partyRideMain
+800b98ec:partyRideChk
+800b9928:allPartyRideOff2
+800b99ec:allPartyRideOff
+800b9ab0:L_allPartyRideOn
+800b9b2c:allPartyForceRideOn
+800b9c00:getRidePos
+800b9e80:allPartyRideShip
+800b9f0c:allPartyRidePlane
+800b9f98:partyDokanEnd
+800ba05c:partyDokanMain
+800ba56c:partyDokanInit
+800baf5c:partyGoodbyeMain
+800bb478:partyGoodbyeInit
+800bb544:partyHelloMain
+800bbc48:partyHello
+800bbddc:partyDoWork
+800bbe84:driveParty
+800bc574:partyMain
+800bc660:unk_800bc660
+800bcab0:N_partyForceChgRunMode
+800bcb2c:partyChgRunMode
+800bcb98:N__partyChgRunMode
+800bcf34:partyUsePost
+800bcf90:partyReInit
+800bd6ac:partyInit
+800bd6d8:partyEntry2Pos
+800bdaa8:partyEntry2Hello
+800bddd0:partyEntry2
+800be144:partyEntryMain
+800be4c4:partyGetHeight
+800be4f4:yoshiSetColor
+800be594:partyKill2
+800be69c:partyKill
+800be7fc:partyGoodbye
+800be84c:partyEntryPos
+800bea68:partyEntry
+800bec20:partyEntryHello
+800bec70:partySetForceMove
+800becb8:partyStop
+800becdc:partyRun
+800bed0c:partyCtrlOn
+800bed44:partyCtrlOff
+800bed7c:partyChgPaper
+800bedec:partyChgPose
+800bee68:partyChgPoseId
+800befcc:partyPaperLightOff
+800beff4:partyPaperOff
+800bf070:partyPaperOn
+800bf190:anotherPartyGetPtr
+800bf1b4:partyGetPtr
+// .data
+8041ead0:partyCtrlNo
+
 // evt_msg.o
 800d0998:evt_msg_fill_num
 800d12b0:evt_msg_fill_item
@@ -825,6 +896,8 @@
 800e7474:evt_mario_key_onoff
 
 // evt_party.o
+800ea2bc:evt_party_set_breed_pose
+800ea61c:evt_party_jump_pos
 800eae70:evt_party_run
 800eb3f8:evt_party_get_pos
 800eb87c:evt_party_set_camid
