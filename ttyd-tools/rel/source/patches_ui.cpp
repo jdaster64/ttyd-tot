@@ -339,8 +339,7 @@ void ApplyFixedPatches() {
         ttyd::winmgr::winMgrSelectEntry, [](
             int32_t type, int32_t new_item, int32_t cancellable) {
             if (type >= tot::window_select::MenuType::CUSTOM_START) {
-                return tot::window_select::HandleSelectWindowEntry(
-                    type, new_item, cancellable);
+                return tot::window_select::HandleSelectWindowEntry(type, new_item);
             }
             return g_winMgrSelectEntry_trampoline(type, new_item, cancellable);
         });

@@ -1,6 +1,8 @@
 #include "tot_generate_reward.h"
 
 #include "evt_cmd.h"
+#include "tot_move_manager.h"
+#include "tot_window_select.h"
 
 #include <ttyd/dispdrv.h>
 #include <ttyd/evt_eff.h>
@@ -40,6 +42,7 @@ using ::ttyd::item_data::itemDataTable;
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
+// Underlying data for chest positions + contents.
 struct ChestData {
     gc::vec3    home_pos;
     int32_t     item;
@@ -47,6 +50,10 @@ struct ChestData {
 };
 ChestData g_Chests[5];
 int32_t g_ChestDrawAlpha = 0;
+
+// Moves selected for unlocking / upgrading menus.
+int32_t g_MoveSelections[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+int32_t g_NumMovesSelected = 0;
 
 int32_t GetIcon(ChestData* chest) {
     switch (chest->item) {
@@ -57,6 +64,9 @@ int32_t GetIcon(ChestData* chest) {
         case -5:    return IconType::VIVIAN;
         case -6:    return IconType::BOBBERY;
         case -7:    return IconType::MS_MOWZ;
+        case -8:    return IconType::BOOTS;
+        case -9:    return IconType::HAMMER;
+        case -10:   return IconType::STAR_ICON;
         default:    return itemDataTable[chest->item].icon_id;
     }
 }
@@ -79,9 +89,12 @@ void DisplayIcons(CameraId camera, void* user_data) {
 }  // namespace
 
 // Evt declarations.
+EVT_DECLARE_USER_FUNC(evtTot_ShouldUnlockPartner, 2)
+EVT_DECLARE_USER_FUNC(evtTot_GetPartnerName, 2)
 EVT_DECLARE_USER_FUNC(evtTot_InitializePartyMember, 2)
 EVT_DECLARE_USER_FUNC(evtTot_PartyJumpOutOfChest, 7)
 EVT_DECLARE_USER_FUNC(evtTot_PartyVictoryPose, 1)
+EVT_DECLARE_USER_FUNC(evtTot_SelectMovesForUnlock, 4)
 
 // Dummy script to run for picking up an Ultra Shroom specifically.
 EVT_BEGIN(Reward_Dummy)
@@ -108,43 +121,57 @@ EVT_BEGIN(Reward_PartnerRestoreBgmEvt)
     RETURN()
 EVT_END()
 
-// Called from tot_gon_tower; LW(10-12) = position, LW(13) = item id (-1 to -7).
-// TODO: Handle move selection menu if you already have the partner.
-EVT_BEGIN(Reward_Partner)
-    USER_FUNC(evt_mario_normalize)
-    USER_FUNC(evt_mario_goodbye_party, 0)
-    WAIT_MSEC(500)
-    USER_FUNC(evtTot_InitializePartyMember, LW(13), LW(6))
-    // TODO: Reposition partner by box? At origin is fine...
-    USER_FUNC(evt_mario_set_party_pos, 0, LW(6), LW(10), LW(11), LW(12))
-    // Wrapper to evt_party_jump_pos.
-    USER_FUNC(evtTot_PartyJumpOutOfChest, 0, 0, 0, 0, 500, 0, -1000)
-    // Start victory animation after a bit.
-    BROTHER_EVT()
-        WAIT_MSEC(50)
-        USER_FUNC(evtTot_PartyVictoryPose, LW(13))
-        WAIT_MSEC(1500)
-        USER_FUNC(evt_party_set_breed_pose, 0, 1)
-    END_BROTHER()
-    RUN_EVT_ID(Reward_PartnerFanfareEvt, LW(7))
-    
-    // TODO: Move from evt_eff and system text to evt_sub_get_coin-like event?
-    USER_FUNC(
-        evt_eff, PTR("sub_bg"), PTR("itemget"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    USER_FUNC(evt_msg_toge, 1, 0, 0, 0)
-    USER_FUNC(evt_msg_print, 0, PTR("pit_reward_party_join"), 0, 0)
-    
-    CHK_EVT(LW(7), LW(6))
-    IF_EQUAL(LW(6), 1)
-        DELETE_EVT(LW(7))
-        USER_FUNC(evt_snd_bgmoff, 0x201)
+// Called from tot_gon_tower; LW(10-12) = position, LW(13) = reward id (-1 ~ -7).
+EVT_BEGIN(Reward_PartnerOrMove)
+    USER_FUNC(evtTot_ShouldUnlockPartner, LW(13), LW(0))
+    IF_EQUAL(LW(0), 0)
+        // Partner is already unlocked; check for unlockable moves.
+        USER_FUNC(evtTot_SelectMovesForUnlock, LW(13), LW(0), LW(1), LW(2))
+        IF_LARGE_EQUAL(LW(0), 0)
+            // Open menu to select a move.
+            // Note that LW(1) and LW(2) are overwritten by result.
+            USER_FUNC(evt_win_other_select,
+                (uint32_t)window_select::MenuType::MOVE_UNLOCK)
+            USER_FUNC(evtTot_UpgradeMove, LW(1))
+            USER_FUNC(
+                evt_msg_print_insert, 0, PTR("tot_reward_learnmove"), 0, 0, LW(2))
+        END_IF()
+    ELSE()
+        USER_FUNC(evt_mario_normalize)
+        USER_FUNC(evt_mario_goodbye_party, 0)
+        WAIT_MSEC(500)
+        USER_FUNC(evtTot_InitializePartyMember, LW(13), LW(6))
+        USER_FUNC(evt_mario_set_party_pos, 0, LW(6), LW(10), LW(11), LW(12))
+        // Have partner jump out of chest; wrapper to evt_party_jump_pos.
+        USER_FUNC(evtTot_PartyJumpOutOfChest, 0, 0, 0, 0, 500, 0, -1000)
+        // Start victory animation after a bit.
+        BROTHER_EVT()
+            WAIT_MSEC(50)
+            USER_FUNC(evtTot_PartyVictoryPose, LW(13))
+            WAIT_MSEC(1500)
+            USER_FUNC(evt_party_set_breed_pose, 0, 1)
+        END_BROTHER()
+        RUN_EVT_ID(Reward_PartnerFanfareEvt, LW(7))
+        
+        // TODO: Move from evt_eff and system text to evt_sub_get_coin-like event?
+        USER_FUNC(
+            evt_eff, PTR("sub_bg"), PTR("itemget"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        USER_FUNC(evt_msg_toge, 1, 0, 0, 0)
+        USER_FUNC(evtTot_GetPartnerName, LW(13), LW(1))
+        USER_FUNC(evt_msg_print_insert, 0, PTR("tot_reward_getparty"), 0, 0, LW(1))
+        
+        CHK_EVT(LW(7), LW(6))
+        IF_EQUAL(LW(6), 1)
+            DELETE_EVT(LW(7))
+            USER_FUNC(evt_snd_bgmoff, 0x201)
+        END_IF()
+        USER_FUNC(evt_eff_softdelete, PTR("sub_bg"))
+        USER_FUNC(evt_snd_bgmon, 0x120, 0)
+        RUN_EVT(Reward_PartnerRestoreBgmEvt)
+        WAIT_MSEC(500)
+        USER_FUNC(evt_party_run, 0)
+        USER_FUNC(evt_party_run, 1)
     END_IF()
-    USER_FUNC(evt_eff_softdelete, PTR("sub_bg"))
-    USER_FUNC(evt_snd_bgmon, 0x120, 0)
-    RUN_EVT(Reward_PartnerRestoreBgmEvt)
-    WAIT_MSEC(500)
-    USER_FUNC(evt_party_run, 0)
-    USER_FUNC(evt_party_run, 1)
     RETURN()
 EVT_END()
 
@@ -189,6 +216,11 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
     }
 }
 
+int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
+    if (num_moves) *num_moves = g_NumMovesSelected;
+    return g_MoveSelections;
+}
+
 // Selects the contents of the chests.
 // TODO: Spawn chests based on Mario's current position.
 EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
@@ -196,7 +228,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
     
     g_Chests[0].home_pos = { 0.0, 0.0, -100.0 };
     g_Chests[0].item = -1;
-    g_Chests[0].pickup_script = (void*)Reward_Partner;
+    g_Chests[0].pickup_script = (void*)Reward_PartnerOrMove;
     g_Chests[1].home_pos = { -80.0, 0.0, -100.0 };
     g_Chests[1].item = ItemType::COIN;
     g_Chests[1].pickup_script = nullptr;
@@ -225,8 +257,46 @@ EVT_DEFINE_USER_FUNC(evtTot_DisplayChestIcons) {
     return 2;
 }
 
+// Returns whether a partner needs unlocking given the reward id.
+// arg0 = reward id, arg1 = (out) needs unlock
+EVT_DEFINE_USER_FUNC(evtTot_ShouldUnlockPartner) {
+    int32_t idx = 0;
+    switch((int32_t)evtGetValue(evt, evt->evtArguments[0])) {
+        case -1:    idx = 1;    break;
+        case -2:    idx = 2;    break;
+        case -3:    idx = 5;    break;
+        case -4:    idx = 4;    break;
+        case -5:    idx = 6;    break;
+        case -6:    idx = 3;    break;
+        case -7:    idx = 7;    break;
+        default:                break;
+    }
+    int32_t should_unlock =
+        idx && !(ttyd::mario_pouch::pouchGetPtr()->party_data[idx].flags & 1);
+    evtSetValue(evt, evt->evtArguments[1], should_unlock);
+    return 2;
+}
+
+// Returns the party member's name.
+// arg0 = reward id, arg1 = (out) name
+EVT_DEFINE_USER_FUNC(evtTot_GetPartnerName) {
+    const char* str = "A new member";
+    switch((int32_t)evtGetValue(evt, evt->evtArguments[0])) {
+        case -1:    str = "Goombella";  break;
+        case -2:    str = "Koops";      break;
+        case -3:    str = "Flurrie";    break;
+        case -4:    str = "Yoshi";      break;
+        case -5:    str = "Vivian";     break;
+        case -6:    str = "Bobbery";    break;
+        case -7:    str = "Ms. Mowz";   break;
+        default:                        break;
+    }
+    evtSetValue(evt, evt->evtArguments[1], PTR(str));
+    return 2;
+}
+
 // Initializes party member's stats.
-// arg0 = idx in actual game order, negative.
+// arg0 = reward id (-1 to -7 in actual game order).
 // arg1 = (out) idx in internal party order.
 EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
     int32_t idx = 1;
@@ -256,7 +326,6 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
 }
 
 // Handle the partner jumping out of the chest.
-// TODO: Jump to more central position / beside Mario?
 EVT_DEFINE_USER_FUNC(evtTot_PartyJumpOutOfChest) {
     int32_t returnVal = ttyd::evt_party::evt_party_jump_pos(evt, isFirstCall);
     if (isFirstCall) {
@@ -284,6 +353,91 @@ EVT_DEFINE_USER_FUNC(evtTot_PartyVictoryPose) {
         }
         if (pose_name) ttyd::party::partyChgPose(party_ptr, pose_name);
     }
+    return 2;
+}
+
+// Selects moves for unlocking selection menu.
+// arg0 = move type (partner/jump/hammer/SP),
+// arg1 = out # options, arg2 = out first option, arg3 = out first option name
+EVT_DEFINE_USER_FUNC(evtTot_SelectMovesForUnlock) {
+    int32_t option_start = 0;
+    int32_t max_options = 0;
+    switch((int32_t)evtGetValue(evt, evt->evtArguments[0])) {
+        case -1: {
+            option_start = MoveType::GOOMBELLA_BASE;
+            max_options = 6;
+            break;
+        }
+        case -2: {
+            option_start = MoveType::KOOPS_BASE;
+            max_options = 6;
+            break;
+        }
+        case -3: {
+            option_start = MoveType::FLURRIE_BASE;
+            max_options = 6;
+            break;
+        }
+        case -4: {
+            option_start = MoveType::YOSHI_BASE;
+            max_options = 6;
+            break;
+        }
+        case -5: {
+            option_start = MoveType::VIVIAN_BASE;
+            max_options = 6;
+            break;
+        }
+        case -6: {
+            option_start = MoveType::BOBBERY_BASE;
+            max_options = 6;
+            break;
+        }
+        case -7: {
+            option_start = MoveType::MOWZ_BASE;
+            max_options = 6;
+            break;
+        }
+        case -8: {
+            option_start = MoveType::JUMP_BASE;
+            max_options = 8;
+            break;
+        }
+        case -9: {
+            option_start = MoveType::HAMMER_BASE;
+            max_options = 8;
+            break;
+        }
+        case -10: {
+            option_start = MoveType::SP_SWEET_TREAT;
+            max_options = 8;
+            break;
+        }
+    }
+    
+    int32_t num_options = 0;
+    for (int32_t i = 0; i < max_options; ++i) {
+        int32_t move = option_start + i;
+        if (MoveManager::GetUnlockedLevel(move) == 0) {
+            // Special condition: Spring Jump / Ultra Hammer require unlocking
+            // Spin Jump or Super Hammer first.
+            if (MoveManager::GetMoveData(move)->move_tier == 4 &&
+                MoveManager::GetUnlockedLevel(move - 1) == 0) {
+                continue;
+            }
+            g_MoveSelections[num_options] = move;
+            ++num_options;
+        }
+    }
+    g_MoveSelections[num_options] = -1;
+    g_NumMovesSelected = num_options;
+    
+    evtSetValue(evt, evt->evtArguments[1], num_options);
+    evtSetValue(evt, evt->evtArguments[2], g_MoveSelections[0]);
+    evtSetValue(
+        evt, evt->evtArguments[3], 
+        PTR(MoveManager::GetMoveData(g_MoveSelections[0])->name_msg));
+    
     return 2;
 }
 

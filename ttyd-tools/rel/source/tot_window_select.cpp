@@ -1,5 +1,8 @@
 #include "tot_window_select.h"
 
+#include "tot_generate_reward.h"
+#include "tot_move_manager.h"
+
 #include <gc/types.h>
 #include <gc/mtx.h>
 #include <ttyd/dispdrv.h>
@@ -32,6 +35,7 @@ using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::item_data::itemDataTable;
 using ::ttyd::mariost::g_MarioSt;
+using ::ttyd::msgdrv::msgSearch;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 
@@ -70,41 +74,55 @@ void DispMainWindow(WinMgrEntry* entry) {
                 ttyd::win_main::winIconInit();
                 text_color = &kBlack;
             }
+            
+            int32_t entry_icon = 0;
+            const char* entry_text = "";
+            
+            if (sel_entry->type == MenuType::CUSTOM_START) {
+                entry_icon = itemDataTable[row.value].icon_id;
+                entry_text = msgSearch(itemDataTable[row.value].name);
+            } else {
+                // MOVE_UNLOCK
+                auto* move_data = MoveManager::GetMoveData(row.value);
+                entry_icon = move_data->icon_id;
+                entry_text = msgSearch(move_data->name_msg);
+            }
+            
             gc::vec3 pos = { entry->x + 35.0f, y_trans, 0.0f };
             gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
-            ttyd::win_main::winIconSet(
-                itemDataTable[row.value].icon_id, &pos, &scale, &kWhite);
+            ttyd::win_main::winIconSet(entry_icon, &pos, &scale, &kWhite);
             
             ttyd::win_main::winFontInit();
             gc::vec3 text_pos = { entry->x + 60.0f, y_trans + 12.0f, 0.0f };
             gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
             ttyd::win_main::winFontSetWidth(
-                &text_pos, &text_scale, text_color, 185.0,
-                ttyd::msgdrv::msgSearch(itemDataTable[row.value].name));
+                &text_pos, &text_scale, text_color, 185.0, entry_text);
         }
         
-        int32_t value = itemDataTable[row.value].buy_price;
-        if (value > 0) {
-            char buf[8] = { 0 };
-            sprintf(buf, "%" PRId32 "", value);
-            int32_t length = ttyd::fontmgr::FontGetMessageWidth(buf);
-            if (length > 30) length = 30;
-            ttyd::win_main::winFontInit();
-            
-            uint32_t* text_color;
-            if (row.flags & WinMgrSelectEntryRow_Flags::GREYED_OUT) {
-                text_color = &kMedGrey;
-            } else {
-                text_color = &kBlack;
+        if (sel_entry->type == MenuType::CUSTOM_START) {
+            int32_t value = itemDataTable[row.value].buy_price;
+            if (value > 0) {
+                char buf[8] = { 0 };
+                sprintf(buf, "%" PRId32 "", value);
+                int32_t length = ttyd::fontmgr::FontGetMessageWidth(buf);
+                if (length > 30) length = 30;
+                ttyd::win_main::winFontInit();
+                
+                uint32_t* text_color;
+                if (row.flags & WinMgrSelectEntryRow_Flags::GREYED_OUT) {
+                    text_color = &kMedGrey;
+                } else {
+                    text_color = &kBlack;
+                }
+                gc::vec3 text_pos = {
+                    entry->x + entry->width - 10.0f - length,
+                    y_trans + 12.0f,
+                    0.0f
+                };
+                gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontSetWidth(
+                    &text_pos, &text_scale, text_color, 30.0, buf);
             }
-            gc::vec3 text_pos = {
-                entry->x + entry->width - 10.0f - length,
-                y_trans + 12.0f,
-                0.0f
-            };
-            gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
-            ttyd::win_main::winFontSetWidth(
-                &text_pos, &text_scale, text_color, 30.0, buf);
         }
         
         offset += 24;
@@ -114,7 +132,13 @@ void DispMainWindow(WinMgrEntry* entry) {
     ttyd::gx::GXTransform::GXSetScissor(
         scissor_0, scissor_1, scissor_2, scissor_3);
     
-    const char* title = ttyd::msgdrv::msgSearch("in_konran_hammer");
+    const char* title = "";
+    if (sel_entry->type == MenuType::CUSTOM_START) {
+        title = msgSearch("in_konran_hammer");
+    } else if (sel_entry->type == MenuType::MOVE_UNLOCK) {
+        title = msgSearch("tot_winsel_titlemove");
+    }
+    
     int32_t length = ttyd::fontmgr::FontGetMessageWidth(title);
     if (length > 120) length = 120;
     ttyd::win_main::winFontInit();
@@ -129,15 +153,17 @@ void DispMainWindow(WinMgrEntry* entry) {
         &text_pos, &text_scale, &kWhite, 120.0, title);
         
     // Draw white circle + currency icon in upper-right corner.
-    gc::mtx34 mtx, mtx2;
-    gc::mtx::PSMTXScale(&mtx2, 0.6f, 0.6f, 0.6f);
-    gc::mtx::PSMTXTrans(&mtx, entry->x + 268.0f, entry->y - 18.0f, 0.0f);
-    gc::mtx::PSMTXConcat(&mtx, &mtx2, &mtx);
-    ttyd::icondrv::iconDispGxCol(
-        &mtx, 0x10, IconType::BLACK_WITH_WHITE_CIRCLE, &kOffWhite);
+    if (sel_entry->type == MenuType::CUSTOM_START) {
+        gc::mtx34 mtx, mtx2;
+        gc::mtx::PSMTXScale(&mtx2, 0.6f, 0.6f, 0.6f);
+        gc::mtx::PSMTXTrans(&mtx, entry->x + 268.0f, entry->y - 18.0f, 0.0f);
+        gc::mtx::PSMTXConcat(&mtx, &mtx2, &mtx);
+        ttyd::icondrv::iconDispGxCol(
+            &mtx, 0x10, IconType::BLACK_WITH_WHITE_CIRCLE, &kOffWhite);
 
-    gc::vec3 icon_pos = { entry->x + 268.0f, entry->y - 12.0f, 0.0f };
-    ttyd::icondrv::iconDispGx(0.6f, &icon_pos, 0x10, IconType::COIN);
+        gc::vec3 icon_pos = { entry->x + 268.0f, entry->y - 12.0f, 0.0f };
+        ttyd::icondrv::iconDispGx(0.6f, &icon_pos, 0x10, IconType::COIN);
+    }
     
     // Draw cursor and scrolling arrows, if necessary.
     gc::vec3 cursor_pos = { sel_entry->cursor_x, sel_entry->cursor_y, 1.0f };
@@ -171,8 +197,13 @@ void DispWindow2(WinMgrEntry* entry) {
     if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
         WinMgrEntry_Flags::IN_FADE) != 0) return;
     
-    // TODO: Implement based on menu type.
-    const char* msg = ttyd::msgdrv::msgSearch("in_konran_hammer");
+    const char* msg = "";
+    if (sel_entry->type == MenuType::CUSTOM_START) {
+        msg = msgSearch("in_konran_hammer");
+    } else if (sel_entry->type == MenuType::MOVE_UNLOCK) {
+        msg = msgSearch("tot_winsel_whichunlock");
+    }
+    
     uint16_t lines;
     int32_t length = ttyd::fontmgr::FontGetMessageWidthLine(msg, &lines);
     
@@ -203,8 +234,16 @@ void DispSelectionHelp(WinMgrEntry* entry) {
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[2]].flags &
         WinMgrEntry_Flags::IN_FADE) == 0) {
-        // TODO: Implement based on menu type.
-        const char* help_msg = ttyd::msgdrv::msgSearch("in_konran_hammer");
+        
+        const char* help_msg = "";
+        if (sel_entry->type == MenuType::CUSTOM_START) {
+            help_msg = msgSearch("in_konran_hammer");
+        } else if (sel_entry->type == MenuType::MOVE_UNLOCK) {
+            help_msg = msgSearch(
+                MoveManager::GetMoveData(
+                    sel_entry->row_data[sel_entry->cursor_index].value
+                )->desc_msg);
+        }
         entry->help_msg = help_msg;
         winMgrHelpDraw(entry);
     }
@@ -262,13 +301,13 @@ void* InitNewSelectDescTable() {
     g_SelectDescList[MenuType::CUSTOM_START] = WinMgrSelectDescList{ 
         .num_descs = 3, .descs = &g_CustomDescs[0] 
     };
+    g_SelectDescList[MenuType::MOVE_UNLOCK] = WinMgrSelectDescList{ 
+        .num_descs = 3, .descs = &g_CustomDescs[0] 
+    }; 
     return g_SelectDescList;
 }
 
-// TODO: Implement.
-WinMgrSelectEntry* HandleSelectWindowEntry(
-    int32_t type, int32_t new_item, int32_t cancellable) {
-    
+WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
     auto* sel_entry = 
         (WinMgrSelectEntry*)ttyd::memory::__memAlloc(0, sizeof(WinMgrSelectEntry));
     memset(sel_entry, 0, sizeof(WinMgrSelectEntry));
@@ -280,7 +319,17 @@ WinMgrSelectEntry* HandleSelectWindowEntry(
     sel_entry->cursor_y = 0;
     sel_entry->list_y_offset = 0;
     sel_entry->new_item = new_item;
-    if (cancellable) sel_entry->flags |= WinMgrSelectEntry_Flags::CANCELLABLE;
+    
+    // Determine whether window should be cancellable based on type.
+    switch (type) {
+        case MenuType::MOVE_UNLOCK:
+            break;
+        case MenuType::CUSTOM_START:
+        default:
+            sel_entry->flags |= WinMgrSelectEntry_Flags::CANCELLABLE;
+            break;
+    }
+    
     sel_entry->num_entries = g_SelectDescList[type].num_descs;
     
     for (int32_t i = 0; i < sel_entry->num_entries; ++i) {
@@ -311,22 +360,35 @@ WinMgrSelectEntry* HandleSelectWindowEntry(
     sel_entry->cursor_x = main_desc.x;
     sel_entry->cursor_y = main_desc.y - 54;
     
-    // TODO: custom logic for populating rows.
-    sel_entry->num_rows = 10;
-    sel_entry->row_data = (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
-        0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
-    memset(sel_entry->row_data, 0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
-    sel_entry->row_data[0].value = 0xf0;
-    sel_entry->row_data[1].value = 0xfb;
-    sel_entry->row_data[2].value = 0xf0;
-    sel_entry->row_data[3].value = 0xfb;
-    sel_entry->row_data[4].value = 0xf0;
-    sel_entry->row_data[5].value = 0xfb;
-    sel_entry->row_data[6].value = 0xfb;
-    sel_entry->row_data[7].value = 0xfb;
-    sel_entry->row_data[8].flags = 3;
-    sel_entry->row_data[8].value = 0xf7;
-    sel_entry->row_data[9].value = 0xfb;
+    if (type == MenuType::CUSTOM_START) {
+        // CUSTOM_START (Dummy selection dialog for testing).
+        sel_entry->num_rows = 10;
+        sel_entry->row_data = (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
+            0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+        memset(sel_entry->row_data, 0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+        sel_entry->row_data[0].value = 0xf0;
+        sel_entry->row_data[1].value = 0xfb;
+        sel_entry->row_data[2].value = 0xf0;
+        sel_entry->row_data[3].value = 0xfb;
+        sel_entry->row_data[4].value = 0xf0;
+        sel_entry->row_data[5].value = 0xfb;
+        sel_entry->row_data[6].value = 0xfb;
+        sel_entry->row_data[7].value = 0xfb;
+        sel_entry->row_data[8].flags = 3;
+        sel_entry->row_data[8].value = 0xf7;
+        sel_entry->row_data[9].value = 0xfb;
+    } else {
+        // MOVE_UNLOCK
+        int32_t num_moves;
+        int32_t* moves = RewardManager::GetSelectedMoves(&num_moves);
+        sel_entry->num_rows = num_moves;
+        sel_entry->row_data = (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
+            0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+        memset(sel_entry->row_data, 0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+        for (int32_t i = 0; i < num_moves; ++i) {
+            sel_entry->row_data[i].value = moves[i];
+        }
+    }
     
     // Shrink the window if it's fewer than eight entries.
     if (sel_entry->num_rows < 8) {
@@ -338,16 +400,20 @@ WinMgrSelectEntry* HandleSelectWindowEntry(
     return sel_entry;
 }
 
-// TODO: Implement.
 int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
     if (!(sel_entry->flags & WinMgrSelectEntry_Flags::FINISHED_SELECTION))
         return 0;
     if (sel_entry->flags & WinMgrSelectEntry_Flags::CANCELLED)
         return -1;
     
-    // TODO: Handle setting relevant event script parameters based on selection.
     int32_t value = sel_entry->row_data[sel_entry->cursor_index].value;
-    evt->lwData[1] = value;
+    if (sel_entry->type == MenuType::CUSTOM_START) {
+        evt->lwData[1] = value;
+    } else {
+        // MOVE_UNLOCK - Assign move id + move name.
+        evt->lwData[1] = value;
+        evt->lwData[2] = PTR(msgSearch(MoveManager::GetMoveData(value)->name_msg));
+    }
     
     return 1;
 }

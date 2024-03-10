@@ -172,7 +172,10 @@ void OnFileLoad(bool new_file = true) {
         // Assign Yoshi a totally random color.
         ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));
         
-        // Set default moves.
+        // Give a small default amount of audience.
+        pouch.audience_level = 5.0f;
+        
+        // Set default moveset.
         tot::MoveManager::Init();
     }
     g_PromptSave = false;

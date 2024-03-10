@@ -321,6 +321,8 @@ void ApplyFixedPatches() {
             CopyChildBattleInfo(/* to_child = */ true);
             // Force enemy ATK/DEF tattles to display at start of encounter.
             partner::RefreshExtraTattleStats();
+            // Reset move selected levels at the start of encounter.
+            tot::MoveManager::ResetSelectedLevels();
             g_seq_battleInit_trampoline();
         });
 

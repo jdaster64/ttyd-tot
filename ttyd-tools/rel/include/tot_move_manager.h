@@ -160,4 +160,7 @@ uint32_t GetWeaponPowerFromUnitWorkVariable(
 // Returns the current level of move arg0, storing the result in arg1.
 EVT_DECLARE_USER_FUNC(evtTot_GetMoveSelectedLevel, 2)
 
+// Unlocks or upgrades the level of move arg0 (bounds are not checked!)
+EVT_DECLARE_USER_FUNC(evtTot_UpgradeMove, 1)
+
 }

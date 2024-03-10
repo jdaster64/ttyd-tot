@@ -8,6 +8,7 @@
 #include <ttyd/battle_unit.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
+#include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/msgdrv.h>
 
@@ -28,21 +29,22 @@ using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace IconType = ::ttyd::icondrv::IconType;
+namespace ItemType = ::ttyd::item_data::ItemType;
     
 }
 
 const MoveData g_MoveData[] = {
     { { 0, 2, 4 }, 3, 0, IconType::BOOTS, "btl_cmd_act_jump", nullptr, "msg_normal_jump", "msg_ac_jump", "tot_upg_damage", },
-    { { 2, 4, 7 }, 3, 2, IconType::SUPER_BOOTS, "btl_wn_mario_kururin_jump", nullptr, "msg_kururin_jump", "msg_ac_k_jump", "tot_upg_damage", },
-    { { 4, 6, 9 }, 3, 3, IconType::ULTRA_BOOTS, "btl_wn_mario_jyabara_jump", "tot_mj_spring_abb", "msg_jyabara_jump", "msg_ac_j_jump", "tot_upg_damage", },
+    { { 2, 4, 7 }, 3, 1, IconType::SUPER_BOOTS, "btl_wn_mario_kururin_jump", nullptr, "msg_kururin_jump", "msg_ac_k_jump", "tot_upg_damage", },
+    { { 4, 6, 9 }, 3, 4, IconType::ULTRA_BOOTS, "btl_wn_mario_jyabara_jump", "tot_mj_spring_abb", "msg_jyabara_jump", "msg_ac_j_jump", "tot_upg_damage", },
     { { 2, 4, 6 }, 3, 1, IconType::POWER_JUMP, "in_gatsun_jump", "tot_mj_pjump_abb", "msg_gatsun_jump", "msg_ac_jump", "tot_upg_damage", },
     { { 3, 4, 6 }, 3, 1, IconType::MULTIBOUNCE, "in_tugitugi_jump", "tot_mj_multi_abb", "msg_tugitugi_jump", "msg_ac_jump", "tot_upg_damage", },
     { { 3, 5, 7 }, 3, 1, IconType::POWER_BOUNCE, "in_renzoku_jump", "tot_mj_pbounce_abb", "msg_renzoku_jump", "msg_ac_jump", "tot_upg_damage", },
     { { 2, 4, 6 }, 3, 1, IconType::SLEEPY_STOMP, "in_nemurase_fumi", "tot_mj_sleep_abb", "msg_nemurase_fumi", "msg_ac_jump", "tot_upg_status", },
     { { 3, 5, 7 }, 3, 1, IconType::TORNADO_JUMP, "in_tamatsuki_jump", "tot_mj_tjump_abb", "msg_tamatsuki_jump", "msg_ac_tatsumaki_jump", "tot_upg_damage", },
     { { 0, 2, 4 }, 3, 0, IconType::HAMMER, "btl_cmd_act_hammer", nullptr, "msg_normal_hammer", "msg_ac_hammer", "tot_upg_damage", },
-    { { 2, 4, 6 }, 3, 2, IconType::SUPER_HAMMER, "btl_wn_mario_kaiten_hammer", "tot_mh_super_abb", "msg_kaiten_hammer", "msg_ac_kaiten_hammer", "tot_upg_damage", },
-    { { 4, 6, 9 }, 3, 3, IconType::ULTRA_HAMMER, "btl_wn_mario_ultra_hammer", "tot_mh_ultra_abb", "msg_ultra_hammer", "msg_ac_ultra_hammer", "tot_upg_damage", },
+    { { 2, 4, 6 }, 3, 1, IconType::SUPER_HAMMER, "btl_wn_mario_kaiten_hammer", "tot_mh_super_abb", "msg_kaiten_hammer", "msg_ac_kaiten_hammer", "tot_upg_damage", },
+    { { 4, 6, 9 }, 3, 4, IconType::ULTRA_HAMMER, "btl_wn_mario_ultra_hammer", "tot_mh_ultra_abb", "msg_ultra_hammer", "msg_ac_ultra_hammer", "tot_upg_damage", },
     { { 2, 4, 6 }, 3, 1, IconType::POWER_SMASH, "in_gatsun_naguri", "tot_mh_power_abb", "msg_gatsun_naguri", "msg_ac_hammer", "tot_upg_damage", },
     { { 2, 4, 6 }, 3, 1, IconType::HEAD_RATTLE, "in_konran_hammer", "tot_mh_shrink_abb", "msg_konran_hammer", "msg_ac_hammer", "tot_upg_status", },
     { { 3, 5, 7 }, 3, 1, IconType::ICE_SMASH, "in_ice_naguri", nullptr, "msg_ice_naguri", "msg_ac_hammer", "tot_upg_status", },
@@ -210,6 +212,45 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMoveSelectedLevel) {
     int32_t move = evtGetValue(evt, evt->evtArguments[0]);
     evtSetValue(
         evt, evt->evtArguments[1], MoveManager::GetSelectedLevel(move));
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_UpgradeMove) {
+    int32_t move = evtGetValue(evt, evt->evtArguments[0]);
+    auto& level = g_Mod->tot_state_.level_unlocked_[move];
+    if (++level == 1) {
+        auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+        switch (move) {
+            // Unlock field moves for Spin/Spring Jump + Super/Ultra Hammer.
+            case MoveType::JUMP_SPIN:
+                pouch.jump_level = 2;
+                ttyd::mario_pouch::pouchGetItem(ItemType::SUPER_BOOTS);
+                break;
+            case MoveType::JUMP_SPRING:
+                pouch.jump_level = 3;
+                ttyd::mario_pouch::pouchGetItem(ItemType::ULTRA_BOOTS);
+                break;
+            case MoveType::HAMMER_SUPER:
+                pouch.hammer_level = 2;
+                ttyd::mario_pouch::pouchGetItem(ItemType::SUPER_HAMMER);
+                break;
+            case MoveType::HAMMER_ULTRA:
+                pouch.hammer_level = 3;
+                ttyd::mario_pouch::pouchGetItem(ItemType::ULTRA_HAMMER);
+                break;
+            // Unlock corresponding SP move + increase max SP.
+            case MoveType::SP_CLOCK_OUT:
+            case MoveType::SP_POWER_LIFT:
+            case MoveType::SP_ART_ATTACK:
+            case MoveType::SP_SWEET_FEAST:
+            case MoveType::SP_SHOWSTOPPER:
+            case MoveType::SP_SUPERNOVA:
+                move -= MoveType::SP_SWEET_TREAT;
+                pouch.star_powers_obtained |= (1 << move);
+                pouch.max_sp += 100;
+                break;
+        }
+    }
     return 2;
 }
 
