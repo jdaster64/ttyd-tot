@@ -12,7 +12,7 @@ BranchBackSpendFpOnSwitchPartner:
 b 0
 
 StartFixMarioSingleMoveCheck:
-nop
+bl checkMarioSingleJumpHammer
 
 BranchBackFixMarioSingleMoveCheck:
 b 0

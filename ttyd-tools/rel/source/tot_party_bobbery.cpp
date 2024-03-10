@@ -60,15 +60,17 @@ void MakeSelectWeaponTable(
         auto& weapon_entry = command_work->weapon_table[*num_options];
         BattleWeapon* weapon = g_WeaponTable[i];
         
-        weapon_entry.index = MoveType::BOBBERY_BASE + i;
-        weapon_entry.item_id = 0;
-        weapon_entry.weapon = weapon;
-        weapon_entry.icon = weapon->icon;
-        weapon_entry.unk_04 = 0;
-        weapon_entry.unk_18 = 0;
-        weapon_entry.name = ttyd::msgdrv::msgSearch(weapon->name);
-        
-        ++*num_options;
+        if (MoveManager::GetUnlockedLevel(MoveType::BOBBERY_BASE + i)) {
+            weapon_entry.index = MoveType::BOBBERY_BASE + i;
+            weapon_entry.item_id = 0;
+            weapon_entry.weapon = weapon;
+            weapon_entry.icon = weapon->icon;
+            weapon_entry.unk_04 = 0;
+            weapon_entry.unk_18 = 0;
+            weapon_entry.name = ttyd::msgdrv::msgSearch(weapon->name);
+            
+            ++*num_options;
+        }
     }
 }
 

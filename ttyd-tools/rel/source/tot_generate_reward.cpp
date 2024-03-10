@@ -242,14 +242,14 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
     auto& party_data = ttyd::mario_pouch::pouchGetPtr()->party_data[idx];
     
     party_data.flags |= 1;
-    // TODO: Different amounts per party member.
+    
+    // TODO: Set different amounts of starting HP per party member.
     party_data.base_max_hp = 10;
     party_data.max_hp = 10;
     party_data.current_hp = 10;
     party_data.hp_level = 0;
     party_data.attack_level = 0;
     party_data.tech_level = 0;
-    // TODO: Start with only base moves.
     
     evtSetValue(evt, evt->evtArguments[1], idx);
     return 2;

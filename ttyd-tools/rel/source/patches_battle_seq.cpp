@@ -7,6 +7,7 @@
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_partner.h"
+#include "tot_move_manager.h"
 #include "tot_party_mario.h"
 
 #include <ttyd/battle.h>
@@ -38,6 +39,28 @@ extern "C" {
     // currency_patches.s
     void StartCheckDeleteFieldItem();
     void BranchBackCheckDeleteFieldItem();
+    
+    void checkMarioSingleJumpHammer() {
+        auto* battleWork = ttyd::battle::g_BattleWork;
+        battleWork->battle_flags |= 0x600;
+        
+        for (int32_t i = 0; i < 8; ++i) {
+            int32_t move = mod::tot::MoveType::JUMP_BASE + i;
+            if (mod::tot::MoveManager::GetMoveData(move)->move_tier > 0 &&
+                mod::tot::MoveManager::GetUnlockedLevel(move) > 0) {
+                battleWork->battle_flags &= ~0x200;
+                break;
+            }
+        }
+        for (int32_t i = 0; i < 8; ++i) {
+            int32_t move = mod::tot::MoveType::HAMMER_BASE + i;
+            if (mod::tot::MoveManager::GetMoveData(move)->move_tier > 0 &&
+                mod::tot::MoveManager::GetUnlockedLevel(move) > 0) {
+                battleWork->battle_flags &= ~0x400;
+                break;
+            }
+        }
+    }
 }
 
 namespace mod::infinite_pit {

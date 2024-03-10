@@ -10,6 +10,7 @@
 #include "patches_apply.h"
 #include "patches_mario_move.h"
 #include "patches_options.h"
+#include "tot_move_manager.h"
 
 #include <gc/OSLink.h>
 #include <ttyd/cardmgr.h>
@@ -170,6 +171,9 @@ void OnFileLoad(bool new_file = true) {
         ttyd::mario_pouch::pouchReviseMarioParam();
         // Assign Yoshi a totally random color.
         ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));
+        
+        // Set default moves.
+        tot::MoveManager::Init();
     }
     g_PromptSave = false;
     

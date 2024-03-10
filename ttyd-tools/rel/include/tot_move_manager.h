@@ -99,22 +99,41 @@ namespace MoveType {
     };
 }
 
+// Metadata for every move.
+struct MoveData {
+    int8_t      move_cost[3];
+    int8_t      max_level;
+    int8_t      move_tier;
+    int16_t     icon_id;    
+    const char* name_msg;
+    const char* abbrev_msg;
+    const char* desc_msg;
+    const char* ac_msg;
+    const char* upgrade_msg;
+};
+
 class MoveManager {
 public:
+    // Resets available moves to the default (base moves only, level 1).
     static void Init();
+    
+    // Returns a pointer to the move data array starting at starting_move.
+    static const MoveData* GetMoveData(int32_t starting_move = MoveType::JUMP_BASE);
 
+    // Gets the currently unlocked / selected move level.
     static int32_t GetUnlockedLevel(int32_t move_type);
     static int32_t GetSelectedLevel(int32_t move_type);
+    
+    // Gets the FP/SP cost for the currently selected level of the move.
     static int32_t GetMoveCost(int32_t move_type);
+    
+    // Changes the currently selected move level.
+    static bool ChangeSelectedLevel(int32_t move_type, int32_t change);
+    // Resets all move selected levels to the minimum (between battles).
+    static void ResetSelectedLevels();
 
     // Returns whether or not the move name should be overridden.
     static bool GetCurrentSelectionString(int32_t move_type, char* out_buf);
-    
-    static bool ChangeSelectedLevel(int32_t move_type, int32_t change);
-    static void ResetSelectedLevels();
-    
-    static bool IsUnlockable(int32_t move_type);
-    static bool IsUpgradable(int32_t move_type);
 };
 
 // battle_weapon_power-like interface for scaling ATK based on a move.

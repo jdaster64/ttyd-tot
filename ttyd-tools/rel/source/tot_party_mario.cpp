@@ -129,15 +129,17 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
                 auto& weapon_entry = command_work.weapon_table[num_options];
                 BattleWeapon* weapon = g_CustomJumpWeapons[i];
                 
-                weapon_entry.index = MoveType::JUMP_BASE + i;
-                weapon_entry.item_id = 0;
-                weapon_entry.unk_04 = 0;
-                weapon_entry.unk_18 = 0;
-                weapon_entry.weapon = weapon;
-                weapon_entry.icon = weapon->icon;
-                weapon_entry.name = msgSearch(weapon->name);
-                
-                ++num_options;
+                if (MoveManager::GetUnlockedLevel(MoveType::JUMP_BASE + i)) {
+                    weapon_entry.index = MoveType::JUMP_BASE + i;
+                    weapon_entry.item_id = 0;
+                    weapon_entry.unk_04 = 0;
+                    weapon_entry.unk_18 = 0;
+                    weapon_entry.weapon = weapon;
+                    weapon_entry.icon = weapon->icon;
+                    weapon_entry.name = msgSearch(weapon->name);
+                    
+                    ++num_options;
+                }
             }
             break;
         }
@@ -152,15 +154,17 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
                     weapon = g_CustomHammerThrowWeapons[i];
                 }
                 
-                weapon_entry.index = MoveType::HAMMER_BASE + i;
-                weapon_entry.item_id = 0;
-                weapon_entry.unk_04 = 0;
-                weapon_entry.unk_18 = 0;
-                weapon_entry.weapon = weapon;
-                weapon_entry.icon = weapon->icon;
-                weapon_entry.name = msgSearch(weapon->name);
-                
-                ++num_options;
+                if (MoveManager::GetUnlockedLevel(MoveType::HAMMER_BASE + i)) {
+                    weapon_entry.index = MoveType::HAMMER_BASE + i;
+                    weapon_entry.item_id = 0;
+                    weapon_entry.unk_04 = 0;
+                    weapon_entry.unk_18 = 0;
+                    weapon_entry.weapon = weapon;
+                    weapon_entry.icon = weapon->icon;
+                    weapon_entry.name = msgSearch(weapon->name);
+                    
+                    ++num_options;
+                }
             }
             break;
         }
@@ -222,21 +226,23 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
                 auto& weapon_entry = command_work.weapon_table[num_options];
                 BattleWeapon* weapon = superActionTable[i];
                 
-                weapon_entry.index = MoveType::SP_SWEET_TREAT + i;
-                weapon_entry.item_id = 0;
-                weapon_entry.unk_04 = 0;
-                weapon_entry.unk_18 = 0;
-                weapon_entry.weapon = weapon;
-                weapon_entry.icon = weapon->icon;
-                
-                if (weapon->name) {
-                     weapon_entry.name = msgSearch(weapon->name);
-                } else {
-                     weapon_entry.name = 
-                        msgSearch(itemDataTable[weapon->item_id].name);
+                if (MoveManager::GetUnlockedLevel(MoveType::SP_SWEET_TREAT + i)) {
+                    weapon_entry.index = MoveType::SP_SWEET_TREAT + i;
+                    weapon_entry.item_id = 0;
+                    weapon_entry.unk_04 = 0;
+                    weapon_entry.unk_18 = 0;
+                    weapon_entry.weapon = weapon;
+                    weapon_entry.icon = weapon->icon;
+                    
+                    if (weapon->name) {
+                         weapon_entry.name = msgSearch(weapon->name);
+                    } else {
+                         weapon_entry.name = 
+                            msgSearch(itemDataTable[weapon->item_id].name);
+                    }
+                    
+                    ++num_options;
                 }
-                
-                ++num_options;
             }
             break;
         }
@@ -4049,7 +4055,7 @@ EVT_END()
 // Weapon definitions.
 
 BattleWeapon customWeapon_Jump = {
-    .name = "btl_wn_mario_normal_jump",
+    .name = "btl_cmd_act_jump",
     .icon = IconType::BOOTS,
     .item_id = 0,
     .description = "msg_normal_jump",
@@ -4416,7 +4422,7 @@ BattleWeapon customWeapon_SpringJumpFailed = {
 };
 
 BattleWeapon customWeapon_Hammer = {
-    .name = "btl_wn_mario_normal_hammer",
+    .name = "btl_cmd_act_hammer",
     .icon = IconType::HAMMER,
     .item_id = 0,
     .description = "msg_normal_hammer",
