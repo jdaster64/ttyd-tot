@@ -190,6 +190,7 @@ g_StringMap = {
             b"the effect and FP cost.",
         
         # Tower reward-related information.
+        
         b"tot_reward_hpplus":       b"HP Up",
         b"tot_rewarddesc_hpplus":
             b"Increases Mario's HP by 5.",
@@ -201,6 +202,12 @@ g_StringMap = {
         b"tot_reward_bpplus":       b"BP Up",
         b"tot_rewarddesc_bpplus":
             b"Increases Mario's BP by 5.",
+            
+        b"tot_reward_getparty":
+            b"<system>\n<p>\n%s joined your party!\n<k>",
+            
+        b"tot_reward_learnmove":
+            b"<system>\n<p>\nYou learned %s!\n<k>",
             
         # Moves and status effects.
         
@@ -447,6 +454,11 @@ g_StringMap = {
         b"tot_upg_sac1":
             b"Upgrading this move will\n"
             b"increase targets' value.",
+            
+        # Menu text
+        
+        b"tot_winsel_titlemove":      b"Move",
+        b"tot_winsel_whichunlock":    b"Which move?",
             
         # Achievements (TODO)
         

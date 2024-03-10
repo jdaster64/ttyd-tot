@@ -39,7 +39,6 @@ using ::ttyd::msgdrv::msgSearch;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 
-// TODO: All of this is testing, pretty much.
 void DispMainWindow(WinMgrEntry* entry) {
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[0]].flags & 

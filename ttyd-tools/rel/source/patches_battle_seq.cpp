@@ -370,7 +370,6 @@ void ApplyFixedPatches() {
         });
         
     // Make Mario's jump/hammer menus always show the full weapon sub-menu.
-    // TODO: Implement code to not have the sub-menu if only base move unlocked.
     mod::patch::writeBranchPair(
         reinterpret_cast<void*>(g_btlSeqMove_FixMarioSingleMoveCheck_BH),
         reinterpret_cast<void*>(g_btlSeqMove_FixMarioSingleMoveCheck_EH),
