@@ -160,19 +160,13 @@ void OnFileLoad(bool new_file = true) {
         ttyd::mario_pouch::pouchGetItem(ItemType::JUMPMAN);
         ttyd::mario_pouch::pouchGetItem(ItemType::TIMING_TUTOR);
         ttyd::mario_pouch::pouchEquipBadgeID(ItemType::TIMING_TUTOR);
-        
         ttyd::mario_pouch::pouchGetItem(ItemType::PEEKABOO);
         ttyd::mario_pouch::pouchEquipBadgeID(ItemType::PEEKABOO);
-        ttyd::mario_pouch::pouchGetItem(ItemType::FP_PLUS);
-        ttyd::mario_pouch::pouchEquipBadgeID(ItemType::FP_PLUS);
-        ttyd::mario_pouch::pouchGetItem(ItemType::HP_PLUS);
-        ttyd::mario_pouch::pouchEquipBadgeID(ItemType::HP_PLUS);
         
-        pouch.current_hp = 15;
+        pouch.current_hp = 10;
         pouch.current_fp = 10;
-        // Start with 9 base BP instead of 3 BP to give the player an edge.
-        pouch.total_bp = 9;
-        pouch.unallocated_bp = 3;
+        pouch.total_bp = 5;
+        pouch.unallocated_bp = 5;
         ttyd::mario_pouch::pouchReviseMarioParam();
         // Assign Yoshi a totally random color.
         ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));

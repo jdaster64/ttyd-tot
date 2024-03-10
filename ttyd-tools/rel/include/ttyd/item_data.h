@@ -365,7 +365,12 @@ namespace ItemType {
         SUPER_CHARGE,
         SUPER_CHARGE_P,
         
-        MAX_ITEM_TYPE
+        MAX_ITEM_TYPE,
+        
+        // TOT reward placeholders.
+        REWARD_HP_UP = HP_PLUS,
+        REWARD_FP_UP = FP_PLUS,
+        REWARD_BP_UP = INN_COUPON,
     };
 }
 

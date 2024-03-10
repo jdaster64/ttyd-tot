@@ -1,10 +1,12 @@
 #include "patches_item.h"
 
+#include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_achievements.h"
 #include "mod_state.h"
 #include "patch.h"
+#include "tot_generate_reward.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_database_common.h>
@@ -19,6 +21,8 @@
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
+#include <ttyd/mario_pouch.h>
+#include <ttyd/swdrv.h>
 #include <ttyd/system.h>
 
 #include <cstdint>
@@ -46,6 +50,7 @@ namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
 extern int32_t (*g__get_flower_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_heart_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_GetItemRecoverParam_trampoline)(EvtEntry*, bool);
+extern uint32_t (*g_pouchGetItem_trampoline)(int32_t);
 // Patch addresses.
 extern const int32_t g_pouchRemoveItemIndex_CheckMaxInv_BH;
 extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH;
@@ -289,9 +294,6 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::SUPER_HAMMER].description = "msg_custom_super_hammer";
     itemDataTable[ItemType::ULTRA_HAMMER].description = "msg_custom_ultra_hammer";
     
-    // Change icon for blue coins.
-    itemDataTable[ItemType::PIANTA].icon_id = IconType::TOT_COIN_BLUE;
-    
     // Change item name / description lookup keys for achievement rewards.
     itemDataTable[AchievementsManager::kChestRewardItem].name = "in_ach_1";
     itemDataTable[AchievementsManager::kChestRewardItem].description = "msg_ach_1";
@@ -452,6 +454,12 @@ void ApplyFixedPatches() {
     ttyd::battle_mario::badgeWeapon_IceNaguri.base_fp_cost = 2;
     ttyd::battle_mario::badgeWeapon_TatsumakiJump.base_fp_cost = 2;
     
+    // Patch data for TOT reward items.
+    tot::RewardManager::PatchRewardItemData();
+    
+    // Change icon for blue coins.
+    itemDataTable[ItemType::PIANTA].icon_id = IconType::TOT_COIN_BLUE;
+    
     // Double Pain doubles coin drops instead of Money Money.
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_fbatBattleMode_Patch_DoubleCoinsBadge1),
@@ -539,6 +547,29 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_pouchGetEmptyHaveItemCnt_CheckMaxInv_BH),
         reinterpret_cast<void*>(StartGetEmptyItemSlotsMax),
         reinterpret_cast<void*>(BranchBackGetEmptyItemSlotsMax));
+    
+    // Override item-get logic for special items.
+    g_pouchGetItem_trampoline = mod::patch::hookFunction(
+        ttyd::mario_pouch::pouchGetItem, [](int32_t item_type) {
+            // Track coins gained.
+            if (item_type == ItemType::COIN) {
+                g_Mod->state_.ChangeOption(STAT_COINS_EARNED);
+            }
+            
+            // If badge is a "P" badge and playing Mario-alone, also mark
+            // off the relevant "P" badge in the badge log.
+            if (g_Mod->state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER)
+                && !g_Mod->state_.GetOptionNumericValue(OPT_FIRST_PARTNER)
+                && IsStackableMarioBadge(item_type)) {
+                ttyd::swdrv::swSet(0x81 + item_type - ItemType::POWER_JUMP);
+            }
+            
+            // Handle items with special effects in ToT.
+            if (tot::RewardManager::HandleRewardItemPickup(item_type)) 
+                return 1U;
+            
+            return g_pouchGetItem_trampoline(item_type);
+        });
 }
 
 int32_t GetBonusCakeRestoration() {

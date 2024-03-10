@@ -9,6 +9,7 @@
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
+#include <ttyd/mario_pouch.h>
 #include <ttyd/swdrv.h>
 
 #include <cstring>
@@ -70,19 +71,60 @@ EVT_END()
 
 }  // namespace
 
+
+void RewardManager::PatchRewardItemData() {
+    // HP upgrade.
+    itemDataTable[ItemType::REWARD_HP_UP].name = "tot_reward_hpplus";
+    itemDataTable[ItemType::REWARD_HP_UP].description = "tot_rewarddesc_hpplus";
+    // FP upgrade.
+    itemDataTable[ItemType::REWARD_FP_UP].name = "tot_reward_fpplus";
+    itemDataTable[ItemType::REWARD_FP_UP].description = "tot_rewarddesc_fpplus";
+    // BP upgrade.
+    itemDataTable[ItemType::REWARD_BP_UP].name = "tot_reward_bpplus";
+    itemDataTable[ItemType::REWARD_BP_UP].description = "tot_rewarddesc_bpplus";
+    itemDataTable[ItemType::REWARD_BP_UP].icon_id = IconType::BP_ICON;
+}
+
+bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    
+    switch (item_type) {
+        case ItemType::PIANTA:
+            // "Big" coins, worth 5 apiece.
+            ttyd::mario_pouch::pouchAddCoin(5);
+            return true;
+        case ItemType::REWARD_HP_UP:
+            pouch.current_hp += 5;
+            pouch.max_hp += 5;
+            pouch.base_max_hp += 5;
+            return true;
+        case ItemType::REWARD_FP_UP:
+            pouch.current_fp += 5;
+            pouch.max_fp += 5;
+            pouch.base_max_fp += 5;
+            return true;
+        case ItemType::REWARD_BP_UP:
+            pouch.total_bp += 5;
+            pouch.unallocated_bp += 5;
+            return true;
+        default:
+            return false;
+    }
+}
+
 // Selects the contents of the chests.
 // TODO: Spawn chests based on Mario's current position.
 EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
     memset(g_Chests, 0, sizeof(g_Chests));
     
     g_Chests[0].home_pos = { 0.0, 0.0, -100.0 };
-    g_Chests[0].item = ItemType::COIN;
+    g_Chests[0].item = ItemType::REWARD_FP_UP;
     g_Chests[0].pickup_script = nullptr;
     g_Chests[1].home_pos = { -80.0, 0.0, -100.0 };
-    g_Chests[1].item = ItemType::MUSHROOM;
+    g_Chests[1].item = ItemType::REWARD_HP_UP;
     g_Chests[1].pickup_script = nullptr;
     g_Chests[2].home_pos = { 80.0, 0.0, -100.0 };
-    g_Chests[2].item = ItemType::ULTRA_SHROOM;
+    g_Chests[2].item = ItemType::REWARD_BP_UP;
     g_Chests[2].pickup_script = (void*)DummyChestEvtSpecial;
     
     return 2;

@@ -188,6 +188,19 @@ g_StringMap = {
             b"the next move's ATK by 2.\n"
             b"Wearing more copies raises\n"
             b"the effect and FP cost.",
+        
+        # Tower reward-related information.
+        b"tot_reward_hpplus":       b"HP Up",
+        b"tot_rewarddesc_hpplus":
+            b"Increases Mario's HP by 5.",
+            
+        b"tot_reward_fpplus":       b"FP Up",
+        b"tot_rewarddesc_fpplus":
+            b"Increases Mario's FP by 5.",
+            
+        b"tot_reward_bpplus":       b"BP Up",
+        b"tot_rewarddesc_bpplus":
+            b"Increases Mario's BP by 5.",
             
         # Moves and status effects.
         

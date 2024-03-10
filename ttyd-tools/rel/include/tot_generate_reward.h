@@ -8,6 +8,14 @@
 
 namespace mod::tot {
 
+class RewardManager {
+public:
+    // Change item data for items used as placeholders for rewards.
+    static void PatchRewardItemData();
+    // Apply effects of reward placeholder items.
+    static bool HandleRewardItemPickup(int32_t item_type);
+};
+
 // Generates chest contents.
 EVT_DECLARE_USER_FUNC(evtTot_GenerateChestContents, 0)
 

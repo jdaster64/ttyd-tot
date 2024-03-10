@@ -1,6 +1,5 @@
 #include "patches_stats.h"
 
-#include "custom_item.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
@@ -35,7 +34,6 @@ extern void (*g_BattleDamageDirect_trampoline)(
     uint32_t, uint32_t, uint32_t);
 extern void (*g_BtlUnit_PayWeaponCost_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
-extern uint32_t (*g_pouchGetItem_trampoline)(int32_t);
 extern int32_t (*g_pouchAddCoin_trampoline)(int16_t);
 extern void (*g_BtlActRec_AddCount_trampoline)(uint8_t*);
 
@@ -75,30 +73,6 @@ void ApplyFixedPatches() {
             g_Mod->state_.ChangeOption(STAT_SP_SPENT, weapon->base_sp_cost);
             // Run normal pay-weapon-cost logic.
             g_BtlUnit_PayWeaponCost_trampoline(unit, weapon);
-        });
-
-    g_pouchGetItem_trampoline = mod::patch::hookFunction(
-        ttyd::mario_pouch::pouchGetItem, [](int32_t item_type) {
-            // Track coins gained.
-            if (item_type == ItemType::COIN) {
-                g_Mod->state_.ChangeOption(STAT_COINS_EARNED);
-            }
-            
-            // If badge is a "P" badge and playing Mario-alone, also mark
-            // off the relevant "P" badge in the badge log.
-            if (g_Mod->state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER)
-                && !g_Mod->state_.GetOptionNumericValue(OPT_FIRST_PARTNER)
-                && IsStackableMarioBadge(item_type)) {
-                ttyd::swdrv::swSet(0x81 + item_type - ItemType::POWER_JUMP);
-            }
-            
-            // Run coin increment logic for custom currency.
-            if (item_type == ItemType::PIANTA) {
-                ttyd::mario_pouch::pouchAddCoin(5);
-                return 1U;
-            }
-            
-            return g_pouchGetItem_trampoline(item_type);
         });
 
     g_pouchAddCoin_trampoline = mod::patch::hookFunction(
