@@ -135,7 +135,7 @@ EVT_BEGIN(Tower_ChestEvt_Core)
         CASE_ETC()
             USER_FUNC(evt_item_get_item, LW(15))
     END_SWITCH()
-    // If no special pickup script, give Mario back control and spawn pipe.
+    // If not a special Give Mario back control and spawn pipe.
     IF_EQUAL(LW(14), 0)
         USER_FUNC(evt_mario_key_onoff, 1)
         SET(GSW(1000), 1)

@@ -104,6 +104,7 @@ struct MoveData {
     int8_t      move_cost[3];
     int8_t      max_level;
     int8_t      move_tier;
+    int8_t      partner_id;     // Using TTYD's internal pouch order; 0 = Mario.
     int16_t     icon_id;    
     const char* name_msg;
     const char* abbrev_msg;
@@ -131,6 +132,11 @@ public:
     static bool ChangeSelectedLevel(int32_t move_type, int32_t change);
     // Resets all move selected levels to the minimum (between battles).
     static void ResetSelectedLevels();
+    
+    // Returns whether the given move is unlockable.
+    static bool IsUnlockable(int32_t move_type);
+    // Returns whether the given move is upgradable.
+    static bool IsUpgradable(int32_t move_type);
 
     // Returns whether or not the move name should be overridden.
     static bool GetCurrentSelectionString(int32_t move_type, char* out_buf);

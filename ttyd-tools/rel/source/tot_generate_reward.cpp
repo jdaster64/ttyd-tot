@@ -16,6 +16,7 @@
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
+#include <ttyd/msgdrv.h>
 #include <ttyd/party.h>
 #include <ttyd/swdrv.h>
 
@@ -94,14 +95,47 @@ EVT_DECLARE_USER_FUNC(evtTot_GetPartnerName, 2)
 EVT_DECLARE_USER_FUNC(evtTot_InitializePartyMember, 2)
 EVT_DECLARE_USER_FUNC(evtTot_PartyJumpOutOfChest, 7)
 EVT_DECLARE_USER_FUNC(evtTot_PartyVictoryPose, 1)
-EVT_DECLARE_USER_FUNC(evtTot_SelectMovesForUnlock, 4)
+EVT_DECLARE_USER_FUNC(evtTot_SelectMoves, 5)
 
-// Dummy script to run for picking up an Ultra Shroom specifically.
-EVT_BEGIN(Reward_Dummy)
-    USER_FUNC(evt_win_other_select, 19)
-    USER_FUNC(
-        evt_msg_print_insert, 0, PTR("zz_test_win_select"), 0, 0,
-        LW(1), LW(2), LW(3), LW(4))
+// Pickup script for Star Pieces (base).
+EVT_BEGIN(Reward_StarPieceBaseEvt)
+    USER_FUNC(evtTot_SelectMoves, 1, 0, LW(0), LW(1), LW(2))
+    IF_LARGE(LW(0), 0)
+        USER_FUNC(evtTot_UpgradeMove, LW(1))
+        USER_FUNC(
+            evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
+    END_IF()
+    RETURN()
+EVT_END()
+
+// Pickup script for Star Pieces from chest.
+EVT_BEGIN(Reward_StarPieceChestEvt)
+    RUN_CHILD_EVT(Reward_StarPieceBaseEvt)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    SET(GSW(1000), 1)
+    RETURN()
+EVT_END()
+
+// Pickup script for Star Pieces as field item.
+EVT_BEGIN(Reward_StarPieceItemDropEvt)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    RUN_CHILD_EVT(Reward_StarPieceBaseEvt)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
+// Pickup script for Shine Sprites.
+EVT_BEGIN(Reward_ShineSpriteChestEvt)
+    USER_FUNC(evtTot_SelectMoves, 1, 0, LW(0), LW(1), LW(2))
+    IF_LARGE(LW(0), 0)
+        // Open menu to select a move.
+        // Note that LW(1) and LW(2) are overwritten by result.
+        USER_FUNC(evt_win_other_select,
+            (uint32_t)window_select::MenuType::MOVE_UPGRADE)
+        USER_FUNC(evtTot_UpgradeMove, LW(1))
+        USER_FUNC(
+            evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
+    END_IF()
     USER_FUNC(evt_mario_key_onoff, 1)
     SET(GSW(1000), 1)
     RETURN()
@@ -126,8 +160,8 @@ EVT_BEGIN(Reward_PartnerOrMove)
     USER_FUNC(evtTot_ShouldUnlockPartner, LW(13), LW(0))
     IF_EQUAL(LW(0), 0)
         // Partner is already unlocked; check for unlockable moves.
-        USER_FUNC(evtTot_SelectMovesForUnlock, LW(13), LW(0), LW(1), LW(2))
-        IF_LARGE_EQUAL(LW(0), 0)
+        USER_FUNC(evtTot_SelectMoves, 0, LW(13), LW(0), LW(1), LW(2))
+        IF_LARGE(LW(0), 0)
             // Open menu to select a move.
             // Note that LW(1) and LW(2) are overwritten by result.
             USER_FUNC(evt_win_other_select,
@@ -230,11 +264,11 @@ EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
     g_Chests[0].item = -1;
     g_Chests[0].pickup_script = (void*)Reward_PartnerOrMove;
     g_Chests[1].home_pos = { -80.0, 0.0, -100.0 };
-    g_Chests[1].item = ItemType::COIN;
-    g_Chests[1].pickup_script = nullptr;
+    g_Chests[1].item = ItemType::STAR_PIECE;
+    g_Chests[1].pickup_script = (void*)Reward_StarPieceChestEvt;
     g_Chests[2].home_pos = { 80.0, 0.0, -100.0 };
-    g_Chests[2].item = ItemType::REWARD_BP_UP;
-    g_Chests[2].pickup_script = (void*)Reward_Dummy;
+    g_Chests[2].item = ItemType::SHINE_SPRITE;
+    g_Chests[2].pickup_script = (void*)Reward_ShineSpriteChestEvt;
     
     return 2;
 }
@@ -254,6 +288,12 @@ EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
 EVT_DEFINE_USER_FUNC(evtTot_DisplayChestIcons) {
     ttyd::dispdrv::dispEntry(
         CameraId::k3d, 1, /* order = */ 900.f, DisplayIcons, g_Chests);
+    return 2;
+}
+
+// Returns a pointer to the pickup script for a Star Piece.
+EVT_DEFINE_USER_FUNC(evtTot_GetStarPiecePickupEvt) {
+    evtSetValue(evt, evt->evtArguments[0], PTR(Reward_StarPieceItemDropEvt));
     return 2;
 }
 
@@ -299,8 +339,9 @@ EVT_DEFINE_USER_FUNC(evtTot_GetPartnerName) {
 // arg0 = reward id (-1 to -7 in actual game order).
 // arg1 = (out) idx in internal party order.
 EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
+    int32_t reward_type = evtGetValue(evt, evt->evtArguments[0]);
     int32_t idx = 1;
-    switch((int32_t)evtGetValue(evt, evt->evtArguments[0])) {
+    switch(reward_type) {
         case -1:    idx = 1;    break;
         case -2:    idx = 2;    break;
         case -3:    idx = 5;    break;
@@ -357,12 +398,20 @@ EVT_DEFINE_USER_FUNC(evtTot_PartyVictoryPose) {
 }
 
 // Selects moves for unlocking selection menu.
-// arg0 = move type (partner/jump/hammer/SP),
-// arg1 = out # options, arg2 = out first option, arg3 = out first option name
-EVT_DEFINE_USER_FUNC(evtTot_SelectMovesForUnlock) {
+// arg0 = mode; unlock (0) or upgrade (1)
+// arg1 = move type (partner/jump/hammer/SP), or all (0)
+// arg2 = (out) # options
+// arg3 = (out) first option, arg4 = (out) first option name
+EVT_DEFINE_USER_FUNC(evtTot_SelectMoves) {
+    bool is_upgrade_mode = evtGetValue(evt, evt->evtArguments[0]);
     int32_t option_start = 0;
     int32_t max_options = 0;
-    switch((int32_t)evtGetValue(evt, evt->evtArguments[0])) {
+    switch((int32_t)evtGetValue(evt, evt->evtArguments[1])) {
+        case 0:  {
+            option_start = 0;
+            max_options = MoveType::MOVE_TYPE_MAX;
+            break;
+        }
         case -1: {
             option_start = MoveType::GOOMBELLA_BASE;
             max_options = 6;
@@ -417,14 +466,12 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectMovesForUnlock) {
     
     int32_t num_options = 0;
     for (int32_t i = 0; i < max_options; ++i) {
+        // Can only support 8 options at once.
+        if (num_options >= 8) break;
+        
         int32_t move = option_start + i;
-        if (MoveManager::GetUnlockedLevel(move) == 0) {
-            // Special condition: Spring Jump / Ultra Hammer require unlocking
-            // Spin Jump or Super Hammer first.
-            if (MoveManager::GetMoveData(move)->move_tier == 4 &&
-                MoveManager::GetUnlockedLevel(move - 1) == 0) {
-                continue;
-            }
+        if ((is_upgrade_mode && MoveManager::IsUpgradable(move)) ||
+            (!is_upgrade_mode && MoveManager::IsUnlockable(move))) {
             g_MoveSelections[num_options] = move;
             ++num_options;
         }
@@ -432,11 +479,11 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectMovesForUnlock) {
     g_MoveSelections[num_options] = -1;
     g_NumMovesSelected = num_options;
     
-    evtSetValue(evt, evt->evtArguments[1], num_options);
-    evtSetValue(evt, evt->evtArguments[2], g_MoveSelections[0]);
+    evtSetValue(evt, evt->evtArguments[2], num_options);
+    evtSetValue(evt, evt->evtArguments[3], g_MoveSelections[0]);
     evtSetValue(
-        evt, evt->evtArguments[3], 
-        PTR(MoveManager::GetMoveData(g_MoveSelections[0])->name_msg));
+        evt, evt->evtArguments[4], PTR(ttyd::msgdrv::msgSearch(
+            MoveManager::GetMoveData(g_MoveSelections[0])->name_msg)));
     
     return 2;
 }

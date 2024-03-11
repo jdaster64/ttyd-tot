@@ -7,6 +7,7 @@
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_partner.h"
+#include "tot_generate_reward.h"
 #include "tot_move_manager.h"
 #include "tot_party_mario.h"
 
@@ -44,18 +45,21 @@ extern "C" {
         auto* battleWork = ttyd::battle::g_BattleWork;
         battleWork->battle_flags |= 0x600;
         
+        // If the only move available is base-rank level 1, skip move selection.
         for (int32_t i = 0; i < 8; ++i) {
             int32_t move = mod::tot::MoveType::JUMP_BASE + i;
-            if (mod::tot::MoveManager::GetMoveData(move)->move_tier > 0 &&
-                mod::tot::MoveManager::GetUnlockedLevel(move) > 0) {
+            int32_t move_tier = mod::tot::MoveManager::GetMoveData(move)->move_tier;
+            int32_t unlocked_level = mod::tot::MoveManager::GetUnlockedLevel(move);
+            if ((move_tier > 0 && unlocked_level > 0) || unlocked_level > 1) {
                 battleWork->battle_flags &= ~0x200;
                 break;
             }
         }
         for (int32_t i = 0; i < 8; ++i) {
             int32_t move = mod::tot::MoveType::HAMMER_BASE + i;
-            if (mod::tot::MoveManager::GetMoveData(move)->move_tier > 0 &&
-                mod::tot::MoveManager::GetUnlockedLevel(move) > 0) {
+            int32_t move_tier = mod::tot::MoveManager::GetMoveData(move)->move_tier;
+            int32_t unlocked_level = mod::tot::MoveManager::GetUnlockedLevel(move);
+            if ((move_tier > 0 && unlocked_level > 0) || unlocked_level > 1) {
                 battleWork->battle_flags &= ~0x400;
                 break;
             }
@@ -103,6 +107,7 @@ extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule;
 extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH;
 extern const int32_t g_itemseq_Bound_Patch_BounceRange;
 extern const int32_t g_enemy_common_dead_event_SpawnCoinsHook;
+extern const int32_t g_enemy_common_dead_event_SpawnItemDropHook;
 
 namespace battle_seq {
     
@@ -134,6 +139,24 @@ EVT_END()
 EVT_BEGIN(SpawnCoinsEvtHook)
 RUN_CHILD_EVT(SpawnCoinsEvt)
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+EVT_PATCH_END()
+
+// Custom event to spawn item drops.
+EVT_BEGIN(SpawnItemDropEvt)
+IF_EQUAL(LW(3), (int32_t)ItemType::STAR_PIECE)
+    // Use custom pickup evt for Star Pieces to handle upgrading moves.
+    USER_FUNC(tot::evtTot_GetStarPiecePickupEvt, LW(4))
+ELSE()
+    SET(LW(4), 0)
+END_IF()
+USER_FUNC(
+    ttyd::evt_item::evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), 10, -1, LW(4))
+RETURN()
+EVT_END()
+
+EVT_BEGIN(SpawnItemDropHook)
+RUN_CHILD_EVT(SpawnItemDropEvt)
+0, 0, 0, 0, 0, 0, 0, 0,
 EVT_PATCH_END()
 
 // Copies NPC battle information to / from children of a parent NPC
@@ -404,6 +427,11 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_btlseqTurn_Patch_RuleDispDismissOnlyWithB), 
         0x38600200U /* li r3, 0x200 (B button) */);
+        
+    // Support Star Piece item drops behaving like reward, upgrading a move.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_enemy_common_dead_event_SpawnItemDropHook),
+        SpawnItemDropHook, sizeof(SpawnItemDropHook));
         
     // Support multiple demonimations of coins dropping at the end of a fight.
     mod::patch::writePatch(

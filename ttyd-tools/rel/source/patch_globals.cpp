@@ -304,6 +304,7 @@ extern const int32_t g_ac_monosiri_target_WhiteReticleScale = 0x80301250;
 extern const int32_t g_ac_monosiri_target_GreyReticleScale = 0x80301280;
 extern const int32_t g_ac_monosiri_target_ReticleZoomSpeed = 0x80428610;
 extern const int32_t g_enemy_common_dead_event_SpawnCoinsHook = 0x8033f094;
+extern const int32_t g_enemy_common_dead_event_SpawnItemDropHook = 0x8033f190;
 extern const int32_t g_subsetevt_blow_dead_Patch_GetRewards = 0x80351ea4;
 extern const int32_t g_subsetevt_shot_damage_Patch_SuperInvolvedWeapon = 0x80351f40;
 extern const int32_t g_subsetevt_shot_damage_Patch_UltraInvolvedWeapon = 0x80351f58;

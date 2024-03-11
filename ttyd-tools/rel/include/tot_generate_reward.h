@@ -32,4 +32,7 @@ EVT_DECLARE_USER_FUNC(evtTot_GetChestData, 6)
 // Draws icons above chests.
 EVT_DECLARE_USER_FUNC(evtTot_DisplayChestIcons, 0)
 
+// Returns a pointer to the pickup script for a Star Piece.
+EVT_DECLARE_USER_FUNC(evtTot_GetStarPiecePickupEvt, 1)
+
 }

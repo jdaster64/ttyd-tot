@@ -410,7 +410,7 @@ void StarPowerMenuDisp() {
     gc::vec3    sac_name_scale          = { 1.0f, 1.0f, 1.0f };
     gc::vec3    sac_max_lvl_position    = { -22.0f, 130.0f, 0.0f };
     gc::vec3    sac_max_lvl_scale       = { 1.0f, 1.0f, 1.0f };
-    gc::vec3    sac_lvl_icon_position   = { -56.0f, 120.0f, 0.0f };
+    gc::vec3    sac_lvl_icon_position   = { -55.0f, 120.0f, 0.0f };
     gc::vec3    sac_lvl_icon_scale      = { 0.5f, 0.5f, 0.5f };
     char        level_str_buf[3]        = { 0, 0, 0 };
     uint32_t    header_color            = 0xffffffffU;

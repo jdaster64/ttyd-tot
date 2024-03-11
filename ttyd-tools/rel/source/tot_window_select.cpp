@@ -76,15 +76,17 @@ void DispMainWindow(WinMgrEntry* entry) {
             
             int32_t entry_icon = 0;
             const char* entry_text = "";
+            float max_width = 185.0f;
             
             if (sel_entry->type == MenuType::CUSTOM_START) {
                 entry_icon = itemDataTable[row.value].icon_id;
                 entry_text = msgSearch(itemDataTable[row.value].name);
             } else {
-                // MOVE_UNLOCK
+                // MOVE_UNLOCK, MOVE_UPGRADE
                 auto* move_data = MoveManager::GetMoveData(row.value);
                 entry_icon = move_data->icon_id;
                 entry_text = msgSearch(move_data->name_msg);
+                if (sel_entry->type == MenuType::MOVE_UPGRADE) max_width -= 13.f;
             }
             
             gc::vec3 pos = { entry->x + 35.0f, y_trans, 0.0f };
@@ -95,10 +97,11 @@ void DispMainWindow(WinMgrEntry* entry) {
             gc::vec3 text_pos = { entry->x + 60.0f, y_trans + 12.0f, 0.0f };
             gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
             ttyd::win_main::winFontSetWidth(
-                &text_pos, &text_scale, text_color, 185.0, entry_text);
+                &text_pos, &text_scale, text_color, max_width, entry_text);
         }
         
         if (sel_entry->type == MenuType::CUSTOM_START) {
+            // Draw "buy prices".
             int32_t value = itemDataTable[row.value].buy_price;
             if (value > 0) {
                 char buf[8] = { 0 };
@@ -122,6 +125,33 @@ void DispMainWindow(WinMgrEntry* entry) {
                 ttyd::win_main::winFontSetWidth(
                     &text_pos, &text_scale, text_color, 30.0, buf);
             }
+        } else if (sel_entry->type == MenuType::MOVE_UPGRADE) {
+            // Draw the level of the upgraded move.
+            const char* lvl_string = 
+                MoveManager::GetUnlockedLevel(row.value) == 1 ? "2" : "3";
+            
+            uint32_t* text_color;
+            if (row.flags & WinMgrSelectEntryRow_Flags::GREYED_OUT) {
+                text_color = &kMedGrey;
+            } else {
+                text_color = &kBlack;
+            }
+            gc::vec3 text_pos = {
+                entry->x + entry->width - 25.0f,
+                y_trans + 12.0f,
+                0.0f
+            };
+            gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
+            ttyd::win_main::winFontInit();
+            ttyd::win_main::winFontSetWidth(
+                &text_pos, &text_scale, text_color, 15.0, lvl_string);
+            
+            text_pos.x -= 27.0f;
+            text_pos.y -= 10.0f;
+            gc::vec3 lvl_text_scale = { 0.5f, 0.5f, 0.5f };
+            ttyd::win_main::winFontInit();
+            ttyd::win_main::winFontSetWidth(
+                &text_pos, &lvl_text_scale, text_color, 27.0, "Lvl.");
         }
         
         offset += 24;
@@ -134,7 +164,8 @@ void DispMainWindow(WinMgrEntry* entry) {
     const char* title = "";
     if (sel_entry->type == MenuType::CUSTOM_START) {
         title = msgSearch("in_konran_hammer");
-    } else if (sel_entry->type == MenuType::MOVE_UNLOCK) {
+    } else {
+        // MOVE_UNLOCK, MOVE_UPGRADE
         title = msgSearch("tot_winsel_titlemove");
     }
     
@@ -151,8 +182,8 @@ void DispMainWindow(WinMgrEntry* entry) {
     ttyd::win_main::winFontSetEdgeWidth(
         &text_pos, &text_scale, &kWhite, 120.0, title);
         
-    // Draw white circle + currency icon in upper-right corner.
     if (sel_entry->type == MenuType::CUSTOM_START) {
+        // Draw white circle + currency icon in upper-right corner.
         gc::mtx34 mtx, mtx2;
         gc::mtx::PSMTXScale(&mtx2, 0.6f, 0.6f, 0.6f);
         gc::mtx::PSMTXTrans(&mtx, entry->x + 268.0f, entry->y - 18.0f, 0.0f);
@@ -201,6 +232,8 @@ void DispWindow2(WinMgrEntry* entry) {
         msg = msgSearch("in_konran_hammer");
     } else if (sel_entry->type == MenuType::MOVE_UNLOCK) {
         msg = msgSearch("tot_winsel_whichunlock");
+    } else if (sel_entry->type == MenuType::MOVE_UPGRADE) {
+        msg = msgSearch("tot_winsel_whichunlock");
     }
     
     uint16_t lines;
@@ -242,6 +275,11 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                 MoveManager::GetMoveData(
                     sel_entry->row_data[sel_entry->cursor_index].value
                 )->desc_msg);
+        } else if (sel_entry->type == MenuType::MOVE_UPGRADE) {
+            help_msg = msgSearch(
+                MoveManager::GetMoveData(
+                    sel_entry->row_data[sel_entry->cursor_index].value
+                )->upgrade_msg);
         }
         entry->help_msg = help_msg;
         winMgrHelpDraw(entry);
@@ -302,6 +340,9 @@ void* InitNewSelectDescTable() {
     };
     g_SelectDescList[MenuType::MOVE_UNLOCK] = WinMgrSelectDescList{ 
         .num_descs = 3, .descs = &g_CustomDescs[0] 
+    };
+    g_SelectDescList[MenuType::MOVE_UPGRADE] = WinMgrSelectDescList{ 
+        .num_descs = 3, .descs = &g_CustomDescs[0] 
     }; 
     return g_SelectDescList;
 }
@@ -322,6 +363,8 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
     // Determine whether window should be cancellable based on type.
     switch (type) {
         case MenuType::MOVE_UNLOCK:
+        case MenuType::MOVE_UPGRADE:
+            // Not cancellable.
             break;
         case MenuType::CUSTOM_START:
         default:
@@ -377,7 +420,7 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
         sel_entry->row_data[8].value = 0xf7;
         sel_entry->row_data[9].value = 0xfb;
     } else {
-        // MOVE_UNLOCK
+        // MOVE_UNLOCK, MOVE_UPGRADE - Read moves from tot_generate_reward.
         int32_t num_moves;
         int32_t* moves = RewardManager::GetSelectedMoves(&num_moves);
         sel_entry->num_rows = num_moves;
@@ -409,7 +452,7 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
     if (sel_entry->type == MenuType::CUSTOM_START) {
         evt->lwData[1] = value;
     } else {
-        // MOVE_UNLOCK - Assign move id + move name.
+        // MOVE_UNLOCK, MOVE_UPGRADE - Assign move id + move name.
         evt->lwData[1] = value;
         evt->lwData[2] = PTR(msgSearch(MoveManager::GetMoveData(value)->name_msg));
     }

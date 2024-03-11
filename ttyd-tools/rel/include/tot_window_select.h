@@ -17,7 +17,10 @@ namespace MenuType {
         // Dummy.
         CUSTOM_START = 19,
         // Unlocking new moves.
-        MOVE_UNLOCK = 20,
+        MOVE_UNLOCK,
+        // Upgrading moves.
+        MOVE_UPGRADE,
+        
         MAX_MENU_TYPE,
     };
 }

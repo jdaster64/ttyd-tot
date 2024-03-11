@@ -209,6 +209,9 @@ g_StringMap = {
         b"tot_reward_learnmove":
             b"<system>\n<p>\nYou learned %s!\n<k>",
             
+        b"tot_reward_upgrademove":
+            b"<system>\n<p>\n%s's level\nwent up by 1!\n<k>",
+            
         # Moves and status effects.
         
         b"in_konran_hammer":        b"Shrink Smash",
