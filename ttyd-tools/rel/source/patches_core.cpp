@@ -11,6 +11,7 @@
 #include "patches_mario_move.h"
 #include "patches_options.h"
 #include "tot_move_manager.h"
+#include "tot_state.h"
 
 #include <gc/OSLink.h>
 #include <ttyd/cardmgr.h>

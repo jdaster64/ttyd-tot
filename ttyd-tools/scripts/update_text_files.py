@@ -202,6 +202,15 @@ g_StringMap = {
         b"tot_reward_bpplus":       b"BP Up",
         b"tot_rewarddesc_bpplus":
             b"Increases Mario's BP by 5.",
+        
+        b"tot_reward_hpplusp":       b"HP Up P",
+        b"tot_rewarddesc_hpplusp":
+            b"Increases partners' HP.",
+        
+        b"tot_reward_sack":         b"Strange Sack",
+        b"tot_rewarddesc_sack":
+            b"Increases the maximum number\n"
+            b"of items you can carry.",
             
         b"tot_reward_getparty":
             b"<system>\n<p>\n%s joined your party!\n<k>",

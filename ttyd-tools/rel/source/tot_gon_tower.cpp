@@ -115,8 +115,7 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13), LW(14))
     SWITCH(LW(13))
-        CASE_EQUAL((int32_t)ItemType::COIN)  // coins reward
-        CASE_SMALL_EQUAL(-1)                 // partner reward
+        CASE_SMALL_EQUAL(-1)    // move, partner, coin rewards
         CASE_ETC()
             USER_FUNC(evtTot_GetUniqueItemName, LW(15))
             USER_FUNC(
@@ -125,17 +124,15 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     END_SWITCH()
     USER_FUNC(evt_mobj_wait_animation_end, LW(8))
     SWITCH(LW(13))
-        CASE_EQUAL((int32_t)ItemType::COIN)
-            // TODO: Move to tot_generate_reward, parameterize.
-            USER_FUNC(evt_sub_get_coin, 64)
         CASE_SMALL_EQUAL(-1)
-            // Run partner-acquisition / move selection event.
+            // Run special event from tot_generate_reward, then null it out
+            // to have this function return control of Mario.
             RUN_CHILD_EVT(LW(14))
             SET(LW(14), 0)
         CASE_ETC()
             USER_FUNC(evt_item_get_item, LW(15))
     END_SWITCH()
-    // If not a special Give Mario back control and spawn pipe.
+    // If no special pickup script, give Mario back control and spawn pipe.
     IF_EQUAL(LW(14), 0)
         USER_FUNC(evt_mario_key_onoff, 1)
         SET(GSW(1000), 1)

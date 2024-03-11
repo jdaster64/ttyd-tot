@@ -1,7 +1,10 @@
 #include "tot_generate_reward.h"
 
 #include "evt_cmd.h"
+#include "mod.h"
+#include "mod_state.h"
 #include "tot_move_manager.h"
+#include "tot_state.h"
 #include "tot_window_select.h"
 
 #include <ttyd/dispdrv.h>
@@ -11,6 +14,7 @@
 #include <ttyd/evt_party.h>
 #include <ttyd/evt_pouch.h>
 #include <ttyd/evt_snd.h>
+#include <ttyd/evt_sub.h>
 #include <ttyd/evt_window.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
@@ -33,6 +37,7 @@ using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_party;
 using namespace ::ttyd::evt_pouch;
 using namespace ::ttyd::evt_snd;
+using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::evt_window;
 
 using ::ttyd::dispdrv::CameraId;
@@ -43,10 +48,38 @@ using ::ttyd::item_data::itemDataTable;
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
+enum RewardType {
+    // Items to use as TOT reward placeholders.
+    REWARD_HP_UP        = ItemType::HP_PLUS,
+    REWARD_FP_UP        = ItemType::FP_PLUS,
+    REWARD_BP_UP        = ItemType::LUCKY_START_P,
+    REWARD_HP_UP_P      = ItemType::HP_PLUS_P,
+    REWARD_INV_UP       = ItemType::INN_COUPON,
+    
+    REWARD_SHINE_SPRITE = ItemType::SHINE_SPRITE,
+    REWARD_STAR_PIECE   = ItemType::STAR_PIECE,
+    
+    REWARD_GOOMBELLA    = -1,
+    REWARD_KOOPS        = -2,
+    REWARD_FLURRIE      = -3,
+    REWARD_YOSHI        = -4,
+    REWARD_VIVIAN       = -5,
+    REWARD_BOBBERY      = -6,
+    REWARD_MOWZ         = -7,
+    REWARD_JUMP         = -8,
+    REWARD_HAMMER       = -9,
+    REWARD_SPECIAL_MOVE = -10,
+    REWARD_COINS        = -11,
+    
+    // TODO: Make these placeholders as well.
+    REWARD_BADGE_STACKABLE  = ItemType::SUPER_SHROOM,
+    REWARD_BADGE_UNIQUE     = ItemType::DAMAGE_DODGE,
+};
+
 // Underlying data for chest positions + contents.
 struct ChestData {
     gc::vec3    home_pos;
-    int32_t     item;
+    int32_t     item;           // RewardType
     void*       pickup_script;
 };
 ChestData g_Chests[5];
@@ -68,6 +101,7 @@ int32_t GetIcon(ChestData* chest) {
         case -8:    return IconType::BOOTS;
         case -9:    return IconType::HAMMER;
         case -10:   return IconType::STAR_ICON;
+        case -11:   return IconType::COIN;
         default:    return itemDataTable[chest->item].icon_id;
     }
 }
@@ -155,6 +189,14 @@ EVT_BEGIN(Reward_PartnerRestoreBgmEvt)
     RETURN()
 EVT_END()
 
+// Script to reward coins.
+// TODO: Parameterize based on floor count or something.
+EVT_BEGIN(Reward_GetCoinsEvt)
+    USER_FUNC(evt_sub_get_coin, 64)
+    RETURN()
+EVT_END()
+
+// Script to reward a partner or jump/hammer/SP/partner move.
 // Called from tot_gon_tower; LW(10-12) = position, LW(13) = reward id (-1 ~ -7).
 EVT_BEGIN(Reward_PartnerOrMove)
     USER_FUNC(evtTot_ShouldUnlockPartner, LW(13), LW(0))
@@ -212,15 +254,22 @@ EVT_END()
 
 void RewardManager::PatchRewardItemData() {
     // HP upgrade.
-    itemDataTable[ItemType::REWARD_HP_UP].name = "tot_reward_hpplus";
-    itemDataTable[ItemType::REWARD_HP_UP].description = "tot_rewarddesc_hpplus";
+    itemDataTable[REWARD_HP_UP].name = "tot_reward_hpplus";
+    itemDataTable[REWARD_HP_UP].description = "tot_rewarddesc_hpplus";
     // FP upgrade.
-    itemDataTable[ItemType::REWARD_FP_UP].name = "tot_reward_fpplus";
-    itemDataTable[ItemType::REWARD_FP_UP].description = "tot_rewarddesc_fpplus";
+    itemDataTable[REWARD_FP_UP].name = "tot_reward_fpplus";
+    itemDataTable[REWARD_FP_UP].description = "tot_rewarddesc_fpplus";
     // BP upgrade.
-    itemDataTable[ItemType::REWARD_BP_UP].name = "tot_reward_bpplus";
-    itemDataTable[ItemType::REWARD_BP_UP].description = "tot_rewarddesc_bpplus";
-    itemDataTable[ItemType::REWARD_BP_UP].icon_id = IconType::BP_ICON;
+    itemDataTable[REWARD_BP_UP].name = "tot_reward_bpplus";
+    itemDataTable[REWARD_BP_UP].description = "tot_rewarddesc_bpplus";
+    itemDataTable[REWARD_BP_UP].icon_id = IconType::BP_ICON;
+    // Partner HP upgrade.
+    itemDataTable[REWARD_HP_UP_P].name = "tot_reward_hpplusp";
+    itemDataTable[REWARD_HP_UP_P].description = "tot_rewarddesc_hpplusp";
+    // Strange Sack upgrade.
+    itemDataTable[REWARD_INV_UP].name = "tot_reward_sack";
+    itemDataTable[REWARD_INV_UP].description = "tot_rewarddesc_sack";
+    itemDataTable[REWARD_INV_UP].icon_id = IconType::STRANGE_SACK;
 }
 
 bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
@@ -231,20 +280,32 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
             // "Big" coins, worth 5 apiece.
             ttyd::mario_pouch::pouchAddCoin(5);
             return true;
-        case ItemType::REWARD_HP_UP:
+        case REWARD_HP_UP:
             pouch.current_hp += 5;
             pouch.max_hp += 5;
             pouch.base_max_hp += 5;
             return true;
-        case ItemType::REWARD_FP_UP:
+        case REWARD_FP_UP:
             pouch.current_fp += 5;
             pouch.max_fp += 5;
             pouch.base_max_fp += 5;
             return true;
-        case ItemType::REWARD_BP_UP:
+        case REWARD_BP_UP:
             pouch.total_bp += 5;
             pouch.unallocated_bp += 5;
             return true;
+        case REWARD_INV_UP:
+            ++infinite_pit::g_Mod->tot_state_.num_sack_upgrades;
+            return true;
+        case REWARD_HP_UP_P: {
+            for (int32_t i = 1; i <= 7; ++i) {
+                // TODO: Different amounts of HP per party member?
+                pouch.party_data[i].current_hp += 5;
+                pouch.party_data[i].max_hp += 5;
+                pouch.party_data[i].base_max_hp += 5;
+            }
+            return true;
+        }
         default:
             return false;
     }
@@ -258,17 +319,44 @@ int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
 // Selects the contents of the chests.
 // TODO: Spawn chests based on Mario's current position.
 EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
+    const int32_t kRewardTypes[] = {
+        REWARD_GOOMBELLA, REWARD_KOOPS, REWARD_FLURRIE, 
+        REWARD_YOSHI, REWARD_VIVIAN, REWARD_BOBBERY,
+        REWARD_MOWZ, REWARD_JUMP, REWARD_HAMMER,
+        REWARD_SPECIAL_MOVE,
+        
+        REWARD_COINS, REWARD_SHINE_SPRITE, REWARD_STAR_PIECE,
+        
+        REWARD_HP_UP, REWARD_FP_UP, REWARD_BP_UP, REWARD_HP_UP_P,
+        REWARD_INV_UP, REWARD_BADGE_STACKABLE, REWARD_BADGE_UNIQUE,
+    };
+    const void* kRewardScripts[] = {
+        Reward_PartnerOrMove, Reward_PartnerOrMove, Reward_PartnerOrMove,
+        Reward_PartnerOrMove, Reward_PartnerOrMove, Reward_PartnerOrMove,
+        Reward_PartnerOrMove, Reward_PartnerOrMove, Reward_PartnerOrMove,
+        Reward_PartnerOrMove,
+        
+        Reward_GetCoinsEvt, Reward_ShineSpriteChestEvt, Reward_StarPieceChestEvt,
+        
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+    };
+    const gc::vec3 positions[] = {
+        { 0.0, 0.0, -100.0 },
+        { -80.0, 0.0, -100.0 },
+        { 80.0, 0.0, -100.0 },
+    };
+    
     memset(g_Chests, 0, sizeof(g_Chests));
     
-    g_Chests[0].home_pos = { 0.0, 0.0, -100.0 };
-    g_Chests[0].item = -1;
-    g_Chests[0].pickup_script = (void*)Reward_PartnerOrMove;
-    g_Chests[1].home_pos = { -80.0, 0.0, -100.0 };
-    g_Chests[1].item = ItemType::STAR_PIECE;
-    g_Chests[1].pickup_script = (void*)Reward_StarPieceChestEvt;
-    g_Chests[2].home_pos = { 80.0, 0.0, -100.0 };
-    g_Chests[2].item = ItemType::SHINE_SPRITE;
-    g_Chests[2].pickup_script = (void*)Reward_ShineSpriteChestEvt;
+    // TODO: Replace with real generation code.
+    for (int32_t i = 0; i < 3; ++i) {
+        g_Chests[i].home_pos = positions[i];
+        
+        int32_t rand_val =
+            infinite_pit::g_Mod->state_.Rand(sizeof(kRewardTypes) / sizeof(int32_t));
+        g_Chests[i].item = kRewardTypes[rand_val];
+        g_Chests[i].pickup_script = (void*)kRewardScripts[rand_val];
+    }
     
     return 2;
 }
@@ -354,10 +442,7 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
     
     party_data.flags |= 1;
     
-    // TODO: Set different amounts of starting HP per party member.
-    party_data.base_max_hp = 10;
-    party_data.max_hp = 10;
-    party_data.current_hp = 10;
+    // TODO: Different amounts of HP per party member?
     party_data.hp_level = 0;
     party_data.attack_level = 0;
     party_data.tech_level = 0;
@@ -464,6 +549,8 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectMoves) {
         }
     }
     
+    // TODO: Write generation code that selects a few randomly from all options.
+    
     int32_t num_options = 0;
     for (int32_t i = 0; i < max_options; ++i) {
         // Can only support 8 options at once.
@@ -480,10 +567,13 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectMoves) {
     g_NumMovesSelected = num_options;
     
     evtSetValue(evt, evt->evtArguments[2], num_options);
-    evtSetValue(evt, evt->evtArguments[3], g_MoveSelections[0]);
-    evtSetValue(
-        evt, evt->evtArguments[4], PTR(ttyd::msgdrv::msgSearch(
-            MoveManager::GetMoveData(g_MoveSelections[0])->name_msg)));
+    if (num_options > 0) {
+        evtSetValue(evt, evt->evtArguments[3], g_MoveSelections[0]);
+        evtSetValue(
+            evt, evt->evtArguments[4],
+            PTR(ttyd::msgdrv::msgSearch(
+                MoveManager::GetMoveData(g_MoveSelections[0])->name_msg)));
+    }
     
     return 2;
 }

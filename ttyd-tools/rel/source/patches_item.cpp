@@ -7,6 +7,7 @@
 #include "mod_state.h"
 #include "patch.h"
 #include "tot_generate_reward.h"
+#include "tot_state.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_database_common.h>
@@ -86,8 +87,14 @@ extern "C" {
     void BranchBackGetEmptyItemSlotsMax();
     
     int32_t getTotItemInventorySize() {
-        // TODO: Set max dynamically based on number of sack upgrades.
-        return 3;
+        switch (g_Mod->tot_state_.num_sack_upgrades) {
+            case 0:     return 6;
+            case 1:     return 8;
+            case 2:     return 10;
+            case 3:     return 13;
+            case 4:     return 16;
+            default:    return 20;
+        }
     }
 }
 
