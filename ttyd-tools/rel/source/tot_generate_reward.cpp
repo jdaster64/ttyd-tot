@@ -295,7 +295,7 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
             pouch.unallocated_bp += 5;
             return true;
         case REWARD_INV_UP:
-            ++infinite_pit::g_Mod->tot_state_.num_sack_upgrades;
+            ++infinite_pit::g_Mod->tot_state_.num_sack_upgrades_;
             return true;
         case REWARD_HP_UP_P: {
             for (int32_t i = 1; i <= 7; ++i) {

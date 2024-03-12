@@ -87,7 +87,7 @@ extern "C" {
     void BranchBackGetEmptyItemSlotsMax();
     
     int32_t getTotItemInventorySize() {
-        switch (g_Mod->tot_state_.num_sack_upgrades) {
+        switch (g_Mod->tot_state_.num_sack_upgrades_) {
             case 0:     return 6;
             case 1:     return 8;
             case 2:     return 10;
