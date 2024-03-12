@@ -2,11 +2,18 @@
 
 #include "tot_move_manager.h"
 
+#include <ttyd/evt_badgeshop.h>
+#include <ttyd/mario_pouch.h>
+#include <ttyd/mariost.h>
+#include <ttyd/npcdrv.h>
+
 #include <cstdint>
 
 namespace mod::tot {
+
+struct TotSaveSlot;
     
-class State {
+class StateManager {
 public:
     // State revision; will eventually be used for versioning.
     uint8_t     version_;
@@ -34,7 +41,8 @@ public:
     
     // RNG information.
     uint32_t    seed_;
-    int16_t     rng_states_[56];
+    uint16_t    rng_states_half_[32];
+    uint8_t     rng_states_byte_[48];
     
     // In-game and real-time timers.
     uint64_t    run_start_time_rta_;
@@ -56,10 +64,10 @@ public:
     // Saves various stats for current runs and all-time.
     uint8_t     play_stats_[1024];
     
-    // Loading / saving functions.
-    // bool LoadFromData(void* data);
-    // void LoadFromBackup();
-    // void SaveBackup();
+    // Loading / saving functions; copies all game data, not just ToT state.
+    // bool Load(TotSaveSlotData* save);
+    // void Save(TotSaveSlotData* save);
+    // TotSaveSlotData* GetBackupSave();
     
     // Initialize all settings to default.
     // void InitDefaultOptions();
@@ -80,17 +88,20 @@ public:
     
     // Gets menu information (raw strings, not msg keys) for a given option.
     // void GetOptionStrings(
-    //      int32_t option, char* name_buf, char* value_buf,
-    //      int32_t* cost, bool* unlocked, bool* default, bool* affects_seeding);
+    //      int32_t option, char* name_buf, char* value_buf, int32_t* cost,
+    //      bool* unlocked, bool* default, bool* affects_seeding) const;
     
     // Returns a string representing the current options encoded.
     // const char* GetEncodedOptions() const;
     
+    // Updates necessary fields for a new floor of the tower.
+    // By default, increments the floor by 1.
+    // void SetFloor(int32_t floor = -1);
+    
     // Functions for time-tracking...
     // void StartTimer();
     // void UpdateTimer();
-    // void SaveFloorSplits();
-    // void ToggleIGT(bool toggle);
+    void ToggleIGT(bool toggle);
     
     // Clear play stats, timers, etc. from current run.
     // void ClearRunStats();
@@ -100,8 +111,31 @@ public:
     // a valid enum value, returns a random value using ttyd::system::irand().
     // uint32_t Rand(uint32_t range, int32_t sequence = -1);
 };
+static_assert(sizeof(StateManager) == 0xc00);
 
-static_assert(sizeof(State) == 0xc00);
+// Format of save data used by Tower of Trials mod.
+struct TotSaveSlot {
+    uint16_t    flags;                  // 0x0
+    uint8_t     pad1[6];                // 0x2
+    
+    // Vanilla save data.
+    ttyd::mariost::MarioSt_Globals          global_data;        // 0x8
+    ttyd::mario_pouch::PouchData            pouch_data;         // 0x13e0
+    ttyd::npcdrv::FbatDatabaseNpcDeadInfo   npc_dead_info[64];  // 0x19b4
+    ttyd::evt_badgeshop::BadgeShopWork      badge_shop_work;    // 0x1eb4
+    // PiantaParlorWork, JohoyaWork excluded as they're unused.
+    
+    // Tower of Trials save data.
+    mod::tot::StateManager tot_state;   // 0x1fd8
+    
+    uint8_t     pad2[0x3ff0-0x2bd8];    // 0x2bd8
+    
+    char        version[4];             // 0x3ff0
+    int32_t     size;                   // 0x3ff4
+    uint32_t    checksum1;              // 0x3ff8
+    uint32_t    checksum2;              // 0x3ffc
+};
+static_assert(sizeof(TotSaveSlot) == 0x4000);
 
 // TODO: New RngSequence enum.
 

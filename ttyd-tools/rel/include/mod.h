@@ -21,7 +21,7 @@ public:
     // Holds state specific to the Infinite Pit mod.
     StateManager_v2 state_;
     // Holds state specific to the Tower of Trials mod.
-    tot::State tot_state_;
+    tot::StateManager tot_state_;
 };
 
 extern Mod* g_Mod;
