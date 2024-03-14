@@ -52,11 +52,11 @@ void ApplyFixedPatches() {
                 target->current_kind >= BattleUnitType::GOOMBELLA) {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
-                g_Mod->state_.ChangeOption(STAT_PLAYER_DAMAGE, damage);
+                g_Mod->inf_state_.ChangeOption(STAT_PLAYER_DAMAGE, damage);
             } else if (target->current_kind <= BattleUnitType::BONETAIL) {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
-                g_Mod->state_.ChangeOption(STAT_ENEMY_DAMAGE, damage);
+                g_Mod->inf_state_.ChangeOption(STAT_ENEMY_DAMAGE, damage);
             }
             // Run normal damage logic.
             g_BattleDamageDirect_trampoline(
@@ -69,8 +69,8 @@ void ApplyFixedPatches() {
             BattleWorkUnit* unit, BattleWeapon* weapon) {
             // Track FP / SP spent.
             const int32_t fp_cost = BtlUnit_GetWeaponCost(unit, weapon);
-            g_Mod->state_.ChangeOption(STAT_FP_SPENT, fp_cost);
-            g_Mod->state_.ChangeOption(STAT_SP_SPENT, weapon->base_sp_cost);
+            g_Mod->inf_state_.ChangeOption(STAT_FP_SPENT, fp_cost);
+            g_Mod->inf_state_.ChangeOption(STAT_SP_SPENT, weapon->base_sp_cost);
             // Run normal pay-weapon-cost logic.
             g_BtlUnit_PayWeaponCost_trampoline(unit, weapon);
         });
@@ -79,10 +79,10 @@ void ApplyFixedPatches() {
         ttyd::mario_pouch::pouchAddCoin, [](int16_t coins) {
             // Track coins gained / lost; if a reward floor, assume lost
             // coins were spent on badges / items from Charlieton.
-            if (coins < 0 && g_Mod->state_.floor_ % 10 == 9) {
-                g_Mod->state_.ChangeOption(STAT_COINS_SPENT, -coins);
+            if (coins < 0 && g_Mod->inf_state_.floor_ % 10 == 9) {
+                g_Mod->inf_state_.ChangeOption(STAT_COINS_SPENT, -coins);
             } else {
-                g_Mod->state_.ChangeOption(STAT_COINS_EARNED, coins);
+                g_Mod->inf_state_.ChangeOption(STAT_COINS_EARNED, coins);
             }
             // Run coin increment logic.
             return g_pouchAddCoin_trampoline(coins);
@@ -96,7 +96,7 @@ void ApplyFixedPatches() {
                 counter == &actRecordWork.mario_num_times_non_attack_items_used ||
                 counter == &actRecordWork.partner_num_times_attack_items_used ||
                 counter == &actRecordWork.partner_num_times_non_attack_items_used) {
-                g_Mod->state_.ChangeOption(STAT_ITEMS_USED);
+                g_Mod->inf_state_.ChangeOption(STAT_ITEMS_USED);
             }
             // Run act record counting logic.
             g_BtlActRec_AddCount_trampoline(counter); 

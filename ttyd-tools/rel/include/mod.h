@@ -18,10 +18,10 @@ public:
     // Code that runs drawing-related code every frame.
     void Draw();
     
-    // Holds state specific to the Infinite Pit mod.
-    StateManager_v2 state_;
     // Holds state specific to the Tower of Trials mod.
-    tot::StateManager tot_state_;
+    tot::StateManager state_;
+    // Holds state specific to the Infinite Pit mod.
+    infinite_pit::StateManager_v2 inf_state_;
 };
 
 extern Mod* g_Mod;

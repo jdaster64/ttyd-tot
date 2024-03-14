@@ -87,7 +87,7 @@ extern "C" {
     void BranchBackGetEmptyItemSlotsMax();
     
     int32_t getTotItemInventorySize() {
-        switch (g_Mod->tot_state_.num_sack_upgrades_) {
+        switch (g_Mod->state_.num_sack_upgrades_) {
             case 0:     return 6;
             case 1:     return 8;
             case 2:     return 10;
@@ -173,7 +173,7 @@ int32_t GetDrainRestoration(EvtEntry* evt, bool hp_drain) {
         } else {
             num_badges = unit->badges_equipped.fp_drain;
         }
-        if (g_Mod->state_.GetOptionNumericValue(OPT_64_STYLE_HP_FP_DRAIN)) {
+        if (g_Mod->inf_state_.GetOptionNumericValue(OPT_64_STYLE_HP_FP_DRAIN)) {
             // 1 point per damaging hit x num badges, max of 5.
             drain = unit->total_damage_dealt_this_attack * num_badges;
             if (drain > 5) drain = 5;
@@ -560,13 +560,13 @@ void ApplyFixedPatches() {
         ttyd::mario_pouch::pouchGetItem, [](int32_t item_type) {
             // Track coins gained.
             if (item_type == ItemType::COIN) {
-                g_Mod->state_.ChangeOption(STAT_COINS_EARNED);
+                g_Mod->inf_state_.ChangeOption(STAT_COINS_EARNED);
             }
             
             // If badge is a "P" badge and playing Mario-alone, also mark
             // off the relevant "P" badge in the badge log.
-            if (g_Mod->state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER)
-                && !g_Mod->state_.GetOptionNumericValue(OPT_FIRST_PARTNER)
+            if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER)
+                && !g_Mod->inf_state_.GetOptionNumericValue(OPT_FIRST_PARTNER)
                 && IsStackableMarioBadge(item_type)) {
                 ttyd::swdrv::swSet(0x81 + item_type - ItemType::POWER_JUMP);
             }

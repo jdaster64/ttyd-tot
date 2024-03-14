@@ -582,7 +582,7 @@ void SelectEnemies(int32_t floor) {
     /*
     
     const auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-    auto& state = mod::infinite_pit::g_Mod->state_;
+    auto& state = mod::infinite_pit::g_Mod->inf_state_;
     
     // If floor > 50, determine whether to use one of the preset loadouts.
     if (floor >= 50 && state.Rand(100, infinite_pit::RNG_ENEMY) < 10) {
@@ -767,7 +767,7 @@ void BuildBattle(
     
     // TODO: Return early for boss fights, if handling them elsewhere?
     
-    auto& state = mod::infinite_pit::g_Mod->state_;
+    auto& state = mod::infinite_pit::g_Mod->inf_state_;
     
     for (int32_t i = 0; i < 12; ++i) g_CustomAudienceWeights[i] = 2;
     // Make Toads slightly likelier since they're never boosted.
@@ -901,7 +901,7 @@ bool GetEnemyStats(
         // No stats to pull from; just use the original message.
         return false;
     }
-    const StateManager_v2& state = mod::infinite_pit::g_Mod->state_;
+    const StateManager_v2& state = mod::infinite_pit::g_Mod->inf_state_;
     const EnemyTypeInfo& ei = kEnemyInfo[unit_type];
     
     int32_t floor_group = state.floor_ / 10;

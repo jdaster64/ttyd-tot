@@ -140,7 +140,7 @@ static_assert(sizeof(DeclareStarPowerPatch) == 0x10);
 // Returns the max level of a move badge based on the number of copies equipped.
 int32_t MaxLevelForMoveBadges(int32_t badge_count) {
     int32_t max_level = badge_count;
-    switch (g_Mod->state_.GetOptionValue(OPT_BADGE_MOVE_LEVEL)) {
+    switch (g_Mod->inf_state_.GetOptionValue(OPT_BADGE_MOVE_LEVEL)) {
         case OPTVAL_BADGE_MOVE_1X: {
             break;
         }
@@ -262,7 +262,7 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
         
         // Handle switch partner cost, if enabled.
         int32_t switch_fp_cost =
-            g_Mod->state_.GetOptionValue(OPTNUM_SWITCH_PARTY_FP_COST);
+            g_Mod->inf_state_.GetOptionValue(OPTNUM_SWITCH_PARTY_FP_COST);
         if (strats[0].type == 0 && switch_fp_cost) {
             // Reduce switch partner cost by Flower Savers.
             switch_fp_cost -= unit->badges_equipped.flower_saver;
@@ -658,12 +658,12 @@ int8_t GetStrategyBadgeLevel(bool is_charge, bool is_mario) {
 }
 
 bool CanUnlockNextLevel(int32_t star_power) {
-    int32_t current_level = g_Mod->state_.GetStarPowerLevel(star_power);
+    int32_t current_level = g_Mod->inf_state_.GetStarPowerLevel(star_power);
     if (current_level == 3) return false;
     // Get the max SP the player would have without using any Shine Sprites.
     int32_t max_sp = 50;
     for (int32_t i = 0; i < 8; ++i) {
-        max_sp += g_Mod->state_.GetStarPowerLevel(i) * 50;
+        max_sp += g_Mod->inf_state_.GetStarPowerLevel(i) * 50;
     }
     // See if the next level of this star power could be affordable.
     int32_t required_sp = kSpCostLevels[star_power * 3 + current_level];

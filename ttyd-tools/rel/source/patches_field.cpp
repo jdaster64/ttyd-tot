@@ -655,13 +655,13 @@ EVT_END()
 
 // Returns the number of chest rewards to spawn based on the floor number.
 EVT_DEFINE_USER_FUNC(GetNumChestRewards) {
-    int32_t num_rewards = g_Mod->state_.GetOptionNumericValue(OPT_CHEST_REWARDS);
+    int32_t num_rewards = g_Mod->inf_state_.GetOptionNumericValue(OPT_CHEST_REWARDS);
     if (num_rewards > 0) {
         // Add a bonus reward for beating a boss (Atomic Boo or Bonetail).
-        if (g_Mod->state_.floor_ % 50 == 49) ++num_rewards;
+        if (g_Mod->inf_state_.floor_ % 50 == 49) ++num_rewards;
     } else {
         // Pick a number of rewards randomly from 1 ~ 7.
-        num_rewards = g_Mod->state_.Rand(7, RNG_CHEST) + 1;
+        num_rewards = g_Mod->inf_state_.Rand(7, RNG_CHEST) + 1;
     }
     evtSetValue(evt, evt->evtArguments[0], num_rewards);
     return 2;
@@ -675,7 +675,7 @@ EVT_DEFINE_USER_FUNC(GetChestReward) {
 
 // Fully heals the player's party.
 EVT_DEFINE_USER_FUNC(FullyHealParty) {
-    if (!g_Mod->state_.GetOptionNumericValue(OPT_DISABLE_CHEST_HEAL)) {
+    if (!g_Mod->inf_state_.GetOptionNumericValue(OPT_DISABLE_CHEST_HEAL)) {
         PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
         pouch.current_hp = pouch.max_hp;
         pouch.current_fp = pouch.max_fp;
@@ -701,8 +701,8 @@ EVT_DEFINE_USER_FUNC(CheckRewardClaimed) {
 EVT_DEFINE_USER_FUNC(CheckPromptSave) {
     evtSetValue(evt, evt->evtArguments[0], core::GetShouldPromptSave());
     if (core::GetShouldPromptSave()) {
-        g_Mod->state_.SaveCurrentTime();
-        g_Mod->state_.Save();
+        g_Mod->inf_state_.SaveCurrentTime();
+        g_Mod->inf_state_.Save();
         core::SetShouldPromptSave(false);
     }
     return 2;
@@ -711,7 +711,7 @@ EVT_DEFINE_USER_FUNC(CheckPromptSave) {
 // Increments the actual current Pit floor, and the corresponding GSW value.
 EVT_DEFINE_USER_FUNC(IncrementInfinitePitFloor) {
     int32_t inc = evtGetValue(evt, evt->evtArguments[0]);
-    int32_t actual_floor = g_Mod->state_.floor_ += inc;
+    int32_t actual_floor = g_Mod->inf_state_.floor_ += inc;
     // Update the floor number used by the game.
     // Floors 101+ are treated as looping 81-90 nine times + 91-100.
     int32_t gsw_floor = actual_floor;
@@ -720,7 +720,7 @@ EVT_DEFINE_USER_FUNC(IncrementInfinitePitFloor) {
         gsw_floor += ((actual_floor / 10) % 10 == 9) ? 90 : 80;
     }
     ttyd::swdrv::swByteSet(1321, gsw_floor);
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_STAGE_RANK_30_FLOORS)) {
+    if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_STAGE_RANK_30_FLOORS)) {
         // Set stage rank based on passing floors 30, 60, 90.
         int32_t rank = 0;
         if (actual_floor >= 90) {
@@ -734,12 +734,12 @@ EVT_DEFINE_USER_FUNC(IncrementInfinitePitFloor) {
     }
     if (inc > 1) {
         // If more than one floor incremented, a Mover must have been used.
-        g_Mod->state_.ChangeOption(STAT_MOVERS_USED, 1);
+        g_Mod->inf_state_.ChangeOption(STAT_MOVERS_USED, 1);
         // Track how many battles were skipped by taking a Mover.
         // Ignore the current floor, as well as a rest floor if one was passed.
         int32_t skipped_battles = inc - 1;
         if (actual_floor % 10 < inc) --skipped_battles;
-        g_Mod->state_.ChangeOption(STAT_BATTLES_SKIPPED, skipped_battles);
+        g_Mod->inf_state_.ChangeOption(STAT_BATTLES_SKIPPED, skipped_battles);
     }
     return 2;
 }
@@ -769,22 +769,22 @@ EVT_DEFINE_USER_FUNC(AddItemStarPower) {
         int32_t star_power_type =
             item == ItemType::MAGICAL_MAP ? 0 : item - ItemType::DIAMOND_STAR + 1;
         pouch.star_powers_obtained |= (1 << star_power_type);
-        g_Mod->state_.star_power_levels_ += (1 << (2 * star_power_type));
+        g_Mod->inf_state_.star_power_levels_ += (1 << (2 * star_power_type));
         
         // Check whether to show the Star Power level tutorial.
-        if (g_Mod->state_.GetStarPowerLevel(star_power_type) > 1 &&
-            !g_Mod->state_.GetOptionNumericValue(OPT_SEEN_MOVE_LEVEL_TUT)) {
+        if (g_Mod->inf_state_.GetStarPowerLevel(star_power_type) > 1 &&
+            !g_Mod->inf_state_.GetOptionNumericValue(OPT_SEEN_MOVE_LEVEL_TUT)) {
             evtSetValue(evt, evt->evtArguments[1], 1);
-            g_Mod->state_.SetOption(OPT_SEEN_MOVE_LEVEL_TUT, true);
+            g_Mod->inf_state_.SetOption(OPT_SEEN_MOVE_LEVEL_TUT, true);
         }
     }
     return 2;
 }
 
 EVT_DEFINE_USER_FUNC(CheckChetRippoSpawn) {
-    uint32_t floor = g_Mod->state_.floor_ + 1;
+    uint32_t floor = g_Mod->inf_state_.floor_ + 1;
     bool can_spawn = floor % 10 == 0 && floor % 100 != 0;
-    switch (g_Mod->state_.GetOptionValue(OPT_CHET_RIPPO_APPEARANCE)) {
+    switch (g_Mod->inf_state_.GetOptionValue(OPT_CHET_RIPPO_APPEARANCE)) {
         case OPTVAL_CHET_RIPPO_GUARANTEE: {
             break;
         }
@@ -793,7 +793,7 @@ EVT_DEFINE_USER_FUNC(CheckChetRippoSpawn) {
             // Pit, capping at 75% per reward floor.
             if (can_spawn) {
                 if (floor > 75) floor = 75;
-                can_spawn = g_Mod->state_.Rand(100, RNG_CHET_RIPPO) < floor;
+                can_spawn = g_Mod->inf_state_.Rand(100, RNG_CHET_RIPPO) < floor;
             }
             break;
         }
@@ -807,9 +807,9 @@ EVT_DEFINE_USER_FUNC(CheckMoverSpawn) {
     evtSetValue(evt, evt->evtArguments[0], false);
     
     // If Movers are disabled, they cannot spawn.
-    if (!g_Mod->state_.GetOptionNumericValue(OPT_MOVERS_ENABLED)) return 2;
+    if (!g_Mod->inf_state_.GetOptionNumericValue(OPT_MOVERS_ENABLED)) return 2;
     
-    uint32_t floor = g_Mod->state_.floor_ + 1;
+    uint32_t floor = g_Mod->inf_state_.floor_ + 1;
     // Cannot spawn on rest floors.
     if (floor % 10 == 0) return 2;
     // Cannot spawn < floor 30 (so you're forced to have a partner, if enabled).
@@ -826,9 +826,9 @@ EVT_DEFINE_USER_FUNC(CheckMoverSpawn) {
     // TTYD, without allowing them to appear in quick succession if skipped.
     
     // Failed the RNG check for this floor.
-    if (g_Mod->state_.Rand(100, RNG_MOVER) >= 10) return 2;
+    if (g_Mod->inf_state_.Rand(100, RNG_MOVER) >= 10) return 2;
     for (int32_t i = 0; i < 5; ++i) {
-        if (g_Mod->state_.Rand(100, RNG_MOVER) < 10) {
+        if (g_Mod->inf_state_.Rand(100, RNG_MOVER) < 10) {
             // Passed the RNG check for a recent prior floor.
             return 2;
         }
@@ -836,14 +836,14 @@ EVT_DEFINE_USER_FUNC(CheckMoverSpawn) {
 
     // A Mover should spawn; mark one battle skipped automatically (this floor).
     evtSetValue(evt, evt->evtArguments[0], true);
-    g_Mod->state_.ChangeOption(STAT_BATTLES_SKIPPED, 1);
+    g_Mod->inf_state_.ChangeOption(STAT_BATTLES_SKIPPED, 1);
     return 2;
 }
 
 // Returns whether any stat upgrades can be sold.
 EVT_DEFINE_USER_FUNC(CheckAnyStatsDowngradeable) {
     bool can_downgrade = ttyd::mario_pouch::pouchGetPtr()->level > 1 &&
-        !g_Mod->state_.GetOptionNumericValue(OPT_NO_EXP_MODE);
+        !g_Mod->inf_state_.GetOptionNumericValue(OPT_NO_EXP_MODE);
     evtSetValue(evt, evt->evtArguments[0], can_downgrade);
     return 2;
 }
@@ -899,9 +899,9 @@ EVT_DEFINE_USER_FUNC(DowngradeStat) {
 // Tracks item / badge / level sold actions in play stats.
 EVT_DEFINE_USER_FUNC(TrackChetRippoSellActionType) {
     switch (evtGetValue(evt, evt->evtArguments[0])) {
-        case 0:     g_Mod->state_.ChangeOption(STAT_ITEMS_SOLD);    break;
-        case 1:     g_Mod->state_.ChangeOption(STAT_BADGES_SOLD);   break;
-        case 2:     g_Mod->state_.ChangeOption(STAT_LEVELS_SOLD);   break;
+        case 0:     g_Mod->inf_state_.ChangeOption(STAT_ITEMS_SOLD);    break;
+        case 1:     g_Mod->inf_state_.ChangeOption(STAT_BADGES_SOLD);   break;
+        case 2:     g_Mod->inf_state_.ChangeOption(STAT_LEVELS_SOLD);   break;
     }
     return 2;
 }
@@ -933,7 +933,7 @@ const char* GetFloorMapName(int32_t floor) {
 
 // Gets the coin cost, floors skipped, and warp destination for a Mover option.
 EVT_DEFINE_USER_FUNC(GetMoverSelectionParams) {
-    int32_t floor = g_Mod->state_.floor_ + 1;
+    int32_t floor = g_Mod->inf_state_.floor_ + 1;
     int32_t cost = (floor > 90 ? 90 : floor) / 10 + 1;
     int32_t floors_to_increment = 0;
     
@@ -985,7 +985,7 @@ EVT_DEFINE_USER_FUNC(UpdateExitDestinationImpl)  {
         reinterpret_cast<const char*>(evtGetValue(evt, evt->evtArguments[0]));
         
     // Get the correct map name for the next floor number.
-    int32_t floor = g_Mod->state_.floor_ + 1;
+    int32_t floor = g_Mod->inf_state_.floor_ + 1;
     const char* next_map = GetFloorMapName(floor + 1);
     
     // Update the destination of the exit loading zone to match the floor.
@@ -1051,7 +1051,7 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
     const uint32_t module_start = reinterpret_cast<uint32_t>(module_ptr);
     
     // Reset RNG states that reset every floor.
-    StateManager_v2& state = g_Mod->state_;
+    StateManager_v2& state = g_Mod->inf_state_;
     state.rng_sequences_[RNG_CHEST] = 0;
     state.rng_sequences_[RNG_ENEMY] = 0;
     state.rng_sequences_[RNG_ITEM] = 0;

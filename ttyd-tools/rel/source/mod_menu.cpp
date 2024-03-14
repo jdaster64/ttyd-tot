@@ -58,7 +58,7 @@ bool ShouldDisplayMenu() {
 
 bool ShouldControlMenu() {
     return ShouldDisplayMenu() && !strcmp(GetNextMap(), kStartRoomName) &&
-           !g_Mod->state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN);
+           !g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN);
 }
 
 bool ShouldTickOrAutotick(int32_t time_held) {
@@ -160,7 +160,7 @@ void MenuManager::Update() {
     }
     
     // If race mode is enabled, prevent input and force-close menu.
-    if (g_Mod->state_.GetOptionNumericValue(OPT_RACE_MODE)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
         if (time_button_held_ < kFadeoutStartTime) {
             time_button_held_ = kFadeoutStartTime;
         }
@@ -205,7 +205,7 @@ void MenuManager::Update() {
     }
         
     menu_state_ = GetMenuState(menu_page_, menu_selection_);
-    StateManager_v2& state = g_Mod->state_;
+    StateManager_v2& state = g_Mod->inf_state_;
     
     if (time_button_held_ < 0) return;
     switch (last_command_) {
@@ -264,7 +264,7 @@ void MenuManager::Draw() {
                      / (kFadeinTextEndTime - kFadeinTextStartTime);
         if (alpha > 0xff) alpha = 0xff;
         
-        if (g_Mod->state_.GetOptionNumericValue(OPT_RACE_MODE)) {
+        if (g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
             DrawText(
                 "Glitz Pit community race settings activated.\n"
                 "Options can no longer be changed.",
@@ -306,7 +306,7 @@ void MenuManager::Draw() {
     uint32_t color;
     bool is_default, affects_seeding;
     
-    const StateManager_v2& state = g_Mod->state_;
+    const StateManager_v2& state = g_Mod->inf_state_;
     
     for (int32_t selection = 1; selection < kOptionsPerPage; ++selection) {
         // Get text strings / info and color for current option.

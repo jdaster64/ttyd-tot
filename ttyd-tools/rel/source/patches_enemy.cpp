@@ -138,7 +138,7 @@ int32_t AlterDamageCalculation(
     
     // Randomize damage dealt, if option enabled.
     const int32_t damage_scale =
-        g_Mod->state_.GetOptionNumericValue(OPT_RANDOM_DAMAGE);
+        g_Mod->inf_state_.GetOptionNumericValue(OPT_RANDOM_DAMAGE);
     if (damage_scale != 0) {
         // Generate a number from -25 to 25 in increments of 5.
         int32_t scale = (ttyd::system::irand(11) - 5) * 5;
@@ -178,7 +178,7 @@ int32_t AlterFpDamageCalculation(
     
     // Randomize damage dealt, if option enabled.
     const int32_t damage_scale =
-        g_Mod->state_.GetOptionNumericValue(OPT_RANDOM_DAMAGE);
+        g_Mod->inf_state_.GetOptionNumericValue(OPT_RANDOM_DAMAGE);
     if (damage_scale != 0) {
         // Generate a number from -25 to 25 in increments of 5.
         int32_t scale = (ttyd::system::irand(11) - 5) * 5;

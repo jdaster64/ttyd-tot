@@ -185,7 +185,7 @@ void CheckBattleCondition() {
     NpcBattleInfo* npc_info = fbat_info->wBattleInfo;
 
     // Track the number of turns spent / number of run aways at fight's end.
-    StateManager_v2& state = g_Mod->state_;
+    StateManager_v2& state = g_Mod->inf_state_;
     state.ChangeOption(
         STAT_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
     state.ChangeOption(
@@ -212,7 +212,7 @@ void CheckBattleCondition() {
     // If condition is a success and rule is not 0, add a bonus item.
     if (fbat_info->wBtlActRecCondition && fbat_info->wRuleKeepResult == 6) {
         int32_t item_reward = 0;
-        if (g_Mod->state_.CheckOptionValue(OPTVAL_DROP_HELD_FROM_BONUS)) {
+        if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_DROP_HELD_FROM_BONUS)) {
             // If using "drop gated by bonus" option, use the held item that
             // would otherwise normally drop instead of the random item.
             // (If that item was stolen, the player receives nothing.)
@@ -233,7 +233,7 @@ void CheckBattleCondition() {
     
     // If battle reward mode is "drop all held", award items other than the
     // natural drop ones until there are no "recovered items" slots left.
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_DROP_ALL_HELD)) {
+    if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_DROP_ALL_HELD)) {
         for (int32_t i = 0; i < 8; ++i) {
             const int32_t held_item = npc_info->wHeldItems[i];
             // If there is a held item, and this isn't the natural drop...
@@ -250,8 +250,8 @@ void CheckBattleCondition() {
     
     // If playing with the "no partners" option, give the player the Tattle logs 
     // for all enemies present at the start of the fight.
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER) &&
-        !g_Mod->state_.GetOptionNumericValue(OPT_FIRST_PARTNER)) {
+    if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER) &&
+        !g_Mod->inf_state_.GetOptionNumericValue(OPT_FIRST_PARTNER)) {
         const auto* group = npc_info->pConfiguration;
         for (int32_t i = 0; i < group->num_enemies; ++i) {
             int32_t type = group->enemy_data[i].unit_kind_params->unit_type;
@@ -323,7 +323,7 @@ void GetDropMaterials(FbatBattleInformation* fbat_info) {
         }
     }
     
-    switch (g_Mod->state_.GetOptionValue(OPT_BATTLE_REWARD_MODE)) {
+    switch (g_Mod->inf_state_.GetOptionValue(OPT_BATTLE_REWARD_MODE)) {
         // If using default battle drop behavior, select the item drop based on
         // the previously determined enemy held item index.
         case OPTVAL_DROP_STANDARD:

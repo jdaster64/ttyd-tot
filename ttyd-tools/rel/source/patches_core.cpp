@@ -83,8 +83,6 @@ namespace {
 
 // Global variables.
 uintptr_t   g_PitModulePtr = 0;
-// char        g_LastModuleLoaded[16] = {0};
-// bool        g_WaitingForCustomLoad = false;
 bool        g_PromptSave = false;
 bool        g_CueGameOver = false;
 
@@ -100,7 +98,7 @@ void OnModuleLoaded(OSModuleInfo* module) {
     if (module_id == ModuleId::JON) g_PitModulePtr = module_ptr;
     
     // Regardless of module loaded, reset Merlee curses if enabled.
-    if (g_Mod->state_.GetOptionNumericValue(OPT_MERLEE_CURSE)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_MERLEE_CURSE)) {
         PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
         // If the player somehow managed to run out of curses, reset completely.
         if (pouch.merlee_curse_uses_remaining < 1) {
@@ -139,8 +137,8 @@ void OnFileLoad(bool new_file = true) {
         ttyd::swdrv::swSet(0x15d9);         // Star piece in Pit room collected
         
         // Initializes the mod's state and copies it to the pouch.
-        g_Mod->state_.Load(/* new_save = */ true);
-        g_Mod->state_.Save();
+        g_Mod->inf_state_.Load(/* new_save = */ true);
+        g_Mod->inf_state_.Save();
         
         // Update any stats / equipment / flags as necessary.
         ttyd::mario_pouch::pouchGetItem(ItemType::BOOTS);
@@ -149,7 +147,7 @@ void OnFileLoad(bool new_file = true) {
         ttyd::mario_pouch::pouchGetItem(ItemType::W_EMBLEM);
         ttyd::mario_pouch::pouchGetItem(ItemType::L_EMBLEM);
         // Start with FX badges equipped if option is set.
-        if (g_Mod->state_.GetOptionNumericValue(OPT_START_WITH_FX)) {
+        if (g_Mod->inf_state_.GetOptionNumericValue(OPT_START_WITH_FX)) {
             ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_P);
             ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_G);
             ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_B);
@@ -171,7 +169,7 @@ void OnFileLoad(bool new_file = true) {
         pouch.unallocated_bp = 5;
         ttyd::mario_pouch::pouchReviseMarioParam();
         // Assign Yoshi a totally random color.
-        ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));
+        ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->inf_state_.Rand(7));
         
         // Give a small default amount of audience.
         pouch.audience_level = 5.0f;
@@ -182,8 +180,8 @@ void OnFileLoad(bool new_file = true) {
     g_PromptSave = false;
     
     // If previous file loaded had obfuscated items, turn off and wipe flag.
-    if (g_Mod->state_.GetOptionNumericValue(OPT_OBFUSCATE_ITEMS)) {
-        g_Mod->state_.SetOption(OPT_OBFUSCATE_ITEMS, 0);
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_OBFUSCATE_ITEMS)) {
+        g_Mod->inf_state_.SetOption(OPT_OBFUSCATE_ITEMS, 0);
         ObfuscateItems(false);
     }
 }
@@ -203,7 +201,7 @@ void ApplyFixedPatches() {
             g_cardCopy2Main_trampoline(save_file_number);
             OnFileLoad(/* new_file = */ false);
             // If invalid Infinite Pit file loaded, give the player a Game Over.
-            if (!g_Mod->state_.Load(/* new_save = */ false)) {
+            if (!g_Mod->inf_state_.Load(/* new_save = */ false)) {
                 g_CueGameOver = true;
             }
             options::ApplySettingBasedPatches();
@@ -231,8 +229,8 @@ void ApplyFixedPatches() {
                 beroName = 0;
                 g_CueGameOver = false;
                 // Reset RTA timer variables so they don't carry across files.
-                g_Mod->state_.pit_start_time_ = 0;
-                g_Mod->state_.last_save_time_ = 0;
+                g_Mod->inf_state_.pit_start_time_ = 0;
+                g_Mod->inf_state_.last_save_time_ = 0;
             } else if (
                 seq == SeqIndex::kMapChange && !strcmp(mapName, "aaa_00") && 
                 !strcmp(beroName, "prologue")) {
@@ -255,7 +253,7 @@ void ApplyFixedPatches() {
         ttyd::pmario_sound::psndBGMOn_f_d, [](
             uint32_t unk0, const char* name, uint32_t fadein_time,
             uint16_t unk1) {
-            if (g_Mod->state_.GetOptionNumericValue(OPT_BGM_DISABLED)) {
+            if (g_Mod->inf_state_.GetOptionNumericValue(OPT_BGM_DISABLED)) {
                 return 0U;
             }
             return g_psndBGMOn_f_d_trampoline(unk0, name, fadein_time, unk1);
@@ -339,13 +337,6 @@ int32_t LoadMap() {
         ttyd::seq_mapchange::_load(
             mario_st->currentMapName, ttyd::seq_mapchange::NextMap,
             ttyd::seq_mapchange::NextBero);
-
-        // TODO: Move this logic into the gon init evt.
-        // if (g_PitModulePtr) {
-            // SelectEnemies(g_Mod->state_.floor_);
-        // }
-        // g_WaitingForCustomLoad = false;
-        // strcpy(g_LastModuleLoaded, area);
         
         reinterpret_cast<void(*)(void)>(mario_st->pRelFileBase->prolog)();
         return 2;

@@ -70,7 +70,7 @@ bool LoadFromPreviousVersion(StateManager_v2* state) {
     InitPartyMaxHpTable(state->partner_upgrades_);
     
     // Reset item obfuscation RNG position in case it needs to be performed.
-    g_Mod->state_.rng_sequences_[RNG_ITEM_OBFUSCATION] = 0;
+    g_Mod->inf_state_.rng_sequences_[RNG_ITEM_OBFUSCATION] = 0;
     
     // Set "has started" flag if loading into an already-in-progress file.
     if (state->floor_ > 0) {
@@ -876,7 +876,7 @@ const char* StateManager_v2::GetCurrentTimeString() {
     // is negative (implying the time was rolled back), or time was never set,
     // return the empty string and clear the timebases previously set.
     if (last_save_diff < 0 || !pit_start_time_ ||
-        g_Mod->state_.GetOptionNumericValue(OPT_DEBUG_MODE_USED)) {
+        g_Mod->inf_state_.GetOptionNumericValue(OPT_DEBUG_MODE_USED)) {
         pit_start_time_ = 0;
         last_save_time_ = 0;
         return "";

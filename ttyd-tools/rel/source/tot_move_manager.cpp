@@ -106,8 +106,8 @@ void MoveManager::Init() {
     // Set unlocked levels of moves.
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
         int32_t default_level = g_MoveData[i].move_tier == 0 ? 1 : 0;
-        g_Mod->tot_state_.level_unlocked_[i] = default_level;
-        g_Mod->tot_state_.level_selected_[i] = default_level;
+        g_Mod->state_.level_unlocked_[i] = default_level;
+        g_Mod->state_.level_selected_[i] = default_level;
     }
     // Set Mario pouch stuff.
     auto& pouch = *::ttyd::mario_pouch::pouchGetPtr();
@@ -122,49 +122,49 @@ const MoveData* MoveManager::GetMoveData(int32_t starting_move) {
 }
 
 int32_t MoveManager::GetUnlockedLevel(int32_t move_type) {
-    return g_Mod->tot_state_.level_unlocked_[move_type];
+    return g_Mod->state_.level_unlocked_[move_type];
 }
 
 int32_t MoveManager::GetSelectedLevel(int32_t move_type) {
-    return g_Mod->tot_state_.level_selected_[move_type];
+    return g_Mod->state_.level_selected_[move_type];
 }
 
 int32_t MoveManager::GetMoveCost(int32_t move_type) {
     return g_MoveData[move_type].move_cost[
-        g_Mod->tot_state_.level_selected_[move_type]-1];
+        g_Mod->state_.level_selected_[move_type]-1];
 }
 
 bool MoveManager::ChangeSelectedLevel(int32_t move_type, int32_t change) {
-    int32_t old_level = g_Mod->tot_state_.level_selected_[move_type];
-    int32_t max_level = g_Mod->tot_state_.level_unlocked_[move_type];
+    int32_t old_level = g_Mod->state_.level_selected_[move_type];
+    int32_t max_level = g_Mod->state_.level_unlocked_[move_type];
     int32_t new_level = old_level + change;
     
     if (new_level < 1) new_level = 1;
     if (new_level > max_level) new_level = max_level;
     
-    g_Mod->tot_state_.level_selected_[move_type] = new_level;
+    g_Mod->state_.level_selected_[move_type] = new_level;
     return new_level != old_level;
 }
 
 void MoveManager::ResetSelectedLevels() {
     // Set all unlocked moves' selected level to 1.
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
-        if (g_Mod->tot_state_.level_unlocked_[i])
-            g_Mod->tot_state_.level_selected_[i] = 1;
+        if (g_Mod->state_.level_unlocked_[i])
+            g_Mod->state_.level_selected_[i] = 1;
     }
 }
 
 bool MoveManager::IsUnlockable(int32_t move_type) {
-    if (g_Mod->tot_state_.level_unlocked_[move_type] != 0) return false;
+    if (g_Mod->state_.level_unlocked_[move_type] != 0) return false;
     // Spring Jump / Ultra Hammer require unlocking Spin/Super as precursor.
     if (g_MoveData[move_type].move_tier == 4 &&
-        g_Mod->tot_state_.level_unlocked_[move_type - 1] == 0) return false;
+        g_Mod->state_.level_unlocked_[move_type - 1] == 0) return false;
     return true;
 }
 
 bool MoveManager::IsUpgradable(int32_t move_type) {
-    if (g_Mod->tot_state_.level_unlocked_[move_type] == 0 ||
-        g_Mod->tot_state_.level_unlocked_[move_type] >= 
+    if (g_Mod->state_.level_unlocked_[move_type] == 0 ||
+        g_Mod->state_.level_unlocked_[move_type] >= 
         g_MoveData[move_type].max_level) return false;
     if (g_MoveData[move_type].partner_id > 0 &&
         !(ttyd::mario_pouch::pouchGetPtr()->party_data[
@@ -236,7 +236,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMoveSelectedLevel) {
 
 EVT_DEFINE_USER_FUNC(evtTot_UpgradeMove) {
     int32_t move = evtGetValue(evt, evt->evtArguments[0]);
-    auto& level = g_Mod->tot_state_.level_unlocked_[move];
+    auto& level = g_Mod->state_.level_unlocked_[move];
     if (++level == 1) {
         auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
         switch (move) {

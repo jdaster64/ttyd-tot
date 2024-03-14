@@ -361,8 +361,8 @@ void DisplayTattleStats(
         (ttyd::swdrv::swGet(0x117a + unit->true_kind) ||
         ttyd::swdrv::swGet(0x117a + unit->current_kind));
     // If cheat is enabled, force it to be on. (TODO: toggle on/off with Z?)
-    if (g_Mod->state_.GetOptionNumericValue(OPT_SHOW_ATK_DEF) ||
-        g_Mod->state_.GetOptionNumericValue(OPT_RACE_MODE)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_SHOW_ATK_DEF) ||
+        g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
         show_atk_def = true;
     }
     // Hide ATK / DEF outside player action phase (or if hidden for this floor).
@@ -408,7 +408,7 @@ void RefreshExtraTattleStats() {
 
 EVT_DEFINE_USER_FUNC(InitializePartyMember) {
     const int32_t starting_rank =
-        g_Mod->state_.GetOptionNumericValue(OPT_PARTNER_RANK);
+        g_Mod->inf_state_.GetOptionNumericValue(OPT_PARTNER_RANK);
     const int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
     const int16_t starting_hp =
         ttyd::mario_pouch::_party_max_hp_table[idx * 4 + starting_rank];

@@ -83,7 +83,7 @@ void DebugManager::Update() {
     const uint32_t button_trg = GetPressedButtons();
     
     // Continuously set the "used debug mode" flag on if in use.
-    g_Mod->state_.SetOption(OPT_DEBUG_MODE_USED, 1);
+    g_Mod->inf_state_.SetOption(OPT_DEBUG_MODE_USED, 1);
     
     if (g_DebugMode == DEBUG_MAIN) {
         if (button_trg & (ButtonId::DPAD_UP | ButtonId::DPAD_RIGHT)) {
@@ -103,7 +103,7 @@ void DebugManager::Update() {
                 case DEBUG_FLOOR: {
                     // Go to submenu on next frame.
                     g_DebugMode = g_CursorPos;
-                    g_CursorPos = g_Mod->state_.floor_;
+                    g_CursorPos = g_Mod->inf_state_.floor_;
                     return;
                 }
                 case DEBUG_UNLOCK_SPECIAL_MOVES: {
@@ -111,7 +111,7 @@ void DebugManager::Update() {
                     pouch.star_powers_obtained = 0xff;
                     pouch.max_sp = 1000;
                     pouch.current_sp = 1000;
-                    g_Mod->state_.star_power_levels_ = 0xffff;
+                    g_Mod->inf_state_.star_power_levels_ = 0xffff;
                     break;
                 }
                 case DEBUG_UNLOCK_TATTLE_LOG: {
@@ -210,7 +210,7 @@ void DebugManager::Update() {
         } else if (button_trg & (ButtonId::DPAD_DOWN | ButtonId::DPAD_LEFT)) {
             dir = -1;       
         } else if (button_trg & ButtonId::Y) {
-            g_Mod->state_.floor_ = g_CursorPos;
+            g_Mod->inf_state_.floor_ = g_CursorPos;
             field::UpdateExitDestination();
             g_DebugMode = DEBUG_OFF;
             return;

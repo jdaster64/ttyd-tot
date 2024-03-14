@@ -295,7 +295,7 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
             pouch.unallocated_bp += 5;
             return true;
         case REWARD_INV_UP:
-            ++infinite_pit::g_Mod->tot_state_.num_sack_upgrades_;
+            ++infinite_pit::g_Mod->state_.num_sack_upgrades_;
             return true;
         case REWARD_HP_UP_P: {
             for (int32_t i = 1; i <= 7; ++i) {
@@ -353,7 +353,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
         g_Chests[i].home_pos = positions[i];
         
         int32_t rand_val =
-            infinite_pit::g_Mod->state_.Rand(sizeof(kRewardTypes) / sizeof(int32_t));
+            infinite_pit::g_Mod->inf_state_.Rand(sizeof(kRewardTypes) / sizeof(int32_t));
         g_Chests[i].item = kRewardTypes[rand_val];
         g_Chests[i].pickup_script = (void*)kRewardScripts[rand_val];
     }

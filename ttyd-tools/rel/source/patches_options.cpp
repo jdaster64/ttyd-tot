@@ -151,7 +151,7 @@ void ApplyFixedPatches() {
             
             // Get the percentage to scale original chances by.
             int32_t scale = 100;
-            switch (g_Mod->state_.GetOptionValue(OPT_STAGE_HAZARDS)) {
+            switch (g_Mod->inf_state_.GetOptionValue(OPT_STAGE_HAZARDS)) {
                 case OPTVAL_STAGE_HAZARDS_HIGH: {
                     scale = 250;
                     break;
@@ -209,7 +209,7 @@ void ApplyFixedPatches() {
     g_BattleAudienceSetThrowItemMax_trampoline = mod::patch::hookFunction(
         ttyd::battle_audience::BattleAudienceSetThrowItemMax, [](){
             g_BattleAudienceSetThrowItemMax_trampoline();
-            if (g_Mod->state_.GetOptionNumericValue(
+            if (g_Mod->inf_state_.GetOptionNumericValue(
                 OPT_AUDIENCE_RANDOM_THROWS)) {
                 // Always set 'max thrown items' value to 1.
                 uintptr_t audience_work_base =
@@ -223,7 +223,7 @@ void ApplyFixedPatches() {
     g_pouchReviseMarioParam_trampoline = mod::patch::hookFunction(
         ttyd::mario_pouch::pouchReviseMarioParam, [](){
             g_pouchReviseMarioParam_trampoline();
-            if (g_Mod->state_.CheckOptionValue(OPTVAL_NO_EXP_MODE_INFINITE) &&
+            if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_NO_EXP_MODE_INFINITE) &&
                 !strcmp(GetCurrentArea(), "jon")) {
                 ttyd::mario_pouch::pouchGetPtr()->unallocated_bp = 99;
             }
@@ -324,7 +324,7 @@ void ApplyFixedPatches() {
 void ApplySettingBasedPatches() {
     // Change stage rank-up levels (set to 100 to force no rank-up on level-up).
     auto* rankup_data = ttyd::battle_seq_end::_rank_up_data;
-    switch (g_Mod->state_.GetOptionValue(OPT_STAGE_RANK)) {
+    switch (g_Mod->inf_state_.GetOptionValue(OPT_STAGE_RANK)) {
         case OPTVAL_STAGE_RANK_30_FLOORS:
         case OPTVAL_STAGE_RANK_ALWAYSMAX: {
             rankup_data[1].level = 100;
@@ -335,7 +335,7 @@ void ApplySettingBasedPatches() {
     }
     
     // Increase some move badge BP costs if playing with larger max move levels.
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_BADGE_MOVE_1X)) {
+    if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_BADGE_MOVE_1X)) {
         itemDataTable[ItemType::POWER_JUMP].bp_cost = 1;
         itemDataTable[ItemType::POWER_SMASH].bp_cost = 1;
         itemDataTable[ItemType::MULTIBOUNCE].bp_cost = 1;
@@ -354,7 +354,7 @@ void ApplySettingBasedPatches() {
     }
     
     // Increase badge BP cost and shop prices if HP/FP Drains heal per hit.
-    if (g_Mod->state_.GetOptionNumericValue(OPT_64_STYLE_HP_FP_DRAIN)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_64_STYLE_HP_FP_DRAIN)) {
         itemDataTable[ItemType::HP_DRAIN].bp_cost = 3;
         itemDataTable[ItemType::HP_DRAIN_P].bp_cost = 3;
         itemDataTable[ItemType::FP_DRAIN].bp_cost = 6;
@@ -376,14 +376,14 @@ void ApplySettingBasedPatches() {
         itemDataTable[ItemType::FP_DRAIN_P].buy_price = 125;
     }
     
-    if (g_Mod->state_.GetOptionNumericValue(OPT_OBFUSCATE_ITEMS)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_OBFUSCATE_ITEMS)) {
         ObfuscateItems(true);
     }
 }
 
 void SpendFpOnSwitchingPartner(ttyd::battle_unit::BattleWorkUnit* unit) {
     int32_t switch_fp_cost =
-        g_Mod->state_.GetOptionValue(OPTNUM_SWITCH_PARTY_FP_COST);
+        g_Mod->inf_state_.GetOptionValue(OPTNUM_SWITCH_PARTY_FP_COST);
     if (switch_fp_cost > 0) {
         switch_fp_cost -= unit->badges_equipped.flower_saver;
         if (switch_fp_cost < 1) switch_fp_cost = 1;
@@ -398,7 +398,7 @@ void SpendFpOnSwitchingPartner(ttyd::battle_unit::BattleWorkUnit* unit) {
 }
 
 int32_t GetPinchThresholdForMaxHp(int32_t max_hp, bool peril) {
-    if (g_Mod->state_.GetOptionNumericValue(OPT_PERCENT_BASED_DANGER)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_PERCENT_BASED_DANGER)) {
         // Danger = 1/3 of max, Peril = 1/10 of max (rounded normally).
         int32_t threshold = peril ? (max_hp + 5) / 10 : (max_hp + 1) / 3;
         // Clamp to range [1, 99] to ensure the pinch range exists,
@@ -421,11 +421,11 @@ void SetPinchThreshold(BattleUnitKind* kind, int32_t max_hp, bool peril) {
 }
 
 int32_t GetRandomAudienceItem(int32_t item_type) {
-    if (g_Mod->state_.GetOptionNumericValue(OPT_AUDIENCE_RANDOM_THROWS)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_AUDIENCE_RANDOM_THROWS)) {
         item_type = PickRandomItem(RNG_AUDIENCE_ITEM, 20, 10, 5, 15);
         if (item_type <= 0) {
             // Pick a coin, heart, flower, or random bad item if "none" selected.
-            switch (g_Mod->state_.Rand(10, RNG_AUDIENCE_ITEM)) {
+            switch (g_Mod->inf_state_.Rand(10, RNG_AUDIENCE_ITEM)) {
                 case 0:  return ItemType::AUDIENCE_CAN;
                 case 1:  return ItemType::AUDIENCE_ROCK;
                 case 2:  return ItemType::AUDIENCE_BONE;

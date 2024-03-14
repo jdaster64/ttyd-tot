@@ -420,7 +420,7 @@ uint32_t StatusEffectTick(BattleWorkUnit* unit, int8_t status_type) {
 
 // Handles Lucky chance from evasion badges.
 bool CheckEvasionBadges(BattleWorkUnit* unit) {
-    if (g_Mod->state_.GetOptionNumericValue(OPT_EVASION_BADGES_CAP)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_EVASION_BADGES_CAP)) {
         float hit_chance = 100.f;
         for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
             hit_chance *= 0.90f;
@@ -562,7 +562,7 @@ int32_t CalculateBaseDamage(
         atk += attacker->badges_equipped.p_up_d_down;
         
         const bool weaker_rush_badges =
-            g_Mod->state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES);
+            g_Mod->inf_state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES);
         
         if (attacker->current_hp <= attacker->unit_kind_params->danger_hp) {
             const int32_t power = weaker_rush_badges ? 1 : 2;
@@ -746,13 +746,13 @@ void ApplyFixedPatches() {
         [](BattleWorkUnit* unit, BattleWeapon* weapon) {
             // Run normal logic if option turned off.
             const int32_t sp_cost =
-                g_Mod->state_.GetOptionValue(OPTNUM_SUPERGUARD_SP_COST);
+                g_Mod->inf_state_.GetOptionValue(OPTNUM_SUPERGUARD_SP_COST);
             if (sp_cost <= 0) {
                 const int32_t defense_result =
                     g_BattleActionCommandCheckDefence_trampoline(unit, weapon);
                 if (defense_result == 5) {
                     // Successful Superguard, track in play stats.
-                    g_Mod->state_.ChangeOption(STAT_SUPERGUARDS);
+                    g_Mod->inf_state_.ChangeOption(STAT_SUPERGUARDS);
                 }
                 return defense_result;
             }
@@ -772,7 +772,7 @@ void ApplyFixedPatches() {
             if (defense_result == 5) {
                 // Successful Superguard, subtract SP and track in play stats.
                 ttyd::mario_pouch::pouchAddAP(-sp_cost);
-                g_Mod->state_.ChangeOption(STAT_SUPERGUARDS);
+                g_Mod->inf_state_.ChangeOption(STAT_SUPERGUARDS);
             }
             if (restore_superguard_frames) {
                 memcpy(ttyd::battle_ac::superguard_frames, superguard_frames, 7);
@@ -898,8 +898,8 @@ void SetTargetAudienceAmount() {
     float target_amount = 200.0f;
     // If set to rank up by progression, make the target audience follow suit;
     // otherwise, keep the target fixed at max capacity.
-    if (g_Mod->state_.GetOptionValue(OPTVAL_STAGE_RANK_30_FLOORS)) {
-        const int32_t floor = g_Mod->state_.floor_;
+    if (g_Mod->inf_state_.GetOptionValue(OPTVAL_STAGE_RANK_30_FLOORS)) {
+        const int32_t floor = g_Mod->inf_state_.floor_;
         target_amount = floor >= 195 ? 200.0f : floor + 5.0f;
     }
     *reinterpret_cast<float*>(audience_work_base + 0x13778) = target_amount;
@@ -907,7 +907,7 @@ void SetTargetAudienceAmount() {
 
 double ApplySpRegenMultiplier(double base_regen) {
     return base_regen * 
-        g_Mod->state_.GetOptionNumericValue(OPTNUM_SP_REGEN_MODIFIER) / 20.0;
+        g_Mod->inf_state_.GetOptionNumericValue(OPTNUM_SP_REGEN_MODIFIER) / 20.0;
 }
 
 void ToggleScopedStatus(

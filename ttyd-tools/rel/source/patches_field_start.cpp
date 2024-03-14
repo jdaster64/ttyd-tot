@@ -82,7 +82,7 @@ EVT_END()
 
 EVT_DEFINE_USER_FUNC(CheckHasSaved) {
     if (g_ReadyForPitSaveWrite &&
-        !g_Mod->state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN)) {
+        !g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN)) {
         // If save already declined, return true.
         ttyd::evtmgr_cmd::evtSetValue(evt, evt->evtArguments[0], true);
     } else {
@@ -96,7 +96,7 @@ EVT_DEFINE_USER_FUNC(CheckHasSaved) {
 
 // Initializes all selected options on initially entering the Pit.
 EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
-    StateManager_v2& state = g_Mod->state_;
+    StateManager_v2& state = g_Mod->inf_state_;
     PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
     // Initialize number of upgrades per partner.
@@ -239,7 +239,7 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
     // player didn't choose to save.
     if (!state.GetOptionNumericValue(OPT_HAS_STARTED_RUN)) {
         state.SetOption(OPT_HAS_STARTED_RUN, true);
-        g_Mod->state_.SaveCurrentTime(/* pit_start = */ true);
+        g_Mod->inf_state_.SaveCurrentTime(/* pit_start = */ true);
     }
     
     // All other options are handled immediately on setting them,
@@ -249,7 +249,7 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
 
 // Increments the randomly selected Yoshi color & marks it as manually changed.
 EVT_DEFINE_USER_FUNC(IncrementYoshiColor) {
-    g_Mod->state_.SetOption(OPT_YOSHI_COLOR_SELECT, true);
+    g_Mod->inf_state_.SetOption(OPT_YOSHI_COLOR_SELECT, true);
     int32_t color = ttyd::mario_pouch::pouchGetPartyColor(4);
     ttyd::mario_pouch::pouchSetPartyColor(4, (color + 1) % 7);
     return 2;
@@ -264,11 +264,11 @@ void ApplyFixedPatches() {
             if (g_ReadyForPitSaveWrite && !g_AttemptingPitSaveWrite) {
                 // Save the timestamp you entered the Pit.
                 g_AttemptingPitSaveWrite = true;
-                g_Mod->state_.SaveCurrentTime(/* pit_start = */ true);
+                g_Mod->inf_state_.SaveCurrentTime(/* pit_start = */ true);
                 // Mark run as "started", assuming the save will succeed.
-                g_Mod->state_.SetOption(OPT_HAS_STARTED_RUN, true);
+                g_Mod->inf_state_.SetOption(OPT_HAS_STARTED_RUN, true);
                 // Copy state to save file location.
-                g_Mod->state_.Save();
+                g_Mod->inf_state_.Save();
             }
             return g_memcard_write_trampoline(evt, isFirstCall);
         });
@@ -292,7 +292,7 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
     g_ReadyForPitSaveWrite = false;
     g_AttemptingPitSaveWrite = false;
     g_SuccessfullySaved =
-        g_Mod->state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN);
+        g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN);
     
     if (module_id != ModuleId::TIK || !module_ptr) return;
     const uint32_t module_start = reinterpret_cast<uint32_t>(module_ptr);

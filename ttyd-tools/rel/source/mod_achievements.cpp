@@ -56,7 +56,7 @@ const int32_t AchievementsManager::kBadgeLogItem      = 0x53;
 const int32_t AchievementsManager::kTattleLogItem     = 0x54;
 
 void AchievementsManager::Update() {
-    StateManager_v2& state = g_Mod->state_;
+    StateManager_v2& state = g_Mod->inf_state_;
     
     // Remove awarded items if debug mode was used at any point.
     if (state.GetOptionNumericValue(OPT_DEBUG_MODE_USED)) {
@@ -141,8 +141,8 @@ int32_t AchievementsManager::GetMaxCompletionPoints(int32_t task_type) {
 
 void AchievementsManager::UpdatePartnerVariantBadgesCollected() {
     // Only mark P badges collected if playing without partners.
-    if (!g_Mod->state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER) ||
-        g_Mod->state_.GetOptionNumericValue(OPT_FIRST_PARTNER)) return;
+    if (!g_Mod->inf_state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER) ||
+        g_Mod->inf_state_.GetOptionNumericValue(OPT_FIRST_PARTNER)) return;
     
     for (int32_t i = ItemType::POWER_JUMP; i < ItemType::MAX_ITEM_TYPE; ++i) {
         bool collected = ttyd::swdrv::swGet(0x80 + i - ItemType::POWER_JUMP);

@@ -41,8 +41,7 @@ public:
     
     // RNG information.
     uint32_t    seed_;
-    uint16_t    rng_states_half_[32];
-    uint8_t     rng_states_byte_[48];
+    uint16_t    rng_states_[56];
     
     // In-game and real-time timers.
     uint64_t    run_start_time_rta_;

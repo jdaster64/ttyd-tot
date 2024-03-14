@@ -49,8 +49,8 @@ void Mod::Init() {
 	g_Mod = this;
     
     // Clear the mod's state completely.
+    memset(&inf_state_, 0, sizeof(inf_state_));
     memset(&state_, 0, sizeof(state_));
-    memset(&tot_state_, 0, sizeof(tot_state_));
     // Initialize managers.
     tot::MoveManager::Init();
 	

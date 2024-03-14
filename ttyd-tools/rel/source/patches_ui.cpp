@@ -422,7 +422,7 @@ void StarPowerMenuDisp() {
 
     for (int32_t i = 0; i < 8; ++i) {
         // Get maximum level of attack; if not unlocked, skip.
-        const int32_t max_level = g_Mod->state_.GetStarPowerLevel(i);
+        const int32_t max_level = g_Mod->inf_state_.GetStarPowerLevel(i);
         if (max_level < 1) continue;
         
         // Print attack name.
@@ -452,7 +452,7 @@ void StarPowerMenuDisp() {
 const char* GetStarPowerMenuDescriptionMsg(int32_t cursor_pos) {
     int32_t current_pos = -1;
     for (int32_t i = 0; i < 8; ++i) {
-        if (g_Mod->state_.GetStarPowerLevel(i) > 0) ++current_pos;
+        if (g_Mod->inf_state_.GetStarPowerLevel(i) > 0) ++current_pos;
         if (current_pos == cursor_pos) {
             return ttyd::battle_mario::superActionTable[i]->description;
         }
@@ -578,7 +578,7 @@ void UseSpecialItemsInMenu(WinPartyData** party_data) {
                 pouch_data->max_hp += 5 * hp_plus_p_cnt;
                 
                 // Save the partner upgrade count to the mod's state.
-                ++g_Mod->state_.partner_upgrades_[selected_party_id - 1];
+                ++g_Mod->inf_state_.partner_upgrades_[selected_party_id - 1];
             }
             
             // Increment the number of actual Shine Sprites, so it shows
@@ -586,13 +586,13 @@ void UseSpecialItemsInMenu(WinPartyData** party_data) {
             if (ttyd::mario_pouch::pouchGetPtr()->shine_sprites < 999) {
                 ++ttyd::mario_pouch::pouchGetPtr()->shine_sprites;
                 // Track Shine Sprites used in StateManager.
-                g_Mod->state_.ChangeOption(STAT_SHINE_SPRITES);
+                g_Mod->inf_state_.ChangeOption(STAT_SHINE_SPRITES);
             }
         }
     }
     
     // Track items used in the menu.
-    g_Mod->state_.ChangeOption(STAT_ITEMS_USED);
+    g_Mod->inf_state_.ChangeOption(STAT_ITEMS_USED);
     
     // Run normal logic to add HP, FP, and SP afterwards...
 }

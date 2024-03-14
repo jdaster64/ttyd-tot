@@ -126,7 +126,7 @@ int16_t PickStarPower(StateManager_v2& state) {
 }
 
 int16_t PickChestReward() {
-    StateManager_v2& state = g_Mod->state_;
+    StateManager_v2& state = g_Mod->inf_state_;
     const bool partners_enabled  =
         !state.CheckOptionValue(OPTVAL_PARTNERS_NEVER) &&
         state.GetOptionNumericValue(OPT_ENABLE_PARTNER_REWARD);
@@ -227,7 +227,7 @@ int16_t PickChestReward() {
 }
 
 int16_t PickPartnerReward() {
-    StateManager_v2& state = g_Mod->state_;
+    StateManager_v2& state = g_Mod->inf_state_;
 
     uint16_t weights[7] = { 10, 10, 10, 10, 10, 10, 10 };
     for (int32_t i = 0; i < 7; ++i) {
