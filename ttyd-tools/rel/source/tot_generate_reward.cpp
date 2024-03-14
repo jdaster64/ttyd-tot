@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "mod_state.h"
 #include "tot_move_manager.h"
+#include "tot_options_manager.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
 
@@ -273,39 +274,30 @@ void RewardManager::PatchRewardItemData() {
 }
 
 bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
-    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-    
     switch (item_type) {
         case ItemType::PIANTA:
             // "Big" coins, worth 5 apiece.
             ttyd::mario_pouch::pouchAddCoin(5);
             return true;
         case REWARD_HP_UP:
-            pouch.current_hp += 5;
-            pouch.max_hp += 5;
-            pouch.base_max_hp += 5;
+            ++infinite_pit::g_Mod->state_.hp_level_;
+            OptionsManager::UpdateLevelupStats();
             return true;
         case REWARD_FP_UP:
-            pouch.current_fp += 5;
-            pouch.max_fp += 5;
-            pouch.base_max_fp += 5;
+            ++infinite_pit::g_Mod->state_.fp_level_;
+            OptionsManager::UpdateLevelupStats();
             return true;
         case REWARD_BP_UP:
-            pouch.total_bp += 5;
-            pouch.unallocated_bp += 5;
+            ++infinite_pit::g_Mod->state_.bp_level_;
+            OptionsManager::UpdateLevelupStats();
+            return true;
+        case REWARD_HP_UP_P:
+            ++infinite_pit::g_Mod->state_.hp_p_level_;
+            OptionsManager::UpdateLevelupStats();
             return true;
         case REWARD_INV_UP:
             ++infinite_pit::g_Mod->state_.num_sack_upgrades_;
             return true;
-        case REWARD_HP_UP_P: {
-            for (int32_t i = 1; i <= 7; ++i) {
-                // TODO: Different amounts of HP per party member?
-                pouch.party_data[i].current_hp += 5;
-                pouch.party_data[i].max_hp += 5;
-                pouch.party_data[i].base_max_hp += 5;
-            }
-            return true;
-        }
         default:
             return false;
     }
@@ -441,8 +433,6 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
     auto& party_data = ttyd::mario_pouch::pouchGetPtr()->party_data[idx];
     
     party_data.flags |= 1;
-    
-    // TODO: Different amounts of HP per party member?
     party_data.hp_level = 0;
     party_data.attack_level = 0;
     party_data.tech_level = 0;

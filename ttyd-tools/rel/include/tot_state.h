@@ -69,7 +69,7 @@ public:
     // TotSaveSlotData* GetBackupSave();
     
     // Initialize all settings to default.
-    // void InitDefaultOptions();
+    void InitDefaultOptions();
     
     // Sets / adjusts options, play stats, achievements, etc.
     // If OPTVAL is provided for 'SetOption', value parameter is ignored.

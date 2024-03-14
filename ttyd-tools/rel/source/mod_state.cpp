@@ -38,21 +38,6 @@ void* GetSavedStateLocation() {
     return &ttyd::mariost::g_MarioSt->gswf[0x2e0];
 }
 
-// Updates partners' Ultra Rank max HP based how many times each partner
-// has had a Shine Sprite used on them (each after the second adds +5 max HP).
-void InitPartyMaxHpTable(uint8_t* partner_upgrades) {
-    static constexpr const int16_t kDefaultUltraRankMaxHp[] = {
-        30, 25, 40, 30, 35, 30, 25
-    };
-    int16_t* hp_table = ttyd::mario_pouch::_party_max_hp_table + 4;
-    for (int32_t i = 0; i < 7; ++i) {
-        int32_t hp = kDefaultUltraRankMaxHp[i] +
-            (partner_upgrades[i] > 2 ? (partner_upgrades[i] - 2) * 5 : 0);
-        if (hp > 200) hp = 200;
-        hp_table[i * 4 + 2] = hp;
-    }
-}
-
 bool LoadFromPreviousVersion(StateManager_v2* state) {
     void* saved_state = GetSavedStateLocation();
     uint8_t version = *reinterpret_cast<uint8_t*>(saved_state);
@@ -67,7 +52,7 @@ bool LoadFromPreviousVersion(StateManager_v2* state) {
 
     // Force version to current.
     state->version_ = 8;
-    InitPartyMaxHpTable(state->partner_upgrades_);
+    // InitPartyMaxHpTable(state->partner_upgrades_);
     
     // Reset item obfuscation RNG position in case it needs to be performed.
     g_Mod->inf_state_.rng_sequences_[RNG_ITEM_OBFUSCATION] = 0;
@@ -134,7 +119,7 @@ bool StateManager_v2::Load(bool new_save) {
     version_ = 8;
     SetDefaultOptions();
     option_flags_[3] = cosmetic_options;
-    InitPartyMaxHpTable(partner_upgrades_);
+    // InitPartyMaxHpTable(partner_upgrades_);
     
     // Turn off "has started" bit, so it won't carry over from previous files.
     SetOption(OPT_HAS_STARTED_RUN, 0);

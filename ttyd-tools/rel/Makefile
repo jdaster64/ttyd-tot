@@ -23,6 +23,7 @@ ifeq ($(VERSION),)
 all: us_full
 us:
 	@$(MAKE) --no-print-directory VERSION=us
+	@$(MAKE) --no-print-directory copy_files VERSION=us
 us_full:
 	@$(MAKE) --no-print-directory VERSION=us
 	@$(MAKE) --no-print-directory debug_symbols VERSION=us

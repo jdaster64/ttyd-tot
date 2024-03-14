@@ -21,7 +21,15 @@ namespace {
 // TotSaveSlotData* StateManager::GetBackupSave();
 
 // Initialize all settings to default.
-// void StateManager::InitDefaultOptions();
+void StateManager::InitDefaultOptions() {
+    // TODO: Move this stuff elsewhere, as relevant.
+    floor_ = 0;
+    hp_level_ = 2;
+    fp_level_ = 1;
+    bp_level_ = 1;
+    hp_p_level_ = 2;
+    num_sack_upgrades_ = 0;
+}
 
 // Sets / adjusts options, play stats, achievements, etc.
 // If OPTVAL is provided for 'SetOption', value parameter is ignored.
