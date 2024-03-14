@@ -1,7 +1,7 @@
 #include "tot_window_select.h"
 
 #include "tot_generate_reward.h"
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 
 #include <gc/types.h>
 #include <gc/mtx.h>

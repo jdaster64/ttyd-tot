@@ -3,7 +3,7 @@
 #include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod_state.h"
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>

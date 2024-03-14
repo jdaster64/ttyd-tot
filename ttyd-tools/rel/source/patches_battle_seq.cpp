@@ -8,7 +8,7 @@
 #include "patch.h"
 #include "patches_partner.h"
 #include "tot_generate_reward.h"
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 #include "tot_party_mario.h"
 
 #include <ttyd/battle.h>

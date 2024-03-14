@@ -3,7 +3,7 @@
 #include "evt_cmd.h"
 #include "patch.h"
 #include "patches_battle.h"
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 
 #include <gc/types.h>
 #include <ttyd/battle.h>

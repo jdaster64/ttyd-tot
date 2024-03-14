@@ -3,8 +3,8 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
-#include "tot_move_manager.h"
-#include "tot_options_manager.h"
+#include "tot_manager_move.h"
+#include "tot_manager_options.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
 

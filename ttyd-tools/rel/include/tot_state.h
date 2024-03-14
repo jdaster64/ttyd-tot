@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 
 #include <ttyd/evt_badgeshop.h>
 #include <ttyd/mario_pouch.h>

@@ -10,8 +10,8 @@
 #include "patches_apply.h"
 #include "patches_mario_move.h"
 #include "patches_options.h"
-#include "tot_move_manager.h"
-#include "tot_options_manager.h"
+#include "tot_manager_move.h"
+#include "tot_manager_options.h"
 #include "tot_state.h"
 
 #include <gc/OSLink.h>

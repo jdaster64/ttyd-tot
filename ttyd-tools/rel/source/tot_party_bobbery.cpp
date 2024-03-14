@@ -1,7 +1,7 @@
 #include "tot_party_bobbery.h"
 
 #include "evt_cmd.h"
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>

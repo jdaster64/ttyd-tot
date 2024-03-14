@@ -6,7 +6,7 @@
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_battle.h"
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 #include "tot_party_mario.h"
 #include "tot_party_yoshi.h"
 

@@ -6,7 +6,7 @@
 #include "patch.h"
 #include "patches_mario_move.h"
 #include "tot_generate_enemy.h"
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_ac.h>

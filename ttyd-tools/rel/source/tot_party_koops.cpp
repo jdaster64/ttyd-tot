@@ -2,7 +2,7 @@
 
 #include "evt_cmd.h"
 #include "patch.h"
-#include "tot_move_manager.h"
+#include "tot_manager_move.h"
 
 #include <ttyd/ac_pendulum_crane_timing.h>
 #include <ttyd/battle.h>
