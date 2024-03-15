@@ -124,7 +124,7 @@ void OptionsManager::UpdateLevelupStats() {
             pouch.party_data[i].base_max_hp += delta_php;
             if (delta_php > 0) {
                 pouch.party_data[i].current_hp += delta_php;
-            } else if (pouch.party_data[i].current_hp < pouch.party_data[i].max_hp) {
+            } else if (pouch.party_data[i].current_hp > pouch.party_data[i].max_hp) {
                 pouch.party_data[i].current_hp = pouch.party_data[i].max_hp;
             }
             
