@@ -140,7 +140,8 @@ int32_t PickRandomItem(
 
 void ObfuscateItems(bool enable) {
     // Obfuscation has already been performed; no need to redo.
-    if (enable && infinite_pit::g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION]) return;
+    if (enable && infinite_pit::g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION])
+        return;
     
     auto* itemData = ttyd::item_data::itemDataTable;
     uint16_t ids[180];

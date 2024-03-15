@@ -4,6 +4,7 @@
 #include "common_types.h"
 
 #include <gc/OSTime.h>
+#include <third_party/fasthash.h>
 #include <ttyd/system.h>
 
 #include <cinttypes>
@@ -73,7 +74,29 @@ void StateManager::ToggleIGT(bool toggle) {
 // enum), returning a value in the range [0, range). If `sequence` is not
 // a valid enum value, returns a random value using ttyd::system::irand().
 uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
-    // TODO: Implement.
+    if (sequence > RNG_VANILLA && sequence < RNG_SEQUENCE_MAX) {
+        uint32_t data[2] = { 0, 0 };
+        uint16_t* seq_val = rng_states_ + sequence;
+        // Include the sequence id and current position, so the beginnings of
+        // different sequences can't end up identical.
+        // (e.g. chest random badge rewards + first floor's enemy items)
+        data[0] = (*seq_val)++ | (sequence << 16);
+        switch (sequence) {
+            case RNG_ENEMY:
+            case RNG_ENEMY_ITEM:
+            case RNG_ENEMY_CONDITION:
+            case RNG_ENEMY_CONDITION_ITEM:
+            case RNG_NPC_TYPE:
+            case RNG_NPC_OPTIONS:
+            case RNG_NPC_RESERVED: {
+                data[1] = floor_;
+                break;
+            }
+            default:
+                break;
+        }
+        return third_party::fasthash64(data, sizeof(data), seed_) % range;
+    }
     return ttyd::system::irand(range);
 }
 
