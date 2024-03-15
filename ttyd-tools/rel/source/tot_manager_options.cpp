@@ -10,20 +10,48 @@ namespace mod::tot {
 namespace {
 
 // Mario, then partners in internal order.
-const int32_t kBaseHP[] = { 10, 10, 8, 12, 8, 12, 10, 8 };
-const int32_t kBaseFP = 10;
-const int32_t kBaseBP = 10;
+const int32_t kHpMultipliers[] = { 100, 100, 80, 120, 80, 120, 100, 80 };
+
+// Returns the current expected base stat given its option value and
+// corresponding level (e.g. OPTNUM_MARIO_HP + hp_level_).
+int32_t GetBaseStat(uint32_t option, int32_t party = 0) {
+    auto& state = infinite_pit::g_Mod->state_;
+    int32_t value = state.GetOption(option);
+    switch (option) {
+        case OPTNUM_MARIO_HP: {
+            value *= state.hp_level_;
+            break;
+        }
+        case OPTNUM_MARIO_FP: {
+            value *= state.fp_level_;
+            break;
+        }
+        case OPTNUM_MARIO_BP: {
+            value *= state.bp_level_;
+            break;
+        }
+        case OPTNUM_PARTNER_HP: {
+            value *= state.hp_p_level_;
+            // Scale the HP multiplier based on each party member's stats.
+            value = (value * kHpMultipliers[party] + 50) / 100;
+            break;
+        }
+        default:
+            return -1;
+    }
+    // Stat values can never go below 1.
+    return value > 0 ? value : 1;
+}
     
 }
 
 void OptionsManager::InitFromSelectedOptions() {
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-    auto& state = infinite_pit::g_Mod->state_;
     
     // Set starting HP, FP, BP.
-    const int32_t hp = kBaseHP[0] * state.hp_level_ / 2;
-    const int32_t fp = kBaseFP * state.fp_level_ / 2;
-    const int32_t bp = kBaseBP * state.bp_level_ / 2;
+    const int32_t hp = GetBaseStat(OPTNUM_MARIO_HP);
+    const int32_t fp = GetBaseStat(OPTNUM_MARIO_FP);
+    const int32_t bp = GetBaseStat(OPTNUM_MARIO_BP);
     
     pouch.current_hp = hp;
     pouch.max_hp = hp;
@@ -36,7 +64,7 @@ void OptionsManager::InitFromSelectedOptions() {
     
     // Set starting partner HP.
     for (int32_t i = 1; i <= 7; ++i) {
-        const int32_t php = kBaseHP[i] * state.hp_p_level_ / 2;
+        const int32_t php = GetBaseStat(OPTNUM_PARTNER_HP, i);
         
         pouch.party_data[i].current_hp = php;
         pouch.party_data[i].max_hp = php;
@@ -49,14 +77,13 @@ void OptionsManager::InitFromSelectedOptions() {
 
 void OptionsManager::UpdateLevelupStats() {
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-    auto& state = infinite_pit::g_Mod->state_;
     
-    // Get change HP, FP, BP, party HP.
-    const int32_t delta_hp = kBaseHP[0] * state.hp_level_ / 2 - pouch.max_hp;
-    const int32_t delta_fp = kBaseFP * state.fp_level_ / 2 - pouch.max_fp;
-    const int32_t delta_bp = kBaseBP * state.bp_level_ / 2 - pouch.total_bp;
-    const int32_t delta_php = 
-        kBaseHP[1] * state.hp_p_level_ / 2 - pouch.party_data[1].max_hp;
+    // Get change HP, FP, BP, party HP (using Goombella by default).
+    const int32_t delta_hp = GetBaseStat(OPTNUM_MARIO_HP) - pouch.max_hp;
+    const int32_t delta_fp = GetBaseStat(OPTNUM_MARIO_FP) - pouch.max_fp;
+    const int32_t delta_bp = GetBaseStat(OPTNUM_MARIO_BP) - pouch.total_bp;
+    const int32_t delta_php =
+        GetBaseStat(OPTNUM_PARTNER_HP, 1) - pouch.party_data[1].max_hp;
     
     // Update stats that have changed.
     if (delta_hp > 0) {
@@ -91,7 +118,7 @@ void OptionsManager::UpdateLevelupStats() {
     
     if (delta_php != 0) {
         for (int32_t i = 1; i <= 7; ++i) {
-            int32_t delta_php = kBaseHP[i] * state.hp_p_level_ / 2 
+            int32_t delta_php = GetBaseStat(OPTNUM_PARTNER_HP, i)
                               - pouch.party_data[i].max_hp;
             pouch.party_data[i].max_hp += delta_php;
             pouch.party_data[i].base_max_hp += delta_php;

@@ -172,8 +172,8 @@ void OnFileLoad(bool new_file = true) {
         
         // Initialize Tower of Trials-specific state.
         g_Mod->state_.InitDefaultOptions();
-        tot::MoveManager::Init();
         tot::OptionsManager::InitFromSelectedOptions();
+        tot::MoveManager::Init();
     }
     g_PromptSave = false;
     
