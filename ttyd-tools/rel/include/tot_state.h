@@ -108,7 +108,7 @@ public:
     // Fetches a random value from the desired sequence (using the RngSequence
     // enum), returning a value in the range [0, range). If `sequence` is not
     // a valid enum value, returns a random value using ttyd::system::irand().
-    // uint32_t Rand(uint32_t range, int32_t sequence = -1);
+    uint32_t Rand(uint32_t range, int32_t sequence = -1);
 };
 static_assert(sizeof(StateManager) == 0xc00);
 
@@ -136,8 +136,60 @@ struct TotSaveSlot {
 };
 static_assert(sizeof(TotSaveSlot) == 0x4000);
 
-// TODO: New RngSequence enum.
+enum RngSequence {
+    // "Totally random"; not reproducible run-to-run.
+    RNG_VANILLA                 = -1,   // Calls ttyd::system::irand().
+    
+    RNG_RESERVED                = 0,
+    
+    // Battle generation; mangled with floor number + reset every floor.
+    RNG_ENEMY                   = 1,    // Enemy loadout + which one drops item.
+    RNG_ENEMY_ITEM              = 2,    // Enemy held item types.
+    RNG_ENEMY_CONDITION         = 3,    // Bonus challenge condition.
+    RNG_ENEMY_CONDITION_ITEM    = 4,    // Bonus challenge reward.
+    
+    // NPC generation; mangled with floor number + reset every floor.
+    RNG_NPC_TYPE                = 5,    // Type of NPC(s) to spawn.
+    RNG_NPC_OPTIONS             = 6,    // NPC parameters, e.g. shop items.
+    RNG_NPC_RESERVED            = 7,    //
+    
+    // Choosing reward metatypes; mangled with floor number + reset every floor.
+    RNG_REWARD                  = 8,    // Types of rewards.
+    // Choosing reward subtypes; not mangled with floor number.
+    RNG_REWARD_MOVE             = 9,    // Jump, Hammer, or Special.
+    RNG_REWARD_PARTNER          = 10,   // Partner, from all seven options.
+    RNG_REWARD_PARTNER_LOOP     = 11,   // Partner, from chosen pool of four.
+    RNG_REWARD_PARTNER_FALLBACK = 12,   // Partner, if prior choice was invalid.
+    RNG_REWARD_STAT_UP          = 13,   // HP, FP, BP, HP-P, or item inv.
+    RNG_REWARD_OTHER            = 14,   // Coins, SP, SS, unique/stackable badge.
+    RNG_REWARD_BADGE_SPECIAL    = 15,   // Which unique badge.
+    RNG_REWARD_BADGE_NORMAL     = 16,   // Which stackable badge.
+    
+    // Order to offer moves for unlocking; not mangled with floor number.
+    RNG_MOVE_GOOMBELLA          = 17,
+    RNG_MOVE_KOOPS              = 18,
+    RNG_MOVE_FLURRIE            = 19,
+    RNG_MOVE_YOSHI              = 20,
+    RNG_MOVE_VIVIAN             = 21,
+    RNG_MOVE_BOBBERY            = 22,
+    RNG_MOVE_MOWZ               = 23,
+    RNG_MOVE_JUMP               = 24,
+    RNG_MOVE_HAMMER             = 25,
+    RNG_MOVE_SPECIAL            = 26,
+    // Order to offer moves for upgrading; not mangled with floor number.
+    // Chooses from all moves together, rolling until valid option found.
+    RNG_MOVE_UPGRADE            = 27,
+    
+    // Miscellaneous uses; not mangled with floor number.
+    RNG_STOLEN_ITEM             = 28,
+    RNG_AUDIENCE_ITEM           = 29,
+    RNG_ITEM_OBFUSCATION        = 30,
+    
+    RNG_SEQUENCE_MAX            = 31,
+};
 
 // TODO: New Options enum.
 
-}
+// TODO: GSWs, etc. enum?
+
+}  // namespace mod::tot

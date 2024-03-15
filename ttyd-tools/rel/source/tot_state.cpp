@@ -4,6 +4,7 @@
 #include "common_types.h"
 
 #include <gc/OSTime.h>
+#include <ttyd/system.h>
 
 #include <cinttypes>
 #include <cstdio>
@@ -71,6 +72,9 @@ void StateManager::ToggleIGT(bool toggle) {
 // Fetches a random value from the desired sequence (using the RngSequence
 // enum), returning a value in the range [0, range). If `sequence` is not
 // a valid enum value, returns a random value using ttyd::system::irand().
-// uint32_t StateManager::Rand(uint32_t range, int32_t sequence = -1);
+uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
+    // TODO: Implement.
+    return ttyd::system::irand(range);
+}
 
 }  // namespace mod::tot
