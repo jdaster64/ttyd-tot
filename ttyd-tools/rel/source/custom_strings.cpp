@@ -30,7 +30,6 @@ namespace MsgKey {
         MSG_EMERALD_STAR,
         MSG_GARNET_STAR,
         MSG_GOLD_STAR,
-        MSG_JON_KANBAN_1,
         MSG_JON_KANBAN_2,
         MSG_JON_KANBAN_3,
         MSG_JON_MOVER_SELECT,
@@ -63,7 +62,6 @@ constexpr const char* kKeyLookups[] = {
     "msg_emerald_star",
     "msg_garnet_star",
     "msg_gold_star",
-    "msg_jon_kanban_1",
     "msg_jon_kanban_2",
     "msg_jon_kanban_3",
     "msg_jon_mover_select",
@@ -160,11 +158,6 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::CUSTOM_TATTLE_BATTLE:
         case MsgKey::CUSTOM_TATTLE_MENU:
             return tot::GetCustomTattle();
-        case MsgKey::MSG_JON_KANBAN_1: {
-            sprintf(buf, "<kanban>\n<pos 150 25>\nFloor %" PRId32 "\n<k>", 
-                    g_Mod->inf_state_.floor_ + 1);
-            return buf;
-        }
         case MsgKey::MSG_JON_KANBAN_2: {
             if (g_Mod->inf_state_.GetPlayStatsString(buf)) return buf;
             return "<kanban>\n"

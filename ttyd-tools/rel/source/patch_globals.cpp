@@ -51,6 +51,8 @@ uint32_t (*g_psndBGMOn_f_d_trampoline)(
     uint32_t, const char*, uint32_t, uint16_t) = nullptr;
 // event.o  800ee688
 void (*g_stg0_00_init_trampoline)(void) = nullptr;
+// battle.o  800f7bfc
+void (*g_BattleStoreExp_trampoline)(BattleWork*, int32_t) = nullptr;
 // battle_ac.o  800fa1b8
 int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*) = nullptr;
@@ -282,7 +284,9 @@ extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_BH = 0x80202614;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_EH = 0x80202618;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_CH1 = 0x8020263c;
 extern const int32_t g_BattleBreakSlot_PointInc_EnableAlways_BH = 0x802034b4;
+extern const int32_t g_effStarPointDisp_Patch_SetIconId = 0x8020af38;
 extern const int32_t g_btlseqEnd_JudgeRuleEarly_BH = 0x80215348;
+extern const int32_t g_btlseqEnd_Patch_CheckDisableExpLevel = 0x802157e0;
 extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule = 0x80216678;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_BH = 0x80231cc0;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_EH = 0x80231d38;

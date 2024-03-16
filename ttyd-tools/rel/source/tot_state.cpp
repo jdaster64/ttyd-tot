@@ -2,9 +2,13 @@
 
 #include "common_functions.h"
 #include "common_types.h"
+#include "evt_cmd.h"
+#include "mod.h"
 
 #include <gc/OSTime.h>
 #include <third_party/fasthash.h>
+#include <ttyd/evtmgr_cmd.h>
+#include <ttyd/mario_pouch.h>
 #include <ttyd/system.h>
 
 #include <cinttypes>
@@ -14,6 +18,9 @@
 namespace mod::tot {
 
 namespace {
+
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 void GetOptionParts(
     uint32_t v, int32_t* t, int32_t* x, int32_t* y, int32_t* a, int32_t* b) {
@@ -32,7 +39,9 @@ void GetOptionParts(
 // TotSaveSlotData* StateManager::GetBackupSave();
 
 void StateManager::InitDefaultOptions() {
-    // TODO: Move this stuff elsewhere, as relevant.
+    // TODO: Seed randomly, or allow user to change.
+    seed_ = 0;
+    
     floor_ = 0;
     hp_level_ = 2;
     fp_level_ = 1;
@@ -245,9 +254,18 @@ bool StateManager::CheckOptionValue(uint32_t option_value) const {
 // Returns a string representing the current options encoded.
 // const char* StateManager::GetEncodedOptions() const;
 
-// Updates necessary fields for a new floor of the tower.
-// By default, increments the floor by 1.
-// void StateManager::SetFloor(int32_t floor = -1);
+void StateManager::IncrementFloor(int32_t change) {
+    floor_ = Clamp(floor_ + change, 0, 64);
+    
+    // Clear RNG state values that should reset every floor.
+    for (int32_t i = RNG_ENEMY; i <= RNG_REWARD; ++i) rng_states_[i] = 0;
+    
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    // Set stage rank based on floor.
+    pouch.rank = (floor_ - 1) / 16;
+    // Display the current floor in place of Star Points, since they're unused.
+    pouch.star_points = floor_;
+}
 
 // Functions for time-tracking...
 // void StateManager::StartTimer();
@@ -288,6 +306,18 @@ uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
         return third_party::fasthash64(data, sizeof(data), seed_) % range;
     }
     return ttyd::system::irand(range);
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_IncrementFloor) {
+    int32_t change = evtGetValue(evt, evt->evtArguments[0]);
+    infinite_pit::g_Mod->state_.IncrementFloor(change);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetFloor) {
+    int32_t floor = infinite_pit::g_Mod->state_.floor_;
+    evtSetValue(evt, evt->evtArguments[0], floor);
+    return 2;
 }
 
 }  // namespace mod::tot

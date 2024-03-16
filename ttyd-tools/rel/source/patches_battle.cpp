@@ -79,6 +79,7 @@ namespace {
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_unit;
 
+using ::ttyd::battle::BattleWork;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 
@@ -90,6 +91,7 @@ using WeaponDamageFn = uint32_t (*) (
 }
 
 // Function hooks.
+extern void (*g_BattleStoreExp_trampoline)(BattleWork*, int32_t);
 extern int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
 extern int32_t (*g_BattlePreCheckDamage_trampoline)(
@@ -117,6 +119,8 @@ extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_CH1;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_BH;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_EH;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_CH1;
+extern const int32_t g_btlseqEnd_Patch_CheckDisableExpLevel;
+extern const int32_t g_effStarPointDisp_Patch_SetIconId;
 
 namespace battle {
 
@@ -740,7 +744,8 @@ int32_t CalculateBaseDamage(
     return damage;
 }
 
-void ApplyFixedPatches() {
+void ApplyFixedPatches() {    
+    // Handle Superguard cost option.
     g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
         ttyd::battle_ac::BattleActionCommandCheckDefence,
         [](BattleWorkUnit* unit, BattleWeapon* weapon) {
@@ -889,19 +894,28 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleAudience_ApRecoveryBuild_BingoRegen_BH),
         reinterpret_cast<void*>(StartApplySpRegenMultiplierBingo),
         reinterpret_cast<void*>(BranchBackApplySpRegenMultiplierBingo));
+        
+    // Disable stored EXP at all levels.
+    g_BattleStoreExp_trampoline = patch::hookFunction(
+        ttyd::battle::BattleStoreExp, [](BattleWork* work, int32_t exp){});
+    // Disable EXP gain, including pity EXP point, at all levels.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_btlseqEnd_Patch_CheckDisableExpLevel),
+        0x2c000000U /* cmpwi r0, (level) 0 */);
+    // Have coin gfx pop out of enemies instead of EXP when defeated.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_effStarPointDisp_Patch_SetIconId),
+        0x38a00193U /* li r5, IconType::COIN */);
 }
 
 void SetTargetAudienceAmount() {
+    // Set audience target value based on current floor.
+    const int32_t floor = g_Mod->state_.floor_;
+    float target_amount = floor * 2.5f + 5.0f;
+    if (target_amount > 200.f) target_amount = 200.f;
+    
     uintptr_t audience_work_base =
-        reinterpret_cast<uintptr_t>(
-            ttyd::battle::g_BattleWork->audience_work);
-    float target_amount = 200.0f;
-    // If set to rank up by progression, make the target audience follow suit;
-    // otherwise, keep the target fixed at max capacity.
-    if (g_Mod->inf_state_.GetOptionValue(OPTVAL_STAGE_RANK_30_FLOORS)) {
-        const int32_t floor = g_Mod->inf_state_.floor_;
-        target_amount = floor >= 195 ? 200.0f : floor + 5.0f;
-    }
+        reinterpret_cast<uintptr_t>(ttyd::battle::g_BattleWork->audience_work);
     *reinterpret_cast<float*>(audience_work_base + 0x13778) = target_amount;
 }
 

@@ -1,9 +1,11 @@
 #include "tot_gon_tower.h"
 
 #include "evt_cmd.h"
+#include "mod.h"
 #include "tot_generate_enemy.h"
 #include "tot_generate_reward.h"
 #include "tot_gon.h"
+#include "tot_state.h"
 
 #include <gc/types.h>
 #include <ttyd/battle_database_common.h>
@@ -95,9 +97,7 @@ extern const BeroEntry normal_room_entry_data[3];
 EVT_BEGIN(Tower_SignEvt)
     USER_FUNC(evt_npc_stop_for_event)
     USER_FUNC(evt_mario_key_onoff, 0)
-    SET(LW(0), GSW(1321))
-    // TODO: Read from mod's floor number instead.
-    ADD(LW(0), 1)
+    USER_FUNC(evtTot_GetFloor, LW(0))
     USER_FUNC(evt_msg_print_insert, 0, PTR("msg_jon_kanban_1"), 0, 0, LW(0))
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_npc_start_for_event)
@@ -171,8 +171,8 @@ EVT_END()
 
 // Increment floor number.
 EVT_BEGIN(Tower_IncrementFloor)
-    ADD(GSW(1321), 1)
-    // TODO: Increment mod's floor number instead.
+    SET(LW(0), 1)
+    USER_FUNC(evtTot_IncrementFloor, LW(0))
     SET(LW(0), 0)
     RETURN()
 EVT_END()

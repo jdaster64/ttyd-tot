@@ -354,7 +354,7 @@ extern "C" {
 // BattleCheckUnitBroken
 // BattleGetFloorHeight
 // BattleGetStockExp
-// BattleStoreExp
+void BattleStoreExp(BattleWork* battleWork, int32_t added_exp);
 // BattleStoreCoin
 // BattlePartyInfoWorkInit
 // _EquipItem

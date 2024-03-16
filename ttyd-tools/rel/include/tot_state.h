@@ -94,9 +94,8 @@ public:
     // Returns a string representing the current options encoded.
     // const char* GetEncodedOptions() const;
     
-    // Updates necessary fields for a new floor of the tower.
-    // By default, increments the floor by 1.
-    // void SetFloor(int32_t floor = -1);
+    // Increments the current tower floor, and makes any necessary changes.
+    void IncrementFloor(int32_t change = 1);
     
     // Functions for time-tracking...
     // void StartTimer();
@@ -112,6 +111,14 @@ public:
     uint32_t Rand(uint32_t range, int32_t sequence = -1);
 };
 static_assert(sizeof(StateManager) == 0xc00);
+
+// Standard evt wrappers to call certain functions / access fields.
+
+// Calls StateManager.IncrementFloor(arg0).
+EVT_DECLARE_USER_FUNC(evtTot_IncrementFloor, 1)
+
+// Returns the current floor number.
+EVT_DECLARE_USER_FUNC(evtTot_GetFloor, 1)
 
 // Format of save data used by Tower of Trials mod.
 struct TotSaveSlot {
