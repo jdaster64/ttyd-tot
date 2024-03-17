@@ -271,6 +271,14 @@ void RewardManager::PatchRewardItemData() {
     itemDataTable[REWARD_INV_UP].name = "tot_reward_sack";
     itemDataTable[REWARD_INV_UP].description = "tot_rewarddesc_sack";
     itemDataTable[REWARD_INV_UP].icon_id = IconType::STRANGE_SACK;
+    // Crystal Star icons.
+    itemDataTable[ItemType::DIAMOND_STAR].icon_id = IconType::DIAMOND_STAR;
+    itemDataTable[ItemType::EMERALD_STAR].icon_id = IconType::EMERALD_STAR;
+    itemDataTable[ItemType::GOLD_STAR].icon_id = IconType::GOLD_STAR;
+    itemDataTable[ItemType::RUBY_STAR].icon_id = IconType::RUBY_STAR;
+    itemDataTable[ItemType::SAPPHIRE_STAR].icon_id = IconType::SAPPHIRE_STAR;
+    itemDataTable[ItemType::GARNET_STAR].icon_id = IconType::GARNET_STAR;
+    itemDataTable[ItemType::CRYSTAL_STAR].icon_id = IconType::CRYSTAL_STAR;
 }
 
 bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
@@ -298,6 +306,18 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
         case REWARD_INV_UP:
             ++infinite_pit::g_Mod->state_.num_sack_upgrades_;
             return true;
+        case ItemType::DIAMOND_STAR:
+        case ItemType::EMERALD_STAR:
+        case ItemType::GOLD_STAR:
+        case ItemType::RUBY_STAR:
+        case ItemType::SAPPHIRE_STAR:
+        case ItemType::GARNET_STAR:
+        case ItemType::CRYSTAL_STAR: {
+            int32_t move = MoveType::SP_EARTH_TREMOR + 
+                (item_type - ItemType::DIAMOND_STAR);
+            MoveManager::UpgradeMove(move);
+            return true;
+        }
         default:
             return false;
     }
@@ -344,10 +364,16 @@ EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
     for (int32_t i = 0; i < 3; ++i) {
         g_Chests[i].home_pos = positions[i];
         
-        int32_t rand_val =
-            infinite_pit::g_Mod->inf_state_.Rand(sizeof(kRewardTypes) / sizeof(int32_t));
-        g_Chests[i].item = kRewardTypes[rand_val];
-        g_Chests[i].pickup_script = (void*)kRewardScripts[rand_val];
+        // int32_t rand_val =
+            // infinite_pit::g_Mod->inf_state_.Rand(sizeof(kRewardTypes) / sizeof(int32_t));
+        // g_Chests[i].item = kRewardTypes[rand_val];
+        // g_Chests[i].pickup_script = (void*)kRewardScripts[rand_val];
+        
+        (void)kRewardScripts;
+        (void)kRewardTypes;
+        
+        g_Chests[i].item = ItemType::SAPPHIRE_STAR + i;
+        g_Chests[i].pickup_script = nullptr;
     }
     
     return 2;

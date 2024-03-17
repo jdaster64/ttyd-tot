@@ -57,11 +57,6 @@ constexpr const char* kKeyLookups[] = {
     "menu_kiken_de_power_p",
     "menu_pinch_de_ganbaru",
     "menu_pinch_de_ganbaru_p",
-    "msg_crystal_star",
-    "msg_diamond_star",
-    "msg_emerald_star",
-    "msg_garnet_star",
-    "msg_gold_star",
     "msg_jon_kanban_2",
     "msg_jon_kanban_3",
     "msg_jon_mover_select",
@@ -69,9 +64,6 @@ constexpr const char* kKeyLookups[] = {
     "msg_kiken_de_power_p",
     "msg_pinch_de_ganbaru",
     "msg_pinch_de_ganbaru_p",
-    "msg_ruby_star",
-    "msg_sapphire_star",
-    "msg_treasure_map",
     "rippo_top_menu",
     "tik_06_02",
     "zz_test_win_select",
@@ -87,16 +79,6 @@ const char* GetYoshiTextColor() {
     } else {
         return kYoshiColorStrings[ttyd::mario_pouch::pouchGetPartyColor(4)];
     }
-}
-
-const char* GetStarPowerItemDescription(char* buf, int32_t index) {
-    int32_t level = g_Mod->inf_state_.GetStarPowerLevel(index);
-    if (!InPauseMenu()) ++level;
-    const char* name_msg = ttyd::battle_mario::superActionTable[index]->name;
-    sprintf(buf,
-        "Allows Mario to use level %" PRId32 "\n"
-        "of the move %s.", level, ttyd::msgdrv::msgSearch(name_msg));
-    return buf;
 }
 
 const char* GetMoverOptionsString(char* buf) {
@@ -210,22 +192,6 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                        "when your ally is in Danger.";
             }
             return nullptr;
-        case MsgKey::MSG_TREASURE_MAP:
-            return GetStarPowerItemDescription(buf, 0);
-        case MsgKey::MSG_DIAMOND_STAR:
-            return GetStarPowerItemDescription(buf, 1);
-        case MsgKey::MSG_EMERALD_STAR:
-            return GetStarPowerItemDescription(buf, 2);
-        case MsgKey::MSG_GOLD_STAR:
-            return GetStarPowerItemDescription(buf, 3);
-        case MsgKey::MSG_RUBY_STAR:
-            return GetStarPowerItemDescription(buf, 4);
-        case MsgKey::MSG_SAPPHIRE_STAR:
-            return GetStarPowerItemDescription(buf, 5);
-        case MsgKey::MSG_GARNET_STAR:
-            return GetStarPowerItemDescription(buf, 6);
-        case MsgKey::MSG_CRYSTAL_STAR:
-            return GetStarPowerItemDescription(buf, 7);
         case MsgKey::MSG_JON_MOVER_SELECT:
             return GetMoverOptionsString(buf);
         case MsgKey::RIPPO_TOP_MENU: {

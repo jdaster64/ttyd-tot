@@ -116,6 +116,29 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13), LW(14))
     SWITCH(LW(13))
         CASE_SMALL_EQUAL(-1)    // move, partner, coin rewards
+        CASE_BETWEEN((int32_t)ItemType::DIAMOND_STAR, (int32_t)ItemType::CRYSTAL_STAR)
+            // Spawn NPC and have the star track it.
+            USER_FUNC(evt_npc_entry, PTR("cstar"), PTR("c_mario"))
+            USER_FUNC(evt_npc_set_position, PTR("cstar"), LW(10), LW(11), LW(12))
+            USER_FUNC(evt_npc_flag_onoff, 1, PTR("cstar"), 0x4000'00a0)
+            USER_FUNC(
+                evt_item_entry, PTR("istar"), LW(13), LW(10), LW(11), LW(12),
+                17, -1, LW(14))
+            
+            INLINE_EVT_ID(LW(9))
+                DO(0)
+                    USER_FUNC(evt_npc_get_position, PTR("cstar"), LW(0), LW(1), LW(2))
+                    USER_FUNC(evt_item_set_position, PTR("istar"), LW(0), LW(1), LW(2))
+                    WAIT_FRM(1)
+                WHILE()
+            END_INLINE()
+            
+            WAIT_MSEC(900)
+            USER_FUNC(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+            ADD(LW(11), 50)
+            ADD(LW(12), 10)
+            USER_FUNC(evt_npc_jump_position_nohit, 
+                PTR("cstar"), LW(10), LW(11), LW(12), 1000, FLOAT(30.0))
         CASE_ETC()
             USER_FUNC(evtTot_GetUniqueItemName, LW(15))
             USER_FUNC(
@@ -129,6 +152,9 @@ EVT_BEGIN(Tower_ChestEvt_Core)
             // to have this function return control of Mario.
             RUN_CHILD_EVT(LW(14))
             SET(LW(14), 0)
+        CASE_BETWEEN((int32_t)ItemType::DIAMOND_STAR, (int32_t)ItemType::CRYSTAL_STAR)
+            DELETE_EVT(LW(9))
+            USER_FUNC(evt_item_get_item, PTR("istar"))
         CASE_ETC()
             USER_FUNC(evt_item_get_item, LW(15))
     END_SWITCH()

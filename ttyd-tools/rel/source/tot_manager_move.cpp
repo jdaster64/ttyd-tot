@@ -134,6 +134,45 @@ int32_t MoveManager::GetMoveCost(int32_t move_type) {
         g_Mod->state_.level_selected_[move_type]-1];
 }
 
+bool MoveManager::UpgradeMove(int32_t move_type) {
+    auto& level = g_Mod->state_.level_unlocked_[move_type];
+    if (level >= g_MoveData[move_type].max_level) return false;
+    if (++level == 1) {
+        auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+        switch (move_type) {
+            // Unlock field moves for Spin/Spring Jump + Super/Ultra Hammer.
+            case MoveType::JUMP_SPIN:
+                pouch.jump_level = 2;
+                ttyd::mario_pouch::pouchGetItem(ItemType::SUPER_BOOTS);
+                break;
+            case MoveType::JUMP_SPRING:
+                pouch.jump_level = 3;
+                ttyd::mario_pouch::pouchGetItem(ItemType::ULTRA_BOOTS);
+                break;
+            case MoveType::HAMMER_SUPER:
+                pouch.hammer_level = 2;
+                ttyd::mario_pouch::pouchGetItem(ItemType::SUPER_HAMMER);
+                break;
+            case MoveType::HAMMER_ULTRA:
+                pouch.hammer_level = 3;
+                ttyd::mario_pouch::pouchGetItem(ItemType::ULTRA_HAMMER);
+                break;
+            // Unlock corresponding SP move + increase max SP by 1.00.
+            case MoveType::SP_CLOCK_OUT:
+            case MoveType::SP_POWER_LIFT:
+            case MoveType::SP_ART_ATTACK:
+            case MoveType::SP_SWEET_FEAST:
+            case MoveType::SP_SHOWSTOPPER:
+            case MoveType::SP_SUPERNOVA:
+                move_type -= MoveType::SP_SWEET_TREAT;
+                pouch.star_powers_obtained |= (1 << move_type);
+                pouch.max_sp += 100;
+                break;
+        }
+    }
+    return true;
+}
+
 bool MoveManager::ChangeSelectedLevel(int32_t move_type, int32_t change) {
     int32_t old_level = g_Mod->state_.level_selected_[move_type];
     int32_t max_level = g_Mod->state_.level_unlocked_[move_type];
@@ -236,40 +275,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMoveSelectedLevel) {
 
 EVT_DEFINE_USER_FUNC(evtTot_UpgradeMove) {
     int32_t move = evtGetValue(evt, evt->evtArguments[0]);
-    auto& level = g_Mod->state_.level_unlocked_[move];
-    if (++level == 1) {
-        auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-        switch (move) {
-            // Unlock field moves for Spin/Spring Jump + Super/Ultra Hammer.
-            case MoveType::JUMP_SPIN:
-                pouch.jump_level = 2;
-                ttyd::mario_pouch::pouchGetItem(ItemType::SUPER_BOOTS);
-                break;
-            case MoveType::JUMP_SPRING:
-                pouch.jump_level = 3;
-                ttyd::mario_pouch::pouchGetItem(ItemType::ULTRA_BOOTS);
-                break;
-            case MoveType::HAMMER_SUPER:
-                pouch.hammer_level = 2;
-                ttyd::mario_pouch::pouchGetItem(ItemType::SUPER_HAMMER);
-                break;
-            case MoveType::HAMMER_ULTRA:
-                pouch.hammer_level = 3;
-                ttyd::mario_pouch::pouchGetItem(ItemType::ULTRA_HAMMER);
-                break;
-            // Unlock corresponding SP move + increase max SP.
-            case MoveType::SP_CLOCK_OUT:
-            case MoveType::SP_POWER_LIFT:
-            case MoveType::SP_ART_ATTACK:
-            case MoveType::SP_SWEET_FEAST:
-            case MoveType::SP_SHOWSTOPPER:
-            case MoveType::SP_SUPERNOVA:
-                move -= MoveType::SP_SWEET_TREAT;
-                pouch.star_powers_obtained |= (1 << move);
-                pouch.max_sp += 100;
-                break;
-        }
-    }
+    MoveManager::UpgradeMove(move);
     return 2;
 }
 

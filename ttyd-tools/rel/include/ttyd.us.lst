@@ -750,6 +750,7 @@
 800a9620:evt_cam_ctrl_onoff
 
 // evt_item.o
+800a9d04:evt_item_set_position
 800a9f98:evt_item_get_item
 800aa400:evt_item_entry
 
@@ -893,6 +894,7 @@
 800e2e78:evt_mario_goodbye_party
 800e3120:evt_mario_set_party_pos
 800e6498:evt_mario_normalize
+800e71f8:evt_mario_get_pos
 800e7474:evt_mario_key_onoff
 
 // evt_party.o

@@ -128,6 +128,8 @@ public:
     // Gets the FP/SP cost for the currently selected level of the move.
     static int32_t GetMoveCost(int32_t move_type);
     
+    // Upgrades the move by a level (Returns false if the move was at max).
+    static bool UpgradeMove(int32_t move_type);
     // Changes the currently selected move level.
     static bool ChangeSelectedLevel(int32_t move_type, int32_t change);
     // Resets all move selected levels to the minimum (between battles).
@@ -166,7 +168,7 @@ uint32_t GetWeaponPowerFromUnitWorkVariable(
 // Returns the current level of move arg0, storing the result in arg1.
 EVT_DECLARE_USER_FUNC(evtTot_GetMoveSelectedLevel, 2)
 
-// Unlocks or upgrades the level of move arg0 (bounds are not checked!)
+// Unlocks or upgrades the level of move arg0.
 EVT_DECLARE_USER_FUNC(evtTot_UpgradeMove, 1)
 
 }

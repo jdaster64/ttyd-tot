@@ -188,24 +188,56 @@ g_StringMap = {
             b"the next move's ATK by 2.\n"
             b"Wearing more copies raises\n"
             b"the effect and FP cost.",
+            
+        b"msg_treasure_map":
+            b"Allows Mario to use the move\n"
+            b"Sweet Treat.",
+            
+        b"msg_diamond_star":
+            b"Allows Mario to use the move\n"
+            b"Earth Tremor.",
+            
+        b"msg_emerald_star":
+            b"Allows Mario to use the move\n"
+            b"Clock Out, and raises max SP.",
+            
+        b"msg_gold_star":
+            b"Allows Mario to use the move\n"
+            b"Power Lift, and raises max SP.",
+            
+        b"msg_ruby_star":
+            b"Allows Mario to use the move\n"
+            b"Art Attack, and raises max SP.",
+            
+        b"msg_sapphire_star":
+            b"Allows Mario to use the move\n"
+            b"Sweet Feast, and raises max SP.",
+            
+        b"msg_garnet_star":
+            b"Allows Mario to use the move\n"
+            b"Showstopper, and raises max SP.",
+            
+        b"msg_crystal_star":
+            b"Allows Mario to use the move\n"
+            b"Supernova, and raises max SP.",
         
         # Tower reward-related information.
         
         b"tot_reward_hpplus":       b"HP Up",
         b"tot_rewarddesc_hpplus":
-            b"Increases Mario's HP by 5.",
+            b"Levels up Mario's HP.",
             
         b"tot_reward_fpplus":       b"FP Up",
         b"tot_rewarddesc_fpplus":
-            b"Increases Mario's FP by 5.",
+            b"Levels up Mario's FP.",
             
         b"tot_reward_bpplus":       b"BP Up",
         b"tot_rewarddesc_bpplus":
-            b"Increases Mario's BP by 5.",
+            b"Levels up Mario's BP.",
         
         b"tot_reward_hpplusp":       b"HP Up P",
         b"tot_rewarddesc_hpplusp":
-            b"Increases partners' HP.",
+            b"Levels up partners' HP.",
         
         b"tot_reward_sack":         b"Strange Sack",
         b"tot_rewarddesc_sack":

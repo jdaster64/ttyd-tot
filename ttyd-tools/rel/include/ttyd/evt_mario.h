@@ -80,7 +80,7 @@ EVT_DECLARE_USER_FUNC(evt_mario_normalize, 0)
 // evt_mario_set_mov_spd
 // evt_mario_set_hosei_xyz
 // evt_mario_set_pos
-// evt_mario_get_pos
+EVT_DECLARE_USER_FUNC(evt_mario_get_pos, 4)
 // evt_mario_set_camid
 // evt_mario_init_camid
 // evt_mario_cam_y_off

@@ -13,7 +13,7 @@ extern "C" {
 // evt_item_set_alpha
 // evt_item_set_scale
 // evt_item_get_position
-// evt_item_set_position
+EVT_DECLARE_USER_FUNC(evt_item_set_position, 4)
 // evt_item_set_bound_next_dir
 // evt_item_set_bound_next_speed
 // evt_item_change_mode
