@@ -693,14 +693,7 @@ void SelectEnemies(int32_t floor) {
     }
     
     // Change Yuxes to corresponding X-Naut types if partner is not present.
-    bool has_partner = false;
-    for (int32_t i = 0; i < 8; ++i) {
-        if (pouch.party_data[i].flags & 1) {
-            has_partner = true;
-            break;
-        }
-    }
-    if (!has_partner) {
+    if (GetNumActivePartners() > 0) {
         for (int32_t i = 0; i < g_NumEnemies; ++i) {
             switch (g_Enemies[i]) {
                 case BattleUnitType::YUX: {

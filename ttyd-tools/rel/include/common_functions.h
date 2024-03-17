@@ -20,6 +20,8 @@ const char* GetCurrentArea();
 const char* GetCurrentMap();
 // Returns the name of the map about to be loaded.
 const char* GetNextMap();
+// Returns the current number of unlocked partners.
+int32_t GetNumActivePartners();
 
 // For custom event support; allows calling subroutines / user_funcs in
 // relocatable modules.

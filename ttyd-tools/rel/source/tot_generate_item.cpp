@@ -1,5 +1,6 @@
 #include "tot_generate_item.h"
 
+#include "common_functions.h"
 #include "mod.h"
 #include "tot_state.h"
 
@@ -98,15 +99,8 @@ int32_t PickRandomItem(
         } else {
             current_weight += badge_weight;
             if (result < current_weight) {
-                bool partners_enabled = false;
-                for (int32_t i = 1; i <= 7; ++i) {
-                    if (ttyd::mario_pouch::pouchGetPtr()
-                        ->party_data[i].flags & 1) {
-                        partners_enabled = true;
-                        break;
-                    }
-                }
-                bitfield = partners_enabled ? kStackableBadges : kStackableBadgesNoP;
+                int32_t num_partners = GetNumActivePartners();
+                bitfield = num_partners ? kStackableBadges : kStackableBadgesNoP;
                 len_bitfield = sizeof(kStackableBadges) / sizeof(uint16_t);
                 offset = 0xf0;
             } else {

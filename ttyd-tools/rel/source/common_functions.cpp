@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 
+#include <ttyd/mario_pouch.h>
 #include <ttyd/mariost.h>
 #include <ttyd/seqdrv.h>
 #include <ttyd/seq_mapchange.h>
@@ -46,6 +47,17 @@ const char* GetCurrentMap() {
 
 const char* GetNextMap() {
     return ttyd::seq_mapchange::NextMap;
+}
+
+int32_t GetNumActivePartners() {
+    auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+    int32_t num_partners = 0;
+    for (int32_t i = 1; i <= 7; ++i) {
+        if (pouch->party_data[i].flags & 1) {
+            ++num_partners;
+        }
+    }
+    return num_partners;
 }
     
 void LinkCustomEvt(ModuleId::e module_id, void* module_ptr, int32_t* evt) {

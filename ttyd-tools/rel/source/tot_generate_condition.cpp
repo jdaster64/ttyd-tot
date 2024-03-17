@@ -1,5 +1,6 @@
 #include "tot_generate_condition.h"
 
+#include "common_functions.h"
 #include "mod.h"
 #include "patches_options.h"
 #include "tot_generate_item.h"
@@ -103,13 +104,8 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
     BattleCondition conditions[kNumConditions];
     memcpy(conditions, kBattleConditions, sizeof(kBattleConditions));
     
-    const PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
-    int32_t num_partners = 0;
-    for (int32_t i = 0; i < 8; ++i) {
-        num_partners += pouch.party_data[i].flags & 1;
-    }
-    
     // Disable conditions that rely on having partners or FP-using moves.
+    int32_t num_partners = GetNumActivePartners();
     for (auto& condition : conditions) {
         switch (condition.type) {
             case PARTNER_TOTAL_DAMAGE_LESS:
