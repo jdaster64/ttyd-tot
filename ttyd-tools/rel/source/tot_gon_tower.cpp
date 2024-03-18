@@ -338,7 +338,6 @@ EVT_BEGIN(Tower_NpcSetup)
         LBL(2)
         WAIT_FRM(1)
         IF_EQUAL(GSW(1000), 0)
-            // TODO: Draw icons corresponding to chest contents.
             IF_LARGE_EQUAL(GSW(1001), 1)
                 USER_FUNC(evtTot_DisplayChestIcons)
             END_IF()

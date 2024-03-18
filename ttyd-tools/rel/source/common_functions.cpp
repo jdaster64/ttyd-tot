@@ -102,12 +102,10 @@ int32_t CountSetBits(uint32_t x) {
 }
 
 uint32_t GetBitMask(uint32_t start_bit, uint32_t end_bit) {
-    // TODO: Replace with rlwinm?
     return (~0U >> (31-end_bit)) - (1U << start_bit) + 1;
 }
 
 uint32_t GetShiftedBitMask(uint32_t x, uint32_t start_bit, uint32_t end_bit) {
-    // TODO: Replace with rlwinm?
     return (x & GetBitMask(start_bit, end_bit)) >> start_bit;
 }
 

@@ -455,9 +455,13 @@ EVT_BEGIN(Reward_PartnerRestoreBgmEvt)
 EVT_END()
 
 // Script to reward coins.
-// TODO: Parameterize based on floor count or something.
 EVT_BEGIN(Reward_GetCoinsEvt)
-    USER_FUNC(evt_sub_get_coin, 64)
+    USER_FUNC(evtTot_GetFloor, LW(0))
+    // Give 25 coins + 5 per every 8 floors afterward.
+    DIV(LW(0), 8)
+    MUL(LW(0), 5)
+    ADD(LW(0), 25)
+    USER_FUNC(evt_sub_get_coin, LW(0))
     RETURN()
 EVT_END()
 
