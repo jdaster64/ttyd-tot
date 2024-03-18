@@ -592,8 +592,7 @@ void SelectPresetLoadout(StateManager& state) {
     // If only 3 enemies, occasionally mirror it across the center.
     if (size == 3 && preset->mirrorable) {
         // The higher the floor number, the more likely the 5-enemy version.
-        if (static_cast<int32_t>(state.Rand(200, RNG_ENEMY)) 
-            < state.floor_) {
+        if (static_cast<int32_t>(state.Rand(64, RNG_ENEMY)) < state.floor_) {
             g_Enemies[3] = g_Enemies[1];
             g_Enemies[4] = g_Enemies[0];
             size = 5;
@@ -603,12 +602,6 @@ void SelectPresetLoadout(StateManager& state) {
 }
 
 void SelectEnemies() {
-    // TODO: Remove this; testing for now.
-    g_NumEnemies = 2;
-    g_Enemies[0] = BattleUnitType::GOOMBA;
-    g_Enemies[1] = BattleUnitType::GOOMBA;
-    (void)SelectPresetLoadout;
-    
     // TODO: Add special cases for boss floors.
     
     // Check to see if there is a debug set of enemies, and use it if so.
@@ -617,14 +610,12 @@ void SelectEnemies() {
         return;
     }
     
-    /*
-    
-    const auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     auto& state = infinite_pit::g_Mod->state_;
     int32_t difficulty = GetDifficulty();
+    int32_t target_level_sum = kTargetLevelSums[difficulty];
     
-    // If floor > 50, determine whether to use one of the preset loadouts.
-    if (floor >= 50 && state.Rand(100, RNG_ENEMY) < 10) {
+    // After enemy loadouts are strong enough, chance to use a preset loadout.
+    if (target_level_sum > 30 && state.Rand(100, RNG_ENEMY) < 10) {
         SelectPresetLoadout(state);
     } else {
         // Put together an array of weights, scaled by the floor number and
@@ -636,11 +627,9 @@ void SelectEnemies() {
             int32_t base_wt = 0;
             const EnemyTypeInfo& ei = kEnemyInfo[i];
             
-            // If enemy does not have a BattleUnitSetup, or is a boss, ignore.
-            if (ei.battle_unit_setup_offset >= 0 &&
-                ei.level >= 2 && ei.level <= 10) {
-                int32_t floor_group = floor < 110 ? floor / 10 : 10;
-                base_wt = kBaseWeights[floor_group][ei.level - 2];
+            // If enemy is unimplemented, or is not a standard enemy, ignore.
+            if (ei.kind && ei.level >= 2 && ei.level <= 10) {
+                base_wt = kBaseWeights[difficulty][ei.level - 2];
             }
             
             // Halve base rate for all Yux types since they're so centralizing.
@@ -669,8 +658,6 @@ void SelectEnemies() {
         
         // Pick enemies in weighted fashion, with preference towards repeats.
         int32_t level_sum = 0;
-        const int32_t target_sum =
-            floor < 100 ? kTargetLevelSums[floor / 10] : kTargetLevelSums[10];
         for (int32_t slot = 0; slot < 5; ++slot) {
             int32_t sum_weights = 0;
             for (int32_t i = 0; i < kNumEnemyTypes; ++i) 
@@ -685,8 +672,8 @@ void SelectEnemies() {
             
             // If level_sum is sufficiently high for the floor and not on the
             // fifth enemy, decide whether to add any further enemies.
-            if (level_sum >= target_sum / 2 && slot < 4) {
-                const int32_t end_chance = level_sum * 100 / target_sum;
+            if (level_sum >= target_level_sum / 2 && slot < 4) {
+                const int32_t end_chance = level_sum * 100 / target_level_sum;
                 if (static_cast<int32_t>(state.Rand(100, RNG_ENEMY)) 
                     < end_chance) {
                     for (++slot; slot < 5; ++slot) g_Enemies[slot] = -1;
@@ -713,8 +700,9 @@ void SelectEnemies() {
             }
         }
         
-        // If floor > 80, rarely insert an Amazy Dayzee in the loadout.
-        if (floor >= 80 && state.Rand(100, RNG_ENEMY) < 5) {
+        // If enemy strength is high enough, small chance to add Amazy Dayzees.
+        if (static_cast<int32_t>(state.Rand(100, RNG_ENEMY)) 
+            < target_level_sum - 33) {
             int32_t idx = 1;
             for (; idx < 5; ++idx) {
                 if (g_Enemies[idx] == -1) break;
@@ -750,7 +738,6 @@ void SelectEnemies() {
             }
         }
     }
-    */
 }
 
 void BuildBattle(
@@ -966,7 +953,9 @@ bool GetEnemyStats(
         }
     }
     if (out_level) {
-        if (ttyd::mario_pouch::pouchGetPtr()->level >= 99) {
+        // Note: in ToT, none of this should matter?
+        int32_t mario_level = ttyd::mario_pouch::pouchGetPtr()->level;
+        if (mario_level >= 99) {
             *out_level = 0;
         } else if (ei.level == 0) {
             // Enemies like Mini-Yuxes should never grant EXP.
@@ -974,12 +963,8 @@ bool GetEnemyStats(
         } else {
             // Enemies' level will always be the same relative to than Mario,
             // typically giving 3 ~ 10 EXP depending on strength and group size.
-            // (The EXP gained will reduce slightly after floor 100.)
             if (ei.level <= 10) {
-                int32_t level = 
-                    ei.level + (state.floor_ < 100 ? 5 : 2);
-                *out_level =
-                    ttyd::mario_pouch::pouchGetPtr()->level + level;
+                *out_level = mario_level + ei.level + 5;
             } else {
                 // Bosses / special enemies get fixed bonus Star Points instead.
                 *out_level = -ei.level / 2;
@@ -987,7 +972,7 @@ bool GetEnemyStats(
         }
     }
     if (out_coinlvl) {
-        // Return the level as the number of coins, or 20 for special enemies.
+        // Return the # of coins = enemy base level, or 20 for special enemies.
         *out_coinlvl = ei.level > 10 ? 20 : ei.level;
     }
     

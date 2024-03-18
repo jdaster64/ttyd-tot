@@ -41,13 +41,16 @@ void GetOptionParts(
 
 void StateManager::InitDefaultOptions() {
     // TODO: Seed randomly, or allow user to change.
-    seed_ = 0;
+    seed_ = 417;
     
-    floor_ = 0;
+    // TODO: Once enemy-less floor 0 is implemented, start at 0.
+    floor_ = 1;
+    
+    // Set stat upgrades to base # of levels.
     hp_level_ = 2;
+    hp_p_level_ = 2;
     fp_level_ = 1;
     bp_level_ = 1;
-    hp_p_level_ = 2;
     num_sack_upgrades_ = 0;
     
     memset(option_flags_, 0, sizeof(option_flags_));
