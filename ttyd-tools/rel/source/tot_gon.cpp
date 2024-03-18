@@ -25,6 +25,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 }  // namespace
 
 #define DEFAULT_WALL_WEAPON {                                       \
+    .base_accuracy = 100,                                           \
     .superguards_allowed = 2,                                       \
     .damage_function = (void*)weaponGetPowerDefault,                \
     .damage_function_params = { 1, 0, 0, 0, 0, 0, 0, 0, },          \
@@ -43,6 +44,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 }
 
 #define DEFAULT_WALL_WEAPON_NO_DAMAGE {                             \
+    .base_accuracy = 100,                                           \
     .superguards_allowed = 2,                                       \
     .target_class_flags =                                           \
         AttackTargetClass_Flags::MULTIPLE_TARGET |                  \

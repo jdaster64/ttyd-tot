@@ -12,8 +12,10 @@ class RewardManager {
 public:
     // Change item data for items used as placeholders for rewards.
     static void PatchRewardItemData();
-    // Apply effects of reward placeholder items.
+    // Apply special effects for reward items.
     static bool HandleRewardItemPickup(int32_t item_type);
+    // Run after picking up an item (for tracking unique badges).
+    static void AfterItemPickup(int32_t item_type);
     // Returns a pointer to an array of moves chosen for unlock/upgrade.
     // Guaranteed to end with a -1.
     static int32_t* GetSelectedMoves(int32_t* num_moves = nullptr);

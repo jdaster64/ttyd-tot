@@ -575,7 +575,12 @@ void ApplyFixedPatches() {
             if (tot::RewardManager::HandleRewardItemPickup(item_type)) 
                 return 1U;
             
-            return g_pouchGetItem_trampoline(item_type);
+            uint32_t return_value = g_pouchGetItem_trampoline(item_type);
+            
+            // Handle unique badges that TOT needs to track having collected.
+            if (return_value) tot::RewardManager::AfterItemPickup(item_type);
+            
+            return return_value;
         });
 }
 

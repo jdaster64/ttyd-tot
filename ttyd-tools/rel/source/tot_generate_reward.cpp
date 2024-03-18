@@ -1,8 +1,10 @@
 #include "tot_generate_reward.h"
 
+#include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
+#include "tot_generate_item.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
@@ -51,30 +53,29 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 
 enum RewardType {
     // Items to use as TOT reward placeholders.
-    REWARD_HP_UP        = ItemType::HP_PLUS,
-    REWARD_FP_UP        = ItemType::FP_PLUS,
-    REWARD_BP_UP        = ItemType::LUCKY_START_P,
-    REWARD_HP_UP_P      = ItemType::HP_PLUS_P,
-    REWARD_INV_UP       = ItemType::INN_COUPON,
+    REWARD_HP_UP            = ItemType::HP_PLUS,
+    REWARD_FP_UP            = ItemType::FP_PLUS,
+    REWARD_BP_UP            = ItemType::LUCKY_START_P,
+    REWARD_HP_UP_P          = ItemType::HP_PLUS_P,
+    REWARD_INV_UP           = ItemType::INN_COUPON,
     
-    REWARD_SHINE_SPRITE = ItemType::SHINE_SPRITE,
-    REWARD_STAR_PIECE   = ItemType::STAR_PIECE,
+    REWARD_SHINE_SPRITE     = ItemType::SHINE_SPRITE,
+    REWARD_STAR_PIECE       = ItemType::STAR_PIECE,
     
-    REWARD_GOOMBELLA    = -1,
-    REWARD_KOOPS        = -2,
-    REWARD_FLURRIE      = -3,
-    REWARD_YOSHI        = -4,
-    REWARD_VIVIAN       = -5,
-    REWARD_BOBBERY      = -6,
-    REWARD_MOWZ         = -7,
-    REWARD_JUMP         = -8,
-    REWARD_HAMMER       = -9,
-    REWARD_SPECIAL_MOVE = -10,
-    REWARD_COINS        = -11,
+    REWARD_GOOMBELLA        = -1,
+    REWARD_KOOPS            = -2,
+    REWARD_FLURRIE          = -3,
+    REWARD_YOSHI            = -4,
+    REWARD_VIVIAN           = -5,
+    REWARD_BOBBERY          = -6,
+    REWARD_MOWZ             = -7,
+    REWARD_JUMP             = -8,
+    REWARD_HAMMER           = -9,
+    REWARD_SPECIAL_MOVE     = -10,
+    REWARD_COINS            = -11,
     
-    // TODO: Make these placeholders as well.
-    REWARD_BADGE_STACKABLE  = ItemType::SUPER_SHROOM,
-    REWARD_BADGE_UNIQUE     = ItemType::DAMAGE_DODGE,
+    // Used to determine how many chests should be filled.
+    REWARD_PLACEHOLDER      = -999,
 };
 
 // Underlying data for chest positions + contents.
@@ -89,6 +90,269 @@ int32_t g_ChestDrawAlpha = 0;
 // Moves selected for unlocking / upgrading menus.
 int32_t g_MoveSelections[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 int32_t g_NumMovesSelected = 0;
+
+// Returns the starting move type and number of moves for the category.
+void GetMoveRange(int32_t reward_type, int32_t& move_start, int32_t& num_moves) {
+    switch(reward_type) {
+        case 0:  {
+            // All moves.
+            move_start = 0;
+            num_moves = MoveType::MOVE_TYPE_MAX;
+            break;
+        }
+        case REWARD_GOOMBELLA: {
+            move_start = MoveType::GOOMBELLA_BASE;
+            num_moves = 6;
+            break;
+        }
+        case REWARD_KOOPS: {
+            move_start = MoveType::KOOPS_BASE;
+            num_moves = 6;
+            break;
+        }
+        case REWARD_FLURRIE: {
+            move_start = MoveType::FLURRIE_BASE;
+            num_moves = 6;
+            break;
+        }
+        case REWARD_YOSHI: {
+            move_start = MoveType::YOSHI_BASE;
+            num_moves = 6;
+            break;
+        }
+        case REWARD_VIVIAN: {
+            move_start = MoveType::VIVIAN_BASE;
+            num_moves = 6;
+            break;
+        }
+        case REWARD_BOBBERY: {
+            move_start = MoveType::BOBBERY_BASE;
+            num_moves = 6;
+            break;
+        }
+        case REWARD_MOWZ: {
+            move_start = MoveType::MOWZ_BASE;
+            num_moves = 6;
+            break;
+        }
+        case REWARD_JUMP: {
+            move_start = MoveType::JUMP_BASE;
+            num_moves = 8;
+            break;
+        }
+        case REWARD_HAMMER: {
+            move_start = MoveType::HAMMER_BASE;
+            num_moves = 8;
+            break;
+        }
+        case REWARD_SPECIAL_MOVE: {
+            move_start = MoveType::SP_SWEET_TREAT;
+            num_moves = 8;
+            break;
+        }
+    }
+}
+
+// Returns whether all moves for the given reward type are already unlocked.
+bool HasAllMovesUnlocked(int32_t reward_type) {
+    int32_t move_start = 0;
+    int32_t num_moves = 0;
+    GetMoveRange(reward_type, move_start, num_moves);
+    
+    for (int32_t i = 0; i < num_moves; ++i) {
+        int32_t move = move_start + i;
+        if (MoveManager::IsUnlockable(move)) return false;
+    }
+    
+    return true;
+}
+
+// Selects which partner to offer as a reward.
+int32_t SelectPartner() {
+    auto& state = infinite_pit::g_Mod->state_;
+    
+    if (GetNumActivePartners() == 4) {
+        // Once the player has taken four partners, choose from among them.
+        int32_t value = state.Rand(4, RNG_REWARD_PARTNER_LOOP);
+        int32_t option = 0;
+        for (int32_t i = 1; i <= 7; ++i) {
+            if (ttyd::mario_pouch::pouchGetPtr()->party_data[i].flags & 1) {
+                if (option == value) {
+                    switch (i) {
+                        case 1: return REWARD_GOOMBELLA;
+                        case 2: return REWARD_KOOPS;
+                        case 3: return REWARD_BOBBERY;
+                        case 4: return REWARD_YOSHI;
+                        case 5: return REWARD_FLURRIE;
+                        case 6: return REWARD_VIVIAN;
+                        case 7: return REWARD_MOWZ;
+                    }
+                }
+                ++option;
+            }
+        }
+    } else {
+        int32_t value = state.Rand(7, RNG_REWARD_PARTNER);
+        return -(value + 1);
+    }
+    
+    // Should never be reached.
+    return 0;
+}
+
+// Selects which Special Move to offer as a reward.
+int32_t SelectSpecialMove() {
+    auto& state = infinite_pit::g_Mod->state_;
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    const int32_t max_sp = pouch.max_sp / 100;
+    uint16_t weights[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    int32_t total_weight = 0;
+    
+    for (int32_t i = 2; i < 8; ++i) {
+        auto* data = MoveManager::GetMoveData(MoveType::SP_SWEET_TREAT + i);
+        // Set weight for move only if it can be afforded and isn't unlocked.
+        if (data->move_cost[2] <= (max_sp + 1) && 
+            !(pouch.star_powers_obtained & (1 << i))) {
+            weights[i] = 1;
+            ++total_weight;
+        }
+    }
+    
+    if (total_weight > 0) {
+        // Make sure the same special move is chosen every time until taken.
+        state.rng_states_[RNG_MOVE_SPECIAL] = max_sp;
+        int32_t weight = state.Rand(total_weight, RNG_MOVE_SPECIAL);
+        total_weight = 0;
+        for (int32_t i = 2; i < 8; ++i) {
+            total_weight += weights[i];
+            if (weight < total_weight) return ItemType::EMERALD_STAR + (i - 2);
+        }
+    }
+    
+    // No Special Moves left to unlock.
+    return 0;
+}
+
+// Selects which unique badge to give as a reward.
+int32_t SelectUniqueBadge() {
+    auto& state = infinite_pit::g_Mod->state_;
+    static constexpr const int32_t kBadges[] = {
+        ItemType::CHILL_OUT, ItemType::DOUBLE_DIP,
+        ItemType::DOUBLE_DIP_P, ItemType::FEELING_FINE,
+        ItemType::FEELING_FINE_P, ItemType::LUCKY_START,
+        ItemType::QUICK_CHANGE, ItemType::RETURN_POSTAGE,
+        ItemType::ZAP_TAP, ItemType::SPIKE_SHIELD,
+    };
+    uint16_t weights[] = { 10, 10, 10, 10, 10, 10, 15, 10, 10, 20 };
+    uint8_t eligible[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    int32_t total_weight = 115;
+    
+    if (GetNumActivePartners() == 0) {
+        eligible[2] = 0;
+        eligible[4] = 0;
+        eligible[6] = 0;
+    }
+    
+    // Disable badges that have already been picked up.
+    for (int32_t i = 0; i < 10; ++i) {
+        if (state.GetOption(STAT_RUN_UNIQUE_BADGE_0 + i)) {
+            eligible[i] = 0;
+        }
+    }
+    
+    int32_t num_eligible = 0;
+    for (int32_t i = 0; i < 10; ++i) num_eligible += eligible[i];
+    
+    if (num_eligible > 0) {
+        // Find the next badge in the sequence that hasn't yet been claimed,
+        // trying multiple times if necessary.
+        for (int32_t retries = 20; retries > 0; --retries) {
+            int32_t weight = state.Rand(total_weight, RNG_REWARD_BADGE_SPECIAL);
+            total_weight = 0;
+            for (int32_t i = 0; i < 10; ++i) {
+                total_weight += weights[i];
+                if (weight < total_weight) {
+                    if (eligible[i]) return kBadges[i];
+                    break;
+                }
+            }
+        }
+    }
+    
+    // No unique badges left to unlock.
+    return 0;
+}
+
+// Selects set of moves to offer for unlocking or upgrading moves.
+void SelectMoves(int32_t reward_type, bool is_upgrade_mode) {
+    auto& state = infinite_pit::g_Mod->state_;
+    
+    // Determine how many moves to offer at maximum.
+    bool is_partner = reward_type <= REWARD_GOOMBELLA && reward_type >= REWARD_MOWZ;
+    int32_t max_options = 3;
+    if (!is_upgrade_mode && is_partner) {
+        max_options = 2;
+    }
+    
+    // Fill in array of available moves for the type.
+    int32_t move_start = 0;
+    int32_t num_moves = 0;
+    GetMoveRange(reward_type, move_start, num_moves);
+    
+    bool moves[MoveType::MOVE_TYPE_MAX] = { 0 };
+    int32_t num_options = 0;
+    for (int32_t i = 0; i < num_moves; ++i) {        
+        int32_t move = move_start + i;
+        if ((is_upgrade_mode && MoveManager::IsUpgradable(move)) ||
+            (!is_upgrade_mode && MoveManager::IsUnlockable(move))) {
+            moves[move] = 1;
+            ++num_options;
+        }
+    }
+    if (num_options < max_options) max_options = num_options;
+    
+    g_NumMovesSelected = 0;
+    
+    int32_t i = 0;
+    if (max_options > 0) {
+        // Pick which RNG state to use.
+        int32_t rng_type = RNG_MOVE_UPGRADE;
+        if (!is_upgrade_mode) {
+            rng_type = RNG_MOVE_GOOMBELLA - (reward_type + 1);
+        }
+        
+        // Select moves at random until picking the requisite number,
+        // or running out of options, whichever happens first.
+        for (int32_t retries = 200; retries > 0; --retries) {
+            int32_t move = move_start + state.Rand(num_moves, rng_type);
+            if (moves[move] == 0) continue;
+            
+            // For unlocking partner moves, limit the tiers that can appear
+            // to 1 on the first pick, 1-2 on the second, and 1-3 otherwise.
+            if (!is_upgrade_mode && is_partner) {
+                int32_t tier = MoveManager::GetMoveData(move)->move_tier;
+                // Determine which # pick this is by the # of available moves.
+                int32_t max_rank = 6 - num_options;
+                if (reward_type == REWARD_GOOMBELLA) --max_rank;
+                // Force a level-2 or 3 to appear in the second and third pick.
+                if (i == 0 && (max_rank == 2 || max_rank == 3)) {
+                    if (tier != max_rank) continue;
+                } else {
+                    if (tier > max_rank) continue;
+                }
+            }
+            
+            // Move is valid; add to possible selections.
+            g_MoveSelections[i] = move;
+            ++g_NumMovesSelected;
+            if (++i >= max_options) break;
+            moves[move] = 0;
+        }
+    }
+    
+    // Put a sentinel at the end of the array of move selections.
+    g_MoveSelections[i] = -1;
+}
 
 int32_t GetIcon(ChestData* chest) {
     switch (chest->item) {
@@ -323,58 +587,217 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
     }
 }
 
+void RewardManager::AfterItemPickup(int32_t item_type) {
+    uint32_t option = 0;
+    switch (item_type) {
+        case ItemType::CHILL_OUT:
+            option = STAT_RUN_UNIQUE_BADGE_0;
+            break;
+        case ItemType::DOUBLE_DIP:
+            option = STAT_RUN_UNIQUE_BADGE_1;
+            break;
+        case ItemType::DOUBLE_DIP_P:
+            option = STAT_RUN_UNIQUE_BADGE_2;
+            break;
+        case ItemType::FEELING_FINE:
+            option = STAT_RUN_UNIQUE_BADGE_3;
+            break;
+        case ItemType::FEELING_FINE_P:
+            option = STAT_RUN_UNIQUE_BADGE_4;
+            break;
+        case ItemType::LUCKY_START:
+            option = STAT_RUN_UNIQUE_BADGE_5;
+            break;
+        case ItemType::QUICK_CHANGE:
+            option = STAT_RUN_UNIQUE_BADGE_6;
+            break;
+        case ItemType::RETURN_POSTAGE:
+            option = STAT_RUN_UNIQUE_BADGE_7;
+            break;
+        case ItemType::ZAP_TAP:
+            option = STAT_RUN_UNIQUE_BADGE_8;
+            break;
+        case ItemType::SPIKE_SHIELD:
+            option = STAT_RUN_UNIQUE_BADGE_9;
+            break;
+    }
+    if (option) infinite_pit::g_Mod->state_.SetOption(option, 1);
+}
+
 int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
     if (num_moves) *num_moves = g_NumMovesSelected;
     return g_MoveSelections;
 }
 
+// Assigns reward types and corresponding pickup scripts to all chests.
+// TODO: Add case for floor 0 that always picks a partner (unless disabled).
+void SelectChestContents() {
+    auto& state = infinite_pit::g_Mod->state_;
+    
+    // Weights for different types of moves (Jump, Hammer, Special, partner).
+    static constexpr const uint16_t kMoveWeights[] = { 15, 15, 6, 50 };
+    // Weights for different types of stat upgrades (HP, FP, BP, HP P, inv.).
+    static constexpr const uint16_t kStatWeights[] = { 20, 20, 20, 15, 10 };
+    // Weights for different types of other rewards
+    // (coins, Star Piece, Shine Sprite, unique badge, stackable badge).
+    static constexpr const uint16_t kOtherWeights[] = { 20, 30, 30, 15, 10 };
+    
+    // Top-level weight for choosing a move, stat-up, or other reward.
+    // The former two categories cannot be chosen more than once per floor.
+    uint16_t top_level_weights[] = { 10, 10, 10 };
+    // Tracks which kind of 'other' categories have been chosen already;
+    // if one of them is rolled twice in one floor, picks a random stackable
+    // badge in its place.
+    bool others_picked[] = { false, false, false, false, false };
+    
+    for (ChestData* chest = g_Chests; chest->item; ++chest) {
+        int32_t sum_weights, weight, type;
+        int32_t reward = 0;
+        const void* pickup_script = nullptr;
+        
+        // Pick top-level reward category.
+        sum_weights = 0;
+        for (const auto& weight : top_level_weights) {
+            sum_weights += weight;
+        }
+        weight = state.Rand(sum_weights, RNG_REWARD);
+        sum_weights = 0;
+        for (type = 0; type < 3; ++type) {
+            sum_weights += top_level_weights[type];
+            if (weight < sum_weights) break;
+        }
+        
+        // If 'move' or 'stat-up' category, disable for future chests.
+        if (type < 2) top_level_weights[type] = 0;
+        
+        if (type == 0) {
+            // Pick type of move reward.
+            sum_weights = 0;
+            for (const auto& weight : kMoveWeights) {
+                sum_weights += weight;
+            }
+            weight = state.Rand(sum_weights, RNG_REWARD_MOVE);
+            sum_weights = 0;
+            for (type = 0; type < 4; ++type) {
+                sum_weights += kMoveWeights[type];
+                if (weight < sum_weights) break;
+            }
+            // Assign reward.
+            switch (type) {
+                case 0:
+                    reward = REWARD_JUMP;
+                    pickup_script = Reward_PartnerOrMove;
+                    break;
+                case 1:
+                    reward = REWARD_HAMMER;
+                    pickup_script = Reward_PartnerOrMove;
+                    break;
+                case 2:
+                    reward = SelectSpecialMove();
+                    break;
+                case 3:
+                    reward = SelectPartner();
+                    pickup_script = Reward_PartnerOrMove;
+                    break;
+            }
+            
+            // If all moves of type already unlocked, pick random badge instead.
+            if (reward == 0 || (reward < 0 && HasAllMovesUnlocked(reward))) {
+                reward = 0;
+                pickup_script = nullptr;
+                top_level_weights[type] = 10;
+            }
+        } else if (type == 1) {
+            // Pick type of stat-up reward.
+            sum_weights = 0;
+            for (const auto& weight : kStatWeights) {
+                sum_weights += weight;
+            }
+            weight = state.Rand(sum_weights, RNG_REWARD_STAT_UP);
+            sum_weights = 0;
+            for (type = 0; type < 5; ++type) {
+                sum_weights += kStatWeights[type];
+                if (weight < sum_weights) break;
+            }
+            // Assign reward.
+            switch (type) {
+                case 0:
+                    reward = REWARD_HP_UP;
+                    break;
+                case 1:
+                    reward = REWARD_FP_UP;
+                    break;
+                case 2:
+                    reward = REWARD_BP_UP;
+                    break;
+                case 3:
+                    reward = REWARD_HP_UP_P;
+                    break;
+                case 4:
+                    reward = REWARD_INV_UP;
+                    break;
+            }
+        } else {
+            // Pick type of other reward.
+            sum_weights = 0;
+            for (const auto& weight : kOtherWeights) {
+                sum_weights += weight;
+            }
+            weight = state.Rand(sum_weights, RNG_REWARD_OTHER);
+            sum_weights = 0;
+            for (type = 0; type < 5; ++type) {
+                sum_weights += kOtherWeights[type];
+                if (weight < sum_weights) break;
+            }
+            // If this reward type was not already picked, assign it.
+            if (!others_picked[type]) {
+                switch (type) {
+                    case 0:
+                        reward = REWARD_COINS;
+                        pickup_script = Reward_GetCoinsEvt;
+                        break;
+                    case 1:
+                        reward = REWARD_STAR_PIECE;
+                        pickup_script = Reward_StarPieceChestEvt;
+                        break;
+                    case 2:
+                        reward = REWARD_SHINE_SPRITE;
+                        pickup_script = Reward_ShineSpriteChestEvt;
+                        break;
+                    case 3:
+                        reward = SelectUniqueBadge();
+                        break;
+                }
+                others_picked[type] = true;
+            }
+        }
+        
+        // If not selected yet, pick a random stackable badge.
+        if (reward == 0) {
+            reward = PickRandomItem(RNG_REWARD_BADGE_NORMAL, 0, 0, 1, 0);
+        }
+        
+        chest->item = reward;
+        chest->pickup_script = (void*)pickup_script;
+    }
+}
+
 // Selects the contents of the chests.
-// TODO: Spawn chests based on Mario's current position.
 EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
-    const int32_t kRewardTypes[] = {
-        REWARD_GOOMBELLA, REWARD_KOOPS, REWARD_FLURRIE, 
-        REWARD_YOSHI, REWARD_VIVIAN, REWARD_BOBBERY,
-        REWARD_MOWZ, REWARD_JUMP, REWARD_HAMMER,
-        REWARD_SPECIAL_MOVE,
-        
-        REWARD_COINS, REWARD_SHINE_SPRITE, REWARD_STAR_PIECE,
-        
-        REWARD_HP_UP, REWARD_FP_UP, REWARD_BP_UP, REWARD_HP_UP_P,
-        REWARD_INV_UP, REWARD_BADGE_STACKABLE, REWARD_BADGE_UNIQUE,
-    };
-    const void* kRewardScripts[] = {
-        Reward_PartnerOrMove, Reward_PartnerOrMove, Reward_PartnerOrMove,
-        Reward_PartnerOrMove, Reward_PartnerOrMove, Reward_PartnerOrMove,
-        Reward_PartnerOrMove, Reward_PartnerOrMove, Reward_PartnerOrMove,
-        Reward_PartnerOrMove,
-        
-        Reward_GetCoinsEvt, Reward_ShineSpriteChestEvt, Reward_StarPieceChestEvt,
-        
-        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-    };
     const gc::vec3 positions[] = {
         { 0.0, 0.0, -100.0 },
         { -80.0, 0.0, -100.0 },
         { 80.0, 0.0, -100.0 },
     };
-    
     memset(g_Chests, 0, sizeof(g_Chests));
     
-    // TODO: Replace with real generation code.
+    // TODO: Set positions based on Mario's current position,
+    // and number of chests based on difficulty of battle.
     for (int32_t i = 0; i < 3; ++i) {
         g_Chests[i].home_pos = positions[i];
-        
-        // int32_t rand_val =
-            // infinite_pit::g_Mod->inf_state_.Rand(sizeof(kRewardTypes) / sizeof(int32_t));
-        // g_Chests[i].item = kRewardTypes[rand_val];
-        // g_Chests[i].pickup_script = (void*)kRewardScripts[rand_val];
-        
-        (void)kRewardScripts;
-        (void)kRewardTypes;
-        
-        g_Chests[i].item = ItemType::SAPPHIRE_STAR + i;
-        g_Chests[i].pickup_script = nullptr;
+        g_Chests[i].item = REWARD_PLACEHOLDER;
     }
+    SelectChestContents();
     
     return 2;
 }
@@ -505,85 +928,12 @@ EVT_DEFINE_USER_FUNC(evtTot_PartyVictoryPose) {
 // arg3 = (out) first option, arg4 = (out) first option name
 EVT_DEFINE_USER_FUNC(evtTot_SelectMoves) {
     bool is_upgrade_mode = evtGetValue(evt, evt->evtArguments[0]);
-    int32_t option_start = 0;
-    int32_t max_options = 0;
-    switch((int32_t)evtGetValue(evt, evt->evtArguments[1])) {
-        case 0:  {
-            option_start = 0;
-            max_options = MoveType::MOVE_TYPE_MAX;
-            break;
-        }
-        case -1: {
-            option_start = MoveType::GOOMBELLA_BASE;
-            max_options = 6;
-            break;
-        }
-        case -2: {
-            option_start = MoveType::KOOPS_BASE;
-            max_options = 6;
-            break;
-        }
-        case -3: {
-            option_start = MoveType::FLURRIE_BASE;
-            max_options = 6;
-            break;
-        }
-        case -4: {
-            option_start = MoveType::YOSHI_BASE;
-            max_options = 6;
-            break;
-        }
-        case -5: {
-            option_start = MoveType::VIVIAN_BASE;
-            max_options = 6;
-            break;
-        }
-        case -6: {
-            option_start = MoveType::BOBBERY_BASE;
-            max_options = 6;
-            break;
-        }
-        case -7: {
-            option_start = MoveType::MOWZ_BASE;
-            max_options = 6;
-            break;
-        }
-        case -8: {
-            option_start = MoveType::JUMP_BASE;
-            max_options = 8;
-            break;
-        }
-        case -9: {
-            option_start = MoveType::HAMMER_BASE;
-            max_options = 8;
-            break;
-        }
-        case -10: {
-            option_start = MoveType::SP_SWEET_TREAT;
-            max_options = 8;
-            break;
-        }
-    }
+    int32_t move_type = evtGetValue(evt, evt->evtArguments[1]);
     
-    // TODO: Write generation code that selects a few randomly from all options.
+    SelectMoves(move_type, is_upgrade_mode);
     
-    int32_t num_options = 0;
-    for (int32_t i = 0; i < max_options; ++i) {
-        // Can only support 8 options at once.
-        if (num_options >= 8) break;
-        
-        int32_t move = option_start + i;
-        if ((is_upgrade_mode && MoveManager::IsUpgradable(move)) ||
-            (!is_upgrade_mode && MoveManager::IsUnlockable(move))) {
-            g_MoveSelections[num_options] = move;
-            ++num_options;
-        }
-    }
-    g_MoveSelections[num_options] = -1;
-    g_NumMovesSelected = num_options;
-    
-    evtSetValue(evt, evt->evtArguments[2], num_options);
-    if (num_options > 0) {
+    evtSetValue(evt, evt->evtArguments[2], g_NumMovesSelected);
+    if (g_NumMovesSelected > 0) {
         evtSetValue(evt, evt->evtArguments[3], g_MoveSelections[0]);
         evtSetValue(
             evt, evt->evtArguments[4],

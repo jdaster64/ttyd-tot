@@ -164,7 +164,7 @@ enum RngSequence {
     // Choosing reward metatypes; mangled with floor number + reset every floor.
     RNG_REWARD                  = 8,    // Types of rewards.
     // Choosing reward subtypes; not mangled with floor number.
-    RNG_REWARD_MOVE             = 9,    // Jump, Hammer, or Special.
+    RNG_REWARD_MOVE             = 9,    // Jump, Hammer, Special, or partner.
     RNG_REWARD_PARTNER          = 10,   // Partner, from all seven options.
     RNG_REWARD_PARTNER_LOOP     = 11,   // Partner, from chosen pool of four.
     RNG_REWARD_PARTNER_FALLBACK = 12,   // Partner, if prior choice was invalid.
@@ -229,7 +229,7 @@ enum OptionsType {
 //          W = A: item_purchased_flags_
 //          W = B: option_unlocked_flags_
 //  - STAT_x:   Play stats value:   (0x XXX Y ZZ VV);
-//      Represents play_stats_ bits [XXX, XXX+Y) (in the range 0x000 ~ 0x400).
+//      Represents play_stats_ bytes [XXX, XXX+Y) (in the range 0x000 ~ 0x400).
 //          If ZZ = 0: Value is uncapped; VV is unused.
 //          If ZZ = 1: Value is capped to +/- value with VV (1-9) digits.
 //  - Other options (0xC0000000+) : reserved for future / other uses.
@@ -344,7 +344,17 @@ enum Options : uint32_t {
     STAT_RUN_LEVELS_SOLD        = 0x029'2'01'04,
     STAT_RUN_CONDITIONS_MET     = 0x02b'1'00'00,
     STAT_RUN_CONDITIONS_TOTAL   = 0x02c'1'00'00,
-    // Next: 0x02d
+    STAT_RUN_UNIQUE_BADGE_0     = 0x02d'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_1     = 0x02e'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_2     = 0x02f'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_3     = 0x030'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_4     = 0x031'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_5     = 0x032'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_6     = 0x033'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_7     = 0x034'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_8     = 0x035'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_9     = 0x036'1'00'00,
+    // Next: 0x037
     // TODO: Add versions of most stats that persist across runs.
 };
 
