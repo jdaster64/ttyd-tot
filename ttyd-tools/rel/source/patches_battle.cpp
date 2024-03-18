@@ -1,5 +1,6 @@
 #include "patches_battle.h"
 
+#include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
@@ -108,6 +109,9 @@ extern int32_t (*g_BattlePreCheckDamage_trampoline)(
 extern uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
     BattleWeapon*, uint32_t);
+extern void (*g_BattleDamageDirect_trampoline)(
+    int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
+    uint32_t, uint32_t, uint32_t);
 extern int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool);
 extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
@@ -775,6 +779,20 @@ void SpendAndIncrementPartySwitchCost() {
     }
 }
 
+void QueuePitySpRestoration(int32_t damage) {
+    // Only damage taken during the enemy attack phase counts.
+    if (ttyd::battle::BattleGetSeq(ttyd::battle::g_BattleWork, 4) == 0x400'0004) {
+        uintptr_t audience_work_base =
+            reinterpret_cast<uintptr_t>(ttyd::battle::g_BattleWork->audience_work);
+        int32_t current_audience =
+            *reinterpret_cast<int32_t*>(audience_work_base + 0x13784);
+        
+        // Restore 0.10 SP per damage, up to 0.01x the current audience count.
+        int32_t sp_regen = Min(damage * 10, current_audience);
+        *reinterpret_cast<int32_t*>(audience_work_base + 0x137c4) += sp_regen;
+    }
+}
+
 void ApplyFixedPatches() {    
     // Handle Superguard cost option.
     g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
@@ -841,6 +859,34 @@ void ApplyFixedPatches() {
                 // Replaces vanilla logic completely.
                 return StatusEffectTick(unit, status_type);
             });
+            
+    // Track damage taken, and queue SP restoration based on damage taken.
+    g_BattleDamageDirect_trampoline = mod::patch::hookFunction(
+        ttyd::battle_damage::BattleDamageDirect, [](
+            int32_t unit_idx, BattleWorkUnit* target, BattleWorkUnitPart* part,
+            int32_t damage, int32_t fp_damage, uint32_t unk0, 
+            uint32_t damage_pattern, uint32_t unk1) {
+            // Save original damage so elemental healing still works.
+            const int32_t original_damage = damage;
+            // Track damage taken, if target is player/enemy and damage > 0.
+            if (target->current_kind == BattleUnitType::MARIO ||
+                target->current_kind >= BattleUnitType::GOOMBELLA) {
+                if (damage < 0) damage = 0;
+                if (damage > 99) damage = 99;
+                g_Mod->inf_state_.ChangeOption(STAT_PLAYER_DAMAGE, damage);
+                
+                // Handle pity sp restoration based on damage taken.
+                QueuePitySpRestoration(damage);
+            } else if (target->current_kind <= BattleUnitType::BONETAIL) {
+                if (damage < 0) damage = 0;
+                if (damage > 99) damage = 99;
+                g_Mod->inf_state_.ChangeOption(STAT_ENEMY_DAMAGE, damage);
+            }
+            // Run normal damage logic.
+            g_BattleDamageDirect_trampoline(
+                unit_idx, target, part, original_damage, fp_damage, 
+                unk0, damage_pattern, unk1);
+        });
             
     // Add support for Snow Whirled-like variant of button pressing AC.
     // Override choosing buttons:

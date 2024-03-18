@@ -268,6 +268,14 @@ void StateManager::IncrementFloor(int32_t change) {
     pouch.rank = (floor_ - 1) / 16;
     // Display the current floor in place of Star Points, since they're unused.
     pouch.star_points = floor_;
+    
+    // Revive any fallen partners.
+    for (int32_t i = 1; i <= 7; ++i) {
+        auto& party_data = pouch.party_data[i];
+        if ((party_data.flags & 1) && party_data.current_hp == 0) {
+            party_data.current_hp = 1;
+        }
+    }
 }
 
 // Functions for time-tracking...

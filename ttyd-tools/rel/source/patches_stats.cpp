@@ -6,7 +6,6 @@
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_actrecord.h>
-#include <ttyd/battle_damage.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/item_data.h>
@@ -29,9 +28,6 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 }
 
 // Function hooks.
-extern void (*g_BattleDamageDirect_trampoline)(
-    int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
-    uint32_t, uint32_t, uint32_t);
 extern void (*g_BtlUnit_PayWeaponCost_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
 extern int32_t (*g_pouchAddCoin_trampoline)(int16_t);
@@ -39,31 +35,7 @@ extern void (*g_BtlActRec_AddCount_trampoline)(uint8_t*);
 
 namespace stats {
     
-void ApplyFixedPatches() {    
-    g_BattleDamageDirect_trampoline = mod::patch::hookFunction(
-        ttyd::battle_damage::BattleDamageDirect, [](
-            int32_t unit_idx, BattleWorkUnit* target, BattleWorkUnitPart* part,
-            int32_t damage, int32_t fp_damage, uint32_t unk0, 
-            uint32_t damage_pattern, uint32_t unk1) {
-            // Save original damage so elemental healing still works.
-            const int32_t original_damage = damage;
-            // Track damage taken, if target is player/enemy and damage > 0.
-            if (target->current_kind == BattleUnitType::MARIO ||
-                target->current_kind >= BattleUnitType::GOOMBELLA) {
-                if (damage < 0) damage = 0;
-                if (damage > 99) damage = 99;
-                g_Mod->inf_state_.ChangeOption(STAT_PLAYER_DAMAGE, damage);
-            } else if (target->current_kind <= BattleUnitType::BONETAIL) {
-                if (damage < 0) damage = 0;
-                if (damage > 99) damage = 99;
-                g_Mod->inf_state_.ChangeOption(STAT_ENEMY_DAMAGE, damage);
-            }
-            // Run normal damage logic.
-            g_BattleDamageDirect_trampoline(
-                unit_idx, target, part, original_damage, fp_damage, 
-                unk0, damage_pattern, unk1);
-        });
-        
+void ApplyFixedPatches() {        
     g_BtlUnit_PayWeaponCost_trampoline = mod::patch::hookFunction(
         ttyd::battle_unit::BtlUnit_PayWeaponCost, [](
             BattleWorkUnit* unit, BattleWeapon* weapon) {

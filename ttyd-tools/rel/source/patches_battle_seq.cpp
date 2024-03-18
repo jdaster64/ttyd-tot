@@ -347,6 +347,8 @@ void ApplyFixedPatches() {
             partner::RefreshExtraTattleStats();
             // Reset cost of Quick Change switches.
             battle::ResetPartySwitchCost();
+            // Reset current Star Power to 0.
+            ttyd::mario_pouch::pouchGetPtr()->current_sp = 0;
             // Reset move selected levels at the start of encounter.
             tot::MoveManager::ResetSelectedLevels();
             g_seq_battleInit_trampoline();

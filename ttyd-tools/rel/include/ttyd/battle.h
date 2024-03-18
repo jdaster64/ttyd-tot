@@ -376,7 +376,7 @@ battle_unit::BattleWorkUnit* BattleGetUnitPtr(
 // BattleFree
 // BattleAlloc
 // BattleIncSeq
-// BattleGetSeq
+int32_t BattleGetSeq(BattleWork* battleWork, int32_t level);
 // BattleSetSeq
 // BattleSetMarioParamToFieldBattle
 // Btl_UnitSetup

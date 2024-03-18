@@ -1151,6 +1151,7 @@
 800f87a8:BattleGetMarioPtr
 800f8874:BattleGetUnitPartsPtr
 800f88cc:BattleGetUnitPtr
+800f89a0:BattleGetSeq
 800f8f04:BattleInit
 // .data
 8041eb90:g_BattleWork
