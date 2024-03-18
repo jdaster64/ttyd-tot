@@ -43,9 +43,8 @@ void StateManager::InitDefaultOptions() {
     // TODO: Seed randomly, or allow user to change.
     seed_ = 417;
     
-    // TODO: Once enemy-less floor 0 is implemented, start at 0.
-    floor_ = 1;
-    
+    // Set floor to 0 (starting floor that only gives a partner).
+    floor_ = 0;
     // Set stat upgrades to base # of levels.
     hp_level_ = 2;
     hp_p_level_ = 2;

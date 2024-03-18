@@ -203,10 +203,12 @@ EVT_BEGIN(Tower_IncrementFloor)
     RETURN()
 EVT_END()
 
-// Spawn chests.
+// Spawn chests. LW(15) = Whether to spawn them statically on load.
 EVT_BEGIN(Tower_SpawnChests)
-    USER_FUNC(evt_mario_key_onoff, 0)
-    WAIT_MSEC(2000)
+    IF_EQUAL(LW(15), 0)
+        USER_FUNC(evt_mario_key_onoff, 0)
+        WAIT_MSEC(2000)
+    END_IF()
     USER_FUNC(evtTot_GenerateChestContents)
     
     SET(LW(10), 3)
@@ -219,14 +221,16 @@ EVT_BEGIN(Tower_SpawnChests)
             DO_BREAK()
         END_IF()
             
-        ADD(LW(1), 50)
-        USER_FUNC(
-            evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
-            0, 0, 0, 0, 0, 0, 0)
-        USER_FUNC(
-            evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
-            LW(0), LW(1), LW(2), 0)
-        SUB(LW(1), 25)
+        IF_EQUAL(LW(15), 0)
+            ADD(LW(1), 50)
+            USER_FUNC(
+                evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
+                0, 0, 0, 0, 0, 0, 0)
+            USER_FUNC(
+                evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
+                LW(0), LW(1), LW(2), 0)
+            SUB(LW(1), 25)
+        END_IF()
         
         SWITCH(LW(11))
             CASE_EQUAL(0)
@@ -244,9 +248,11 @@ EVT_BEGIN(Tower_SpawnChests)
         END_SWITCH()
     WHILE()
 
-    WAIT_MSEC(1000)
+    IF_EQUAL(LW(15), 0)
+        WAIT_MSEC(1000)
+        USER_FUNC(evt_mario_key_onoff, 1)
+    END_IF()
     SET(GSW(1001), 1)
-    USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()
 
@@ -298,40 +304,47 @@ EVT_END()
 
 // Set up the battle / enemy NPC, or other NPCs on the floor.
 EVT_BEGIN(Tower_NpcSetup)
-    // TODO: Check for special NPCs (Mover, Charlieton, etc.)...
+    USER_FUNC(evtTot_GetFloor, LW(0))
+    IF_LARGE(LW(0), 0)
+        // TODO: Check for special NPCs (Mover, Charlieton, etc.)...
     
-    USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
-    SET(LW(1), PTR(g_NpcSetupInfo))
-    USER_FUNC(evtTot_GetEnemyNpcInfo, 
-        LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
-    
-    USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
-    USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
-    USER_FUNC(evt_npc_setup, LW(1))
-    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
-    
-    IF_STR_EQUAL(LW(3), PTR(kPiderName))
-        USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
-    END_IF()
-    IF_STR_EQUAL(LW(3), PTR(kArantulaName))
-        USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
-    END_IF()
-    
-    // TODO: Special initialization for bosses...
-    
-    // TODO: Swap out battle id as appropriate for special battles?
-    USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
-    
-    // Wait for the enemy to be defeated, then spawn chests.
-    INLINE_EVT()
-        LBL(1)
-        WAIT_FRM(1)
-        USER_FUNC(evt_npc_status_check, PTR(kPitNpcName), 4, LW(0))
-        IF_EQUAL(LW(0), 0)
-            GOTO(1)
+        USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
+        SET(LW(1), PTR(g_NpcSetupInfo))
+        USER_FUNC(evtTot_GetEnemyNpcInfo, 
+            LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
+        
+        USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
+        USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
+        USER_FUNC(evt_npc_setup, LW(1))
+        USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
+        
+        IF_STR_EQUAL(LW(3), PTR(kPiderName))
+            USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
         END_IF()
+        IF_STR_EQUAL(LW(3), PTR(kArantulaName))
+            USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
+        END_IF()
+        
+        // TODO: Special initialization for bosses...
+        
+        // TODO: Swap out battle id as appropriate for special battles?
+        USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
+        
+        // Wait for the enemy to be defeated, then spawn chests.
+        INLINE_EVT()
+            LBL(1)
+            WAIT_FRM(1)
+            USER_FUNC(evt_npc_status_check, PTR(kPitNpcName), 4, LW(0))
+            IF_EQUAL(LW(0), 0)
+                GOTO(1)
+            END_IF()
+            SET(LW(15), 0)
+            RUN_EVT(Tower_SpawnChests)
+        END_INLINE()
+    ELSE()
+        SET(LW(15), 1)
         RUN_EVT(Tower_SpawnChests)
-    END_INLINE()
+    END_IF()
     
     // Wait for a chest to be opened, then spawn pipe.
     INLINE_EVT()
@@ -366,13 +379,11 @@ EVT_BEGIN(gon_01_InitEvt)
     
     // TODO: Handle cases for Mover / NPC rooms, boss rooms?
     RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
-    USER_FUNC(evt_npc_check, PTR(kPitNpcName), LW(0))
-    IF_NOT_EQUAL(LW(0), 1)
-        USER_FUNC(evt_hit_bind_mapobj, PTR("a_dokan_1"), PTR("dokan_1_s"))
-        USER_FUNC(evt_mapobj_trans, 1, PTR("dokan_1_s"), 0, 30, 0)
-        USER_FUNC(evt_hit_bind_update, PTR("a_dokan_1"))
-        USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
-    END_IF()
+    // Always disable pipe, since its appearance is triggered by the chests.
+    // USER_FUNC(evt_hit_bind_mapobj, PTR("a_dokan_1"), PTR("dokan_1_s"))
+    // USER_FUNC(evt_mapobj_trans, 1, PTR("dokan_1_s"), 0, 30, 0)
+    // USER_FUNC(evt_hit_bind_update, PTR("a_dokan_1"))
+    // USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
     
     // Always remove graffiti from wall on floor 50 map (not needed anymore?)
     // USER_FUNC(evt_sub_get_mapname, LW(0))

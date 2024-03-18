@@ -634,7 +634,6 @@ int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
 }
 
 // Assigns reward types and corresponding pickup scripts to all chests.
-// TODO: Add case for floor 0 that always picks a partner (unless disabled).
 void SelectChestContents() {
     auto& state = infinite_pit::g_Mod->state_;
     
@@ -671,6 +670,9 @@ void SelectChestContents() {
             if (weight < sum_weights) break;
         }
         
+        // Floor 0: Force a move.
+        if (state.floor_ == 0) type = 0;
+        
         // If 'move' or 'stat-up' category, disable for future chests.
         if (type < 2) top_level_weights[type] = 0;
         
@@ -686,6 +688,10 @@ void SelectChestContents() {
                 sum_weights += kMoveWeights[type];
                 if (weight < sum_weights) break;
             }
+            
+            // Floor 0: Force a partner.
+            if (state.floor_ == 0) type = 3;
+            
             // Assign reward.
             switch (type) {
                 case 0:
@@ -795,9 +801,13 @@ EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
     };
     memset(g_Chests, 0, sizeof(g_Chests));
     
+    const auto& state = infinite_pit::g_Mod->state_;
+    
     // TODO: Set positions based on Mario's current position,
     // and number of chests based on difficulty of battle.
-    for (int32_t i = 0; i < 3; ++i) {
+    int32_t max_chests = state.floor_ == 0 ? 1 : 3;
+    
+    for (int32_t i = 0; i < max_chests; ++i) {
         g_Chests[i].home_pos = positions[i];
         g_Chests[i].item = REWARD_PLACEHOLDER;
     }
