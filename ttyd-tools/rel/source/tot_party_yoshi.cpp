@@ -108,8 +108,8 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEggLayItem) {
         item = PickRandomItem(infinite_pit::RNG_KISS_THIEF, 20, 10, 10, 60);
         if (!item) item = ItemType::COIN;
     }
-    if (item == ItemType::GOLD_BAR_X3 || !ttyd::mario_pouch::pouchGetItem(item)) {
-        // Item = Shine Sprite (can't be stolen), or player's inventory is full.
+    if (item == ItemType::STAR_PIECE || !ttyd::mario_pouch::pouchGetItem(item)) {
+        // Item = Star Piece (can't be stolen), or player's inventory is full.
         evtSetValue(evt, evt->evtArguments[1], ItemType::COIN);
     } else {
         // Remove the corresponding held/stolen item from the NPC setup,

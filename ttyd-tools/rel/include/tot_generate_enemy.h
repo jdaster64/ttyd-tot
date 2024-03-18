@@ -38,6 +38,9 @@ EVT_DECLARE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo, 2)
 bool GetEnemyStats(
     int32_t unit_type, int32_t* out_hp, int32_t* out_atk, int32_t* out_def, 
     int32_t* out_level, int32_t* out_coinlvl, int32_t base_attack_power = 0);
+
+// Returns how many chests to offer based on the battle's relative difficulty.
+int32_t GetBattleRewardTier();
     
 // Gets/sets a custom Tattle message based on the enemy's parameters.
 // In-battle:

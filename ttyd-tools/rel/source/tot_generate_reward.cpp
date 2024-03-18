@@ -4,6 +4,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
+#include "tot_generate_enemy.h"
 #include "tot_generate_item.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
@@ -794,21 +795,22 @@ void SelectChestContents() {
 
 // Selects the contents of the chests.
 EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
+    // TODO: Set positions based on Mario's current position?
     const gc::vec3 positions[] = {
         { 0.0, 0.0, -100.0 },
         { -80.0, 0.0, -100.0 },
         { 80.0, 0.0, -100.0 },
+        { -40.0, 0.0, -100.0 },
+        { 40.0, 0.0, -100.0 },
     };
     memset(g_Chests, 0, sizeof(g_Chests));
     
-    const auto& state = infinite_pit::g_Mod->state_;
+    // Implicitly, will only provide one reward for floors with no enemies.
+    int32_t max_chests = GetBattleRewardTier();
     
-    // TODO: Set positions based on Mario's current position,
-    // and number of chests based on difficulty of battle.
-    int32_t max_chests = state.floor_ == 0 ? 1 : 3;
-    
+    int32_t start_position = (max_chests == 2) ? 3 : 0;
     for (int32_t i = 0; i < max_chests; ++i) {
-        g_Chests[i].home_pos = positions[i];
+        g_Chests[i].home_pos = positions[start_position + i];
         g_Chests[i].item = REWARD_PLACEHOLDER;
     }
     SelectChestContents();

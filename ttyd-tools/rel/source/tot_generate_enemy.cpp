@@ -6,6 +6,8 @@
 #include "mod_debug.h"
 #include "mod_state.h"
 #include "tot_custom_rel.h"
+#include "tot_generate_condition.h"
+#include "tot_generate_item.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_database_common.h>
@@ -515,9 +517,9 @@ const int8_t kTargetLevelSums[21] = {
     // Tutorial
     12,
     // Half
-    15, 20, 24, 28,
+    14, 18, 22, 26,
     // Full
-    15, 20, 24, 28, 31, 34, 37, 40,
+    14, 18, 22, 26, 31, 34, 37, 40,
     // Full EX
     18, 22, 26, 30, 34, 38, 42, 46,
 };
@@ -903,7 +905,29 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
     NpcEntry* npc = ttyd::evt_npc::evtNpcNameToPtr(evt, name);
     ttyd::npcdrv::npcSetBattleInfo(npc, battle_id);
     
-    // TODO: Set enemy held items, battle conditions.
+    // TODO: Skip for final boss battle.
+    
+    const auto& state = infinite_pit::g_Mod->state_;
+    
+    const int32_t reward_mode = state.GetOptionValue(OPT_BATTLE_DROPS);
+    NpcBattleInfo* battle_info = &npc->battleInfo;
+    if (reward_mode == OPTVAL_DROP_NO_HELD_W_BONUS) {
+        for (int32_t i = 0; i < battle_info->pConfiguration->num_enemies; ++i) {
+            battle_info->wHeldItems[i] = 0;
+        }
+    } else {
+        int32_t sp_rate = state.floor_ / 10;
+        // Make Star Pieces more likely if they can't be given by conditions.
+        if (reward_mode == OPTVAL_DROP_HELD_FROM_BONUS) sp_rate += 10;
+        for (int32_t i = 0; i < battle_info->pConfiguration->num_enemies; ++i) {
+            int32_t item = PickRandomItem(RNG_ENEMY_ITEM, 40, 20, 40, sp_rate);            
+            if (!item) item = ItemType::STAR_PIECE;
+            battle_info->wHeldItems[i] = item;
+        }
+    }
+    
+    // Occasionally, set a battle condition for an optional bonus reward.
+    SetBattleCondition(&npc->battleInfo);
     
     return 2;
 }
@@ -977,6 +1001,23 @@ bool GetEnemyStats(
     }
     
     return true;
+}
+
+int32_t GetBattleRewardTier() {
+    // For midboss or boss floors, always return the maximum number.
+    int32_t floor = infinite_pit::g_Mod->state_.floor_;
+    if (floor > 0 && floor % 8 == 0) return 3;
+    
+    int32_t level_target_sum = kTargetLevelSums[GetDifficulty()];
+    int32_t level_sum = 0;
+    for (int32_t i = 0; i < 5; ++i) {
+        if (g_Enemies[i] == -1) break;
+        level_sum += kEnemyInfo[g_Enemies[i]].level;
+    }
+    level_sum *= 100;
+    if (level_sum / level_target_sum >= 80) return 3;
+    if (level_sum / level_target_sum >= 60) return 2;
+    return 1;
 }
 
 char g_TattleTextBuf[512];

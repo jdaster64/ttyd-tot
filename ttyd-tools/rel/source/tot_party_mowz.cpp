@@ -166,9 +166,9 @@ EVT_DEFINE_USER_FUNC(evtTot_GetKissThiefResult) {
         item = PickRandomItem(infinite_pit::RNG_KISS_THIEF, 20, 10, 10, 60);
         if (!item) item = ItemType::COIN;
     }
-    if ((ac_result & 2) == 0 || item == ItemType::GOLD_BAR_X3 ||
+    if ((ac_result & 2) == 0 || item == ItemType::STAR_PIECE ||
         !ttyd::mario_pouch::pouchGetItem(item)) {
-        // Action command unsuccessful, item = Shine Sprite (can't be stolen),
+        // Action command unsuccessful, item = Star Piece (can't be stolen),
         // or the player's inventory cannot hold the item.
         evtSetValue(evt, evt->evtArguments[1], 0);
     } else {
