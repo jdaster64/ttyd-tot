@@ -13,9 +13,6 @@ void ApplyFixedPatches();
 
 // Apply balance changes that are based on the current file's settings.
 void ApplySettingBasedPatches();
-
-// Spends FP for switching partners, if the option is enabled.
-void SpendFpOnSwitchingPartner(ttyd::battle_unit::BattleWorkUnit* unit);
     
 // Gets the Danger / Peril threshold to use based on a max HP value.
 int32_t GetPinchThresholdForMaxHp(int32_t max_hp, bool peril);

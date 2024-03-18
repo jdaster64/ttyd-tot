@@ -261,13 +261,8 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
         }
         
         // Handle switch partner cost, if enabled.
-        int32_t switch_fp_cost =
-            g_Mod->inf_state_.GetOptionValue(OPTNUM_SWITCH_PARTY_FP_COST);
-        if (strats[0].type == 0 && switch_fp_cost) {
-            // Reduce switch partner cost by Flower Savers.
-            switch_fp_cost -= unit->badges_equipped.flower_saver;
-            if (switch_fp_cost < 1) switch_fp_cost = 1;
-            
+        int32_t switch_fp_cost = battle::GetPartySwitchCost();
+        if (strats[0].type == 0 && switch_fp_cost) {           
             strats[0].cost = switch_fp_cost;
             strats[0].enabled =
                 ttyd::battle_unit::BtlUnit_GetFp(unit) >= switch_fp_cost;

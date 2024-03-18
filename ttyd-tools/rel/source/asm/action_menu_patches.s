@@ -5,7 +5,7 @@
 
 StartSpendFpOnSwitchPartner:
 mr %r3, %r28
-bl spendFpOnSwitchPartner
+bl signalPlayerInitiatedPartySwitch
 lwz %r0, 0x8 (%r28)  # Original opcode replaced.
 
 BranchBackSpendFpOnSwitchPartner:

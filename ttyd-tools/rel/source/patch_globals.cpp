@@ -88,6 +88,8 @@ int32_t (*g_btlevtcmd_GetConsumeItem_trampoline)(EvtEntry*, bool) = nullptr;
 int32_t (*g_btlevtcmd_GetSelectEnemy_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_cmd.o  8010ef44
 int32_t (*g_btlevtcmd_CheckSpace_trampoline)(EvtEntry*, bool) = nullptr;
+// battle_event_cmd.o  80113140
+int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_default.o  801138d8
 int32_t (*g__get_flower_suitoru_point_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_default.o  80113950
@@ -105,14 +107,14 @@ uint32_t (*g_BattleCheckConcluded_trampoline)(BattleWork*) = nullptr;
 void (*g__rule_disp_trampoline)(void) = nullptr;
 // battle_seq.o  8011edb8
 BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t) = nullptr;
+// battle_seq_command.o  8011f62c
+void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*) = nullptr;
 // battle_seq_command.o  80123ec0
 int32_t (*g__btlcmd_MakeSelectWeaponTable_trampoline)(BattleWork*, int32_t) = nullptr;
 // battle_unit.o  80126840
-void (*g_BtlUnit_PayWeaponCost_trampoline)(
-    BattleWorkUnit*, BattleWeapon*) = nullptr;
+void (*g_BtlUnit_PayWeaponCost_trampoline)(BattleWorkUnit*, BattleWeapon*) = nullptr;
 // battle_unit.o  80126968
-int32_t (*g_BtlUnit_GetWeaponCost_trampoline)(
-    BattleWorkUnit*, BattleWeapon*) = nullptr;
+int32_t (*g_BtlUnit_GetWeaponCost_trampoline)(BattleWorkUnit*, BattleWeapon*) = nullptr;
 // battle_unit.o  80127890
 uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(BattleWorkUnit*, int8_t) = nullptr;
 // battle_unit.o  80128fe0

@@ -6,6 +6,7 @@
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
+#include "patches_battle.h"
 #include "patches_partner.h"
 #include "tot_generate_reward.h"
 #include "tot_manager_move.h"
@@ -344,6 +345,8 @@ void ApplyFixedPatches() {
             CopyChildBattleInfo(/* to_child = */ true);
             // Force enemy ATK/DEF tattles to display at start of encounter.
             partner::RefreshExtraTattleStats();
+            // Reset cost of Quick Change switches.
+            battle::ResetPartySwitchCost();
             // Reset move selected levels at the start of encounter.
             tot::MoveManager::ResetSelectedLevels();
             g_seq_battleInit_trampoline();

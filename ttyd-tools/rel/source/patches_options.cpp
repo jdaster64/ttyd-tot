@@ -26,9 +26,6 @@
 
 // Assembly patch functions.
 extern "C" {
-    // action_menu_patches.s
-    void StartSpendFpOnSwitchPartner();
-    void BranchBackSpendFpOnSwitchPartner();
     // audience_item_patches.s
     void StartAudienceItem();
     void BranchBackAudienceItem();
@@ -61,9 +58,6 @@ extern "C" {
     void StartEnableIncrementingBingoCheck();
     void BranchBackEnableIncrementingBingoCheck();
     
-    void spendFpOnSwitchPartner(ttyd::battle_unit::BattleWorkUnit* unit) {
-        mod::infinite_pit::options::SpendFpOnSwitchingPartner(unit);
-    }
     int32_t getAudienceItem(int32_t item_type) {
         return mod::infinite_pit::options::GetRandomAudienceItem(item_type);
     }
@@ -109,7 +103,6 @@ extern void (*g_pouchReviseMarioParam_trampoline)();
 extern int32_t (*g_btlevtcmd_WeaponAftereffect_trampoline)(EvtEntry*, bool);
 extern void (*g_BattleAudienceSetThrowItemMax_trampoline)();
 // Patch addresses.
-extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
 extern const int32_t g_BtlUnit_CheckPinchStatus_DangerThreshold_BH;
 extern const int32_t g_BtlUnit_CheckPinchStatus_PerilThreshold_BH;
 extern const int32_t g_DrawMenuMarioPinchMark_CheckThreshold_BH;
@@ -228,12 +221,6 @@ void ApplyFixedPatches() {
                 ttyd::mario_pouch::pouchGetPtr()->unallocated_bp = 99;
             }
         });
-        
-    // Add code that subtracts FP for switching partners (if option enabled).
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH),
-        reinterpret_cast<void*>(StartSpendFpOnSwitchPartner),
-        reinterpret_cast<void*>(BranchBackSpendFpOnSwitchPartner));
         
     // Override the default Danger / Peril threshold checks for all actors.
     mod::patch::writeBranchPair(
@@ -378,22 +365,6 @@ void ApplySettingBasedPatches() {
     
     if (g_Mod->inf_state_.GetOptionNumericValue(OPT_OBFUSCATE_ITEMS)) {
         ObfuscateItems(true);
-    }
-}
-
-void SpendFpOnSwitchingPartner(ttyd::battle_unit::BattleWorkUnit* unit) {
-    int32_t switch_fp_cost =
-        g_Mod->inf_state_.GetOptionValue(OPTNUM_SWITCH_PARTY_FP_COST);
-    if (switch_fp_cost > 0) {
-        switch_fp_cost -= unit->badges_equipped.flower_saver;
-        if (switch_fp_cost < 1) switch_fp_cost = 1;
-        
-        // Spend FP (and track total FP spent in BattleActRec).
-        int32_t fp = ttyd::battle_unit::BtlUnit_GetFp(unit);
-        ttyd::battle_unit::BtlUnit_SetFp(unit, fp - switch_fp_cost);
-        ttyd::battle_actrecord::BtlActRec_AddPoint(
-            &ttyd::battle::g_BattleWork->act_record_work.mario_fp_spent,
-            switch_fp_cost);
     }
 }
 

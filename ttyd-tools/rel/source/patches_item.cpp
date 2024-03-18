@@ -294,6 +294,7 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::PITY_FLOWER_P].bp_cost  = 4;
     itemDataTable[ItemType::RETURN_POSTAGE].bp_cost = 5;
     itemDataTable[ItemType::LUCKY_START].bp_cost    = 3;
+    itemDataTable[ItemType::QUICK_CHANGE].bp_cost   = 4;
     
     // Changed pickup messages for Super / Ultra boots and hammer.
     itemDataTable[ItemType::SUPER_BOOTS].description = "msg_custom_super_boots";

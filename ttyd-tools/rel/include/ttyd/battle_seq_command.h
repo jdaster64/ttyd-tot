@@ -9,6 +9,9 @@ struct BattleWork;
 struct BattleWorkCommand;
 struct BattleWorkCommandCursor;
 }
+namespace ttyd::battle_unit {
+struct BattleWorkUnit;
+}
 
 namespace ttyd::battle_seq_command {
 
@@ -18,7 +21,8 @@ extern "C" {
 // _get_msg
 // BattleCommandAttackAudienceCheck
 // _commandRestoreRec
-// BattleSetConfuseAct
+void* BattleSetConfuseAct(
+    battle::BattleWork* battleWork, battle_unit::BattleWorkUnit* unit);
 // BattleDrawEnemyHPBar
 // BattleDrawEnemyHP
 // _check_present_item

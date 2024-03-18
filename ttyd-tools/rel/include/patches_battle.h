@@ -46,6 +46,13 @@ int32_t CalculateBaseDamage(
 void QueueCustomStatusMessage(
     ttyd::battle_unit::BattleWorkUnit* unit, const char* announce_msg);
 
+// Gets the party switch cost in FP (0, or 1+ with Quick Change).
+int32_t GetPartySwitchCost();
+// Resets the party switch cost at the start of an encounter.
+void ResetPartySwitchCost();
+// Signals that a party switch should cost FP unless cancelled by Confusion.
+void SignalPlayerInitiatedPartySwitch();
+
 // Applies a custom status effect to the target.
 // Params: unit, part, status_flag, color1 & color2 (rgb), sfx, announce_msg
 EVT_DECLARE_USER_FUNC(evtTot_ApplyCustomStatus, 7)

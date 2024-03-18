@@ -15,6 +15,7 @@
 #include <ttyd/battle_damage.h>
 #include <ttyd/battle_disp.h>
 #include <ttyd/battle_event_cmd.h>
+#include <ttyd/battle_seq_command.h>
 #include <ttyd/battle_status_effect.h>
 #include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
@@ -38,6 +39,9 @@ extern "C" {
     void StartButtonDownCheckComplete();
     void BranchBackButtonDownCheckComplete();
     void ConditionalBranchButtonDownCheckComplete();
+    // action_menu_patches.s
+    void StartSpendFpOnSwitchPartner();
+    void BranchBackSpendFpOnSwitchPartner();
     // audience_level_patches.s
     void StartSetTargetAudienceCount();
     void BranchBackSetTargetAudienceCount();
@@ -57,6 +61,9 @@ extern "C" {
     void StartToggleScopedAndCheckFreezeBreak();
     void BranchBackToggleScopedAndCheckFreezeBreak();
     
+    void signalPlayerInitiatedPartySwitch(ttyd::battle_unit::BattleWorkUnit* unit) {
+        mod::infinite_pit::battle::SignalPlayerInitiatedPartySwitch();
+    }
     void setTargetAudienceCount() {
         mod::infinite_pit::battle::SetTargetAudienceAmount();
     }
@@ -80,6 +87,7 @@ using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_unit;
 
 using ::ttyd::battle::BattleWork;
+using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 
@@ -100,6 +108,8 @@ extern int32_t (*g_BattlePreCheckDamage_trampoline)(
 extern uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
     BattleWeapon*, uint32_t);
+extern int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool);
+extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
 // Patch addresses.
@@ -108,6 +118,7 @@ extern const int32_t g_BattleCheckDamage_Patch_PaybackDivisor;
 extern const int32_t g_BattleCheckDamage_Patch_HoldFastDivisor;
 extern const int32_t g_BattleCheckDamage_Patch_ReturnPostageDivisor;
 extern const int32_t g_BattleCheckDamage_Patch_SkipHugeTinyArrows;
+extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
@@ -121,6 +132,9 @@ extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_EH;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_CH1;
 extern const int32_t g_btlseqEnd_Patch_CheckDisableExpLevel;
 extern const int32_t g_effStarPointDisp_Patch_SetIconId;
+
+int32_t g_PartySwitchNextFpCost = 1;
+int32_t g_PartySwitchPlayerInitiated = false;
 
 namespace battle {
 
@@ -744,6 +758,23 @@ int32_t CalculateBaseDamage(
     return damage;
 }
 
+void SpendAndIncrementPartySwitchCost() {
+    if (g_PartySwitchPlayerInitiated) {
+        // Spend FP (and track total FP spent in BattleActRec).
+        auto* battleWork = ttyd::battle::g_BattleWork;
+        auto* unit = ttyd::battle::BattleGetMarioPtr(battleWork);
+        
+        int32_t switch_fp_cost = g_PartySwitchNextFpCost;
+        int32_t fp = ttyd::battle_unit::BtlUnit_GetFp(unit);
+        ttyd::battle_unit::BtlUnit_SetFp(unit, fp - switch_fp_cost);
+        ttyd::battle_actrecord::BtlActRec_AddPoint(
+            &battleWork->act_record_work.mario_fp_spent, switch_fp_cost);
+        
+        // Increment cost of next use, until it hits max FP.
+        if (switch_fp_cost < unit->max_fp) ++g_PartySwitchNextFpCost;
+    }
+}
+
 void ApplyFixedPatches() {    
     // Handle Superguard cost option.
     g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
@@ -906,6 +937,29 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_effStarPointDisp_Patch_SetIconId),
         0x38a00193U /* li r5, IconType::COIN */);
+        
+    // Quick Change FP cost:
+    // Signal that party switch was initiated by the player.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH),
+        reinterpret_cast<void*>(StartSpendFpOnSwitchPartner),
+        reinterpret_cast<void*>(BranchBackSpendFpOnSwitchPartner));
+    // Cancel signal if any unit was confused.
+    g_BattleSetConfuseAct_trampoline = patch::hookFunction(
+        ttyd::battle_seq_command::BattleSetConfuseAct,
+        [](BattleWork* battleWork, BattleWorkUnit* unit){
+            g_PartySwitchPlayerInitiated = false;
+            // Run vanilla logic.
+            return g_BattleSetConfuseAct_trampoline(battleWork, unit);
+        });
+    // Pay and increment cost when actual party switch action begins.
+    g_btlevtcmd_ChangeParty_trampoline = patch::hookFunction(
+        ttyd::battle_event_cmd::btlevtcmd_ChangeParty,
+        [](EvtEntry* evt, bool isFirstCall) {
+            SpendAndIncrementPartySwitchCost();
+            // Run vanilla logic.
+            return g_btlevtcmd_ChangeParty_trampoline(evt, isFirstCall);
+        });
 }
 
 void SetTargetAudienceAmount() {
@@ -963,6 +1017,21 @@ void QueueCustomStatusMessage(BattleWorkUnit* unit, const char* announce_msg) {
         unit, /* placeholder status + turns */ 1, 1, /* no effect */ 0);
     ttyd::battle_status_effect::BattleStatusChangeMsgSetAnnouce(
         unit, /* placeholder status */ 1, /* no effect */ 0);
+}
+
+int32_t GetPartySwitchCost() {
+    return ttyd::mario_pouch::pouchEquipCheckBadge(ItemType::QUICK_CHANGE) 
+        ? g_PartySwitchNextFpCost : 0;
+}
+
+void ResetPartySwitchCost() {
+    g_PartySwitchNextFpCost = 1;
+}
+
+void SignalPlayerInitiatedPartySwitch() {
+    if (ttyd::mario_pouch::pouchEquipCheckBadge(ItemType::QUICK_CHANGE)) {
+        g_PartySwitchPlayerInitiated = true;
+    }
 }
 
 // Applies a custom status effect to the target.
