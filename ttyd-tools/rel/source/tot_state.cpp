@@ -25,7 +25,8 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 void GetOptionParts(
     uint32_t v, int32_t* t, int32_t* x, int32_t* y, int32_t* a, int32_t* b) {
     *t = GetShiftedBitMask(v, 28, 31);
-    *x = GetShiftedBitMask(v, 20, 29);
+    // Get the full upper 12 bits if STAT_, otherwise just the lower eight.
+    *x = GetShiftedBitMask(v, 20, *t < 4 ? 31 : 27);
     *y = GetShiftedBitMask(v, 16, 19);
     *a = GetShiftedBitMask(v, 8, 15);
     *b = GetShiftedBitMask(v, 0, 7);

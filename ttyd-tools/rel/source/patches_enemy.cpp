@@ -83,10 +83,9 @@ void AlterUnitKindParams(BattleUnitKind* unit) {
         unit->bonus_exp = -level;
     }
     
-    unit->base_coin = coinlvl / 2;
-    // Give an additional coin half the time if coinlvl is odd.
-    unit->bonus_coin_rate = 50;
-    unit->bonus_coin = coinlvl & 1;
+    // Give coins equal to the underlying level (2~10).
+    unit->base_coin = coinlvl;
+    unit->bonus_coin = 0;
     
     // Additional global changes for enemies in this mod.
     unit->itemsteal_param = 20;

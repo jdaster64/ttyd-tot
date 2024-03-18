@@ -32,7 +32,6 @@ namespace {
 using namespace ::ttyd::battle_database_common;
 
 using ::mod::infinite_pit::DebugManager;
-using ::mod::infinite_pit::StateManager_v2;
 
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::evtmgr_cmd::evtGetValue;
@@ -280,6 +279,7 @@ struct PresetLoadoutInfo {
     int32_t weight;
 };
 
+// TODO: Add presets with new enemy variants.
 const PresetLoadoutInfo kPresetLoadouts[] = {
     { { BattleUnitType::GOOMBA, 
         BattleUnitType::HYPER_GOOMBA, 
@@ -475,26 +475,6 @@ const PresetLoadoutInfo kPresetLoadouts[] = {
         0, true, true, 20 },
 };
 
-// TODO: Update for TOT.
-// Base weights per floor group (00s, 10s, ...) and level (2, 3, ... 10).
-const int8_t kBaseWeights[11][9] = {
-    { 10, 10, 5, 3, 2, 0, 0, 0, 0 },
-    { 5, 10, 5, 5, 3, 0, 0, 0, 0 },
-    { 3, 5, 10, 7, 5, 1, 0, 0, 0 },
-    { 1, 1, 7, 10, 10, 3, 2, 0, 0 },
-    { 1, 1, 5, 10, 10, 5, 3, 0, 0 },
-    { 1, 1, 2, 5, 10, 10, 5, 1, 1 },
-    { 0, 0, 2, 3, 10, 10, 6, 4, 2 },
-    { 0, 0, 2, 3, 7, 10, 10, 5, 4 },
-    { 0, 0, 1, 3, 6, 8, 10, 10, 8 },
-    { 0, 0, 1, 2, 5, 7, 10, 10, 10 },
-    { 0, 0, 1, 2, 5, 7, 10, 10, 10 },
-};
-// The target sum of enemy levels for each floor group.
-const int8_t kTargetLevelSums[11] = {
-    12, 15, 18, 22, 25, 28, 31, 34, 37, 40, 50
-};
-
 // Structures for holding constructed battle information.
 int32_t g_NumEnemies = 0;
 int32_t g_Enemies[5] = { -1, -1, -1, -1, -1 };
@@ -502,7 +482,67 @@ BattleUnitSetup g_CustomUnits[6];
 BattleGroupSetup g_CustomBattleParty;
 int8_t g_CustomAudienceWeights[12];
 
+// Base enemy weights at level 2 ~ 10, per difficulty level.
+const int8_t kBaseWeights[21][9] = {
+    // Tutorial 
+    { 10, 10, 5, 3, 2, 0, 0, 0, 0 },
+    // Half
+    { 5, 10, 5, 5, 3, 0, 0, 0, 0 },
+    { 2, 5, 10, 8, 6, 2, 0, 0, 0 },
+    { 1, 1, 5, 10, 10, 5, 3, 0, 0 },
+    { 1, 1, 2, 5, 10, 10, 5, 1, 1 },
+    // Full
+    { 5, 10, 5, 5, 3, 0, 0, 0, 0 },
+    { 3, 5, 10, 7, 5, 1, 0, 0, 0 },
+    { 1, 1, 7, 10, 10, 3, 2, 0, 0 },
+    { 1, 1, 5, 10, 10, 5, 3, 0, 0 },
+    { 1, 1, 2, 5, 10, 10, 5, 1, 1 },
+    { 0, 0, 2, 3, 7, 10, 10, 5, 3 },
+    { 0, 0, 1, 3, 6, 8, 10, 10, 6 },
+    { 0, 0, 1, 2, 5, 7, 10, 10, 10 },
+    // Full EX
+    { 3, 5, 10, 7, 5, 1, 0, 0, 0 },
+    { 1, 1, 7, 10, 10, 3, 2, 0, 0 },
+    { 1, 1, 5, 10, 10, 5, 3, 0, 0 },
+    { 1, 1, 2, 5, 10, 10, 5, 1, 1 },
+    { 0, 0, 2, 3, 7, 10, 10, 5, 3 },
+    { 0, 0, 1, 3, 6, 8, 10, 10, 8 },
+    { 0, 0, 1, 2, 5, 7, 10, 10, 10 },
+    { 0, 0, 1, 2, 5, 7, 10, 10, 10 },
+};
+// The target sum of enemy levels for each difficulty.
+const int8_t kTargetLevelSums[21] = {
+    // Tutorial
+    12,
+    // Half
+    16, 20, 24, 28,
+    // Full
+    16, 20, 24, 28, 31, 34, 37, 40,
+    // Full EX
+    18, 22, 26, 30, 34, 38, 42, 46,
+};
+// Percentage of enemy base stats for each difficulty.
+const int8_t kStatPercents[21] = {
+    // Tutorial
+    20,
+    // Half
+    25, 35, 45, 55,
+    // Full
+    25, 35, 45, 55, 65, 75, 90, 100,
+    // Full EX
+    30, 40, 50, 65, 75, 90, 105, 120,
+};
+// Starting difficulty level offset for each tower.
+const int8_t kBaseDifficulty[4] = { 0, 1, 5, 13 };
 
+
+// Gets the difficulty level for the given tower / floor combination.
+int32_t GetDifficulty() {
+    StateManager& state = infinite_pit::g_Mod->state_;
+    int32_t tower = state.GetOption(OPT_DIFFICULTY);
+    int32_t floor = state.floor_;
+    return kBaseDifficulty[tower] + (floor - 1) / 8;
+}
 
 // Skips the enemy loadout selection process, using debug enemies instead.
 void PopulateDebugEnemyLoadout(int32_t* debug_enemies) {
@@ -518,12 +558,11 @@ void PopulateDebugEnemyLoadout(int32_t* debug_enemies) {
 }
 
 // Selects one of the "preset" loadouts of related enemies.
-/*
-void SelectPresetLoadout(StateManager_v2& state) {
+void SelectPresetLoadout(StateManager& state) {
     int32_t sum_weights = 0;
     for (const auto& preset : kPresetLoadouts) sum_weights += preset.weight;
     
-    int32_t weight = state.Rand(sum_weights, infinite_pit::RNG_ENEMY);
+    int32_t weight = state.Rand(sum_weights, RNG_ENEMY);
     const PresetLoadoutInfo* preset = kPresetLoadouts;
     for (; (weight -= preset->weight) >= 0; ++preset);
     
@@ -532,7 +571,7 @@ void SelectPresetLoadout(StateManager_v2& state) {
     for (const auto& enemy_type : preset->enemies) {
         if (enemy_type >= 0) ++size;
     }
-    if (preset->alt_start_idx >= 0 && state.Rand(2, infinite_pit::RNG_ENEMY)) {
+    if (preset->alt_start_idx >= 0 && state.Rand(2, RNG_ENEMY)) {
         // 50% chance of choosing the three-enemy subset, if possible.
         start = preset->alt_start_idx;
         size = 3;
@@ -542,7 +581,7 @@ void SelectPresetLoadout(StateManager_v2& state) {
     for (int32_t i = 0; i < 5; ++i) {
         g_Enemies[i] = i < size ? preset->enemies[start+i] : -1;
     }
-    if (preset->reversible && state.Rand(2, infinite_pit::RNG_ENEMY)) {
+    if (preset->reversible && state.Rand(2, RNG_ENEMY)) {
         // 50% chance of flipping the loadout left-to-right, if possible.
         for (int32_t i = 0; i < size/2; ++i) {
             int32_t tmp = g_Enemies[i];
@@ -553,7 +592,7 @@ void SelectPresetLoadout(StateManager_v2& state) {
     // If only 3 enemies, occasionally mirror it across the center.
     if (size == 3 && preset->mirrorable) {
         // The higher the floor number, the more likely the 5-enemy version.
-        if (static_cast<int32_t>(state.Rand(200, infinite_pit::RNG_ENEMY)) 
+        if (static_cast<int32_t>(state.Rand(200, RNG_ENEMY)) 
             < state.floor_) {
             g_Enemies[3] = g_Enemies[1];
             g_Enemies[4] = g_Enemies[0];
@@ -562,13 +601,13 @@ void SelectPresetLoadout(StateManager_v2& state) {
     }
     g_NumEnemies = size;
 }
-*/
 
-void SelectEnemies(int32_t floor) {
+void SelectEnemies() {
     // TODO: Remove this; testing for now.
     g_NumEnemies = 2;
     g_Enemies[0] = BattleUnitType::GOOMBA;
     g_Enemies[1] = BattleUnitType::GOOMBA;
+    (void)SelectPresetLoadout;
     
     // TODO: Add special cases for boss floors.
     
@@ -581,10 +620,11 @@ void SelectEnemies(int32_t floor) {
     /*
     
     const auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-    auto& state = mod::infinite_pit::g_Mod->inf_state_;
+    auto& state = infinite_pit::g_Mod->state_;
+    int32_t difficulty = GetDifficulty();
     
     // If floor > 50, determine whether to use one of the preset loadouts.
-    if (floor >= 50 && state.Rand(100, infinite_pit::RNG_ENEMY) < 10) {
+    if (floor >= 50 && state.Rand(100, RNG_ENEMY) < 10) {
         SelectPresetLoadout(state);
     } else {
         // Put together an array of weights, scaled by the floor number and
@@ -621,7 +661,7 @@ void SelectEnemies(int32_t floor) {
         
         // Randomly upweight a handful of enemies by 100% or 50%.
         for (int32_t i = 0; i < 6; ++i) {
-            int32_t idx = state.Rand(kNumEnemyTypes, infinite_pit::RNG_ENEMY);
+            int32_t idx = state.Rand(kNumEnemyTypes, RNG_ENEMY);
             for (int32_t slot = 0; slot < 5; ++slot) {  // don't change 6th slot
                 weights[slot][idx] = weights[slot][idx] * (i < 3 ? 4 : 3) / 2;
             }
@@ -636,7 +676,7 @@ void SelectEnemies(int32_t floor) {
             for (int32_t i = 0; i < kNumEnemyTypes; ++i) 
                 sum_weights += weights[slot][i];
             
-            int32_t weight = state.Rand(sum_weights, infinite_pit::RNG_ENEMY);
+            int32_t weight = state.Rand(sum_weights, RNG_ENEMY);
             int32_t idx = 0;
             for (; (weight -= weights[slot][idx]) >= 0; ++idx);
             
@@ -647,7 +687,7 @@ void SelectEnemies(int32_t floor) {
             // fifth enemy, decide whether to add any further enemies.
             if (level_sum >= target_sum / 2 && slot < 4) {
                 const int32_t end_chance = level_sum * 100 / target_sum;
-                if (static_cast<int32_t>(state.Rand(100, infinite_pit::RNG_ENEMY)) 
+                if (static_cast<int32_t>(state.Rand(100, RNG_ENEMY)) 
                     < end_chance) {
                     for (++slot; slot < 5; ++slot) g_Enemies[slot] = -1;
                     break;
@@ -674,13 +714,13 @@ void SelectEnemies(int32_t floor) {
         }
         
         // If floor > 80, rarely insert an Amazy Dayzee in the loadout.
-        if (floor >= 80 && state.Rand(100, infinite_pit::RNG_ENEMY) < 5) {
+        if (floor >= 80 && state.Rand(100, RNG_ENEMY) < 5) {
             int32_t idx = 1;
             for (; idx < 5; ++idx) {
                 if (g_Enemies[idx] == -1) break;
             }
             if (idx > 1) {
-                g_Enemies[state.Rand(idx - 1, infinite_pit::RNG_ENEMY) + 1] =
+                g_Enemies[state.Rand(idx - 1, RNG_ENEMY) + 1] =
                     BattleUnitType::AMAZY_DAYZEE;
             }
         }
@@ -714,7 +754,7 @@ void SelectEnemies(int32_t floor) {
 }
 
 void BuildBattle(
-    BattleSetupData* battle, NpcSetupInfo* npc_setup_info, int32_t floor,
+    BattleSetupData* battle, NpcSetupInfo* npc_setup_info,
     NpcTribeDescription** out_npc_tribe_description, int32_t* out_lead_type) {
 
     const EnemyTypeInfo* enemy_info[5];
@@ -759,7 +799,7 @@ void BuildBattle(
     
     // TODO: Return early for boss fights, if handling them elsewhere?
     
-    auto& state = mod::infinite_pit::g_Mod->inf_state_;
+    auto& state = infinite_pit::g_Mod->state_;
     
     for (int32_t i = 0; i < 12; ++i) g_CustomAudienceWeights[i] = 2;
     // Make Toads slightly likelier since they're never boosted.
@@ -794,8 +834,7 @@ void BuildBattle(
             case BattleUnitType::WHITE_MAGIKOOPA:
             case BattleUnitType::GREEN_MAGIKOOPA: {
                 // Magikoopas in the back can randomly be flying or grounded.
-                unit.unit_work[0] = state.Rand(
-                    i > 0 ? 2 : 1, infinite_pit::RNG_ENEMY);
+                unit.unit_work[0] = state.Rand(i > 0 ? 2 : 1, RNG_ENEMY);
                 break;
             }
         }
@@ -816,8 +855,7 @@ void BuildBattle(
         kFpTables[enemy_info[0]->fp_drop_table_idx];
     
     // Actually used as the index of the enemy whose item should be dropped.
-    g_CustomBattleParty.held_item_weight = state.Rand(
-        g_NumEnemies, infinite_pit::RNG_ENEMY);
+    g_CustomBattleParty.held_item_weight = state.Rand(g_NumEnemies, RNG_ENEMY);
     
     // Point the passed-in battle setup's loadouts to the constructed party.
     battle->flag_off_loadouts[0].group_data = &g_CustomBattleParty;
@@ -843,11 +881,8 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     ttyd::npcdrv::NpcTribeDescription* npc_tribe_description;
     int32_t lead_enemy_type;
     
-    // TODO: Incorporate floor number into generation.
-    int32_t floor = 0;
-    SelectEnemies(floor);
-    BuildBattle(
-        battle_db, npc_setup, floor, &npc_tribe_description, &lead_enemy_type);
+    SelectEnemies();
+    BuildBattle(battle_db, npc_setup, &npc_tribe_description, &lead_enemy_type);
     
     int32_t x_pos = ttyd::system::irand(50) + 80;
     x_pos *= (ttyd::system::irand(2) ? 1 : -1);
@@ -886,11 +921,6 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
     return 2;
 }
 
-// TODO: Rebalance for TOT.
-// Stat weights as percentages for certain Pit floors (00s, 10s, 20s, ... 90s).
-// After floor 100, HP, ATK and DEF rise by 5% every 10 floors.
-const int8_t kStatPercents[10] = { 20, 25, 35, 40, 50, 55, 65, 75, 90, 100 };
-
 bool GetEnemyStats(
     int32_t unit_type, int32_t* out_hp, int32_t* out_atk, int32_t* out_def,
     int32_t* out_level, int32_t* out_coinlvl, int32_t base_attack_power) {
@@ -900,52 +930,28 @@ bool GetEnemyStats(
         // No stats to pull from; just use the original message.
         return false;
     }
-    const StateManager_v2& state = mod::infinite_pit::g_Mod->inf_state_;
+    const auto& state = mod::infinite_pit::g_Mod->state_;
     const EnemyTypeInfo& ei = kEnemyInfo[unit_type];
     
-    int32_t floor_group = state.floor_ / 10;
-    int32_t hp_base_atk =
-        state.GetOptionNumericValue(infinite_pit::OPT_FLOOR_100_SCALING) ? 10 : 5;
+    int32_t difficulty = GetDifficulty();
         
-    int32_t base_hp_pct = 
-        floor_group > 9 ?
-            100 + (floor_group - 9) * hp_base_atk : kStatPercents[floor_group];
-    int32_t base_atk_pct = 
-        floor_group > 9 ?
-            100 + (floor_group - 9) * hp_base_atk : kStatPercents[floor_group];
-    int32_t base_def_pct = 
-        floor_group > 9 ?
-            100 + (floor_group - 9) * 5 : kStatPercents[floor_group];
+    int32_t base_hp_pct = kStatPercents[difficulty];
+    int32_t base_atk_pct = kStatPercents[difficulty];
+    int32_t base_def_pct = kStatPercents[difficulty];
     
+    // Change this if adding back a boss scaling option.
     int32_t boss_scale_factor = 4;
-    if (unit_type == BattleUnitType::ATOMIC_BOO ||
-        unit_type == BattleUnitType::BONETAIL) {
-        switch (state.GetOptionValue(infinite_pit::OPT_BOSS_SCALING)) {
-            case infinite_pit::OPTVAL_BOSS_SCALING_1_25X: {
-                boss_scale_factor = 5;
-                break;
-            }
-            case infinite_pit::OPTVAL_BOSS_SCALING_1_50X: {
-                boss_scale_factor = 6;
-                break;
-            }
-            case infinite_pit::OPTVAL_BOSS_SCALING_2_00X: {
-                boss_scale_factor = 8;
-                break;
-            }
-        }
-    }
             
     if (out_hp) {
         int32_t hp = Min(ei.base_hp * base_hp_pct, 1000000);
-        hp *= state.GetOptionValue(infinite_pit::OPTNUM_ENEMY_HP);
+        hp *= state.GetOption(OPTNUM_ENEMY_HP);
         hp = hp * boss_scale_factor / 4;
         *out_hp = Clamp((hp + 5000) / 10000, 1, 9999);
     }
     if (out_atk) {
         int32_t atk = Min(ei.base_atk * base_atk_pct, 1000000);
         atk += (base_attack_power - ei.atk_reference) * 100;
-        atk *= state.GetOptionValue(infinite_pit::OPTNUM_ENEMY_ATK);
+        atk *= state.GetOption(OPTNUM_ENEMY_ATK);
         atk = atk * boss_scale_factor / 4;
         *out_atk = Clamp((atk + 5000) / 10000, 1, 99);
     }
@@ -981,9 +987,7 @@ bool GetEnemyStats(
         }
     }
     if (out_coinlvl) {
-        // "Coin level" = expected number of coins x 2.
-        // Return level for normal enemies (lv 2 ~ 10 / 1 ~ 5 coins),
-        // or 20 (10 coins) for boss / special enemies.
+        // Return the level as the number of coins, or 20 for special enemies.
         *out_coinlvl = ei.level > 10 ? 20 : ei.level;
     }
     
