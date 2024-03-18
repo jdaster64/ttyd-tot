@@ -20,7 +20,7 @@ namespace mod::tot {
     
 namespace {
 
-using ::mod::infinite_pit::g_Mod;
+using ::mod::g_Mod;
 using ::ttyd::battle::g_BattleWork;
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::battle_unit::BattleWorkUnit;

@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit {
+namespace mod {
 
 class Mod {
 public:

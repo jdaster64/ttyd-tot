@@ -49,7 +49,7 @@ uint16_t* PopulateFromBitfield(
 }
 
 template <class T> inline void KnuthShuffle(T* arr, int32_t size) {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     for (int32_t i = size-1; i > 0; --i) {
         int32_t j = state.Rand(i+1, RNG_ITEM_OBFUSCATION);
         T temp = arr[i];
@@ -59,7 +59,7 @@ template <class T> inline void KnuthShuffle(T* arr, int32_t size) {
 }
 
 template <class T> inline void KnuthUnshuffle(T* arr, int32_t size) {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     for (int32_t i = 1; i < size; ++i) {
         --state.rng_states_[RNG_ITEM_OBFUSCATION];
         int32_t j = state.Rand(i+1, RNG_ITEM_OBFUSCATION);
@@ -75,7 +75,7 @@ template <class T> inline void KnuthUnshuffle(T* arr, int32_t size) {
 int32_t PickRandomItem(
     int32_t sequence, int32_t normal_item_weight, int32_t recipe_item_weight,
     int32_t badge_weight, int32_t no_item_weight) {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     
     int32_t total_weight =
         normal_item_weight + recipe_item_weight + badge_weight + no_item_weight;
@@ -134,7 +134,7 @@ int32_t PickRandomItem(
 
 void ObfuscateItems(bool enable) {
     // Obfuscation has already been performed; no need to redo.
-    if (enable && infinite_pit::g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION])
+    if (enable && g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION])
         return;
     
     auto* itemData = ttyd::item_data::itemDataTable;

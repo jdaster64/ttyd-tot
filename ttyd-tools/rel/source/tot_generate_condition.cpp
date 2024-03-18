@@ -70,7 +70,7 @@ static constexpr const BattleCondition kBattleConditions[] = {
 char g_ConditionTextBuf[64];
 
 void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     
     // Only have conditions on ~1/4 floors for one/all held drops + bonus modes.
     int32_t reward_mode = state.GetOptionValue(OPT_BATTLE_DROPS);
@@ -212,7 +212,7 @@ void GetBattleConditionString(char* out_buf) {
         ttyd::item_data::itemDataTable[item_reward].name);
     
     // If held item drop is contingent on condition, don't say which will drop.
-    if (infinite_pit::g_Mod->state_.CheckOptionValue(OPTVAL_DROP_HELD_FROM_BONUS)) {
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_DROP_HELD_FROM_BONUS)) {
         sprintf(out_buf, "Reward challenge:\n%s", g_ConditionTextBuf);
     } else {
         sprintf(out_buf, "Bonus reward (%s):\n%s", item_name, g_ConditionTextBuf);

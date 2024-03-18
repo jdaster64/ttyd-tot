@@ -170,7 +170,7 @@ bool HasAllMovesUnlocked(int32_t reward_type) {
 
 // Selects which partner to offer as a reward.
 int32_t SelectPartner() {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     
     if (GetNumActivePartners() == 4) {
         // Once the player has taken four partners, choose from among them.
@@ -203,7 +203,7 @@ int32_t SelectPartner() {
 
 // Selects which Special Move to offer as a reward.
 int32_t SelectSpecialMove() {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     const int32_t max_sp = pouch.max_sp / 100;
     uint16_t weights[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -236,7 +236,7 @@ int32_t SelectSpecialMove() {
 
 // Selects which unique badge to give as a reward.
 int32_t SelectUniqueBadge() {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     static constexpr const int32_t kBadges[] = {
         ItemType::CHILL_OUT, ItemType::DOUBLE_DIP,
         ItemType::DOUBLE_DIP_P, ItemType::FEELING_FINE,
@@ -286,7 +286,7 @@ int32_t SelectUniqueBadge() {
 
 // Selects set of moves to offer for unlocking or upgrading moves.
 void SelectMoves(int32_t reward_type, bool is_upgrade_mode) {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     
     // Determine how many moves to offer at maximum.
     bool is_partner = reward_type <= REWARD_GOOMBELLA && reward_type >= REWARD_MOWZ;
@@ -557,23 +557,23 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
             ttyd::mario_pouch::pouchAddCoin(5);
             return true;
         case REWARD_HP_UP:
-            ++infinite_pit::g_Mod->state_.hp_level_;
+            ++g_Mod->state_.hp_level_;
             OptionsManager::UpdateLevelupStats();
             return true;
         case REWARD_FP_UP:
-            ++infinite_pit::g_Mod->state_.fp_level_;
+            ++g_Mod->state_.fp_level_;
             OptionsManager::UpdateLevelupStats();
             return true;
         case REWARD_BP_UP:
-            ++infinite_pit::g_Mod->state_.bp_level_;
+            ++g_Mod->state_.bp_level_;
             OptionsManager::UpdateLevelupStats();
             return true;
         case REWARD_HP_UP_P:
-            ++infinite_pit::g_Mod->state_.hp_p_level_;
+            ++g_Mod->state_.hp_p_level_;
             OptionsManager::UpdateLevelupStats();
             return true;
         case REWARD_INV_UP:
-            ++infinite_pit::g_Mod->state_.num_sack_upgrades_;
+            ++g_Mod->state_.num_sack_upgrades_;
             return true;
         case ItemType::DIAMOND_STAR:
         case ItemType::EMERALD_STAR:
@@ -626,7 +626,7 @@ void RewardManager::AfterItemPickup(int32_t item_type) {
             option = STAT_RUN_UNIQUE_BADGE_9;
             break;
     }
-    if (option) infinite_pit::g_Mod->state_.SetOption(option, 1);
+    if (option) g_Mod->state_.SetOption(option, 1);
 }
 
 int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
@@ -636,7 +636,7 @@ int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
 
 // Assigns reward types and corresponding pickup scripts to all chests.
 void SelectChestContents() {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     
     // Weights for different types of moves (Jump, Hammer, Special, partner).
     static constexpr const uint16_t kMoveWeights[] = { 15, 15, 6, 50 };

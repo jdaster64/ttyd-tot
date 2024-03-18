@@ -313,12 +313,12 @@ uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
 
 EVT_DEFINE_USER_FUNC(evtTot_IncrementFloor) {
     int32_t change = evtGetValue(evt, evt->evtArguments[0]);
-    infinite_pit::g_Mod->state_.IncrementFloor(change);
+    g_Mod->state_.IncrementFloor(change);
     return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_GetFloor) {
-    int32_t floor = infinite_pit::g_Mod->state_.floor_;
+    int32_t floor = g_Mod->state_.floor_;
     evtSetValue(evt, evt->evtArguments[0], floor);
     return 2;
 }

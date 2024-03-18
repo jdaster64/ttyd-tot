@@ -540,7 +540,7 @@ const int8_t kBaseDifficulty[4] = { 0, 1, 5, 13 };
 
 // Gets the difficulty level for the given tower / floor combination.
 int32_t GetDifficulty() {
-    StateManager& state = infinite_pit::g_Mod->state_;
+    StateManager& state = g_Mod->state_;
     int32_t tower = state.GetOption(OPT_DIFFICULTY);
     int32_t floor = state.floor_;
     return kBaseDifficulty[tower] + (floor - 1) / 8;
@@ -612,7 +612,7 @@ void SelectEnemies() {
         return;
     }
     
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     int32_t difficulty = GetDifficulty();
     int32_t target_level_sum = kTargetLevelSums[difficulty];
     
@@ -788,7 +788,7 @@ void BuildBattle(
     
     // TODO: Return early for boss fights, if handling them elsewhere?
     
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     
     for (int32_t i = 0; i < 12; ++i) g_CustomAudienceWeights[i] = 2;
     // Make Toads slightly likelier since they're never boosted.
@@ -907,7 +907,7 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
     
     // TODO: Skip for final boss battle.
     
-    const auto& state = infinite_pit::g_Mod->state_;
+    const auto& state = g_Mod->state_;
     
     const int32_t reward_mode = state.GetOptionValue(OPT_BATTLE_DROPS);
     NpcBattleInfo* battle_info = &npc->battleInfo;
@@ -941,7 +941,7 @@ bool GetEnemyStats(
         // No stats to pull from; just use the original message.
         return false;
     }
-    const auto& state = mod::infinite_pit::g_Mod->state_;
+    const auto& state = mod::g_Mod->state_;
     const EnemyTypeInfo& ei = kEnemyInfo[unit_type];
     
     int32_t difficulty = GetDifficulty();
@@ -1005,7 +1005,7 @@ bool GetEnemyStats(
 
 int32_t GetBattleRewardTier() {
     // For midboss or boss floors, always return the maximum number.
-    int32_t floor = infinite_pit::g_Mod->state_.floor_;
+    int32_t floor = g_Mod->state_.floor_;
     if (floor > 0 && floor % 8 == 0) return 3;
     
     int32_t level_target_sum = kTargetLevelSums[GetDifficulty()];

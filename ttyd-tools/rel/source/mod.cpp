@@ -21,14 +21,14 @@
 namespace mod {
 
 void main() {
-	infinite_pit::Mod* mod = new infinite_pit::Mod();
+	Mod* mod = new Mod();
 	mod->Init();
     tot::gon::Prolog();
 }
 
 }
 
-namespace mod::infinite_pit {
+namespace mod {
 
 // Global instance of Mod class.
 Mod* g_Mod = nullptr;
@@ -66,23 +66,28 @@ void Mod::Init() {
 	patch::hookFunction(ttyd::fontmgr::fontmgrTexSetup, [](){});
     
     // Hook / patch other functions with custom logic.
-    ApplyAllFixedPatches();
+    infinite_pit::ApplyAllFixedPatches();
 }
 
 void Mod::Update() {
-    DebugManager::Update();
-    CheatsManager::Update();
-    AchievementsManager::Update();
-    TitleScreenManager::Update();
-    MenuManager::Update();
+    infinite_pit::DebugManager::Update();
+    infinite_pit::CheatsManager::Update();
+    infinite_pit::AchievementsManager::Update();
+    infinite_pit::TitleScreenManager::Update();
+    infinite_pit::MenuManager::Update();
 }
 
 void Mod::Draw() {
-    RegisterDrawCallback(DebugManager::Draw,        CameraId::kDebug3d);
-    RegisterDrawCallback(CheatsManager::Draw,       CameraId::kDebug3d);
-    RegisterDrawCallback(AchievementsManager::Draw, CameraId::kDebug3d);
-    RegisterDrawCallback(TitleScreenManager::Draw,  CameraId::k2d);
-    RegisterDrawCallback(MenuManager::Draw,         CameraId::k2d);
+    RegisterDrawCallback(
+        infinite_pit::DebugManager::Draw, CameraId::kDebug3d);
+    RegisterDrawCallback(
+        infinite_pit::CheatsManager::Draw, CameraId::kDebug3d);
+    RegisterDrawCallback(
+        infinite_pit::AchievementsManager::Draw, CameraId::kDebug3d);
+    RegisterDrawCallback(
+        infinite_pit::TitleScreenManager::Draw, CameraId::k2d);
+    RegisterDrawCallback(
+        infinite_pit::MenuManager::Draw, CameraId::k2d);
 }
 
 }

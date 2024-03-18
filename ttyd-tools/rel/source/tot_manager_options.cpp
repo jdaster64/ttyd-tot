@@ -15,7 +15,7 @@ const int32_t kHpMultipliers[] = { 100, 100, 80, 120, 80, 120, 100, 80 };
 // Returns the current expected base stat given its option value and
 // corresponding level (e.g. OPTNUM_MARIO_HP + hp_level_).
 int32_t GetBaseStat(uint32_t option, int32_t party = 0) {
-    auto& state = infinite_pit::g_Mod->state_;
+    auto& state = g_Mod->state_;
     int32_t value = state.GetOption(option);
     switch (option) {
         case OPTNUM_MARIO_HP: {
