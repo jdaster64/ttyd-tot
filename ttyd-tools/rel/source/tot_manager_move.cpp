@@ -54,10 +54,10 @@ const MoveData g_MoveData[] = {
     { { 1, 2, 3 }, 3, 0, 0, IconType::DIAMOND_STAR, "btl_wn_sac_dekkaku_dokkan", "tot_ms_2_abb", "msg_dekkaku_dokkan", "msg_sac_2", "tot_upg_damage", },
     { { 2, 3, 4 }, 3, 1, 0, IconType::EMERALD_STAR, "btl_wn_sac_bakugame", nullptr, "msg_bakugame", "msg_sac_3", "tot_upg_status", },
     { { 2, 3, 4 }, 3, 1, 0, IconType::GOLD_STAR, "btl_wn_sac_mukimuki_body", nullptr, "msg_mukimuki_body", "msg_sac_4", "tot_upg_sac1", },
-    { { 3, 4, 5 }, 3, 2, 0, IconType::RUBY_STAR, "btl_wn_sac_scissor", nullptr, "msg_scissor", "msg_sac_5", "tot_upg_damage", },
-    { { 2, 3, 4 }, 3, 1, 0, IconType::SAPPHIRE_STAR, "btl_wn_sac_genki1", "tot_ms_6_abb", "msg_super_genki", "msg_sac_6", "tot_upg_sac1", },
-    { { 3, 4, 5 }, 3, 2, 0, IconType::GARNET_STAR, "btl_wn_sac_sukkari_sukkiri", "tot_ms_7_abb", "msg_sukkari_sukkiri", "msg_sac_7", "tot_upg_statuschance", },
-    { { 4, 5, 6 }, 3, 3, 0, IconType::CRYSTAL_STAR, "btl_wn_sac_zubastar", nullptr, "msg_zubastar", "msg_sac_8", "tot_upg_damage", },
+    { { 3, 5, 6 }, 3, 2, 0, IconType::RUBY_STAR, "btl_wn_sac_scissor", nullptr, "msg_scissor", "msg_sac_5", "tot_upg_damage", },
+    { { 2, 3, 5 }, 3, 1, 0, IconType::SAPPHIRE_STAR, "btl_wn_sac_genki1", "tot_ms_6_abb", "msg_super_genki", "msg_sac_6", "tot_upg_sac1", },
+    { { 2, 4, 5 }, 3, 2, 0, IconType::GARNET_STAR, "btl_wn_sac_sukkari_sukkiri", "tot_ms_7_abb", "msg_sukkari_sukkiri", "msg_sac_7", "tot_upg_statuschance", },
+    { { 4, 6, 7 }, 3, 3, 0, IconType::CRYSTAL_STAR, "btl_wn_sac_zubastar", nullptr, "msg_zubastar", "msg_sac_8", "tot_upg_damage", },
     { { 0, 2, 4 }, 3, 0, 1, IconType::PARTNER_MOVE_0, "btl_wn_pkr_normal", nullptr, "msg_pkr_normal_jump", "msg_ac_zutsuki", "tot_upg_damage", },
     { { 0, 0, 0 }, 1, 0, 1, IconType::PARTNER_MOVE_0, "btl_wn_pkr_lv1", nullptr, "msg_pkr_monosiri", "msg_ac_monoshiri", "tot_upg_none", },
     { { 2, 4, 6 }, 3, 1, 1, IconType::PARTNER_MOVE_1, "tot_ptr1_ironbonk", nullptr, "tot_ptr1_ironbonk_desc", "msg_ac_zutsuki", "tot_upg_damage", },
@@ -169,6 +169,7 @@ bool MoveManager::UpgradeMove(int32_t move_type) {
                 pouch.max_sp += 100;
                 break;
         }
+        g_Mod->state_.level_selected_[move_type] = 1;
     }
     return true;
 }

@@ -220,14 +220,25 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
             break;
         }
         case 4: {  // Special moves
+            // Sort in ascending order of SP cost.
+            static constexpr const int32_t kMoveOrder[] = {
+                MoveType::SP_SWEET_TREAT,   MoveType::SP_EARTH_TREMOR,
+                MoveType::SP_CLOCK_OUT,     MoveType::SP_POWER_LIFT,
+                MoveType::SP_SWEET_FEAST,   MoveType::SP_SHOWSTOPPER,
+                MoveType::SP_ART_ATTACK,    MoveType::SP_SUPERNOVA,
+            };
+        
             for (int32_t i = 0; i < 8; ++i) {
-                if ((pouch.star_powers_obtained & (1 << i)) == 0) continue;
+                int32_t move = kMoveOrder[i];
+                int32_t index = move - MoveType::SP_SWEET_TREAT;
+                
+                if ((pouch.star_powers_obtained & (1 << index)) == 0) continue;
                 
                 auto& weapon_entry = command_work.weapon_table[num_options];
-                BattleWeapon* weapon = superActionTable[i];
+                BattleWeapon* weapon = superActionTable[index];
                 
-                if (MoveManager::GetUnlockedLevel(MoveType::SP_SWEET_TREAT + i)) {
-                    weapon_entry.index = MoveType::SP_SWEET_TREAT + i;
+                if (MoveManager::GetUnlockedLevel(move)) {
+                    weapon_entry.index = move;
                     weapon_entry.item_id = 0;
                     weapon_entry.unk_04 = 0;
                     weapon_entry.unk_18 = 0;

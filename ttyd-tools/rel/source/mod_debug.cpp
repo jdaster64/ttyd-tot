@@ -7,6 +7,7 @@
 #include "mod_state.h"
 #include "patches_field.h"
 #include "tot_generate_enemy.h"
+#include "tot_manager_move.h"
 
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_monosiri.h>
@@ -28,7 +29,8 @@ enum DebugManagerMode {
     DEBUG_MIN       = 100,
     DEBUG_ENEMIES,
     DEBUG_FLOOR,
-    DEBUG_UNLOCK_SPECIAL_MOVES,
+    DEBUG_UNLOCK_ALL_MOVES,
+    DEBUG_UNLOCK_ALL_PARTNERS,
     DEBUG_UNLOCK_TATTLE_LOG,
     DEBUG_EXIT,
     DEBUG_MAX
@@ -106,13 +108,23 @@ void DebugManager::Update() {
                     g_CursorPos = g_Mod->state_.floor_;
                     return;
                 }
-                case DEBUG_UNLOCK_SPECIAL_MOVES: {
-                    PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
-                    pouch.star_powers_obtained = 0xff;
-                    pouch.max_sp = 1000;
-                    pouch.current_sp = 1000;
-                    g_Mod->inf_state_.star_power_levels_ = 0xffff;
+                case DEBUG_UNLOCK_ALL_MOVES: {
+                    // Unlock all moves and move levels.
+                    for (int32_t i = 0; i < tot::MoveType::MOVE_TYPE_MAX; ++i) {
+                        tot::MoveManager::UpgradeMove(i);
+                        tot::MoveManager::UpgradeMove(i);
+                        tot::MoveManager::UpgradeMove(i);
+                    }
                     break;
+                }
+                case DEBUG_UNLOCK_ALL_PARTNERS: {
+                    // Unlock all partners, if you have at least one unlocked.
+                    if (GetNumActivePartners() > 0) {
+                        auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+                        for (int32_t i = 1; i <= 7; ++i) {
+                            pouch.party_data[i].flags |= 1;
+                        }
+                    }
                 }
                 case DEBUG_UNLOCK_TATTLE_LOG: {
                     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
@@ -237,8 +249,11 @@ void DebugManager::Draw() {
             case DEBUG_FLOOR: {
                 strcpy(buf, "Set Current Floor");           break;
             }
-            case DEBUG_UNLOCK_SPECIAL_MOVES: {
-                strcpy(buf, "Unlock All Special Moves");    break;
+            case DEBUG_UNLOCK_ALL_MOVES: {
+                strcpy(buf, "Unlock All Moves");            break;
+            }
+            case DEBUG_UNLOCK_ALL_PARTNERS: {
+                strcpy(buf, "Unlock All Partners");         break;
             }
             case DEBUG_UNLOCK_TATTLE_LOG: {
                 strcpy(buf, "Unlock All Tattle Logs");      break;

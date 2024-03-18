@@ -567,12 +567,12 @@ void ApplyFixedPatches() {
         ttyd::sac_muki::main_muki, [](EvtEntry* evt, bool isFirstCall) {
             // Change the amount of power gained per arrow hit on startup.
             if (isFirstCall) {
-                float arrow_power = 0.20001;
+                float arrow_power = 0.16667;
                 switch (
                     tot::MoveManager::GetSelectedLevel(
                         tot::MoveType::SP_POWER_LIFT)) {
-                    case 2: arrow_power = 0.25001; break;
-                    case 3: arrow_power = 0.33334; break;
+                    case 2: arrow_power = 0.20001; break;
+                    case 3: arrow_power = 0.25001; break;
                 }
                 mod::patch::writePatch(
                     &ttyd::sac_muki::_sac_muki_power_per_arrow,
@@ -609,20 +609,16 @@ void ApplyFixedPatches() {
             return 2;
         });
     
-    // Change attack power of Supernova to 3/5/10x bars + 1, based on level.
+    // Change attack power of Supernova to 2/4/6x # of bars, based on level.
     g_weaponGetPower_ZubaStar_trampoline = patch::hookFunction(
         ttyd::sac_zubastar::weaponGetPower_ZubaStar, [](
             BattleWorkUnit*, BattleWeapon*, 
             BattleWorkUnit*, BattleWorkUnitPart*) {
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
             int32_t level = *reinterpret_cast<int32_t*>(sac_work_addr + 0x10);
-            int32_t multiplier = 3;
-            switch (tot::MoveManager::GetSelectedLevel(
-                tot::MoveType::SP_SUPERNOVA)) {
-                case 2: multiplier = 5;     break;
-                case 3: multiplier = 10;    break;
-            }
-            return static_cast<uint32_t>((level + 1) * multiplier);
+            int32_t multiplier = 2 * tot::MoveManager::GetSelectedLevel(
+                tot::MoveType::SP_SUPERNOVA);
+            return static_cast<uint32_t>(level * multiplier);
         });
 }
 
