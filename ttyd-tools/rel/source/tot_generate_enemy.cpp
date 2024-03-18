@@ -569,7 +569,6 @@ void SelectEnemies(int32_t floor) {
     g_NumEnemies = 2;
     g_Enemies[0] = BattleUnitType::GOOMBA;
     g_Enemies[1] = BattleUnitType::GOOMBA;
-    return;
     
     // TODO: Add special cases for boss floors.
     
@@ -854,6 +853,13 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     x_pos *= (ttyd::system::irand(2) ? 1 : -1);
     int32_t z_pos = ttyd::system::irand(200) - 100;
     int32_t y_pos = kEnemyInfo[lead_enemy_type].field_y_pos;
+    
+    if (lead_enemy_type == BattleUnitType::PIDER ||
+        lead_enemy_type == BattleUnitType::ARANTULA) {
+        // Need extra vertical range to detect Mario from the ceiling.
+        npc_setup->territoryBase.y = y_pos;
+        npc_setup->territoryLoiter.y = 300.f;
+    }
     
     if (lead_enemy_type == BattleUnitType::CHAIN_CHOMP ||
         lead_enemy_type == BattleUnitType::RED_CHOMP) {

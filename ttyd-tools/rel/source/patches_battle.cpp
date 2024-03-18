@@ -911,7 +911,7 @@ void ApplyFixedPatches() {
 void SetTargetAudienceAmount() {
     // Set audience target value based on current floor.
     const int32_t floor = g_Mod->state_.floor_;
-    float target_amount = floor * 2.5f + 5.0f;
+    float target_amount = floor * 2.0f + 5.0f;
     if (target_amount > 200.f) target_amount = 200.f;
     
     uintptr_t audience_work_base =

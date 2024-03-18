@@ -310,10 +310,10 @@ EVT_BEGIN(Tower_NpcSetup)
     USER_FUNC(evt_npc_setup, LW(1))
     USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
     
-    IF_STR_EQUAL(LW(2), PTR(kPiderName))
+    IF_STR_EQUAL(LW(3), PTR(kPiderName))
         USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
     END_IF()
-    IF_STR_EQUAL(LW(2), PTR(kArantulaName))
+    IF_STR_EQUAL(LW(3), PTR(kArantulaName))
         USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
     END_IF()
     

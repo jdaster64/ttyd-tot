@@ -103,7 +103,7 @@ void DebugManager::Update() {
                 case DEBUG_FLOOR: {
                     // Go to submenu on next frame.
                     g_DebugMode = g_CursorPos;
-                    g_CursorPos = g_Mod->inf_state_.floor_;
+                    g_CursorPos = g_Mod->state_.floor_;
                     return;
                 }
                 case DEBUG_UNLOCK_SPECIAL_MOVES: {
@@ -210,15 +210,15 @@ void DebugManager::Update() {
         } else if (button_trg & (ButtonId::DPAD_DOWN | ButtonId::DPAD_LEFT)) {
             dir = -1;       
         } else if (button_trg & ButtonId::Y) {
-            g_Mod->inf_state_.floor_ = g_CursorPos;
-            field::UpdateExitDestination();
+            g_Mod->state_.floor_ = g_CursorPos;
+            // field::UpdateExitDestination();
             g_DebugMode = DEBUG_OFF;
             return;
         }
         
         if (dir == 0) return;
         if (buttons & ButtonId::L) dir *= 10;
-        g_CursorPos += dir;
+        g_CursorPos = Clamp(g_CursorPos + dir, 0, 64);
         if (g_CursorPos < 0) g_CursorPos = 0;
     }
 }
@@ -267,7 +267,7 @@ void DebugManager::Draw() {
         }
     } else if (g_DebugMode == DEBUG_FLOOR) {
         // Print current floor number to buffer.
-        sprintf(buf, "%" PRId32, g_CursorPos + 1);
+        sprintf(buf, "%" PRId32, g_CursorPos);
         DrawCenteredTextWindow(
             buf, 0, -60, 0xFFu, true, 0xFFFFFFFFu, 0.7f, red_alpha, 10, 7);
         // Draw main menu text to make it look like a contextual menu.
