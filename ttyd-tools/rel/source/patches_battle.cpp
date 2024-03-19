@@ -101,6 +101,7 @@ using WeaponDamageFn = uint32_t (*) (
 
 // Function hooks.
 extern void (*g_BattleStoreExp_trampoline)(BattleWork*, int32_t);
+extern void (*g__EquipItem_trampoline)(BattleWorkUnit*, uint32_t, int32_t);
 extern int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
 extern int32_t (*g_BattlePreCheckDamage_trampoline)(
@@ -583,6 +584,11 @@ int32_t CalculateBaseDamage(
         atk += attacker->badges_equipped.power_plus;
         atk += attacker->badges_equipped.p_up_d_down;
         
+        // Perfect Power.
+        if (attacker->current_hp == attacker->max_hp) {
+            atk += attacker->badges_equipped.unk_03;
+        }
+        
         const bool weaker_rush_badges =
             g_Mod->inf_state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES);
         
@@ -983,6 +989,34 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_effStarPointDisp_Patch_SetIconId),
         0x38a00193U /* li r5, IconType::COIN */);
+        
+    // Equipping new badges.
+    g__EquipItem_trampoline = patch::hookFunction(
+        ttyd::battle::_EquipItem, 
+        [](BattleWorkUnit* unit, uint32_t flags, int32_t item) {
+            // Handle vanilla badges.
+            g__EquipItem_trampoline(unit, flags, item);
+            
+            // Mario or enemies:
+            if ((flags & 4) == 0) {
+                if (item == 0x14c) ++unit->badges_equipped.unk_03;
+            }
+            // Partner or enemies:
+            if ((flags & 2) == 0) {
+                if (item == 0x14d) ++unit->badges_equipped.unk_03;
+            }
+            
+            // Enable Triple Dip action for any # of copies of Double Dip (P).
+            if ((flags & 6) == 2 && item == ItemType::DOUBLE_DIP) {
+                unit->badges_equipped.double_dip = 1;
+                unit->badges_equipped.triple_dip = 1;
+            }
+            if ((flags & 6) == 4 && item == ItemType::DOUBLE_DIP_P) {
+                unit->badges_equipped.double_dip = 1;
+                unit->badges_equipped.triple_dip = 1;
+            }
+        });
+        
         
     // Quick Change FP cost:
     // Signal that party switch was initiated by the player.

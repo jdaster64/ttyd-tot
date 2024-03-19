@@ -23,6 +23,9 @@ g_StringMap = {
         b"in_2bai_damage":      b"No Pain, No Gain",
         b"in_toughen_up":       b"Toughen Up",
         b"in_toughen_up_p":     b"Toughen Up P",
+        b"in_super_start":      b"Super Start",
+        b"in_perfect_power":    b"Perfect Power",
+        b"in_perfect_power_p":  b"Perfect Power P",
         
         # Item descriptions.
         b"msg_super_coin":
@@ -116,6 +119,18 @@ g_StringMap = {
         b"msg_toughen_up_p":
             b"Wear this to add Toughen Up\n"
             b"to partners' Tactics menu.",
+            
+        b"msg_super_start":
+            b"Grants a bit of extra SP\n"
+            b"when starting a battle.",
+            
+        b"msg_perfect_power":
+            b"Increases attack power by 1\n"
+            b"when Mario is at full HP.",
+            
+        b"msg_perfect_power_p":
+            b"Increases attack power by 1\n"
+            b"when allies are at full HP.",
             
         b"msg_toughen_up_menu":
             b"Wear this to add Toughen Up\n"

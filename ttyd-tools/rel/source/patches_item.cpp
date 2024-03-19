@@ -73,6 +73,7 @@ extern const int32_t g_btlevtcmd_ConsumeItem_Patch_RefundBase;
 extern const int32_t g_btlevtcmd_ConsumeItemReserve_Patch_RefundBase;
 extern const int32_t g_BattleDamageDirect_Patch_AddTotalDamage;
 extern const int32_t g_BattleDamageDirect_Patch_PityFlowerChance;
+extern const int32_t g_BattleAudience_Case_Appeal_Patch_AppealSp;
 
 // Assembly patch functions.
 extern "C" {
@@ -196,13 +197,28 @@ void ApplyFixedPatches() {
         0x00700000, 0x30743250, 0xa7764353, 0x35078644, 0x00842420,
         0x34703543, 0x30040740, 0x54444045, 0x00002045,
         // Badges.
-        0xb8a88dbb, 0x009d8a8b, 0xeedd99cc, 0xcceeffff, 0xbbccccdd,
+        0xb8a88dbb, 0x009d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,
         0x0000beeb, 0x9aaa0dfc, 0xcaaddcc9, 0xc000dd7c, 0x0000000c,
-        0x00770000, 0x00000000, 0x00000880
-    };
+        0x00770000, 0x0dee0000, 0x00000880,
+    };   
+    
     // Prices corresponding to the price tiers in the above array.
     static const constexpr uint8_t kPrices[] = {
         5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 125, 150, 200, 250
+    };
+    static const constexpr uint32_t kBpCost[] = {
+        0x11111111, 0x44111111, 0x22663311, 0x22111144, 0x11224411,
+        0x33331441, 0x12226220, 0x62211111, 0x30043316, 0x00000003,
+        0x03110001, 0x03220100, 0x00000110,
+    };
+    static const constexpr int8_t kBadgeSortOrder[] = {
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, 26,
+        21, 22, 90, 91, 36, 37, 44, 45, 38, 39, 55, 56, 53, 54, 46, 47,
+        57, 58, 50, 51, 48, 49, -1, -1, -1, 69, 70, 82, 83, 86, 87, 84,
+        52, 42, 43, 85, 66, 67, 68, 75, 76, 77, 78, 59, 60, 61, 62, 63, 
+        64, 88, 71, 72, 93, 126, 127, 79, 80, -1, -1, 102, 103, 104, 105, 106,
+        98, -1, -1, -1, 96, 97, 65, 107, 108, -1, -1, -1, 40, 41, 92, -1,
+        -1, 23, 24,
     };
     
     // - Set coin buy & sell (for Refund) prices based on above tiers.
@@ -239,62 +255,19 @@ void ApplyFixedPatches() {
                     ttyd::battle_item_data::ItemWeaponData_Kinoko.
                         target_weighting_flags;
             }
+
             // Fix sorting order.
             if (item.type_sort_order > 0x31) {
                 item.type_sort_order += 1;
             }
         } else {
-            // Fix sorting order.
-            if (item.type_sort_order > 0x49) ++item.type_sort_order;
-            if (item.type_sort_order > 0x43) ++item.type_sort_order;
-            if (item.type_sort_order > 0x3b) ++item.type_sort_order;
-            if (item.type_sort_order > 0x24) ++item.type_sort_order;
-            if (item.type_sort_order > 0x21) ++item.type_sort_order;
-            if (item.type_sort_order > 0x1f) ++item.type_sort_order;
-            if (item.type_sort_order > 0x16) item.type_sort_order += 2;
+            // Assign new sort order and BP cost.
+            const int32_t word_index = (i - ItemType::POWER_JUMP) >> 3;
+            const int32_t nybble_index = (i - ItemType::POWER_JUMP) & 7;
+            item.bp_cost = (kBpCost[word_index] >> (nybble_index << 2)) & 15;
+            item.type_sort_order = kBadgeSortOrder[i - ItemType::POWER_JUMP];
         }
     }
-    
-    // Fixed sort order for Koopa Curse, new badges, and unused 'P' badges.
-    itemDataTable[ItemType::KOOPA_CURSE].type_sort_order        = 0x31 + 1;
-    
-    itemDataTable[ItemType::SUPER_CHARGE].type_sort_order       = 0x16 + 1;
-    itemDataTable[ItemType::SUPER_CHARGE_P].type_sort_order     = 0x16 + 2;
-    // Leftover code for Mini HP-/FP-Plus from Shufflizer.
-    // itemDataTable[ItemType::SQUARE_DIAMOND_BADGE].type_sort_order = 0x1f + 3;
-    // itemDataTable[ItemType::SQUARE_DIAMOND_BADGE_P].type_sort_order = 0x21 + 4;
-    itemDataTable[ItemType::ALL_OR_NOTHING_P].type_sort_order   = 0x24 + 5;
-    itemDataTable[ItemType::LUCKY_DAY_P].type_sort_order        = 0x3b + 6;
-    itemDataTable[ItemType::PITY_FLOWER_P].type_sort_order      = 0x43 + 7;
-    itemDataTable[ItemType::FP_DRAIN_P].type_sort_order         = 0x49 + 8;
-    
-    // Make Peekaboo 0 BP, and sort it last, as it's unlikely to be unequipped.
-    itemDataTable[ItemType::PEEKABOO].bp_cost = 0;
-    itemDataTable[ItemType::PEEKABOO].type_sort_order = 999;
-    // TOT: For testing; make Timing Tutor cost 0 BP.
-    itemDataTable[ItemType::TIMING_TUTOR].bp_cost = 0;
-    
-    // Set sort order of unused badges to -1 so they don't show up in log.
-    itemDataTable[ItemType::TIMING_TUTOR].type_sort_order = -1;
-    itemDataTable[ItemType::MONEY_MONEY].type_sort_order = -1;
-    itemDataTable[ItemType::ITEM_HOG].type_sort_order = -1;
-    itemDataTable[ItemType::BUMP_ATTACK].type_sort_order = -1;
-    itemDataTable[ItemType::FIRST_ATTACK].type_sort_order = -1;
-    itemDataTable[ItemType::SLOW_GO].type_sort_order = -1;
-    
-    // BP cost changes.
-    itemDataTable[ItemType::TORNADO_JUMP].bp_cost   = 1;
-    itemDataTable[ItemType::FIRE_DRIVE].bp_cost     = 2;
-    itemDataTable[ItemType::DEFEND_PLUS].bp_cost    = 4;
-    itemDataTable[ItemType::DEFEND_PLUS_P].bp_cost  = 4;
-    itemDataTable[ItemType::FEELING_FINE].bp_cost   = 3;
-    itemDataTable[ItemType::FEELING_FINE_P].bp_cost = 3;
-    itemDataTable[ItemType::FP_DRAIN_P].bp_cost     = 1;
-    itemDataTable[ItemType::PITY_FLOWER].bp_cost    = 4;
-    itemDataTable[ItemType::PITY_FLOWER_P].bp_cost  = 4;
-    itemDataTable[ItemType::RETURN_POSTAGE].bp_cost = 5;
-    itemDataTable[ItemType::LUCKY_START].bp_cost    = 3;
-    itemDataTable[ItemType::QUICK_CHANGE].bp_cost   = 4;
     
     // Changed pickup messages for Super / Ultra boots and hammer.
     itemDataTable[ItemType::SUPER_BOOTS].description = "msg_custom_super_boots";
@@ -313,17 +286,30 @@ void ApplyFixedPatches() {
     itemDataTable[AchievementsManager::kTattleLogItem].description = "msg_ach_3";
     itemDataTable[AchievementsManager::kTattleLogItem].menu_description = "msg_ach_3";
     
-    // New badges (Toughen Up, Toughen Up P); a single-turn +DEF buff.
-    itemDataTable[ItemType::SUPER_CHARGE].bp_cost = 1;
+    // New badges:
+    // Toughen Up (P): a move that grants a single-turn +DEF buff.
     itemDataTable[ItemType::SUPER_CHARGE].icon_id = IconType::DEFEND_BADGE;
     itemDataTable[ItemType::SUPER_CHARGE].name = "in_toughen_up";
     itemDataTable[ItemType::SUPER_CHARGE].description = "msg_toughen_up";
     itemDataTable[ItemType::SUPER_CHARGE].menu_description = "msg_toughen_up_menu";
-    itemDataTable[ItemType::SUPER_CHARGE_P].bp_cost = 1;
     itemDataTable[ItemType::SUPER_CHARGE_P].icon_id = IconType::DEFEND_BADGE_P;
     itemDataTable[ItemType::SUPER_CHARGE_P].name = "in_toughen_up_p";
     itemDataTable[ItemType::SUPER_CHARGE_P].description = "msg_toughen_up_p";
     itemDataTable[ItemType::SUPER_CHARGE_P].menu_description = "msg_toughen_up_p_menu";
+    // Perfect Power (P): gives +1 power for being at full health.
+    itemDataTable[ItemType::MEGA_JUMP].icon_id = IconType::PERFECT_POWER;
+    itemDataTable[ItemType::MEGA_JUMP].name = "in_perfect_power";
+    itemDataTable[ItemType::MEGA_JUMP].description = "msg_perfect_power";
+    itemDataTable[ItemType::MEGA_JUMP].menu_description = "msg_perfect_power";
+    itemDataTable[ItemType::MEGA_SMASH].icon_id = IconType::PERFECT_POWER_P;
+    itemDataTable[ItemType::MEGA_SMASH].name = "in_perfect_power_p";
+    itemDataTable[ItemType::MEGA_SMASH].description = "msg_perfect_power_p";
+    itemDataTable[ItemType::MEGA_SMASH].menu_description = "msg_perfect_power_p";
+    // Super Start: gives +0.50 SP at the start of a battle.
+    itemDataTable[ItemType::MEGA_QUAKE].icon_id = IconType::SUPER_START;
+    itemDataTable[ItemType::MEGA_QUAKE].name = "in_super_start";
+    itemDataTable[ItemType::MEGA_QUAKE].description = "msg_super_start";
+    itemDataTable[ItemType::MEGA_QUAKE].menu_description = "msg_super_start";
         
     // Change Super Charge (P) weapons into Toughen Up (P).
     ttyd::battle_mario::badgeWeapon_SuperCharge.base_fp_cost = 1;
@@ -343,6 +329,7 @@ void ApplyFixedPatches() {
     ttyd::battle_mario::badgeWeapon_SuperChargeP.name = "in_toughen_up";
     
     // Turn Gold Bars x3 into "Shine Sprites" that can be used from the menu.
+    // TODO: Remove this code as it's not necessary in ToT.
     memcpy(&itemDataTable[ItemType::GOLD_BAR_X3], 
            &itemDataTable[ItemType::SHINE_SPRITE], sizeof(ItemData));
     itemDataTable[ItemType::GOLD_BAR_X3].usable_locations 
@@ -427,40 +414,16 @@ void ApplyFixedPatches() {
     // Make Koopa Curse multi-target.
     ttyd::battle_item_data::ItemWeaponData_Kameno_Noroi.target_class_flags =
         0x02101260;
-    // Give it its correct icon.
+    // Give it its correct icon and non-default sort order.
     itemDataTable[ItemType::KOOPA_CURSE].icon_id = IconType::KOOPA_CURSE;
+    itemDataTable[ItemType::KOOPA_CURSE].type_sort_order = 0x31 + 1;
         
     // Make Hot Sauce charge by +3.
     ttyd::battle_item_data::ItemWeaponData_RedKararing.charge_strength = 3;
         
-    // Add 75%-rate Dizzy status to Tornado Jump's tornadoes.
-    ttyd::battle_mario::badgeWeapon_TatsumakiJumpInvolved.dizzy_time = 3;
-    ttyd::battle_mario::badgeWeapon_TatsumakiJumpInvolved.dizzy_chance = 75;
-        
-    // Make Piercing Blow stackable (copy Hammer Throw damage function & params)
-    memcpy(
-        &ttyd::battle_mario::badgeWeapon_TsuranukiNaguri.damage_function,
-        &ttyd::battle_mario::badgeWeapon_HammerNageru.damage_function,
-        9 * sizeof(uint32_t));
-    // Determines which badge type to count to determine the power level.
-    ttyd::battle_mario::badgeWeapon_TsuranukiNaguri.damage_function_params[6] =
-        ItemType::PIERCING_BLOW;
-        
-    // Make Head Rattle have a higher rate of success and base turn count.
-    ttyd::battle_mario::badgeWeapon_ConfuseHammer.confuse_chance = 127;
-    ttyd::battle_mario::badgeWeapon_ConfuseHammer.confuse_time = 4;
-
-    // Make Fire Drive cheaper to use, but deal only 4 damage at base power.
-    ttyd::battle_mario::badgeWeapon_FireNaguri.damage_function_params[1] = 2;
-    ttyd::battle_mario::badgeWeapon_FireNaguri.damage_function_params[3] = 2;
-    ttyd::battle_mario::badgeWeapon_FireNaguri.damage_function_params[5] = 2;
-    ttyd::battle_mario::badgeWeapon_FireNaguri.base_fp_cost = 3;
-        
-    // Change base FP cost of some moves.
+    // Change base FP cost of Charge badges.
     ttyd::battle_mario::badgeWeapon_Charge.base_fp_cost = 2;
     ttyd::battle_mario::badgeWeapon_ChargeP.base_fp_cost = 2;
-    ttyd::battle_mario::badgeWeapon_IceNaguri.base_fp_cost = 2;
-    ttyd::battle_mario::badgeWeapon_TatsumakiJump.base_fp_cost = 2;
     
     // Patch data for TOT reward items.
     tot::RewardManager::PatchRewardItemData();
@@ -475,6 +438,11 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_fbatBattleMode_Patch_DoubleCoinsBadge2),
         0x38600120U /* li r3, 0x120 (Double Pain) */);
+        
+    // Super Appeal (P) give +0.50 SP per copy instead of +0.25.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_BattleAudience_Case_Appeal_Patch_AppealSp),
+        0x1c000032U /* mulli r0, r0, 50 */);
         
     // Happy badges have 50% chance of restoring HP / FP instead of 33%.
     mod::patch::writePatch(

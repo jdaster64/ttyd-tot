@@ -53,6 +53,8 @@ uint32_t (*g_psndBGMOn_f_d_trampoline)(
 void (*g_stg0_00_init_trampoline)(void) = nullptr;
 // battle.o  800f7bfc
 void (*g_BattleStoreExp_trampoline)(BattleWork*, int32_t) = nullptr;
+// battle.o  800f7ca4
+void (*g__EquipItem_trampoline)(BattleWorkUnit*, uint32_t, int32_t) = nullptr;
 // battle_ac.o  800fa1b8
 int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*) = nullptr;
@@ -263,6 +265,7 @@ extern const int32_t g_acShot_main_Patch_targetVar3_5 = 0x80198ea7;
 extern const int32_t g_acShot_main_Patch_sfxId_1 = 0x80198803;
 extern const int32_t g_acShot_main_Patch_sfxId_2 = 0x80198827;
 extern const int32_t g_acShot_main_Patch_sfxId_3 = 0x80198f13;
+extern const int32_t g_BattleAudience_Case_Appeal_Patch_AppealSp = 0x8019f238;
 extern const int32_t g_BattleAudienceAddPuni_EnableAlways_BH = 0x801a15c8;
 extern const int32_t g_BattleAudienceAddAudienceNum_EnableAlways_BH = 0x801a1734;
 extern const int32_t g_BattleAudienceItemCtrlProcess_Patch_CheckItemValidRange = 0x801a5418;

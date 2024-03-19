@@ -1146,6 +1146,7 @@
 // battle.o
 // .text
 800f7bfc:BattleStoreExp
+800f7ca4:_EquipItem
 800f831c:BtlUnit_EquipItem
 800f8728:BattleGetPartyPtr
 800f87a8:BattleGetMarioPtr

@@ -31,6 +31,12 @@ FLAGS.DefineString("out_dir", "")
 g_NewIconDefs = [
     # Blue coin
     [(613, 6), (614, 6), (615, 6), (616, 6)],
+    # Super Start badge
+    [(617, 0)],
+    # Perfect Power badge
+    [(618, 0)],
+    # Perfect Power P badge
+    [(619, 0)],
 ]
 g_IconDefs = []
 

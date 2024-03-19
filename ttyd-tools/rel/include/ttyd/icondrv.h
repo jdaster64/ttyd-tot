@@ -583,6 +583,9 @@ namespace IconType {
         
         // Custom icons.
         TOT_COIN_BLUE,
+        SUPER_START,
+        PERFECT_POWER,
+        PERFECT_POWER_P,
     };
 }
 

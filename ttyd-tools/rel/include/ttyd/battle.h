@@ -357,7 +357,8 @@ extern "C" {
 void BattleStoreExp(BattleWork* battleWork, int32_t added_exp);
 // BattleStoreCoin
 // BattlePartyInfoWorkInit
-// _EquipItem
+void _EquipItem(
+    battle_unit::BattleWorkUnit* unit, uint32_t unk0, int32_t item);
 void BtlUnit_EquipItem(
     battle_unit::BattleWorkUnit* unit, uint32_t unk0, int32_t item);
 // BattleTransPartyIdToUnitKind
