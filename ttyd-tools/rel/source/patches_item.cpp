@@ -63,10 +63,10 @@ extern const int32_t g_ItemEvent_Support_NoEffect_TradeOffJumpPoint;
 extern const int32_t g_ItemEvent_Poison_Kinoko_PoisonChance;
 extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge1;
 extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge2;
-extern const int32_t g_btlseqTurn_Patch_HappyFlowerReductionAtMax;
-extern const int32_t g_btlseqTurn_Patch_HappyFlowerBaseRate;
-extern const int32_t g_btlseqTurn_Patch_HappyHeartReductionAtMax;
-extern const int32_t g_btlseqTurn_Patch_HappyHeartBaseRate;
+extern const int32_t g_btlseqTurn_HappyHeartProc_BH;
+extern const int32_t g_btlseqTurn_HappyHeartProc_EH;
+extern const int32_t g_btlseqTurn_HappyFlowerProc_BH;
+extern const int32_t g_btlseqTurn_HappyFlowerProc_EH;
 extern const int32_t g_btlevtcmd_ConsumeItem_Patch_RefundPer;
 extern const int32_t g_btlevtcmd_ConsumeItemReserve_Patch_RefundPer;
 extern const int32_t g_btlevtcmd_ConsumeItem_Patch_RefundBase;
@@ -77,6 +77,11 @@ extern const int32_t g_BattleAudience_Case_Appeal_Patch_AppealSp;
 
 // Assembly patch functions.
 extern "C" {
+    // happy_badge_patches.s
+    void StartHappyHeartProc();
+    void BranchBackHappyHeartProc();
+    void StartHappyFlowerProc();
+    void BranchBackHappyFlowerProc();
     // item_inventory_patches.s
     void StartGetItemMax();
     void BranchBackGetItemMax();
@@ -444,21 +449,17 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleAudience_Case_Appeal_Patch_AppealSp),
         0x1c000032U /* mulli r0, r0, 50 */);
         
-    // Happy badges have 50% chance of restoring HP / FP instead of 33%.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_btlseqTurn_Patch_HappyHeartBaseRate),
-        0x23400032 /* subfic r26, r0, 50 */);
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_btlseqTurn_Patch_HappyFlowerBaseRate),
-        0x23800032 /* subfic r28, r0, 50 */);
-    // For some reason they also were slightly less likely to restore if already
-    // at max HP/FP in vanilla!?  Remove that.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_btlseqTurn_Patch_HappyHeartReductionAtMax),
-        0x1c000000U /* mulli r0, r0, 0 */);
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_btlseqTurn_Patch_HappyFlowerReductionAtMax),
-        0x1c000000U /* mulli r0, r0, 0 */);
+    // Happy badges are guaranteed to proc on even turns only.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_btlseqTurn_HappyHeartProc_BH),
+        reinterpret_cast<void*>(g_btlseqTurn_HappyHeartProc_EH),
+        reinterpret_cast<void*>(StartHappyHeartProc),
+        reinterpret_cast<void*>(BranchBackHappyHeartProc));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_btlseqTurn_HappyFlowerProc_BH),
+        reinterpret_cast<void*>(g_btlseqTurn_HappyFlowerProc_EH),
+        reinterpret_cast<void*>(StartHappyFlowerProc),
+        reinterpret_cast<void*>(BranchBackHappyFlowerProc));
         
     // Pity Flower (P) guarantees 1 FP recovery on each damaging hit.
     mod::patch::writePatch(
