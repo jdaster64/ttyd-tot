@@ -119,7 +119,7 @@ int32_t pouchAddCoin(int16_t coins);
 // pouchSortItem
 // comp_kind_r
 // comp_aiueo_r
-// comp_kind
+int32_t comp_kind(int16_t* lhs, int16_t* rhs);
 // comp_aiueo
 // unk051[US|JP] zz_800d48b0_
 // pouchRemoveItemIndex

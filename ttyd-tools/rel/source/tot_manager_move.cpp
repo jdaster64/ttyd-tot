@@ -113,8 +113,6 @@ void MoveManager::Init() {
     auto& pouch = *::ttyd::mario_pouch::pouchGetPtr();
     pouch.jump_level = 1;
     pouch.hammer_level = 1;
-    pouch.star_powers_obtained = 0b11;
-    pouch.max_sp = 300;
 }
     
 const MoveData* MoveManager::GetMoveData(int32_t starting_move) {

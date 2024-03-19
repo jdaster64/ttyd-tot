@@ -10,6 +10,9 @@ namespace mod::tot {
     
 class OptionsManager {
 public:
+    // Sets up starting stats, etc. from cold boot / returning to lobby.
+    static void InitLobby();
+
     // Sets up starting stats, etc. from tot_state options.
     static void InitFromSelectedOptions();
 

@@ -1,15 +1,19 @@
 #include "tot_manager_options.h"
 
 #include "mod.h"
+#include "tot_generate_item.h"
 #include "tot_state.h"
 
+#include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
 
 namespace mod::tot {
     
 namespace {
 
-// Mario, then partners in internal order.
+namespace ItemType = ::ttyd::item_data::ItemType;
+
+// Mario, then partners' HP scaling, in internal order.
 const int32_t kHpMultipliers[] = { 100, 100, 80, 120, 80, 120, 100, 80 };
 
 // Returns the current expected base stat given its option value and
@@ -42,10 +46,8 @@ int32_t GetBaseStat(uint32_t option, int32_t party = 0) {
     // Stat values can never go below 1.
     return value > 0 ? value : 1;
 }
-    
-}
 
-void OptionsManager::InitFromSelectedOptions() {
+void SetBaseStats() {
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
     // Set starting HP, FP, BP.
@@ -62,16 +64,111 @@ void OptionsManager::InitFromSelectedOptions() {
     pouch.total_bp = bp;
     pouch.unallocated_bp = bp;
     
-    // Set starting partner HP.
+    // Disable partners, and set starting partner HP.
     for (int32_t i = 1; i <= 7; ++i) {
-        const int32_t php = GetBaseStat(OPTNUM_PARTNER_HP, i);
+        pouch.party_data[i].flags &= ~1;
         
+        const int32_t php = GetBaseStat(OPTNUM_PARTNER_HP, i);
         pouch.party_data[i].current_hp = php;
         pouch.party_data[i].max_hp = php;
         pouch.party_data[i].base_max_hp = php;
             
         // Update ttyd::mario_pouch::_party_max_hp_table.
         ttyd::mario_pouch::_party_max_hp_table[i * 4] = pouch.party_data[i].max_hp;
+    }
+}
+    
+}
+
+void OptionsManager::InitLobby() {
+    g_Mod->state_.InitDefaultOptions();
+    
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    
+    for (int32_t i = 0; i < 20; ++i) pouch.items[i] = 0;
+    for (int32_t i = 0; i < 121; ++i) pouch.key_items[i] = 0;
+    for (int32_t i = 0; i < 200; ++i) pouch.badges[i] = 0;
+    for (int32_t i = 0; i < 200; ++i) pouch.equipped_badges[i] = 0;
+    pouch.coins = 0;
+    pouch.star_pieces = 0;
+    pouch.shine_sprites = 0;
+    pouch.star_points = 0;
+    pouch.star_powers_obtained = 0;
+    pouch.max_sp = 0;
+    pouch.current_sp = 0;
+    pouch.rank = 0;
+    pouch.jump_level = 1;
+    pouch.hammer_level = 1;
+    
+    // Give a small amount of audience by default.
+    pouch.audience_level = 10.0f;
+    
+    // Update any stats / equipment / flags as necessary.
+    ttyd::mario_pouch::pouchGetItem(ItemType::BOOTS);
+    ttyd::mario_pouch::pouchGetItem(ItemType::HAMMER);
+    ttyd::mario_pouch::pouchGetItem(ItemType::W_EMBLEM);
+    ttyd::mario_pouch::pouchGetItem(ItemType::L_EMBLEM);
+    
+    // Start with FX badges equipped if InfPit option is set.
+    if (g_Mod->inf_state_.GetOptionNumericValue(infinite_pit::OPT_START_WITH_FX)) {
+        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_P);
+        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_G);
+        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_B);
+        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_Y);
+        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_R);
+    }
+    
+    // Assign Yoshi a totally random color.
+    ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->inf_state_.Rand(7));
+    
+    // Assign Peekaboo and Timing Tutor (for testing; might make optional).
+    ttyd::mario_pouch::pouchGetItem(ItemType::TIMING_TUTOR);
+    ttyd::mario_pouch::pouchEquipBadgeID(ItemType::TIMING_TUTOR);
+    ttyd::mario_pouch::pouchGetItem(ItemType::PEEKABOO);
+    ttyd::mario_pouch::pouchEquipBadgeID(ItemType::PEEKABOO);
+    
+    // Set starting HP, FP, BP.
+    SetBaseStats();
+    
+    // Initialize default moves.
+    MoveManager::Init();
+}
+
+void OptionsManager::InitFromSelectedOptions() {
+    // Set starting HP, FP, BP.
+    SetBaseStats();
+    
+    auto& state = g_Mod->state_;
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    pouch.star_powers_obtained = 0b11;
+    pouch.max_sp = 300;
+    
+    switch (state.GetOptionValue(OPT_STARTER_ITEMS)) {
+        case OPTVAL_STARTER_ITEMS_BASIC: {
+            ttyd::mario_pouch::pouchGetItem(ItemType::THUNDER_BOLT);
+            ttyd::mario_pouch::pouchGetItem(ItemType::FIRE_FLOWER);
+            ttyd::mario_pouch::pouchGetItem(ItemType::HONEY_SYRUP);
+            ttyd::mario_pouch::pouchGetItem(ItemType::MUSHROOM);
+            break;
+        }
+        case OPTVAL_STARTER_ITEMS_STRONG: {
+            ttyd::mario_pouch::pouchGetItem(ItemType::LIFE_SHROOM);
+            ttyd::mario_pouch::pouchGetItem(ItemType::CAKE);
+            ttyd::mario_pouch::pouchGetItem(ItemType::THUNDER_RAGE);
+            ttyd::mario_pouch::pouchGetItem(ItemType::SHOOTING_STAR);
+            ttyd::mario_pouch::pouchGetItem(ItemType::MAPLE_SYRUP);
+            ttyd::mario_pouch::pouchGetItem(ItemType::SUPER_SHROOM);
+            break;
+        }
+        case OPTVAL_STARTER_ITEMS_RANDOM: {
+            // Give 4 to 6 random items, based on the seed.
+            int32_t num_items = state.Rand(3, RNG_STARTER_ITEM) + 4;
+            for (int32_t i = 0; i < num_items; ++i) {
+                int32_t item_type = PickRandomItem(RNG_STARTER_ITEM, 10, 5, 0, 0);
+                ttyd::mario_pouch::pouchGetItem(item_type);
+            }
+            break;
+        }
     }
 }
 

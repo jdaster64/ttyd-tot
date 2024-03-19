@@ -451,7 +451,9 @@ bool CheckEvasionBadges(BattleWorkUnit* unit) {
         for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
             hit_chance *= 0.75f;
         }
-        if (unit->current_hp <= unit->unit_kind_params->danger_hp) {
+        // Will not activate if the actor is at 1/1 (max) HP.
+        if (unit->current_hp <= unit->unit_kind_params->danger_hp &&
+            unit->current_hp < unit->max_hp) {
             for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
                 hit_chance *= 0.67f;
             }
@@ -465,7 +467,9 @@ bool CheckEvasionBadges(BattleWorkUnit* unit) {
         for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
             if (ttyd::system::irand(100) < 25) return true;
         }
-        if (unit->current_hp <= unit->unit_kind_params->danger_hp) {
+        // Will not activate if the actor is at 1/1 (max) HP.
+        if (unit->current_hp <= unit->unit_kind_params->danger_hp &&
+            unit->current_hp < unit->max_hp) {
             for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
                 if (ttyd::system::irand(100) < 33) return true;
             }
@@ -589,16 +593,15 @@ int32_t CalculateBaseDamage(
             atk += attacker->badges_equipped.unk_03;
         }
         
-        const bool weaker_rush_badges =
-            g_Mod->inf_state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES);
-        
-        if (attacker->current_hp <= attacker->unit_kind_params->danger_hp) {
-            const int32_t power = weaker_rush_badges ? 1 : 2;
-            atk += power * attacker->badges_equipped.power_rush;
+        // Danger / Peril badges (weaker than in original).
+        // Will not activate if the actor is at 1/1 (max) HP.
+        if (attacker->current_hp <= attacker->unit_kind_params->danger_hp &&
+            attacker->current_hp < attacker->max_hp) {
+            atk += 1 * attacker->badges_equipped.power_rush;
         }
-        if (attacker->current_hp <= attacker->unit_kind_params->peril_hp) {
-            const int32_t power = weaker_rush_badges ? 2 : 5;
-            atk += power * attacker->badges_equipped.mega_rush;
+        if (attacker->current_hp <= attacker->unit_kind_params->peril_hp &&
+            attacker->current_hp < attacker->max_hp) {
+            atk += 3 * attacker->badges_equipped.mega_rush;
         }
         if (part->part_attribute_flags & PartsAttribute_Flags::WEAK_TO_ICE_POWER) {
             atk += attacker->badges_equipped.ice_power;
@@ -627,8 +630,9 @@ int32_t CalculateBaseDamage(
     // Negative attack modifiers (badges and statuses).
     if (sp & AttackSpecialProperty_Flags::BADGE_BUFFABLE) {
         atk -= attacker->badges_equipped.p_down_d_up;
-        atk -= attacker->badges_equipped.hp_drain;
-        atk -= attacker->badges_equipped.fp_drain;
+        // Only drop by 1, regardless of number equipped.
+        atk -= attacker->badges_equipped.hp_drain ? 1 : 0;
+        atk -= attacker->badges_equipped.fp_drain ? 1 : 0;
     }
     if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
         int8_t strength = 0;
@@ -730,7 +734,9 @@ int32_t CalculateBaseDamage(
     damage *= (target->badges_equipped.double_pain + 1);
     
     int32_t last_stands = target->badges_equipped.last_stand;
-    if (target->current_hp <= target->unit_kind_params->danger_hp && 
+    // Will not activate if the actor is at 1/1 (max) HP.
+    if (target->current_hp <= target->unit_kind_params->danger_hp &&
+        target->current_hp < target->max_hp &&
         last_stands > 0) {
         damage = (damage + last_stands) / (last_stands + 1);
     }

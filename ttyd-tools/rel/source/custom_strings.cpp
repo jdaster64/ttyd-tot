@@ -21,17 +21,9 @@ namespace MsgKey {
     enum e {
         CUSTOM_TATTLE_BATTLE = 0,
         CUSTOM_TATTLE_MENU,
-        MENU_KIKEN_DE_POWER,
-        MENU_KIKEN_DE_POWER_P,
-        MENU_PINCH_DE_GANBARU,
-        MENU_PINCH_DE_GANBARU_P,
         MSG_JON_KANBAN_2,
         MSG_JON_KANBAN_3,
         MSG_JON_MOVER_SELECT,
-        MSG_KIKEN_DE_POWER,
-        MSG_KIKEN_DE_POWER_P,
-        MSG_PINCH_DE_GANBARU,
-        MSG_PINCH_DE_GANBARU_P,
         RIPPO_TOP_MENU,
         TIK_06_02,
         ZZ_TEST_WIN_SELECT,
@@ -45,17 +37,9 @@ namespace {
 constexpr const char* kKeyLookups[] = {
     "custom_tattle_battle",
     "custom_tattle_menu",
-    "menu_kiken_de_power",
-    "menu_kiken_de_power_p",
-    "menu_pinch_de_ganbaru",
-    "menu_pinch_de_ganbaru_p",
     "msg_jon_kanban_2",
     "msg_jon_kanban_3",
     "msg_jon_mover_select",
-    "msg_kiken_de_power",
-    "msg_kiken_de_power_p",
-    "msg_pinch_de_ganbaru",
-    "msg_pinch_de_ganbaru_p",
     "rippo_top_menu",
     "tik_06_02",
     "zz_test_win_select",
@@ -156,34 +140,6 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                 "name your file \"random\" or \"\xde\".\n<k>");
             return buf;
         }
-        case MsgKey::MSG_KIKEN_DE_POWER:
-        case MsgKey::MENU_KIKEN_DE_POWER:
-            if (g_Mod->inf_state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES)) {
-                return "Increase Attack power by 2\n"
-                       "when Mario is in Peril.";
-            }
-            return nullptr;
-        case MsgKey::MSG_KIKEN_DE_POWER_P:
-        case MsgKey::MENU_KIKEN_DE_POWER_P:
-            if (g_Mod->inf_state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES)) {
-                return "Increase Attack power by 2\n"
-                       "when your partner is in Peril.";
-            }
-            return nullptr;
-        case MsgKey::MSG_PINCH_DE_GANBARU:
-        case MsgKey::MENU_PINCH_DE_GANBARU:
-            if (g_Mod->inf_state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES)) {
-                return "Increase Attack power by 1\n"
-                       "when Mario is in Danger.";
-            }
-            return nullptr;
-        case MsgKey::MSG_PINCH_DE_GANBARU_P:
-        case MsgKey::MENU_PINCH_DE_GANBARU_P:
-            if (g_Mod->inf_state_.GetOptionNumericValue(OPT_WEAKER_RUSH_BADGES)) {
-                return "Increase Attack power by 1\n"
-                       "when your ally is in Danger.";
-            }
-            return nullptr;
         case MsgKey::MSG_JON_MOVER_SELECT:
             return GetMoverOptionsString(buf);
         case MsgKey::RIPPO_TOP_MENU: {

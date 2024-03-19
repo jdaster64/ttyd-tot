@@ -189,11 +189,12 @@ enum RngSequence {
     RNG_MOVE_UPGRADE            = 27,
     
     // Miscellaneous uses; not mangled with floor number.
-    RNG_STOLEN_ITEM             = 28,
-    RNG_AUDIENCE_ITEM           = 29,
-    RNG_ITEM_OBFUSCATION        = 30,
+    RNG_STARTER_ITEM            = 28,
+    RNG_STOLEN_ITEM             = 29,
+    RNG_AUDIENCE_ITEM           = 30,
+    RNG_ITEM_OBFUSCATION        = 31,
     
-    RNG_SEQUENCE_MAX            = 31,
+    RNG_SEQUENCE_MAX            = 32,
 };
 
 // Different types of option values (see below for descriptions of each).

@@ -872,6 +872,7 @@
 800d3d30:pouchGetHP
 800d3dd4:pouchSetCoin
 800d3e18:pouchAddCoin
+800d46d4:comp_kind
 800d4c38:pouchRemoveItem
 800d4ed4:pouchCheckItem
 800d50cc:pouchGetItem

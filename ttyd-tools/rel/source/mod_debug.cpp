@@ -11,6 +11,7 @@
 
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_monosiri.h>
+#include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/swdrv.h>
@@ -31,6 +32,7 @@ enum DebugManagerMode {
     DEBUG_FLOOR,
     DEBUG_UNLOCK_ALL_MOVES,
     DEBUG_UNLOCK_ALL_PARTNERS,
+    DEBUG_UNLOCK_ALL_BADGES,
     DEBUG_UNLOCK_TATTLE_LOG,
     DEBUG_EXIT,
     DEBUG_MAX
@@ -41,6 +43,7 @@ namespace {
 using ::ttyd::mario_pouch::PouchData;
     
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Globals.
 int32_t g_DebugMode = DEBUG_OFF;
@@ -125,6 +128,28 @@ void DebugManager::Update() {
                             pouch.party_data[i].flags |= 1;
                         }
                     }
+                }
+                case DEBUG_UNLOCK_ALL_BADGES: {
+                    auto* item_data = ttyd::item_data::itemDataTable;
+                    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+                    
+                    for (int32_t i = 0; i < 200; ++i) {
+                        pouch.badges[i] = 0;
+                        pouch.equipped_badges[i] = 0;
+                    }
+                    pouch.unallocated_bp = pouch.total_bp;
+                    
+                    for (int32_t i = ItemType::POWER_JUMP;
+                         i <= ItemType::MAX_ITEM_TYPE; ++i) {
+                        if (item_data[i].type_sort_order >= 0) {
+                            ttyd::mario_pouch::pouchGetItem(i);
+                        }
+                    }
+                    ttyd::system::qqsort(
+                        &pouch.badges[0],
+                        ttyd::mario_pouch::pouchGetHaveBadgeCnt(),
+                        sizeof(int16_t),
+                        (void*)ttyd::mario_pouch::comp_kind);
                 }
                 case DEBUG_UNLOCK_TATTLE_LOG: {
                     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
@@ -254,6 +279,9 @@ void DebugManager::Draw() {
             }
             case DEBUG_UNLOCK_ALL_PARTNERS: {
                 strcpy(buf, "Unlock All Partners");         break;
+            }
+            case DEBUG_UNLOCK_ALL_BADGES: {
+                strcpy(buf, "Unlock 1 of Each Badge");      break;
             }
             case DEBUG_UNLOCK_TATTLE_LOG: {
                 strcpy(buf, "Unlock All Tattle Logs");      break;

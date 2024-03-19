@@ -369,17 +369,13 @@ void ApplySettingBasedPatches() {
 }
 
 int32_t GetPinchThresholdForMaxHp(int32_t max_hp, bool peril) {
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_PERCENT_BASED_DANGER)) {
-        // Danger = 1/3 of max, Peril = 1/10 of max (rounded normally).
-        int32_t threshold = peril ? (max_hp + 5) / 10 : (max_hp + 1) / 3;
-        // Clamp to range [1, 99] to ensure the pinch range exists,
-        // but doesn't exceed the range of a signed byte.
-        if (threshold < 1) threshold = 1;
-        if (threshold > 99) threshold = 99;
-        return threshold;
-    }
-    // If not using %-based, return a fixed 1 / 5 HP (including for enemies).
-    return peril ? 1 : 5;
+    // 10% of max health for Peril, 30% of max health for Danger, rounded 5/4.
+    int32_t threshold =  (max_hp * (peril ? 1 : 3) + 5) / 10;
+    // Clamp to range [1, 99] to ensure the pinch range exists,
+    // but doesn't exceed the range of a signed byte.
+    if (threshold < 1) threshold = 1;
+    if (threshold > 99) threshold = 99;
+    return threshold;
 }
 
 void SetPinchThreshold(BattleUnitKind* kind, int32_t max_hp, bool peril) {

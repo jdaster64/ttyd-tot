@@ -79,6 +79,38 @@ g_StringMap = {
             b"Gives 20 FP, but might freeze!\n"
             b"Made by mixing Maple Syrup \n"
             b"with an Ice Storm.",
+            
+        b"msg_kiken_de_power":
+            b"Increase Attack power by 3\n"
+            b"when Mario is in Peril.",
+            
+        b"menu_kiken_de_power":
+            b"Increase Attack power by 3\n"
+            b"when Mario is in Peril.",
+            
+        b"msg_kiken_de_power_p":
+            b"Increase Attack power by 3\n"
+            b"when your partner is in Peril.",
+
+        b"menu_kiken_de_power_p":
+            b"Increase Attack power by 3\n"
+            b"when your partner is in Peril.",
+
+        b"msg_pinch_de_ganbaru":
+            b"Increase Attack power by 1\n"
+            b"when Mario is in Danger.",
+            
+        b"menu_pinch_de_ganbaru":
+            b"Increase Attack power by 1\n"
+            b"when Mario is in Danger.",
+            
+        b"msg_pinch_de_ganbaru_p":
+            b"Increase Attack power by 1\n"
+            b"when your ally is in Danger.",
+            
+        b"menu_pinch_de_ganbaru_p":
+            b"Increase Attack power by 1\n"
+            b"when your ally is in Danger.",
         
         b"msg_2bai_damage":
             b"Doubles the damage Mario \n"
@@ -96,6 +128,30 @@ g_StringMap = {
             b"Make direct-attackers take\n"
             b"the same damage they deal.",
             
+        b"menu_happy_heart":
+            b"Mario restores 1 HP at the\n"
+            b"start of every other turn.",
+            
+        b"msg_happy_heart":
+            b"Mario restores 1 HP at the\n"
+            b"start of every other turn.",
+            
+        b"menu_happy_heart_p":
+            b"Allies restore 1 HP at the\n"
+            b"start of every other turn.",
+            
+        b"msg_happy_heart_p":
+            b"Allies restore 1 HP at the\n"
+            b"start of every other turn.",
+            
+        b"menu_happy_flower":
+            b"Mario restores 1 FP at the\n"
+            b"start of every other turn.",
+            
+        b"menu_happy_flower":
+            b"Mario restores 1 FP at the\n"
+            b"start of every other turn.",
+            
         b"msg_damage_flower":
             b"Recover 1 FP whenever\n"
             b"Mario receives damage.",
@@ -111,6 +167,56 @@ g_StringMap = {
         b"menu_damage_flower_p":
             b"Recover 1 FP whenever your\n"
             b"partner receives damage.",
+            
+        b"menu_heart_suitoru":
+            b"Drop Mario's Attack power by\n"
+            b"1 but regain 1 HP per attack.\n"
+            b"Wearing multiple copies raises\n"
+            b"HP more, for no extra ATK loss.",
+            
+        b"menu_heart_suitoru_p":
+            b"Drop your ally's Attack power\n"
+            b"by 1 but regain 1 HP per attack.\n"
+            b"Wearing multiple copies raises\n"
+            b"HP more, for no extra ATK loss.",
+
+        b"menu_flower_suitoru":
+            b"Drop Mario's Attack power by\n"
+            b"1 but regain 1 FP per attack.\n"
+            b"Wearing multiple copies raises\n"
+            b"FP more, for no extra ATK loss.",
+            
+        b"menu_flower_suitoru_p":
+            b"Drop your ally's Attack power\n"
+            b"by 1 but regain 1 FP per attack.\n"
+            b"Wearing multiple copies raises\n"
+            b"FP more, for no extra ATK loss.",
+
+        b"msg_2kai_item":
+            b"During battle, Mario can use\n"
+            b"multiple items in one turn.",
+
+        b"msg_2kai_item_p":
+            b"During battle, allies can use\n"
+            b"multiple items in one turn.",
+            
+        b"menu_2kai_item":
+            b"Wear this to become able to\n"
+            b"use two or three items on\n"
+            b"Mario's turn, for a cost\n"
+            b"of 4 or 8 FP.",
+
+        b"menu_2kai_item_p":
+            b"Wear this to allow partners\n"
+            b"to use two or three items\n"
+            b"on their turn, for a cost\n"
+            b"of 4 or 8 FP.",
+            
+        b"menu_subayaku_kawaru":
+            b"Allow your ally to attack\n"
+            b"even after changing partners.\n"
+            b"Switching costs 1 FP initially,\n"
+            b"and increases on every use.",
         
         b"msg_toughen_up":
             b"Wear this to add Toughen Up\n"
@@ -121,7 +227,7 @@ g_StringMap = {
             b"to partners' Tactics menu.",
             
         b"msg_super_start":
-            b"Grants a bit of extra SP\n"
+            b"Grants a bit of Star Power\n"
             b"when starting a battle.",
             
         b"msg_perfect_power":

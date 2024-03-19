@@ -39,7 +39,7 @@ uint32_t keyGetButton(uint32_t padId);
 uint32_t keyGetDir(uint32_t padId);
 void makeKey();
 
-// qqsort
+void qqsort(void* data, uint32_t num_entries, uint32_t entry_size, void* comparator);
 // intplGetValue
 // angleABf
 // compAngle

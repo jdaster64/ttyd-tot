@@ -1,9 +1,10 @@
 #include "tot_party_mowz.h"
 
-#include "custom_item.h"
 #include "evt_cmd.h"
-#include "mod_state.h"
+#include "mod.h"
+#include "tot_generate_item.h"
 #include "tot_manager_move.h"
+#include "tot_state.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
@@ -47,7 +48,6 @@ using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_chuchurina;
 
-using ::mod::infinite_pit::PickRandomItem;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
@@ -163,7 +163,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetKissThiefResult) {
     // No held item; pick a random item to steal;
     // 30% chance of item (20% normal, 10% recipe), 10% badge, 60% coin.
     if (!item) {
-        item = PickRandomItem(infinite_pit::RNG_KISS_THIEF, 20, 10, 10, 60);
+        item = PickRandomItem(RNG_STOLEN_ITEM, 20, 10, 10, 60);
         if (!item) item = ItemType::COIN;
     }
     if ((ac_result & 2) == 0 || item == ItemType::STAR_PIECE ||

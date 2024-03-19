@@ -1,6 +1,7 @@
 #include "tot_gon_lobby.h"
 
 #include "evt_cmd.h"
+#include "tot_manager_options.h"
 
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/database.h>
@@ -37,6 +38,12 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 }  // namespace
 
 extern const BeroEntry gon_00_entry_data[5];
+
+EVT_DECLARE_USER_FUNC(evtTot_TowerInitFromOptions, 0)
+
+EVT_BEGIN(Lobby_EnterTowerEvt)
+    USER_FUNC(evtTot_TowerInitFromOptions)
+EVT_END()
 
 EVT_BEGIN(Lobby_ExitPipeReentryRejectEvt)
     INLINE_EVT()
@@ -120,7 +127,7 @@ const BeroEntry gon_00_entry_data[5] = {
         .length = -1,
         .entry_evt_code = nullptr,
         .case_type = 6,
-        .out_evt_code = nullptr,
+        .out_evt_code = (void*)Lobby_EnterTowerEvt,
         .target_map = "gon_01",
         .target_bero = "dokan_2",
         .entry_anim_type = BeroAnimType::ANIMATION,
@@ -180,6 +187,11 @@ const BeroEntry gon_00_entry_data[5] = {
 
 const int32_t* GetLobbyInitEvt() {
     return gon_00_InitEvt;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_TowerInitFromOptions) {
+    OptionsManager::InitFromSelectedOptions();
+    return 2;
 }
 
 }  // namespace mod::tot::gon

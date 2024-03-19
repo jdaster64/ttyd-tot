@@ -10,7 +10,6 @@
 #include "patches_apply.h"
 #include "patches_mario_move.h"
 #include "patches_options.h"
-#include "tot_manager_move.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
 
@@ -115,7 +114,6 @@ void OnModuleLoaded(OSModuleInfo* module) {
 void OnFileLoad(bool new_file = true) {
     if (new_file) {
         ttyd::mario_pouch::pouchInit();
-        PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
         // Initialize other systems / data.
         ttyd::evt_badgeshop::badgeShop_init();
         ttyd::evt_yuugijou::yuugijou_init();
@@ -141,39 +139,8 @@ void OnFileLoad(bool new_file = true) {
         g_Mod->inf_state_.Load(/* new_save = */ true);
         g_Mod->inf_state_.Save();
         
-        // Update any stats / equipment / flags as necessary.
-        ttyd::mario_pouch::pouchGetItem(ItemType::BOOTS);
-        ttyd::mario_pouch::pouchGetItem(ItemType::HAMMER);
-        ttyd::mario_pouch::pouchSetCoin(0);
-        ttyd::mario_pouch::pouchGetItem(ItemType::W_EMBLEM);
-        ttyd::mario_pouch::pouchGetItem(ItemType::L_EMBLEM);
-        // Start with FX badges equipped if option is set.
-        if (g_Mod->inf_state_.GetOptionNumericValue(OPT_START_WITH_FX)) {
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_P);
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_G);
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_B);
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_Y);
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_R);
-        }
-        
-        // TOT: For testing.
-        ttyd::mario_pouch::pouchGetItem(ItemType::HAMMERMAN);
-        ttyd::mario_pouch::pouchGetItem(ItemType::JUMPMAN);
-        ttyd::mario_pouch::pouchGetItem(ItemType::TIMING_TUTOR);
-        ttyd::mario_pouch::pouchEquipBadgeID(ItemType::TIMING_TUTOR);
-        ttyd::mario_pouch::pouchGetItem(ItemType::PEEKABOO);
-        ttyd::mario_pouch::pouchEquipBadgeID(ItemType::PEEKABOO);
-        
-        // Assign Yoshi a totally random color.
-        ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->inf_state_.Rand(7));
-        
-        // Give a small default amount of audience.
-        pouch.audience_level = 10.0f;
-        
-        // Initialize Tower of Trials-specific state.
-        g_Mod->state_.InitDefaultOptions();
-        tot::OptionsManager::InitFromSelectedOptions();
-        tot::MoveManager::Init();
+        // Initialize Tower of Trials-specific state & pouch stuff.
+        tot::OptionsManager::InitLobby();
     }
     g_PromptSave = false;
     

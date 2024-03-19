@@ -42,6 +42,7 @@ void GetOptionParts(
 void StateManager::InitDefaultOptions() {
     // TODO: Seed randomly, or allow user to change.
     seed_ = 417;
+    for (int32_t i = 0; i < 56; ++i) rng_states_[i] = 0;
     
     // Set floor to 0 (starting floor that only gives a partner).
     floor_ = 0;
@@ -235,7 +236,7 @@ int32_t StateManager::GetOptionValue(uint32_t option) const {
     const uint32_t word = option_flags_[x >> 5];
     const uint32_t start_bit = x & 31;
     const int32_t value = GetShiftedBitMask(word, start_bit, start_bit + y - 1);
-    return (TYPE_OPT << 28) | (option & 0x0fff'0000) | value;
+    return (TYPE_OPTVAL << 28) | (option & 0x0fff'0000) | value;
 }
 
 bool StateManager::CheckOptionValue(uint32_t option_value) const {

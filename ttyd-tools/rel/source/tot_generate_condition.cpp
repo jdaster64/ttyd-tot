@@ -127,6 +127,11 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
                 // "Use FP" shouldn't appear at the very beginning.
                 if (state.floor_ < 9) condition.weight = 0;
                 break;
+            case MARIO_FINAL_HP_MORE:
+            case MARIO_FINAL_HP_LESS:
+                // HP conditions shouldn't appear if Mario's HP is forced to 1.
+                if (!g_Mod->state_.GetOption(OPTNUM_MARIO_HP)) condition.weight = 0;
+                break;
         }
     }
     
