@@ -645,28 +645,127 @@ g_StringMap = {
         
     },
     
-    'gon_13': {
-        # 'Pit'-specific text (TODO: move to specific maps or global).
-        b"pit_reward_party_join":
-            b"<system>\n<p>\nYou got a new party member!\n<k>",
+    # Tower lobby placeholder
+    'gon_00': {
+        # Area tattle. (TODO: Write final script)
+        
+        b"msg_kuri_map":
+            b"Placeholder area tattle \xd0\n<k>",
+    },
+    
+    # Tower floor 1; TODO: Copy to other tower maps as needed.
+    'gon_01': {
+        # Area tattle. (TODO: Write final script)
+        
+        b"msg_kuri_map":
+            b"Placeholder area tattle \xd0\n<k>",
+        
+        # NPC tattles.
+
+        b"\x8d\x73\x8f\xa4\x90\x6c":
+            b"<keyxon>\nThat's Charlieton, the\n"
+            b"merchant.<dkey><wait 300></dkey> I guess he sells his\n"
+            b"wares here, too.\n<k>\n<p>\n"
+            b"But...<wait 100>it looks like his stuff\n"
+            b"gets more expensive the\n"
+            b"deeper he is in the Pit.\n<k>\n<p>\n"
+            b"I'm happy to be able to shop\n"
+            b"here and all, but sheesh...\n"
+            b"<wait 300>\n"
+            b"Well, it's your money.\n<k>",
+            
+        b"\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae":
+            b"<keyxon>\nThat's Chet Rippo, the\n"
+            b"adjuster.<dkey><wait 300></dkey> Seems he's found a\n"
+            b"new niche here in the Pit.\n<k>\n<p>\n"
+            b"He'll take your unwanted\n"
+            b"items, badges, and level-ups\n"
+            b"in exchange for a few coins.\n<k>\n<p>\n"
+            b"Me, <wait 200>I wouldn't trust this guy\n"
+            b"personally, Mario, but I guess\n"
+            b"if you're desperate...\n<k>",
+        
+        # NPC text.
+        
+        # Generic
+        
+        b"tot_npc_yesnoopt":
+            b"<select 0 1 0 40>\nYes\nNo",
+        
+        # Charlieton
+        
+        b"tot_charlieton_intro":
+            b"Hey hey HEY-YO!<wait 250> I've got ALL\n"
+            b"the hottest new products\n"
+            b"right here.<wait 250> Look no further!\n<k>\n<p>\n"
+            b"You got the fevered look of\n"
+            b"a man with a mind for goods!\n"
+            b"<wait 250>\n"
+            b"Wanna buy something?\n<o>",
+
+        b"tot_charlieton_decline":
+            b"<p>\n"
+            b"Oh, not interested, my man?\n"
+            b"<wait 250>\n"
+            b"That's too bad, seriously...\n"
+            b"<wait 250>\n"
+            b"It's all hot...<wait 250>I mean rare...<wait 250>stuff!\n"
+            b"<k>\n<p>\n"
+            b"And you never know when\n"
+            b"you're gonna wish you had\n"
+            b"some of this gear, my man...\n<k>",
+
+        b"tot_charlieton_nocoins":
+            b"Whoa whoa whoa WHOA!\n"
+            b"<wait 250>\n"
+            b"You don't have enough coins,\n"
+            b"my man.\n<k>",
+
+        b"tot_charlieton_itemdesc":
+            b"That's my man, right there!\n"
+            b"<wait 300>\n"
+            b"You've got an eye for quality,\n"
+            b"and that's no lie!\n<k>\n<p>\n"
+            b"That <ITEM> is going\n"
+            b"for a low price of <NUM> coin<S>!\n"
+            b"<wait 250>\n"
+            b"Wanna buy it?\n<o>",
+
+        b"tot_charlieton_success":
+            b"<p>\n"
+            b"Thank you SO very much!\n"
+            b"<wait 250>\n"
+            b"You got yourself a good deal,\n"
+            b"there, I kid you not!\n<k>\n<p>\n"
+            b"You are SET for the future\n"
+            b"with that item, my man!\n"
+            b"<wait 250>\n"
+            b"Come back real soon!\n<k>",
+
+        b"tot_charlieton_buyanother":
+            b"<p>\n"
+            b"Thank you SO very much!\n"
+            b"<wait 250>\n"
+            b"And I've still got oodles\n"
+            b"of super-hot items for you!\n<k>\n<p>\n"
+            b"Wanna see?\n<o>",
+            
+        b"tot_charlieton_full_inv":
+            b"<p>\n"
+            b"Ooh, you can't carry any more \n"
+            b"stuff, my man. You sure you\n"
+            b"want to buy this anyway?\n<o>",
+            
+        # Miscellaneous.
             
         b"pit_move_level":
             b"<system>\n<p>\n"
             b"You obtained a Lv. 2 Star Power!\n"
             b"Tap left or right to select which\n"
             b"power level you want to use.\n<k>",
-            
-        b"pit_chest_unclaimed":
-            b"<system>\n<p>\nYou haven't claimed your\nreward!\n<k>",
         
         b"pit_disabled_return":
             b"<system>\n<p>\nYou can't leave the Infinite Pit!\n<k>",
-            
-        b"pit_charlieton_full_inv":
-            b"<p>\n"
-            b"Ooh, you can't carry any more \n"
-            b"stuff, my man. You sure you\n"
-            b"want to buy this anyway?\n<o>",
         
         b"rippo_confirm_bp":
             b"<p>\nI'll give you 39 coins for 3 BP.\n"
@@ -761,26 +860,6 @@ g_StringMap = {
             
         b"rippo_yes_no":
             b"<select 0 1 0 40>\nYes\nNo",
-            
-        b"msg_kuri_map":
-            b"<keyxon>\nWe're in the Infinite Pit,\n"
-            b"an endless series of trials\n"
-            b"and enemy encounters.\n<k>\n<p>\n"
-            b"It may be never-ending, but that\n"
-            b"doesn't mean we can't give it\n"
-            b"our best effort, right, Mario?\n<k>",
-            
-        # Chet Rippo NPC tattle.
-        b"\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae":
-            b"<keyxon>\nThat's Chet Rippo, the\n"
-            b"adjuster.<dkey><wait 300></dkey> Seems he's found a\n"
-            b"new niche here in the Pit.\n<k>\n<p>\n"
-            b"He'll take your unwanted\n"
-            b"items, badges, and level-ups\n"
-            b"in exchange for a few coins.\n<k>\n<p>\n"
-            b"Me, <wait 200>I wouldn't trust this guy\n"
-            b"personally, Mario, but I guess\n"
-            b"if you're desperate...\n<k>",
     }
 }
 
@@ -792,7 +871,7 @@ def _UpdateStrings(in_dir, out_dir):
     for file in g_StringMap:
         # Read the original strings for the given file, if it exists.
         strings = {}
-        if os.path.exists(in_dir / f'{file}.txt'):
+        if file == 'global' and os.path.exists(in_dir / f'{file}.txt'):
             with open(str(in_dir / f'{file}.txt'), 'rb') as infile:
                 # Keys and values are all delimited by nulls.
                 split_kvs = infile.read().split(b'\x00')

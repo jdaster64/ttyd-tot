@@ -1,19 +1,25 @@
 #include "tot_generate_item.h"
 
 #include "common_functions.h"
+#include "evt_cmd.h"
 #include "mod.h"
 #include "tot_state.h"
 
+#include <ttyd/evtmgr.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/system.h>
 
-#include <cstdint>
+#include <cinttypes>
+#include <cstdio>
 #include <cstring>
 
 namespace mod::tot {
 
 namespace {
+
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace ItemType = ::ttyd::item_data::ItemType;
 
@@ -267,6 +273,16 @@ void ObfuscateItems(bool enable) {
             itemData[ids[i]].name = reinterpret_cast<const char*>(data[i]);
         }
     }
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetUniqueItemName) {
+    static int32_t id = 0;
+    static char name[16];
+    
+    id = (id + 1) % 1000;
+    sprintf(name, "item_t%03" PRId32, id);
+    evtSetValue(evt, evt->evtArguments[0], PTR(name));
+    return 2;
 }
 
 }  // namespace mod::tot

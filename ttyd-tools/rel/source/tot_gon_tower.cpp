@@ -3,8 +3,10 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_generate_enemy.h"
+#include "tot_generate_item.h"
 #include "tot_generate_reward.h"
 #include "tot_gon.h"
+#include "tot_gon_tower_npcs.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -30,6 +32,7 @@
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
 #include <ttyd/evt_window.h>
+#include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
@@ -78,19 +81,25 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 const char kPitNpcName[] = "\x93\x47";  // "enemy"
-const char kMoverNpcName[] = "\x88\xda\x93\xae\x89\xae";  // "idouya"
 const char kPiderName[] = "\x83\x70\x83\x43\x83\x5f\x81\x5b\x83\x58";
 const char kArantulaName[] = 
     "\x83\x60\x83\x85\x83\x89\x83\x93\x83\x5e\x83\x89\x81\x5b";
 
+const char kCharlietonName[] = 
+    "\x8d\x73\x8f\xa4\x90\x6c";  // "gyoushounin" / "peddler"
+// TODO: Move non-enemy NPC tribe info to a consistent location.
+const char kCharlietonTribe[] =
+    "\x83\x7b\x83\x62\x83\x5e\x83\x4e\x81\x5b\x83\x8b";
+
 // Info for custom NPCs.
-NpcSetupInfo g_NpcSetupInfo[2];
+NpcSetupInfo g_EnemyNpcSetup[2];
 
 }  // namespace
 
-// USER_FUNC declarations.
-EVT_DECLARE_USER_FUNC(evtTot_GetUniqueItemName, 1)
+// USER_FUNC Declarations.
+EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
 
+// Other declarations.
 extern const BeroEntry normal_room_entry_data[3];
 
 // Script for sign that shows current floor.
@@ -304,12 +313,27 @@ EVT_END()
 
 // Set up the battle / enemy NPC, or other NPCs on the floor.
 EVT_BEGIN(Tower_NpcSetup)
-    USER_FUNC(evtTot_GetFloor, LW(0))
-    IF_LARGE(LW(0), 0)
-        // TODO: Check for special NPCs (Mover, Charlieton, etc.)...
-    
+    USER_FUNC(evtTot_IsRestFloor, LW(0))
+    IF_EQUAL(LW(0), 1)
+        // Rest floor; spawn chest immediately.
+        SET(LW(15), 1)
+        RUN_EVT(Tower_SpawnChests)
+        
+        USER_FUNC(evtTot_ClearEnemyInfo)
+        
+        // Spawn one or more NPCs as well, if floor > 0.
+        USER_FUNC(evtTot_GetFloor, LW(0))
+        IF_LARGE(LW(0), 0)
+            USER_FUNC(evtTot_GetCharlietonNpcSetup, LW(0))
+            USER_FUNC(evt_npc_entry, PTR(kCharlietonName), PTR("c_botta"))
+            USER_FUNC(evt_npc_set_tribe, PTR(kCharlietonName), PTR(kCharlietonTribe))
+            USER_FUNC(evt_npc_setup, LW(0))
+            USER_FUNC(evt_npc_set_position, PTR(kCharlietonName), 100, 0, 0)
+        END_IF()
+    ELSE()
+        // Regular enemy floor; spawn enemies.
         USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
-        SET(LW(1), PTR(g_NpcSetupInfo))
+        SET(LW(1), PTR(g_EnemyNpcSetup))
         USER_FUNC(evtTot_GetEnemyNpcInfo, 
             LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
         
@@ -341,9 +365,6 @@ EVT_BEGIN(Tower_NpcSetup)
             SET(LW(15), 0)
             RUN_EVT(Tower_SpawnChests)
         END_INLINE()
-    ELSE()
-        SET(LW(15), 1)
-        RUN_EVT(Tower_SpawnChests)
     END_IF()
     
     // Wait for a chest to be opened, then spawn pipe.
@@ -405,17 +426,6 @@ EVT_BEGIN(gon_01_InitEvt)
     RETURN()
 EVT_END()
 
-// Get unique names for spawning items, to avoid softlocks with full inventory.
-EVT_DEFINE_USER_FUNC(evtTot_GetUniqueItemName) {
-    static int32_t id = 0;
-    static char name[16];
-    
-    id = (id + 1) % 1000;
-    sprintf(name, "item_t%03" PRId32, id);
-    evtSetValue(evt, evt->evtArguments[0], PTR(name));
-    return 2;
-}
-
 const BeroEntry normal_room_entry_data[3] = {
     {
         .name = "dokan_2",
@@ -454,6 +464,17 @@ const BeroEntry normal_room_entry_data[3] = {
 
 const int32_t* GetTowerInitEvt() {
     return gon_01_InitEvt;
+}
+
+// Returns whether the floor is a "rest floor" (no enemies).
+EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
+    auto& state = g_Mod->state_;
+    int32_t floor = state.floor_;
+    int32_t max_floors = state.GetOption(OPT_DIFFICULTY) >= 2 ? 64 : 32;
+    bool is_rest_floor = 
+        floor == 0 || ((floor % 8 == 7) && floor < max_floors - 8);
+    evtSetValue(evt, evt->evtArguments[0], is_rest_floor);
+    return 2;
 }
 
 }  // namespace mod::tot::gon

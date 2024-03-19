@@ -932,6 +932,12 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_ClearEnemyInfo) {
+    for (int32_t i = 0; i < g_NumEnemies; ++i) g_Enemies[i] = -1;
+    g_NumEnemies = 0;
+    return 2;
+}
+
 bool GetEnemyStats(
     int32_t unit_type, int32_t* out_hp, int32_t* out_atk, int32_t* out_def,
     int32_t* out_level, int32_t* out_coinlvl, int32_t base_attack_power) {

@@ -128,6 +128,7 @@ void DebugManager::Update() {
                             pouch.party_data[i].flags |= 1;
                         }
                     }
+                    break;
                 }
                 case DEBUG_UNLOCK_ALL_BADGES: {
                     auto* item_data = ttyd::item_data::itemDataTable;
@@ -150,6 +151,7 @@ void DebugManager::Update() {
                         ttyd::mario_pouch::pouchGetHaveBadgeCnt(),
                         sizeof(int16_t),
                         (void*)ttyd::mario_pouch::comp_kind);
+                    break;
                 }
                 case DEBUG_UNLOCK_TATTLE_LOG: {
                     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {

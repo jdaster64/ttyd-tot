@@ -1,8 +1,10 @@
 #pragma once
 
+#include "evt_cmd.h"
 #include "tot_manager_move.h"
 
 #include <ttyd/evt_badgeshop.h>
+#include <ttyd/evtmgr.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/mariost.h>
 #include <ttyd/npcdrv.h>

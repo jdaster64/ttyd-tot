@@ -1,5 +1,9 @@
 #pragma once
 
+#include "evt_cmd.h"
+
+#include <ttyd/evtmgr.h>
+
 #include <cstdint>
 
 namespace mod::tot {
@@ -15,5 +19,9 @@ int32_t PickRandomItem(
     
 // Obfuscates or un-obfuscates the appearance and description of items.
 void ObfuscateItems(bool enable);
+
+// Generates a globally unique name to use to identify item pickups.
+// This is necessary to avoid softlocks with full inventory.
+EVT_DECLARE_USER_FUNC(evtTot_GetUniqueItemName, 1)
 
 }

@@ -115,8 +115,8 @@ EVT_DECLARE_USER_FUNC(evt_npc_set_ry, 2)
 // evt_npc_set_ry_lr(char *name, float rotationY)
 EVT_DECLARE_USER_FUNC(evt_npc_set_ry_lr, 2)
 
-// evt_npc_reverse_ry(char *name, float rotationY)
-EVT_DECLARE_USER_FUNC(evt_npc_reverse_ry, 2)
+// evt_npc_reverse_ry(char *name)
+EVT_DECLARE_USER_FUNC(evt_npc_reverse_ry, 1)
 
 // evt_npc_get_dir(char *name, float &rotationY)
 EVT_DECLARE_USER_FUNC(evt_npc_get_dir, 2)
