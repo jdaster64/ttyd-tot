@@ -23,7 +23,11 @@ b 0
 
 StartEarthTremorNumberOfBars:
 # Override the normal length of the minigame (r0 = number of bars completed).
+stwu %sp, -0x10 (%sp)
+stw %r0, 0xc (%sp)
 bl getEarthTremorNumberOfBars
+lwz %r0, 0xc (%sp)
+addi %sp, %sp, 0x10
 cmpw %r0, %r3
 
 BranchBackEarthTremorNumberOfBars:

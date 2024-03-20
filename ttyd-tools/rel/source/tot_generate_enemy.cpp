@@ -1140,10 +1140,10 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMinionSpawnPos) {
 }
 
 EVT_BEGIN(MidbossEvt)
-    // If the battle has started (not a First Strike), 50% to call for backup.
+    // If the battle has started (not a First Strike), 30% to call for backup.
     USER_FUNC(btlevtcmd_get_turn, LW(0))
     USER_FUNC(evt_sub_random, 99, LW(1))
-    IF_LARGE_EQUAL(LW(1), 50)
+    IF_LARGE_EQUAL(LW(1), 30)
         SET(LW(0), 0)
     END_IF()
     IF_LARGE(LW(0), 0)
