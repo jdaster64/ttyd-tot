@@ -20,6 +20,8 @@ namespace MenuType {
         MOVE_UNLOCK,
         // Upgrading moves.
         MOVE_UPGRADE,
+        // Charlieton.
+        TOT_CHARLIETON_SHOP,
         
         MAX_MENU_TYPE,
     };

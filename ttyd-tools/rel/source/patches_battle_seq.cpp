@@ -117,9 +117,11 @@ namespace {
 
 // Custom evt to spawn different denominations of coins.
 EVT_BEGIN(SpawnCoinsEvt)
-IF_LARGE(LW(3), 100)
-    SET(LW(3), 100)
+IF_LARGE(LW(3), 200)
+    SET(LW(3), 200)
 END_IF()
+// Divide total # of coins by 2 rather than at individual enemy level.
+DIV(LW(3), 2)
 LBL(5)
 IF_LARGE_EQUAL(LW(3), 5)
     SUB(LW(3), 5)

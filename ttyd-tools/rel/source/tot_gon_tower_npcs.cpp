@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_state.h"
+#include "tot_window_select.h"
 
 #include <ttyd/evt_badgeshop.h>
 #include <ttyd/evt_item.h>
@@ -15,6 +16,7 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/npcdrv.h>
+#include <ttyd/system.h>
 
 #include <cinttypes>
 #include <cstdio>
@@ -35,6 +37,7 @@ using namespace ::ttyd::evt_window;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::npcdrv::NpcSetupInfo;
+using ::ttyd::system::qqsort;
 
 const char kCharlietonName[] = 
     "\x8d\x73\x8f\xa4\x90\x6c";  // "gyoushounin" / "peddler"
@@ -94,7 +97,8 @@ EVT_BEGIN(TowerNpc_CharlietonTalk)
 LBL(0)
     USER_FUNC(evt_win_coin_on, 0, LW(12))
     // TODO: Custom window to account for different prices based on floor.
-    USER_FUNC(evt_win_other_select, 15)
+    USER_FUNC(evt_win_other_select, 
+        (uint32_t)window_select::MenuType::TOT_CHARLIETON_SHOP)
     IF_EQUAL(LW(0), 0)
         USER_FUNC(evt_win_coin_off, LW(12))
         USER_FUNC(evt_msg_print, 0, PTR("tot_charlieton_decline"), 0, PTR("me"))
@@ -180,8 +184,9 @@ NpcSetupInfo g_ChetRippoNpcSetup[2] = {
 };
 
 EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
-    // TODO: Move to separate table when making a custom selection window.
-    int32_t* inventory = ttyd::evt_badgeshop::badge_bottakuru100_table;
+    int16_t* inventory = GetCharlietonInventoryPtr();
+    
+    // Pick 5 normal items, 5 special items, and 5 badges.
     const int32_t kNumCharlietonItemsPerType = 5;
     for (int32_t i = 0; i < kNumCharlietonItemsPerType * 3; ++i) {
         bool found = true;
@@ -203,11 +208,21 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
             inventory[i] = item;
         }
     }
+    // Add sentinel terminator at end.
+    inventory[kNumCharlietonItemsPerType * 3] = -1;
+    
+    // Sort each category by ascending price.
+    qqsort(&inventory[0], 5, sizeof(int16_t), (void*)BuyPriceComparator);
+    qqsort(&inventory[5], 5, sizeof(int16_t), (void*)BuyPriceComparator);
+    qqsort(&inventory[10], 5, sizeof(int16_t), (void*)BuyPriceComparator);
+    
     return 2;
 }
 
-EVT_DEFINE_USER_FUNC(evtTot_GetCharlietonNpcSetup) {
-    evtSetValue(evt, evt->evtArguments[0], PTR(g_CharlietonNpcSetup));
+EVT_DEFINE_USER_FUNC(evtTot_GetCharlietonNpcParams) {
+    evtSetValue(evt, evt->evtArguments[0], PTR(kCharlietonName));
+    evtSetValue(evt, evt->evtArguments[1], PTR(kCharlietonTribe));
+    evtSetValue(evt, evt->evtArguments[2], PTR(g_CharlietonNpcSetup));
     return 2;
 }
 

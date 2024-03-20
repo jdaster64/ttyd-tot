@@ -256,7 +256,7 @@ void DebugManager::Update() {
         }
         
         if (dir == 0) return;
-        if (buttons & ButtonId::L) dir *= 10;
+        if (buttons & ButtonId::L) dir *= 8;
         g_CursorPos = Clamp(g_CursorPos + dir, 0, 64);
         if (g_CursorPos < 0) g_CursorPos = 0;
     }

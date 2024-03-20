@@ -138,6 +138,23 @@ int32_t PickRandomItem(
     return -1;
 }
 
+int32_t BuyPriceComparator(int16_t* lhs, int16_t* rhs) {
+    auto* itemData = ttyd::item_data::itemDataTable;
+    return itemData[*lhs].buy_price - itemData[*rhs].buy_price;
+}
+
+int16_t g_CharlietonInventory[16] = { -1 };
+
+int16_t* GetCharlietonInventoryPtr() {
+    return g_CharlietonInventory;
+}
+
+int32_t GetBuyPriceScale() {
+    // 20% for first shop, 30% for second, etc.
+    int32_t shop_index = (g_Mod->state_.floor_ + 1) / 8;
+    return (shop_index + 1) * 10;
+}
+
 void ObfuscateItems(bool enable) {
     // Obfuscation has already been performed; no need to redo.
     if (enable && g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION])

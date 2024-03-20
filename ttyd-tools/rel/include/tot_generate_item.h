@@ -16,6 +16,14 @@ namespace mod::tot {
 int32_t PickRandomItem(
     int32_t sequence, int32_t normal_item_weight, int32_t recipe_item_weight,
     int32_t badge_weight, int32_t no_item_weight = 0);
+
+// Returns a comparison value that sorts items by ascending buy price.
+int32_t BuyPriceComparator(int16_t* lhs, int16_t* rhs);
+// Returns a pointer to Charlieton's item inventory.
+// Holds up to 15 items + a '-1' terminator.
+int16_t* GetCharlietonInventoryPtr();
+// Returns the multiplier for item buy price (out of 100) on the current floor.
+int32_t GetBuyPriceScale();
     
 // Obfuscates or un-obfuscates the appearance and description of items.
 void ObfuscateItems(bool enable);

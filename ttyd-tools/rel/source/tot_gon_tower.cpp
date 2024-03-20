@@ -85,12 +85,6 @@ const char kPiderName[] = "\x83\x70\x83\x43\x83\x5f\x81\x5b\x83\x58";
 const char kArantulaName[] = 
     "\x83\x60\x83\x85\x83\x89\x83\x93\x83\x5e\x83\x89\x81\x5b";
 
-const char kCharlietonName[] = 
-    "\x8d\x73\x8f\xa4\x90\x6c";  // "gyoushounin" / "peddler"
-// TODO: Move non-enemy NPC tribe info to a consistent location.
-const char kCharlietonTribe[] =
-    "\x83\x7b\x83\x62\x83\x5e\x83\x4e\x81\x5b\x83\x8b";
-
 // Info for custom NPCs.
 NpcSetupInfo g_EnemyNpcSetup[2];
 
@@ -324,11 +318,11 @@ EVT_BEGIN(Tower_NpcSetup)
         // Spawn one or more NPCs as well, if floor > 0.
         USER_FUNC(evtTot_GetFloor, LW(0))
         IF_LARGE(LW(0), 0)
-            USER_FUNC(evtTot_GetCharlietonNpcSetup, LW(0))
-            USER_FUNC(evt_npc_entry, PTR(kCharlietonName), PTR("c_botta"))
-            USER_FUNC(evt_npc_set_tribe, PTR(kCharlietonName), PTR(kCharlietonTribe))
-            USER_FUNC(evt_npc_setup, LW(0))
-            USER_FUNC(evt_npc_set_position, PTR(kCharlietonName), 100, 0, 0)
+            USER_FUNC(evtTot_GetCharlietonNpcParams, LW(0), LW(1), LW(2))
+            USER_FUNC(evt_npc_entry, LW(0), PTR("c_botta"))
+            USER_FUNC(evt_npc_set_tribe, LW(0), LW(1))
+            USER_FUNC(evt_npc_setup, LW(2))
+            USER_FUNC(evt_npc_set_position, LW(0), 100, 0, 0)
         END_IF()
     ELSE()
         // Regular enemy floor; spawn enemies.
