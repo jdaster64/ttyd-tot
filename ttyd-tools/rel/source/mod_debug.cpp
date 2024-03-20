@@ -247,7 +247,7 @@ void DebugManager::Update() {
         if (button_trg & (ButtonId::DPAD_UP | ButtonId::DPAD_RIGHT)) {
             dir = 1;
         } else if (button_trg & (ButtonId::DPAD_DOWN | ButtonId::DPAD_LEFT)) {
-            dir = -1;       
+            dir = -1;
         } else if (button_trg & ButtonId::Y) {
             g_Mod->state_.floor_ = g_CursorPos;
             // field::UpdateExitDestination();
