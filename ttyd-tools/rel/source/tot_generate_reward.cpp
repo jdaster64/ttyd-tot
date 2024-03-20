@@ -267,7 +267,7 @@ int32_t SelectUniqueBadge() {
     if (num_eligible > 0) {
         // Find the next badge in the sequence that hasn't yet been claimed,
         // trying multiple times if necessary.
-        for (int32_t retries = 20; retries > 0; --retries) {
+        for (int32_t retries = 100; retries > 0; --retries) {
             int32_t weight = state.Rand(total_weight, RNG_REWARD_BADGE_SPECIAL);
             total_weight = 0;
             for (int32_t i = 0; i < 10; ++i) {
@@ -324,7 +324,7 @@ void SelectMoves(int32_t reward_type, bool is_upgrade_mode) {
         
         // Select moves at random until picking the requisite number,
         // or running out of options, whichever happens first.
-        for (int32_t retries = 200; retries > 0; --retries) {
+        for (int32_t retries = 300; retries > 0; --retries) {
             int32_t move = move_start + state.Rand(num_moves, rng_type);
             if (moves[move] == 0) continue;
             
