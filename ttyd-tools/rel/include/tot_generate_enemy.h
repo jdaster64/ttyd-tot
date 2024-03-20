@@ -44,6 +44,9 @@ bool GetEnemyStats(
 
 // Returns how many chests to offer based on the battle's relative difficulty.
 int32_t GetBattleRewardTier();
+
+// Returns the attack script for a midboss, based on its original script.
+void* GetMidbossAttackScript(void* original_script);
     
 // Gets/sets a custom Tattle message based on the enemy's parameters.
 // In-battle:

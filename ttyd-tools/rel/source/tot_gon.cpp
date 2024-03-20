@@ -110,7 +110,6 @@ BattleSetupData g_SetupDataTbl[] = {
         .flag_off_loadouts = g_NormalBattleLoadouts,
         .battle_setup_flags = 0,    // First Attack allowed (unavailable anyway)
         .audience_setting_mode = 0, // no special audience
-        .music_name = "BGM_ZAKO_BATTLE1",
     },
     {},
 };

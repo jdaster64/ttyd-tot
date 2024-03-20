@@ -205,13 +205,18 @@ const int32_t HammerBrosHpCheck[] = {
 EVT_DEFINE_USER_FUNC(CheckNumEnemiesRemaining) {
     auto* battleWork = ttyd::battle::g_BattleWork;
     int32_t num_enemies = 0;
+    bool is_midboss = false;
     for (int32_t i = 0; i < 64; ++i) {
         BattleWorkUnit* unit = battleWork->battle_units[i];
         // Count enemies of either alliance that are still alive.
         if (unit && unit->current_kind <= BattleUnitType::BONETAIL &&
-            unit->alliance <= 1 && !BtlUnit_CheckStatus(unit, 27))
+            unit->alliance <= 1 && !BtlUnit_CheckStatus(unit, 27)) {
             ++num_enemies;
+            if (unit->size_change_turns > 99) is_midboss = true;
+        }
     }
+    // If there is a midboss, force enemies to use their AI for 2+ enemies.
+    if (is_midboss && num_enemies < 2) num_enemies = 2;
     evtSetValue(evt, evt->evtArguments[0], num_enemies);
     return 2;
 }
@@ -360,6 +365,16 @@ void ApplyFixedPatches() {
                             return 2;
                         default:
                             break;
+                    }
+                }
+                // If there is a midboss on the field, always fail.
+                for (int32_t i = 0; i < 64; ++i) {
+                    auto* unit = battleWork->battle_units[i];
+                    if (unit && !BtlUnit_CheckStatus(unit, 27) &&
+                        unit->size_change_turns > 99) {
+                        // Treat the spot as full.
+                        evtSetValue(evt, evt->evtArguments[0], 1);
+                        return 2;
                     }
                 }
             }

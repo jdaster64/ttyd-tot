@@ -2,13 +2,13 @@
 
 #include "common_functions.h"
 #include "common_ui.h"
-#include "custom_condition.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_battle.h"
 #include "patches_partner.h"
+#include "tot_generate_condition.h"
 #include "tot_generate_reward.h"
 #include "tot_manager_move.h"
 #include "tot_party_mario.h"
@@ -280,7 +280,7 @@ void CheckBattleCondition() {
 // Displays text associated with the battle condition.
 void DisplayBattleCondition() {
     char buf[128];
-    GetBattleConditionString(buf);
+    tot::GetBattleConditionString(buf);
     DrawCenteredTextWindow(
         buf, 0, 60, 0xFFu, false, 0x000000FFu, 0.75f, 0xFFFFFFE5u, 15, 10);
 }

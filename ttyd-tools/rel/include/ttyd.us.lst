@@ -1147,6 +1147,7 @@
 // battle.o
 // .text
 800f7bfc:BattleStoreExp
+800f7c0c:BattleStoreCoin
 800f7ca4:_EquipItem
 800f831c:BtlUnit_EquipItem
 800f8728:BattleGetPartyPtr
@@ -1707,6 +1708,7 @@
 80126968:BtlUnit_GetWeaponCost
 80126c10:BtlUnit_SetFp
 80126c64:BtlUnit_GetFp
+80126ca8:BtlUnit_GetCoin
 80126fe8:BtlUnit_ReviseHpFp
 8012733c:BtlUnit_GetData
 801277ac:BtlUnit_OffUnitFlag

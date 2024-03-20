@@ -10,10 +10,14 @@
 #include "tot_generate_item.h"
 
 #include <ttyd/battle.h>
+#include <ttyd/battle_camera.h>
 #include <ttyd/battle_database_common.h>
+#include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_monosiri.h>
+#include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/evt_npc.h>
+#include <ttyd/evt_sub.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
@@ -31,7 +35,10 @@ namespace mod::tot {
 namespace {
 
 // Including entire namespace for convenience.
+using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
+using namespace ::ttyd::battle_event_cmd;
+using namespace ::ttyd::evt_sub;
 
 using ::mod::infinite_pit::DebugManager;
 
@@ -51,6 +58,8 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 struct EnemyTypeInfo {
     // Pointer to enemy type's basic parameters (usually in custom.rel).
     BattleUnitKind* kind;
+    // Whether the enemy can be used as a midboss.
+    bool            midboss_eligible;
     // Indices into npc_data tribe and AI type tables.
     int16_t         npc_tribe_idx;
     int8_t          ai_type_idx;
@@ -63,9 +72,9 @@ struct EnemyTypeInfo {
     // The reference point used as the enemy's "base" attack power; other
     // attacks will have the same difference in power as in the original game.
     // (e.g. a Hyper Goomba will charge by its attack power + 4).
-    int16_t         atk_reference;
+    int8_t          atk_reference;
     // The difference between vanilla 'base' ATK and the mod's atk_reference.
-    int16_t         atk_offset;
+    int8_t          atk_offset;
     // The enemy's level; used for loadout weighting and coin drops.
     int8_t          level;
     // Makes a type of audience more likely to spawn (-1 = none).
@@ -93,181 +102,179 @@ const float kEnemyPartySepX = 40.0f;
 const float kEnemyPartySepZ = 10.0f;
 
 const EnemyTypeInfo kEnemyInfo[] = {
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_Goomba, 214, 0x04, 1, 10, 6, 0, 1, 0, 2, 10, 0, 0, 0, 0 },						
-    { &custom::unit_Paragoomba, 216, 0x06, 2, 10, 6, 0, 1, 0, 3, 10, 0, 0, 40, 50 },						
-    { &custom::unit_SpikyGoomba, 215, 0x04, 3, 10, 6, 0, 1, 1, 3, 10, 0, 0, 0, 0 },						
-    { &custom::unit_Spinia, 310, 0x28, 43, 13, 6, 0, 1, 0, 2, -1, 0, 0, 0, 0 },						
-    { &custom::unit_Spania, 309, 0x28, 44, 13, 6, 0, 1, 0, 3, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_Koopatrol, 205, 0x2d, 18, 15, 8, 3, 4, 0, 6, 8, 3, 0, 0, 0 },						
-    { &custom::unit_Magikoopa, 313, 0x2a, 35, 15, 7, 0, 4, 0, 7, 3, 0, 3, 0, 0 },						
-    { nullptr, -1, -1, -1, 15, 7, 0, 4, 0, 7, 3, 0, 3, 0, 0 },						
-    { &custom::unit_KoopaTroopa, 242, 0x07, 10, 14, 7, 2, 2, 0, 3, 8, 0, 0, 0, 0 },						
-    { &custom::unit_Paratroopa, 243, 0x08, 11, 14, 7, 2, 2, 0, 4, 8, 0, 0, 40, 50 },						
-    { &custom::unit_Fuzzy, 248, 0x10, 46, 11, 5, 0, 1, 0, 2, -1, 0, 0, 0, 0 },						
-    { &custom::unit_DullBones, 39, 0x0e, 20, 7, 5, 1, 1, 1, 2, 4, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_Bristle, 258, 0x17, 73, 6, 6, 4, 1, 0, 4, -1, 0, 1, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_RedBones, 36, 0x0e, 21, 10, 7, 2, 3, 0, 5, 4, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_DarkPuff, 286, 0x1d, 61, 12, 7, 0, 2, 0, 3, -1, 0, 0, 40, 10 },						
-    { &custom::unit_PalePiranha, 261, 0x1c, 51, 12, 7, 0, 2, 0, 4, 11, 0, 1, 0, 0 },						
-    { &custom::unit_Cleft, 237, 0x16, 70, 8, 6, 5, 2, 0, 2, -1, 1, 0, 0, 0 },						
-    { &custom::unit_Pider, 266, 0x1b, 56, 14, 6, 0, 2, 0, 5, -1, 0, 0, 40, 140 },						
-    { &custom::unit_XNaut, 271, 0x04, 83, 12, 7, 0, 3, 0, 4, 1, 0, 0, 0, 0 },						
-    { &custom::unit_Yux, 268, 0x19, 86, 7, 5, 0, 2, 0, 6, 1, 0, 0, 40, 30 },						
-    { &custom::unit_MiniYux, -1, -1, 87, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, 10, 6, 0, 1, 0, 2, 10, 0, 0, 0, 0 },						
-    { &custom::unit_KpKoopa, 246, 0x07, 12, 16, 7, 2, 2, 0, 4, 8, 0, 0, 0, 0 },						
-    { &custom::unit_KpParatroopa, 247, 0x08, 13, 16, 7, 2, 2, 0, 5, 8, 0, 0, 40, 50 },						
-    { &custom::unit_Pokey, 233, 0x14, 49, 12, 7, 0, 3, 0, 4, -1, 1, 0, 0, 0 },						
-    { &custom::unit_Lakitu, 280, 0x24, 27, 13, 7, 0, 2, 0, 5, -1, 0, 1, 40, 20 },						
-    { &custom::unit_Spiny, 287, -1, 29, 8, 7, 4, 2, 1, 1, -1, 0, 0, 0, 0 },						
-    { nullptr, 288, 0x15, -1, 10, 6, 5, 3, 0, 5, -1, 1, 0, 0, 0 },						
-    { &custom::unit_BobOmb, 283, 0x04, 75, 10, 7, 2, 2, 0, 5, 9, 1, 0, 0, 0 },						
-    { &custom::unit_Bandit, 274, 0x04, 40, 12, 6, 0, 2, 0, 4, 5, 0, 0, 0, 0 },						
-    { &custom::unit_BigBandit, 129, 0x04, 41, 15, 6, 0, 2, 1, 5, 5, 0, 0, 0, 0 },						
-    { nullptr, 230, 0x0b, -1, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },						
-    { &custom::unit_ShadyKoopa, 282, 0x07, 14, 18, 7, 2, 3, 0, 6, 8, 0, 0, 0, 0 },						
-    { &custom::unit_ShadyParatroopa, 291, 0x08, 15, 18, 7, 2, 3, 0, 7, 8, 0, 0, 40, 50 },						
-    { &custom::unit_RedMagikoopa, 314, -1, 36, 15, 7, 0, 3, 1, 8, 3, 0, 3, 0, 0 },						
-    { nullptr, -1, -1, -1, 15, 7, 0, 3, 1, 8, 3, 0, 3, 0, 0 },						
-    { &custom::unit_WhiteMagikoopa, 315, -1, 37, 18, 7, 0, 4, 0, 8, 3, 0, 3, 0, 0 },						
-    { nullptr, -1, -1, -1, 18, 7, 0, 4, 0, 8, 3, 0, 3, 0, 0 },						
-    { &custom::unit_GreenMagikoopa, 316, -1, 38, 15, 7, 1, 4, 0, 8, 3, 0, 3, 0, 0 },						
-    { nullptr, -1, -1, -1, 15, 7, 1, 4, 0, 8, 3, 0, 3, 0, 0 },						
-    { &custom::unit_DarkCraw, 308, 0x04, 39, 20, 9, 0, 6, 0, 8, -1, 3, 0, 0, 0 },						
-    { &custom::unit_HammerBro, 206, 0x2b, 24, 16, 6, 2, 3, 1, 9, 3, 2, 1, 0, 0 },						
-    { &custom::unit_BoomerangBro, 294, 0x04, 25, 16, 4, 2, 2, 0, 9, 3, 2, 1, 0, 0 },						
-    { &custom::unit_FireBro, 293, 0x04, 26, 16, 4, 2, 1, 2, 9, 3, 2, 1, 0, 0 },						
-    { &custom::unit_RedChomp, 306, 0x2c, 79, 12, 10, 5, 5, 0, 8, -1, 2, 0, 0, 0 },						
-    { &custom::unit_DarkKoopatrol, 307, 0x2d, 19, 25, 10, 3, 5, 0, 10, 8, 3, 1, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_HyperGoomba, 217, 0x04, 4, 15, 6, 0, 3, -1, 5, 10, 0, 0, 0, 0 },						
-    { &custom::unit_HyperParagoomba, 219, 0x06, 5, 15, 6, 0, 3, -1, 6, 10, 0, 0, 40, 50 },						
-    { &custom::unit_HyperSpikyGoomba, 218, 0x04, 6, 15, 6, 0, 3, 0, 6, 10, 0, 0, 0, 0 },						
-    { &custom::unit_CrazeeDayzee, 252, 0x22, 55, 14, 5, 0, 2, 0, 6, 6, 0, 2, 0, 0 },						
-    { &custom::unit_AmazyDayzee, 253, -1, 92, 20, 20, 1, 20, 0, 80, 6, 2, 4, 0, 0 },						
-    { &custom::unit_HyperCleft, 236, 0x16, 71, 10, 6, 5, 3, 0, 6, -1, 1, 0, 0, 0 },						
-    { &custom::unit_BuzzyBeetle, 225, 0x09, 31, 8, 6, 5, 3, 0, 4, 7, 1, 0, 0, 0 },						
-    { &custom::unit_SpikeTop, 226, 0x0b, 32, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },						
-    { &custom::unit_Swooper, 239, 0x20, 58, 14, 7, 0, 3, 0, 5, -1, 0, 0, 130, 80 },						
-    { &custom::unit_Boo, 146, 0x21, 65, 13, 6, 0, 2, 1, 5, 2, 0, 1, 0, 30 },						
-    { nullptr, 148, 0x21, 93, 100, 4, 0, 2, 2, 60, 2, 2, 2, 20, 30 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_Ember, 159, 0x24, 68, 13, 6, 0, 3, 0, 6, 2, 0, 1, 40, 20 },						
-    { &custom::unit_LavaBubble, 302, 0x24, 67, 10, 6, 0, 3, 1, 6, 2, 0, 1, 40, 20 },						
-    { &custom::unit_GreenFuzzy, 249, 0x10, 47, 13, 6, 0, 2, 1, 4, -1, 0, 0, 0, 0 },						
-    { &custom::unit_FlowerFuzzy, 250, 0x10, 48, 13, 6, 0, 2, 1, 6, -1, 0, 2, 0, 0 },						
-    { &custom::unit_PutridPiranha, 262, 0x1c, 52, 14, 6, 0, 2, 1, 6, 11, 0, 2, 0, 0 },						
-    { &custom::unit_Parabuzzy, 228, 0x0d, 33, 8, 6, 5, 3, 0, 5, 7, 1, 0, 40, 50 },						
-    { nullptr, 254, 0x12, -1, 10, 0, 3, 0, 0, 6, 9, 1, 0, 0, 0 },						
-    { nullptr, 255, -1, -1, 4, 7, 1, 4, 0, 0, 9, 0, 0, 40, 0 },						
-    { &custom::unit_BulkyBobOmb, 304, 0x25, 76, 12, 4, 2, 2, 0, 5, 9, 1, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_RuffPuff, 284, 0x1d, 62, 14, 8, 0, 4, 0, 4, -1, 0, 0, 40, 10 },						
-    { &custom::unit_PoisonPokey, 234, 0x14, 50, 15, 7, 0, 3, 1, 6, -1, 1, 0, 0, 0 },						
-    { &custom::unit_SpikyParabuzzy, 227, 0x0d, 34, 8, 6, 5, 3, 0, 7, 7, 2, 0, 40, 50 },						
-    { &custom::unit_DarkBoo, 147, 0x21, 66, 17, 8, 0, 4, 1, 7, 2, 0, 1, 0, 30 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_IcePuff, 285, 0x1d, 63, 16, 8, 0, 4, 0, 6, -1, 0, 0, 40, 10 },						
-    { &custom::unit_FrostPiranha, 263, 0x1c, 53, 16, 7, 0, 4, 1, 7, 11, 0, 2, 0, 0 },						
-    { &custom::unit_MoonCleft, 235, 0x16, 72, 12, 8, 5, 5, 0, 6, -1, 1, 0, 0, 0 },						
-    { &custom::unit_ZYux, 269, 0x19, 88, 9, 6, 0, 4, 0, 8, 1, 1, 1, 40, 30 },						
-    { &custom::unit_MiniZYux, -1, -1, 89, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },						
-    { &custom::unit_XYux, 270, 0x19, 90, 11, 5, 2, 3, 0, 10, 1, 2, 2, 40, 30 },						
-    { &custom::unit_MiniXYux, -1, -1, 91, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },						
-    { &custom::unit_XNautPhD, 273, 0x27, 84, 14, 8, 0, 4, 0, 8, 1, 0, 2, 0, 0 },						
-    { &custom::unit_EliteXNaut, 272, 0x04, 85, 16, 9, 2, 5, 0, 8, 1, 2, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_Swoopula, 240, 0x20, 59, 14, 6, 0, 4, 0, 5, -1, 0, 0, 130, 80 },						
-    { &custom::unit_PhantomEmber, 303, 0x24, 69, 16, 6, 0, 3, 2, 8, 2, 0, 2, 40, 20 },						
-    { nullptr, 257, -1, -1, 6, 9, 2, 6, 0, 0, 9, 0, 0, 0, 0 },						
-    { nullptr, 256, 0x12, -1, 15, 0, 5, 0, 0, 10, 9, 2, 0, 40, 0 },						
-    { &custom::unit_ChainChomp, 301, 0x2c, 78, 10, 8, 4, 6, 0, 6, -1, 3, 0, 0, 0 },						
-    { &custom::unit_DarkWizzerd, 296, 0x26, 81, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },						
-    { nullptr, -1, -1, -1, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },						
-    { &custom::unit_DryBones, 196, 0x0f, 22, 12, 7, 3, 5, 0, 7, 4, 0, 2, 0, 0 },						
-    { &custom::unit_DarkBones, 197, 0x0f, 23, 20, 7, 3, 4, 1, 10, 4, 1, 2, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { nullptr, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_Gloomba, 220, 0x04, 7, 20, 6, 0, 2, 1, 5, 10, 0, 0, 0, 0 },						
-    { &custom::unit_Paragloomba, 222, 0x06, 8, 20, 6, 0, 2, 1, 6, 10, 0, 0, 40, 50 },						
-    { &custom::unit_SpikyGloomba, 221, 0x04, 9, 20, 6, 0, 2, 2, 6, 10, 0, 0, 0, 0 },						
-    { &custom::unit_DarkKoopa, 244, 0x07, 16, 20, 8, 3, 3, 1, 6, 8, 0, 0, 0, 0 },						
-    { &custom::unit_DarkParatroopa, 245, 0x08, 17, 20, 8, 3, 3, 1, 7, 8, 0, 0, 40, 50 },						
-    { &custom::unit_BadgeBandit, 275, 0x04, 42, 18, 6, 0, 3, 2, 6, 5, 0, 0, 0, 0 },						
-    { &custom::unit_DarkLakitu, 281, 0x24, 28, 19, 9, 0, 5, 0, 8, -1, 2, 0, 40, 20 },						
-    { &custom::unit_SkyBlueSpiny, -1, -1, 30, 10, 9, 4, 5, 1, 1, -1, 0, 0, 0, 0 },						
-    { &custom::unit_Wizzerd, 295, 0x26, 80, 10, 8, 3, 7, -1, 7, -1, 1, 1, 0, 20 },						
-    { &custom::unit_PiranhaPlant, 260, 0x1c, 54, 18, 8, 0, 7, 2, 9, 11, 0, 4, 0, 0 },						
-    { &custom::unit_Spunia, 311, 0x28, 45, 16, 7, 2, 6, 1, 6, -1, 3, 0, 0, 0 },						
-    { &custom::unit_Arantula, 267, 0x1b, 57, 18, 6, 0, 5, 2, 8, -1, 2, 2, 40, 140 },						
-    { &custom::unit_DarkBristle, 259, 0x17, 74, 9, 9, 4, 8, 0, 8, -1, 0, 3, 0, 0 },						
-    { &custom::unit_PoisonPuff, 265, 0x1d, 64, 18, 8, 0, 8, 0, 8, -1, 0, 0, 40, 10 },						
-    { &custom::unit_Swampire, 241, 0x20, 60, 20, 8, 0, 6, 0, 8, -1, 0, 0, 130, 80 },						
-    { &custom::unit_BobUlk, 305, 0x25, 77, 15, 5, 2, 4, 0, 7, 9, 3, 0, 0, 0 },						
-    { &custom::unit_EliteWizzerd, 297, 0x26, 82, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },						
-    { nullptr, -1, -1, -1, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },						
-    { nullptr, 325, 0x11, 94, 200, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },						
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Goomba, 1, 214, 0x04, 1, 10, 6, 0, 1, 0, 2, 10, 0, 0, 0, 0 },
+    { &custom::unit_Paragoomba, 1, 216, 0x06, 2, 10, 6, 0, 1, 0, 3, 10, 0, 0, 40, 50 },
+    { &custom::unit_SpikyGoomba, 1, 215, 0x04, 3, 10, 6, 0, 1, 1, 3, 10, 0, 0, 0, 0 },
+    { &custom::unit_Spinia, 1, 310, 0x28, 43, 13, 6, 0, 1, 0, 2, -1, 0, 0, 0, 0 },
+    { &custom::unit_Spania, 1, 309, 0x28, 44, 13, 6, 0, 1, 0, 3, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Koopatrol, 1, 205, 0x2d, 18, 15, 8, 3, 4, 0, 6, 8, 3, 0, 0, 0 },
+    { &custom::unit_Magikoopa, 1, 313, 0x2a, 35, 15, 7, 0, 4, 0, 7, 3, 0, 3, 0, 0 },
+    { nullptr, 0, -1, -1, -1, 15, 7, 0, 4, 0, 7, 3, 0, 3, 0, 0 },
+    { &custom::unit_KoopaTroopa, 1, 242, 0x07, 10, 14, 7, 2, 2, 0, 3, 8, 0, 0, 0, 0 },
+    { &custom::unit_Paratroopa, 1, 243, 0x08, 11, 14, 7, 2, 2, 0, 4, 8, 0, 0, 40, 50 },
+    { &custom::unit_Fuzzy, 1, 248, 0x10, 46, 11, 5, 0, 1, 0, 2, -1, 0, 0, 0, 0 },
+    { &custom::unit_DullBones, 1, 39, 0x0e, 20, 7, 5, 1, 1, 1, 2, 4, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Bristle, 1, 258, 0x17, 73, 6, 6, 4, 1, 0, 4, -1, 0, 1, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_RedBones, 1, 36, 0x0e, 21, 10, 7, 2, 3, 0, 5, 4, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_DarkPuff, 1, 286, 0x1d, 61, 12, 7, 0, 2, 0, 3, -1, 0, 0, 40, 10 },
+    { &custom::unit_PalePiranha, 1, 261, 0x1c, 51, 12, 7, 0, 2, 0, 4, 11, 0, 1, 0, 0 },
+    { &custom::unit_Cleft, 1, 237, 0x16, 70, 8, 6, 5, 2, 0, 2, -1, 1, 0, 0, 0 },
+    { &custom::unit_Pider, 1, 266, 0x1b, 56, 14, 6, 0, 2, 0, 5, -1, 0, 0, 40, 140 },
+    { &custom::unit_XNaut, 1, 271, 0x04, 83, 12, 7, 0, 3, 0, 4, 1, 0, 0, 0, 0 },
+    { &custom::unit_Yux, 0, 268, 0x19, 86, 7, 5, 0, 2, 0, 6, 1, 0, 0, 40, 30 },
+    { &custom::unit_MiniYux, 0, -1, -1, 87, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, 10, 6, 0, 1, 0, 2, 10, 0, 0, 0, 0 },
+    { &custom::unit_KpKoopa, 1, 246, 0x07, 12, 16, 7, 2, 2, 0, 4, 8, 0, 0, 0, 0 },
+    { &custom::unit_KpParatroopa, 1, 247, 0x08, 13, 16, 7, 2, 2, 0, 5, 8, 0, 0, 40, 50 },
+    { &custom::unit_Pokey, 1, 233, 0x14, 49, 12, 7, 0, 3, 0, 4, -1, 1, 0, 0, 0 },
+    { &custom::unit_Lakitu, 1, 280, 0x24, 27, 13, 7, 0, 2, 0, 5, -1, 0, 1, 40, 20 },
+    { &custom::unit_Spiny, 0, 287, -1, 29, 8, 7, 4, 2, 1, 1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 288, 0x15, -1, 10, 6, 5, 3, 0, 5, -1, 1, 0, 0, 0 },
+    { &custom::unit_BobOmb, 0, 283, 0x04, 75, 10, 7, 2, 2, 0, 5, 9, 1, 0, 0, 0 },
+    { &custom::unit_Bandit, 0, 274, 0x04, 40, 12, 6, 0, 2, 0, 4, 5, 0, 0, 0, 0 },
+    { &custom::unit_BigBandit, 0, 129, 0x04, 41, 15, 6, 0, 2, 1, 5, 5, 0, 0, 0, 0 },
+    { nullptr, 0, 230, 0x0b, -1, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },
+    { &custom::unit_ShadyKoopa, 1, 282, 0x07, 14, 18, 7, 2, 3, 0, 6, 8, 0, 0, 0, 0 },
+    { &custom::unit_ShadyParatroopa, 1, 291, 0x08, 15, 18, 7, 2, 3, 0, 7, 8, 0, 0, 40, 50 },
+    { &custom::unit_RedMagikoopa, 0, 314, -1, 36, 15, 7, 0, 3, 1, 8, 3, 0, 3, 0, 0 },
+    { nullptr, 0, -1, -1, -1, 15, 7, 0, 3, 1, 8, 3, 0, 3, 0, 0 },
+    { &custom::unit_WhiteMagikoopa, 0, 315, -1, 37, 18, 7, 0, 4, 0, 8, 3, 0, 3, 0, 0 },
+    { nullptr, 0, -1, -1, -1, 18, 7, 0, 4, 0, 8, 3, 0, 3, 0, 0 },
+    { &custom::unit_GreenMagikoopa, 0, 316, -1, 38, 15, 7, 1, 4, 0, 8, 3, 0, 3, 0, 0 },
+    { nullptr, 0, -1, -1, -1, 15, 7, 1, 4, 0, 8, 3, 0, 3, 0, 0 },
+    { &custom::unit_DarkCraw, 1, 308, 0x04, 39, 20, 9, 0, 6, 0, 8, -1, 3, 0, 0, 0 },
+    { &custom::unit_HammerBro, 1, 206, 0x2b, 24, 16, 6, 2, 3, 1, 9, 3, 2, 1, 0, 0 },
+    { &custom::unit_BoomerangBro, 1, 294, 0x04, 25, 16, 4, 2, 2, 0, 9, 3, 2, 1, 0, 0 },
+    { &custom::unit_FireBro, 1, 293, 0x04, 26, 16, 4, 2, 1, 2, 9, 3, 2, 1, 0, 0 },
+    { &custom::unit_RedChomp, 1, 306, 0x2c, 79, 12, 10, 5, 5, 0, 8, -1, 2, 0, 0, 0 },
+    { &custom::unit_DarkKoopatrol, 1, 307, 0x2d, 19, 25, 10, 3, 5, 0, 10, 8, 3, 1, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_HyperGoomba, 1, 217, 0x04, 4, 15, 6, 0, 3, -1, 5, 10, 0, 0, 0, 0 },
+    { &custom::unit_HyperParagoomba, 1, 219, 0x06, 5, 15, 6, 0, 3, -1, 6, 10, 0, 0, 40, 50 },
+    { &custom::unit_HyperSpikyGoomba, 1, 218, 0x04, 6, 15, 6, 0, 3, 0, 6, 10, 0, 0, 0, 0 },
+    { &custom::unit_CrazeeDayzee, 1, 252, 0x22, 55, 14, 5, 0, 2, 0, 6, 6, 0, 2, 0, 0 },
+    { &custom::unit_AmazyDayzee, 0, 253, -1, 92, 20, 20, 1, 20, 0, 80, 6, 2, 4, 0, 0 },
+    { &custom::unit_HyperCleft, 1, 236, 0x16, 71, 10, 6, 5, 3, 0, 6, -1, 1, 0, 0, 0 },
+    { &custom::unit_BuzzyBeetle, 1, 225, 0x09, 31, 8, 6, 5, 3, 0, 4, 7, 1, 0, 0, 0 },
+    { &custom::unit_SpikeTop, 1, 226, 0x0b, 32, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },
+    { &custom::unit_Swooper, 1, 239, 0x20, 58, 14, 7, 0, 3, 0, 5, -1, 0, 0, 130, 80 },
+    { &custom::unit_Boo, 1, 146, 0x21, 65, 13, 6, 0, 2, 1, 5, 2, 0, 1, 0, 30 },
+    { nullptr, 0, 148, 0x21, 93, 100, 4, 0, 2, 2, 60, 2, 2, 2, 20, 30 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Ember, 1, 159, 0x24, 68, 13, 6, 0, 3, 0, 6, 2, 0, 1, 40, 20 },
+    { &custom::unit_LavaBubble, 1, 302, 0x24, 67, 10, 6, 0, 3, 1, 6, 2, 0, 1, 40, 20 },
+    { &custom::unit_GreenFuzzy, 1, 249, 0x10, 47, 13, 6, 0, 2, 1, 4, -1, 0, 0, 0, 0 },
+    { &custom::unit_FlowerFuzzy, 1, 250, 0x10, 48, 13, 6, 0, 2, 1, 6, -1, 0, 2, 0, 0 },
+    { &custom::unit_PutridPiranha, 1, 262, 0x1c, 52, 14, 6, 0, 2, 1, 6, 11, 0, 2, 0, 0 },
+    { &custom::unit_Parabuzzy, 1, 228, 0x0d, 33, 8, 6, 5, 3, 0, 5, 7, 1, 0, 40, 50 },
+    { nullptr, 0, 254, 0x12, -1, 10, 0, 3, 0, 0, 6, 9, 1, 0, 0, 0 },
+    { nullptr, 0, 255, -1, -1, 4, 7, 1, 4, 0, 0, 9, 0, 0, 40, 0 },
+    { &custom::unit_BulkyBobOmb, 0, 304, 0x25, 76, 12, 4, 2, 2, 0, 5, 9, 1, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_RuffPuff, 1, 284, 0x1d, 62, 14, 8, 0, 4, 0, 4, -1, 0, 0, 40, 10 },
+    { &custom::unit_PoisonPokey, 1, 234, 0x14, 50, 15, 7, 0, 3, 1, 6, -1, 1, 0, 0, 0 },
+    { &custom::unit_SpikyParabuzzy, 1, 227, 0x0d, 34, 8, 6, 5, 3, 0, 7, 7, 2, 0, 40, 50 },
+    { &custom::unit_DarkBoo, 1, 147, 0x21, 66, 17, 8, 0, 4, 1, 7, 2, 0, 1, 0, 30 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_IcePuff, 1, 285, 0x1d, 63, 16, 8, 0, 4, 0, 6, -1, 0, 0, 40, 10 },
+    { &custom::unit_FrostPiranha, 1, 263, 0x1c, 53, 16, 7, 0, 4, 1, 7, 11, 0, 2, 0, 0 },
+    { &custom::unit_MoonCleft, 1, 235, 0x16, 72, 12, 8, 5, 5, 0, 6, -1, 1, 0, 0, 0 },
+    { &custom::unit_ZYux, 0, 269, 0x19, 88, 9, 6, 0, 4, 0, 8, 1, 1, 1, 40, 30 },
+    { &custom::unit_MiniZYux, 0, -1, -1, 89, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    { &custom::unit_XYux, 0, 270, 0x19, 90, 11, 5, 2, 3, 0, 10, 1, 2, 2, 40, 30 },
+    { &custom::unit_MiniXYux, 0, -1, -1, 91, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    { &custom::unit_XNautPhD, 1, 273, 0x27, 84, 14, 8, 0, 4, 0, 8, 1, 0, 2, 0, 0 },
+    { &custom::unit_EliteXNaut, 1, 272, 0x04, 85, 16, 9, 2, 5, 0, 8, 1, 2, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Swoopula, 1, 240, 0x20, 59, 14, 6, 0, 4, 0, 5, -1, 0, 0, 130, 80 },
+    { &custom::unit_PhantomEmber, 1, 303, 0x24, 69, 16, 6, 0, 3, 2, 8, 2, 0, 2, 40, 20 },
+    { nullptr, 0, 257, -1, -1, 6, 9, 2, 6, 0, 0, 9, 0, 0, 0, 0 },
+    { nullptr, 0, 256, 0x12, -1, 15, 0, 5, 0, 0, 10, 9, 2, 0, 40, 0 },
+    { &custom::unit_ChainChomp, 1, 301, 0x2c, 78, 10, 8, 4, 6, 0, 6, -1, 3, 0, 0, 0 },
+    { &custom::unit_DarkWizzerd, 1, 296, 0x26, 81, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },
+    { nullptr, 0, -1, -1, -1, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },
+    { &custom::unit_DryBones, 1, 196, 0x0f, 22, 12, 7, 3, 5, 0, 7, 4, 0, 2, 0, 0 },
+    { &custom::unit_DarkBones, 1, 197, 0x0f, 23, 20, 7, 3, 4, 1, 10, 4, 1, 2, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Gloomba, 1, 220, 0x04, 7, 20, 6, 0, 2, 1, 5, 10, 0, 0, 0, 0 },
+    { &custom::unit_Paragloomba, 1, 222, 0x06, 8, 20, 6, 0, 2, 1, 6, 10, 0, 0, 40, 50 },
+    { &custom::unit_SpikyGloomba, 1, 221, 0x04, 9, 20, 6, 0, 2, 2, 6, 10, 0, 0, 0, 0 },
+    { &custom::unit_DarkKoopa, 1, 244, 0x07, 16, 20, 8, 3, 3, 1, 6, 8, 0, 0, 0, 0 },
+    { &custom::unit_DarkParatroopa, 1, 245, 0x08, 17, 20, 8, 3, 3, 1, 7, 8, 0, 0, 40, 50 },
+    { &custom::unit_BadgeBandit, 0, 275, 0x04, 42, 18, 6, 0, 3, 2, 6, 5, 0, 0, 0, 0 },
+    { &custom::unit_DarkLakitu, 1, 281, 0x24, 28, 19, 9, 0, 5, 0, 8, -1, 2, 0, 40, 20 },
+    { &custom::unit_SkyBlueSpiny, 0, -1, -1, 30, 10, 9, 4, 5, 1, 1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Wizzerd, 1, 295, 0x26, 80, 10, 8, 3, 7, -1, 7, -1, 1, 1, 0, 20 },
+    { &custom::unit_PiranhaPlant, 1, 260, 0x1c, 54, 18, 8, 0, 7, 2, 9, 11, 0, 4, 0, 0 },
+    { &custom::unit_Spunia, 1, 311, 0x28, 45, 16, 7, 2, 6, 1, 6, -1, 3, 0, 0, 0 },
+    { &custom::unit_Arantula, 1, 267, 0x1b, 57, 18, 6, 0, 5, 2, 8, -1, 2, 2, 40, 140 },
+    { &custom::unit_DarkBristle, 1, 259, 0x17, 74, 9, 9, 4, 8, 0, 8, -1, 0, 3, 0, 0 },
+    { &custom::unit_PoisonPuff, 1, 265, 0x1d, 64, 18, 8, 0, 8, 0, 8, -1, 0, 0, 40, 10 },
+    { &custom::unit_Swampire, 1, 241, 0x20, 60, 20, 8, 0, 6, 0, 8, -1, 0, 0, 130, 80 },
+    { &custom::unit_BobUlk, 0, 305, 0x25, 77, 15, 5, 2, 4, 0, 7, 9, 3, 0, 0, 0 },
+    { &custom::unit_EliteWizzerd, 1, 297, 0x26, 82, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
+    { nullptr, 0, -1, -1, -1, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
+    { nullptr, 0, 325, 0x11, 94, 200, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },					
 };
-
-
 
 struct PresetLoadoutInfo {
     // The base set of enemies.
@@ -481,6 +488,7 @@ const PresetLoadoutInfo kPresetLoadouts[] = {
 int32_t g_NumEnemies = 0;
 int32_t g_Enemies[5] = { -1, -1, -1, -1, -1 };
 BattleUnitSetup g_CustomUnits[6];
+BattleUnitSetup g_MidbossMinionUnits[2];
 BattleGroupSetup g_CustomBattleParty;
 int8_t g_CustomAudienceWeights[12];
 
@@ -546,6 +554,10 @@ int32_t GetDifficulty() {
     return kBaseDifficulty[tower] + (floor - 1) / 8;
 }
 
+int32_t IsMidbossFloor(int32_t floor) {
+    return floor % 8 == 0;
+}
+
 // Skips the enemy loadout selection process, using debug enemies instead.
 void PopulateDebugEnemyLoadout(int32_t* debug_enemies) {
     g_NumEnemies = 0;
@@ -604,17 +616,56 @@ void SelectPresetLoadout(StateManager& state) {
 }
 
 void SelectEnemies() {
-    // TODO: Add special cases for boss floors.
-    
-    // Check to see if there is a debug set of enemies, and use it if so.
-    if (int32_t* debug_enemies = DebugManager::GetEnemies(); debug_enemies) {
-        PopulateDebugEnemyLoadout(debug_enemies);
-        return;
-    }
-    
     auto& state = g_Mod->state_;
     int32_t difficulty = GetDifficulty();
     int32_t target_level_sum = kTargetLevelSums[difficulty];
+    int32_t* debug_enemies = DebugManager::GetEnemies();
+    
+    // TODO: Handle Atomic Boo, dragon fights.
+    
+    // Select a mid-boss when floor is a multiple of 8.
+    if (IsMidbossFloor(state.floor_)) {        
+        // If debug set of enemies, take the first enemy from the list.
+        if (debug_enemies) {
+            PopulateDebugEnemyLoadout(debug_enemies);
+            for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
+            g_NumEnemies = 1;
+            return;
+        }
+        
+        int32_t kNumEnemyTypes = BattleUnitType::BONETAIL;
+        int16_t weights[kNumEnemyTypes];
+        for (int32_t i = 0; i < kNumEnemyTypes; ++i) {
+            int32_t base_wt = 0;
+            const EnemyTypeInfo& ei = kEnemyInfo[i];
+            
+            // If enemy is not mid-boss eligible, ignore.
+            if (ei.midboss_eligible && ei.level >= 2 && ei.level <= 10) {
+                base_wt = kBaseWeights[difficulty][ei.level - 2];
+            }
+            weights[i] = base_wt;
+        }
+        
+        // Pick a single enemy to make into a mid-boss.
+        int32_t sum_weights = 0;
+        for (int32_t i = 0; i < kNumEnemyTypes; ++i) sum_weights += weights[i];
+        
+        int32_t weight = state.Rand(sum_weights, RNG_ENEMY);
+        int32_t idx = 0;
+        for (; (weight -= weights[idx]) >= 0; ++idx);
+        
+        g_Enemies[0] = idx;
+        for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
+        g_NumEnemies = 1;
+        
+        return;
+    }
+    
+    // Check to see if there is a debug set of enemies, and use it if so.
+    if (debug_enemies) {
+        PopulateDebugEnemyLoadout(debug_enemies);
+        return;
+    }
     
     // After enemy loadouts are strong enough, chance to use a preset loadout.
     if (target_level_sum > 30 && state.Rand(100, RNG_ENEMY) < 10) {
@@ -742,6 +793,40 @@ void SelectEnemies() {
     }
 }
 
+void FillBattleUnitSetup(
+    BattleUnitSetup& unit, const EnemyTypeInfo* type_info,
+    float x_position, float z_position, bool back_enemy = true) {
+    unit.unit_kind_params = type_info->kind;
+    unit.alliance = 1;
+    unit.attack_phase = 0x400'0004;
+    unit.addl_target_offset_x = 0;
+    memset(unit.unit_work, 0, sizeof(unit.unit_work));
+    unit.item_drop_table = nullptr;
+    
+    // Height depends on enemy.
+    unit.position.x = x_position;
+    unit.position.y = type_info->battle_y_pos;
+    unit.position.z = z_position;
+    
+    switch (type_info - kEnemyInfo) {
+        case BattleUnitType::SWOOPER:
+        case BattleUnitType::SWOOPULA:
+        case BattleUnitType::SWAMPIRE: {
+            // Swoopers should always be the flying variant.
+            unit.unit_work[0] = 1;
+            break;
+        }
+        case BattleUnitType::MAGIKOOPA:
+        case BattleUnitType::RED_MAGIKOOPA:
+        case BattleUnitType::WHITE_MAGIKOOPA:
+        case BattleUnitType::GREEN_MAGIKOOPA: {
+            // Magikoopas in the back can randomly be flying or grounded.
+            unit.unit_work[0] = g_Mod->state_.Rand(back_enemy ? 2 : 1, RNG_ENEMY);
+            break;
+        }
+    }
+}
+
 void BuildBattle(
     BattleSetupData* battle, NpcSetupInfo* npc_setup_info,
     NpcTribeDescription** out_npc_tribe_description, int32_t* out_lead_type) {
@@ -796,37 +881,15 @@ void BuildBattle(
     for (int32_t i = 0; i < g_NumEnemies; ++i) {
         BattleUnitSetup& unit = g_CustomUnits[i];
         
-        unit.unit_kind_params = enemy_info[i]->kind;
-        unit.alliance = 1;
-        unit.attack_phase = 0x400'0004;
-        unit.addl_target_offset_x = 0;
-        memset(unit.unit_work, 0, sizeof(unit.unit_work));
-        unit.item_drop_table = nullptr;
-        
-        // Position the enemies in standard spacing.
+        // Position the unit in standard spacing.
         float offset = i - (g_NumEnemies - 1) * 0.5f;
-        unit.position.x = kEnemyPartyCenterX + offset * kEnemyPartySepX;
-        unit.position.z = offset * kEnemyPartySepZ;
-        // Height depends on enemy.
-        unit.position.y = enemy_info[i]->battle_y_pos;
+        float x = kEnemyPartyCenterX + offset * kEnemyPartySepX;
+        float z = offset * kEnemyPartySepZ;
         
-        switch (g_Enemies[i]) {
-            case BattleUnitType::SWOOPER:
-            case BattleUnitType::SWOOPULA:
-            case BattleUnitType::SWAMPIRE: {
-                // Swoopers should always be the flying variant.
-                unit.unit_work[0] = 1;
-                break;
-            }
-            case BattleUnitType::MAGIKOOPA:
-            case BattleUnitType::RED_MAGIKOOPA:
-            case BattleUnitType::WHITE_MAGIKOOPA:
-            case BattleUnitType::GREEN_MAGIKOOPA: {
-                // Magikoopas in the back can randomly be flying or grounded.
-                unit.unit_work[0] = state.Rand(i > 0 ? 2 : 1, RNG_ENEMY);
-                break;
-            }
-        }
+        FillBattleUnitSetup(unit, enemy_info[i], x, z, /* back_enemy */ i > 0);
+        
+        // If a midboss floor, set unit work 3 to 1 as sentinel.
+        if (IsMidbossFloor(state.floor_)) unit.unit_work[3] = 1;
         
         // If the enemy is related to a particular type of audience member,
         // increase that audience type's weight.
@@ -856,10 +919,14 @@ void BuildBattle(
         weights.max_weight = g_CustomAudienceWeights[i];
     }
     
-    // TODO: Change music for mid-bosses, Atomic Boo fights?
-    // if (floor % 100 == 48) {
-    //     battle_setup->music_name = "BGM_CHUBOSS_BATTLE1";
-    // }
+    if (IsMidbossFloor(state.floor_)) {
+        battle->music_name = "BGM_KOBOSS_BATTLE1";
+    } else {
+        battle->music_name = "BGM_ZAKO_BATTLE1";
+    }
+    
+    // Atomic Boo:  "BGM_CHUBOSS_BATTLE1";
+    // Dragons:     "BGM_BOSS_STG1_GONBABA1";
 }
 
 }  // namespace
@@ -1024,6 +1091,129 @@ int32_t GetBattleRewardTier() {
     if (level_sum / level_target_sum >= 80) return 3;
     if (level_sum / level_target_sum >= 60) return 2;
     return 1;
+}
+
+EVT_DECLARE_USER_FUNC(evtTot_GetMinionEntries, 2)
+EVT_DEFINE_USER_FUNC(evtTot_GetMinionEntries) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t boss_id = ttyd::battle_sub::BattleTransID(evt, -2);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, boss_id);
+    int32_t unit_kind = unit->current_kind;
+    
+    int32_t position_offsets[] = { -1, 1 };
+    
+    for (int32_t i = 0; i < 2; ++i) {
+        BattleUnitSetup* setup = nullptr;
+    
+        float x = kEnemyPartyCenterX + position_offsets[i] * kEnemyPartySepX;
+        float z = position_offsets[i] * kEnemyPartySepZ;
+        
+        // Check to make sure no other enemies are at the given X position.
+        bool position_free = true;
+        for (int32_t idx = 0; idx < 64; ++idx) {
+            auto* unit = battleWork->battle_units[idx];
+            if (unit && !ttyd::battle_unit::BtlUnit_CheckStatus(unit, 27) &&
+                unit->home_position.x == x) {
+                position_free = false;
+                break;
+            }
+        }
+        
+        if (position_free) {
+            setup = &g_MidbossMinionUnits[i];
+            FillBattleUnitSetup(*setup, &kEnemyInfo[unit_kind], x, z);
+        }
+        
+        evtSetValue(evt, evt->evtArguments[i], PTR(setup));
+    }
+    return 2;
+}
+
+EVT_DECLARE_USER_FUNC(evtTot_GetMinionSpawnPos, 4)
+EVT_DEFINE_USER_FUNC(evtTot_GetMinionSpawnPos) {
+    int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
+    auto& unit_setup = g_MidbossMinionUnits[idx];
+    evtSetValue(evt, evt->evtArguments[1], unit_setup.position.x);
+    evtSetValue(evt, evt->evtArguments[2], unit_setup.position.y);
+    evtSetValue(evt, evt->evtArguments[3], unit_setup.position.z);
+    return 2;
+}
+
+EVT_BEGIN(MidbossEvt)
+    // If the battle has started (not a First Strike), 50% to call for backup.
+    USER_FUNC(btlevtcmd_get_turn, LW(0))
+    USER_FUNC(evt_sub_random, 99, LW(1))
+    IF_LARGE_EQUAL(LW(1), 50)
+        SET(LW(0), 0)
+    END_IF()
+    IF_LARGE(LW(0), 0)
+        USER_FUNC(evtTot_GetMinionEntries, LW(10), LW(11))
+        SET(LW(2), 0)
+        
+        // Independently run spawning events for enemies.
+        IF_NOT_EQUAL(LW(10), 0)
+            ADD(LW(2), 1)
+            
+            INLINE_EVT()
+                WAIT_MSEC(600)
+                USER_FUNC(btlevtcmd_SpawnUnit, LW(3), LW(10), 0)
+                USER_FUNC(evtTot_GetMinionSpawnPos, 0, LW(0), LW(1), LW(2))
+                SET(LW(4), LW(0))
+                ADD(LW(4), 250)
+                USER_FUNC(btlevtcmd_SetPos, LW(3), LW(4), LW(1), LW(2))
+                WAIT_FRM(10)
+                USER_FUNC(btlevtcmd_SetMoveSpeed, LW(3), 8)
+                USER_FUNC(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), 0, -1, 0)
+                USER_FUNC(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
+            END_INLINE()
+        END_IF()
+        IF_NOT_EQUAL(LW(11), 0)
+            ADD(LW(2), 1)
+            
+            INLINE_EVT()
+                WAIT_MSEC(600)
+                USER_FUNC(btlevtcmd_SpawnUnit, LW(3), LW(11), 0)
+                USER_FUNC(evtTot_GetMinionSpawnPos, 1, LW(0), LW(1), LW(2))
+                SET(LW(4), LW(0))
+                ADD(LW(4), 250)
+                USER_FUNC(btlevtcmd_SetPos, LW(3), LW(4), LW(1), LW(2))
+                WAIT_FRM(10)
+                USER_FUNC(btlevtcmd_SetMoveSpeed, LW(3), 8)
+                USER_FUNC(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), 0, -1, 0)
+                USER_FUNC(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
+            END_INLINE()
+        END_IF()
+        
+        // If at least one spot was open, wait for spawn event to finish.
+        IF_NOT_EQUAL(LW(2), 0)
+            USER_FUNC(evt_btl_camera_set_mode, 0, 7)
+            USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -1)
+            USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+            USER_FUNC(evt_btl_camera_set_zoom, 0, 200)
+            USER_FUNC(
+                btlevtcmd_snd_se, -2, PTR("SFX_ENM_TOGENOKO_CALL1"),
+                EVT_NULLPTR, 0, EVT_NULLPTR)
+            WAIT_MSEC(600)
+            // Rough length of spawning animation.
+            WAIT_MSEC(1500)
+            USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+            WAIT_MSEC(300)
+            RETURN()
+        END_IF()
+    END_IF()
+    // Fall back to running normal attack event.
+    // (The pointer to the event is patched in via GetMidbossAttackScript!)
+    RUN_CHILD_EVT(0)
+    RETURN()
+EVT_END()
+
+void* GetMidbossAttackScript(void* original_script) {
+    // Patch over the "RUN_CHILD_EVT" script pointer.
+    uintptr_t patch_location = reinterpret_cast<uintptr_t>(MidbossEvt);
+    // Third op/arg from the end (0, RETURN(), END())
+    patch_location += sizeof(MidbossEvt) - sizeof(int32_t) * 3;
+    *(void**)patch_location = original_script;
+    return (void*)MidbossEvt;
 }
 
 char g_TattleTextBuf[512];

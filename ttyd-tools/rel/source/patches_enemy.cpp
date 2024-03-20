@@ -1,5 +1,6 @@
 #include "patches_enemy.h"
 
+#include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
@@ -36,6 +37,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
+namespace PartsAttribute_Flags = ::ttyd::battle_unit::PartsAttribute_Flags;
 
 }
 
@@ -47,8 +49,11 @@ extern int32_t (*g_BattleCalculateDamage_trampoline)(
 extern int32_t (*g_BattleCalculateFpDamage_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,
     uint32_t*, uint32_t);
+extern int32_t (*g_btlevtcmd_SetEventConfusion_trampoline)(EvtEntry*, bool);
+extern int32_t (*g_btlevtcmd_SetEventAttack_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_ConsumeItem_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_GetConsumeItem_trampoline)(EvtEntry*, bool);
+extern int32_t (*g_BtlUnit_GetCoin_trampoline)(BattleWorkUnit*);
 extern void* (*g_BattleEnemyUseItemCheck_trampoline)(BattleWorkUnit*);
 // Patch addresses.
 extern const int32_t g_BtlUnit_EnemyItemCanUseCheck_Patch_SkipCheck;
@@ -60,6 +65,30 @@ namespace {
 // Global variable for the last type of item consumed;
 // this is necessary to allow enemies to use cooked items.
 int32_t g_EnemyItem = 0;
+
+void ApplyMidbossStats(BattleWorkUnit* unit) {
+    // Unit work 3 is used as sentinel for 'is midboss'.
+    if (unit->unit_work[3] == 1) {
+        unit->unit_work[3] = 0;
+        
+        unit->current_hp *= 6;
+        unit->base_max_hp *= 6;
+        
+        // Apply permanent Huge status.
+        unit->size_change_strength = 1;
+        unit->size_change_turns = 100;
+        
+        // Turn off weaknesses that incapacitate the enemy.
+        for (BattleWorkUnitPart* part = unit->parts; 
+             part != nullptr; part = part->next_part) {
+             part->part_attribute_flags &= ~(
+                PartsAttribute_Flags::WINGED |
+                PartsAttribute_Flags::SHELLED |
+                PartsAttribute_Flags::BOMB_FLIPPABLE
+             );
+        }
+    }
+}
 
 void AlterUnitKindParams(BattleUnitKind* unit) {
     // If not an enemy, nothing to change.
@@ -256,7 +285,9 @@ void ApplyFixedPatches() {
     g_BtlUnit_Entry_trampoline = patch::hookFunction(
         ttyd::battle_unit::BtlUnit_Entry, [](BattleUnitSetup* unit_setup) {
             AlterUnitKindParams(unit_setup->unit_kind_params);
-            return g_BtlUnit_Entry_trampoline(unit_setup);
+            BattleWorkUnit* unit = g_BtlUnit_Entry_trampoline(unit_setup);
+            ApplyMidbossStats(unit);
+            return unit;
         });
         
     g_BattleCalculateDamage_trampoline = patch::hookFunction(
@@ -305,6 +336,31 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_BtlUnit_EnemyItemCanUseCheck_Patch_SkipCheck),
         0x60000000U /* nop */);
+        
+    // Assign midbosses a wrapper attack script.
+    g_btlevtcmd_SetEventAttack_trampoline = patch::hookFunction(
+        ttyd::battle_event_cmd::btlevtcmd_SetEventAttack,
+        [](EvtEntry* evt, bool isFirstCall) {
+            auto* battleWork = ttyd::battle::g_BattleWork;
+            int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+            id = ttyd::battle_sub::BattleTransID(evt, id);
+            auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+            void* script = (void*)evt->evtArguments[1];
+            if (unit->size_change_turns > 99) {
+                script = tot::GetMidbossAttackScript(script);
+            }
+            unit->attack_evt_code = script;
+            unit->battle_menu_state = 0;
+            return 2;
+        });
+    
+    // Give 3x the normal number of coins for defeating a midboss.
+    g_BtlUnit_GetCoin_trampoline = patch::hookFunction(
+        ttyd::battle_unit::BtlUnit_GetCoin, [](BattleWorkUnit* unit) {
+            int32_t coins = g_BtlUnit_GetCoin_trampoline(unit);
+            if (unit->size_change_turns > 99) coins *= 3;
+            return coins;
+        });
 }
 
 }  // namespace enemy

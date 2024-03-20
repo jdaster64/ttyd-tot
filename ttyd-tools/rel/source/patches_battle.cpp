@@ -388,6 +388,30 @@ uint32_t GetStatusDamageFromWeapon(
                     break;
             }
             
+            // Make midbosses less susceptible to most negative statuses.
+            if (target->size_change_turns > 99) {
+                switch (type) {
+                    case StatusEffectType::SLEEP:
+                    case StatusEffectType::STOP:
+                    case StatusEffectType::DIZZY:
+                    case StatusEffectType::CONFUSE:
+                    case StatusEffectType::FREEZE:
+                    case StatusEffectType::ATTACK_DOWN:
+                    case StatusEffectType::DEFENSE_DOWN:
+                    case StatusEffectType::SLOW:
+                        chance = chance * 75 / 100;
+                        break;
+                    case StatusEffectType::FRIGHT:
+                    case StatusEffectType::GALE_FORCE:
+                    case StatusEffectType::OHKO:
+                        chance /= 2;
+                        break;
+                    case StatusEffectType::TINY:
+                        chance = 0;
+                        break;
+                }
+            }
+            
             // Statuses are more likely to land.
             if (target->status_flags & BattleUnitStatus_Flags::SCOPED) {
                 chance *= 1.5;
@@ -649,11 +673,16 @@ int32_t CalculateBaseDamage(
     // Attack multiplier statuses.
     if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
         if (BtlUnit_CheckStatus(attacker, StatusEffectType::HUGE)) {
-            // Round up.
-            atk = ((atk * 3) + 1) / 2;
+            if (attacker->size_change_turns > 99) {
+                // Double for midbosses.
+                atk *= 2;
+            } else {
+                // 1.5x, rounded up.
+                atk = ((atk * 3) + 1) / 2;
+            }
         } else if (atk > 1 &&
             BtlUnit_CheckStatus(attacker, StatusEffectType::TINY)) {
-            // Round down (unless base is 1).
+            // 0.5x, rounded down (unless base is 1).
             atk /= 2;
         }
     }

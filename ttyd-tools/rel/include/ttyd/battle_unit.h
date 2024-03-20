@@ -424,7 +424,7 @@ struct BattleWorkUnit {
     void*           attack_evt_code;
     void*           confuse_evt_code;
     int32_t         attack_evt_tid;
-    uint32_t        unk_2ac;  // battle menu state?
+    uint32_t        battle_menu_state;
     void*           damage_evt_code;
     int32_t         damage_evt_tid;
     void*           entry_evt_code;
@@ -473,7 +473,7 @@ int32_t BtlUnit_GetWeaponCost(
 // BtlUnit_RecoverHp
 void BtlUnit_SetFp(BattleWorkUnit* unit, int32_t fp);
 int32_t BtlUnit_GetFp(BattleWorkUnit* unit);
-// BtlUnit_GetCoin
+int32_t BtlUnit_GetCoin(BattleWorkUnit* unit);
 // BtlUnit_GetExp
 // BtlUnit_CheckPinchStatus
 // BtlUnit_SetParamToPouch
