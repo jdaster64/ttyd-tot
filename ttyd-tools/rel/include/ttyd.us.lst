@@ -754,6 +754,38 @@
 800a9f98:evt_item_get_item
 800aa400:evt_item_entry
 
+// itemdrv.o
+800aa4fc:itemPickUp
+800aa530:itemStatus
+800aa53c:itemStatusOn
+800aa54c:itemFlag
+800aa55c:itemFlagOff
+800aa56c:itemFlagOn
+800aa57c:itemNokoForceGet
+800aa62c:itemForceGet
+800aa660:itemHitCheckSide
+800aab24:itemSetPosition
+800aab34:itemseq_Bound
+800ab930:itemseq_GetItem
+800acc54:winFullDisp
+800acd5c:winHelpDisp
+800acdc8:winHelpMain
+800acde8:winNameDisp2
+800acf34:winNameDisp
+800ad0e8:itemNearDistCheck
+800ad2ac:itemHitCheck
+800ad658:itemNameToPtr
+800ad6f4:itemDelete
+800ad7f0:itemEntry
+800adfd0:itemModeChange
+800adfe0:itemMain
+800ae67c:N_itemPickUpFromFieldCheck
+800ae6dc:itemGetNokoCheck
+800ae870:itemGetCheck
+800aeaac:itemCoinDrop
+800aeb20:itemReInit
+800aec18:itemInit
+
 // cardmgr.o
 800b2388:cardCopy2Main
 800b2b80:cardGetCode

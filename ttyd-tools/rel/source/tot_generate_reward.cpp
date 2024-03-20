@@ -634,6 +634,10 @@ int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
     return g_MoveSelections;
 }
 
+void* RewardManager::GetStarPieceItemDropEvt() {
+    return (void*)Reward_StarPieceItemDropEvt;
+}
+
 // Assigns reward types and corresponding pickup scripts to all chests.
 void SelectChestContents() {
     auto& state = g_Mod->state_;
@@ -833,12 +837,6 @@ EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
 EVT_DEFINE_USER_FUNC(evtTot_DisplayChestIcons) {
     ttyd::dispdrv::dispEntry(
         CameraId::k3d, 1, /* order = */ 900.f, DisplayIcons, g_Chests);
-    return 2;
-}
-
-// Returns a pointer to the pickup script for a Star Piece.
-EVT_DEFINE_USER_FUNC(evtTot_GetStarPiecePickupEvt) {
-    evtSetValue(evt, evt->evtArguments[0], PTR(Reward_StarPieceItemDropEvt));
     return 2;
 }
 

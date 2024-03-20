@@ -109,7 +109,6 @@ extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule;
 extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH;
 extern const int32_t g_itemseq_Bound_Patch_BounceRange;
 extern const int32_t g_enemy_common_dead_event_SpawnCoinsHook;
-extern const int32_t g_enemy_common_dead_event_SpawnItemDropHook;
 
 namespace battle_seq {
     
@@ -143,24 +142,6 @@ EVT_END()
 EVT_BEGIN(SpawnCoinsEvtHook)
 RUN_CHILD_EVT(SpawnCoinsEvt)
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-EVT_PATCH_END()
-
-// Custom event to spawn item drops.
-EVT_BEGIN(SpawnItemDropEvt)
-IF_EQUAL(LW(3), (int32_t)ItemType::STAR_PIECE)
-    // Use custom pickup evt for Star Pieces to handle upgrading moves.
-    USER_FUNC(tot::evtTot_GetStarPiecePickupEvt, LW(4))
-ELSE()
-    SET(LW(4), 0)
-END_IF()
-USER_FUNC(
-    ttyd::evt_item::evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), 10, -1, LW(4))
-RETURN()
-EVT_END()
-
-EVT_BEGIN(SpawnItemDropHook)
-RUN_CHILD_EVT(SpawnItemDropEvt)
-0, 0, 0, 0, 0, 0, 0, 0,
 EVT_PATCH_END()
 
 // Copies NPC battle information to / from children of a parent NPC
@@ -438,11 +419,6 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_btlseqTurn_Patch_RuleDispDismissOnlyWithB), 
         0x38600200U /* li r3, 0x200 (B button) */);
-        
-    // Support Star Piece item drops behaving like reward, upgrading a move.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_enemy_common_dead_event_SpawnItemDropHook),
-        SpawnItemDropHook, sizeof(SpawnItemDropHook));
         
     // Support multiple demonimations of coins dropping at the end of a fight.
     mod::patch::writePatch(

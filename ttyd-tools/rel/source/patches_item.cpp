@@ -22,6 +22,7 @@
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
+#include <ttyd/itemdrv.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/swdrv.h>
 #include <ttyd/system.h>
@@ -48,10 +49,12 @@ namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
 }
 
 // Function hooks.
+extern void* (*g_itemEntry_trampoline)(
+    const char*, int32_t, float, float, float, uint32_t, int32_t, void*);
+extern uint32_t (*g_pouchGetItem_trampoline)(int32_t);
+extern int32_t (*g_btlevtcmd_GetItemRecoverParam_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_flower_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_heart_suitoru_point_trampoline)(EvtEntry*, bool);
-extern int32_t (*g_btlevtcmd_GetItemRecoverParam_trampoline)(EvtEntry*, bool);
-extern uint32_t (*g_pouchGetItem_trampoline)(int32_t);
 // Patch addresses.
 extern const int32_t g_pouchRemoveItemIndex_CheckMaxInv_BH;
 extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH;
@@ -524,6 +527,18 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_pouchGetEmptyHaveItemCnt_CheckMaxInv_BH),
         reinterpret_cast<void*>(StartGetEmptyItemSlotsMax),
         reinterpret_cast<void*>(BranchBackGetEmptyItemSlotsMax));
+        
+    // Override item pickup script for Star Pieces that spawn as item drops.
+    g_itemEntry_trampoline = mod::patch::hookFunction(
+        ttyd::itemdrv::itemEntry,
+        [](const char* name, int32_t item, float x, float y, float z,
+           uint32_t mode, int32_t collection_gswf, void* pickup_script) {
+            if (item == ItemType::STAR_PIECE && !pickup_script) {
+                pickup_script = tot::RewardManager::GetStarPieceItemDropEvt();
+            }
+            return g_itemEntry_trampoline(
+                name, item, x, y, z, mode, collection_gswf, pickup_script);
+        });
     
     // Override item-get logic for special items.
     g_pouchGetItem_trampoline = mod::patch::hookFunction(
