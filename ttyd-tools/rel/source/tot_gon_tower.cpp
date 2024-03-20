@@ -464,9 +464,7 @@ const int32_t* GetTowerInitEvt() {
 EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
     auto& state = g_Mod->state_;
     int32_t floor = state.floor_;
-    int32_t max_floors = state.GetOption(OPT_DIFFICULTY) >= 2 ? 64 : 32;
-    bool is_rest_floor = 
-        floor == 0 || ((floor % 8 == 7) && floor < max_floors - 8);
+    bool is_rest_floor = floor == 0 || (floor % 8 == 7);
     evtSetValue(evt, evt->evtArguments[0], is_rest_floor);
     return 2;
 }
