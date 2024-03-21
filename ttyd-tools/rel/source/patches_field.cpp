@@ -3,7 +3,6 @@
 #include "common_functions.h"
 #include "common_types.h"
 #include "custom_chest_reward.h"
-#include "custom_condition.h"
 #include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod.h"
