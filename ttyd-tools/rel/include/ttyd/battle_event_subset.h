@@ -17,6 +17,7 @@ extern "C" {
 // _disable_restore_command_cursor
 
 // .data
+extern int32_t subsetevt_confuse_flustered[1];
 extern int32_t unk_evt_803537c4[1];
 
 }

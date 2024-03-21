@@ -178,7 +178,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_SpikeTop, 1, 226, 0x0b, 32, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },
     { &custom::unit_Swooper, 1, 239, 0x20, 58, 14, 7, 0, 3, 0, 5, -1, 0, 0, 130, 80 },
     { &custom::unit_Boo, 1, 146, 0x21, 65, 13, 6, 0, 2, 1, 5, 2, 0, 1, 0, 30 },
-    { nullptr, 0, 148, 0x21, 93, 100, 4, 0, 2, 2, 60, 2, 2, 2, 20, 30 },
+    { &custom::unit_AtomicBoo, 0, 148, 0x21, 93, 100, 4, 0, 2, 2, 60, 2, 2, 2, 20, 30 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -885,6 +885,9 @@ void BuildBattle(
         float offset = i - (g_NumEnemies - 1) * 0.5f;
         float x = kEnemyPartyCenterX + offset * kEnemyPartySepX;
         float z = offset * kEnemyPartySepZ;
+        
+        // TODO: Hack to make sure Atomic Boo is in the right location.
+        if (g_Enemies[0] == BattleUnitType::ATOMIC_BOO) x -= 20.0f;
         
         FillBattleUnitSetup(unit, enemy_info[i], x, z, /* back_enemy */ i > 0);
         

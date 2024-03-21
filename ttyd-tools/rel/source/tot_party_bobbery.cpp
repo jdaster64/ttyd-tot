@@ -251,6 +251,7 @@ PoseTableEntry unitBombzo_pose_table_1[] = {
     31, "B_4",
     39, "B_4",
     69, "B_4",
+    0, nullptr,
 };
 
 PoseTableEntry unitBombzo_pose_table_2[] = {
@@ -258,6 +259,7 @@ PoseTableEntry unitBombzo_pose_table_2[] = {
     31, "B_3",
     39, "B_3",
     69, "B_3",
+    0, nullptr,
 };
 
 PoseTableEntry unitBombzo_pose_table_3[] = {
@@ -265,6 +267,7 @@ PoseTableEntry unitBombzo_pose_table_3[] = {
     31, "B_2",
     39, "B_2",
     69, "B_2",
+    0, nullptr,
 };
 
 EVT_BEGIN(unitBombzo_explosion_event)
@@ -440,7 +443,7 @@ DataTableEntry unitBombzo_data_table[] = {
     49, (void*)unitBombzo_dead_event,
     53, (void*)unitBombzo_explosion_event,
     63, (void*)unitBombzo_end_battle_evt,
-    0, 0,
+    0, nullptr,
 };
 
 BattleUnitKindPart unitBombzo_parts = {

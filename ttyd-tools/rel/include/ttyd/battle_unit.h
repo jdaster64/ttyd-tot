@@ -453,7 +453,8 @@ extern "C" {
 // BtlUnit_EnemyItemCanUseCheck
 // BtlUnit_HpGaugeMain
 // BtlUnit_HpGaugeInit
-// BtlUnit_snd_se_pos
+int32_t BtlUnit_snd_se_pos(
+    BattleWorkUnit* unit, const char* sfx, int32_t vol, int32_t pit, gc::vec3* pos);
 // BtlUnit_snd_se
 // BtlUnit_ControlPoseSoundMain
 // BtlUnit_PoseSoundInit
@@ -536,8 +537,8 @@ void BtlUnit_GetStatus(
 // BtlUnit_SetPartsScale
 // BtlUnit_SetPartsBaseScale
 // BtlUnit_AddScale
-// BtlUnit_SetScale
-// BtlUnit_GetScale
+void BtlUnit_SetScale(BattleWorkUnit* unit, float x, float y, float z);
+void BtlUnit_GetScale(BattleWorkUnit* unit, float* x, float* y, float* z);
 // BtlUnit_SetBaseScale
 // BtlUnit_AddPartsRotateOffset
 // BtlUnit_SetPartsRotateOffset
@@ -568,7 +569,7 @@ void BtlUnit_GetHitPos(
 // BtlUnit_SetPos
 void BtlUnit_GetPos(BattleWorkUnit* unit, float* x, float* y, float* z);
 // BtlUnit_GetBodyPartsId
-// BtlUnit_GetPartsPtr
+BattleWorkUnitPart* BtlUnit_GetPartsPtr(BattleWorkUnit* unit, int part_idx);
 // BtlUnit_GetUnitId
 // BtlUnit_Spawn
 // BtlUnit_Delete

@@ -40,7 +40,8 @@ uint32_t keyGetDir(uint32_t padId);
 void makeKey();
 
 void qqsort(void* data, uint32_t num_entries, uint32_t entry_size, void* comparator);
-// intplGetValue
+double intplGetValue(
+    double start, double end, int32_t ease_mode, int32_t step, int32_t num_steps);
 // angleABf
 // compAngle
 // distABf

@@ -375,7 +375,7 @@ battle_unit::BattleWorkUnitPart* BattleGetUnitPartsPtr(
 battle_unit::BattleWorkUnit* BattleGetUnitPtr(
     BattleWork* battleWork, int32_t idx);
 // BattleFree
-// BattleAlloc
+void* BattleAlloc(int32_t size);
 // BattleIncSeq
 int32_t BattleGetSeq(BattleWork* battleWork, int32_t level);
 // BattleSetSeq

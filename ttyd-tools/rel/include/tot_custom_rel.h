@@ -17,6 +17,7 @@ namespace mod::tot::custom {
 extern "C" {
 
 // BattleUnitKind structures for all supported enemies.
+// Defined in custom.rel...
 extern ttyd::battle_database_common::BattleUnitKind unit_Goomba;
 extern ttyd::battle_database_common::BattleUnitKind unit_Paragoomba;
 extern ttyd::battle_database_common::BattleUnitKind unit_SpikyGoomba;
@@ -109,7 +110,8 @@ extern ttyd::battle_database_common::BattleUnitKind unit_MiniZYux;
 extern ttyd::battle_database_common::BattleUnitKind unit_XYux;
 extern ttyd::battle_database_common::BattleUnitKind unit_MiniXYux;
 extern ttyd::battle_database_common::BattleUnitKind unit_AmazyDayzee;
-// extern ttyd::battle_database_common::BattleUnitKind unit_AtomicBoo;
+// Defined in codebase...
+extern ttyd::battle_database_common::BattleUnitKind unit_AtomicBoo;
 // extern ttyd::battle_database_common::BattleUnitKind unit_Bonetail;
 
 // Other structures referenced by patches, etc.
@@ -117,7 +119,6 @@ extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_ZYux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_XYux_Main;
 extern int8_t defense_GreenMagikoopa[5];
-// extern ttyd::battle_database_common::BattleWeapon weapon_AtomicBoo_Breath;
 
 // Individual evt instructions referenced by patches, etc.
 extern int32_t evt_Koopatrol_NormalAttackReturnLbl_PatchLoc[1];
@@ -146,7 +147,6 @@ extern int32_t evt_XNaut_NormalAttackReturnLbl_PatchLoc[1];
 extern int32_t evt_XNaut_JumpAttackReturnLbl_PatchLoc[1];
 extern int32_t evt_EliteXNaut_NormalAttackReturnLbl_PatchLoc[1];
 extern int32_t evt_EliteXNaut_JumpAttackReturnLbl_PatchLoc[1];
-// extern int32_t evt_AtomicBoo_BreathSubEvt_PatchLoc[1];
 
 }
 

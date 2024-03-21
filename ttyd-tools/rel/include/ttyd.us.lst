@@ -914,6 +914,32 @@
 // .data
 80315380:_party_max_hp_table
 
+// extdrv.o
+800d5eb8:extDrawShadow
+800d5fd0:extLoadShadowMtx
+800d6010:extLoadShadowRenderMode
+800d6070:extLoadShadowTev
+800d6188:extLoadShadowVertex
+800d6218:extLoadTev
+800d6314:extLoadTextureExit
+800d6334:extLoadTexture
+800d6444:extLoadVertex
+800d64f8:extLoadRenderMode
+800d6558:extDraw
+800d6650:extPoseDraw
+800d6758:extGetPoseNum
+800d677c:extGetPosePtr
+800d67a0:compare
+800d67cc:extMain
+800d6b7c:extReset
+800d6c58:extMakeTexture
+800d6fe8:extEntry
+800d7344:extInit
+
+// evt_ext.o
+800d7370:evt_ext_reset
+800d7394:evt_ext_entry
+
 // pmario_sound.o
 800d9848:psndSFXOn_3D
 800daf24:psndBGMOn_f_d
@@ -1186,6 +1212,7 @@
 800f87a8:BattleGetMarioPtr
 800f8874:BattleGetUnitPartsPtr
 800f88cc:BattleGetUnitPtr
+800f8934:BattleAlloc
 800f89a0:BattleGetSeq
 800f8f04:BattleInit
 // .data
@@ -1544,6 +1571,7 @@
 // .text
 // 80113d4c:_binta_effect
 // .data
+803532b0:subsetevt_confuse_flustered
 803537c4:unk_evt_803537c4
 
 // battle_information.o
@@ -1736,6 +1764,7 @@
 801253ec:BattleTransID
 
 // battle_unit.o
+80126088:BtlUnit_snd_se_pos
 80126840:BtlUnit_PayWeaponCost
 80126968:BtlUnit_GetWeaponCost
 80126c10:BtlUnit_SetFp
@@ -1751,8 +1780,11 @@
 80127890:BtlUnit_CheckRecoveryStatus
 80127bac:BtlUnit_SetStatus
 80127f34:BtlUnit_GetStatus
+80128524:BtlUnit_SetScale
+80128558:BtlUnit_GetScale
 801289ec:BtlUnit_GetHitPos
 80128c7c:BtlUnit_GetPos
+80128cd8:BtlUnit_GetPartsPtr
 80128fe0:BtlUnit_Entry
 
 // battle_monosiri.o
