@@ -189,7 +189,7 @@ void DebugManager::Update() {
         }
         if (dir == 0) return;
         
-        const int32_t max_enemy = BattleUnitType::BONETAIL - 1;
+        const int32_t max_enemy = BattleUnitType::BONETAIL;
         const int32_t first_move = (buttons & ButtonId::L) ? 0x10 : 1;
         int32_t enemy_type = g_DebugEnemies[g_CursorPos];
         
@@ -211,9 +211,17 @@ void DebugManager::Update() {
         do {
             if (g_CursorPos == 0) {
                 // If valid for the front, fill the first 3 slots with the type.
+                // (Bosses only fill the first slot and wipe all others).
                 if (tot::IsEligibleFrontEnemy(enemy_type)) {
-                    const int32_t num_enemies = 
-                        enemy_type == BattleUnitType::ATOMIC_BOO ? 1 : 3;
+                    int32_t num_enemies = 3;
+                    switch (enemy_type) {
+                        case BattleUnitType::ATOMIC_BOO:
+                        case BattleUnitType::HOOKTAIL:
+                        case BattleUnitType::GLOOMTAIL:
+                        case BattleUnitType::BONETAIL:
+                            num_enemies = 1;
+                            break;
+                    }
                     for (int32_t i = 0; i < 5; ++i)
                         g_DebugEnemies[i] = i < num_enemies ? enemy_type : -1;
                     break;
@@ -221,7 +229,25 @@ void DebugManager::Update() {
             } else {
                 // If valid, change the currently selected slot only.
                 if (tot::IsEligibleLoadoutEnemy(enemy_type) || enemy_type == -1) {
-                    if (enemy_type != BattleUnitType::ATOMIC_BOO) {
+                    bool valid_back_enemy = true;
+                    switch (enemy_type) {
+                        case BattleUnitType::ATOMIC_BOO:
+                        case BattleUnitType::HOOKTAIL:
+                        case BattleUnitType::GLOOMTAIL:
+                        case BattleUnitType::BONETAIL:
+                            valid_back_enemy = false;
+                            break;
+                    }
+                    switch (g_DebugEnemies[0]) {
+                        case BattleUnitType::ATOMIC_BOO:
+                        case BattleUnitType::HOOKTAIL:
+                        case BattleUnitType::GLOOMTAIL:
+                        case BattleUnitType::BONETAIL:
+                        case -1:
+                            valid_back_enemy = false;
+                            break;
+                    }
+                    if (valid_back_enemy) {
                         g_DebugEnemies[g_CursorPos] = enemy_type;
                         // Exception: if type == "None", clear all later slots.
                         if (enemy_type == -1) {

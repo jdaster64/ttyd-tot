@@ -125,7 +125,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { &custom::unit_RedBones, 1, 36, 0x0e, 21, 10, 7, 2, 3, 0, 5, 4, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Hooktail, 0, 33, 0x11, 94, 50, 6, 1, 8, 0, 100, -1, 0, 0, 0, 0 },
     { &custom::unit_DarkPuff, 1, 286, 0x1d, 61, 12, 7, 0, 2, 0, 3, -1, 0, 0, 40, 10 },
     { &custom::unit_PalePiranha, 1, 261, 0x1c, 51, 12, 7, 0, 2, 0, 4, 11, 0, 1, 0, 0 },
     { &custom::unit_Cleft, 1, 237, 0x16, 70, 8, 6, 5, 2, 0, 2, -1, 1, 0, 0, 0 },
@@ -234,7 +234,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { nullptr, 0, -1, -1, -1, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },
     { &custom::unit_DryBones, 1, 196, 0x0f, 22, 12, 7, 3, 5, 0, 7, 4, 0, 2, 0, 0 },
     { &custom::unit_DarkBones, 1, 197, 0x0f, 23, 20, 7, 3, 4, 1, 10, 4, 1, 2, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Gloomtail, 0, 198, 0x11, 95, 100, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -273,7 +273,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_BobUlk, 0, 305, 0x25, 77, 15, 5, 2, 4, 0, 7, 9, 3, 0, 0, 0 },
     { &custom::unit_EliteWizzerd, 1, 297, 0x26, 82, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
     { nullptr, 0, -1, -1, -1, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
-    { nullptr, 0, 325, 0x11, 94, 200, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },					
+    { &custom::unit_Bonetail, 0, 325, 0x11, 96, 200, 10, 2, 8, 0, 100, -1, 0, 0, 0, 0 },					
 };
 
 struct PresetLoadoutInfo {
@@ -633,7 +633,7 @@ void SelectEnemies() {
             return;
         }
         
-        int32_t kNumEnemyTypes = BattleUnitType::BONETAIL;
+        int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
         int16_t weights[kNumEnemyTypes];
         for (int32_t i = 0; i < kNumEnemyTypes; ++i) {
             int32_t base_wt = 0;
@@ -673,7 +673,7 @@ void SelectEnemies() {
     } else {
         // Put together an array of weights, scaled by the floor number and
         // enemy's level offset (such that harder enemies appear more later on).
-        int32_t kNumEnemyTypes = BattleUnitType::BONETAIL;
+        int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
         
         int16_t weights[6][kNumEnemyTypes];
         for (int32_t i = 0; i < kNumEnemyTypes; ++i) {
@@ -842,6 +842,17 @@ void BuildBattle(
         ttyd::npc_data::npcTribe + enemy_info[0]->npc_tribe_idx;
     NpcAiTypeTable* npc_ai =
         ttyd::npc_data::npc_ai_type_table + enemy_info[0]->ai_type_idx;
+        
+    // TODO: Special case for dragons _WHILE TESTING ONLY!_
+    switch (g_Enemies[0]) {
+        case BattleUnitType::HOOKTAIL:
+        case BattleUnitType::GLOOMTAIL:
+        case BattleUnitType::BONETAIL:
+            // Use Goomba on the overworld; don't first strike it!
+            npc_tribe = ttyd::npc_data::npcTribe + kEnemyInfo[1].npc_tribe_idx;
+            npc_ai = ttyd::npc_data::npc_ai_type_table + kEnemyInfo[1].ai_type_idx;
+            break;
+    }
 
     NpcSetupInfo& npc = npc_setup_info[0];
     memset(&npc, 0, sizeof(NpcSetupInfo));
@@ -886,8 +897,17 @@ void BuildBattle(
         float x = kEnemyPartyCenterX + offset * kEnemyPartySepX;
         float z = offset * kEnemyPartySepZ;
         
-        // TODO: Hack to make sure Atomic Boo is in the right location.
-        if (g_Enemies[0] == BattleUnitType::ATOMIC_BOO) x -= 20.0f;
+        // TODO: Hack to make sure bosses are in the right location.
+        switch (g_Enemies[0]) {
+            case BattleUnitType::ATOMIC_BOO:
+                x = 70.0f;
+                break;
+            case BattleUnitType::HOOKTAIL:
+            case BattleUnitType::GLOOMTAIL:
+            case BattleUnitType::BONETAIL:
+                x = 365.0f;
+                break;
+        }
         
         FillBattleUnitSetup(unit, enemy_info[i], x, z, /* back_enemy */ i > 0);
         

@@ -112,7 +112,9 @@ extern ttyd::battle_database_common::BattleUnitKind unit_MiniXYux;
 extern ttyd::battle_database_common::BattleUnitKind unit_AmazyDayzee;
 // Defined in codebase...
 extern ttyd::battle_database_common::BattleUnitKind unit_AtomicBoo;
-// extern ttyd::battle_database_common::BattleUnitKind unit_Bonetail;
+extern ttyd::battle_database_common::BattleUnitKind unit_Hooktail;
+extern ttyd::battle_database_common::BattleUnitKind unit_Gloomtail;
+extern ttyd::battle_database_common::BattleUnitKind unit_Bonetail;
 
 // Other structures referenced by patches, etc.
 extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;

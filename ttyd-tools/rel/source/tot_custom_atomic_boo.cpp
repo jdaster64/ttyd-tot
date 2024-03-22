@@ -85,7 +85,6 @@ EVT_DECLARE_USER_FUNC(evtTot_AtomicBoo_BreathWait2, 0)
 
 // Unit data.
 int8_t unitAtomicBoo_defense[] = { 0, 0, 0, 0, 0 };
-
 int8_t unitAtomicBoo_defense_attr[] = { 0, 0, 0, 0, 0 };
 
 StatusVulnerability unitAtomicBoo_status = {

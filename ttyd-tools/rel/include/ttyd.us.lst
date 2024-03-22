@@ -2306,6 +2306,9 @@
 801abc70:_disp
 801abdd0:btlevtcmd_AnnounceMessage
 
+// eff_kemuri9_n64.o
+801ce8a4:effKemuri9N64Entry
+
 // eff_stamp_n64.o
 801eaf74:effStampN64Entry
 

@@ -17,6 +17,10 @@ lbl_CheckFreezeBreak:
 lbz %r0, 0x6c (%r29)
 cmpwi %r0, 2
 beq- lbl_SkipFreezeBreak
+# Check whether the attack can inflict Freeze, and skip new code if so.
+lbz %r0, 0x92 (%r29)
+cmpwi %r0, 0
+bgt- lbl_SkipFreezeBreak
 # Check for Freeze status on the target.
 lbz %r0, 0x122 (%r27)
 cmpwi %r0, 0

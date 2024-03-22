@@ -770,8 +770,9 @@ int32_t CalculateBaseDamage(
         damage = (damage + last_stands) / (last_stands + 1);
     }
     
+    // Double the damage of a hit if it will break Freeze status.
     if (BtlUnit_CheckStatus(target, StatusEffectType::FREEZE) &&
-        element != AttackElement::ICE) {
+        element != AttackElement::ICE && weapon->freeze_time == 0) {
         damage *= 2;
     }
     

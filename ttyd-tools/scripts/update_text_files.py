@@ -687,6 +687,11 @@ g_StringMap = {
         
         # NPC text.
         
+        # Boss fights.
+        
+        b"tot_dragon_debug":
+            b"Placeholder text %d-%d<k>",
+        
         # Generic
         
         b"tot_npc_yesnoopt":
