@@ -624,6 +624,10 @@ g_StringMap = {
         
         b"tot_winsel_titlemove":      b"Move",
         b"tot_winsel_whichunlock":    b"Which move?",
+        
+        # Enemy names + Tattle info (TODO)
+        
+        b"btl_un_monban":             b"Craw",
             
         # Achievements (TODO)
         

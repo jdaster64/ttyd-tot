@@ -35,6 +35,7 @@
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
+#include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/swdrv.h>
 #include <ttyd/system.h>
@@ -42,15 +43,6 @@
 #include <cinttypes>
 #include <cstdio>
 #include <cstring>
-
-// Assembly patch functions.
-extern "C" {
-    // charlieton_patches.s (patched directly, not branched to)
-    void CharlietonPitPriceListPatchStart();
-    void CharlietonPitPriceListPatchEnd();
-    void CharlietonPitPriceItemPatchStart();
-    void CharlietonPitPriceItemPatchEnd();
-}
 
 namespace mod::infinite_pit {
 
@@ -73,7 +65,6 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Patch addresses.
 extern const int32_t g_select_disp_Patch_PitListPriceHook;
 extern const int32_t g_select_disp_Patch_PitItemPriceHook;
-extern const int32_t g_getBadgeBottakuru100TableMaxCount_Patch_ShopSize;
 extern const int32_t g_jon_setup_npc_ex_para_FuncOffset;
 extern const int32_t g_jon_yattukeFlag_FuncOffset;
 extern const int32_t g_jon_evt_raster_FuncOffset;
@@ -85,7 +76,6 @@ extern const int32_t g_jon_talk_idouya_EvtOffset;
 extern const int32_t g_jon_npcEnt_idouya_Offset;
 extern const int32_t g_jon_talk_gyousyou_MinItemForBadgeDialogOffset;
 extern const int32_t g_jon_talk_gyousyou_NoInvSpaceBranchOffset;
-extern const int32_t g_jon_gyousyou_setup_CharlietonSpawnChanceOffset;
 extern const int32_t g_jon_dokan_open_PipeOpenEvtOffset;
 extern const int32_t g_jon_evt_kanban2_ReturnSignEvtOffset;
 extern const int32_t g_jon_floor_inc_EvtOffset;
@@ -102,7 +92,6 @@ namespace field {
 namespace {
 
 // Global variables and constants.
-constexpr const int32_t kNumCharlietonItemsPerType = 5;
 
 const char kPitNpcName[] = "\x93\x47";  // "enemy"
 const char kPiderName[] = "\x83\x70\x83\x43\x83\x5f\x81\x5b\x83\x58";
@@ -296,39 +285,6 @@ EVT_BEGIN(FloorIncrementEvtHook)
 RUN_CHILD_EVT(FloorIncrementEvt)
 RETURN()
 EVT_END()
-
-// Inventory full; ask the player if they still want to buy the item,
-// and throw out an existing one.
-EVT_BEGIN(CharlietonInvFullEvt)
-USER_FUNC(
-    ttyd::evt_msg::evt_msg_print_add, 0, PTR("pit_charlieton_full_inv"))
-USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("100kai_item_00"))
-IF_EQUAL(LW(0), 1)  // Declined.
-    USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(12))
-    USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("100kai_item_08"))
-    RETURN()
-END_IF()
-// Spend coins.
-MUL(LW(3), -1)
-USER_FUNC(ttyd::evt_pouch::evt_pouch_add_coin, LW(3))
-USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(12))
-WAIT_MSEC(200)
-USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(12))
-// Close text dialog and handle spawning item / throwing away.
-USER_FUNC(ttyd::evt_msg::evt_msg_continue)
-USER_FUNC(GetUniqueItemName, LW(0))
-USER_FUNC(
-    ttyd::evt_item::evt_item_entry,
-    LW(0), LW(1), FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
-USER_FUNC(ttyd::evt_item::evt_item_get_item, LW(0))
-RETURN()
-EVT_END()
-
-// Wrapper for Charlieton full-inventory event.
-EVT_BEGIN(CharlietonInvFullEvtHook)
-RUN_CHILD_EVT(CharlietonInvFullEvt)
-RETURN()
-EVT_PATCH_END()
 
 // Chet Rippo item-selling event.
 EVT_BEGIN(ChetRippoSellItemsEvent)
@@ -543,7 +499,7 @@ USER_FUNC(ttyd::evt_bero::evt_bero_mapchange, LW(3), LW(4))
 RETURN()
 EVT_END()
 
-// Wrapper for Charlieton full-inventory event.
+// Wrapper for Move talk event.
 EVT_BEGIN(MoverTalkEvtHook)
 RUN_CHILD_EVT(MoverTalkEvt)
 RETURN()
@@ -743,8 +699,7 @@ EVT_DEFINE_USER_FUNC(IncrementInfinitePitFloor) {
     return 2;
 }
 
-// Gets a unique id for an item to spawn when buying items from Charlieton
-// with a maxed inventory.
+// Gets a unique id for items that spawn from chests.
 EVT_DEFINE_USER_FUNC(GetUniqueItemName) {
     static int32_t id = 0;
     static char name[16];
@@ -999,50 +954,21 @@ EVT_DEFINE_USER_FUNC(UpdateExitDestinationImpl)  {
     return 2;
 }
 
-// Replaces Pit Charlieton's stock with items from the random pool.
-void ReplaceCharlietonStock() {
-    int32_t* inventory = ttyd::evt_badgeshop::badge_bottakuru100_table;
-    // Fill in Charlieton's expanded inventory.
-    for (int32_t i = 0; i < kNumCharlietonItemsPerType * 3; ++i) {
-        bool found = true;
-        while (found) {
-            found = false;
-            int32_t item = PickRandomItem(
-                RNG_ITEM,
-                i / kNumCharlietonItemsPerType == 0,
-                i / kNumCharlietonItemsPerType == 1, 
-                i / kNumCharlietonItemsPerType == 2, 
-                0);
-            // Make sure no duplicate items exist.
-            for (int32_t j = 0; j < i; ++j) {
-                if (inventory[j] == item) {
-                    found = true;
-                    break;
-                }
-            }
-            inventory[i] = item;
-        }
-    }
 }
 
-}
-
-void ApplyFixedPatches() {
-    // Patch Charlieton's sell price scripts, making them scale from 20 to 100%.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_select_disp_Patch_PitListPriceHook),
-        reinterpret_cast<void*>(CharlietonPitPriceListPatchStart),
-        reinterpret_cast<void*>(CharlietonPitPriceListPatchEnd));
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_select_disp_Patch_PitItemPriceHook),
-        reinterpret_cast<void*>(CharlietonPitPriceItemPatchStart),
-        reinterpret_cast<void*>(CharlietonPitPriceItemPatchEnd));
-        
-    // Change the length of Charlieton's shop item list.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(
-            g_getBadgeBottakuru100TableMaxCount_Patch_ShopSize),
-        0x38600000U | (kNumCharlietonItemsPerType * 3) /* li r3, N */);
+void ApplyFixedPatches() {        
+    // Correcting NPC tribe description data.
+    auto* tribe_descs = ttyd::npc_data::npcTribe;
+    // Shady Paratroopa
+    tribe_descs[291].height = 30;
+    // Fire Bro
+    tribe_descs[293].height = 40;
+    // Boomerang Bro
+    tribe_descs[294].height = 40;
+    // Craw
+    tribe_descs[298].height = 40;
+    // Atomic Boo
+    tribe_descs[148].height = 100;
 }
 
 void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
@@ -1092,25 +1018,6 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
     mod::patch::writePatch(
         reinterpret_cast<void*>(module_start + g_jon_floor_inc_EvtOffset),
         FloorIncrementEvtHook, sizeof(FloorIncrementEvtHook));
-        
-    // Replace Charlieton talk evt, adding a dialog for buying an item
-    // and throwing away an old one if you have a full item/badge inventory.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(
-            module_start + g_jon_talk_gyousyou_NoInvSpaceBranchOffset),
-        CharlietonInvFullEvtHook, sizeof(CharlietonInvFullEvtHook));
-        
-    // Fix Charlieton's text when offering to sell a badge.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(
-            module_start + g_jon_talk_gyousyou_MinItemForBadgeDialogOffset),
-            1000);
-        
-    // Make Charlieton always spawn.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(
-            module_start + g_jon_gyousyou_setup_CharlietonSpawnChanceOffset),
-            1000);
             
     // Set Chet Rippo NPC information.
     memset(&g_ChetRippoNpcSetupInfo, 0, sizeof(g_ChetRippoNpcSetupInfo));
@@ -1171,9 +1078,6 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
                     module_start + g_jon_unit_boss_zonbaba_battle_entry_event),
                 BonetailMarioAloneEntryEvt, sizeof(BonetailMarioAloneEntryEvt));
         }
-    } else {
-        // Otherwise, modify Charlieton's stock.
-        ReplaceCharlietonStock();
     }
 }
 
@@ -1184,16 +1088,12 @@ void LinkCustomEvts(void* module_ptr, ModuleId::e module_id, bool link) {
         LinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(BossSetupEvt));
         LinkCustomEvt(
-            module_id, module_ptr, const_cast<int32_t*>(CharlietonInvFullEvt));
-        LinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(ChetRippoMoverSetupEvt));
         LinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(MoverTalkEvt));
     } else {
         UnlinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(BossSetupEvt));
-        UnlinkCustomEvt(
-            module_id, module_ptr, const_cast<int32_t*>(CharlietonInvFullEvt));
         UnlinkCustomEvt(
             module_id, module_ptr, const_cast<int32_t*>(ChetRippoMoverSetupEvt));
         UnlinkCustomEvt(

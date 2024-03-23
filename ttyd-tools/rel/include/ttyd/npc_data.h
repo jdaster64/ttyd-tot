@@ -26,7 +26,7 @@ static_assert(sizeof(NpcAiTypeTable) == 0x24);
 
 extern "C" {
 
-extern ttyd::npcdrv::NpcTribeDescription npcTribe[1];
+extern ttyd::npcdrv::NpcTribeDescription npcTribe[328];
 extern NpcAiTypeTable npc_ai_type_table[57];
 
 // npc_define_territory_type

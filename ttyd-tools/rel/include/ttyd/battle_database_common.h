@@ -560,6 +560,14 @@ struct DataTableEntry {
     void*       data;
 } __attribute__((__packed__));
 
+struct PoseSoundTimingEntry {
+    const char* pose_name;
+    float       unk_float;
+    int32_t     unk_int0;
+    const char* sfx_name;
+    int32_t     unk_int1;
+} __attribute__((__packed__));
+
 struct BattleUnitKindPart {
     int32_t     index;  // one-indexed
     const char* name;

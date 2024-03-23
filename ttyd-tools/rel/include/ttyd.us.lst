@@ -3001,7 +3001,7 @@
 40,5,000972d8:unit_RedMagikoopa
 40,5,0009ac00:unit_WhiteMagikoopa
 40,5,000939b0:unit_GreenMagikoopa
-40,5,0006a260:unit_DarkCraw
+// 40,5,0006a260:unit_DarkCraw
 40,5,00031238:unit_Bandit
 40,5,0009e528:unit_BigBandit
 40,5,00070eb8:unit_BadgeBandit

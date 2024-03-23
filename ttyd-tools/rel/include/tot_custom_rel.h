@@ -56,7 +56,6 @@ extern ttyd::battle_database_common::BattleUnitKind unit_Magikoopa;
 extern ttyd::battle_database_common::BattleUnitKind unit_RedMagikoopa;
 extern ttyd::battle_database_common::BattleUnitKind unit_WhiteMagikoopa;
 extern ttyd::battle_database_common::BattleUnitKind unit_GreenMagikoopa;
-extern ttyd::battle_database_common::BattleUnitKind unit_DarkCraw;
 extern ttyd::battle_database_common::BattleUnitKind unit_Bandit;
 extern ttyd::battle_database_common::BattleUnitKind unit_BigBandit;
 extern ttyd::battle_database_common::BattleUnitKind unit_BadgeBandit;
@@ -108,6 +107,8 @@ extern ttyd::battle_database_common::BattleUnitKind unit_XYux;
 extern ttyd::battle_database_common::BattleUnitKind unit_MiniXYux;
 extern ttyd::battle_database_common::BattleUnitKind unit_AmazyDayzee;
 // Defined in codebase...
+extern ttyd::battle_database_common::BattleUnitKind unit_Craw;
+extern ttyd::battle_database_common::BattleUnitKind unit_DarkCraw;
 extern ttyd::battle_database_common::BattleUnitKind unit_Cleft;
 extern ttyd::battle_database_common::BattleUnitKind unit_HyperCleft;
 extern ttyd::battle_database_common::BattleUnitKind unit_MoonCleft;

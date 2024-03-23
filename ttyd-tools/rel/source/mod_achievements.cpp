@@ -95,9 +95,9 @@ void AchievementsManager::Update() {
         if (tot::GetCustomTattleIndex(i) < 0) continue;
         num_tattles += ttyd::swdrv::swGet(0x117a + i);
     }
-    if (num_tattles == 96) GetAchievement(kTattleLogItem);
+    if (num_tattles == 98) GetAchievement(kTattleLogItem);
     g_CurrentTaskPoints[2] = num_tattles;
-    g_MaxTaskPoints[2] = 96;
+    g_MaxTaskPoints[2] = 98;
 }
 
 void AchievementsManager::Draw() {    
