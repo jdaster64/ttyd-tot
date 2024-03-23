@@ -120,7 +120,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_Paratroopa, 1, 243, 0x08, 11, 14, 7, 2, 2, 0, 4, 8, 0, 0, 40, 50 },
     { &custom::unit_Fuzzy, 1, 248, 0x10, 47, 11, 5, 0, 1, 0, 2, -1, 0, 0, 0, 0 },
     { &custom::unit_DullBones, 1, 39, 0x0e, 20, 7, 5, 1, 1, 1, 2, 4, 0, 0, 0, 0 },
-    { &custom::unit_HyperBobOmb, 1, 238, 0x04, 78, 15, 8, 2, 1, 1, 7, 9, 1, 2, 0, 0 },
+    { &custom::unit_HyperBobOmb, 0, 238, 0x04, 78, 15, 8, 2, 1, 1, 7, 9, 1, 2, 0, 0 },
     { &custom::unit_Bristle, 1, 258, 0x17, 75, 6, 6, 4, 1, 0, 4, -1, 0, 1, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
