@@ -628,6 +628,11 @@ g_StringMap = {
         # Enemy names + Tattle info (TODO)
         
         b"btl_un_monban":             b"Craw",
+        b"btl_un_sinnosuke":          b"H. Bob-omb",
+        b"btl_un_hyper_sinnosuke":    b"Cosmic Boo",
+        
+        # TODO: Shortened Tattles for all enemies - b"btl_hlp_monban", etc.
+        # TODO: Menu Tattles for all enemies. - b"menu_enemy_001", etc.
             
         # Achievements (TODO)
         

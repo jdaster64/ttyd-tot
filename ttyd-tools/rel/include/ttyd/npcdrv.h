@@ -26,28 +26,28 @@ static_assert(sizeof(NpcWork) == 0x14);
 
 struct NpcTribeDescription
 {
-	char *nameJp;
-	char *modelName;
-	char *wInitialAnimation;
-	char *stopAnimation;
-	char *stayAnimation;
-	char *talkAnimation;
-	char *walkAnimation;
-	char *runAnimation;
-	char *damageAnimation;
-	char *confuseAnimation;
+	const char *nameJp;
+	const char *modelName;
+	const char *wInitialAnimation;
+	const char *stopAnimation;
+	const char *stayAnimation;
+	const char *talkAnimation;
+	const char *walkAnimation;
+	const char *runAnimation;
+	const char *damageAnimation;
+	const char *confuseAnimation;
 	float wWidth;
 	float height;
 	float wShadowOffsetX;
 	float wShadowOffsetY;
 	float wShadowOffsetZ;
 	float runStartSpeed;
-	char *moveLeftSfxId;
-	char *moveRightSfxId;
+	const char *moveLeftSfxId;
+	const char *moveRightSfxId;
 	uint16_t unkSfxId;
 	uint8_t pad_4a[2];
-	char *jumpSfxId;
-	char *landingSfxId;
+	const char *jumpSfxId;
+	const char *landingSfxId;
 } __attribute__((__packed__));
 
 static_assert(sizeof(NpcTribeDescription) == 0x54);

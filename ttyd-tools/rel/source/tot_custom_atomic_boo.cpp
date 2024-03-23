@@ -1,4 +1,4 @@
-#include "tot_custom_rel.h"     // For externed unit_AtomicBoo
+#include "tot_custom_rel.h"     // For externed unit definitions.
 
 #include "evt_cmd.h"
 
@@ -55,7 +55,7 @@ using ::ttyd::extdrv::ExtPoseWork;
 // State for "ext" Boo actors.
 struct ExtBooWork {
     int8_t      state;
-    bool        animate;
+    bool        surprise_animation;
     int8_t      pad_0x02[2];
     int32_t     anim_timer;
     int32_t     delay;          // will not execute switch code while > 0.
@@ -83,6 +83,14 @@ EVT_DECLARE_USER_FUNC(evtTot_AtomicBoo_BreathAppear, 0)
 EVT_DECLARE_USER_FUNC(evtTot_AtomicBoo_BreathWait1, 0)
 EVT_DECLARE_USER_FUNC(evtTot_AtomicBoo_BreathWait2, 0)
 
+// Constants.
+
+constexpr const int32_t UW_BattleUnitType = 0;
+constexpr const int32_t UW_FaceHidden = 1;
+
+constexpr const double k2Pi = 6.28318530718;
+constexpr const double kPiOver4 = 0.78539816339;
+
 // Unit data.
 int8_t unitAtomicBoo_defense[] = { 0, 0, 0, 0, 0 };
 int8_t unitAtomicBoo_defense_attr[] = { 0, 0, 0, 0, 0 };
@@ -91,6 +99,12 @@ StatusVulnerability unitAtomicBoo_status = {
     40,  40,  40, 100,  40, 100, 100,  30,
      0,   0, 100,   0, 100,  80,  40,   0,
     10, 100,  40, 100, 100,   5,
+};
+
+StatusVulnerability unitCosmicBoo_status = {
+    30,  30,  30, 100,  30, 100, 100,  30,
+     0,   0, 100,   0, 100,  80,  30,   0,
+    10, 100,  30, 100, 100,   5,
 };
 
 PoseTableEntry unitAtomicBoo_pose_table[] = {
@@ -154,6 +168,26 @@ const ExtEntryData unitAtomicBoo_ext_entry_data[] = {
     { "c_teresa", "A_2", 10.0f },
     { "c_teresa", "A_2", 11.0f },
     { "c_teresa", "A_2", 12.0f },
+    { nullptr, nullptr, 0.0f },
+};
+
+const ExtEntryData unitCosmicBoo_ext_entry_data[] = {
+    { "c_teresa_p", "S_1", 0.0f },
+    { "c_teresa_p", "S_1", 2.0f },
+    { "c_teresa_p", "S_1", 4.0f },
+    { "c_teresa_p", "S_1", 6.0f },
+    { "c_teresa_p", "S_1", 8.0f },
+    { "c_teresa_p", "S_1", 10.0f },
+    { "c_teresa_p", "S_1", 6.0f },
+    { "c_teresa_p", "S_1", 7.0f },
+    { "c_teresa_p", "A_1", 0.0f },
+    { "c_teresa_p", "A_2", 6.0f },
+    { "c_teresa_p", "A_2", 7.0f },
+    { "c_teresa_p", "A_2", 8.0f },
+    { "c_teresa_p", "A_2", 9.0f },
+    { "c_teresa_p", "A_2", 10.0f },
+    { "c_teresa_p", "A_2", 11.0f },
+    { "c_teresa_p", "A_2", 12.0f },
     { nullptr, nullptr, 0.0f },
 };
 
@@ -395,6 +429,23 @@ BattleUnitKindPart unitAtomicBoo_parts = {
     .pose_table = unitAtomicBoo_pose_table,
 };
 
+BattleUnitKindPart unitCosmicBoo_parts = {
+    .index = 1,
+    .name = "btl_un_hyper_sinnosuke",       // Replaces Hyper Bald Cleft.
+    .model_name = "c_atmic_trs_p",
+    .part_offset_pos = { 0.0f, 0.0f, 0.0f },
+    .part_hit_base_offset = { 10.0f, 80.0f, 0.0f },
+    .part_hit_cursor_base_offset = { 0.0f, 110.0f, 0.0f },
+    .unk_30 = 20,
+    .unk_32 = 30,
+    .base_alpha = 255,
+    .defense = unitAtomicBoo_defense,
+    .defense_attr = unitAtomicBoo_defense_attr,
+    .attribute_flags = 0x0060'0009,
+    .counter_attribute_flags = 0,
+    .pose_table = unitAtomicBoo_pose_table,
+};
+
 EVT_BEGIN(unitAtomicBoo_face_hide_event)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BOSS_ATMTLSA_MOVE2"), EVT_NULLPTR, 0, LW(15))
@@ -416,7 +467,7 @@ EVT_BEGIN(unitAtomicBoo_face_hide_event)
         USER_FUNC(btlevtcmd_AddPartsRotate, -2, 1, 0, 12, 0)
     WHILE()
     WAIT_FRM(20)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, 1)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FaceHidden, 1)
     USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitAtomicBoo_pose_table_hidden))
     RETURN()
 EVT_END()
@@ -533,7 +584,7 @@ EVT_BEGIN(unitAtomicBoo_surprise_event)
     USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
     USER_FUNC(evt_btl_camera_set_zoom, 0, 200)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FaceHidden, 0)
     USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitAtomicBoo_pose_table))
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("A_2"))
     USER_FUNC(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
@@ -766,7 +817,7 @@ EVT_BEGIN(unitAtomicBoo_breath_event)
     SUB(LW(1), 10)
     USER_FUNC(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FaceHidden, 0)
     USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitAtomicBoo_pose_table))
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("A_3"))
     USER_FUNC(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
@@ -813,7 +864,7 @@ EVT_BEGIN(unitAtomicBoo_attack_event)
         USER_FUNC(btlevtcmd_StartWaitEvent, -2)
         RETURN()
     END_IF()
-    USER_FUNC(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_FaceHidden, LW(0))
     IF_EQUAL(LW(0), 0)
         SET(LW(1), 30)
         ADD(LW(1), 20)
@@ -823,7 +874,14 @@ EVT_BEGIN(unitAtomicBoo_attack_event)
         SET(LW(1), 30)
         IF_SMALL(LW(0), LW(1))
             RUN_CHILD_EVT(PTR(&unitAtomicBoo_face_hide_event))
-            GOTO(99)
+            USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(5))
+            IF_EQUAL(LW(5), (int32_t)BattleUnitType::ATOMIC_BOO)
+                GOTO(99)
+            ELSE()
+                // Cosmic Boo can charge and attack on the same turn.
+                WAIT_MSEC(400)
+                GOTO(50)
+            END_IF()
         END_IF()
         ADD(LW(1), 20)
         IF_SMALL(LW(0), LW(1))
@@ -833,6 +891,7 @@ EVT_BEGIN(unitAtomicBoo_attack_event)
         RUN_CHILD_EVT(PTR(&unitAtomicBoo_circle_event))
         GOTO(99)
     ELSE()
+LBL(50)
         SET(LW(1), 50)
         ADD(LW(1), 50)
         SUB(LW(1), 1)
@@ -865,13 +924,21 @@ EVT_END()
 EVT_BEGIN(unitAtomicBoo_init_ext_event)
     USER_FUNC(evt_npc_entry, PTR("ext_teresa"), PTR("c_teresa"))
     USER_FUNC(evt_npc_set_position, PTR("ext_teresa"), 0, -1000, 0)
-    USER_FUNC(
-        evt_ext_entry, 30, PTR(&unitAtomicBoo_ext_entry_data), 
-        PTR(&ext_boo_init), PTR(&ext_boo_main), 0)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(0))
+    IF_EQUAL(LW(0), (int32_t)BattleUnitType::ATOMIC_BOO)
+        USER_FUNC(
+            evt_ext_entry, 30, PTR(&unitAtomicBoo_ext_entry_data), 
+            PTR(&ext_boo_init), PTR(&ext_boo_main), 0)
+    ELSE()
+        // TODO: Use CosmicBoo ext if I can figure out how to make them display.
+        USER_FUNC(
+            evt_ext_entry, 30, PTR(&unitAtomicBoo_ext_entry_data), 
+            PTR(&ext_boo_init), PTR(&ext_boo_main), 0)
+    END_IF()
     RETURN()
 EVT_END()
 
-EVT_BEGIN(unitAtomicBoo_init_event)
+EVT_BEGIN(unitAtomicBoo_common_init_event)
     USER_FUNC(btlevtcmd_SetEventWait, -2, PTR(&unitAtomicBoo_wait_event))
     USER_FUNC(btlevtcmd_SetEventAttack, -2, PTR(&unitAtomicBoo_attack_event))
     USER_FUNC(btlevtcmd_SetEventDamage, -2, PTR(&unitAtomicBoo_damage_event))
@@ -879,6 +946,22 @@ EVT_BEGIN(unitAtomicBoo_init_event)
     USER_FUNC(evtTot_AtomicBoo_SetUnitId, -2)
     RUN_CHILD_EVT(PTR(&unitAtomicBoo_init_ext_event))
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitAtomicBoo_init_event)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType,
+        (int32_t)BattleUnitType::ATOMIC_BOO)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FaceHidden, 0)
+    RUN_CHILD_EVT(PTR(&unitAtomicBoo_common_init_event))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitCosmicBoo_init_event)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType,
+        (int32_t)BattleUnitType::TOT_COSMIC_BOO)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FaceHidden, 0)
+    RUN_CHILD_EVT(PTR(&unitAtomicBoo_common_init_event))
     RETURN()
 EVT_END()
 
@@ -929,9 +1012,51 @@ BattleUnitKind unit_AtomicBoo = {
     .data_table = unitAtomicBoo_data_table,
 };
 
-// Misc. constants.
-constexpr const double k2Pi = 6.28318530718;
-constexpr const double kPiOver4 = 0.78539816339;
+BattleUnitKind unit_CosmicBoo = {
+    .unit_type = BattleUnitType::TOT_COSMIC_BOO,
+    .unit_name = "btl_un_hyper_sinnosuke",  // Replaces Hyper Bald Cleft.
+    .max_hp = 40,
+    .max_fp = 0,
+    .danger_hp = 1,
+    .peril_hp = 1,
+    .level = 52,
+    .bonus_exp = 0,
+    .bonus_coin = 1,
+    .bonus_coin_rate = 100,
+    .base_coin = 0,
+    .run_rate = 50,
+    .pb_soft_cap = 7,
+    .width = 120,
+    .height = 110,
+    .hit_offset = { 30, 105 },
+    .center_offset = { 0.0f, 55.0f, 0.0f },
+    .hp_gauge_offset = { 0, 0 },
+    .talk_toge_base_offset = { 0.0f, 0.0f, 0.0f },
+    .held_item_base_offset = { 60.0f, 0.0f, -10.0f },
+    .burn_flame_offset = { 0.0f, 0.0f, 0.0f },
+    .binta_hit_offset = { 60.0f, 0.0f, 0.0f },
+    .kiss_hit_offset = { 46.0f, 71.5f, 10.0f },
+    .cut_base_offset = { 0.0f, 55.0f, 0.0f },
+    .cut_width = 120.0f,
+    .cut_height = 110.0f,
+    .turn_order = 0,
+    .turn_order_variance = 0,
+    .swallow_chance = -1,
+    .swallow_attributes = 0,
+    .hammer_knockback_chance = 100,
+    .itemsteal_param = 20,
+    .star_point_disp_offset = { 0.0f, 0.0f, 0.0f },
+    .damage_sfx_name = "SFX_BOSS_ATMTLSA_DAMAGED1",
+    .fire_damage_sfx_name = "SFX_BTL_DAMAGE_FIRE1",
+    .ice_damage_sfx_name = "SFX_BTL_DAMAGE_ICE1",
+    .explosion_damage_sfx_name = "SFX_BTL_DAMAGE_BIRIBIRI1",
+    .attribute_flags = 0x0000'0004,
+    .status_vulnerability = &unitCosmicBoo_status,
+    .num_parts = 1,
+    .parts = &unitCosmicBoo_parts,
+    .init_evt_code = (void*)unitCosmicBoo_init_event,
+    .data_table = unitAtomicBoo_data_table,
+};
 
 // Global state.
 ExtBooWork* g_BooWork;
@@ -964,7 +1089,7 @@ void ext_boo_init() {
         poseWork[i].mtx->m[2][3] = 0.0f;
         
         g_BooWork[i].state = 0;
-        g_BooWork[i].animate = false;
+        g_BooWork[i].surprise_animation = false;
         g_BooWork[i].anim_timer = 0;
         
         g_BooWork[i].unk_0x10.x = 0.0f;
@@ -1030,7 +1155,7 @@ void ext_boo_main() {
         auto& booWork = g_BooWork[i];
         auto& poseWork = extPoseWork[i];
         
-        if (booWork.animate) {
+        if (booWork.surprise_animation) {
             int32_t val = ++booWork.anim_timer;
             if (val < 31) {
                 poseWork.anim_frame = 8;
@@ -1041,7 +1166,7 @@ void ext_boo_main() {
             }
         } else {
             if (++booWork.anim_timer >= 24) booWork.anim_timer -= 24;
-            poseWork.anim_frame = (booWork.anim_timer + 4) / 3;
+            poseWork.anim_frame = booWork.anim_timer / 3;
         }
         
         if (booWork.delay >= 1) {
@@ -1167,7 +1292,7 @@ void ext_boo_main() {
                     if (i == 8) {
                         for (int32_t i = 0; i < 8; ++i) {
                             g_BooWork[i].state = 20;
-                            g_BooWork[i].animate = true;
+                            g_BooWork[i].surprise_animation = true;
                             g_BooWork[i].anim_timer = 0;
                             g_BooWork[i].unk_0x10.x = 0.0f;
                             g_BooWork[i].unk_0x10.y = 0.0f;
@@ -1180,7 +1305,7 @@ void ext_boo_main() {
                 case 20: {
                     if (booWork.anim_timer >= 180) {
                         booWork.state = 23;
-                        booWork.animate = false;
+                        booWork.surprise_animation = false;
                         booWork.anim_timer = 0;
                         booWork.delay = kDelayFrames[i];
                         booWork.timer = 60;

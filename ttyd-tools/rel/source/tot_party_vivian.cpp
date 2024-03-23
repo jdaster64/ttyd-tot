@@ -95,8 +95,11 @@ EVT_DEFINE_USER_FUNC(evtTot_InfatuateChangeAlliance) {
     
     // If not a boss enemy or Yux, undo Confusion status and change alliance.
     switch (unit->current_kind) {
+        case BattleUnitType::HOOKTAIL:
+        case BattleUnitType::GLOOMTAIL:
         case BattleUnitType::BONETAIL:
         case BattleUnitType::ATOMIC_BOO:
+        case BattleUnitType::TOT_COSMIC_BOO:
         case BattleUnitType::YUX:
         case BattleUnitType::Z_YUX:
         case BattleUnitType::X_YUX:

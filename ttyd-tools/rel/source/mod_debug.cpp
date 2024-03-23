@@ -216,6 +216,7 @@ void DebugManager::Update() {
                     int32_t num_enemies = 3;
                     switch (enemy_type) {
                         case BattleUnitType::ATOMIC_BOO:
+                        case BattleUnitType::TOT_COSMIC_BOO:
                         case BattleUnitType::HOOKTAIL:
                         case BattleUnitType::GLOOMTAIL:
                         case BattleUnitType::BONETAIL:
@@ -232,6 +233,7 @@ void DebugManager::Update() {
                     bool valid_back_enemy = true;
                     switch (enemy_type) {
                         case BattleUnitType::ATOMIC_BOO:
+                        case BattleUnitType::TOT_COSMIC_BOO:
                         case BattleUnitType::HOOKTAIL:
                         case BattleUnitType::GLOOMTAIL:
                         case BattleUnitType::BONETAIL:
@@ -240,6 +242,7 @@ void DebugManager::Update() {
                     }
                     switch (g_DebugEnemies[0]) {
                         case BattleUnitType::ATOMIC_BOO:
+                        case BattleUnitType::TOT_COSMIC_BOO:
                         case BattleUnitType::HOOKTAIL:
                         case BattleUnitType::GLOOMTAIL:
                         case BattleUnitType::BONETAIL:

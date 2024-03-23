@@ -114,6 +114,7 @@ extern ttyd::battle_database_common::BattleUnitKind unit_HyperCleft;
 extern ttyd::battle_database_common::BattleUnitKind unit_MoonCleft;
 extern ttyd::battle_database_common::BattleUnitKind unit_IronCleft;
 extern ttyd::battle_database_common::BattleUnitKind unit_AtomicBoo;
+extern ttyd::battle_database_common::BattleUnitKind unit_CosmicBoo;
 extern ttyd::battle_database_common::BattleUnitKind unit_Hooktail;
 extern ttyd::battle_database_common::BattleUnitKind unit_Gloomtail;
 extern ttyd::battle_database_common::BattleUnitKind unit_Bonetail;

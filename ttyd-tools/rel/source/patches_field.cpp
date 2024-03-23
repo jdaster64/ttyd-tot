@@ -14,6 +14,7 @@
 #include <ttyd/battle_camera.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
+#include <ttyd/battle_monosiri.h>
 #include <ttyd/evt_badgeshop.h>
 #include <ttyd/evt_bero.h>
 #include <ttyd/evt_cam.h>
@@ -55,6 +56,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::mario_pouch::PouchData;
 using ::ttyd::npcdrv::NpcBattleInfo;
 using ::ttyd::npcdrv::NpcEntry;
+using ::ttyd::npcdrv::NpcTribeDescription;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
@@ -957,8 +959,8 @@ EVT_DEFINE_USER_FUNC(UpdateExitDestinationImpl)  {
 }
 
 void ApplyFixedPatches() {        
-    // Correcting NPC tribe description data.
-    auto* tribe_descs = ttyd::npc_data::npcTribe;
+    // Correcting heights in NPC tribe description data.
+    NpcTribeDescription* tribe_descs = ttyd::npc_data::npcTribe;
     // Shady Paratroopa
     tribe_descs[291].height = 30;
     // Fire Bro
@@ -969,6 +971,26 @@ void ApplyFixedPatches() {
     tribe_descs[298].height = 40;
     // Atomic Boo
     tribe_descs[148].height = 100;
+    
+    // Copying tribe description data for Bob-omb, Atomic Boo over slots for
+    // Bald + Hyper Bald Clefts, so they can be used for variants.
+    memcpy(&tribe_descs[238], &tribe_descs[283], sizeof(NpcTribeDescription));
+    memcpy(&tribe_descs[288], &tribe_descs[148], sizeof(NpcTribeDescription));
+    // Set unique names + model filenames.
+    tribe_descs[238].nameJp = "hyper_bomb";
+    tribe_descs[238].modelName = "c_bomhey_h";
+    tribe_descs[288].nameJp = "cosmic_boo";
+    tribe_descs[288].modelName = "c_atmic_trs_p";
+    
+    // TODO: Move to patches_ui.h?
+    // Fix captures / location information in Tattle menu.
+    auto* tattle_inf = ttyd::battle_monosiri::battleGetUnitMonosiriPtr(0);
+    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].model_name = "c_atmic_trs_p";
+    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].pose_name = "Z_1";
+    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].location_name = "menu_monosiri_shiga";
+    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].model_name = "c_bomhey_h";
+    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].pose_name = "BOM_Z_1";
+    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].location_name = "menu_monosiri_shiga";
 }
 
 void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {

@@ -290,6 +290,10 @@ namespace BattleUnitType {
         VIVIAN              = 0xE4,
         BOBBERY             = 0xE5,
         MS_MOWZ             = 0xE6,
+        
+        // For TOT only.
+        TOT_HYPER_BOB_OMB   = BALD_CLEFT,
+        TOT_COSMIC_BOO      = HYPER_BALD_CLEFT,
     };
 }
 
