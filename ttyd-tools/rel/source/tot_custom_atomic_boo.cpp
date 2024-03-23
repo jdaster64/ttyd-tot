@@ -110,7 +110,7 @@ PoseTableEntry unitAtomicBoo_pose_table[] = {
     56, "X_1",
     57, "X_1",
     65, "T_1",
-    0, nullptr,
+    69, "S_1",
 };
 
 PoseTableEntry unitAtomicBoo_pose_table_hidden[] = {
@@ -130,7 +130,7 @@ PoseTableEntry unitAtomicBoo_pose_table_hidden[] = {
     56, "A_1",
     57, "A_1",
     65, "T_1",
-    0, nullptr,
+    69, "A_1",
 };
 
 DataTableEntry unitAtomicBoo_data_table[] = {

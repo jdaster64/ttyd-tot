@@ -34,6 +34,7 @@ extern int32_t btldefaultevt_Confuse[1];
 extern int32_t btldefaultevt_CantMoveZeroGravity[1];
 extern int32_t btldefaultevt_SuitoruBadgeEffect[1];
 extern int32_t btldefaultevt_avoid_counter_event[1];
+extern int32_t btldefaultevt_Dummy[1];
 
 
 

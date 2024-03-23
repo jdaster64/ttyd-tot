@@ -1426,7 +1426,7 @@
 8010de30:btlevtcmd_OffToken
 8010de94:btlevtcmd_OnToken
 8010def8:btlevtcmd_SetPartsBlur
-801e008:btlevtcmd_OffPartsCounterAttribute
+8010e008:btlevtcmd_OffPartsCounterAttribute
 8010e08c:btlevtcmd_OnPartsCounterAttribute
 8010e110:btlevtcmd_CheckPartsCounterAttribute
 8010e1b8:btlevtcmd_OffPartsAttribute
@@ -1566,6 +1566,7 @@
 8034f234:btldefaultevt_CantMoveZeroGravity
 8034f2e4:btldefaultevt_SuitoruBadgeEffect
 8034f4cc:btldefaultevt_avoid_counter_event
+80416b38:btldefaultevt_Dummy
 
 // battle_event_subset.o
 // .text
@@ -3031,9 +3032,9 @@
 40,5,00043ae0:unit_LavaBubble
 40,5,0007ef18:unit_Ember
 40,5,00059200:unit_PhantomEmber
-40,5,00029238:unit_Cleft
-40,5,0003a700:unit_HyperCleft
-40,5,000568f8:unit_MoonCleft
+// 40,5,00029238:unit_Cleft
+// 40,5,0003a700:unit_HyperCleft
+// 40,5,000568f8:unit_MoonCleft
 40,5,0008dd90:unit_Bristle
 40,5,0004c780:unit_DarkBristle
 40,5,00034ba8:unit_BobOmb

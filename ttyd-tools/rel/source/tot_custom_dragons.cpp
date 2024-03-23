@@ -145,9 +145,7 @@ PoseTableEntry unitDragon_pose_table[] = {
     65, "GNB_T_3",
     31, "GNB_S_3",
     39, "GNB_D_1",
-    // Needs some animation for retreating after Superguarded bite.
-    40, "GNB_N_1",
-    0, nullptr,
+    69, "GNB_S_3",
 };
 
 PoseTableEntry unitDragon_pose_table_weak[] = {
@@ -159,9 +157,7 @@ PoseTableEntry unitDragon_pose_table_weak[] = {
     65, "GNB_T_4",
     31, "GNB_S_4",
     39, "GNB_V_1",
-    // Needs some animation for retreating after Superguarded bite.
-    40, "GNB_N_1",
-    0, nullptr,
+    69, "GNB_S_4",
 };
 
 BattleWeapon unitDragon_weaponStomp = {

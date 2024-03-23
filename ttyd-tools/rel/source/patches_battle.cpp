@@ -784,7 +784,8 @@ int32_t CalculateBaseDamage(
             damage = 0;
             break;
         case 4:
-            if (!(unk1 & 0x8000'0000)) damage = 0;
+            // New Iron Clefts never take more than one damage.
+            if (damage > 1) damage = 1;
             break;
     }
     
