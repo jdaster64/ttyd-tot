@@ -3037,7 +3037,7 @@
 // 40,5,000568f8:unit_MoonCleft
 40,5,0008dd90:unit_Bristle
 40,5,0004c780:unit_DarkBristle
-40,5,00034ba8:unit_BobOmb
+// 40,5,00034ba8:unit_BobOmb
 40,5,000423b8:unit_BulkyBobOmb
 40,5,000676d8:unit_BobUlk
 40,5,0004d9b8:unit_ChainChomp

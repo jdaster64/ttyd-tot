@@ -88,7 +88,6 @@ extern ttyd::battle_database_common::BattleUnitKind unit_Ember;
 extern ttyd::battle_database_common::BattleUnitKind unit_PhantomEmber;
 extern ttyd::battle_database_common::BattleUnitKind unit_Bristle;
 extern ttyd::battle_database_common::BattleUnitKind unit_DarkBristle;
-extern ttyd::battle_database_common::BattleUnitKind unit_BobOmb;
 extern ttyd::battle_database_common::BattleUnitKind unit_BulkyBobOmb;
 extern ttyd::battle_database_common::BattleUnitKind unit_BobUlk;
 extern ttyd::battle_database_common::BattleUnitKind unit_ChainChomp;
@@ -107,6 +106,8 @@ extern ttyd::battle_database_common::BattleUnitKind unit_XYux;
 extern ttyd::battle_database_common::BattleUnitKind unit_MiniXYux;
 extern ttyd::battle_database_common::BattleUnitKind unit_AmazyDayzee;
 // Defined in codebase...
+extern ttyd::battle_database_common::BattleUnitKind unit_BobOmb;
+extern ttyd::battle_database_common::BattleUnitKind unit_HyperBobOmb;
 extern ttyd::battle_database_common::BattleUnitKind unit_Craw;
 extern ttyd::battle_database_common::BattleUnitKind unit_DarkCraw;
 extern ttyd::battle_database_common::BattleUnitKind unit_Cleft;
