@@ -66,6 +66,7 @@ extern int32_t badge_bteresa_table_card_special[5];
 extern int32_t badge_bteresa_table_card_silver[5];
 extern int32_t badge_bteresa_table_card_gold[5];
 extern int32_t badge_bteresa_table_card_platinum[5];
+extern void* g_BadgeShopWork;  // "bdsw"
 
 }
 

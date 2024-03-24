@@ -126,7 +126,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
             sprintf(buf, "<kanban>\nYour seed: <col %sff>%s\n</col>"
                 "Currently selected options:\n<col 0000ffff>%s\n</col><k>",
                 GetYoshiTextColor(),
-                ttyd::mariost::g_MarioSt->saveFileName, 
+                (const char*)ttyd::mariost::g_MarioSt->saveFileName, 
                 g_Mod->inf_state_.GetEncodedOptions());
             return buf;
         }

@@ -29,7 +29,7 @@ bool g_RtaTimerStopped = false;
 uint64_t g_RtaTimer100 = 0;
 
 const char* GetSavefileName() {
-    return ttyd::mariost::g_MarioSt->saveFileName;
+    return (const char*)ttyd::mariost::g_MarioSt->saveFileName;
 }
     
 void* GetSavedStateLocation() {

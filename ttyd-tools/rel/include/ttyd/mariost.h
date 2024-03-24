@@ -67,7 +67,7 @@ struct MarioSt_Globals {
     uint8_t     lswf[0x40];
     uint8_t     lsw[0x400];
     uint32_t    unk_11b8;
-    const char  saveFileName[20];
+    char        saveFileName[20];
     int32_t     saveFileNumber;
     gc::vec3    saveLastPlayerPosition;
     int32_t     saveParty0Id;

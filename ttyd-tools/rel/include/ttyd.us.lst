@@ -1900,6 +1900,8 @@
 8013de10:evt_seq_set_seq
 
 // mario_party.o
+80140fb8:marioGetExtraPartyId
+80141050:marioGetPartyId
 801410e8:marioGetParty
 
 // battle_stage_object.o
@@ -2347,6 +2349,7 @@
 80419e5c:badge_bteresa_table_card_silver
 80419e70:badge_bteresa_table_card_gold
 80419e84:badge_bteresa_table_card_platinum
+8041ece8:g_BadgeShopWork
 
 // evt_johoya.o
 801fb068:johoya_init

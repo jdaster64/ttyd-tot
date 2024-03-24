@@ -92,6 +92,9 @@ NpcSetupInfo g_EnemyNpcSetup[2];
 }  // namespace
 
 // USER_FUNC Declarations.
+EVT_DECLARE_USER_FUNC(evtTot_ClearBattleResult, 0)
+EVT_DECLARE_USER_FUNC(evtTot_HasBackupSave, 1)
+EVT_DECLARE_USER_FUNC(evtTot_LoadBackupSaveData, 0)
 EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
 
@@ -336,15 +339,26 @@ EVT_BEGIN(Tower_CheckGameOver)
                     USER_FUNC(evt_party_set_pose, 0, PTR("PCH_D_3"))
             END_SWITCH()
             
+            USER_FUNC(evtTot_ClearBattleResult)
             USER_FUNC(evt_msg_print, 0, PTR("tot_gameover"), 0, PTR("me"))
             USER_FUNC(evt_msg_select, 0, PTR("tot_gameover_opt"))
             // Despawn partner.
             USER_FUNC(evt_mario_goodbye_party, 0)
-            USER_FUNC(evtTot_SetPreviousPartner, 0)
-            // Regardless for now, reload into lobby.
-            // TODO: Experiment with different map transitions.
-            USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-            USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("dokan_3"))
+            // Chose "continue" option.
+            IF_EQUAL(LW(0), 0)
+                USER_FUNC(evtTot_LoadBackupSaveData)
+                // Resets floor-based stats without making saves, etc.
+                USER_FUNC(evtTot_IncrementFloor, 0)
+                // Set flag to spawn player in room with pipe already spawned.
+                SET(GSW(1002), 1)
+                USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+                USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("dokan_2"))
+            ELSE()
+                // Reload into lobby.
+                USER_FUNC(evtTot_SetPreviousPartner, 0)
+                USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+                USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("dokan_3"))
+            END_IF()
             RETURN()
         END_IF()
         WAIT_FRM(1)
@@ -439,16 +453,23 @@ EVT_BEGIN(gon_01_InitEvt)
 
     USER_FUNC(evt_run_case_evt, 9, 1, PTR("a_kanban"), 0, PTR(Tower_SignEvt), 0)
     
-    // Set up enemy NPC (TODO: or Mover, Charlieton, etc.)
-    RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
-    
-    // TODO: Handle cases for Mover / NPC rooms, boss rooms?
-    RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
-    // Always disable pipe, since its appearance is triggered by the chests.
-    // USER_FUNC(evt_hit_bind_mapobj, PTR("a_dokan_1"), PTR("dokan_1_s"))
-    // USER_FUNC(evt_mapobj_trans, 1, PTR("dokan_1_s"), 0, 30, 0)
-    // USER_FUNC(evt_hit_bind_update, PTR("a_dokan_1"))
-    // USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
+    // Is the player continuing from a Game Over?
+    IF_EQUAL(GSW(1002), 0)
+        // Set up enemy NPC (TODO: or Mover, Charlieton, etc.)
+        RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
+        // TODO: Handle cases for Mover / NPC rooms, boss rooms?
+        RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
+    ELSE()
+        // TODO: Handle cases for Mover / NPC rooms, boss rooms?
+        RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
+        // Enable exit pipe immediately.
+        USER_FUNC(evt_hit_bind_mapobj, PTR("a_dokan_1"), PTR("dokan_1_s"))
+        USER_FUNC(evt_mapobj_trans, 1, PTR("dokan_1_s"), 0, 30, 0)
+        USER_FUNC(evt_hit_bind_update, PTR("a_dokan_1"))
+        USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
+        
+        SET(GSW(1002), 0)
+    END_IF()
     
     // Always remove graffiti from wall on floor 50 map (not needed anymore?)
     // USER_FUNC(evt_sub_get_mapname, LW(0))
@@ -510,6 +531,23 @@ const int32_t* GetTowerInitEvt() {
     return gon_01_InitEvt;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_ClearBattleResult) {
+    auto* fbat = (ttyd::npcdrv::FbatData*)ttyd::npcdrv::fbatGetPointer();
+    fbat->battleInfo.wResult = 0;
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_HasBackupSave) {
+    evtSetValue(evt, evt->evtArguments[0], g_Mod->state_.HasBackupSave());
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_LoadBackupSaveData) {
+    auto& state = g_Mod->state_;
+    state.Load(state.GetBackupSave());
+    return 2;
+}
+
 // Returns whether the floor is a "rest floor" (no enemies).
 EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
     auto& state = g_Mod->state_;
@@ -521,7 +559,7 @@ EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
 
 // Overrides the previous party member that was out.
 EVT_DEFINE_USER_FUNC(evtTot_SetPreviousPartner) {
-    // TODO: Read from saved data if continuing.
+    // TODO: Read from saved data if continuing, or will that be handled?
     auto* player = ttyd::mario::marioGetPtr();
     player->prevFollowerId[0] = 0;
     return 2;

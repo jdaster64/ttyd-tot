@@ -5,10 +5,14 @@
 #include "evt_cmd.h"
 #include "mod.h"
 
+#include <gc/OSLink.h>
 #include <gc/OSTime.h>
 #include <third_party/fasthash.h>
 #include <ttyd/evtmgr_cmd.h>
+#include <ttyd/mario.h>
+#include <ttyd/mario_party.h>
 #include <ttyd/mario_pouch.h>
+#include <ttyd/party.h>
 #include <ttyd/system.h>
 
 #include <cinttypes>
@@ -32,12 +36,158 @@ void GetOptionParts(
     *b = GetShiftedBitMask(v, 0, 7);
 }
 
+// Holds backup save data (updated on floor 0 and after every boss floor).
+TotSaveSlot g_BackupSave;
+bool g_HasBackupSave = false;
+
+void ComputeChecksum(TotSaveSlot& save) {
+    constexpr const char kVersion[] = "009";
+    strcpy(save.version, kVersion);
+    save.size = sizeof(save.data);
+    
+    uint32_t checksum = 0U;
+    uint8_t* ptr = (uint8_t*)&save.data;
+    for (int32_t i = 0; i < (int32_t)sizeof(save.data); i++) {
+        checksum += ptr[i];
+    }
+    save.checksum1 = checksum;
+    save.checksum2 = ~save.checksum1;
+}
+
 }  // namespace
 
 // Loading / saving functions.
-// bool StateManager::Load(TotSaveSlotData* save);
-// void StateManager::Save(TotSaveSlotData* save);
-// TotSaveSlotData* StateManager::GetBackupSave();
+bool StateManager::Load(TotSaveSlot* save) {
+    // TODO: Compatibility check to make sure ToT data is valid before loading.
+    memcpy(this, &save->data.tot_state, sizeof(StateManager));
+    
+    auto* mariost = ttyd::mariost::g_MarioSt;
+    auto* player = ttyd::mario::marioGetPtr();
+    
+    // Back up certain fields.
+    gc::OSLink::OSModuleInfo* relAlloc = mariost->pMapAlloc;
+    void* fbatData = mariost->fbatData;
+    uint32_t gp_flag8 = (mariost->flags & 8);
+    uint32_t language = mariost->language;
+    int32_t unk1 = *(int32_t*)((uintptr_t)mariost + 0x1274);
+    int32_t unk2 = *(int32_t*)((uintptr_t)mariost + 0x1294);  // rumble
+    int32_t unk3 = *(int32_t*)((uintptr_t)mariost + 0x11b8);
+    
+    memcpy(
+        mariost, 
+        &save->data.global_data, 
+        sizeof(ttyd::mariost::MarioSt_Globals));
+    mariost->fbatData = fbatData;
+    
+    memcpy(
+        ttyd::mario_pouch::pouchGetPtr(),
+        &save->data.pouch_data, 
+        sizeof(ttyd::mario_pouch::PouchData));
+    memcpy(
+        ttyd::npcdrv::fbatGetPointer()->deadInfos, 
+        save->data.npc_dead_info,
+        sizeof(ttyd::npcdrv::FbatDatabaseNpcDeadInfo) * 64);
+    memcpy(
+        ttyd::evt_badgeshop::g_BadgeShopWork,
+        &save->data.badge_shop_work,
+        sizeof(ttyd::evt_badgeshop::BadgeShopWork));
+        
+    *(int32_t*)((uintptr_t)mariost + 0x1278) = 0;
+    *(int32_t*)((uintptr_t)mariost + 0x127c) = 0;
+    *(int32_t*)((uintptr_t)mariost + 0x1280) = 0;
+    mariost->bDvdHasError = 0;
+    mariost->lastFrameRetraceTime = gc::OSTime::OSGetTime();
+    
+    // TODO: Only do this if not loading from backup?
+    // strcpy(mariost->currentAreaName, "123");
+    // mariost->pRelFileBase = nullptr;
+    
+    *(int32_t*)((uintptr_t)mariost + 0x1274) = unk1;
+    *(int32_t*)((uintptr_t)mariost + 0x1294) = unk2;
+    *(int32_t*)((uintptr_t)mariost + 0x11b8) = unk3;
+    mariost->pMapAlloc = relAlloc;
+    
+    mariost->unk_0008 = 0;
+    mariost->bDebugMode = 0;
+    if (gp_flag8 != 0) {
+        mariost->flags |= 8;
+    }
+    else {
+        mariost->flags &= ~8;
+    }
+    mariost->language = language;
+    
+    // Restore the previous active partner (or none).
+    player->prevFollowerId[0] = mariost->saveParty0Id;
+    player->prevFollowerId[1] = mariost->saveParty1Id;
+    
+    return true;
+}
+
+void StateManager::Save(TotSaveSlot* save) {
+    auto* mariost = ttyd::mariost::g_MarioSt;
+    auto* player = ttyd::mario::marioGetPtr();
+    
+    memset(save, 0, sizeof(TotSaveSlot));
+    
+    mariost->saveLastPlayerPosition.x = player->playerPosition[0];
+    mariost->saveLastPlayerPosition.y = player->playerPosition[1];
+    mariost->saveLastPlayerPosition.z = player->playerPosition[2];
+    
+    auto* party = ttyd::party::partyGetPtr(ttyd::mario_party::marioGetPartyId());
+    if (party) {
+        mariost->saveParty0Id = party->current_member_id;
+    } else {
+        mariost->saveParty0Id = player->prevFollowerId[0];
+    }
+    party = ttyd::party::partyGetPtr(ttyd::mario_party::marioGetExtraPartyId());
+    if (party) {
+        mariost->saveParty1Id = party->current_member_id;
+    } else {
+        mariost->saveParty1Id = player->prevFollowerId[1];
+    }
+    
+    mariost->lastSaveTime = gc::OSTime::OSGetTime();
+    ++mariost->saveCounter;
+    mariost->flags &= ~3;
+    
+    *(int32_t*)((uintptr_t)mariost + 0x1278) = 0;
+    *(int32_t*)((uintptr_t)mariost + 0x127c) = 0;
+    *(int32_t*)((uintptr_t)mariost + 0x1280) = 0;
+    mariost->bDvdHasError = 0;
+    
+    memcpy(&save->data.tot_state, this, sizeof(StateManager));
+    memcpy(
+        &save->data.global_data, 
+        mariost,
+        sizeof(ttyd::mariost::MarioSt_Globals));
+    memcpy(
+        &save->data.pouch_data, 
+        ttyd::mario_pouch::pouchGetPtr(),
+        sizeof(ttyd::mario_pouch::PouchData));
+    memcpy( 
+        save->data.npc_dead_info,
+        ttyd::npcdrv::fbatGetPointer()->deadInfos,
+        sizeof(ttyd::npcdrv::FbatDatabaseNpcDeadInfo) * 64);
+    memcpy(
+        &save->data.badge_shop_work,
+        ttyd::evt_badgeshop::g_BadgeShopWork,
+        sizeof(ttyd::evt_badgeshop::BadgeShopWork));
+    
+    save->data.flags &= ~3;
+    
+    ComputeChecksum(*save);
+    
+    g_HasBackupSave = true;
+}
+
+bool StateManager::HasBackupSave() const {
+    return g_HasBackupSave;
+}
+
+TotSaveSlot* StateManager::GetBackupSave() const {
+    return &g_BackupSave;
+}
 
 void StateManager::InitDefaultOptions() {
     // TODO: Seed randomly, or allow user to change.
@@ -64,6 +214,8 @@ void StateManager::InitDefaultOptions() {
     SetOption(OPTNUM_PARTNER_HP, 5);
     SetOption(OPTNUM_ENEMY_HP, 100);
     SetOption(OPTNUM_ENEMY_ATK, 100);
+    
+    g_HasBackupSave = false;
 }
 
 bool StateManager::SetOption(uint32_t option, int32_t value) {
@@ -259,6 +411,11 @@ bool StateManager::CheckOptionValue(uint32_t option_value) const {
 // const char* StateManager::GetEncodedOptions() const;
 
 void StateManager::IncrementFloor(int32_t change) {
+    // Make a backup save if advancing, and if the floor is divisible by 8.
+    if (floor_ % 8 == 0 && change > 0) {
+        Save(&g_BackupSave);
+    }
+    
     floor_ = Clamp(floor_ + change, 0, 64);
     
     // Clear RNG state values that should reset every floor.

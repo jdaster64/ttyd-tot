@@ -66,9 +66,10 @@ public:
     uint8_t     play_stats_[1024];
     
     // Loading / saving functions; copies all game data, not just ToT state.
-    // bool Load(TotSaveSlotData* save);
-    // void Save(TotSaveSlotData* save);
-    // TotSaveSlotData* GetBackupSave();
+    bool Load(TotSaveSlot* save);
+    void Save(TotSaveSlot* save);
+    bool HasBackupSave() const;
+    TotSaveSlot* GetBackupSave() const;
     
     // Initialize all settings to default.
     void InitDefaultOptions();
@@ -96,7 +97,7 @@ public:
     // Returns a string representing the current options encoded.
     // const char* GetEncodedOptions() const;
     
-    // Increments the current tower floor, and makes any necessary changes.
+    // Sets/increments the current tower floor, and makes any necessary changes.
     void IncrementFloor(int32_t change = 1);
     
     // Functions for time-tracking...
@@ -123,7 +124,7 @@ EVT_DECLARE_USER_FUNC(evtTot_IncrementFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetFloor, 1)
 
 // Format of save data used by Tower of Trials mod.
-struct TotSaveSlot {
+struct TotSaveData {
     uint16_t    flags;                  // 0x0
     uint8_t     pad1[6];                // 0x2
     
@@ -136,7 +137,11 @@ struct TotSaveSlot {
     
     // Tower of Trials save data.
     mod::tot::StateManager tot_state;   // 0x1fd8
-    
+};
+static_assert(sizeof(TotSaveData) == 0x2bd8);
+
+struct TotSaveSlot {
+    TotSaveData data;                   // 0x0000
     uint8_t     pad2[0x3ff0-0x2bd8];    // 0x2bd8
     
     char        version[4];             // 0x3ff0

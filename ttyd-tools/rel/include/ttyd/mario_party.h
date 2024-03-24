@@ -12,8 +12,8 @@ extern "C" {
 // partyChkJoin
 // partyLeft
 // partyJoin
-// marioGetExtraPartyId
-// marioGetPartyId
+int32_t marioGetExtraPartyId();
+int32_t marioGetPartyId();
 int32_t marioGetParty();
 // marioPartyKill
 // marioPartyGoodbye
