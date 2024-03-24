@@ -39,20 +39,28 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 
 extern const BeroEntry gon_00_entry_data[5];
 
+EVT_DECLARE_USER_FUNC(evtTot_TowerInitLobby, 0)
 EVT_DECLARE_USER_FUNC(evtTot_TowerInitFromOptions, 0)
 
 EVT_BEGIN(Lobby_EnterTowerEvt)
+    // Initialize stats, etc. based on selected options.
     USER_FUNC(evtTot_TowerInitFromOptions)
+    RETURN()
 EVT_END()
 
-EVT_BEGIN(Lobby_ExitPipeReentryRejectEvt)
+EVT_BEGIN(Lobby_ExitTowerEvt)
+    // Re-init everything from scratch.
+    USER_FUNC(evtTot_TowerInitLobby)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Lobby_ExitReentryRejectEvt)
     INLINE_EVT()
         USER_FUNC(evt_cam_ctrl_onoff, 4, 0)
         USER_FUNC(evt_mario_key_onoff, 0)
         USER_FUNC(evt_bero_exec_wait, 65536)
         WAIT_MSEC(750)
-        // TODO: New strings for map.
-        USER_FUNC(evt_msg_print, 0, PTR("tik_06_01"), 0, 0)
+        USER_FUNC(evt_msg_print, 0, PTR("gon_00_reentry"), 0, 0)
         USER_FUNC(evt_mario_key_onoff, 1)
         USER_FUNC(evt_cam_ctrl_onoff, 4, 1)
     END_INLINE()
@@ -157,9 +165,9 @@ const BeroEntry gon_00_entry_data[5] = {
         .direction = BeroDirection::DOWN,
         .center_position = { 100000, 0, 0 },
         .length = -1,
-        .entry_evt_code = nullptr,
+        .entry_evt_code = (void*)Lobby_ExitTowerEvt,
         .case_type = 6,
-        .out_evt_code = (void*)Lobby_ExitPipeReentryRejectEvt,
+        .out_evt_code = (void*)Lobby_ExitReentryRejectEvt,
         .target_map = nullptr,
         .target_bero = "dokan_3",
         .entry_anim_type = BeroAnimType::ANIMATION,
@@ -187,6 +195,11 @@ const BeroEntry gon_00_entry_data[5] = {
 
 const int32_t* GetLobbyInitEvt() {
     return gon_00_InitEvt;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_TowerInitLobby) {
+    OptionsManager::InitLobby();
+    return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_TowerInitFromOptions) {

@@ -108,7 +108,8 @@ BattleSetupData g_SetupDataTbl[] = {
         .different_loadouts_flag = -1,
         .flag_on_loadouts = nullptr,
         .flag_off_loadouts = g_NormalBattleLoadouts,
-        .battle_setup_flags = 0,    // First Attack allowed (unavailable anyway)
+        .battle_setup_flags = 0x40, // Respawn on overworld after loss,
+                                    // First Attack allowed (unavailable anyway)
         .audience_setting_mode = 0, // no special audience
     },
     {},

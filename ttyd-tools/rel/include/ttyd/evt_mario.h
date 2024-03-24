@@ -33,7 +33,7 @@ EVT_DECLARE_USER_FUNC(evt_mario_set_party_pos, 5)
 // evt_mario_party_use_check
 // evt_mario_chk_join_party
 // evt_mario_get_exparty
-// evt_mario_get_party
+EVT_DECLARE_USER_FUNC(evt_mario_get_party, 1)
 // evt_peach_set_condition
 // evt_peach_transform_gundan_off
 // evt_peach_transform_gundan_on
@@ -66,7 +66,7 @@ EVT_DECLARE_USER_FUNC(evt_mario_set_party_pos, 5)
 // evt_mario_set_motion
 // evt_mario_get_motion
 EVT_DECLARE_USER_FUNC(evt_mario_normalize, 0)
-// evt_mario_set_pose
+EVT_DECLARE_USER_FUNC(evt_mario_set_pose, 1)
 // evt_mario_set_normal_pose
 // evt_mario_adjust_dir
 // unk_JP_US_EU_26_800e6b1c
@@ -95,7 +95,7 @@ EVT_DECLARE_USER_FUNC(evt_mario_get_pos, 4)
 EVT_DECLARE_USER_FUNC(evt_mario_key_onoff, 1)
 // evt_mario_cont_onoff
 // evt_mario_trigflag_onoff
-// evt_mario_dispflag_onoff
+EVT_DECLARE_USER_FUNC(evt_mario_dispflag_onoff, 2)
 // evt_mario_flag_onoff
 // evt_mario_balloon_off
 // evt_mario_balloon_tenten

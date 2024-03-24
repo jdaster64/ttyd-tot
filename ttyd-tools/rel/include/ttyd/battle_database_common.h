@@ -732,7 +732,7 @@ struct BattleSetupData {
     BattleSetupWeightedLoadout* flag_off_loadouts;
     // 0x10 = cannot flee
     // 0x20 = if set, makes ATK/DEF Merlee curses more frequent
-    // 0x40 = enforces BtlActRec conditions?
+    // 0x40 = suppresses Game Over (respawn on overworld with 1 HP)
     // 0x1000'0000 = set on Pit battles; disables First/Bump Attack
     uint32_t        battle_setup_flags;
     // 0 = normal; others are used for bosses w/set audience makeup

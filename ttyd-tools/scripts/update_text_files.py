@@ -660,6 +660,12 @@ g_StringMap = {
         
         b"msg_kuri_map":
             b"Placeholder area tattle \xd0\n<k>",
+            
+        # Map text.
+        
+        b"gon_00_reentry":
+            b"<system>\n<p>\n"
+            b"You can't re-enter that way!\n<k>",
     },
     
     # Tower floor 1; TODO: Copy to other tower maps as needed.
@@ -668,6 +674,17 @@ g_StringMap = {
         
         b"msg_kuri_map":
             b"Placeholder area tattle \xd0\n<k>",
+            
+        # Map text.
+        
+        b"tot_gameover":
+            b"<system>\n<p>\n"
+            b"Do you want to continue from\n"
+            b"after the last boss, or give up\n"
+            b"and restart from the lobby?\n<o>",
+            
+        b"tot_gameover_opt":
+            b"<select 0 1 0 40>\nContinue\nGive Up",
         
         # NPC tattles.
 

@@ -27,7 +27,7 @@ extern "C" {
 EVT_DECLARE_USER_FUNC(evt_party_set_breed_pose, 2)
 // evt_party_sleep_off
 // evt_party_sleep_on
-// evt_party_set_pose
+EVT_DECLARE_USER_FUNC(evt_party_set_pose, 2)
 // evt_party_set_homing_dist
 // evt_party_move_beside_mario
 // evt_party_move_behind_mario
@@ -49,7 +49,7 @@ EVT_DECLARE_USER_FUNC(evt_party_get_pos, 4)
 // evt_party_force_reset_outofscreen
 EVT_DECLARE_USER_FUNC(evt_party_set_camid, 2)
 // evt_party_init_camid
-// evt_party_cont_onoff
+EVT_DECLARE_USER_FUNC(evt_party_cont_onoff, 2)
 // unk_JP_US_EU_27_800eb9cc
 // evt_party_dispflg_onoff
 // evt_party_flg_onoff

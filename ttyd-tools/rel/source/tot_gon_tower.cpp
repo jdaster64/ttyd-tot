@@ -37,6 +37,7 @@
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
+#include <ttyd/mario.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/swdrv.h>
 
@@ -92,6 +93,7 @@ NpcSetupInfo g_EnemyNpcSetup[2];
 
 // USER_FUNC Declarations.
 EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
+EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
 
 // Other declarations.
 extern const BeroEntry normal_room_entry_data[3];
@@ -305,6 +307,51 @@ EVT_BEGIN(Tower_SpawnPipe)
     RETURN()
 EVT_END()
 
+// Checks for Game Over state.
+EVT_BEGIN(Tower_CheckGameOver)
+    DO(0)
+        USER_FUNC(evt_npc_get_battle_result, LW(0))
+        IF_EQUAL(LW(0), 3)
+            USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
+            USER_FUNC(evt_mario_dispflag_onoff, 1, 2)
+            USER_FUNC(evt_mario_key_onoff, 0)
+            USER_FUNC(evt_mario_set_pose, PTR("M_D_2"))
+            WAIT_FRM(3)
+            USER_FUNC(evt_party_cont_onoff, 0, 0)
+            USER_FUNC(evt_mario_get_party, LW(0))
+            SWITCH(LW(0))
+                CASE_EQUAL(1)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PKR_D_3"))
+                CASE_EQUAL(2)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PNK_D_3"))
+                CASE_EQUAL(3)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("D_3"))
+                CASE_EQUAL(4)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PYS_D_3"))
+                CASE_EQUAL(5)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PWD_D_3"))
+                CASE_EQUAL(6)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PTR_D_3"))
+                CASE_EQUAL(7)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PCH_D_3"))
+            END_SWITCH()
+            
+            USER_FUNC(evt_msg_print, 0, PTR("tot_gameover"), 0, PTR("me"))
+            USER_FUNC(evt_msg_select, 0, PTR("tot_gameover_opt"))
+            // Despawn partner.
+            USER_FUNC(evt_mario_goodbye_party, 0)
+            USER_FUNC(evtTot_SetPreviousPartner, 0)
+            // Regardless for now, reload into lobby.
+            // TODO: Experiment with different map transitions.
+            USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+            USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("dokan_3"))
+            RETURN()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+    RETURN()
+EVT_END()
+
 // Set up the battle / enemy NPC, or other NPCs on the floor.
 EVT_BEGIN(Tower_NpcSetup)
     USER_FUNC(evtTot_IsRestFloor, LW(0))
@@ -347,6 +394,9 @@ EVT_BEGIN(Tower_NpcSetup)
         
         // TODO: Swap out battle id as appropriate for special battles?
         USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
+        
+        // Asynchronously check for battle failure state.
+        RUN_EVT(Tower_CheckGameOver)
         
         // Wait for the enemy to be defeated, then spawn chests.
         INLINE_EVT()
@@ -466,6 +516,14 @@ EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
     int32_t floor = state.floor_;
     bool is_rest_floor = floor == 0 || (floor % 8 == 7);
     evtSetValue(evt, evt->evtArguments[0], is_rest_floor);
+    return 2;
+}
+
+// Overrides the previous party member that was out.
+EVT_DEFINE_USER_FUNC(evtTot_SetPreviousPartner) {
+    // TODO: Read from saved data if continuing.
+    auto* player = ttyd::mario::marioGetPtr();
+    player->prevFollowerId[0] = 0;
     return 2;
 }
 

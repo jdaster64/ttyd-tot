@@ -952,16 +952,21 @@
 800e2e0c:evt_mario_kill_party
 800e2e78:evt_mario_goodbye_party
 800e3120:evt_mario_set_party_pos
+800e372c:evt_mario_get_party
 800e6498:evt_mario_normalize
+800e6840:evt_mario_set_pose
 800e71f8:evt_mario_get_pos
 800e7474:evt_mario_key_onoff
+800e75a8:evt_mario_dispflag_onoff
 
 // evt_party.o
 800ea2bc:evt_party_set_breed_pose
+800ea3f8:evt_party_set_pose
 800ea61c:evt_party_jump_pos
 800eae70:evt_party_run
 800eb3f8:evt_party_get_pos
 800eb87c:evt_party_set_camid
+800eb94c:evt_party_cont_onoff
 
 // event.o
 800ee688:stg0_00_init
