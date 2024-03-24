@@ -922,17 +922,18 @@ EVT_BEGIN(unitAtomicBoo_wait_event)
 EVT_END()
 
 EVT_BEGIN(unitAtomicBoo_init_ext_event)
-    USER_FUNC(evt_npc_entry, PTR("ext_teresa"), PTR("c_teresa"))
-    USER_FUNC(evt_npc_set_position, PTR("ext_teresa"), 0, -1000, 0)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(0))
     IF_EQUAL(LW(0), (int32_t)BattleUnitType::ATOMIC_BOO)
+        USER_FUNC(evt_npc_entry, PTR("ext_teresa"), PTR("c_teresa"))
+        USER_FUNC(evt_npc_set_position, PTR("ext_teresa"), 0, -1000, 0)
         USER_FUNC(
             evt_ext_entry, 30, PTR(&unitAtomicBoo_ext_entry_data), 
             PTR(&ext_boo_init), PTR(&ext_boo_main), 0)
     ELSE()
-        // TODO: Use CosmicBoo ext if I can figure out how to make them display.
+        USER_FUNC(evt_npc_entry, PTR("ext_teresa"), PTR("c_teresa_p"))
+        USER_FUNC(evt_npc_set_position, PTR("ext_teresa"), 0, -1000, 0)
         USER_FUNC(
-            evt_ext_entry, 30, PTR(&unitAtomicBoo_ext_entry_data), 
+            evt_ext_entry, 30, PTR(&unitCosmicBoo_ext_entry_data), 
             PTR(&ext_boo_init), PTR(&ext_boo_main), 0)
     END_IF()
     RETURN()
