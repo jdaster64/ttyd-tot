@@ -78,7 +78,7 @@ void _btlcmd_GetCursorPtr(
     battle::BattleWorkCommand* command_work, int cursor_type,
     battle::BattleWorkCommandCursor** out_cursor);
 // _btlcmd_MakeActClassTable
-// BattleCommandInit
+void BattleCommandInit(battle::BattleWork* battleWork);
 
 // .data
 extern ttyd::battle_database_common::BattleWeapon defaultWeapon_Dummy_NoItem;

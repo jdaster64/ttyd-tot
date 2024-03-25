@@ -120,6 +120,8 @@ BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t) = nullptr;
 void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*) = nullptr;
 // battle_seq_command.o  80123ec0
 int32_t (*g__btlcmd_MakeSelectWeaponTable_trampoline)(BattleWork*, int32_t) = nullptr;
+// battle_seq_command.o  80125380
+void (*g_BattleCommandInit_trampoline)(BattleWork*) = nullptr;
 // battle_unit.o  80126840
 void (*g_BtlUnit_PayWeaponCost_trampoline)(BattleWorkUnit*, BattleWeapon*) = nullptr;
 // battle_unit.o  80126968

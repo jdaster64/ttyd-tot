@@ -95,6 +95,7 @@ extern void (*g__rule_disp_trampoline)(void);
 extern BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t);
 extern int32_t (*g__btlcmd_MakeSelectWeaponTable_trampoline)(
     BattleWork*, int32_t);
+extern void (*g_BattleCommandInit_trampoline)(BattleWork*);
 extern void (*g_BattleInformationSetDropMaterial_trampoline)(
     FbatBattleInformation*);
 // Patch addresses.
@@ -336,8 +337,6 @@ void ApplyFixedPatches() {
                 ttyd::mario_pouch::pouchEquipCheckBadge(0x14e) * 50,
                 static_cast<int32_t>(ttyd::mario_pouch::pouchGetPtr()->max_sp));
             ttyd::mario_pouch::pouchGetPtr()->current_sp = sp;
-            // Reset move selected levels at the start of encounter.
-            tot::MoveManager::ResetSelectedLevels();
             g_seq_battleInit_trampoline();
         });
 
@@ -375,6 +374,14 @@ void ApplyFixedPatches() {
             // Replaces the original logic completely.
             return tot::party_mario::MakeSelectWeaponTable(
                 battleWork, table_type);
+        });
+    
+    g_BattleCommandInit_trampoline = patch::hookFunction(
+        ttyd::battle_seq_command::BattleCommandInit, [](BattleWork* battleWork) {
+            // Reset selected move levels before every player action.
+            tot::MoveManager::ResetSelectedLevels();
+            // Run original logic.
+            g_BattleCommandInit_trampoline(battleWork);
         });
         
     g_BattleInformationSetDropMaterial_trampoline = patch::hookFunction(
