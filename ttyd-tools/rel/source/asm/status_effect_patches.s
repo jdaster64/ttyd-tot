@@ -1,5 +1,22 @@
+.global StartCalculateCounterDamage
+.global BranchBackCalculateCounterDamage
 .global StartToggleScopedAndCheckFreezeBreak
 .global BranchBackToggleScopedAndCheckFreezeBreak
+
+StartCalculateCounterDamage:
+# Counterattack work (input to BattleCheckCounter).
+addi %r3, %r1, 0x54
+# Original attacker.
+mr %r4, %r31
+# Original target + targeted part.
+mr %r5, %r27
+mr %r6, %r28
+# Damage dealt to other party.
+mr %r7, %r22
+bl calculateCounterDamage
+
+BranchBackCalculateCounterDamage:
+b 0
 
 StartToggleScopedAndCheckFreezeBreak:
 # If this is the final hit in the attack...

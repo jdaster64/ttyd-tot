@@ -554,8 +554,9 @@ int32_t GetDifficulty() {
     return kBaseDifficulty[tower] + (floor - 1) / 8;
 }
 
+// Every 8 floors, except 32 and 64, which are regular bosses.
 int32_t IsMidbossFloor(int32_t floor) {
-    return floor % 8 == 0;
+    return floor % 8 == 0 && floor % 32 != 0;
 }
 
 // Skips the enemy loadout selection process, using debug enemies instead.
@@ -621,10 +622,42 @@ void SelectEnemies() {
     int32_t target_level_sum = kTargetLevelSums[difficulty];
     int32_t* debug_enemies = DebugManager::GetEnemies();
     
-    // TODO: Handle Atomic Boo, dragon fights.
+    // Handle dragon / Atomic Boo bosses.
+    if (state.IsFinalBossFloor()) {
+        int32_t enemy_type;
+        switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+            case OPTVAL_DIFFICULTY_FULL_EX:
+                enemy_type = BattleUnitType::BONETAIL;
+                break;
+            case OPTVAL_DIFFICULTY_FULL:
+                enemy_type = BattleUnitType::GLOOMTAIL;
+                break;
+            default:
+                enemy_type = BattleUnitType::HOOKTAIL;
+                break;
+        }
+        for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
+        g_Enemies[0] = enemy_type;
+        g_NumEnemies = 1;
+        return;
+    } else if (state.floor_ == 32) {
+        int32_t enemy_type;
+        switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+            case OPTVAL_DIFFICULTY_FULL_EX:
+                enemy_type = BattleUnitType::TOT_COSMIC_BOO;
+                break;
+            default:
+                enemy_type = BattleUnitType::ATOMIC_BOO;
+                break;
+        }
+        for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
+        g_Enemies[0] = enemy_type;
+        g_NumEnemies = 1;
+        return;
+    }
     
     // Select a mid-boss when floor is a multiple of 8.
-    if (IsMidbossFloor(state.floor_)) {        
+    if (IsMidbossFloor(state.floor_)) {
         // If debug set of enemies, take the first enemy from the list.
         if (debug_enemies) {
             PopulateDebugEnemyLoadout(debug_enemies);
@@ -842,17 +875,26 @@ void BuildBattle(
         ttyd::npc_data::npcTribe + enemy_info[0]->npc_tribe_idx;
     NpcAiTypeTable* npc_ai =
         ttyd::npc_data::npc_ai_type_table + enemy_info[0]->ai_type_idx;
+    
+    auto& state = g_Mod->state_;
         
-    // TODO: Special case for dragons _WHILE TESTING ONLY!_
-    switch (g_Enemies[0]) {
-        case BattleUnitType::HOOKTAIL:
-        case BattleUnitType::GLOOMTAIL:
-        case BattleUnitType::BONETAIL:
-            // Use Goomba on the overworld; don't first strike it!
-            npc_tribe = ttyd::npc_data::npcTribe + kEnemyInfo[1].npc_tribe_idx;
-            npc_ai = ttyd::npc_data::npc_ai_type_table + kEnemyInfo[1].ai_type_idx;
-            break;
+    // Special case overworld NPC for dragons, for testing purposes.
+    if (!state.IsFinalBossFloor()) {
+        switch (g_Enemies[0]) {
+            case BattleUnitType::HOOKTAIL:
+            case BattleUnitType::GLOOMTAIL:
+            case BattleUnitType::BONETAIL:
+                // Use a Goomba on the overworld; don't first strike it!
+                npc_tribe = 
+                    ttyd::npc_data::npcTribe + kEnemyInfo[1].npc_tribe_idx;
+                npc_ai =
+                    ttyd::npc_data::npc_ai_type_table +
+                    kEnemyInfo[1].ai_type_idx;
+                break;
+        }
     }
+    
+    // TODO: Special setup for boss floors.
 
     NpcSetupInfo& npc = npc_setup_info[0];
     memset(&npc, 0, sizeof(NpcSetupInfo));
@@ -882,10 +924,6 @@ void BuildBattle(
     
     // Construct the BattleGroupSetup from previously selected enemies.
     
-    // TODO: Return early for boss fights, if handling them elsewhere?
-    
-    auto& state = g_Mod->state_;
-    
     for (int32_t i = 0; i < 12; ++i) g_CustomAudienceWeights[i] = 2;
     // Make Toads slightly likelier since they're never boosted.
     g_CustomAudienceWeights[0] = 3;
@@ -897,8 +935,8 @@ void BuildBattle(
         float x = kEnemyPartyCenterX + offset * kEnemyPartySepX;
         float z = offset * kEnemyPartySepZ;
         
-        // TODO: Hack to make sure bosses are in the right location.
-        switch (g_Enemies[0]) {
+        // Make sure bosses appear in the right position.
+        switch (g_Enemies[i]) {
             case BattleUnitType::ATOMIC_BOO:
             case BattleUnitType::TOT_COSMIC_BOO:
                 x = 70.0f;
@@ -943,14 +981,15 @@ void BuildBattle(
         weights.max_weight = g_CustomAudienceWeights[i];
     }
     
-    if (IsMidbossFloor(state.floor_)) {
+    if (state.IsFinalBossFloor()) {
+        battle->music_name = "BGM_BOSS_STG1_GONBABA1";
+    } else if (state.floor_ == 32) {
+        battle->music_name = "BGM_BOSS_STG4_RUNPELL1";  // "BGM_CHUBOSS_BATTLE1"
+    } else if (IsMidbossFloor(state.floor_)) {
         battle->music_name = "BGM_KOBOSS_BATTLE1";
     } else {
         battle->music_name = "BGM_ZAKO_BATTLE1";
     }
-    
-    // Atomic Boo:  "BGM_CHUBOSS_BATTLE1";
-    // Dragons:     "BGM_BOSS_STG1_GONBABA1";
 }
 
 }  // namespace
@@ -996,9 +1035,9 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
     NpcEntry* npc = ttyd::evt_npc::evtNpcNameToPtr(evt, name);
     ttyd::npcdrv::npcSetBattleInfo(npc, battle_id);
     
-    // TODO: Skip for final boss battle.
-    
     const auto& state = g_Mod->state_;
+    
+    if (state.IsFinalBossFloor()) return 2;
     
     const int32_t reward_mode = state.GetOptionValue(OPT_BATTLE_DROPS);
     NpcBattleInfo* battle_info = &npc->battleInfo;

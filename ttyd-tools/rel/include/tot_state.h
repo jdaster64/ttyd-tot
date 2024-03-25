@@ -86,7 +86,7 @@ public:
     int32_t GetOption(uint32_t option, int32_t value = 0) const;
     
     // Returns values as / checks values against OPTVAL.
-    int32_t GetOptionValue(uint32_t option) const;
+    uint32_t GetOptionValue(uint32_t option) const;
     bool CheckOptionValue(uint32_t option_value) const;
     
     // Gets menu information (raw strings, not msg keys) for a given option.
@@ -99,6 +99,8 @@ public:
     
     // Sets/increments the current tower floor, and makes any necessary changes.
     void IncrementFloor(int32_t change = 1);
+    // Returns whether the floor (or current, if -1) contains the final boss.
+    bool IsFinalBossFloor(int32_t floor = -1) const;
     
     // Functions for time-tracking...
     // void StartTimer();

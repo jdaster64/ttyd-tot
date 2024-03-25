@@ -379,7 +379,7 @@ int32_t StateManager::GetOption(uint32_t option, int32_t value) const {
     return -1;
 }
 
-int32_t StateManager::GetOptionValue(uint32_t option) const {
+uint32_t StateManager::GetOptionValue(uint32_t option) const {
     int32_t t, x, y, a, b;
     GetOptionParts(option, &t, &x, &y, &a, &b);
     // Only TYPE_OPT has OPTVAL values.
@@ -434,6 +434,12 @@ void StateManager::IncrementFloor(int32_t change) {
             party_data.current_hp = 1;
         }
     }
+}
+
+bool StateManager::IsFinalBossFloor(int32_t floor) const {
+    if (floor < 0) floor = floor_;
+    bool is_full = GetOptionValue(OPT_DIFFICULTY) >= OPTVAL_DIFFICULTY_FULL;
+    return floor >= (is_full ? 64 : 32);
 }
 
 // Functions for time-tracking...

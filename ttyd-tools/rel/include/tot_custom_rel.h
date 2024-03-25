@@ -121,6 +121,8 @@ extern ttyd::battle_database_common::BattleUnitKind unit_Gloomtail;
 extern ttyd::battle_database_common::BattleUnitKind unit_Bonetail;
 
 // Other structures referenced by patches, etc.
+extern ttyd::battle_database_common::BattleWeapon unitBobOmb_weaponBomb;
+extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_ZYux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_XYux_Main;

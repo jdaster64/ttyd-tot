@@ -12,6 +12,23 @@ struct BattleWorkUnitPart;
 
 namespace ttyd::battle_damage {
 
+struct CounterattackWork {
+    int32_t allow_attacker_damage;  // Whether attack will still damage target.
+    int32_t payback_or_poison_countered;
+    int32_t fiery_status_countered;
+    int32_t poison_status_countered;
+    int32_t electric_status_countered;
+    int32_t icy_status_countered;
+    int32_t hold_fast_countered;
+    int32_t return_postage_countered;
+    int32_t counter_type_1;
+    int32_t counter_type_2;         // Same as counter_type_1 + 0x100 flag?
+    int32_t total_damage;
+    int32_t target_hit_event;       // Run on target after successful counter?
+}  __attribute__((__packed__));
+
+static_assert(sizeof(CounterattackWork) == 0x30);
+
 extern "C" {
 
 // BattleCheckCounter

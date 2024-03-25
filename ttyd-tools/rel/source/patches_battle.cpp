@@ -6,6 +6,7 @@
 #include "mod_state.h"
 #include "patch.h"
 #include "patches_mario_move.h"
+#include "tot_custom_rel.h"
 #include "tot_generate_enemy.h"
 #include "tot_manager_move.h"
 
@@ -59,8 +60,11 @@ extern "C" {
     void StartApplySpRegenMultiplierBingo();
     void BranchBackApplySpRegenMultiplierBingo();
     // status_effect_patches.s
+    void StartCalculateCounterDamage();
+    void BranchBackCalculateCounterDamage();
     void StartToggleScopedAndCheckFreezeBreak();
     void BranchBackToggleScopedAndCheckFreezeBreak();
+    
     
     void signalPlayerInitiatedPartySwitch(ttyd::battle_unit::BattleWorkUnit* unit) {
         mod::infinite_pit::battle::SignalPlayerInitiatedPartySwitch();
@@ -70,6 +74,14 @@ extern "C" {
     }
     double applySpRegenMultiplier(double base_regen) {
         return mod::infinite_pit::battle::ApplySpRegenMultiplier(base_regen);
+    }
+    void calculateCounterDamage(
+        ttyd::battle_damage::CounterattackWork* cw,
+        ttyd::battle_unit::BattleWorkUnit* attacker,
+        ttyd::battle_unit::BattleWorkUnit* target,
+        ttyd::battle_unit::BattleWorkUnitPart* part, int32_t damage_dealt) {
+        mod::infinite_pit::battle::CalculateCounterDamage(
+            cw, attacker, target, part, damage_dealt);
     }
     void toggleOffScopedStatus(
         ttyd::battle_unit::BattleWorkUnit* attacker,
@@ -88,6 +100,7 @@ using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_unit;
 
 using ::ttyd::battle::BattleWork;
+using ::ttyd::battle_damage::CounterattackWork;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
@@ -119,10 +132,9 @@ extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
 // Patch addresses.
 extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH;
-extern const int32_t g_BattleCheckDamage_Patch_PaybackDivisor;
-extern const int32_t g_BattleCheckDamage_Patch_HoldFastDivisor;
-extern const int32_t g_BattleCheckDamage_Patch_ReturnPostageDivisor;
-extern const int32_t g_BattleCheckDamage_Patch_SkipHugeTinyArrows;
+extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_BH;
+extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH;
+extern const int32_t g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
@@ -805,6 +817,26 @@ int32_t CalculateBaseDamage(
     return damage;
 }
 
+void CalculateCounterDamage(
+    CounterattackWork* cw, BattleWorkUnit* attacker, BattleWorkUnit* target,
+    BattleWorkUnitPart* part, int32_t damage_dealt) {
+    // For Payback, Hold Fast and Return Postage, return the full damage.
+    if (cw->payback_or_poison_countered) cw->total_damage += damage_dealt;
+    if (cw->hold_fast_countered) cw->total_damage += damage_dealt;
+    if (cw->return_postage_countered) cw->total_damage += damage_dealt;
+    
+    // For Bob-omb counters, deal the damage the explosion would have dealt.
+    // (Note that if the Bob-omb has Payback status that will take precedent).
+    if (cw->counter_type_1 == 0x31 || cw->counter_type_1 == 0x32) {
+        int32_t part_id = BtlUnit_GetBodyPartsId(attacker);
+        auto* attacker_part = BtlUnit_GetPartsPtr(attacker, part_id);
+        auto* weapon = &tot::custom::unitBobOmb_weaponBomb;
+        uint32_t unk0 = 0U;
+        cw->total_damage = ttyd::battle_damage::BattleCalculateDamage(
+            target, attacker, attacker_part, weapon, &unk0, 0x20000U);
+    }
+}
+
 void SpendAndIncrementPartySwitchCost() {
     if (g_PartySwitchPlayerInitiated) {
         // Spend FP (and track total FP spent in BattleActRec).
@@ -902,6 +934,15 @@ void ApplyFixedPatches() {
                 // Replaces vanilla logic completely.
                 return StatusEffectTick(unit, status_type);
             });
+        
+    // Replace damage calculation for counters to make Payback, Hold Fast
+    // and Return Postage deal 1x damage, and make Bob-omb counters
+    // deal the same damage that the explosion normally would have.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_BattleCheckDamage_CalculateCounterDamage_BH),
+        reinterpret_cast<void*>(g_BattleCheckDamage_CalculateCounterDamage_EH),
+        reinterpret_cast<void*>(StartCalculateCounterDamage),
+        reinterpret_cast<void*>(BranchBackCalculateCounterDamage));
             
     // Track damage taken, and queue SP restoration based on damage taken.
     g_BattleDamageDirect_trampoline = mod::patch::hookFunction(
@@ -975,19 +1016,8 @@ void ApplyFixedPatches() {
             
     // Skip drawing Huge / Tiny status arrows when inflicted.
     mod::patch::writePatch(
-        reinterpret_cast<void*>(g_BattleCheckDamage_Patch_SkipHugeTinyArrows),
+        reinterpret_cast<void*>(g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows),
         0x2c19000cU /* cmpwi r25, 12 */);
-        
-    // Increase all forms of Payback-esque status returned damage to 1x.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_BattleCheckDamage_Patch_PaybackDivisor),
-        0x38000032U /* li r0, 50 */);
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_BattleCheckDamage_Patch_HoldFastDivisor),
-        0x38000032U /* li r0, 50 */);
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_BattleCheckDamage_Patch_ReturnPostageDivisor),
-        0x38000032U /* li r0, 50 */);
         
     // Change frame windows for guarding / Superguarding at different levels
     // of Simplifiers / Unsimplifiers to be more symmetric.

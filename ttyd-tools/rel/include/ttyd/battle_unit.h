@@ -568,7 +568,7 @@ void BtlUnit_GetHitPos(
 // BtlUnit_AddPos
 // BtlUnit_SetPos
 void BtlUnit_GetPos(BattleWorkUnit* unit, float* x, float* y, float* z);
-// BtlUnit_GetBodyPartsId
+int32_t BtlUnit_GetBodyPartsId(BattleWorkUnit* unit);
 BattleWorkUnitPart* BtlUnit_GetPartsPtr(BattleWorkUnit* unit, int part_idx);
 // BtlUnit_GetUnitId
 // BtlUnit_Spawn

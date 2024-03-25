@@ -7,6 +7,7 @@
 #include "mod_state.h"
 #include "patches_field.h"
 #include "tot_generate_enemy.h"
+#include "tot_gon_tower.h"
 #include "tot_manager_move.h"
 
 #include <ttyd/battle_database_common.h>
@@ -279,7 +280,7 @@ void DebugManager::Update() {
             dir = -1;
         } else if (button_trg & ButtonId::Y) {
             g_Mod->state_.floor_ = g_CursorPos;
-            // field::UpdateExitDestination();
+            tot::gon::UpdateDestinationMap();
             g_DebugMode = DEBUG_OFF;
             return;
         }

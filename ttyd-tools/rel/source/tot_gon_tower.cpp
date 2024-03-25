@@ -95,11 +95,24 @@ NpcSetupInfo g_EnemyNpcSetup[2];
 EVT_DECLARE_USER_FUNC(evtTot_ClearBattleResult, 0)
 EVT_DECLARE_USER_FUNC(evtTot_HasBackupSave, 1)
 EVT_DECLARE_USER_FUNC(evtTot_LoadBackupSaveData, 0)
+EVT_DECLARE_USER_FUNC(evtTot_IsFinalFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
+EVT_DECLARE_USER_FUNC(evtTot_UpdateDestinationMap, 0)
+EVT_DECLARE_USER_FUNC(evtTot_WaitForDragonLanding, 0)
 
 // Other declarations.
-extern const BeroEntry normal_room_entry_data[3];
+extern BeroEntry normal_room_entry_data[3];
+
+// Script for changing room destinations dynamically.
+EVT_BEGIN(Tower_UpdateDestinationEvt)
+    SET(LW(0), PTR("dokan_1"))
+    RUN_CHILD_EVT(bero_case_switch_off)
+    USER_FUNC(evtTot_UpdateDestinationMap)
+    SET(LW(0), PTR("dokan_1"))
+    RUN_CHILD_EVT(bero_case_switch_on)
+    RETURN()
+EVT_END()
 
 // Script for sign that shows current floor.
 EVT_BEGIN(Tower_SignEvt)
@@ -205,8 +218,7 @@ EVT_END()
 
 // Increment floor number.
 EVT_BEGIN(Tower_IncrementFloor)
-    SET(LW(0), 1)
-    USER_FUNC(evtTot_IncrementFloor, LW(0))
+    USER_FUNC(evtTot_IncrementFloor, 1)
     SET(LW(0), 0)
     RETURN()
 EVT_END()
@@ -310,59 +322,262 @@ EVT_BEGIN(Tower_SpawnPipe)
     RETURN()
 EVT_END()
 
-// Checks for Game Over state.
+EVT_BEGIN(Tower_RunGameOverScript)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
+    USER_FUNC(evt_mario_dispflag_onoff, 1, 2)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mario_set_pose, PTR("M_D_2"))
+    WAIT_FRM(3)
+    USER_FUNC(evt_party_cont_onoff, 0, 0)
+    USER_FUNC(evt_mario_get_party, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(1)
+            USER_FUNC(evt_party_set_pose, 0, PTR("PKR_D_3"))
+        CASE_EQUAL(2)
+            USER_FUNC(evt_party_set_pose, 0, PTR("PNK_D_3"))
+        CASE_EQUAL(3)
+            USER_FUNC(evt_party_set_pose, 0, PTR("D_3"))
+        CASE_EQUAL(4)
+            USER_FUNC(evt_party_set_pose, 0, PTR("PYS_D_3"))
+        CASE_EQUAL(5)
+            USER_FUNC(evt_party_set_pose, 0, PTR("PWD_D_3"))
+        CASE_EQUAL(6)
+            USER_FUNC(evt_party_set_pose, 0, PTR("PTR_D_3"))
+        CASE_EQUAL(7)
+            USER_FUNC(evt_party_set_pose, 0, PTR("PCH_D_3"))
+    END_SWITCH()
+    
+    USER_FUNC(evtTot_ClearBattleResult)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_gameover"), 0, PTR("me"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_gameover_opt"))
+    // Despawn partner.
+    USER_FUNC(evt_mario_goodbye_party, 0)
+    // Chose "continue" option.
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(evtTot_LoadBackupSaveData)
+        // Resets floor-based stats without making saves, etc.
+        USER_FUNC(evtTot_IncrementFloor, 0)
+        // Set flag to spawn player in room with pipe already spawned.
+        SET(GSW(1002), 1)
+        USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+        USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("dokan_2"))
+    ELSE()
+        // Reload into lobby.
+        USER_FUNC(evtTot_SetPreviousPartner, 0)
+        USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+        USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("dokan_3"))
+    END_IF()
+    RETURN()
+EVT_END()
+
+// Checks for Game Over state on standard floors.
 EVT_BEGIN(Tower_CheckGameOver)
     DO(0)
         USER_FUNC(evt_npc_get_battle_result, LW(0))
         IF_EQUAL(LW(0), 3)
-            USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
-            USER_FUNC(evt_mario_dispflag_onoff, 1, 2)
-            USER_FUNC(evt_mario_key_onoff, 0)
-            USER_FUNC(evt_mario_set_pose, PTR("M_D_2"))
-            WAIT_FRM(3)
-            USER_FUNC(evt_party_cont_onoff, 0, 0)
-            USER_FUNC(evt_mario_get_party, LW(0))
-            SWITCH(LW(0))
-                CASE_EQUAL(1)
-                    USER_FUNC(evt_party_set_pose, 0, PTR("PKR_D_3"))
-                CASE_EQUAL(2)
-                    USER_FUNC(evt_party_set_pose, 0, PTR("PNK_D_3"))
-                CASE_EQUAL(3)
-                    USER_FUNC(evt_party_set_pose, 0, PTR("D_3"))
-                CASE_EQUAL(4)
-                    USER_FUNC(evt_party_set_pose, 0, PTR("PYS_D_3"))
-                CASE_EQUAL(5)
-                    USER_FUNC(evt_party_set_pose, 0, PTR("PWD_D_3"))
-                CASE_EQUAL(6)
-                    USER_FUNC(evt_party_set_pose, 0, PTR("PTR_D_3"))
-                CASE_EQUAL(7)
-                    USER_FUNC(evt_party_set_pose, 0, PTR("PCH_D_3"))
-            END_SWITCH()
-            
-            USER_FUNC(evtTot_ClearBattleResult)
-            USER_FUNC(evt_msg_print, 0, PTR("tot_gameover"), 0, PTR("me"))
-            USER_FUNC(evt_msg_select, 0, PTR("tot_gameover_opt"))
-            // Despawn partner.
-            USER_FUNC(evt_mario_goodbye_party, 0)
-            // Chose "continue" option.
-            IF_EQUAL(LW(0), 0)
-                USER_FUNC(evtTot_LoadBackupSaveData)
-                // Resets floor-based stats without making saves, etc.
-                USER_FUNC(evtTot_IncrementFloor, 0)
-                // Set flag to spawn player in room with pipe already spawned.
-                SET(GSW(1002), 1)
-                USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-                USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("dokan_2"))
-            ELSE()
-                // Reload into lobby.
-                USER_FUNC(evtTot_SetPreviousPartner, 0)
-                USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-                USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("dokan_3"))
-            END_IF()
+            RUN_CHILD_EVT(&Tower_RunGameOverScript)
             RETURN()
         END_IF()
         WAIT_FRM(1)
     WHILE()
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_DragonFelledShake)
+    USER_FUNC(evt_npc_get_position, PTR(kPitNpcName), LW(0), LW(1), LW(2))
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_STG1_GNB_DOWN1"), 0)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_GNB_DOWN2"), LW(0), LW(1), LW(2), LW(8))
+    INLINE_EVT()
+        USER_FUNC(evt_sub_intpl_msec_init, 0, 90, 0, 10000)
+        LBL(0)
+        USER_FUNC(evt_sub_intpl_msec_get_value)
+        USER_FUNC(evt_snd_sfx_vol, LW(8), LW(0))
+        WAIT_FRM(1)
+        IF_EQUAL(LW(1), 1)
+            GOTO(0)
+        END_IF()
+        USER_FUNC(evt_snd_sfxoff, LW(8))
+    END_INLINE()
+    USER_FUNC(evt_cam_shake, 4, FLOAT(0.05), FLOAT(0.0), 500)
+    USER_FUNC(evt_sub_intpl_init, 11, 50, 5, 50)
+    DO(0)
+        USER_FUNC(evt_sub_intpl_get_value)
+        DIVF(LW(0), FLOAT(1000.0))
+        USER_FUNC(evt_cam_shake, 4, LW(0), FLOAT(0.0), 50)
+        IF_EQUAL(LW(1), 0)
+            DO_BREAK()
+        END_IF()
+    WHILE()
+    USER_FUNC(evt_cam_shake, 4, FLOAT(0.005), FLOAT(0.0), 2000)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_DragonFogChange)
+    USER_FUNC(evt_map_get_fog, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
+    SET(GW(0), LW(5))
+    SET(GW(1), LW(6))
+    SET_FRAME_FROM_MSEC(LW(10), 8000)
+    ADD(LW(10), 1)
+    INLINE_EVT()
+        DO(LW(10))
+            USER_FUNC(evt_map_set_fog, LW(4), GW(0), GW(1), LW(7), LW(8), LW(9))
+            WAIT_FRM(1)
+        WHILE()
+    END_INLINE()
+    INLINE_EVT()
+        USER_FUNC(evt_sub_intpl_init, 11, 0, 400, LW(10))
+        DO(LW(10))
+            USER_FUNC(evt_sub_intpl_get_value)
+            SET(GW(0), LW(0))
+            ADD(GW(0), LW(5))
+            IF_EQUAL(LW(1), 0)
+                DO_BREAK()
+            END_IF()
+            WAIT_FRM(1)
+        WHILE()
+    END_INLINE()
+    USER_FUNC(evt_sub_intpl_init, 11, 0, 1600, LW(10))
+    DO(LW(10))
+        USER_FUNC(evt_sub_intpl_get_value)
+        SET(GW(1), LW(0))
+        ADD(GW(1), LW(6))
+        IF_EQUAL(LW(1), 0)
+            DO_BREAK()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_DragonStandupShake)
+    WAIT_MSEC(3700)
+    USER_FUNC(evt_npc_get_position, PTR(kPitNpcName), LW(0), LW(1), LW(2))
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_GNB_STEP1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.0), 800)
+    RETURN()
+EVT_END()
+
+// Runs event for encountering final boss.
+EVT_BEGIN(Tower_FinalBossEvent)
+    // Entry animation.
+    USER_FUNC(evt_map_set_fog, 2, 400, 1000, 0, 10, 40)
+    USER_FUNC(evt_map_fog_onoff, 1)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mario_normalize)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 175, 0, 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_S_1"))
+    USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("oFF_jon_06"), 1)
+    USER_FUNC(evt_seq_wait, 2)
+    WAIT_MSEC(3500)
+    USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_eff_fukidashi, 0, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
+    USER_FUNC(evt_eff_fukidashi, 3, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
+    USER_FUNC(evt_mario_set_pose, PTR("M_N_5B"))
+    INLINE_EVT()
+        SET(LW(3), LW(0))
+        ADD(LW(3), -40)
+        USER_FUNC(evt_party_move_pos, 0, LW(3), LW(2), 250)
+    END_INLINE()
+    WAIT_MSEC(2000)
+    USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
+    USER_FUNC(evt_mario_set_dir_npc, PTR(kPitNpcName))
+    USER_FUNC(evt_party_set_dir_npc, 0, PTR(kPitNpcName))
+    USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_EVT_GONBABA_FLY2"))
+    INLINE_EVT()
+        USER_FUNC(evt_snd_sfxon_3d_ex, PTR("SFX_STG1_GNB_ROAR2"), 0, 0, 0, 255, 255, 4300, 16, 0)
+        USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_U_1"))
+        USER_FUNC(evt_npc_wait_anim, PTR(kPitNpcName), FLOAT(1.0))
+        USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_S_1"))
+    END_INLINE()
+    RUN_EVT(PTR(&Tower_DragonStandupShake))
+    RUN_EVT(PTR(&Tower_DragonFogChange))
+    USER_FUNC(evt_cam3d_evt_set, -755, 24, 376, -84, 114, -22, 4500, 11)
+    WAIT_MSEC(4000)
+    DO(30)
+        USER_FUNC(evt_cam3d_evt_set, -755, 24, 376, -84, 114, -22, 15, 11)
+        WAIT_MSEC(15)
+        USER_FUNC(evt_cam3d_evt_set, -745, 23, 366, -84, 114, -22, 15, 11)
+        WAIT_MSEC(15)
+    WHILE()
+    WAIT_MSEC(3000)
+    USER_FUNC(evt_npc_battle_start, PTR(kPitNpcName))
+    
+    // Handle game over sequence.
+    USER_FUNC(evt_npc_wait_battle_end)
+    USER_FUNC(evt_npc_get_battle_result, LW(0))
+    IF_EQUAL(LW(0), 3)
+        RUN_CHILD_EVT(&Tower_RunGameOverScript)
+        RETURN()
+    END_IF()
+    
+    // Otherwise, play dragon death animation.
+    USER_FUNC(evt_cam3d_evt_set, -769, 50, 527, -22, 114, 7, 1, 11)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_1"))
+    USER_FUNC(evt_map_fog_onoff, 0)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 60, 0)
+    USER_FUNC(evt_mario_set_pos, 25, 10, 150)
+    USER_FUNC(evt_party_set_pos, 0, -25, 10, 150)
+    USER_FUNC(evt_mario_set_dir, 270, 0, 0)
+    USER_FUNC(evt_party_set_dir, 0, 90, -1)
+    RUN_EVT(PTR(&Tower_DragonFelledShake))
+    INLINE_EVT()
+        WAIT_MSEC(300)
+        USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 131088)
+        USER_FUNC(evtTot_WaitForDragonLanding)
+        USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_2"))
+    END_INLINE()
+    USER_FUNC(evt_npc_get_position, PTR(kPitNpcName), LW(0), LW(1), LW(2))
+    INLINE_EVT()
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG8_GNB_DOWN2"), LW(0), LW(1), LW(2), LW(3))
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.05), FLOAT(0.0), 500)
+        USER_FUNC(evt_sub_intpl_init, 11, 50, 5, 50)
+        DO(0)
+            USER_FUNC(evt_sub_intpl_get_value)
+            DIVF(LW(0), FLOAT(1000.0))
+            USER_FUNC(evt_cam_shake, 4, LW(0), FLOAT(0.0), 50)
+            IF_EQUAL(LW(1), 0)
+                DO_BREAK()
+            END_IF()
+        WHILE()
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.005), FLOAT(0.0), 2000)
+        USER_FUNC(evt_snd_sfxoff, LW(3))
+    END_INLINE()
+    WAIT_MSEC(5000)
+    
+    // TODO: Victory animation, results, ...
+    
+    // Despawn partner.
+    USER_FUNC(evt_mario_goodbye_party, 0)
+    // Reload into lobby.
+    USER_FUNC(evtTot_SetPreviousPartner, 0)
+    USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("dokan_3"))
+
+    RETURN()
+EVT_END()
+
+// Set up NPC and run async script for final boss floor.
+EVT_BEGIN(Tower_FinalBossSetup)
+    // Get battle / NPC info.
+    USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
+    SET(LW(1), PTR(g_EnemyNpcSetup))
+    USER_FUNC(evtTot_GetEnemyNpcInfo, 
+        LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
+    
+    // Set up NPC.
+    USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
+    USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
+    USER_FUNC(evt_npc_setup, LW(1))
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 0, 0)
+    USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
+    
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_3"))
+    USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 33554496)
+    USER_FUNC(evt_npc_pera_onoff, PTR(kPitNpcName), 0)
+    USER_FUNC(evt_npc_set_ry, PTR(kPitNpcName), 0)
+    
+    RUN_EVT(&Tower_FinalBossEvent)
     RETURN()
 EVT_END()
 
@@ -404,9 +619,6 @@ EVT_BEGIN(Tower_NpcSetup)
             USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
         END_IF()
         
-        // TODO: Special initialization for bosses...
-        
-        // TODO: Swap out battle id as appropriate for special battles?
         USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
         
         // Asynchronously check for battle failure state.
@@ -455,12 +667,16 @@ EVT_BEGIN(gon_01_InitEvt)
     
     // Is the player continuing from a Game Over?
     IF_EQUAL(GSW(1002), 0)
-        // Set up enemy NPC (TODO: or Mover, Charlieton, etc.)
-        RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
-        // TODO: Handle cases for Mover / NPC rooms, boss rooms?
+        // If not, set up NPCs, enemies, etc.
+        USER_FUNC(evtTot_IsFinalFloor, LW(0))
+        IF_EQUAL(LW(0), 1)
+            RUN_CHILD_EVT(PTR(&Tower_FinalBossSetup))
+        ELSE()
+            RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
+        END_IF()
+        // Set up loading zones.
         RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
     ELSE()
-        // TODO: Handle cases for Mover / NPC rooms, boss rooms?
         RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
         // Enable exit pipe immediately.
         USER_FUNC(evt_hit_bind_mapobj, PTR("a_dokan_1"), PTR("dokan_1_s"))
@@ -470,28 +686,27 @@ EVT_BEGIN(gon_01_InitEvt)
         
         SET(GSW(1002), 0)
     END_IF()
-    
-    // Always remove graffiti from wall on floor 50 map (not needed anymore?)
-    // USER_FUNC(evt_sub_get_mapname, LW(0))
-    // IF_STR_EQUAL(LW(0), PTR("jon_04"))
-    //     USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("after"), 1)
-    //     USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("s_rakugaki"), 1)
-    // END_IF()
         
-    // Non-boss room music / env sound:
-    USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STG0_100DN1"))
-    USER_FUNC(evt_snd_envoff, 512)
-    USER_FUNC(evt_snd_set_rev_mode, 1)
+    // Dynamically update the destination of the exit loading zone.
+    USER_FUNC(evtTot_UpdateDestinationMap)
     
-    // Boss room music / env sound:
-    // USER_FUNC(evt_snd_bgmoff, 512)
-    // USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG0_DAN1"))
-    // USER_FUNC(evt_snd_set_rev_mode, 2)
+    USER_FUNC(evtTot_IsFinalFloor, LW(0))
+    IF_EQUAL(LW(0), 0)
+        // Non-boss room music / env sound:
+        USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STG0_100DN1"))
+        USER_FUNC(evt_snd_envoff, 512)
+        USER_FUNC(evt_snd_set_rev_mode, 1)
+    ELSE()
+        // Boss room music / env sound:
+        USER_FUNC(evt_snd_bgmoff, 512)
+        USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG0_DAN1"))
+        USER_FUNC(evt_snd_set_rev_mode, 2)
+    END_IF()
 
     RETURN()
 EVT_END()
 
-const BeroEntry normal_room_entry_data[3] = {
+BeroEntry normal_room_entry_data[3] = {
     {
         .name = "dokan_2",
         .type = BeroType::PIPE,
@@ -531,10 +746,8 @@ const int32_t* GetTowerInitEvt() {
     return gon_01_InitEvt;
 }
 
-EVT_DEFINE_USER_FUNC(evtTot_ClearBattleResult) {
-    auto* fbat = (ttyd::npcdrv::FbatData*)ttyd::npcdrv::fbatGetPointer();
-    fbat->battleInfo.wResult = 0;
-    return 2;
+void UpdateDestinationMap() {
+    ttyd::evtmgr::evtEntry(const_cast<int32_t*>(Tower_UpdateDestinationEvt), 0, 0);
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_HasBackupSave) {
@@ -548,6 +761,13 @@ EVT_DEFINE_USER_FUNC(evtTot_LoadBackupSaveData) {
     return 2;
 }
 
+// Clear the negative result of the last battle.
+EVT_DEFINE_USER_FUNC(evtTot_ClearBattleResult) {
+    auto* fbat = (ttyd::npcdrv::FbatData*)ttyd::npcdrv::fbatGetPointer();
+    fbat->battleInfo.wResult = 0;
+    return 2;
+}
+
 // Returns whether the floor is a "rest floor" (no enemies).
 EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
     auto& state = g_Mod->state_;
@@ -557,11 +777,47 @@ EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
     return 2;
 }
 
+// Returns whether the floor is the final floor.
+EVT_DEFINE_USER_FUNC(evtTot_IsFinalFloor) {
+    bool is_final_floor = g_Mod->state_.IsFinalBossFloor();
+    evtSetValue(evt, evt->evtArguments[0], is_final_floor);
+    return 2;
+}
+
 // Overrides the previous party member that was out.
 EVT_DEFINE_USER_FUNC(evtTot_SetPreviousPartner) {
     // TODO: Read from saved data if continuing, or will that be handled?
     auto* player = ttyd::mario::marioGetPtr();
     player->prevFollowerId[0] = 0;
+    return 2;
+}
+
+// Wait for the dragon to hit the ground.
+EVT_DEFINE_USER_FUNC(evtTot_WaitForDragonLanding) {
+  ttyd::npcdrv::NpcEntry* npc = ttyd::npcdrv::npcNameToPtr(kPitNpcName);
+  return npc->wKpaMobjDeadCheck ? 2 : 0;
+}
+
+// Dynamically change the destination of the exit pipe.
+//
+// Note: This is probably overkill; I wasn't running the entry event in testing.
+// It's probably sufficient to update normal_room_entry_data on leaving a floor.
+EVT_DEFINE_USER_FUNC(evtTot_UpdateDestinationMap) {
+    const char* exit_bero = "dokan_1";
+    
+    int32_t floor = g_Mod->state_.floor_;
+    bool is_penultimate_floor = g_Mod->state_.IsFinalBossFloor(floor + 1);
+    const char* next_map = is_penultimate_floor ? "gon_05" : "gon_01";
+    
+    // Update the destination of the exit loading zone to match the floor.
+    BeroEntry** entries = ttyd::evt_bero::BeroINFOARR;
+    for (int32_t i = 0; i < 16; ++i) {
+        if (entries[i] && !strcmp(entries[i]->name, exit_bero)) {
+            entries[i]->target_map = next_map;
+            entries[i]->target_bero = "dokan_2";
+            break;
+        }
+    }
     return 2;
 }
 

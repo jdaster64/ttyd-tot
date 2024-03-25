@@ -124,6 +124,7 @@ ttyd::database::DatabaseDefinition g_SetupNoTbl[] = {
 void Prolog() {
     ttyd::mapdata::relSetEvtAddr("gon_00", GetLobbyInitEvt());
     ttyd::mapdata::relSetEvtAddr("gon_01", GetTowerInitEvt());
+    ttyd::mapdata::relSetEvtAddr("gon_05", GetTowerInitEvt());
     ttyd::mapdata::relSetBtlAddr("gon", g_SetupDataTbl, g_SetupNoTbl);
 }
 

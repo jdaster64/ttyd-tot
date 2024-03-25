@@ -624,6 +624,17 @@ g_StringMap = {
         
         b"tot_winsel_titlemove":      b"Move",
         b"tot_winsel_whichunlock":    b"Which move?",
+            
+        # Generic Map text.
+        
+        b"tot_gameover":
+            b"<system>\n<p>\n"
+            b"Do you want to continue from\n"
+            b"after the last boss, or give up\n"
+            b"and restart from the lobby?\n<o>",
+            
+        b"tot_gameover_opt":
+            b"<select 0 1 0 40>\nContinue\nGive Up",
         
         # Enemy names + Tattle info (TODO)
         
@@ -674,17 +685,6 @@ g_StringMap = {
         
         b"msg_kuri_map":
             b"Placeholder area tattle \xd0\n<k>",
-            
-        # Map text.
-        
-        b"tot_gameover":
-            b"<system>\n<p>\n"
-            b"Do you want to continue from\n"
-            b"after the last boss, or give up\n"
-            b"and restart from the lobby?\n<o>",
-            
-        b"tot_gameover_opt":
-            b"<select 0 1 0 40>\nContinue\nGive Up",
         
         # NPC tattles.
 
@@ -712,11 +712,6 @@ g_StringMap = {
             b"if you're desperate...\n<k>",
         
         # NPC text.
-        
-        # Boss fights.
-        
-        b"tot_dragon_debug":
-            b"Placeholder text %d-%d<k>",
         
         # Generic
         
@@ -891,6 +886,15 @@ g_StringMap = {
             
         b"rippo_yes_no":
             b"<select 0 1 0 40>\nYes\nNo",
+    },
+    
+    # Tower final floor.
+    'gon_05': {
+        
+        # Dragon fight dialogue.
+        
+        b"tot_dragon_debug":
+            b"Placeholder text %d-%d<k>",
     }
 }
 
