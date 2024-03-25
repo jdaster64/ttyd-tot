@@ -1,7 +1,9 @@
-.global StartStarPowerLevelMenuDisp
-.global BranchBackStarPowerLevelMenuDisp
-.global StartStarPowerGetMenuDescriptionMsg
-.global BranchBackStarPowerGetMenuDescriptionMsg
+.global StartCheckOpenMarioMoveMenu
+.global BranchBackCheckOpenMarioMoveMenu
+.global StartMarioMoveMenuDisp
+.global BranchBackMarioMoveMenuDisp
+.global StartMarioMoveMenuMsgEntry
+.global BranchBackMarioMoveMenuMsgEntry
 .global StartFixItemWinPartyDispOrder
 .global BranchBackFixItemWinPartyDispOrder
 .global StartFixItemWinPartySelectOrder
@@ -14,33 +16,29 @@
 .global StartInitTattleLog
 .global BranchBackInitTattleLog
 
-StartStarPowerLevelMenuDisp:
-bl starPowerMenuDisp
+StartCheckOpenMarioMoveMenu:
+# Check for opening the menu for jumps and hammers as well.
+mr %r3, %r29
+bl checkOpenMarioMoveMenu
+cmpwi %r3, 1
 
-BranchBackStarPowerLevelMenuDisp:
+BranchBackCheckOpenMarioMoveMenu:
 b 0
 
-StartStarPowerGetMenuDescriptionMsg:
-# Save registers.
-stwu %sp, -0x18 (%sp)
-stw %r3, 0xc (%sp)
-stw %r4, 0x10 (%sp)
-stw %r6, 0x14 (%sp)
-# Get the correct Star Power description, given the cursor position in the menu.
-mr %r3, %r0
-mflr %r0
-stw %r0, 0x1c (%sp)
-bl getStarPowerMenuDescriptionMsg
-mr %r5, %r3
-# Load registers.
-lwz %r3, 0xc (%sp)
-lwz %r4, 0x10 (%sp)
-lwz %r6, 0x14 (%sp)
-lwz %r0, 0x1c (%sp)
-mtlr %r0
-addi %sp, %sp, 0x18
+StartMarioMoveMenuDisp:
+# Move win_root pointer to r3.
+mr %r3, %r30
+bl marioMoveMenuDisp
 
-BranchBackStarPowerGetMenuDescriptionMsg:
+BranchBackMarioMoveMenuDisp:
+b 0
+
+StartMarioMoveMenuMsgEntry:
+# Get the correct Star Power description, given the cursor position in the menu
+# (win_root pointer already in r3).
+bl marioMoveMenuMsgEntry
+
+BranchBackMarioMoveMenuMsgEntry:
 b 0
 
 StartFixItemWinPartyDispOrder:

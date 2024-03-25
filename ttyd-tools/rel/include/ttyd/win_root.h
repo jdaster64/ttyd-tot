@@ -63,7 +63,7 @@ extern "C" {
 // winBookGX
 // winNameGX
 // winKirinukiGX
-// winMsgEntry
+void winMsgEntry(void* pWin, int32_t unk0, const char* msg, int32_t unk1);
 // winMsgDisp
 // winMsgMain
 // winBgGX

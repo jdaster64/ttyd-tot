@@ -7,6 +7,7 @@
 #include "patch.h"
 #include "patches_item.h"
 #include "tot_generate_enemy.h"
+#include "tot_manager_move.h"
 #include "tot_window_select.h"
 
 #include <gc/mtx.h>
@@ -43,10 +44,12 @@ extern "C" {
     void StartDispUpdownNumberIcons();
     void BranchBackDispUpdownNumberIcons();
     // menu_patches.s
-    void StartStarPowerLevelMenuDisp();
-    void BranchBackStarPowerLevelMenuDisp();
-    void StartStarPowerGetMenuDescriptionMsg();
-    void BranchBackStarPowerGetMenuDescriptionMsg();
+    void StartCheckOpenMarioMoveMenu();
+    void BranchBackCheckOpenMarioMoveMenu();
+    void StartMarioMoveMenuDisp();
+    void BranchBackMarioMoveMenuDisp();
+    void StartMarioMoveMenuMsgEntry();
+    void BranchBackMarioMoveMenuMsgEntry();
     void StartFixItemWinPartyDispOrder();
     void BranchBackFixItemWinPartyDispOrder();
     void StartFixItemWinPartySelectOrder();
@@ -81,11 +84,14 @@ extern "C" {
     void useSpecialItems(ttyd::win_party::WinPartyData** party_data) {
         mod::infinite_pit::ui::UseSpecialItemsInMenu(party_data);
     }
-    void starPowerMenuDisp() {
-        mod::infinite_pit::ui::StarPowerMenuDisp();
+    bool checkOpenMarioMoveMenu(void* pWin) {
+        return mod::infinite_pit::ui::CheckOpenMarioMoveMenu(pWin);
     }
-    void getStarPowerMenuDescriptionMsg(int32_t idx) {
-        mod::infinite_pit::ui::GetStarPowerMenuDescriptionMsg(idx);
+    void marioMoveMenuDisp(void* pWin) {
+        mod::infinite_pit::ui::MarioMoveMenuDisp(pWin);
+    }
+    void marioMoveMenuMsgEntry(void* pWin) {
+        mod::infinite_pit::ui::MarioMoveMenuMsgEntry(pWin);
     }
     void initTattleLog(void* win_log_ptr) {
         mod::infinite_pit::ui::InitializeTattleLog(win_log_ptr);
@@ -128,10 +134,11 @@ extern const int32_t g_winItemMain_CheckInvalidTarget_EH;
 extern const int32_t g_winItemMain_CheckInvalidTarget_CH1;
 extern const int32_t g_winItemMain_UseSpecialItems_BH;
 extern const int32_t g_winItemMain_Patch_AlwaysUseItemsInMenu;
-extern const int32_t g_winMarioDisp_StarPowerMenu_BH;
-extern const int32_t g_winMarioDisp_StarPowerMenu_EH;
-extern const int32_t g_winMarioMain_StarPowerDescription_BH;
-extern const int32_t g_winMarioMain_StarPowerDescription_EH;
+extern const int32_t g_winMarioDisp_MoveMenuDisp_BH;
+extern const int32_t g_winMarioDisp_MoveMenuDisp_EH;
+extern const int32_t g_winMarioMain_MoveDescription_BH;
+extern const int32_t g_winMarioMain_MoveDescription_EH;
+extern const int32_t g_winMarioMain_CheckOpenMoveMenu_BH;
 extern const int32_t g_winLogInit_Patch_DisableCrystalStarLog;
 extern const int32_t g_winLogInit_InitTattleLog_BH;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblHi16;
@@ -281,21 +288,28 @@ void ApplyFixedPatches() {
             g__btlcmd_MakeSelectWeaponTable_Patch_GetNameFromItem),
         0x807b0004U /* lwz r3, 0x4 (r27) */);
         
-    // Apply patch to Mario menu code to display the max levels of all
-    // currently unlocked Special Move.
+    // Apply patch to Mario menu code to open the moves menu on the jump/hammer
+    // selections as well as the Special Moves one.
     mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winMarioDisp_StarPowerMenu_BH),
-        reinterpret_cast<void*>(g_winMarioDisp_StarPowerMenu_EH),
-        reinterpret_cast<void*>(StartStarPowerLevelMenuDisp),
-        reinterpret_cast<void*>(BranchBackStarPowerLevelMenuDisp));
+        reinterpret_cast<void*>(g_winMarioMain_CheckOpenMoveMenu_BH),
+        reinterpret_cast<void*>(StartCheckOpenMarioMoveMenu),
+        reinterpret_cast<void*>(BranchBackCheckOpenMarioMoveMenu));
+        
+    // Apply patch to Mario menu code to display the max levels of all
+    // currently unlocked jump / hammer / Special Moves.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_winMarioDisp_MoveMenuDisp_BH),
+        reinterpret_cast<void*>(g_winMarioDisp_MoveMenuDisp_EH),
+        reinterpret_cast<void*>(StartMarioMoveMenuDisp),
+        reinterpret_cast<void*>(BranchBackMarioMoveMenuDisp));
         
     // Apply patch to Mario menu code to show the right description
-    // of the currently selected Special Move.
+    // of the currently selected jump / hammer / Special Move.
     mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winMarioMain_StarPowerDescription_BH),
-        reinterpret_cast<void*>(g_winMarioMain_StarPowerDescription_EH),
-        reinterpret_cast<void*>(StartStarPowerGetMenuDescriptionMsg),
-        reinterpret_cast<void*>(BranchBackStarPowerGetMenuDescriptionMsg));
+        reinterpret_cast<void*>(g_winMarioMain_MoveDescription_BH),
+        reinterpret_cast<void*>(g_winMarioMain_MoveDescription_EH),
+        reinterpret_cast<void*>(StartMarioMoveMenuMsgEntry),
+        reinterpret_cast<void*>(BranchBackMarioMoveMenuMsgEntry));
         
     // Apply patch to only include Infinite Pit enemies in the Tattle Log.
     mod::patch::writeBranchPair(
@@ -402,7 +416,34 @@ void DisplayUpDownNumberIcons(
         -8.0, 16.0, 16.0, 16.0, 1.0, 1.0, 0, unk0);
 }
 
-void StarPowerMenuDisp() {
+bool CheckOpenMarioMoveMenu(void* pWin) {
+    int32_t starting_move = -1;
+    switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
+        case 3:
+            starting_move = tot::MoveType::JUMP_BASE;
+            break;
+        case 2:
+            starting_move = tot::MoveType::HAMMER_BASE;
+            break;
+        case 12:
+            starting_move = tot::MoveType::SP_SWEET_TREAT;
+            break;
+    }
+    if (starting_move < 0) return false;
+    
+    // Update the maximum number of selections.
+    int32_t num_selections = 0;
+    for (int32_t i = 0; i < 8; ++i) {
+        if (tot::MoveManager::GetUnlockedLevel(starting_move + i) > 0) {
+            ++num_selections;
+        }
+    }
+    *(int32_t*)((uintptr_t)pWin + 0x198) = num_selections;
+    
+    return true;
+}
+
+void MarioMoveMenuDisp(void* pWin) {
     // Constants for menu code.
     gc::vec3    header_position         = { -50.0, 155.0, 0.0 };
     gc::vec3    header_scale            = { 0.8, 0.8, 0.8 };
@@ -419,15 +460,29 @@ void StarPowerMenuDisp() {
     // Print "Lvl." string on header in place of "SP".
     ttyd::win_main::winFontSetEdge(
         &header_position, &header_scale, &header_color, "Lvl.");
-
+        
+    int32_t starting_move;
+    switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
+        case 3:
+            starting_move = tot::MoveType::JUMP_BASE;
+            break;
+        case 2:
+            starting_move = tot::MoveType::HAMMER_BASE;
+            break;
+        default:
+            starting_move = tot::MoveType::SP_SWEET_TREAT;
+            break;
+    }
+    
     for (int32_t i = 0; i < 8; ++i) {
+        int32_t move = starting_move + i;
         // Get maximum level of attack; if not unlocked, skip.
-        const int32_t max_level = g_Mod->inf_state_.GetStarPowerLevel(i);
+        const int32_t max_level = tot::MoveManager::GetUnlockedLevel(move);
         if (max_level < 1) continue;
         
         // Print attack name.
-        const BattleWeapon* sac = ttyd::battle_mario::superActionTable[i];
-        const char* name = ttyd::msgdrv::msgSearch(sac->name);
+        const char* name = ttyd::msgdrv::msgSearch(
+            tot::MoveManager::GetMoveData(move)->name_msg);
         ttyd::win_main::winFontSetWidth(
             &sac_name_position, &sac_name_scale, &sac_color, 180.0, name);
         
@@ -449,16 +504,31 @@ void StarPowerMenuDisp() {
     }
 }
 
-const char* GetStarPowerMenuDescriptionMsg(int32_t cursor_pos) {
+void MarioMoveMenuMsgEntry(void* pWin) {
+    int32_t starting_move;
+    switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
+        case 3:
+            starting_move = tot::MoveType::JUMP_BASE;
+            break;
+        case 2:
+            starting_move = tot::MoveType::HAMMER_BASE;
+            break;
+        default:
+            starting_move = tot::MoveType::SP_SWEET_TREAT;
+            break;
+    }
+    int32_t cursor_pos = *(int32_t*)((uintptr_t)pWin + 0x194);
+    
     int32_t current_pos = -1;
     for (int32_t i = 0; i < 8; ++i) {
-        if (g_Mod->inf_state_.GetStarPowerLevel(i) > 0) ++current_pos;
+        int32_t move = starting_move + i;
+        if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
         if (current_pos == cursor_pos) {
-            return ttyd::battle_mario::superActionTable[i]->description;
+            ttyd::win_root::winMsgEntry(
+                pWin, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
+            return;
         }
     }
-    // Should not be reachable.
-    return "";
 }
 
 void GetPartyMemberMenuOrder(WinPartyData** out_party_data) {

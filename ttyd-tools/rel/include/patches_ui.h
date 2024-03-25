@@ -14,10 +14,14 @@ void ApplyFixedPatches();
 void DisplayUpDownNumberIcons(
     int32_t number, void* tex_obj, gc::mtx34* icon_mtx, gc::mtx34* view_mtx,
     uint32_t unk0);
-// Prints the maximum level of each available Star Power to the "Mario" menu.
-void StarPowerMenuDisp();
-// Gets the correct description for the selected Star Power in the menu.
-const char* GetStarPowerMenuDescriptionMsg(int32_t cursor_pos);
+
+// Checks whether to open the moves submenu in the "Mario" tab.
+bool CheckOpenMarioMoveMenu(void* win_ptr);
+// Prints the maximum level of each available move in the Mario tab.
+void MarioMoveMenuDisp(void* win_ptr);
+// Prints the description for the currently hovered move in the Mario tab.
+void MarioMoveMenuMsgEntry(void* win_ptr);
+
 // Stores pointers to WinPartyData entries in the correct order based
 // on the currently active partner and partners currently obtained.
 void GetPartyMemberMenuOrder(ttyd::win_party::WinPartyData** out_party_data);

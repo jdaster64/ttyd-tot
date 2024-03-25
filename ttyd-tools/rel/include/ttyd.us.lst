@@ -1947,6 +1947,7 @@
 // win_root.o
 // .text
 // 80152f00:winMailDisp
+80162ed0:winMsgEntry
 // .data
 80377218:enemy_monoshiri_sort_table
 
