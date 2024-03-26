@@ -74,6 +74,7 @@ enum RewardType {
     REWARD_HAMMER           = -9,
     REWARD_SPECIAL_MOVE     = -10,
     REWARD_COINS            = -11,
+    REWARD_FULL_HEAL        = -12,
     
     // Used to determine how many chests should be filled.
     REWARD_PLACEHOLDER      = -999,
@@ -368,6 +369,7 @@ int32_t GetIcon(ChestData* chest) {
         case -9:    return IconType::HAMMER;
         case -10:   return IconType::STAR_ICON;
         case -11:   return IconType::COIN;
+        case -12:   return IconType::HP_ICON;
         default:    return itemDataTable[chest->item].icon_id;
     }
 }
@@ -390,12 +392,24 @@ void DisplayIcons(CameraId camera, void* user_data) {
 }  // namespace
 
 // Evt declarations.
+EVT_DECLARE_USER_FUNC(evtTot_FullRecover, 0)
 EVT_DECLARE_USER_FUNC(evtTot_ShouldUnlockPartner, 2)
 EVT_DECLARE_USER_FUNC(evtTot_GetPartnerName, 2)
 EVT_DECLARE_USER_FUNC(evtTot_InitializePartyMember, 2)
 EVT_DECLARE_USER_FUNC(evtTot_PartyJumpOutOfChest, 7)
 EVT_DECLARE_USER_FUNC(evtTot_PartyVictoryPose, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SelectMoves, 5)
+
+// Script for health.
+EVT_BEGIN(Reward_FullHealEvt)
+    USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    USER_FUNC(evt_eff, 0, PTR("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_HP_RECOVER_SHINE2"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evtTot_FullRecover)
+    WAIT_MSEC(500)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_reward_fullrecovery"), 0, 0)
+    RETURN()
+EVT_END()
 
 // Pickup script for Star Pieces (base).
 EVT_BEGIN(Reward_StarPieceBaseEvt)
@@ -652,42 +666,52 @@ void SelectChestContents() {
     auto& state = g_Mod->state_;
     
     // Weights for different types of moves (Jump, Hammer, Special, partner).
-    static constexpr const uint16_t kMoveWeights[] = { 15, 15, 6, 50 };
+    static constexpr const uint16_t kMoveWeights[] = { 16, 16, 10, 50 };
     // Weights for different types of stat upgrades (HP, FP, BP, HP P, inv.).
     static constexpr const uint16_t kStatWeights[] = { 20, 20, 20, 15, 10 };
     // Weights for different types of other rewards
     // (coins, Star Piece, Shine Sprite, unique badge, stackable badge).
-    static constexpr const uint16_t kOtherWeights[] = { 20, 30, 30, 15, 10 };
+    static constexpr const uint16_t kOtherWeights[] = { 20, 25, 30, 20, 10 };
     
     // Top-level weight for choosing a move, stat-up, or other reward.
     // The former two categories cannot be chosen more than once per floor.
-    uint16_t top_level_weights[] = { 10, 10, 10 };
+    uint16_t top_level_weights[] = { 12, 8, 10 };
     // Tracks which kind of 'other' categories have been chosen already;
     // if one of them is rolled twice in one floor, picks a random stackable
     // badge in its place.
     bool others_picked[] = { false, false, false, false, false };
+    // Whether a full heal chest has been spawned (on boss floors).
+    bool full_heal_picked = false;
     
-    for (ChestData* chest = g_Chests; chest->item; ++chest) {
+    for (ChestData* chest = g_Chests; chest->item; ++chest) {        
         int32_t sum_weights, weight, type;
         int32_t reward = 0;
         const void* pickup_script = nullptr;
         
-        // Pick top-level reward category.
-        sum_weights = 0;
-        for (const auto& weight : top_level_weights) {
-            sum_weights += weight;
-        }
-        weight = state.Rand(sum_weights, RNG_REWARD);
-        sum_weights = 0;
-        for (type = 0; type < 3; ++type) {
-            sum_weights += top_level_weights[type];
-            if (weight < sum_weights) break;
+        if (state.floor_ == 0) {
+            // Floor 0: Force a move.
+            type = 0;
+        } else if (state.floor_ % 8 == 0 && !full_heal_picked) {
+            // Boss floors: Force a full heal for the first chest.
+            chest->item = REWARD_FULL_HEAL;
+            chest->pickup_script = (void*)Reward_FullHealEvt;
+            full_heal_picked = true;
+            continue;
+        } else {
+            // Otherwise, pick top-level reward category.
+            sum_weights = 0;
+            for (const auto& weight : top_level_weights) {
+                sum_weights += weight;
+            }
+            weight = state.Rand(sum_weights, RNG_REWARD);
+            sum_weights = 0;
+            for (type = 0; type < 3; ++type) {
+                sum_weights += top_level_weights[type];
+                if (weight < sum_weights) break;
+            }
         }
         
-        // Floor 0: Force a move.
-        if (state.floor_ == 0) type = 0;
-        
-        // If 'move' or 'stat-up' category, disable for future chests.
+        // If 'move' or 'stat-up' category, disable for rest of chests.
         if (type < 2) top_level_weights[type] = 0;
         
         if (type == 0) {
@@ -846,6 +870,17 @@ EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
 EVT_DEFINE_USER_FUNC(evtTot_DisplayChestIcons) {
     ttyd::dispdrv::dispEntry(
         CameraId::k3d, 1, /* order = */ 900.f, DisplayIcons, g_Chests);
+    return 2;
+}
+
+// Fully recovers the party's HP and FP.
+EVT_DEFINE_USER_FUNC(evtTot_FullRecover) {
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    pouch.current_hp = pouch.max_hp;
+    pouch.current_fp = pouch.max_fp;
+    for (int32_t i = 0; i < 8; ++i) {
+        pouch.party_data[i].current_hp = pouch.party_data[i].max_hp;
+    }
     return 2;
 }
 

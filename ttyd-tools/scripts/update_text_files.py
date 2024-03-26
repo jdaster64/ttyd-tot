@@ -419,6 +419,9 @@ g_StringMap = {
             
         b"tot_reward_upgrademove":
             b"<system>\n<p>\n%s's level\nwent up by 1!\n<k>",
+        
+        b"tot_reward_fullrecovery":
+            b"<system>\n<p>\nYour party fully recovered!\n<k>",
             
         # Moves and status effects.
         
