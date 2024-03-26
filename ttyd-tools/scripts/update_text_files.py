@@ -79,6 +79,44 @@ g_StringMap = {
             b"Gives 20 FP, but might freeze!\n"
             b"Made by mixing Maple Syrup \n"
             b"with an Ice Storm.",
+
+        b'menu_power_plus':
+            b"Boosts Mario's attack power\n"
+            b'by 1.',
+
+        b'msg_power_plus':
+            b"Boosts Mario's attack power\n"
+            b'by 1.',
+
+        b'menu_power_plus_p':
+            b"Boosts allies' attack power\n"
+            b'by 1.',
+
+        b'msg_power_plus_p':
+            b"Boosts allies' attack power\n"
+            b'by 1.',
+
+        b'menu_hammer_only':
+            b'Increase hammer power by 1,\n'
+            b'but lose the ability to jump.\n'
+            b'Mario will throw his hammer\n'
+            b'for single-target attacks.',
+
+        b'menu_nice_de_bougyo':
+            b"Successful guards reduce\n"
+            b"Mario's damage by 1 more.",
+
+        b'msg_nice_de_bougyo':
+            b"Successful guards reduce\n"
+            b"Mario's damage by 1 more.",
+
+        b'menu_nice_de_bougyo_p':
+            b"Successful guards reduce\n"
+            b"allies' damage by 1 more.",
+
+        b'msg_nice_de_bougyo_p':
+            b"Successful guards reduce\n"
+            b"allies' damage by 1 more.",
             
         b"msg_kiken_de_power":
             b"Increase Attack power by 3\n"
@@ -192,6 +230,22 @@ g_StringMap = {
             b"Wearing multiple copies raises\n"
             b"FP more, for no extra ATK loss.",
 
+        b'menu_itsumo_genki':
+            b'Makes Mario immune to many\n'
+            b'kinds of status effects.',
+
+        b'msg_itsumo_genki':
+            b'Makes Mario immune to many\n'
+            b'kinds of status effects.',
+
+        b'menu_itsumo_genki_p':
+            b'Makes allies immune to many\n'
+            b'kinds of status effects.',
+
+        b'msg_itsumo_genki_p':
+            b'Make allies immune to many\n'
+            b'kinds of status effects.',
+
         b"msg_2kai_item":
             b"During battle, Mario can use\n"
             b"multiple items in one turn.",
@@ -219,12 +273,12 @@ g_StringMap = {
             b"and increases on every use.",
         
         b"msg_toughen_up":
-            b"Wear this to add Toughen Up\n"
-            b"to Mario's Tactics menu.",
+            b"Increases the defense given by\n"
+            b"Mario's Defend command by 1.",
             
         b"msg_toughen_up_p":
-            b"Wear this to add Toughen Up\n"
-            b"to partners' Tactics menu.",
+            b"Increases the defense given by\n"
+            b"allies' Defend command by 1.",
             
         b"msg_super_start":
             b"Grants a bit of Star Power\n"
@@ -239,20 +293,12 @@ g_StringMap = {
             b"when allies are at full HP.",
             
         b"msg_toughen_up_menu":
-            b"Wear this to add Toughen Up\n"
-            b"to Mario's Tactics menu.\n"
-            b"This uses 1 FP to raise DEF\n"
-            b"by 2 points for a turn.\n"
-            b"Wearing more copies raises\n"
-            b"the effect and FP cost.",
+            b"Increases the defense given by\n"
+            b"Mario's Defend command by 1.",
             
         b"msg_toughen_up_p_menu":
-            b"Wear this to add Toughen Up\n"
-            b"to partners' Tactics menu.\n"
-            b"This uses 1 FP to raise DEF\n"
-            b"by 2 points for a turn.\n"
-            b"Wearing more copies raises\n"
-            b"the effect and FP cost.",
+            b"Increases the defense given by\n"
+            b"allies' Defend command by 1.",
             
         b"btl_hlp_cmd_operation_super_charge":
             b"Briefly increases DEF by\n"

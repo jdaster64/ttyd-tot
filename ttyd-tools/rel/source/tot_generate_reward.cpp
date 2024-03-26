@@ -638,6 +638,15 @@ void* RewardManager::GetStarPieceItemDropEvt() {
     return (void*)Reward_StarPieceItemDropEvt;
 }
 
+int32_t RewardManager::GetUniqueBadgeForShop() {
+    // Use same function / RNG state as chests.
+    int32_t unique_badge = SelectUniqueBadge();
+    for (ChestData* chest = g_Chests; chest->item; ++chest) {
+        if (chest->item == unique_badge) unique_badge = ItemType::STAR_PIECE;
+    }
+    return unique_badge;
+}
+
 // Assigns reward types and corresponding pickup scripts to all chests.
 void SelectChestContents() {
     auto& state = g_Mod->state_;

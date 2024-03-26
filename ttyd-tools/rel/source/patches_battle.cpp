@@ -136,6 +136,7 @@ extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH;
 extern const int32_t g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
+extern const int32_t g__btlcmd_MakeOperationTable_Patch_NoSuperCharge;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
@@ -725,11 +726,9 @@ int32_t CalculateBaseDamage(
         def = 0;
     } else {
         def += target->badges_equipped.defend_plus;
-        if (unk1 & 0x40000) {  // successful guard
-            def += target->badges_equipped.damage_dodge;
-        }
         if (target->status_flags & BattleUnitStatus_Flags::DEFENDING) {
-            def += 1;
+            // Toughen Up buffs the "Defend" action.
+            def += 1 + target->badges_equipped.super_charge;
         }
         
         int8_t strength = 0;
@@ -766,7 +765,8 @@ int32_t CalculateBaseDamage(
         if (damage < 1) damage = 1;
     }
     if (unk1 & 0x40000) {  // guarding
-        damage -= 1;
+        // Damage Dodge is now unpierceable.
+        damage -= (1 + target->badges_equipped.damage_dodge);
     }
     if (element == AttackElement::FIRE) {
         damage -= target->badges_equipped.ice_power;
@@ -1083,7 +1083,11 @@ void ApplyFixedPatches() {
                 unit->badges_equipped.triple_dip = 1;
             }
         });
-        
+            
+    // Disable Super Charge / Toughen Up as menu option.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g__btlcmd_MakeOperationTable_Patch_NoSuperCharge),
+        0x480000b8U /* unconditional branch */);
         
     // Quick Change FP cost:
     // Signal that party switch was initiated by the player.

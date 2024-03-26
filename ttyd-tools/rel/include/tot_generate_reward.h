@@ -22,6 +22,9 @@ public:
     // Returns a pointer to the event that runs when picking up a Star Piece
     // on the field (as an item drop / condition reward).
     static void* GetStarPieceItemDropEvt();
+    
+    // Picks a random unique badge, or Star Piece, to add to Charlieton's shop.
+    static int32_t GetUniqueBadgeForShop();
 };
 
 // Generates chest contents.

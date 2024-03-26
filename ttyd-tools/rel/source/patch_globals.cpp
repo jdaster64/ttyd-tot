@@ -231,6 +231,7 @@ extern const int32_t g_btlseqTurn_HappyFlowerProc_EH = 0x8011e0b4;
 extern const int32_t g_BattleDrawEnemyHP_DrawEnemyHPText_BH = 0x8011ffcc;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH = 0x801204c8;
 extern const int32_t g__btlcmd_MakeOperationTable_AppealAlways_BH = 0x801239e4;
+extern const int32_t g__btlcmd_MakeOperationTable_Patch_NoSuperCharge = 0x80123b00;
 extern const int32_t g__btlcmd_MakeSelectWeaponTable_Patch_GetNameFromItem = 0x80124924;
 extern const int32_t g_BtlUnit_EnemyItemCanUseCheck_Patch_SkipCheck = 0x80125d54;
 extern const int32_t g_BtlUnit_CheckPinchStatus_PerilThreshold_BH = 0x80126e20;

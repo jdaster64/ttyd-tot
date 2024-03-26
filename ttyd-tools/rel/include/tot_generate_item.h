@@ -20,7 +20,7 @@ int32_t PickRandomItem(
 // Returns a comparison value that sorts items by ascending buy price.
 int32_t BuyPriceComparator(int16_t* lhs, int16_t* rhs);
 // Returns a pointer to Charlieton's item inventory.
-// Holds up to 15 items + a '-1' terminator.
+// Holds up to 16 items + a '-1' terminator.
 int16_t* GetCharlietonInventoryPtr();
 // Returns the multiplier for item buy price (out of 100) on the current floor.
 int32_t GetBuyPriceScale();

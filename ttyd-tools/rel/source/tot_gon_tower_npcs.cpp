@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_generate_item.h"
+#include "tot_generate_reward.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
 
@@ -15,6 +16,7 @@
 #include <ttyd/evt_window.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
+#include <ttyd/item_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/system.h>
 
@@ -38,6 +40,8 @@ using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::npcdrv::NpcSetupInfo;
 using ::ttyd::system::qqsort;
+
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 const char kCharlietonName[] = 
     "\x8d\x73\x8f\xa4\x90\x6c";  // "gyoushounin" / "peddler"
@@ -208,13 +212,18 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
             inventory[i] = item;
         }
     }
-    // Add sentinel terminator at end.
-    inventory[kNumCharlietonItemsPerType * 3] = -1;
+    int32_t special_offer = RewardManager::GetUniqueBadgeForShop();
+    if (g_Mod->state_.Rand(5, RNG_NPC_OPTIONS) == 0) {
+        special_offer = ItemType::STAR_PIECE;
+    }
+    // Add special badge / Star Piece, then null terminator at end.
+    inventory[kNumCharlietonItemsPerType * 3] = special_offer;
+    inventory[kNumCharlietonItemsPerType * 3 + 1] = -1;
     
     // Sort each category by ascending price.
     qqsort(&inventory[0], 5, sizeof(int16_t), (void*)BuyPriceComparator);
     qqsort(&inventory[5], 5, sizeof(int16_t), (void*)BuyPriceComparator);
-    qqsort(&inventory[10], 5, sizeof(int16_t), (void*)BuyPriceComparator);
+    qqsort(&inventory[10], 6, sizeof(int16_t), (void*)BuyPriceComparator);
     
     return 2;
 }

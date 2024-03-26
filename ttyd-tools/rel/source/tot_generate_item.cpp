@@ -143,7 +143,7 @@ int32_t BuyPriceComparator(int16_t* lhs, int16_t* rhs) {
     return itemData[*lhs].buy_price - itemData[*rhs].buy_price;
 }
 
-int16_t g_CharlietonInventory[16] = { -1 };
+int16_t g_CharlietonInventory[16 + 1] = { -1 };
 
 int16_t* GetCharlietonInventoryPtr() {
     return g_CharlietonInventory;

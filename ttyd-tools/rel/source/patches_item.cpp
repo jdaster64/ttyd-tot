@@ -198,28 +198,28 @@ void ApplyFixedPatches() {
         0x00700000, 0x30743250, 0xa7764353, 0x35078644, 0x00842420,
         0x34703543, 0x30040740, 0x54444045, 0x00002045,
         // Badges.
-        0xb8a88dbb, 0x009d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,
-        0x0000beeb, 0x9aaa0dfc, 0xcaaddcc9, 0xc000dd7c, 0x0000000c,
-        0x00770000, 0x0dee0000, 0x00000880,
-    };   
+        0xb8a88dbb, 0xdd9d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,
+        0xbbbebeeb, 0xaaaacdfc, 0xcaacccca, 0xc00edd7c, 0x0000000c,
+        0x0a77000a, 0x0dee0000, 0x00000bb0,
+    };
     
     // Prices corresponding to the price tiers in the above array.
     static const constexpr uint8_t kPrices[] = {
         5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 125, 150, 200, 250
     };
     static const constexpr uint32_t kBpCost[] = {
-        0x11111111, 0x44111111, 0x22663311, 0x22111144, 0x11224411,
+        0x11111111, 0x44111111, 0x22662211, 0x22111144, 0x11224411,
         0x33331441, 0x12226220, 0x62211111, 0x30043316, 0x00000003,
         0x03110001, 0x03220100, 0x00000110,
     };
     static const constexpr int8_t kBadgeSortOrder[] = {
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, 26,
-        21, 22, 90, 91, 36, 37, 44, 45, 38, 39, 55, 56, 53, 54, 46, 47,
-        57, 58, 50, 51, 48, 49, -1, -1, -1, 69, 70, 82, 83, 86, 87, 84,
-        52, 42, 43, 85, 66, 67, 68, 75, 76, 77, 78, 59, 60, 61, 62, 63, 
-        64, 88, 71, 72, 93, 126, 127, 79, 80, -1, -1, 102, 103, 104, 105, 106,
-        98, -1, -1, -1, 96, 97, 65, 107, 108, -1, -1, -1, 40, 41, 92, -1,
-        -1, 23, 24,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 33, 34, 
+        29, 30, 27, 28,  1,  2,  9, 10,  3,  4, 20, 21, 18, 19, 11, 12,
+        22, 23, 13, 14, 15, 16, -1, -1, -1, 46, 47, 57, 58, 61, 62, 59,
+        17,  7,  8, 60, 43, 44, 45, 50, 51, 52, 53, 24, 25, 38, 39, 40,
+        41, 56, 48, 49, 26, 98, 99, 54, 55, -1, -1, 80, 81, 82, 83, 84,
+        63, -1, -1, -1, 36, 37, 42, 85, 86, -1, -1, -1,  5,  6, 35, -1,
+        -1, 31, 32,
     };
     
     // - Set coin buy & sell (for Refund) prices based on above tiers.
@@ -269,6 +269,9 @@ void ApplyFixedPatches() {
             item.type_sort_order = kBadgeSortOrder[i - ItemType::POWER_JUMP];
         }
     }
+    
+    // Set Star Piece buy price (max price, +1 so it sorts to the bottom).
+    itemDataTable[ItemType::STAR_PIECE].buy_price = 251;
     
     // Changed pickup messages for Super / Ultra boots and hammer.
     itemDataTable[ItemType::SUPER_BOOTS].description = "msg_custom_super_boots";

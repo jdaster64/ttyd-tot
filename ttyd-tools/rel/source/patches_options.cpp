@@ -321,48 +321,6 @@ void ApplySettingBasedPatches() {
         }
     }
     
-    // Increase some move badge BP costs if playing with larger max move levels.
-    if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_BADGE_MOVE_1X)) {
-        itemDataTable[ItemType::POWER_JUMP].bp_cost = 1;
-        itemDataTable[ItemType::POWER_SMASH].bp_cost = 1;
-        itemDataTable[ItemType::MULTIBOUNCE].bp_cost = 1;
-        itemDataTable[ItemType::QUAKE_HAMMER].bp_cost = 2;
-        itemDataTable[ItemType::FIRE_DRIVE].bp_cost = 2;
-        itemDataTable[ItemType::CHARGE].bp_cost = 1;
-        itemDataTable[ItemType::CHARGE_P].bp_cost = 1;
-    } else {
-        itemDataTable[ItemType::POWER_JUMP].bp_cost = 2;
-        itemDataTable[ItemType::POWER_SMASH].bp_cost = 2;
-        itemDataTable[ItemType::MULTIBOUNCE].bp_cost = 3;
-        itemDataTable[ItemType::QUAKE_HAMMER].bp_cost = 3;
-        itemDataTable[ItemType::FIRE_DRIVE].bp_cost = 3;
-        itemDataTable[ItemType::CHARGE].bp_cost = 2;
-        itemDataTable[ItemType::CHARGE_P].bp_cost = 2;
-    }
-    
-    // Increase badge BP cost and shop prices if HP/FP Drains heal per hit.
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_64_STYLE_HP_FP_DRAIN)) {
-        itemDataTable[ItemType::HP_DRAIN].bp_cost = 3;
-        itemDataTable[ItemType::HP_DRAIN_P].bp_cost = 3;
-        itemDataTable[ItemType::FP_DRAIN].bp_cost = 6;
-        itemDataTable[ItemType::FP_DRAIN_P].bp_cost = 6;
-        
-        itemDataTable[ItemType::HP_DRAIN].buy_price = 150;
-        itemDataTable[ItemType::HP_DRAIN_P].buy_price = 150;
-        itemDataTable[ItemType::FP_DRAIN].buy_price = 150;
-        itemDataTable[ItemType::FP_DRAIN_P].buy_price = 150;
-    } else {
-        itemDataTable[ItemType::HP_DRAIN].bp_cost = 1;
-        itemDataTable[ItemType::HP_DRAIN_P].bp_cost = 1;
-        itemDataTable[ItemType::FP_DRAIN].bp_cost = 1;
-        itemDataTable[ItemType::FP_DRAIN_P].bp_cost = 1;
-        
-        itemDataTable[ItemType::HP_DRAIN].buy_price = 70;
-        itemDataTable[ItemType::HP_DRAIN_P].buy_price = 70;
-        itemDataTable[ItemType::FP_DRAIN].buy_price = 125;
-        itemDataTable[ItemType::FP_DRAIN_P].buy_price = 125;
-    }
-    
     if (g_Mod->inf_state_.GetOptionNumericValue(OPT_OBFUSCATE_ITEMS)) {
         ObfuscateItems(true);
     }
