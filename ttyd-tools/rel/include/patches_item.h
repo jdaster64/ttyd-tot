@@ -16,4 +16,7 @@ bool CheckEvasionBadges(ttyd::battle_unit::BattleWorkUnit* unit);
 // above the base 5.
 int32_t GetBonusCakeRestoration();
 
+// Gets the current size of the player's item inventory.
+int32_t GetItemInventorySize();
+
 }

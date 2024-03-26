@@ -248,6 +248,7 @@ extern const int32_t g_winPartyMain_OverrideMoveTextCursor_BH = 0x801676b8;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_EH = 0x80167718;
 extern const int32_t g_itemUseDisp_FixPartyOrder_BH = 0x80169f40;
 extern const int32_t g_itemUseDisp_FixPartyOrder_EH = 0x8016a088;
+extern const int32_t g_winItemDisp_DispInventorySize_BH = 0x8016bec4;
 extern const int32_t g_winItemMain_CheckInvalidTarget_BH = 0x8016cd74;
 extern const int32_t g_winItemMain_CheckInvalidTarget_EH = 0x8016cd78;
 extern const int32_t g_winItemMain_Patch_AlwaysUseItemsInMenu = 0x8016ce40;

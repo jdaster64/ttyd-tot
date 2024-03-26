@@ -15,6 +15,8 @@
 .global StartPartyDispHook2
 .global BranchBackPartyDispHook2
 # win_item
+.global StartItemDispInventorySize
+.global BranchBackItemDispInventorySize
 .global StartFixItemWinPartyDispOrder
 .global BranchBackFixItemWinPartyDispOrder
 .global StartFixItemWinPartySelectOrder
@@ -77,6 +79,15 @@ mr %r3, %r30
 bl partyMenuDispStats
 
 BranchBackPartyDispHook2:
+b 0
+
+StartItemDispInventorySize:
+mr %r3, %r29
+bl itemDispInventorySize
+# Original opcode.
+fmr %f1, %f28
+
+BranchBackItemDispInventorySize:
 b 0
 
 StartFixItemWinPartyDispOrder:

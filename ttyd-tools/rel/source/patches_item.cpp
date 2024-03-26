@@ -96,14 +96,7 @@ extern "C" {
     void BranchBackGetEmptyItemSlotsMax();
     
     int32_t getTotItemInventorySize() {
-        switch (g_Mod->state_.num_sack_upgrades_) {
-            case 0:     return 6;
-            case 1:     return 8;
-            case 2:     return 10;
-            case 3:     return 13;
-            case 4:     return 16;
-            default:    return 20;
-        }
+        return mod::infinite_pit::item::GetItemInventorySize();
     }
 }
 
@@ -572,6 +565,12 @@ void ApplyFixedPatches() {
 int32_t GetBonusCakeRestoration() {
     // Returns one of 0, 5, 10, ..., 25 at random (to be added to the base 5).
     return ttyd::system::irand(6) * 5;
+}
+
+int32_t GetItemInventorySize() {
+    // Returns the current inventory size based on Strange Sack upgrades.
+    int32_t items = g_Mod->state_.num_sack_upgrades_ * 2 + 6;
+    return items < 20 ? items : 20;
 }
 
 }  // namespace item

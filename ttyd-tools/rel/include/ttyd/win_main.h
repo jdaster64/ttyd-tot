@@ -16,7 +16,8 @@ extern "C" {
 void winIconSet(int32_t icon, gc::vec3* pos, gc::vec3* scale, uint32_t* color);
 void winIconGrayInit();
 void winIconInit();
-// winTexSet_x2
+void winTexSet_x2(
+    uint32_t unk1, uint32_t unk2, gc::vec3* pos, gc::vec3* scale, uint32_t* color);
 // winTexInit_x2
 // winTexSetRot
 // unk_JP_US_EU_50_8017c9bc

@@ -131,7 +131,7 @@ uint32_t pouchGetItem(int32_t item_type);
 // pouchGetEquipBadgeCnt
 int32_t pouchGetHaveBadgeCnt();
 // pouchGetKeepItemCnt
-// pouchGetHaveItemCnt
+int32_t pouchGetHaveItemCnt();
 // ?pouchEquipBadge
 // pouchHaveBadge
 // pouchKeepItem

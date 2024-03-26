@@ -29,6 +29,9 @@ void PartyMenuSetMoveDescAndCursorPos(void* win_ptr);
 // Prints all of the information on the right side of the Party tab.
 void PartyMenuDispStats(void* win_ptr);
 
+// Prints the current inventory fullness / size in the Item tab.
+void ItemMenuDispInventory(void* win_ptr);
+
 // Stores pointers to WinPartyData entries in the correct order based
 // on the currently active partner and partners currently obtained.
 void GetPartyMemberMenuOrder(ttyd::win_party::WinPartyData** out_party_data);

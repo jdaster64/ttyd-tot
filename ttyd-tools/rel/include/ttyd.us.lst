@@ -911,6 +911,7 @@
 800d4ed4:pouchCheckItem
 800d50cc:pouchGetItem
 800d5738:pouchGetHaveBadgeCnt
+800d58a0:pouchGetHaveItemCnt
 800d59c8:pouchInit
 800d5eb0:pouchGetPtr
 // .data

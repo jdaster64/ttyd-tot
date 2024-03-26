@@ -62,6 +62,8 @@ extern "C" {
     void StartPartyDispHook2();
     void BranchBackPartyDispHook2();
     
+    void StartItemDispInventorySize();
+    void BranchBackItemDispInventorySize();
     void StartFixItemWinPartyDispOrder();
     void BranchBackFixItemWinPartyDispOrder();
     void StartFixItemWinPartySelectOrder();
@@ -115,6 +117,9 @@ extern "C" {
     void partyMenuDispStats(void* pWin) {
         mod::infinite_pit::ui::PartyMenuDispStats(pWin);
     }
+    void itemDispInventorySize(void* pWin) {
+        mod::infinite_pit::ui::ItemMenuDispInventory(pWin);
+    }
     void initTattleLog(void* win_log_ptr) {
         mod::infinite_pit::ui::InitializeTattleLog(win_log_ptr);
     }
@@ -162,6 +167,7 @@ extern const int32_t g_winPartyMain_OverrideMoveTextCursor_BH;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_EH;
 extern const int32_t g_itemUseDisp_FixPartyOrder_BH;
 extern const int32_t g_itemUseDisp_FixPartyOrder_EH;
+extern const int32_t g_winItemDisp_DispInventorySize_BH;
 extern const int32_t g_winItemMain_FixPartyOrder_BH;
 extern const int32_t g_winItemMain_FixPartyOrder_EH;
 extern const int32_t g_winItemMain_CheckInvalidTarget_BH;
@@ -373,6 +379,13 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_winPartyDisp_StatsHook2_EH),
         reinterpret_cast<void*>(StartPartyDispHook2),
         reinterpret_cast<void*>(BranchBackPartyDispHook2));
+        
+    // Display current number of items / max inventory size in Item menu.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_winItemDisp_DispInventorySize_BH),
+        reinterpret_cast<void*>(StartItemDispInventorySize),
+        reinterpret_cast<void*>(BranchBackItemDispInventorySize));
+    
         
     // Apply patch to only include Infinite Pit enemies in the Tattle Log.
     mod::patch::writeBranchPair(
@@ -810,6 +823,62 @@ void PartyMenuDispStats(void* pWin) {
         
         y_offset -= 23.4f;
     }
+}
+
+void ItemMenuDispInventory(void* pWin) {
+    // Don't display if not actively in tower.
+    // TODO: Ideally, check this in a better way!
+    if (!strcmp(GetCurrentMap(), "gon_00")) return;
+    // Only run if on regular item inventory screen.
+    if (*(int32_t*)((uintptr_t)pWin + 0x210) != 0) return;
+    
+    float win_x = *(float*)((uintptr_t)pWin + 0xc4);
+    float win_y = *(float*)((uintptr_t)pWin + 0xc8);
+    
+    // void* texInit_param = **(void***)(*(uintptr_t*)((uintptr_t)pWin + 0x28) + 0xa0);
+    
+    // "Constant" colors.
+    static uint32_t kBlack = 0x000000FFU;
+    // static uint32_t kWhite = 0xFFFFFFFFU;
+    static uint32_t kRed   = 0xA00000FFU;
+    
+    // Temporary variables, used across draw calls.
+    gc::vec3 pos = { 0.0f, 0.0f, 0.0f };
+    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+    int32_t width;
+    
+    // Top-left corner of the window, for reference.
+    gc::vec3 win_pos = { win_x - 268.0f, win_y + 35.0f, 0.0f };
+
+    // Draw recessed window for item count.
+    ttyd::win_root::winKirinukiGX(win_pos.x, win_pos.y, 100.0f, 40.0f, pWin, 0);
+
+    ttyd::win_main::winFontInit();
+    
+    // Draw slash between current and maximum item count.
+    width = ttyd::fontmgr::FontGetMessageWidth("/");
+    pos.x = win_pos.x + 50.0f - 0.5f * width;
+    pos.y = win_pos.y - 9.0f;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "/");
+    
+    // Draw slash between current and maximum item count.
+    // ttyd::win_main::winTexInit(texInit_param);
+    // ttyd::win_main::winTexSet(0x10, &pos, &scale, &kWhite);
+    
+    int32_t current_items = ttyd::mario_pouch::pouchGetHaveItemCnt();
+    int32_t max_items = mod::infinite_pit::item::GetItemInventorySize();
+    
+    // Draw current and max inventory numbers.
+    const char* temp_current_items = ttyd::win_mario::winZenkakuStr(current_items);
+    width = ttyd::fontmgr::FontGetMessageWidth(temp_current_items);
+    pos.x = win_pos.x + 30.0f - 0.5f * width;
+    uint32_t* color = current_items < max_items ? &kBlack : &kRed;
+    ttyd::win_main::winFontSet(&pos, &scale, color, "%s", temp_current_items);
+
+    const char* temp_max_items = ttyd::win_mario::winZenkakuStr(max_items);
+    width = ttyd::fontmgr::FontGetMessageWidth(temp_max_items);
+    pos.x = win_pos.x + 70.0f - 0.5f * width;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "%s", temp_max_items);
 }
 
 void GetPartyMemberMenuOrder(WinPartyData** out_party_data) {
