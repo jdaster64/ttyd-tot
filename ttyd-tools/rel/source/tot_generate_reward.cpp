@@ -107,7 +107,7 @@ uint32_t GetUniqueBadgeObtainedOption(int32_t item_type) {
         case ItemType::ZAP_TAP:         return STAT_RUN_UNIQUE_BADGE_8;
         case ItemType::SPIKE_SHIELD:    return STAT_RUN_UNIQUE_BADGE_9;
     }
-    return -1;
+    return 0;
 }
 
 // Selects which unique badge to give as a reward.
@@ -625,7 +625,20 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
 
 void RewardManager::AfterItemPickup(int32_t item_type) {
     uint32_t option = GetUniqueBadgeObtainedOption(item_type);
-    if (option) g_Mod->state_.SetOption(option, 1);
+    if (option) {
+        g_Mod->state_.SetOption(option, 1);
+        
+        // Search Charlieton's array for the badge and remove it.
+        int16_t* charlieton_data = GetCharlietonInventoryPtr();
+        int16_t* last = charlieton_data;
+        while (*charlieton_data >= 0) {
+            if (*charlieton_data != item_type) {
+                *last++ = *charlieton_data;
+            }
+            ++charlieton_data;
+        }
+        *last = -1;
+    }
 }
 
 int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {

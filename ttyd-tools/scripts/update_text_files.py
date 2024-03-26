@@ -33,7 +33,7 @@ g_StringMap = {
             b"up a move of your choice.",
 
         b'msg_star_piece':
-            b'A mysterious object that ranks\n'
+            b'A capricious object that ranks\n'
             b'up a random move.',
             
         b"msg_custom_super_boots":
