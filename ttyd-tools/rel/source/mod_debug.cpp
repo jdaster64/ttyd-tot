@@ -10,6 +10,7 @@
 #include "tot_gon_tower.h"
 #include "tot_manager_move.h"
 
+#include <gc/OSTime.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_monosiri.h>
 #include <ttyd/item_data.h>
@@ -29,6 +30,7 @@ enum DebugManagerMode {
     DEBUG_MAIN      = 0,
     
     DEBUG_MIN       = 100,
+    DEBUG_SEED,
     DEBUG_ENEMIES,
     DEBUG_FLOOR,
     DEBUG_UNLOCK_ALL_MOVES,
@@ -81,6 +83,24 @@ uint32_t GetPressedButtons() {
     return button_trg;
 }
 
+// Handle looping around and skipping invalid options for the given game state.
+void UpdateMainMenuPos(int32_t change) {
+    g_CursorPos += change;
+    if (g_CursorPos == DEBUG_MAX) g_CursorPos = DEBUG_MIN + 1;
+    if (g_CursorPos == DEBUG_MIN) g_CursorPos = DEBUG_MAX - 1; 
+    
+    bool in_lobby = !strcmp(GetCurrentMap(), "gon_00");
+    if (in_lobby) {
+        if (g_CursorPos == DEBUG_ENEMIES || g_CursorPos == DEBUG_FLOOR) {
+            g_CursorPos = change > 0 ? DEBUG_UNLOCK_ALL_MOVES : DEBUG_SEED;
+        }
+    } else {
+        if (g_CursorPos == DEBUG_SEED) {
+            g_CursorPos = change > 0 ? DEBUG_ENEMIES : DEBUG_EXIT;
+        }
+    }
+}
+
 }
 
 void DebugManager::Update() {
@@ -92,14 +112,19 @@ void DebugManager::Update() {
     g_Mod->inf_state_.SetOption(OPT_DEBUG_MODE_USED, 1);
     
     if (g_DebugMode == DEBUG_MAIN) {
+        UpdateMainMenuPos(0);
         if (button_trg & (ButtonId::DPAD_UP | ButtonId::DPAD_RIGHT)) {
-            ++g_CursorPos;
-            if (g_CursorPos == DEBUG_MAX) g_CursorPos = DEBUG_MIN + 1;
+            UpdateMainMenuPos(1);
         } else if (button_trg & (ButtonId::DPAD_DOWN | ButtonId::DPAD_LEFT)) {
-            --g_CursorPos;
-            if (g_CursorPos == DEBUG_MIN) g_CursorPos = DEBUG_MAX - 1;          
+            UpdateMainMenuPos(-1);
         } else if (button_trg & ButtonId::Y) {
             switch (g_CursorPos) {
+                case DEBUG_SEED: {
+                    // Go to submenu on next frame.
+                    g_DebugMode = g_CursorPos;
+                    g_CursorPos = g_Mod->state_.seed_;
+                    return;
+                }
                 case DEBUG_ENEMIES: {
                     // Go to submenu on next frame.
                     g_DebugMode = g_CursorPos;
@@ -166,6 +191,29 @@ void DebugManager::Update() {
             }
             g_DebugMode = DEBUG_OFF;
             return;
+        }
+    } else if (g_DebugMode == DEBUG_SEED) {
+        if (button_trg & (ButtonId::DPAD_UP | ButtonId::DPAD_RIGHT)) {
+            if (buttons & ButtonId::L) {
+                g_CursorPos = (g_CursorPos % 100'000'000) * 10;
+            } else {
+                if (++g_CursorPos > 999'999'999) g_CursorPos = 0;
+            }
+        } else if (button_trg & (ButtonId::DPAD_DOWN | ButtonId::DPAD_LEFT)) {
+            if (buttons & ButtonId::L) {
+                g_CursorPos /= 10;
+            } else {
+                if (--g_CursorPos < 0) g_CursorPos = 999'999'999;
+            }            
+        } else if (button_trg & ButtonId::Y) {
+            if (g_CursorPos == 0) {
+                g_Mod->state_.seed_ = 
+                    static_cast<uint32_t>(gc::OSTime::OSGetTime()) %
+                    1'000'000'000;
+            } else {
+                g_Mod->state_.seed_ = g_CursorPos;
+            }
+            g_DebugMode = DEBUG_OFF;
         }
     } else if (g_DebugMode == DEBUG_ENEMIES) {
         int32_t dir = 0;
@@ -300,6 +348,9 @@ void DebugManager::Draw() {
     const uint32_t red_alpha  = 0xC00000E5u;
     if (g_DebugMode == DEBUG_MAIN) {
         switch (g_CursorPos) {
+            case DEBUG_SEED: {
+                strcpy(buf, "Select Seed");                 break;
+            }
             case DEBUG_ENEMIES: {
                 strcpy(buf, "Select Enemy Loadout");        break;
             }
@@ -324,6 +375,19 @@ void DebugManager::Draw() {
         }
         DrawCenteredTextWindow(
             buf, 0, -20, 0xFFu, true, 0xFFFFFFFFu, 0.7f, red_alpha, 10, 7);
+    } else if (g_DebugMode == DEBUG_SEED) {
+        // Print current seed value to buffer.
+        sprintf(buf, "%09" PRId32, g_CursorPos);
+        DrawCenteredTextWindow(
+            buf, 0, -60, 0xFFu, true, 0xFFFFFFFFu, 0.7f, red_alpha, 10, 7);
+        // Draw main menu text to make it look like a contextual menu.
+        DrawCenteredTextWindow(
+            "Select Seed",
+            0, -20, 0xFFu, true, 0xFFFFFFFFu, 0.7f, black_alpha, 10, 7);
+        DrawText(
+            "Hold L to multiply / divide by 10 instead of adding.\n"
+            "Set seed to 0 to have one chosen randomly.",
+            0, -90, 0xFFu, true, ~0U, 0.6f, /* top-middle */ 1);
     } else if (g_DebugMode == DEBUG_ENEMIES) {
         for (int32_t i = 0; i < 5; ++i) {
             int32_t bg_color = i == g_CursorPos ? red_alpha : black_alpha;

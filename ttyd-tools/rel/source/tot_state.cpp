@@ -495,4 +495,10 @@ EVT_DEFINE_USER_FUNC(evtTot_GetFloor) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_GetSeed) {
+    uint32_t seed = g_Mod->state_.seed_;
+    evtSetValue(evt, evt->evtArguments[0], seed);
+    return 2;
+}
+
 }  // namespace mod::tot

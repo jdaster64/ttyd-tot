@@ -125,6 +125,9 @@ EVT_DECLARE_USER_FUNC(evtTot_IncrementFloor, 1)
 // Returns the current floor number.
 EVT_DECLARE_USER_FUNC(evtTot_GetFloor, 1)
 
+// Returns the current seed.
+EVT_DECLARE_USER_FUNC(evtTot_GetSeed, 1)
+
 // Format of save data used by Tower of Trials mod.
 struct TotSaveData {
     uint16_t    flags;                  // 0x0
@@ -157,7 +160,8 @@ enum RngSequence {
     // "Totally random"; not reproducible run-to-run.
     RNG_VANILLA                 = -1,   // Calls ttyd::system::irand().
     
-    RNG_RESERVED                = 0,
+    // Only for generating the random seed.
+    RNG_RANDOM_SEED             = 0,
     
     // Battle generation; mangled with floor number + reset every floor.
     RNG_ENEMY                   = 1,    // Enemy loadout + which one drops item.

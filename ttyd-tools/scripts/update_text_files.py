@@ -745,7 +745,18 @@ g_StringMap = {
             
         # Map text.
         
-        b"gon_00_reentry":
+        b"tot_lobby_frontsign":
+            b'<kanban>\n'
+            b'<pos 118 10>\n"Battle Tower"\n'
+            b'<pos 78 39>\nUnder Construction\n<k>',
+        
+        b"tot_lobby_backsign":
+            b'<kanban>\n'
+            b'Current options: <col 0000ffff>TBD\n</col>'
+            b'Current seed: %09d\n'
+            b'<k>',
+        
+        b"tot_lobby_reentry":
             b"<system>\n<p>\n"
             b"You can't re-enter that way!\n<k>",
     },

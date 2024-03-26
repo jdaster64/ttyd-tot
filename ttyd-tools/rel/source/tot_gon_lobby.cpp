@@ -1,7 +1,9 @@
 #include "tot_gon_lobby.h"
 
 #include "evt_cmd.h"
+#include "mod.h"
 #include "tot_manager_options.h"
+#include "tot_state.h"
 
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/database.h>
@@ -60,7 +62,7 @@ EVT_BEGIN(Lobby_ExitReentryRejectEvt)
         USER_FUNC(evt_mario_key_onoff, 0)
         USER_FUNC(evt_bero_exec_wait, 65536)
         WAIT_MSEC(750)
-        USER_FUNC(evt_msg_print, 0, PTR("gon_00_reentry"), 0, 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_reentry"), 0, 0)
         USER_FUNC(evt_mario_key_onoff, 1)
         USER_FUNC(evt_cam_ctrl_onoff, 4, 1)
     END_INLINE()
@@ -68,17 +70,18 @@ EVT_BEGIN(Lobby_ExitReentryRejectEvt)
     RETURN()
 EVT_END()
 
-// TODO: Testing different winSelect stuff.
 EVT_BEGIN(Lobby_FrontSignEvt)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_normalize)
     
-    USER_FUNC(evt_win_other_select, 19)
-    USER_FUNC(
-        evt_msg_print_insert, 0, PTR("zz_test_win_select"), 0, 0,
-        LW(1), LW(2), LW(3), LW(4))
+    USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_frontsign"), 0, 0)
     
-    // USER_FUNC(evt_msg_print, 0, PTR("tik_06_02"), 0, 0)
+    // "Shrink Smash" window test
+    // USER_FUNC(evt_win_other_select, 19)
+    // USER_FUNC(
+        // evt_msg_print_insert, 0, PTR("zz_test_win_select"), 0, 0,
+        // LW(1), LW(2), LW(3), LW(4))
+
     USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()
@@ -88,17 +91,8 @@ EVT_BEGIN(Lobby_BackSignEvt)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_normalize)
     
-    // Calculate vanilla sign stats.
-    SET(LW(0), GSW(33))
-    SET(LW(1), GSW(32))
-    SET(LW(4), GSW(35))
-    MUL(LW(4), 256)
-    ADD(LW(1), LW(4))
-    SET(LW(2), GSW(34))
-    SET(LW(3), 100)
-    USER_FUNC(
-        evt_msg_print_insert, 0, PTR("msg_jon_kanban_3"), 0, 0,
-        LW(0), LW(1), LW(2), LW(3))
+    USER_FUNC(evtTot_GetSeed, LW(0))
+    USER_FUNC(evt_msg_print_insert, 0, PTR("tot_lobby_backsign"), 0, 0, LW(0))
 
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_npc_start_for_event)
