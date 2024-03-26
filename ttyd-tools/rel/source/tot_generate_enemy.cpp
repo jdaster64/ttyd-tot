@@ -163,7 +163,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_FireBro, 1, 293, 0x04, 26, 16, 4, 2, 1, 2, 9, 3, 2, 1, 0, 0 },
     { &custom::unit_RedChomp, 1, 306, 0x2c, 82, 12, 10, 5, 5, 0, 8, -1, 2, 0, 0, 0 },
     { &custom::unit_DarkKoopatrol, 1, 307, 0x2d, 19, 25, 10, 3, 5, 0, 10, 8, 3, 1, 0, 0 },
-    { &custom::unit_IronCleft, 0, 289, 0x16, 74, 8, 8, 1, 3, 0, 8, -1, 2, 0, 0, 0 },
+    { &custom::unit_IronCleft, 0, 289, 0x16, 74, 8, 8, 1, 3, 0, 9, -1, 2, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -288,7 +288,6 @@ struct PresetLoadoutInfo {
     int32_t weight;
 };
 
-// TODO: Add presets with new enemy variants.
 const PresetLoadoutInfo kPresetLoadouts[] = {
     { { BattleUnitType::GOOMBA, 
         BattleUnitType::HYPER_GOOMBA, 
@@ -410,6 +409,12 @@ const PresetLoadoutInfo kPresetLoadouts[] = {
         -1,
         -1, },
         -1, true, true, 20 },
+    { { BattleUnitType::GUS,
+        BattleUnitType::DARK_CRAW,
+        BattleUnitType::GUS,
+        BattleUnitType::DARK_CRAW,
+        -1, },
+        0, true, true, 20 },
     { { BattleUnitType::X_NAUT,
         BattleUnitType::X_NAUT_PHD,
         BattleUnitType::ELITE_X_NAUT,
@@ -431,9 +436,9 @@ const PresetLoadoutInfo kPresetLoadouts[] = {
     { { BattleUnitType::CLEFT,
         BattleUnitType::HYPER_CLEFT,
         BattleUnitType::MOON_CLEFT,
-        -1,
+        BattleUnitType::IRON_CLEFT_RED,
         -1, },
-        -1, true, true, 20 },
+        1, true, true, 20 },
     { { BattleUnitType::POKEY,
         BattleUnitType::POISON_POKEY,
         BattleUnitType::POKEY,
@@ -456,6 +461,12 @@ const PresetLoadoutInfo kPresetLoadouts[] = {
         BattleUnitType::RED_CHOMP,
         BattleUnitType::CHAIN_CHOMP,
         BattleUnitType::RED_CHOMP,
+        -1, },
+        0, true, true, 20 },
+    { { BattleUnitType::BOB_OMB,
+        BattleUnitType::TOT_HYPER_BOB_OMB,
+        BattleUnitType::BOB_OMB,
+        BattleUnitType::TOT_HYPER_BOB_OMB,
         -1, },
         0, true, true, 20 },
     { { BattleUnitType::BULKY_BOB_OMB,
@@ -806,7 +817,7 @@ void SelectEnemies() {
     }
     
     // Change Yuxes to corresponding X-Naut types if partner is not present.
-    if (GetNumActivePartners() > 0) {
+    if (GetNumActivePartners() <= 0) {
         for (int32_t i = 0; i < g_NumEnemies; ++i) {
             switch (g_Enemies[i]) {
                 case BattleUnitType::YUX: {
