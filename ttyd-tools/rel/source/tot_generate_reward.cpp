@@ -93,6 +93,73 @@ int32_t g_ChestDrawAlpha = 0;
 int32_t g_MoveSelections[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 int32_t g_NumMovesSelected = 0;
 
+// Returns the option flag to check for whether the badge was already obtained.
+uint32_t GetUniqueBadgeObtainedOption(int32_t item_type) {
+    switch (item_type) {
+        case ItemType::CHILL_OUT:       return STAT_RUN_UNIQUE_BADGE_0;
+        case ItemType::DOUBLE_DIP:      return STAT_RUN_UNIQUE_BADGE_1;
+        case ItemType::DOUBLE_DIP_P:    return STAT_RUN_UNIQUE_BADGE_2;
+        case ItemType::FEELING_FINE:    return STAT_RUN_UNIQUE_BADGE_3;
+        case ItemType::FEELING_FINE_P:  return STAT_RUN_UNIQUE_BADGE_4;
+        case ItemType::LUCKY_START:     return STAT_RUN_UNIQUE_BADGE_5;
+        case ItemType::QUICK_CHANGE:    return STAT_RUN_UNIQUE_BADGE_6;
+        case ItemType::RETURN_POSTAGE:  return STAT_RUN_UNIQUE_BADGE_7;
+        case ItemType::ZAP_TAP:         return STAT_RUN_UNIQUE_BADGE_8;
+        case ItemType::SPIKE_SHIELD:    return STAT_RUN_UNIQUE_BADGE_9;
+    }
+    return -1;
+}
+
+// Selects which unique badge to give as a reward.
+int32_t SelectUniqueBadge() {
+    auto& state = g_Mod->state_;
+    static constexpr const int32_t kBadges[] = {
+        ItemType::CHILL_OUT, ItemType::DOUBLE_DIP,
+        ItemType::DOUBLE_DIP_P, ItemType::FEELING_FINE,
+        ItemType::FEELING_FINE_P, ItemType::LUCKY_START,
+        ItemType::QUICK_CHANGE, ItemType::RETURN_POSTAGE,
+        ItemType::ZAP_TAP, ItemType::SPIKE_SHIELD,
+    };
+    uint16_t weights[] = { 10, 10, 10, 10, 10, 10, 15, 10, 10, 20 };
+    uint8_t eligible[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    int32_t total_weight = 115;
+    
+    if (GetNumActivePartners() == 0) {
+        eligible[2] = 0;
+        eligible[4] = 0;
+        eligible[6] = 0;
+    }
+    
+    // Disable badges that have already been picked up.
+    for (int32_t i = 0; i < 10; ++i) {
+        if (state.GetOption(GetUniqueBadgeObtainedOption(kBadges[i]))) {
+            eligible[i] = 0;
+        }
+    }
+    
+    int32_t num_eligible = 0;
+    for (int32_t i = 0; i < 10; ++i) num_eligible += eligible[i];
+    
+    if (num_eligible > 0) {
+        // Find the next badge in the sequence that hasn't yet been claimed,
+        // trying multiple times if necessary.
+        for (int32_t retries = 100; retries > 0; --retries) {
+            int32_t weight = state.Rand(total_weight, RNG_REWARD_BADGE_SPECIAL);
+            total_weight = 0;
+            for (int32_t i = 0; i < 10; ++i) {
+                total_weight += weights[i];
+                if (weight < total_weight) {
+                    if (eligible[i]) return kBadges[i];
+                    break;
+                }
+            }
+        }
+    }
+    
+    // No unique badges left to unlock.
+    return 0;
+}
+
 // Returns the starting move type and number of moves for the category.
 void GetMoveRange(int32_t reward_type, int32_t& move_start, int32_t& num_moves) {
     switch(reward_type) {
@@ -232,56 +299,6 @@ int32_t SelectSpecialMove() {
     }
     
     // No Special Moves left to unlock.
-    return 0;
-}
-
-// Selects which unique badge to give as a reward.
-int32_t SelectUniqueBadge() {
-    auto& state = g_Mod->state_;
-    static constexpr const int32_t kBadges[] = {
-        ItemType::CHILL_OUT, ItemType::DOUBLE_DIP,
-        ItemType::DOUBLE_DIP_P, ItemType::FEELING_FINE,
-        ItemType::FEELING_FINE_P, ItemType::LUCKY_START,
-        ItemType::QUICK_CHANGE, ItemType::RETURN_POSTAGE,
-        ItemType::ZAP_TAP, ItemType::SPIKE_SHIELD,
-    };
-    uint16_t weights[] = { 10, 10, 10, 10, 10, 10, 15, 10, 10, 20 };
-    uint8_t eligible[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    int32_t total_weight = 115;
-    
-    if (GetNumActivePartners() == 0) {
-        eligible[2] = 0;
-        eligible[4] = 0;
-        eligible[6] = 0;
-    }
-    
-    // Disable badges that have already been picked up.
-    for (int32_t i = 0; i < 10; ++i) {
-        if (state.GetOption(STAT_RUN_UNIQUE_BADGE_0 + i)) {
-            eligible[i] = 0;
-        }
-    }
-    
-    int32_t num_eligible = 0;
-    for (int32_t i = 0; i < 10; ++i) num_eligible += eligible[i];
-    
-    if (num_eligible > 0) {
-        // Find the next badge in the sequence that hasn't yet been claimed,
-        // trying multiple times if necessary.
-        for (int32_t retries = 100; retries > 0; --retries) {
-            int32_t weight = state.Rand(total_weight, RNG_REWARD_BADGE_SPECIAL);
-            total_weight = 0;
-            for (int32_t i = 0; i < 10; ++i) {
-                total_weight += weights[i];
-                if (weight < total_weight) {
-                    if (eligible[i]) return kBadges[i];
-                    break;
-                }
-            }
-        }
-    }
-    
-    // No unique badges left to unlock.
     return 0;
 }
 
@@ -607,39 +624,7 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
 }
 
 void RewardManager::AfterItemPickup(int32_t item_type) {
-    uint32_t option = 0;
-    switch (item_type) {
-        case ItemType::CHILL_OUT:
-            option = STAT_RUN_UNIQUE_BADGE_0;
-            break;
-        case ItemType::DOUBLE_DIP:
-            option = STAT_RUN_UNIQUE_BADGE_1;
-            break;
-        case ItemType::DOUBLE_DIP_P:
-            option = STAT_RUN_UNIQUE_BADGE_2;
-            break;
-        case ItemType::FEELING_FINE:
-            option = STAT_RUN_UNIQUE_BADGE_3;
-            break;
-        case ItemType::FEELING_FINE_P:
-            option = STAT_RUN_UNIQUE_BADGE_4;
-            break;
-        case ItemType::LUCKY_START:
-            option = STAT_RUN_UNIQUE_BADGE_5;
-            break;
-        case ItemType::QUICK_CHANGE:
-            option = STAT_RUN_UNIQUE_BADGE_6;
-            break;
-        case ItemType::RETURN_POSTAGE:
-            option = STAT_RUN_UNIQUE_BADGE_7;
-            break;
-        case ItemType::ZAP_TAP:
-            option = STAT_RUN_UNIQUE_BADGE_8;
-            break;
-        case ItemType::SPIKE_SHIELD:
-            option = STAT_RUN_UNIQUE_BADGE_9;
-            break;
-    }
+    uint32_t option = GetUniqueBadgeObtainedOption(item_type);
     if (option) g_Mod->state_.SetOption(option, 1);
 }
 

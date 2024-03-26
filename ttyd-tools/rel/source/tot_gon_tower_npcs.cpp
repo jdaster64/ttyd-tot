@@ -212,9 +212,11 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
             inventory[i] = item;
         }
     }
-    int32_t special_offer = RewardManager::GetUniqueBadgeForShop();
+    int32_t special_offer;
     if (g_Mod->state_.Rand(5, RNG_NPC_OPTIONS) == 0) {
         special_offer = ItemType::STAR_PIECE;
+    } else {
+        special_offer = RewardManager::GetUniqueBadgeForShop();
     }
     // Add special badge / Star Piece, then null terminator at end.
     inventory[kNumCharlietonItemsPerType * 3] = special_offer;

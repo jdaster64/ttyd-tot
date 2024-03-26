@@ -190,8 +190,8 @@ TotSaveSlot* StateManager::GetBackupSave() const {
 }
 
 void StateManager::InitDefaultOptions() {
-    // TODO: Seed randomly, or allow user to change.
-    seed_ = 417;
+    // Pick a random seed, and reset all RNG states to the start.
+    seed_ = static_cast<uint32_t>(gc::OSTime::OSGetTime()) % 1'000'000'000;
     for (int32_t i = 0; i < 56; ++i) rng_states_[i] = 0;
     
     // Set floor to 0 (starting floor that only gives a partner).
