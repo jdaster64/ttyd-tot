@@ -750,13 +750,15 @@ g_StringMap = {
         
         b"tot_lobby_frontsign":
             b'<kanban>\n'
-            b'<pos 118 10>\n"Battle Tower"\n'
-            b'<pos 78 39>\nUnder Construction\n<k>',
+            b'<pos 116 10>\n"Battle Tower"\n'
+            b'<pos 77 39>\nUnder Construction\n<k>',
         
         b"tot_lobby_backsign":
             b'<kanban>\n'
-            b'Current options: <col 0000ffff>TBD\n</col>'
-            b'Current seed: %09d\n'
+            b'Current seed: <col 0000ffff>\n'
+            b'%09d\n</col>\n'
+            b'Current options: <col 0000ffff>\n'
+            b'TBD\n</col>\n'
             b'<k>',
         
         b"tot_lobby_reentry":
@@ -1008,23 +1010,63 @@ g_StringMap = {
         
         # Gloomtail battle entry.
         b"tot_dragon01_00":
-            b"Placeholder text 1-0<k>",
+            b"<boss>\n"
+            b"So you've come this far to\n"
+            b"challenge me again, mortals?\n"
+            b"<k>\n"
+            b"<p>\n"
+            b"That was quite foolish, I fear.\n"
+            b"<wait 250>\n"
+            b"I shall not go so easy on you\n"
+            b"this time!\n"
+            b"<k>",
         
         # Gloomtail phase 2 start.
         b"tot_dragon01_01":
-            b"Placeholder text 1-1<k>",
+            b"<boss>\n"
+            b"GWAAAAH HA HA HA HA!\n"
+            b"<wait 250>\n"
+            b"You are tough meat, my little\n"
+            b"tasty morsels!\n"
+            b"<k>\n"
+            b"<p>\n"
+            b"But how will you fare\n"
+            b"against THIS!!!\n"
+            b"<k>",
         
         # Gloomtail phase 3 start.
         b"tot_dragon01_02":
-            b"Placeholder text 1-2<k>",
+            b"<boss>\n"
+            b"Gwuhhh...\n"
+            b"<k>\n"
+            b"<p>\n"
+            b"You are not the easy prey\n"
+            b"you appear to be...\n"
+            b"<k>\n"
+            b"<p>\n"
+            b"I would never be able to show\n"
+            b"my face again if I was bested\n"
+            b"again by you whelps...\n"
+            b"<k>\n"
+            b"<p>\n"
+            b"...So I will show you the true\n"
+            b"extent of my power!\n"
+            b"<k>",
         
         # Gloomtail low health.
         b"tot_dragon01_03":
-            b"Placeholder text 1-3<k>",
+            b"<boss>\n"
+            b"Mmmmph...<wait 250> How can this be...\n"
+            b"<k>",
         
         # Gloomtail megabreath.
         b"tot_dragon01_04":
-            b"Placeholder text 1-4<k>",
+            b"<boss>\n"
+            b"<dynamic 3>\n"
+            b"<scale 2>\n"
+            b"<pos 15 10>\n"
+            b"MEGABREATH!\n"
+            b"<k>",
         
         # Gloomtail healing (unused).
         b"tot_dragon01_05":
@@ -1032,7 +1074,9 @@ g_StringMap = {
         
         # Gloomtail death.
         b"tot_dragon01_06":
-            b"Placeholder text 1-6<k>",
+            b"<boss>\n"
+            b"No... <wait 250>No...<wait 250> It can't be true!\n"
+            b"<k>",
         
         # Bonetail battle entry.
         b"tot_dragon02_00":
