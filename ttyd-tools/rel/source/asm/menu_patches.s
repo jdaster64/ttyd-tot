@@ -1,9 +1,20 @@
+# win_mario
 .global StartCheckOpenMarioMoveMenu
 .global BranchBackCheckOpenMarioMoveMenu
 .global StartMarioMoveMenuDisp
 .global BranchBackMarioMoveMenuDisp
 .global StartMarioMoveMenuMsgEntry
 .global BranchBackMarioMoveMenuMsgEntry
+# win_party
+.global StartPartySetPartnerDescAndMoveCount
+.global BranchBackPartySetPartnerDescAndMoveCount
+.global StartPartyOverrideMoveTextAndCursorPos
+.global BranchBackPartyOverrideMoveTextAndCursorPos
+.global StartPartyDispHook1
+.global BranchBackPartyDispHook1
+.global StartPartyDispHook2
+.global BranchBackPartyDispHook2
+# win_item
 .global StartFixItemWinPartyDispOrder
 .global BranchBackFixItemWinPartyDispOrder
 .global StartFixItemWinPartySelectOrder
@@ -13,6 +24,7 @@
 .global BranchBackCheckForUnusableItemInMenu
 .global StartUseSpecialItems
 .global BranchBackUseSpecialItems
+# win_log
 .global StartInitTattleLog
 .global BranchBackInitTattleLog
 
@@ -39,6 +51,32 @@ StartMarioMoveMenuMsgEntry:
 bl marioMoveMenuMsgEntry
 
 BranchBackMarioMoveMenuMsgEntry:
+b 0
+
+StartPartySetPartnerDescAndMoveCount:
+mr %r3, %r31
+bl partyMenuSetupPartnerDescAndMoveCount
+
+BranchBackPartySetPartnerDescAndMoveCount:
+b 0
+
+StartPartyOverrideMoveTextAndCursorPos:
+mr %r3, %r31
+bl partyMenuSetMoveDescAndCursorPos
+
+BranchBackPartyOverrideMoveTextAndCursorPos:
+b 0
+
+StartPartyDispHook1:
+nop
+BranchBackPartyDispHook1:
+b 0
+
+StartPartyDispHook2:
+mr %r3, %r30
+bl partyMenuDispStats
+
+BranchBackPartyDispHook2:
 b 0
 
 StartFixItemWinPartyDispOrder:

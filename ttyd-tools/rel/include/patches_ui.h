@@ -22,6 +22,13 @@ void MarioMoveMenuDisp(void* win_ptr);
 // Prints the description for the currently hovered move in the Mario tab.
 void MarioMoveMenuMsgEntry(void* win_ptr);
 
+// Prints the partner's description and sets their move count in the Party menu.
+void PartyMenuSetupPartnerDescAndMoveCount(void* win_ptr);
+// Sets the move description and updates the move cursor XY pos for Party menu.
+void PartyMenuSetMoveDescAndCursorPos(void* win_ptr);
+// Prints all of the information on the right side of the Party tab.
+void PartyMenuDispStats(void* win_ptr);
+
 // Stores pointers to WinPartyData entries in the correct order based
 // on the currently active partner and partners currently obtained.
 void GetPartyMemberMenuOrder(ttyd::win_party::WinPartyData** out_party_data);

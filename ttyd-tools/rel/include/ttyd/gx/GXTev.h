@@ -72,11 +72,45 @@ enum GXTevMode {
     GX_PASSCLR,
 };
 
+enum GXTevAlphaArg {
+    GX_CA_APREV = 0,
+    GX_CA_A0,
+    GX_CA_A1,
+    GX_CA_A2,
+    GX_CA_TEXA,
+    GX_CA_RAS,
+    GX_CA_KONST,
+    GX_CA_ZERO,
+};
+
+enum GXTevColorArg {
+    GX_CC_CPREV = 0,
+    GX_CC_APREV,
+    GX_CC_C0,
+    GX_CC_A0,
+    GX_CC_C1,
+    GX_CC_A1,
+    GX_CC_C2,
+    GX_CC_A2,
+    GX_CC_TEXC,
+    GX_CC_TEXA,
+    GX_CC_RASC,
+    GX_CC_RASA,
+    GX_CC_ONE,
+    GX_CC_HALF,
+    GX_CC_KONST,
+    GX_CC_ZERO,
+};
+
 extern "C" {
 
 void GXSetTevOp(GXTevStageID stage, GXTevMode mode);
-// GXSetTevColorIn
-// GXSetTevAlphaIn
+void GXSetTevColorIn(
+    GXTevStageID stage_id, GXTevColorArg cc1, GXTevColorArg cc2,
+    GXTevColorArg cc3, GXTevColorArg cc4);
+void GXSetTevAlphaIn(
+    GXTevStageID stage_id, GXTevAlphaArg ca1, GXTevAlphaArg ca2,
+    GXTevAlphaArg ca3, GXTevAlphaArg ca4);
 void GXSetTevColorOp(
     int32_t unk0, int32_t unk1, int32_t unk2,
     int32_t unk3, int32_t unk4, int32_t unk5);

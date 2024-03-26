@@ -12,6 +12,7 @@
 
 #include <gc/mtx.h>
 #include <gc/types.h>
+#include <ttyd/gx/GXTev.h>
 #include <ttyd/gx/GXAttr.h>
 #include <ttyd/gx/GXTexture.h>
 #include <ttyd/gx/GXTransform.h>
@@ -30,6 +31,7 @@
 #include <ttyd/sound.h>
 #include <ttyd/statuswindow.h>
 #include <ttyd/win_main.h>
+#include <ttyd/win_mario.h>
 #include <ttyd/win_party.h>
 #include <ttyd/win_root.h>
 #include <ttyd/winmgr.h>
@@ -50,6 +52,16 @@ extern "C" {
     void BranchBackMarioMoveMenuDisp();
     void StartMarioMoveMenuMsgEntry();
     void BranchBackMarioMoveMenuMsgEntry();
+    
+    void StartPartySetPartnerDescAndMoveCount();
+    void BranchBackPartySetPartnerDescAndMoveCount();
+    void StartPartyOverrideMoveTextAndCursorPos();
+    void BranchBackPartyOverrideMoveTextAndCursorPos();
+    void StartPartyDispHook1();
+    void BranchBackPartyDispHook1();
+    void StartPartyDispHook2();
+    void BranchBackPartyDispHook2();
+    
     void StartFixItemWinPartyDispOrder();
     void BranchBackFixItemWinPartyDispOrder();
     void StartFixItemWinPartySelectOrder();
@@ -59,6 +71,7 @@ extern "C" {
     void BranchBackCheckForUnusableItemInMenu();
     void StartUseSpecialItems();
     void BranchBackUseSpecialItems();
+    
     void StartInitTattleLog();
     void BranchBackInitTattleLog();
     // status_window_patches.s
@@ -93,6 +106,15 @@ extern "C" {
     void marioMoveMenuMsgEntry(void* pWin) {
         mod::infinite_pit::ui::MarioMoveMenuMsgEntry(pWin);
     }
+    void partyMenuSetupPartnerDescAndMoveCount(void* pWin) {
+        mod::infinite_pit::ui::PartyMenuSetupPartnerDescAndMoveCount(pWin);
+    }
+    void partyMenuSetMoveDescAndCursorPos(void* pWin) {
+        mod::infinite_pit::ui::PartyMenuSetMoveDescAndCursorPos(pWin);
+    }
+    void partyMenuDispStats(void* pWin) {
+        mod::infinite_pit::ui::PartyMenuDispStats(pWin);
+    }
     void initTattleLog(void* win_log_ptr) {
         mod::infinite_pit::ui::InitializeTattleLog(win_log_ptr);
     }
@@ -101,14 +123,19 @@ extern "C" {
 namespace mod::infinite_pit {
 
 namespace {
+
+// For convenience.
+using namespace ::ttyd::gx::GXTev;
     
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::mario_pouch::PouchData;
+using ::ttyd::msgdrv::msgSearch;
 using ::ttyd::win_party::WinPartyData;
 using ::ttyd::winmgr::WinMgrSelectEntry;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
+namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 }
@@ -125,6 +152,14 @@ extern const int32_t g_effUpdownDisp_TwoDigitSupport_EH;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_BH;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_EH;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_CH1;
+extern const int32_t g_winPartyDisp_StatsHook1_BH;
+extern const int32_t g_winPartyDisp_StatsHook1_EH;
+extern const int32_t g_winPartyDisp_StatsHook2_BH;
+extern const int32_t g_winPartyDisp_StatsHook2_EH;
+extern const int32_t g_winPartyMain_RotatePartnersHook_BH;
+extern const int32_t g_winPartyMain_RotatePartnersHook_EH;
+extern const int32_t g_winPartyMain_OverrideMoveTextCursor_BH;
+extern const int32_t g_winPartyMain_OverrideMoveTextCursor_EH;
 extern const int32_t g_itemUseDisp_FixPartyOrder_BH;
 extern const int32_t g_itemUseDisp_FixPartyOrder_EH;
 extern const int32_t g_winItemMain_FixPartyOrder_BH;
@@ -196,7 +231,7 @@ void DisplayStarPowerOrbs(double x, double y, int32_t star_power) {
             static_cast<float>(y + 12.f),
             0.f };
         uint16_t icon = i < full_orbs ?
-            ttyd::statuswindow::gauge_back[i] : 0x1c7;
+            ttyd::statuswindow::gauge_back[i] : IconType::SP_ORB_EMPTY;
         ttyd::icondrv::iconDispGx(1.f, &pos, 0x10, icon);
     }
 }
@@ -311,6 +346,34 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(StartMarioMoveMenuMsgEntry),
         reinterpret_cast<void*>(BranchBackMarioMoveMenuMsgEntry));
         
+    // Apply patch to Party menu code to print the party member's description
+    // and update the number of options in their moves dialog.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_winPartyMain_RotatePartnersHook_BH),
+        reinterpret_cast<void*>(g_winPartyMain_RotatePartnersHook_EH),
+        reinterpret_cast<void*>(StartPartySetPartnerDescAndMoveCount),
+        reinterpret_cast<void*>(BranchBackPartySetPartnerDescAndMoveCount));
+        
+    // Apply patch to Party menu code to override the description and
+    // XY cursor position for the moves window, given the current index.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_winPartyMain_OverrideMoveTextCursor_BH),
+        reinterpret_cast<void*>(g_winPartyMain_OverrideMoveTextCursor_EH),
+        reinterpret_cast<void*>(StartPartyOverrideMoveTextAndCursorPos),
+        reinterpret_cast<void*>(BranchBackPartyOverrideMoveTextAndCursorPos));
+        
+    // Completely replace code to draw Party menu stats (HP and moves window).
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_winPartyDisp_StatsHook1_BH),
+        reinterpret_cast<void*>(g_winPartyDisp_StatsHook1_EH),
+        reinterpret_cast<void*>(StartPartyDispHook1),
+        reinterpret_cast<void*>(BranchBackPartyDispHook1));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_winPartyDisp_StatsHook2_BH),
+        reinterpret_cast<void*>(g_winPartyDisp_StatsHook2_EH),
+        reinterpret_cast<void*>(StartPartyDispHook2),
+        reinterpret_cast<void*>(BranchBackPartyDispHook2));
+        
     // Apply patch to only include Infinite Pit enemies in the Tattle Log.
     mod::patch::writeBranchPair(
         reinterpret_cast<void*>(g_winLogInit_InitTattleLog_BH),
@@ -401,11 +464,11 @@ void DisplayUpDownNumberIcons(
         
     // Print plus / minus sign.
     if (number < 0) {
-        ttyd::icondrv::iconGetTexObj(&tex_obj, 0x1f6);
+        ttyd::icondrv::iconGetTexObj(&tex_obj, IconType::NUMBER_MINUS);
         ttyd::gx::GXTexture::GXLoadTexObj(&tex_obj, 0);
         gc::mtx::PSMTXTrans(&pos_mtx, x_pos, 7.0, 1.0);
     } else {
-        ttyd::icondrv::iconGetTexObj(&tex_obj, 0x1f5);
+        ttyd::icondrv::iconGetTexObj(&tex_obj, IconType::NUMBER_PLUS);
         ttyd::gx::GXTexture::GXLoadTexObj(&tex_obj, 0);
         gc::mtx::PSMTXTrans(&pos_mtx, x_pos, 0.0, 1.0);
     }
@@ -419,15 +482,9 @@ void DisplayUpDownNumberIcons(
 bool CheckOpenMarioMoveMenu(void* pWin) {
     int32_t starting_move = -1;
     switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
-        case 3:
-            starting_move = tot::MoveType::JUMP_BASE;
-            break;
-        case 2:
-            starting_move = tot::MoveType::HAMMER_BASE;
-            break;
-        case 12:
-            starting_move = tot::MoveType::SP_SWEET_TREAT;
-            break;
+        case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
+        case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
+        case 12:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
     }
     if (starting_move < 0) return false;
     
@@ -463,15 +520,9 @@ void MarioMoveMenuDisp(void* pWin) {
         
     int32_t starting_move;
     switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
-        case 3:
-            starting_move = tot::MoveType::JUMP_BASE;
-            break;
-        case 2:
-            starting_move = tot::MoveType::HAMMER_BASE;
-            break;
-        default:
-            starting_move = tot::MoveType::SP_SWEET_TREAT;
-            break;
+        case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
+        case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
+        default:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
     }
     
     for (int32_t i = 0; i < 8; ++i) {
@@ -505,20 +556,14 @@ void MarioMoveMenuDisp(void* pWin) {
 }
 
 void MarioMoveMenuMsgEntry(void* pWin) {
-    int32_t starting_move;
-    switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
-        case 3:
-            starting_move = tot::MoveType::JUMP_BASE;
-            break;
-        case 2:
-            starting_move = tot::MoveType::HAMMER_BASE;
-            break;
-        default:
-            starting_move = tot::MoveType::SP_SWEET_TREAT;
-            break;
-    }
     int32_t cursor_pos = *(int32_t*)((uintptr_t)pWin + 0x194);
     
+    int32_t starting_move;
+    switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
+        case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
+        case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
+        default:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
+    }
     int32_t current_pos = -1;
     for (int32_t i = 0; i < 8; ++i) {
         int32_t move = starting_move + i;
@@ -528,6 +573,242 @@ void MarioMoveMenuMsgEntry(void* pWin) {
                 pWin, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
             return;
         }
+    }
+}
+
+void PartyMenuSetupPartnerDescAndMoveCount(void* pWin) {
+    int32_t selected_partner_idx = *(int32_t*)((uintptr_t)pWin + 0x1d8);
+    auto* winpartydt = ttyd::win_party::g_winPartyDt;
+    int32_t party_id = winpartydt[selected_partner_idx].partner_id;
+        
+    // Calculate number of unlocked moves.
+    int32_t starting_move;
+    switch (party_id) {
+        case 1:     starting_move = tot::MoveType::GOOMBELLA_BASE;  break;
+        case 2:     starting_move = tot::MoveType::KOOPS_BASE;      break;
+        case 3:     starting_move = tot::MoveType::BOBBERY_BASE;    break;
+        case 4:     starting_move = tot::MoveType::YOSHI_BASE;      break;
+        case 5:     starting_move = tot::MoveType::FLURRIE_BASE;    break;
+        case 6:     starting_move = tot::MoveType::VIVIAN_BASE;     break;
+        default:    starting_move = tot::MoveType::MOWZ_BASE;       break;
+    }
+    int32_t num_moves = 0;
+    for (int32_t i = 0; i < 6; ++i) {
+        int32_t move = starting_move + i;
+        if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++num_moves;
+    }
+    *(int32_t*)((uintptr_t)pWin + 0x204) = num_moves;
+    
+    ttyd::win_root::winMsgEntry(
+        pWin, 0, winpartydt[selected_partner_idx].msg_menu, 0);
+}
+
+void PartyMenuSetMoveDescAndCursorPos(void* pWin) {
+    int32_t cursor_pos = *(int32_t*)((uintptr_t)pWin + 0x208);
+    
+    // Override cursor XY position.
+    *(float*)((uintptr_t)pWin + 0x158) = -13.0f;
+    *(float*)((uintptr_t)pWin + 0x15c) = 38.0f - 23.4f * cursor_pos;
+    
+    int32_t selected_partner_idx = *(int32_t*)((uintptr_t)pWin + 0x1d8);
+    int32_t party_id =
+        ttyd::win_party::g_winPartyDt[selected_partner_idx].partner_id;
+    
+    // Set move description.
+    int32_t starting_move;
+    switch (party_id) {
+        case 1:     starting_move = tot::MoveType::GOOMBELLA_BASE;  break;
+        case 2:     starting_move = tot::MoveType::KOOPS_BASE;      break;
+        case 3:     starting_move = tot::MoveType::BOBBERY_BASE;    break;
+        case 4:     starting_move = tot::MoveType::YOSHI_BASE;      break;
+        case 5:     starting_move = tot::MoveType::FLURRIE_BASE;    break;
+        case 6:     starting_move = tot::MoveType::VIVIAN_BASE;     break;
+        default:    starting_move = tot::MoveType::MOWZ_BASE;       break;
+    }
+    int32_t current_pos = -1;
+    for (int32_t i = 0; i < 6; ++i) {
+        int32_t move = starting_move + i;
+        if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
+        if (current_pos == cursor_pos) {
+            ttyd::win_root::winMsgEntry(
+                pWin, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
+            return;
+        }
+    }
+}
+
+void PartyMenuDispStats(void* pWin) {
+    float win_x = *(float*)((uintptr_t)pWin + 0xc4);
+    float win_y = *(float*)((uintptr_t)pWin + 0xc8);
+    void* texInit_param = **(void***)(*(uintptr_t*)((uintptr_t)pWin + 0x28) + 0xa0);
+    
+    int32_t selected_partner_idx = *(int32_t*)((uintptr_t)pWin + 0x1d8);
+    int32_t party_id =
+        ttyd::win_party::g_winPartyDt[selected_partner_idx].partner_id;
+
+    auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+    
+    // "Constant" colors.
+    static uint32_t kBlack = 0x000000FFU;
+    static uint32_t kWhite = 0xFFFFFFFFU;
+    static uint32_t kPinkBlobColor = 0xCB8CA2FEU;
+    static uint32_t kHeartPointsTextColor = 0xA73C3CFFU;
+    
+    // Temporary variables, used across draw calls.
+    gc::vec3 pos = { 0.0f, 0.0f, 0.0f };
+    gc::vec3 scale;
+    int32_t width;
+    
+    // Top-left corner of the two windows, for reference.
+    gc::vec3 hp_win = { win_x + 5.0f, win_y + 136.0f, 0.0f };
+    gc::vec3 tbl_win = { win_x - 5.0f, win_y + 80.0f, 0.0f };
+
+    // Draw recessed window for HP.
+    ttyd::win_root::winKirinukiGX(hp_win.x, hp_win.y, 240.0f, 46.0f, pWin, 0);
+    // Draw move table background.
+    ttyd::win_root::winWazaGX(tbl_win.x, tbl_win.y, 260.0f, 176.0f, pWin, 0);
+
+    // Draw pink blob behind "HP" text.
+    ttyd::win_main::winTexInit(texInit_param);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+    pos.x = hp_win.x + 45.0f - 2.0f;
+    pos.y = hp_win.y - 26.0f - 4.0f;
+    scale.x = 1.0f;
+    scale.y = 1.0f;
+    scale.z = 1.0f;
+    ttyd::win_main::winTexSet(0xaf, &pos, &scale, &kPinkBlobColor);
+    
+    // Draw slash between current and maximum HP.
+    ttyd::win_main::winTexInit(texInit_param);
+    pos.x = hp_win.x + 8.0f + 170.f;
+    pos.y = hp_win.y - 26.0f + 4.0f;
+    ttyd::win_main::winTexSet(0x10, &pos, &scale, &kWhite);
+    
+    // Draw heart icon for HP.
+    ttyd::win_main::winIconInit();
+    pos.x = hp_win.x + 45.0f + 60.f;
+    pos.y = hp_win.y - 26.0f + 4.0f;
+    scale.x = 0.82f;
+    scale.y = 0.82f;
+    scale.z = 0.82f;
+    ttyd::win_main::winIconSet(IconType::HP_ICON, &pos, &scale, &kWhite);
+        
+    ttyd::win_main::winFontInit();
+    
+    // Draw "HP" text.
+    const char* hp_string = msgSearch("msg_menu_party_hp");
+    width = ttyd::fontmgr::FontGetMessageWidth(hp_string);
+    pos.x = hp_win.x + 45.0f - width * 0.5f;
+    pos.y = hp_win.y - 26.0f + 12.0f;
+    scale.x = 1.0f;
+    scale.y = 1.0f;
+    scale.z = 1.0f;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, hp_string);
+
+    // Draw "Heart Pts." text.
+    const char* ruby_string = ttyd::msgdrv::msgSearch("msg_menu_mario_ruby_hp");
+    width = ttyd::fontmgr::FontGetMessageWidth(ruby_string);
+    pos.x = hp_win.x + 45.0f - width * 0.25f;
+    pos.y = hp_win.y - 26.0f + 21.0f;
+    scale.x = 0.5f;
+    scale.y = 0.5f;
+    scale.z = 0.5f;
+    ttyd::win_main::winFontSet(&pos, &scale, &kHeartPointsTextColor, ruby_string);
+
+    // Draw HP current and max numbers.
+    const char* temp_current_hp = ttyd::win_mario::winZenkakuStr(
+        pouch->party_data[party_id].current_hp);
+    pos.x = hp_win.x + 10.0f + 110.0f;
+    pos.y = hp_win.y - 26.0f + 4.0f + 12.0f;
+    scale.x = 0.9f;
+    scale.y = 0.9f;
+    scale.z = 0.9f;
+    ttyd::win_main::winFontSetR(&pos, &scale, &kBlack, "%s", temp_current_hp);
+
+    const char* temp_max_hp = ttyd::win_mario::winZenkakuStr(
+        pouch->party_data[party_id].max_hp);
+    pos.x = hp_win.x + 8.0f + 180.0f;
+    pos.y = hp_win.y - 26.0f + 4.0f + 12.0f;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "%s", temp_max_hp);
+
+    // Draw "Check moves" text and X button icon.
+    const char* check_moves = msgSearch("msg_menu_party_waza_kakunin");
+    width = ttyd::fontmgr::FontGetMessageWidth(check_moves);
+    pos.x = win_x + 250.0f - 0.7f * width;
+    pos.y = win_y - 100.f;
+    scale.x = 0.7f;
+    scale.y = 0.7f;
+    scale.z = 0.7f;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, check_moves);
+
+    ttyd::win_main::winIconInit();
+    pos.x = win_x + 250.0f - 0.7f * width - 20.f;
+    pos.y = win_y - 110.f;
+    ttyd::win_main::winIconSet(IconType::FLAT_X_BUTTON, &pos, &scale, &kWhite);
+
+    ttyd::win_main::winFontInit();
+    
+    // Draw table headings.
+    const char* move = msgSearch("msg_menu_party_waza");
+    width = ttyd::fontmgr::FontGetMessageWidth(move);
+    pos.x = tbl_win.x + 5.0f + (200.0f - 0.8f * width) * 0.5f;
+    pos.y = tbl_win.y - 5.0f;
+    scale.x = 0.8f;
+    scale.y = 0.8f;
+    scale.z = 0.8f;
+    ttyd::win_main::winFontSetEdge(&pos, &scale, &kWhite, move);
+
+    pos.x = tbl_win.x + 213.0f;
+    pos.y = tbl_win.y - 5.0f;
+    ttyd::win_main::winFontSetEdge(&pos, &scale, &kWhite, "Lvl.");
+
+    // Draw rows of table.
+    int32_t starting_move;
+    switch (party_id) {
+        case 1:     starting_move = tot::MoveType::GOOMBELLA_BASE;  break;
+        case 2:     starting_move = tot::MoveType::KOOPS_BASE;      break;
+        case 3:     starting_move = tot::MoveType::BOBBERY_BASE;    break;
+        case 4:     starting_move = tot::MoveType::YOSHI_BASE;      break;
+        case 5:     starting_move = tot::MoveType::FLURRIE_BASE;    break;
+        case 6:     starting_move = tot::MoveType::VIVIAN_BASE;     break;
+        default:    starting_move = tot::MoveType::MOWZ_BASE;       break;
+    }
+    float y_offset = 0.0f;
+    for (int32_t i = 0; i < 6; ++i) {
+        int32_t move = starting_move + i;
+        
+        // Skip moves that aren't unlocked.
+        int32_t level = tot::MoveManager::GetUnlockedLevel(move);
+        if (level < 1) continue;
+        
+        auto* move_data = tot::MoveManager::GetMoveData(move);
+        const char* move_name = msgSearch(move_data->name_msg);
+        int32_t max_level = move_data->max_level;
+        
+        pos.x = tbl_win.x + 15.0f;
+        pos.y = tbl_win.y - 31.0f + y_offset;
+        scale.x = 0.9f;
+        scale.y = 0.9f;
+        scale.z = 0.9f;
+        ttyd::win_main::winFontSetWidth(&pos, &scale, &kBlack, 175.0f, move_name);
+        
+        // Only print current level if move has more than 1 possible level.
+        if (max_level > 1) {
+            const char* level_temp = ttyd::win_mario::winZenkakuStr(level);
+            width = ttyd::fontmgr::FontGetMessageWidth(level_temp);
+            pos.x = tbl_win.x + 243.0f - 0.5f * width;
+            ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "%s", level_temp);
+            
+            pos.x = tbl_win.x + 209.0f;
+            pos.y  -= 8.0f;
+            scale.x = 0.5f;
+            scale.y = 0.5f;
+            scale.z = 0.5f;
+            ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "Lvl.");
+        }
+        
+        y_offset -= 23.4f;
     }
 }
 

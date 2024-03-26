@@ -4,53 +4,19 @@
 
 #include <cstdint>
 
-namespace ttyd::win_main {
+namespace ttyd::win_mario {
 
 extern "C" {
 
-// winLectureCheck
-// winLectureOn
-// winLectureKeyMask
-// unk_JP_US_EU_48_8017b84c
-// unk_JP_US_EU_49_8017b864
-void winIconSet(int32_t icon, gc::vec3* pos, gc::vec3* scale, uint32_t* color);
-void winIconGrayInit();
-void winIconInit();
-// winTexSet_x2
-// winTexInit_x2
-// winTexSetRot
-// unk_JP_US_EU_50_8017c9bc
-// winTexSet
-// winTexInit
-// winFontSetLabel
-void winFontSetEdgeWidth(
-    gc::vec3* pos, gc::vec3* scale, uint32_t* color, double width,
-    const char* str);
-void winFontSetEdge(
-    gc::vec3* pos, gc::vec3* scale, uint32_t* color, const char* str);
-// winFontSetR
-void winFontSetWidth(
-    gc::vec3* pos, gc::vec3* scale, uint32_t* color, double length,
-    const char* str);
-void winFontSet(
-    gc::vec3* pos, gc::vec3* scale, uint32_t* color, const char* str);
-void winFontInit();
-// winGhostDiaryChk
-// cam_r
-// unk_JP_US_EU_51_8017d8f8
-// party_color
-// famicom_check
-// itemUseFunc2
-// itemUseFunc
-// winDispKoopa
-// winDisp
-// winMain
-// winOpenDisable
-// winOpenEnable
-// winCheck
-// winReInit
-// winInit
-void* winGetPtr();
+// winMarioDisp
+// fukidashi
+// unk_801703e8
+const char* winZenkakuStr(int32_t value);
+// winMarioMain2
+// winMarioMain
+// winMarioExit
+// winMarioInit2
+// winMarioInit
 
 }
 

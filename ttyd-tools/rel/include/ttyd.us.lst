@@ -1946,8 +1946,71 @@
 
 // win_root.o
 // .text
-// 80152f00:winMailDisp
+80152bdc:unk_80152bdc
+80152e80:unk_80152e80
+80152f00:winMailDisp
+80153dd4:winZClear
+80153f84:winKageGX
+801543a4:winSortWait
+801543b8:winSortEntry
+80154414:winSortGX
+801553e4:winSortMain
+80155664:sort_8_2_func
+80155700:compare_func5_r
+80155724:compare_func5
+80155748:sort_8_1_func
+801557e4:compare_func4_r
+8015584c:compare_func4
+801558bc:sort_7_3_func
+80155978:compare_func3_r
+80155ab0:compare_func3
+80155be8:sort_7_2_func
+80155ca4:compare_func2_r
+80155db8:compare_func2
+80155ecc:sort_7_1_func
+80155f58:compare_func1_r
+80155f7c:compare_func1
+80155fa0:sort_6_2_func
+80156040:sort_6_1_func
+801560e0:compare_func6_2_r
+80156138:compare_func6_2
+80156190:compare_func6_1_r
+80156214:compare_func6_1
+80156298:sort_5_3_func
+80156484:sort_5_2_func
+80156524:sort_5_1_func
+801565c4:compare_func5_2_r
+8015661c:compare_func5_2
+80156674:compare_func5_1_r
+801566f8:compare_func5_1
+8015677c:sort_4_3_func
+8015699c:sort_4_2_func
+80156a28:sort_4_1_func
+80156ab4:N_compare_func4_2_r
+80156b04:N_compare_func4_2
+80156b54:N_compare_func4_1_r
+80156bd0:N_compare_func4_1
+80156c4c:sort_3_3_func
+80156ce8:sort_3_2_func
+80156d6c:sort_3_1_func
+80156df0:sort_2_2_func
+80156e6c:sort_2_1_func
+80156ee8:sort_1_2_func
+80156f7c:sort_1_1_func
+80157010:winWazaGX
+801583f4:winHakoGX
+8015a3cc:winMailGX
+8015c51c:winHalfBookGX
+8015e080:winBookGX
+8015fd70:winNameGX
+80160940:winKirinukiGX
 80162ed0:winMsgEntry
+80162f8c:winMsgDisp
+801637c8:winMsgMain
+80163a10:winBgGX
+801641b8:winBgMain
+801645d0:winRootDisp
+801648e8:winRootMain
 // .data
 80377218:enemy_monoshiri_sort_table
 
@@ -1957,18 +2020,57 @@
 // .data
 803773d8:g_winPartyDt
 
+// win_mario.o
+8016d7c4:winMarioDisp
+8016f87c:fukidashi
+801703e8:unk_801703e8
+80170448:winZenkakuStr
+80170484:winMarioMain2
+80170488:winMarioMain
+80170c6c:winMarioExit
+80170c90:winMarioInit2
+80170dc0:winMarioInit
+
 // evt_win.o
 80177b28:unitwin_get_work_ptr
 
 // win_main.o
+8017b5b0:winLectureCheck
+8017b60c:winLectureOn
+8017b670:winLectureKeyMask
+8017b84c:unk_8017b84c
+8017b864:unk_8017b864
 8017b8d8:winIconSet
 8017bbcc:winIconGrayInit
 8017bfdc:winIconInit
+8017c158:winTexSet_x2
+8017c3f8:winTexInit_x2
+8017c6d0:winTexSetRot
+8017c9bc:unk_8017c9bc
+8017cc2c:winTexSet
+8017cef0:winTexInit
+8017d068:winFontSetLabel
 8017d10c:winFontSetEdgeWidth
 8017d28c:winFontSetEdge
+8017d3b8:winFontSetR
 8017d52c:winFontSetWidth
 8017d6ac:winFontSet
 8017d7d0:winFontInit
+8017d7f0:winGhostDiaryChk
+8017d834:cam_r
+8017d8f8:unk_8017d8f8
+8017d91c:party_color
+8017d96c:famicom_check
+8017d9bc:itemUseFunc2
+8017d9e0:itemUseFunc
+8017dd14:winDispKoopa
+8017df00:winDisp
+8017df24:winMain
+8017eaec:winOpenDisable
+8017eb08:winOpenEnable
+8017eb24:winCheck
+8017eb70:winReInit
+8017eb9c:winInit
 8017ebd4:winGetPtr
 
 // unit_party_clauda.o
@@ -2635,6 +2737,8 @@
 
 // gx.a GXTev.c
 802b88d4:GXSetTevOp
+802b8960:GXSetTevColorIn
+802b89a4:GXSetTevAlphaIn
 802b89e8:GXSetTevColorOp
 802b8a50:GXSetTevAlphaOp
 802b8e30:GXSetTevOrder

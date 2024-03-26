@@ -20,20 +20,21 @@ void winIconInit();
 // winTexInit_x2
 // winTexSetRot
 // unk_JP_US_EU_50_8017c9bc
-// winTexSet
-// winTexInit
+void winTexSet(uint32_t unk, gc::vec3* pos, gc::vec3* scale, uint32_t* color);
+void winTexInit(void* unk);
 // winFontSetLabel
 void winFontSetEdgeWidth(
     gc::vec3* pos, gc::vec3* scale, uint32_t* color, double width,
     const char* str);
 void winFontSetEdge(
     gc::vec3* pos, gc::vec3* scale, uint32_t* color, const char* str);
-// winFontSetR
+void winFontSetR(
+    gc::vec3* pos, gc::vec3* scale, uint32_t* color, const char* str, ...);
 void winFontSetWidth(
     gc::vec3* pos, gc::vec3* scale, uint32_t* color, double length,
     const char* str);
 void winFontSet(
-    gc::vec3* pos, gc::vec3* scale, uint32_t* color, const char* str);
+    gc::vec3* pos, gc::vec3* scale, uint32_t* color, const char* str, ...);
 void winFontInit();
 // winGhostDiaryChk
 // cam_r

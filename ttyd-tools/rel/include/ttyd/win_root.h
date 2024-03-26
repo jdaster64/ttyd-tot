@@ -9,7 +9,7 @@ extern "C" {
 // .text
 // winMailDisp
 // winZClear
-// winKageGX
+void winKageGX(float x, float y, float z, float scale, void* pWin, uint32_t* color);
 // winSortWait
 // winSortEntry
 // winSortGX
@@ -56,13 +56,13 @@ extern "C" {
 // sort_2_1_func
 // sort_1_2_func
 // sort_1_1_func
-// winWazaGX
-// winHakoGX
+void winWazaGX(float x, float y, float w, float h, void* pWin, int32_t type);
+void winHakoGX(float x, float y, void* pWin, int32_t type);
 // winMailGX
 // winHalfBookGX
 // winBookGX
-// winNameGX
-// winKirinukiGX
+void winNameGX(float x, float y, float w, float h, void* pWin, int32_t type);
+void winKirinukiGX(float x, float y, float w, float h, void* pWin, int32_t type);
 void winMsgEntry(void* pWin, int32_t unk0, const char* msg, int32_t unk1);
 // winMsgDisp
 // winMsgMain
