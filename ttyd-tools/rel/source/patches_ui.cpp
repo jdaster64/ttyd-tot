@@ -806,8 +806,8 @@ void PartyMenuDispStats(void* pWin) {
         scale.z = 0.9f;
         ttyd::win_main::winFontSetWidth(&pos, &scale, &kBlack, 175.0f, move_name);
         
-        // Only print current level if move has more than 1 possible level.
         if (max_level > 1) {
+            // Print current level if move's max level is > 1.
             const char* level_temp = ttyd::win_mario::winZenkakuStr(level);
             width = ttyd::fontmgr::FontGetMessageWidth(level_temp);
             pos.x = tbl_win.x + 243.0f - 0.5f * width;
@@ -819,6 +819,10 @@ void PartyMenuDispStats(void* pWin) {
             scale.y = 0.5f;
             scale.z = 0.5f;
             ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "Lvl.");
+        } else {
+            // Print "-" instead.
+            pos.x = tbl_win.x + 225.0f;
+            ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "-");
         }
         
         y_offset -= 23.4f;
