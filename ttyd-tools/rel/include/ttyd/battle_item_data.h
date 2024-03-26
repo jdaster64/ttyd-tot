@@ -1,13 +1,29 @@
 #pragma once
 
 #include "battle_database_common.h"
+#include "evtmgr.h"
 
 #include <cstdint>
 
 namespace ttyd::battle_item_data {
 
 extern "C" {
+    
+// .text
+// BattleItemData_full_ap_recover
+// BattleItemData_nancy_disp
+// BattleItemData_nancy_mirage
+// BattleItemData_disp_item_icon
+// BattleItemData_throw_item_icon
+// BattleItemData_get_throw_first_pos
+// BattleItemData_naniga_okorukana_check
+// BattleItemData_hpfp_change_declare_2
+// BattleItemData_hpfp_change_declare_1
+EVT_DECLARE_USER_FUNC(BattleItemData_rank_up, 1)
+// BattleItemData_cam_rot
+// BattleItemData_sampling_random_target
 
+// .data
 // Event code for various items / item types.
 extern int32_t _return_home_event[1];
 extern int32_t ItemEvent_Automatic_Target[1];

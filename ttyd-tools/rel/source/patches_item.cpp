@@ -55,6 +55,7 @@ extern uint32_t (*g_pouchGetItem_trampoline)(int32_t);
 extern int32_t (*g_btlevtcmd_GetItemRecoverParam_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_flower_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_heart_suitoru_point_trampoline)(EvtEntry*, bool);
+extern int32_t (*g_BattleItemData_rank_up_trampoline)(EvtEntry*, bool);
 // Patch addresses.
 extern const int32_t g_pouchRemoveItemIndex_CheckMaxInv_BH;
 extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH;
@@ -194,7 +195,7 @@ void ApplyFixedPatches() {
     // Rebalanced price tiers for items & badges (non-pool items may have 0s).
     static const constexpr uint32_t kPriceTiers[] = {
         // Items / recipes.
-        0x1a444662, 0x5a334343, 0xb7321253, 0x34453205, 0x00700665,
+        0x1a444662, 0x5b334343, 0xb7321253, 0x34453205, 0x00700665,
         0x00700000, 0x30743250, 0xa7764353, 0x35078644, 0x00842420,
         0x34703543, 0x30040740, 0x54444045, 0x00002045,
         // Badges.
@@ -406,7 +407,7 @@ void ApplyFixedPatches() {
     // Make Trade Off usable only on the enemy party.
     ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka.target_class_flags =
         0x02100063;
-    // Make it inflict +ATK for 9 turns (and increase level by 5, as usual).
+    // Make it inflict +ATK for 9 turns.
     ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka.atk_change_chance = 100;
     ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka.atk_change_time     = 9;
     ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka.atk_change_strength = 3;
@@ -414,6 +415,20 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_ItemEvent_Teki_Kyouka_ApplyStatusHook),
         TradeOffPatch, sizeof(TradeOffPatch));
+    // Change "rank up" code to increase coins instead of level.
+    g_BattleItemData_rank_up_trampoline = patch::hookFunction(
+        ttyd::battle_item_data::BattleItemData_rank_up,
+        [](EvtEntry* evt, bool isFirstCall) {
+            //  Replace original logic.
+            int32_t unit_id = evtGetValue(evt, evt->evtArguments[0]);
+            unit_id = ttyd::battle_sub::BattleTransID(evt, unit_id);
+            auto* unit = ttyd::battle::BattleGetUnitPtr(
+                ttyd::battle::g_BattleWork, unit_id);
+            // Use padding byte as storage for extra coins.
+            unit->pad_00f += 10;
+            if (unit->pad_00f > 50) unit->pad_00f = 50;
+            return 2;
+        });
         
     // Make Koopa Curse multi-target.
     ttyd::battle_item_data::ItemWeaponData_Kameno_Noroi.target_class_flags =

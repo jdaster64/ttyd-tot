@@ -57,8 +57,8 @@ g_StringMap = {
             b"status on all foes.",
             
         b"msg_teki_kyouka":
-            b"Boosts foes' level by 5, but \n"
-            b"temporarily gives them +3 ATK.",
+            b"Enemies drop extra coins, but\n"
+            b"temporarily gain +3 ATK.",
             
         b"msg_ice_candy":
             b"A dessert made by Zess T.\n"

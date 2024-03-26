@@ -354,11 +354,14 @@ void ApplyFixedPatches() {
             return 2;
         });
     
-    // Give 3x the normal number of coins for defeating a midboss.
+    // Override the number of coins earned from an enemy.
     g_BtlUnit_GetCoin_trampoline = patch::hookFunction(
         ttyd::battle_unit::BtlUnit_GetCoin, [](BattleWorkUnit* unit) {
             int32_t coins = g_BtlUnit_GetCoin_trampoline(unit);
+            // Coin multiplier for midbosses.
             if (unit->size_change_turns > 99) coins *= 3;
+            // Extra coins from Trade Off.
+            coins += unit->pad_00f;
             return coins;
         });
 }
