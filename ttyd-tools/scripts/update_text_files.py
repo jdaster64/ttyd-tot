@@ -29,8 +29,12 @@ g_StringMap = {
         
         # Item descriptions.
         b"msg_super_coin":
-            b"A powerful object that raises\n"
-            b"max SP, or ranks up a partner.",
+            b"A powerful object that ranks\n"
+            b"up a move of your choice.",
+
+        b'msg_star_piece':
+            b'A mysterious object that ranks\n'
+            b'up a random move.',
             
         b"msg_custom_super_boots":
             b"A stronger pair of boots.",
