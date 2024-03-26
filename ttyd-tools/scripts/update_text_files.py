@@ -643,6 +643,31 @@ g_StringMap = {
         b"btl_un_hyper_sinnosuke":    b"Cosmic Boo",
         
         # TODO: Shortened Tattles for all enemies - b"btl_hlp_monban", etc.
+        
+        b'btl_hlp_monban':
+            b"That's a Craw.\n"
+            b'<wait 250>\n'
+            b'These guards are pretty stoic,\n'
+            b'no-nonsense types.\n<k>\n<p>\n',
+        
+        b'btl_hlp_sinnosuke':
+            b"That's a Hyper Bob-omb.\n"
+            b'<wait 250>\n'
+            b'Massive destructive power<wait 250>, now\n'
+            b'in a trendy hot-pink package!\n<k>\n<p>\n',
+        
+        b'btl_hlp_hyper_sinnosuke':
+            b"That's a Cosmic Boo.\n"
+            b'<wait 250>\n'
+            b"A giant purple Boo spoken of only\n"
+            b"in legend, but I guess it's real!\n<k>\n<p>\n",
+        
+        b'btl_hlp_iron_sinemon':
+            b"That's an Iron Cleft.\n"
+            b'<wait 250>\n'
+            b'These guys are so tough,<wait 50> that\n'
+            b'any hit only leaves a scratch!\n<k>\n<p>\n',
+        
         # TODO: Menu Tattles for all enemies. - b"menu_enemy_001", etc.
             
         # Achievements (TODO)
