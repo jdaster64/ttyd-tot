@@ -893,8 +893,89 @@ g_StringMap = {
         
         # Dragon fight dialogue.
         
-        b"tot_dragon_debug":
-            b"Placeholder text %d-%d<k>",
+        # Hooktail battle entry.
+        b"tot_dragon00_00":
+            b"Placeholder text 0-0<k>",
+        
+        # Hooktail phase 2 start.
+        b"tot_dragon00_01":
+            b"Placeholder text 0-1<k>",
+        
+        # Hooktail phase 3 start (unused).
+        b"tot_dragon00_02":
+            b"Placeholder text 0-2<k>",
+        
+        # Hooktail low health.
+        b"tot_dragon00_03":
+            b"Placeholder text 0-3<k>",
+        
+        # Hooktail megabreath (unused).
+        b"tot_dragon00_04":
+            b"Placeholder text 0-4<k>",
+        
+        # Hooktail healing (unused).
+        b"tot_dragon00_05":
+            b"Placeholder text 0-5<k>",
+        
+        # Hooktail death.
+        b"tot_dragon00_06":
+            b"Placeholder text 0-6<k>",
+        
+        # Gloomtail battle entry.
+        b"tot_dragon01_00":
+            b"Placeholder text 1-0<k>",
+        
+        # Gloomtail phase 2 start.
+        b"tot_dragon01_01":
+            b"Placeholder text 1-1<k>",
+        
+        # Gloomtail phase 3 start.
+        b"tot_dragon01_02":
+            b"Placeholder text 1-2<k>",
+        
+        # Gloomtail low health.
+        b"tot_dragon01_03":
+            b"Placeholder text 1-3<k>",
+        
+        # Gloomtail megabreath.
+        b"tot_dragon01_04":
+            b"Placeholder text 1-4<k>",
+        
+        # Gloomtail healing (unused).
+        b"tot_dragon01_05":
+            b"Placeholder text 1-5<k>",
+        
+        # Gloomtail death.
+        b"tot_dragon01_06":
+            b"Placeholder text 1-6<k>",
+        
+        # Bonetail battle entry.
+        b"tot_dragon02_00":
+            b"Placeholder text 2-0<k>",
+        
+        # Bonetail phase 2 start.
+        b"tot_dragon02_01":
+            b"Placeholder text 2-1<k>",
+        
+        # Bonetail phase 3 start (unused).
+        b"tot_dragon02_02":
+            b"Placeholder text 2-2<k>",
+        
+        # Bonetail low health.
+        b"tot_dragon02_03":
+            b"Placeholder text 2-3<k>",
+        
+        # Bonetail megabreath (unused).
+        b"tot_dragon02_04":
+            b"Placeholder text 2-4<k>",
+        
+        # Bonetail healing (unused).
+        b"tot_dragon02_05":
+            b"Placeholder text 2-5<k>",
+        
+        # Bonetail death.
+        b"tot_dragon02_06":
+            b"Placeholder text 2-6<k>",
     }
 }
 

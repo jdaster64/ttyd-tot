@@ -20,7 +20,9 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 
+#include <cinttypes>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 
 namespace mod::tot::custom {
@@ -111,6 +113,8 @@ EVT_DECLARE_USER_FUNC(evtTot_Dragon_SetBreathParams, 1)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetPhaseHpThresholds, 4)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetAttackWeights, 10)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetBreathWeights, 9)
+EVT_DECLARE_USER_FUNC(evtTot_Dragon_SetupConversation, 2)
+EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetNextDialogue, 2)
 
 // Unit data.
 int8_t unitHooktail_defense[] = { 1, 1, 1, 1, 1 };
@@ -469,19 +473,29 @@ BattleWeapon unitDragon_weaponRecover = {
 
 // EVTs.
 
-// Custom, handles all dialogue at phase transitions, etc.
+// Custom, drives all dragon / party dialogue at phase transitions, etc.
 // LW(0) = Conversation type, LW(1) = Dragon type.
+// Note that the camera does not change, at least currently.
 EVT_BEGIN(unitDragon_conversation_event)
     USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
+    USER_FUNC(evtTot_Dragon_SetupConversation, LW(1), LW(0))
+    USER_FUNC(evtTot_Dragon_GetNextDialogue, LW(14), LW(15))
     
-    // Placeholder text with numeric id inserted.
-    USER_FUNC(evt_msg_print_insert, 0, PTR("tot_dragon_debug"), 0, 0, LW(0), LW(1))
-    
-    // TODO: Implement.
-    // USER_FUNC(evt_msg_print, 2, PTR("tot_dragon_00"), 0, -2)
-    // WAIT_MSEC(300)
-    // USER_FUNC(evt_msg_print_battle_party, PTR("tot_dragon_p00"))
-    
+    DO(0)
+        IF_EQUAL(LW(14), 1)
+            USER_FUNC(evt_msg_print, 2, LW(15), 0, -2)
+        ELSE()
+            USER_FUNC(evt_msg_print_battle_party, LW(15))
+        END_IF()
+            
+        USER_FUNC(evtTot_Dragon_GetNextDialogue, LW(14), LW(15))
+        IF_EQUAL(LW(14), -1)
+            DO_BREAK()
+        END_IF()
+            
+        WAIT_MSEC(300)
+    WHILE()
+
     USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
     RETURN()
 EVT_END()
@@ -1186,7 +1200,7 @@ EVT_END()
 
 EVT_BEGIN(unitDragon_dead_event)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_X_1"))
-    USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_DOWN1"), EVT_NULLPTR, 0, -250, 0, 0, LW(15))
+    USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_DOWN1"), EVT_NULLPTR, 0, -250, 0, 0, LW(13))
     USER_FUNC(btlevtcmd_WaitAttackEnd)
     USER_FUNC(evt_btl_camera_set_prilimit, 1)
     USER_FUNC(evt_btl_camera_wait_move_end)
@@ -1212,7 +1226,7 @@ EVT_BEGIN(unitDragon_dead_event)
     
     USER_FUNC(evt_btl_camera_set_mode, 1, 3)
     USER_FUNC(evt_btl_camera_set_moveto, 1, -38, 33, 1005, -38, 92, 13, 60, 0)
-    USER_FUNC(evt_snd_sfxoff, LW(15))
+    USER_FUNC(evt_snd_sfxoff, LW(13))
     USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_DOWN2"), EVT_NULLPTR, 0, -250, 0, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_D_3"))
     WAIT_MSEC(700)
@@ -1827,6 +1841,40 @@ EVT_DEFINE_USER_FUNC(evtTot_Dragon_GetBreathWeights) {
         evtSetValue(evt, evt->evtArguments[2 + i], weights[i]);
     }
     
+    return 2;
+}
+
+struct DialogueEntry {
+    int32_t speaker;    // 1 for dragon, 2 for partners
+    char msg[16];
+};
+DialogueEntry g_DialogueList[16];
+int32_t g_DialoguePos = 0;
+
+// arg0 = dragon, arg1 = conversation type
+EVT_DEFINE_USER_FUNC(evtTot_Dragon_SetupConversation) {
+    int32_t dragon_type = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t conversation_type = evtGetValue(evt, evt->evtArguments[1]);
+    
+    // For now, assume every message is a single dragon dialogue box.
+    g_DialogueList[0].speaker = 1;
+    sprintf(
+        g_DialogueList[0].msg, "tot_dragon%02" PRId32 "_%02" PRId32,
+        dragon_type, conversation_type);
+    
+    g_DialogueList[1].speaker = -1;
+    g_DialoguePos = 0;
+    
+    return 2;
+}
+
+// out arg0 = speaker, arg1 = message id
+EVT_DEFINE_USER_FUNC(evtTot_Dragon_GetNextDialogue) {
+    evtSetValue(
+        evt, evt->evtArguments[0], g_DialogueList[g_DialoguePos].speaker);
+    evtSetValue(
+        evt, evt->evtArguments[1], PTR(g_DialogueList[g_DialoguePos].msg));
+    ++g_DialoguePos;
     return 2;
 }
 
