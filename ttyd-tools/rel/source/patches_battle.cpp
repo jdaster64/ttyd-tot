@@ -686,13 +686,8 @@ int32_t CalculateBaseDamage(
     // Attack multiplier statuses.
     if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
         if (BtlUnit_CheckStatus(attacker, StatusEffectType::HUGE)) {
-            if (attacker->size_change_turns > 99) {
-                // Double for midbosses.
-                atk *= 2;
-            } else {
-                // 1.5x, rounded up.
-                atk = ((atk * 3) + 1) / 2;
-            }
+            // 1.5x, rounded up.
+            atk = ((atk * 3) + 1) / 2;
         } else if (atk > 1 &&
             BtlUnit_CheckStatus(attacker, StatusEffectType::TINY)) {
             // 0.5x, rounded down (unless base is 1).

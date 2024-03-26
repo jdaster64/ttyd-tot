@@ -144,7 +144,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_Pokey, 1, 233, 0x14, 50, 12, 7, 0, 3, 0, 4, -1, 1, 0, 0, 0 },
     { &custom::unit_Lakitu, 1, 280, 0x24, 27, 13, 7, 0, 2, 0, 5, -1, 0, 1, 40, 20 },
     { &custom::unit_Spiny, 0, 287, -1, 29, 8, 7, 4, 2, 1, 1, -1, 0, 0, 0, 0 },
-    { &custom::unit_CosmicBoo, 0, 288, 0x21, 97, 150, 6, 0, 2, 2, 60, 2, 3, 3, 20, 30 },
+    { &custom::unit_CosmicBoo, 0, 288, 0x21, 97, 70, 7, 0, 5, 0, 40, 2, 3, 3, 20, 30 },
     { &custom::unit_BobOmb, 0, 283, 0x04, 77, 10, 7, 2, 2, 0, 5, 9, 1, 0, 0, 0 },
     { &custom::unit_Bandit, 0, 274, 0x04, 41, 12, 6, 0, 2, 0, 4, 5, 0, 0, 0, 0 },
     { &custom::unit_BigBandit, 0, 129, 0x04, 42, 15, 6, 0, 2, 1, 5, 5, 0, 0, 0, 0 },
@@ -172,13 +172,13 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_HyperParagoomba, 1, 219, 0x06, 5, 15, 6, 0, 3, -1, 6, 10, 0, 0, 40, 50 },
     { &custom::unit_HyperSpikyGoomba, 1, 218, 0x04, 6, 15, 6, 0, 3, 0, 6, 10, 0, 0, 0, 0 },
     { &custom::unit_CrazeeDayzee, 1, 252, 0x22, 56, 14, 5, 0, 2, 0, 6, 6, 0, 2, 0, 0 },
-    { &custom::unit_AmazyDayzee, 0, 253, -1, 95, 20, 20, 1, 20, 0, 80, 6, 2, 4, 0, 0 },
+    { &custom::unit_AmazyDayzee, 0, 253, -1, 95, 20, 20, 1, 20, 0, 40, 6, 2, 4, 0, 0 },
     { &custom::unit_HyperCleft, 1, 236, 0x16, 72, 10, 6, 5, 3, 0, 6, -1, 1, 0, 0, 0 },
     { &custom::unit_BuzzyBeetle, 1, 225, 0x09, 31, 8, 6, 5, 3, 0, 4, 7, 1, 0, 0, 0 },
     { &custom::unit_SpikeTop, 1, 226, 0x0b, 32, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },
     { &custom::unit_Swooper, 1, 239, 0x20, 59, 14, 7, 0, 3, 0, 5, -1, 0, 0, 130, 80 },
     { &custom::unit_Boo, 1, 146, 0x21, 66, 13, 6, 0, 2, 1, 5, 2, 0, 1, 0, 30 },
-    { &custom::unit_AtomicBoo, 0, 148, 0x21, 96, 100, 4, 0, 2, 2, 60, 2, 2, 2, 20, 30 },
+    { &custom::unit_AtomicBoo, 0, 148, 0x21, 96, 50, 5, 0, 5, 0, 30, 2, 2, 2, 20, 30 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -1097,6 +1097,13 @@ bool GetEnemyStats(
     int32_t base_atk_pct = kStatPercents[difficulty];
     int32_t base_def_pct = kStatPercents[difficulty];
     
+    // Exception: for Atomic Boo and dragon fights, use base stats directly.
+    if (state.floor_ % 32 == 0) {
+        base_hp_pct = 100;
+        base_atk_pct = 100;
+        base_def_pct = 100;
+    }
+    
     // Change this if adding back a boss scaling option.
     int32_t boss_scale_factor = 4;
             
@@ -1143,8 +1150,8 @@ bool GetEnemyStats(
         }
     }
     if (out_coinlvl) {
-        // Return the # of coins = enemy base level, or 20 for special enemies.
-        *out_coinlvl = ei.level > 10 ? 20 : ei.level;
+        // Return the level directly.
+        *out_coinlvl = ei.level;
     }
     
     return true;
