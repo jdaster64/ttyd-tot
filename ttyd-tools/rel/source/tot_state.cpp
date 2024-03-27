@@ -471,7 +471,8 @@ uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
             case RNG_ENEMY_CONDITION_ITEM:
             case RNG_NPC_TYPE:
             case RNG_NPC_OPTIONS:
-            case RNG_NPC_RESERVED: {
+            case RNG_NPC_RESERVED:
+            case RNG_REWARD: {
                 data[1] = floor_;
                 break;
             }

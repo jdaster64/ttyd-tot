@@ -26,9 +26,8 @@ namespace {
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Constants for secret codes.
-uint32_t secretCode_BonusOptions1   = 012651265;
-uint32_t secretCode_BonusOptions2   = 043652131;
-uint32_t secretCode_BonusOptions3   = 031313141;
+uint32_t secretCode_BumpAttack      = 043652131;
+uint32_t secretCode_BgmOnOff        = 031313141;
 uint32_t secretCode_RaceMode        = 013341336;
 uint32_t secretCode_RtaTimer        = 034345566;
 uint32_t secretCode_ShowAtkDef      = 023122312;
@@ -74,19 +73,7 @@ void CheatsManager::Update() {
         g_DrawRtaTimer = true;
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
     }
-    if ((code_history & 0xFFFFFF) == secretCode_BonusOptions1) {
-        code_history = 0;
-        // Unlock the first page of bonus options.
-        MenuManager::SetMenuPageVisibility(6, true);
-        ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
-    }
-    if ((code_history & 0xFFFFFF) == secretCode_BonusOptions2) {
-        code_history = 0;
-        // Unlock the second page of bonus options.
-        MenuManager::SetMenuPageVisibility(7, true);
-        ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
-    }
-    if ((code_history & 0xFFFFFF) == secretCode_BonusOptions3) {
+    if ((code_history & 0xFFFFFF) == secretCode_BgmOnOff) {
         code_history = 0;
         // Toggle on/off background music from playing or starting.
         g_Mod->inf_state_.ChangeOption(OPT_BGM_DISABLED);
@@ -115,6 +102,16 @@ void CheatsManager::Update() {
             ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_B);
             ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_Y);
             ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_R);
+            ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
+        }
+    }
+    if ((code_history & 0xFFFFFF) == secretCode_BumpAttack) {
+        code_history = 0;
+        // Check Journal for whether the badge was already unlocked.
+        bool has_fx_badges = ttyd::swdrv::swGet(
+            ItemType::BUMP_ATTACK - ItemType::POWER_JUMP + 0x80);
+        if (!has_fx_badges && ttyd::mario_pouch::pouchGetHaveBadgeCnt() < 200) {
+            ttyd::mario_pouch::pouchGetItem(ItemType::BUMP_ATTACK);
             ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
         }
     }

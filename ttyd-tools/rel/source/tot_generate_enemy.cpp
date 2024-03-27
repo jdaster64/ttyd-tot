@@ -1169,8 +1169,8 @@ int32_t GetBattleRewardTier() {
         level_sum += kEnemyInfo[g_Enemies[i]].level;
     }
     level_sum *= 100;
-    if (level_sum / level_target_sum >= 80) return 3;
-    if (level_sum / level_target_sum >= 60) return 2;
+    if (level_sum / level_target_sum >= 75) return 3;
+    if (level_sum / level_target_sum >= 55) return 2;
     return 1;
 }
 

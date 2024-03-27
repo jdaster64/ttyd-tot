@@ -65,6 +65,7 @@ extern const int32_t g_ItemEvent_LastDinner_Weapon;
 extern const int32_t g_ItemEvent_Teki_Kyouka_ApplyStatusHook;
 extern const int32_t g_ItemEvent_Support_NoEffect_TradeOffJumpPoint;
 extern const int32_t g_ItemEvent_Poison_Kinoko_PoisonChance;
+extern const int32_t g_fbatBattleMode_Patch_BumpAttackLevel;
 extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge1;
 extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge2;
 extern const int32_t g_btlseqTurn_HappyHeartProc_BH;
@@ -449,6 +450,11 @@ void ApplyFixedPatches() {
     
     // Change icon for blue coins.
     itemDataTable[ItemType::PIANTA].icon_id = IconType::TOT_COIN_BLUE;
+    
+    // For testing purposes, Bump Attack ignores level check.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_fbatBattleMode_Patch_BumpAttackLevel),
+        0x60000000U /* nop */);
     
     // Double Pain doubles coin drops instead of Money Money.
     mod::patch::writePatch(

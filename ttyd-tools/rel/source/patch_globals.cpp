@@ -185,6 +185,7 @@ extern const int32_t g_seq_mapChangeMain_MapLoad_BH = 0x80007ef0;
 extern const int32_t g_seq_mapChangeMain_MapLoad_EH = 0x80008148;
 extern const int32_t g_titleMain_Patch_NeverPlayDemo = 0x800096c0;
 extern const int32_t g_titleInit_Patch_EnableCrashHandler = 0x80009b2c;
+extern const int32_t g_fbatBattleMode_Patch_BumpAttackLevel = 0x80046b94;
 extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge1 = 0x80046f70;
 extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge2 = 0x80046f80;
 extern const int32_t g_fbatBattleMode_GivePlayerInvuln_BH = 0x8004706c;

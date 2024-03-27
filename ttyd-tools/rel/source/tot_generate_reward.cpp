@@ -627,8 +627,9 @@ void RewardManager::AfterItemPickup(int32_t item_type) {
     uint32_t option = GetUniqueBadgeObtainedOption(item_type);
     if (option) {
         g_Mod->state_.SetOption(option, 1);
-        
-        // Search Charlieton's array for the badge and remove it.
+    }
+    if (option || item_type == ItemType::STAR_PIECE) {
+        // Search Charlieton's array for the item id and remove it.
         int16_t* charlieton_data = GetCharlietonInventoryPtr();
         int16_t* last = charlieton_data;
         while (*charlieton_data >= 0) {
@@ -664,7 +665,7 @@ void SelectChestContents() {
     auto& state = g_Mod->state_;
     
     // Weights for different types of moves (Jump, Hammer, Special, partner).
-    static constexpr const uint16_t kMoveWeights[] = { 16, 16, 10, 50 };
+    static constexpr const uint16_t kMoveWeights[] = { 17, 17, 12, 50 };
     // Weights for different types of stat upgrades (HP, FP, BP, HP P, inv.).
     static constexpr const uint16_t kStatWeights[] = { 20, 20, 20, 15, 10 };
     // Weights for different types of other rewards
@@ -673,7 +674,7 @@ void SelectChestContents() {
     
     // Top-level weight for choosing a move, stat-up, or other reward.
     // The former two categories cannot be chosen more than once per floor.
-    uint16_t top_level_weights[] = { 12, 8, 10 };
+    uint16_t top_level_weights[] = { 10, 10, 10 };
     // Tracks which kind of 'other' categories have been chosen already;
     // if one of them is rolled twice in one floor, picks a random stackable
     // badge in its place.
