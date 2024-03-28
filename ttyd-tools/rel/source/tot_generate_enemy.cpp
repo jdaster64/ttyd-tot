@@ -1186,7 +1186,8 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMinionEntries) {
     for (int32_t i = 0; i < 2; ++i) {
         BattleUnitSetup* setup = nullptr;
     
-        float x = kEnemyPartyCenterX + position_offsets[i] * kEnemyPartySepX;
+        float x =
+            kEnemyPartyCenterX + position_offsets[i] * kEnemyPartySepX + 250.0f;
         float z = position_offsets[i] * kEnemyPartySepZ;
         
         // Check to make sure no other enemies are at the given X position.
@@ -1221,11 +1222,19 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMinionSpawnPos) {
 }
 
 EVT_BEGIN(MidbossEvt)
-    // If the battle has started (not a First Strike), 30% to call for backup.
+    // If the battle has started (not a First Strike), can call for backup.
     USER_FUNC(btlevtcmd_get_turn, LW(0))
     USER_FUNC(evt_sub_random, 99, LW(1))
-    IF_LARGE_EQUAL(LW(1), 30)
-        SET(LW(0), 0)
+    IF_LARGE_EQUAL(LW(0), 1)
+        // Backup call chance = 33%, diminishing by 3% per turn.
+        MUL(LW(0), 3)
+        SUB(LW(0), 36)
+        MUL(LW(0), -1)
+        IF_SMALL(LW(1), LW(0))
+            SET(LW(0), 1)
+        ELSE()
+            SET(LW(0), 0)
+        END_IF()
     END_IF()
     IF_LARGE(LW(0), 0)
         USER_FUNC(evtTot_GetMinionEntries, LW(10), LW(11))
@@ -1238,10 +1247,9 @@ EVT_BEGIN(MidbossEvt)
             INLINE_EVT()
                 WAIT_MSEC(600)
                 USER_FUNC(btlevtcmd_SpawnUnit, LW(3), LW(10), 0)
-                USER_FUNC(evtTot_GetMinionSpawnPos, 0, LW(0), LW(1), LW(2))
-                SET(LW(4), LW(0))
-                ADD(LW(4), 250)
-                USER_FUNC(btlevtcmd_SetPos, LW(3), LW(4), LW(1), LW(2))
+                WAIT_FRM(2)
+                USER_FUNC(btlevtcmd_GetHomePos, LW(3), LW(0), LW(1), LW(2))
+                SUB(LW(0), 250)
                 WAIT_FRM(10)
                 USER_FUNC(btlevtcmd_SetMoveSpeed, LW(3), 8)
                 USER_FUNC(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), 0, -1, 0)
@@ -1254,10 +1262,9 @@ EVT_BEGIN(MidbossEvt)
             INLINE_EVT()
                 WAIT_MSEC(600)
                 USER_FUNC(btlevtcmd_SpawnUnit, LW(3), LW(11), 0)
-                USER_FUNC(evtTot_GetMinionSpawnPos, 1, LW(0), LW(1), LW(2))
-                SET(LW(4), LW(0))
-                ADD(LW(4), 250)
-                USER_FUNC(btlevtcmd_SetPos, LW(3), LW(4), LW(1), LW(2))
+                WAIT_FRM(2)
+                USER_FUNC(btlevtcmd_GetHomePos, LW(3), LW(0), LW(1), LW(2))
+                SUB(LW(0), 250)
                 WAIT_FRM(10)
                 USER_FUNC(btlevtcmd_SetMoveSpeed, LW(3), 8)
                 USER_FUNC(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), 0, -1, 0)
@@ -1279,6 +1286,8 @@ EVT_BEGIN(MidbossEvt)
             WAIT_MSEC(1500)
             USER_FUNC(evt_btl_camera_set_mode, 0, 0)
             WAIT_MSEC(300)
+            
+            USER_FUNC(btlevtcmd_StartWaitEvent, -2)
             RETURN()
         END_IF()
     END_IF()

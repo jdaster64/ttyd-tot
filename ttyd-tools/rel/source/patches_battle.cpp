@@ -421,6 +421,8 @@ uint32_t GetStatusDamageFromWeapon(
                     case StatusEffectType::OHKO:
                         chance /= 2;
                         break;
+                    // Immune to any changes in size.
+                    case StatusEffectType::HUGE:
                     case StatusEffectType::TINY:
                         chance = 0;
                         break;
