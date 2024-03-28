@@ -1102,14 +1102,6 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH),
         reinterpret_cast<void*>(StartSpendFpOnSwitchPartner),
         reinterpret_cast<void*>(BranchBackSpendFpOnSwitchPartner));
-    // Cancel signal if any unit was confused.
-    g_BattleSetConfuseAct_trampoline = patch::hookFunction(
-        ttyd::battle_seq_command::BattleSetConfuseAct,
-        [](BattleWork* battleWork, BattleWorkUnit* unit){
-            g_PartySwitchPlayerInitiated = false;
-            // Run vanilla logic.
-            return g_BattleSetConfuseAct_trampoline(battleWork, unit);
-        });
     // Pay and increment cost when actual party switch action begins.
     g_btlevtcmd_ChangeParty_trampoline = patch::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_ChangeParty,
@@ -1117,6 +1109,18 @@ void ApplyFixedPatches() {
             SpendAndIncrementPartySwitchCost();
             // Run vanilla logic.
             return g_btlevtcmd_ChangeParty_trampoline(evt, isFirstCall);
+        });
+        
+    // Run additional logic on confusion proc.
+    g_BattleSetConfuseAct_trampoline = patch::hookFunction(
+        ttyd::battle_seq_command::BattleSetConfuseAct,
+        [](BattleWork* battleWork, BattleWorkUnit* unit){
+            // Cancel Quick Change signal.
+            g_PartySwitchPlayerInitiated = false;
+            // Reset move levels to avoid using higher-level moves in Confusion.
+            tot::MoveManager::ResetSelectedLevels();
+            // Run vanilla logic.
+            return g_BattleSetConfuseAct_trampoline(battleWork, unit);
         });
 }
 
