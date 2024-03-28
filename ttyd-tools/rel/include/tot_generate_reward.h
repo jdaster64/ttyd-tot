@@ -23,7 +23,8 @@ public:
     // on the field (as an item drop / condition reward).
     static void* GetStarPieceItemDropEvt();
     
-    // Picks a random unique badge, or Star Piece, to add to Charlieton's shop.
+    // Picks a random unique badge to add to Charlieton's shop.
+    // Returns 0 if the attempted badge is already in a chest on the same floor.
     static int32_t GetUniqueBadgeForShop();
 };
 

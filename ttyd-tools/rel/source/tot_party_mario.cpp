@@ -5242,7 +5242,7 @@ BattleWeapon customWeapon_TornadoJumpRecoil = {
     .target_weighting_flags = 0,
         
     // status chances (only for flying enemies)
-    .dizzy_chance = 75,
+    .dizzy_chance = 100,
     .dizzy_time = 2,
     
     .attack_evt_code = nullptr,

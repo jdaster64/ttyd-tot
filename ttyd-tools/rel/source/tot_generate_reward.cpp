@@ -655,7 +655,10 @@ int32_t RewardManager::GetUniqueBadgeForShop() {
     // Use same function / RNG state as chests.
     int32_t unique_badge = SelectUniqueBadge();
     for (ChestData* chest = g_Chests; chest->item; ++chest) {
-        if (chest->item == unique_badge) unique_badge = ItemType::STAR_PIECE;
+        if (chest->item == unique_badge) {
+            unique_badge = 0;
+            break;
+        }
     }
     return unique_badge;
 }

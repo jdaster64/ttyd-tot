@@ -196,16 +196,16 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     int16_t* inventory = GetCharlietonInventoryPtr();
     
     // Pick 5 normal items, 5 special items, and 5 badges.
-    const int32_t kNumCharlietonItemsPerType = 5;
-    for (int32_t i = 0; i < kNumCharlietonItemsPerType * 3; ++i) {
+    const int32_t kNumItemsPerType = 5;
+    for (int32_t i = 0; i < kNumItemsPerType * 3; ++i) {
         bool found = true;
         while (found) {
             found = false;
             int32_t item = PickRandomItem(
                 RNG_NPC_OPTIONS,
-                i / kNumCharlietonItemsPerType == 0,
-                i / kNumCharlietonItemsPerType == 1, 
-                i / kNumCharlietonItemsPerType == 2, 
+                i / kNumItemsPerType == 0,
+                i / kNumItemsPerType == 1, 
+                i / kNumItemsPerType == 2, 
                 0);
             // Make sure no duplicate items exist.
             for (int32_t j = 0; j < i; ++j) {
@@ -217,20 +217,30 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
             inventory[i] = item;
         }
     }
-    int32_t special_offer;
-    if (g_Mod->state_.Rand(5, RNG_NPC_OPTIONS) == 0) {
-        special_offer = ItemType::STAR_PIECE;
+    
+    // Add a unique badge, and a (one-time purchase) Star Piece to the shop.
+    int32_t num_badges = kNumItemsPerType;
+    int32_t special_badge = RewardManager::GetUniqueBadgeForShop();
+    if (special_badge) {
+        inventory[kNumItemsPerType * 3] = special_badge;
+        inventory[kNumItemsPerType * 3 + 1] = ItemType::STAR_PIECE;
+        inventory[kNumItemsPerType * 3 + 2] = -1;
+        ++num_badges;
     } else {
-        special_offer = RewardManager::GetUniqueBadgeForShop();
+        inventory[kNumItemsPerType * 3] = ItemType::STAR_PIECE;
+        inventory[kNumItemsPerType * 3 + 1] = -1;
     }
-    // Add special badge / Star Piece, then null terminator at end.
-    inventory[kNumCharlietonItemsPerType * 3] = special_offer;
-    inventory[kNumCharlietonItemsPerType * 3 + 1] = -1;
     
     // Sort each category by ascending price.
-    qqsort(&inventory[0], 5, sizeof(int16_t), (void*)BuyPriceComparator);
-    qqsort(&inventory[5], 5, sizeof(int16_t), (void*)BuyPriceComparator);
-    qqsort(&inventory[10], 6, sizeof(int16_t), (void*)BuyPriceComparator);
+    qqsort(
+        &inventory[kNumItemsPerType * 0], kNumItemsPerType, sizeof(int16_t),
+        (void*)BuyPriceComparator);
+    qqsort(
+        &inventory[kNumItemsPerType * 1], kNumItemsPerType, sizeof(int16_t),
+        (void*)BuyPriceComparator);
+    qqsort(
+        &inventory[kNumItemsPerType * 2], num_badges, sizeof(int16_t),
+        (void*)BuyPriceComparator);
     
     return 2;
 }

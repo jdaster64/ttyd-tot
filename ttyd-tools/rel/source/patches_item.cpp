@@ -270,8 +270,8 @@ void ApplyFixedPatches() {
         }
     }
     
-    // Set Star Piece buy price (max price, +1 so it sorts to the bottom).
-    itemDataTable[ItemType::STAR_PIECE].buy_price = 251;
+    // Set Star Piece buy price (you can buy only 1 per shop).
+    itemDataTable[ItemType::STAR_PIECE].buy_price = 50;
     
     // Changed pickup messages for Super / Ultra boots and hammer.
     itemDataTable[ItemType::SUPER_BOOTS].description = "msg_custom_super_boots";
