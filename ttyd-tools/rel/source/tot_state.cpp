@@ -219,7 +219,7 @@ void StateManager::InitDefaultOptions() {
     g_HasBackupSave = false;
 }
 
-bool StateManager::SetOption(uint32_t option, int32_t value) {
+bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
     int32_t t, x, y, a, b;
     GetOptionParts(option, &t, &x, &y, &a, &b);
     
@@ -285,7 +285,12 @@ bool StateManager::SetOption(uint32_t option, int32_t value) {
         }
         // Play stats.
         default: {
-            if (a == 1) {
+            uint8_t* ptr = play_stats_ + x;
+            if (a == 0 && b > 1) {
+                // Index into array of values.
+                if (index < 0 || index >= b) return false;
+                ptr += (index * y);
+            } else if (a == 1) {
                 // Clamp number to b digits long.
                 if (b < 1 || b > 9) return false;
                 static const constexpr int32_t powers_of_10[] = {
@@ -295,7 +300,6 @@ bool StateManager::SetOption(uint32_t option, int32_t value) {
                 if (value >= powers_of_10[b]) value = powers_of_10[b] - 1;
                 if (value <= -powers_of_10[b]) value = -(powers_of_10[b] - 1);
             }
-            uint8_t* ptr = play_stats_ + x;
             uint32_t uint_val = static_cast<uint32_t>(value);
             for (int32_t i = y - 1; i >= 0; --i) {
                 ptr[i] = uint_val & 0xff;
@@ -306,24 +310,22 @@ bool StateManager::SetOption(uint32_t option, int32_t value) {
     }
 }
 
-bool StateManager::ChangeOption(uint32_t option, int32_t change) {
+bool StateManager::ChangeOption(uint32_t option, int32_t change, int32_t index) {
     int32_t t, x, y, a, b;
     GetOptionParts(option, &t, &x, &y, &a, &b);
     if (t == TYPE_OPTNUM) change *= a;
-    int32_t value = GetOption(option);
-    return SetOption(option, value + change);
+    int32_t value = GetOption(option, index);
+    return SetOption(option, value + change, index);
 }
 
-// Gets the numeric value of options, play stats, achievements, etc.
-// 'value' is only used as a parameter for option types that require it.
-int32_t StateManager::GetOption(uint32_t option, int32_t value) const {
+int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
     int32_t t, x, y, a, b;
     GetOptionParts(option, &t, &x, &y, &a, &b);
     // OPTVALs are constants, so this doesn't make sense to request.
     if (t == TYPE_OPTVAL) return -1;
     // FLAGS can use value or | with the base flag type.
     if (t >= TYPE_FLAGS_ACHIEVEMENT) {
-        x = value == 0 ? b : value;
+        x = index == 0 ? b : index;
     }
     
     const uint32_t* flag_ptr = nullptr;
@@ -369,6 +371,12 @@ int32_t StateManager::GetOption(uint32_t option, int32_t value) const {
     } else if (t == TYPE_OPTNUM) {
         return *byte_ptr * a;
     } else {
+        // Index into array, if STAT_x option is an array.
+        if (a == 0 && b > 1) {
+            // Value is out of range for array.
+            if (index < 0 || index >= b) return -1;
+            byte_ptr += (index * y);
+        }
         // Start with all 0 or 1 bits based on sign of value.
         uint32_t uint_val = (*byte_ptr & 0x80) ? ~0 : 0;
         for (int32_t i = 0; i < y; ++i) {

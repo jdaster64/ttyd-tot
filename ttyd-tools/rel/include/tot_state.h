@@ -78,14 +78,16 @@ public:
     
     // Sets / adjusts options, play stats, achievements, etc.
     // If OPTVAL is provided for 'SetOption', value parameter is ignored.
+    // `index` is used for STAT_x options that represent arrays.
     // All flag / numeric options saturate at both ends.
     // Returns false if the value is invalid or was not changed.
-    bool SetOption(uint32_t option, int32_t value = 0);
-    bool ChangeOption(uint32_t option, int32_t change = 1);
+    bool SetOption(uint32_t option, int32_t value = 0, int32_t index = 0);
+    bool ChangeOption(uint32_t option, int32_t change = 1, int32_t index = 0);
     
     // Gets the numeric value of options, play stats, achievements, etc.
-    // 'value' is only used as a parameter for option types that require it.
-    int32_t GetOption(uint32_t option, int32_t value = 0) const;
+    // `index` is only used as a parameter for option types that require it
+    // (flag arrays or STAT_x arrays).
+    int32_t GetOption(uint32_t option, int32_t index = 0) const;
     
     // Returns values as / checks values against OPTVAL.
     uint32_t GetOptionValue(uint32_t option) const;
@@ -247,7 +249,7 @@ enum OptionsType {
 //          W = B: option_unlocked_flags_
 //  - STAT_x:   Play stats value:   (0x XXX Y ZZ VV);
 //      Represents play_stats_ bytes [XXX, XXX+Y) (in the range 0x000 ~ 0x400).
-//          If ZZ = 0: Value is uncapped; VV is unused.
+//          If ZZ = 0: Value is uncapped; if VV > 1, array of VVx Y-byte values.
 //          If ZZ = 1: Value is capped to +/- value with VV (1-9) digits.
 //  - Other options (0xC0000000+) : reserved for future / other uses.
 //
@@ -361,16 +363,7 @@ enum Options : uint32_t {
     STAT_RUN_LEVELS_SOLD        = 0x029'2'01'04,
     STAT_RUN_CONDITIONS_MET     = 0x02b'1'00'00,
     STAT_RUN_CONDITIONS_TOTAL   = 0x02c'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_0     = 0x02d'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_1     = 0x02e'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_2     = 0x02f'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_3     = 0x030'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_4     = 0x031'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_5     = 0x032'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_6     = 0x033'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_7     = 0x034'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_8     = 0x035'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_9     = 0x036'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_FLAGS = 0x02d'1'00'0a,
     // Next: 0x037
     // TODO: Add versions of most stats that persist across runs.
 };

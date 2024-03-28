@@ -95,20 +95,20 @@ int32_t g_MoveSelections[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 int32_t g_NumMovesSelected = 0;
 
 // Returns the option flag to check for whether the badge was already obtained.
-uint32_t GetUniqueBadgeObtainedOption(int32_t item_type) {
+uint32_t GetUniqueBadgeObtainedIndex(int32_t item_type) {
     switch (item_type) {
-        case ItemType::CHILL_OUT:       return STAT_RUN_UNIQUE_BADGE_0;
-        case ItemType::DOUBLE_DIP:      return STAT_RUN_UNIQUE_BADGE_1;
-        case ItemType::DOUBLE_DIP_P:    return STAT_RUN_UNIQUE_BADGE_2;
-        case ItemType::FEELING_FINE:    return STAT_RUN_UNIQUE_BADGE_3;
-        case ItemType::FEELING_FINE_P:  return STAT_RUN_UNIQUE_BADGE_4;
-        case ItemType::LUCKY_START:     return STAT_RUN_UNIQUE_BADGE_5;
-        case ItemType::QUICK_CHANGE:    return STAT_RUN_UNIQUE_BADGE_6;
-        case ItemType::RETURN_POSTAGE:  return STAT_RUN_UNIQUE_BADGE_7;
-        case ItemType::ZAP_TAP:         return STAT_RUN_UNIQUE_BADGE_8;
-        case ItemType::SPIKE_SHIELD:    return STAT_RUN_UNIQUE_BADGE_9;
+        case ItemType::CHILL_OUT:       return 0;
+        case ItemType::DOUBLE_DIP:      return 1;
+        case ItemType::DOUBLE_DIP_P:    return 2;
+        case ItemType::FEELING_FINE:    return 3;
+        case ItemType::FEELING_FINE_P:  return 4;
+        case ItemType::LUCKY_START:     return 5;
+        case ItemType::QUICK_CHANGE:    return 6;
+        case ItemType::RETURN_POSTAGE:  return 7;
+        case ItemType::ZAP_TAP:         return 8;
+        case ItemType::SPIKE_SHIELD:    return 9;
     }
-    return 0;
+    return -1;
 }
 
 // Selects which unique badge to give as a reward.
@@ -133,7 +133,9 @@ int32_t SelectUniqueBadge() {
     
     // Disable badges that have already been picked up.
     for (int32_t i = 0; i < 10; ++i) {
-        if (state.GetOption(GetUniqueBadgeObtainedOption(kBadges[i]))) {
+        if (state.GetOption(
+                STAT_RUN_UNIQUE_BADGE_FLAGS,
+                GetUniqueBadgeObtainedIndex(kBadges[i]))) {
             eligible[i] = 0;
         }
     }
@@ -629,11 +631,11 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
 }
 
 void RewardManager::AfterItemPickup(int32_t item_type) {
-    uint32_t option = GetUniqueBadgeObtainedOption(item_type);
-    if (option) {
-        g_Mod->state_.SetOption(option, 1);
+    uint32_t index = GetUniqueBadgeObtainedIndex(item_type);
+    if (index >= 0) {
+        g_Mod->state_.SetOption(STAT_RUN_UNIQUE_BADGE_FLAGS, 1, index);
     }
-    if (option || item_type == ItemType::STAR_PIECE) {
+    if (index >= 0 || item_type == ItemType::STAR_PIECE) {
         // Search Charlieton's array for the item id and remove it.
         int16_t* charlieton_data = GetCharlietonInventoryPtr();
         int16_t* last = charlieton_data;
