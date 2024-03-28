@@ -37,6 +37,8 @@ g_NewIconDefs = [
     [(618, 0)],
     # Perfect Power P badge
     [(619, 0)],
+    # Timer colon
+    [(620, 0)],
 ]
 g_IconDefs = []
 

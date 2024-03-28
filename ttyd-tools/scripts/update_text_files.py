@@ -451,16 +451,36 @@ g_StringMap = {
             b"HP and FP over 5 turns.",
             
         b"tot_ptr1_scope_out_effect_msg":
-            b"Scoped! Your next attack is\n"
-            b"guaranteed to connect!",
+            b"Scoped! The next attack and\n"
+            b"non-KO status will succeed!",
             
         b"tot_ptr5_infatuate_effect_msg":
             b"Infatuated! The enemy will\n"
             b"fight for your side now!",
+
+        b'msg_st_chg_fire':
+            b'Burned! The fire will deal\n'
+            b'steady damage and sap ATK!',
+
+        b'msg_st_chg_poison':
+            b'Poisoned! The toxins will\n'
+            b'deal increasing damage!',
             
         b"msg_st_chg_allergy":
             b"Allergic! Status effects\n"
             b"cannot be changed!",
+
+        b'msg_st_chg_big':
+            b'Huge! Attack power is\n'
+            b'now boosted by 50%!',
+
+        b'msg_st_chg_small':
+            b'Tiny! Attack power has\n'
+            b'now dropped by 50%!',
+            
+        b"tot_status_withdraw":
+            b"Invulnerable to all\n"
+            b"attacks this turn!",
             
         b"msg_gatsun_jump":
             b"Attack an enemy with a single\n"
@@ -507,8 +527,8 @@ g_StringMap = {
             b"defense-piercing Headbonk.",
             
         b"tot_ptr1_scope_out_desc":
-            b"Scope out an enemy, ensuring\n"
-            b"your next attack lands.",
+            b"Ensures the next attack lands\n"
+            b"and guarantees most statuses.",
             
         b"msg_pnk_normal_attack":
             b"Attack the front enemy with\n"
@@ -674,6 +694,8 @@ g_StringMap = {
             b"increase targets' value.",
             
         # Menu text
+        
+        b"tot_menu_spaceused":        b"Items",
         
         b"tot_winsel_titlemove":      b"Move",
         b"tot_winsel_whichunlock":    b"Which move?",
