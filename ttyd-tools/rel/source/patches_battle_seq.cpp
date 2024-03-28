@@ -23,6 +23,7 @@
 #include <ttyd/battle_unit.h>
 #include <ttyd/evt_item.h>
 #include <ttyd/item_data.h>
+#include <ttyd/mariost.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/seq_battle.h>
 #include <ttyd/system.h>
@@ -39,6 +40,8 @@ extern "C" {
     void BranchBackGivePlayerInvuln();
     void StartBtlSeqEndJudgeRule();
     void BranchBackBtlSeqEndJudgeRule();
+    void StartCalculateCoinDrops();
+    void BranchBackCalculateCoinDrops();
     // currency_patches.s
     void StartCheckDeleteFieldItem();
     void BranchBackCheckDeleteFieldItem();
@@ -66,6 +69,12 @@ extern "C" {
                 break;
             }
         }
+    }
+    
+    int32_t calculateCoinDrops(
+        ttyd::npcdrv::FbatBattleInformation* battleInfo,
+        ttyd::npcdrv::NpcEntry* npc) {
+        return mod::infinite_pit::battle_seq::CalculateCoinDrops(battleInfo, npc);
     }
 }
 
@@ -99,6 +108,8 @@ extern void (*g_BattleCommandInit_trampoline)(BattleWork*);
 extern void (*g_BattleInformationSetDropMaterial_trampoline)(
     FbatBattleInformation*);
 // Patch addresses.
+extern const int32_t g_fbatBattleMode_CalculateCoinDrops_BH;
+extern const int32_t g_fbatBattleMode_CalculateCoinDrops_EH;
 extern const int32_t g_fbatBattleMode_GivePlayerInvuln_BH;
 extern const int32_t g_fbatBattleMode_GivePlayerInvuln_EH;
 extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_BH;
@@ -117,27 +128,25 @@ namespace {
 
 // Custom evt to spawn different denominations of coins.
 EVT_BEGIN(SpawnCoinsEvt)
-IF_LARGE(LW(3), 200)
-    SET(LW(3), 200)
-END_IF()
-// Divide total # of coins by 2 rather than at individual enemy level.
-DIV(LW(3), 2)
+    IF_LARGE(LW(3), 100)
+        SET(LW(3), 100)
+    END_IF()
 LBL(5)
-IF_LARGE_EQUAL(LW(3), 5)
-    SUB(LW(3), 5)
-    USER_FUNC(
-        ttyd::evt_item::evt_item_entry, 0, ItemType::PIANTA,
-        LW(0), LW(1), LW(2), 10, -1, 0)
-    GOTO(5)
-END_IF()
-IF_LARGE_EQUAL(LW(3), 1)
-    SUB(LW(3), 1)
-    USER_FUNC(
-        ttyd::evt_item::evt_item_entry, 0, ItemType::COIN,
-        LW(0), LW(1), LW(2), 10, -1, 0)
-    GOTO(5)
-END_IF()
-RETURN()
+    IF_LARGE_EQUAL(LW(3), 5)
+        SUB(LW(3), 5)
+        USER_FUNC(
+            ttyd::evt_item::evt_item_entry, 0, ItemType::PIANTA,
+            LW(0), LW(1), LW(2), 10, -1, 0)
+        GOTO(5)
+    END_IF()
+    IF_LARGE_EQUAL(LW(3), 1)
+        SUB(LW(3), 1)
+        USER_FUNC(
+            ttyd::evt_item::evt_item_entry, 0, ItemType::COIN,
+            LW(0), LW(1), LW(2), 10, -1, 0)
+        GOTO(5)
+    END_IF()
+    RETURN()
 EVT_END()
 
 EVT_BEGIN(SpawnCoinsEvtHook)
@@ -328,6 +337,8 @@ void ApplyFixedPatches() {
         ttyd::seq_battle::seq_battleInit, []() {
             // Copy information from parent npc before battle, if applicable.
             CopyChildBattleInfo(/* to_child = */ true);
+            // Reset selected move levels before start of battle.
+            tot::MoveManager::ResetSelectedLevels();
             // Force enemy ATK/DEF tattles to display at start of encounter.
             partner::RefreshExtraTattleStats();
             // Reset cost of Quick Change switches.
@@ -427,6 +438,14 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_btlseqTurn_Patch_RuleDispDismissOnlyWithB), 
         0x38600200U /* li r3, 0x200 (B button) */);
         
+    // Override logic to calculate coin drops to fix the original's overflow,
+    // as well as dividing the result by 2 and capping to 100.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_fbatBattleMode_CalculateCoinDrops_BH),
+        reinterpret_cast<void*>(g_fbatBattleMode_CalculateCoinDrops_EH),
+        reinterpret_cast<void*>(StartCalculateCoinDrops),
+        reinterpret_cast<void*>(BranchBackCalculateCoinDrops));
+        
     // Support multiple demonimations of coins dropping at the end of a fight.
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_enemy_common_dead_event_SpawnCoinsHook),
@@ -441,6 +460,24 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_itemseq_Bound_Patch_BounceRange),
         0x2c00007b /* cmpwi r0,0x7b (heart, not Pianta) */);
+}
+
+int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
+    int32_t result = npc->wBaseCoinCount;
+    if (battleInfo->wResult == 1) {
+        int32_t base_coins = battleInfo->wCoinDropCount;
+        int32_t multiplier =
+            1 + ttyd::mario_pouch::pouchEquipCheckBadge(ItemType::DOUBLE_PAIN);
+        
+        // Merlee coin multiplier; x2 instead of +2 to multiplier.
+        if (*(int8_t*)((uintptr_t)ttyd::mariost::g_MarioSt->fbatData + 0x54c)) {
+            multiplier *= 2;
+        }
+        
+        // Divide ultimate result by 2.
+        result = base_coins * multiplier / 2;
+    }
+    return result < 100 ? result : 100;
 }
 
 }  // namespace battle_seq

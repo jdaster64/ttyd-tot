@@ -124,8 +124,7 @@ int32_t IntegerToFmtString(int32_t val, char* out_buf, int32_t max_val) {
     return sprintf(out_buf, "%" PRId32, val);
 }
 
-int32_t DurationTicksToFmtString(int64_t val, char* out_buf) {
-    // Divide by the number of ticks in a centisecond (bus speed / 400).
+uint32_t DurationTicksToCentiseconds(int64_t val) {
     const int32_t kTicksPerCentisecond =
         *reinterpret_cast<const int32_t*>(0x800000f8) / 400;
     val /= kTicksPerCentisecond;
@@ -133,13 +132,25 @@ int32_t DurationTicksToFmtString(int64_t val, char* out_buf) {
     if (val >= 100 * 60 * 60 * 100 || val < 0) {
         val = 100 * 60 * 60 * 100 - 1;
     }
-    const int32_t hours   = val / (60 * 60 * 100);
-    const int32_t minutes = val / (60 * 100) % 60;
-    const int32_t seconds = val / 100 % 60;
-    const int32_t centis  = val % 100;
+    return val;
+}
+
+void DurationTicksToParts(
+    int64_t val, int32_t* h, int32_t* m, int32_t* s, int32_t* cs) {
+    uint32_t cs_val = DurationTicksToCentiseconds(val);
+    *h = cs_val / (60 * 60 * 100);
+    *m = cs_val / (60 * 100) % 60;
+    *s = cs_val / 100 % 60;
+    *cs = cs_val % 100;
+}
+
+int32_t DurationTicksToFmtString(int64_t val, char* out_buf) {
+    // Divide by the number of ticks in a centisecond (bus speed / 400).
+    int32_t h, m, s, cs;
+    DurationTicksToParts(val, &h, &m, &s, &cs);
     return sprintf(
         out_buf, "%02" PRId32 ":%02" PRId32 ":%02" PRId32 ".%02" PRId32,
-        hours, minutes, seconds, centis);
+        h, m, s, cs);
 }
 
 }

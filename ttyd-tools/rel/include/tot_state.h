@@ -47,13 +47,15 @@ public:
     
     // In-game and real-time timers.
     uint64_t    run_start_time_rta_;
-    uint64_t    last_save_time_rta_;
+    uint64_t    last_floor_rta_;
+    uint64_t    last_floor_total_igt_;
+    uint64_t    last_floor_total_battle_igt_;
     uint64_t    current_total_igt_;
-    uint64_t    current_battle_igt_;
     // Split timers for floors (# of centiseconds).
-    uint32_t    start_time_igt_[130];
-    uint32_t    end_time_igt_[130];
-    uint32_t    battle_duration_igt_[130];
+    uint32_t    splits_rta_[129];
+    uint32_t    splits_igt_[129];
+    uint32_t    splits_battle_igt_[129];
+    uint32_t    reserved_pad_;
     
     // Permanent tracking data.
     uint32_t    achievement_flags_[4];
@@ -103,12 +105,13 @@ public:
     bool IsFinalBossFloor(int32_t floor = -1) const;
     
     // Functions for time-tracking...
-    // void StartTimer();
-    // void UpdateTimer();
+    void TimerStart();
+    void TimerTick();
+    void TimerFloorUpdate();
     void ToggleIGT(bool toggle);
     
     // Clear play stats, timers, etc. from current run.
-    // void ClearRunStats();
+    void ClearRunStats();
     
     // Fetches a random value from the desired sequence (using the RngSequence
     // enum), returning a value in the range [0, range). If `sequence` is not
@@ -288,9 +291,9 @@ enum Options : uint32_t {
     OPTVAL_DROP_ALL_HELD        = 0x50b'2'00'03,   // all drop + bonus chance
     // Enable timer display.
     OPT_TIMER_DISPLAY           = 0x40d'3'00'02,
-    OPT_TIMER_NONE              = 0x50d'3'00'00,
-    OPT_TIMER_IGT               = 0x50d'3'00'01,
-    OPT_TIMER_RTA               = 0x50d'3'00'02,
+    OPTVAL_TIMER_NONE           = 0x50d'3'00'00,
+    OPTVAL_TIMER_IGT            = 0x50d'3'00'01,
+    OPTVAL_TIMER_RTA            = 0x50d'3'00'02,
     // Reserved: several options for countdown timers?
     // Whether to enable Merlee curses.
     OPT_MERLEE_CURSE            = 0x410'1'00'01,
@@ -313,7 +316,7 @@ enum Options : uint32_t {
     // Next: 0x418
     
     // Internal / cosmetic flag options.
-    // TODO...
+    OPT_RUN_STARTED             = 0x460'1'00'01,
     
     // Numeric options.
     // Stat increase per upgrade (0-10); at 0, you only ever have 1 point.

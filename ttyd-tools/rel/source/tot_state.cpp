@@ -190,8 +190,9 @@ TotSaveSlot* StateManager::GetBackupSave() const {
 }
 
 void StateManager::InitDefaultOptions() {
+    seed_ = 765;
     // Pick a random seed, and reset all RNG states to the start.
-    seed_ = static_cast<uint32_t>(gc::OSTime::OSGetTime()) % 1'000'000'000;
+    // seed_ = static_cast<uint32_t>(gc::OSTime::OSGetTime()) % 1'000'000'000;
     for (int32_t i = 0; i < 56; ++i) rng_states_[i] = 0;
     
     // Set floor to 0 (starting floor that only gives a partner).
@@ -411,6 +412,9 @@ bool StateManager::CheckOptionValue(uint32_t option_value) const {
 // const char* StateManager::GetEncodedOptions() const;
 
 void StateManager::IncrementFloor(int32_t change) {
+    // Update timer values for the current floor.
+    TimerFloorUpdate();
+    
     // Make a backup save if advancing, and if the floor is divisible by 8.
     if (floor_ % 8 == 0 && change > 0) {
         Save(&g_BackupSave);
@@ -443,15 +447,76 @@ bool StateManager::IsFinalBossFloor(int32_t floor) const {
 }
 
 // Functions for time-tracking...
-// void StateManager::StartTimer();
-// void StateManager::UpdateTimer();
+void StateManager::TimerStart() {
+    auto* mariost = ttyd::mariost::g_MarioSt;
+    
+    uint64_t current_time = mariost->lastFrameRetraceTime;
+    run_start_time_rta_ = current_time;
+    last_floor_rta_ = current_time;
+    last_floor_total_battle_igt_ =
+        mariost->animationTimeIncludingBattle - mariost->animationTimeNoBattle;
+    last_floor_total_igt_ = 0;
+    current_total_igt_ = 0;
+    
+    for (int32_t i = 0; i < 129; ++i) {
+        splits_rta_[i] = 0;
+        splits_igt_[i] = 0;
+        splits_battle_igt_[i] = 0;
+    }
+}
+
+void StateManager::TimerTick() {
+    if (igt_active_) {
+        current_total_igt_ += 
+            ttyd::mariost::g_MarioSt->lastFrameRetraceDeltaTime;
+    }
+}
+
+void StateManager::TimerFloorUpdate() {
+    auto* mariost = ttyd::mariost::g_MarioSt;
+    uint64_t current_time = mariost->lastFrameRetraceTime;
+    uint64_t current_battle_igt =
+        mariost->animationTimeIncludingBattle - mariost->animationTimeNoBattle;
+    
+    // Update splits for the current floor, if not already set.
+    if (splits_rta_[floor_] == 0) {
+        splits_rta_[floor_] = DurationTicksToCentiseconds(
+            current_time - last_floor_rta_);
+        splits_igt_[floor_] = DurationTicksToCentiseconds(
+            current_total_igt_ - last_floor_total_igt_);
+        splits_battle_igt_[floor_] = DurationTicksToCentiseconds(
+            current_battle_igt - last_floor_total_battle_igt_);
+    }
+    
+    last_floor_rta_ = current_time;
+    last_floor_total_igt_ = current_total_igt_;
+    last_floor_total_battle_igt_ = current_battle_igt;
+}
 
 void StateManager::ToggleIGT(bool toggle) {
     igt_active_ = toggle;
 }
 
 // Clear play stats, timers, etc. from current run.
-// void StateManager::ClearRunStats();
+void StateManager::ClearRunStats() {
+    igt_active_ = false;
+    
+    run_start_time_rta_ = 0;
+    last_floor_rta_ = 0;
+    last_floor_total_igt_ = 0;
+    last_floor_total_battle_igt_ = 0;
+    current_total_igt_ = 0;
+    
+    for (int32_t i = 0; i < 129; ++i) {
+        splits_rta_[i] = 0;
+        splits_igt_[i] = 0;
+        splits_battle_igt_[i] = 0;
+    }
+    
+    for (int32_t i = 0; i < 0x100; ++i) {
+        play_stats_[i] = 0;
+    }
+}
 
 // Fetches a random value from the desired sequence (using the RngSequence
 // enum), returning a value in the range [0, range). If `sequence` is not

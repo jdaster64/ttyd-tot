@@ -132,6 +132,9 @@ void OptionsManager::InitLobby() {
     
     // Initialize default moves.
     MoveManager::Init();
+    
+    // Set run to not having started.
+    g_Mod->state_.SetOption(OPT_RUN_STARTED, 0);
 }
 
 void OptionsManager::InitFromSelectedOptions() {
@@ -170,6 +173,10 @@ void OptionsManager::InitFromSelectedOptions() {
             break;
         }
     }
+    
+    // Start timers and mark run as started.
+    state.SetOption(OPT_RUN_STARTED, 1);
+    state.TimerStart();
 }
 
 void OptionsManager::UpdateLevelupStats() {

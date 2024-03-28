@@ -91,8 +91,15 @@ void UpdateMainMenuPos(int32_t change) {
     
     bool in_lobby = !strcmp(GetCurrentMap(), "gon_00");
     if (in_lobby) {
-        if (g_CursorPos == DEBUG_ENEMIES || g_CursorPos == DEBUG_FLOOR) {
-            g_CursorPos = change > 0 ? DEBUG_UNLOCK_ALL_MOVES : DEBUG_SEED;
+        switch (g_CursorPos) {
+            case DEBUG_ENEMIES:
+            case DEBUG_FLOOR:
+            case DEBUG_UNLOCK_ALL_MOVES:
+            case DEBUG_UNLOCK_ALL_PARTNERS:
+                g_CursorPos = change > 0 ? DEBUG_UNLOCK_ALL_BADGES : DEBUG_SEED;
+                break;
+            default:
+                break;
         }
     } else {
         if (g_CursorPos == DEBUG_SEED) {

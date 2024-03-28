@@ -852,10 +852,12 @@ void ItemMenuDispInventory(void* pWin) {
     int32_t width;
     
     // Top-left corner of the window, for reference.
-    gc::vec3 win_pos = { win_x - 268.0f, win_y + 35.0f, 0.0f };
+    gc::vec3 win_pos = { win_x - 268.0f, win_y + 20.0f, 0.0f };
+    gc::vec3 win_dim = { 100.0f, 40.0f, 0.0f };
 
     // Draw recessed window for item count.
-    ttyd::win_root::winKirinukiGX(win_pos.x, win_pos.y, 100.0f, 40.0f, pWin, 0);
+    ttyd::win_root::winKirinukiGX(
+        win_pos.x, win_pos.y, win_dim.x, win_dim.y, pWin, 0);
 
     ttyd::win_main::winFontInit();
     
@@ -883,6 +885,16 @@ void ItemMenuDispInventory(void* pWin) {
     width = ttyd::fontmgr::FontGetMessageWidth(temp_max_items);
     pos.x = win_pos.x + 70.0f - 0.5f * width;
     ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "%s", temp_max_items);
+    
+    // Draw "Space used" string.
+    const char* space_used = msgSearch("tot_menu_spaceused");
+    width = ttyd::fontmgr::FontGetMessageWidth(space_used);
+    scale.x = 0.6f;
+    scale.y = 0.6f;
+    scale.z = 0.6f;
+    pos.x = win_pos.x + (win_dim.x - scale.x * width) * 0.5f ;
+    pos.y = win_pos.y + scale.y * 26.0f + 2.0f;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, space_used);
 }
 
 void GetPartyMemberMenuOrder(WinPartyData** out_party_data) {

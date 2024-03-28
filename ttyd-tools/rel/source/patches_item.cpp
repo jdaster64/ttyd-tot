@@ -66,8 +66,6 @@ extern const int32_t g_ItemEvent_Teki_Kyouka_ApplyStatusHook;
 extern const int32_t g_ItemEvent_Support_NoEffect_TradeOffJumpPoint;
 extern const int32_t g_ItemEvent_Poison_Kinoko_PoisonChance;
 extern const int32_t g_fbatBattleMode_Patch_BumpAttackLevel;
-extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge1;
-extern const int32_t g_fbatBattleMode_Patch_DoubleCoinsBadge2;
 extern const int32_t g_btlseqTurn_HappyHeartProc_BH;
 extern const int32_t g_btlseqTurn_HappyHeartProc_EH;
 extern const int32_t g_btlseqTurn_HappyFlowerProc_BH;
@@ -455,14 +453,6 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_fbatBattleMode_Patch_BumpAttackLevel),
         0x60000000U /* nop */);
-    
-    // Double Pain doubles coin drops instead of Money Money.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_fbatBattleMode_Patch_DoubleCoinsBadge1),
-        0x38600120U /* li r3, 0x120 (Double Pain) */);
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_fbatBattleMode_Patch_DoubleCoinsBadge2),
-        0x38600120U /* li r3, 0x120 (Double Pain) */);
         
     // Super Appeal (P) give +0.50 SP per copy instead of +0.25.
     mod::patch::writePatch(

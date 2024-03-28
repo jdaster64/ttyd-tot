@@ -365,6 +365,8 @@ uint32_t GetStatusDamageFromWeapon(
             int32_t chance, turns, strength;
             GetStatusParams(
                 attacker, target, weapon, type, chance, turns, strength);
+                
+            uint32_t special_properties = weapon->special_property_flags;
 
             bool always_update = true;
             switch (type) {
@@ -425,15 +427,23 @@ uint32_t GetStatusDamageFromWeapon(
                 }
             }
             
-            // Statuses are more likely to land.
+            // Non-KO statuses are guaranteed to land if target is Scoped.
             if (target->status_flags & BattleUnitStatus_Flags::SCOPED) {
-                chance *= 1.5;
+                switch (type) {
+                    case StatusEffectType::FRIGHT:
+                    case StatusEffectType::GALE_FORCE:
+                    case StatusEffectType::OHKO:
+                        break;
+                    default:
+                        special_properties |=
+                            AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE;
+                }
             }
 
             if (always_update || turns != 0 || strength != 0) {
                 int32_t damage_result = 
                     ttyd::battle_damage::BattleSetStatusDamage(
-                        &result, target, part, weapon->special_property_flags,
+                        &result, target, part, special_properties,
                         type, chance, /* gale_factor */ 0, turns, strength);
 
                 if (damage_result && type == StatusEffectType::INVISIBLE) {

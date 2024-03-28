@@ -5623,7 +5623,7 @@ BattleWeapon customWeapon_FireDriveFailed = {
 // Throw variants of single-target Hammer moves, if Hammerman is equipped.
 
 BattleWeapon customWeapon_HammerThrow = {
-    .name = "btl_wn_mario_normal_hammer",
+    .name = "btl_cmd_act_hammer",
     .icon = IconType::HAMMER,
     .item_id = 0,
     .description = "msg_normal_hammer",

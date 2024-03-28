@@ -586,6 +586,7 @@ namespace IconType {
         SUPER_START,
         PERFECT_POWER,
         PERFECT_POWER_P,
+        TOT_TIMER_COLON,
     };
 }
 

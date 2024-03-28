@@ -1462,8 +1462,7 @@ EVT_BEGIN(customAttack_Withdraw)
         WHILE()
             
         WAIT_FRM(LW(13))
-        // TODO: Change text to indicate Koops is invincible until next turn.
-        USER_FUNC(btlevtcmd_AnnounceMessage, 0, 0, 0, PTR("btl_msg_defend_command_exec"), 60)
+        USER_FUNC(btlevtcmd_AnnounceMessage, 0, 0, 0, PTR("tot_status_withdraw"), 60)
         
         // Disable all damage and status.
         USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, int(0xe0000000))
