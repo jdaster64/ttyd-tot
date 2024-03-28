@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
+#include "tot_manager_timer.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
 

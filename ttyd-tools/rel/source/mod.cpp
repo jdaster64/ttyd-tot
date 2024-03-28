@@ -10,6 +10,7 @@
 #include "patch.h"
 #include "patches_apply.h"
 #include "tot_gon.h"
+#include "tot_manager_timer.h"
 
 #include <ttyd/dispdrv.h>
 #include <ttyd/fontmgr.h>
@@ -75,6 +76,7 @@ void Mod::Update() {
     infinite_pit::AchievementsManager::Update();
     infinite_pit::TitleScreenManager::Update();
     infinite_pit::MenuManager::Update();
+    tot::TimerManager::Update();
 }
 
 void Mod::Draw() {
@@ -88,6 +90,8 @@ void Mod::Draw() {
         infinite_pit::TitleScreenManager::Draw, CameraId::k2d);
     RegisterDrawCallback(
         infinite_pit::MenuManager::Draw, CameraId::k2d);
+    RegisterDrawCallback(
+        tot::TimerManager::Draw, CameraId::k2d);
 }
 
 }

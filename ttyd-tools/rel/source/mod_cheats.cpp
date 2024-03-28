@@ -7,6 +7,7 @@
 #include "mod_debug.h"
 #include "mod_menu.h"
 #include "mod_state.h"
+#include "tot_state.h"
 
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
@@ -69,9 +70,11 @@ void CheatsManager::Update() {
     }
     if ((code_history & 0xFFFFFF) == secretCode_RtaTimer) {
         code_history = 0;
-        // Display the RTA time since the current Pit run was started.
-        g_DrawRtaTimer = true;
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
+        // Toggle between timer options.
+        int32_t option = g_Mod->state_.GetOption(tot::OPT_TIMER_DISPLAY);
+        option = (option + 1) % 3;
+        g_Mod->state_.SetOption(tot::OPT_TIMER_DISPLAY, option);
     }
     if ((code_history & 0xFFFFFF) == secretCode_BgmOnOff) {
         code_history = 0;

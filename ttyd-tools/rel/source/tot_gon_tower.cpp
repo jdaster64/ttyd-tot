@@ -7,6 +7,7 @@
 #include "tot_generate_reward.h"
 #include "tot_gon.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_manager_timer.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -167,6 +168,7 @@ EVT_BEGIN(Tower_ChestEvt_Core)
                 17, -1, LW(14))
     END_SWITCH()
     USER_FUNC(evt_mobj_wait_animation_end, LW(8))
+    USER_FUNC(evtTot_ToggleIGT, 0)
     SWITCH(LW(13))
         CASE_SMALL_EQUAL(-1)
             // Run special event from tot_generate_reward, then null it out
@@ -181,6 +183,7 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     END_SWITCH()
     // If no special pickup script, give Mario back control and spawn pipe.
     IF_EQUAL(LW(14), 0)
+        USER_FUNC(evtTot_ToggleIGT, 1)
         USER_FUNC(evt_mario_key_onoff, 1)
         SET(GSW(1000), 1)
     END_IF()
@@ -218,6 +221,7 @@ EVT_END()
 
 // Increment floor number.
 EVT_BEGIN(Tower_IncrementFloor)
+    USER_FUNC(evtTot_ToggleIGT, 0)
     USER_FUNC(evtTot_IncrementFloor, 1)
     SET(LW(0), 0)
     RETURN()
@@ -323,6 +327,7 @@ EVT_BEGIN(Tower_SpawnPipe)
 EVT_END()
 
 EVT_BEGIN(Tower_RunGameOverScript)
+    USER_FUNC(evtTot_ToggleIGT, 0)
     USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
     USER_FUNC(evt_mario_dispflag_onoff, 1, 2)
     USER_FUNC(evt_mario_key_onoff, 0)
@@ -702,6 +707,8 @@ EVT_BEGIN(gon_01_InitEvt)
         USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG0_DAN1"))
         USER_FUNC(evt_snd_set_rev_mode, 2)
     END_IF()
+    
+    USER_FUNC(evtTot_ToggleIGT, 1)
 
     RETURN()
 EVT_END()

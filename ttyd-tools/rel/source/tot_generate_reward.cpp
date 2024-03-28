@@ -8,6 +8,7 @@
 #include "tot_generate_item.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
+#include "tot_manager_timer.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
 
@@ -442,6 +443,7 @@ EVT_END()
 // Pickup script for Star Pieces from chest.
 EVT_BEGIN(Reward_StarPieceChestEvt)
     RUN_CHILD_EVT(Reward_StarPieceBaseEvt)
+    USER_FUNC(evtTot_ToggleIGT, 1)
     USER_FUNC(evt_mario_key_onoff, 1)
     SET(GSW(1000), 1)
     RETURN()
@@ -449,8 +451,10 @@ EVT_END()
 
 // Pickup script for Star Pieces as field item.
 EVT_BEGIN(Reward_StarPieceItemDropEvt)
+    USER_FUNC(evtTot_ToggleIGT, 0)
     USER_FUNC(evt_mario_key_onoff, 0)
     RUN_CHILD_EVT(Reward_StarPieceBaseEvt)
+    USER_FUNC(evtTot_ToggleIGT, 1)
     USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()
@@ -467,6 +471,7 @@ EVT_BEGIN(Reward_ShineSpriteChestEvt)
         USER_FUNC(
             evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
     END_IF()
+    USER_FUNC(evtTot_ToggleIGT, 1)
     USER_FUNC(evt_mario_key_onoff, 1)
     SET(GSW(1000), 1)
     RETURN()
