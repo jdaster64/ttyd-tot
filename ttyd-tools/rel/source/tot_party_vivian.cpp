@@ -109,6 +109,9 @@ EVT_DEFINE_USER_FUNC(evtTot_InfatuateChangeAlliance) {
             break;
             
         default: {
+            // Infatuate should not work on midbosses.
+            if (unit->size_change_turns > 99) break;
+            
             uint32_t dummy = 0;
             ttyd::battle_damage::BattleSetStatusDamage(
                 &dummy, unit, part, 0x100 /* ignore status vulnerability */,
