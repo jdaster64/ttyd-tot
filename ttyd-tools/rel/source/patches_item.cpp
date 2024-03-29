@@ -199,7 +199,7 @@ void ApplyFixedPatches() {
         0x34703543, 0x30040740, 0x54444045, 0x00002045,
         // Badges.
         0xb8a88dbb, 0xdd9d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,
-        0xbbbebeeb, 0xaaaacdfc, 0xcaacccca, 0xc00edd7c, 0x0000000c,
+        0xbbbebeeb, 0xaaaacdfc, 0xcaacccca, 0xd00edd7c, 0x0000000d,
         0x0a77000a, 0x0dee0000, 0x00000bb0,
     };
     
@@ -209,7 +209,7 @@ void ApplyFixedPatches() {
     };
     static const constexpr uint32_t kBpCost[] = {
         0x11111111, 0x44111111, 0x22662211, 0x22111144, 0x11224411,
-        0x33331441, 0x12226220, 0x62211111, 0x30043316, 0x00000003,
+        0x33331441, 0x12226220, 0x62211111, 0x40043316, 0x00000004,
         0x03110001, 0x03220100, 0x00000110,
     };
     static const constexpr int8_t kBadgeSortOrder[] = {

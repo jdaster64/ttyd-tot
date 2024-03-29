@@ -1187,7 +1187,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMinionEntries) {
         BattleUnitSetup* setup = nullptr;
     
         float x =
-            kEnemyPartyCenterX + position_offsets[i] * kEnemyPartySepX + 250.0f;
+            kEnemyPartyCenterX + position_offsets[i] * kEnemyPartySepX;
         float z = position_offsets[i] * kEnemyPartySepZ;
         
         // Check to make sure no other enemies are at the given X position.
@@ -1203,7 +1203,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMinionEntries) {
         
         if (position_free) {
             setup = &g_MidbossMinionUnits[i];
-            FillBattleUnitSetup(*setup, &kEnemyInfo[unit_kind], x, z);
+            FillBattleUnitSetup(*setup, &kEnemyInfo[unit_kind], x  + 250.0f, z);
         }
         
         evtSetValue(evt, evt->evtArguments[i], PTR(setup));
@@ -1226,9 +1226,9 @@ EVT_BEGIN(MidbossEvt)
     USER_FUNC(btlevtcmd_get_turn, LW(0))
     USER_FUNC(evt_sub_random, 99, LW(1))
     IF_LARGE_EQUAL(LW(0), 1)
-        // Backup call chance = 33%, diminishing by 3% per turn.
-        MUL(LW(0), 3)
-        SUB(LW(0), 36)
+        // Backup call chance = 50%, diminishing by 5% per turn.
+        MUL(LW(0), 5)
+        SUB(LW(0), 55)
         MUL(LW(0), -1)
         IF_SMALL(LW(1), LW(0))
             SET(LW(0), 1)
