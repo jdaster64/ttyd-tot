@@ -422,7 +422,7 @@ g_StringMap = {
             b"<system>\n<p>\nYou learned %s!\n<k>",
             
         b"tot_reward_upgrademove":
-            b"<system>\n<p>\n%s's level\nwent up by 1!\n<k>",
+            b"<system>\n<p>\n%s's max level\nwent up by 1!\n<k>",
         
         b"tot_reward_fullrecovery":
             b"<system>\n<p>\nYour party fully recovered!\n<k>",
