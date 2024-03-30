@@ -10,6 +10,7 @@
 #include "tot_generate_enemy.h"
 #include "tot_manager_move.h"
 
+#include <ttyd/ac_button_down.h>
 #include <ttyd/battle.h>
 #include <ttyd/battle_ac.h>
 #include <ttyd/battle_actrecord.h>
@@ -38,6 +39,9 @@ extern "C" {
     // action_command_patches.s
     void StartButtonDownChooseButtons();
     void BranchBackButtonDownChooseButtons();
+    void StartButtonDownWrongButton();
+    void BranchBackButtonDownWrongButton();
+    void ConditionalBranchButtonDownWrongButton();
     void StartButtonDownCheckComplete();
     void BranchBackButtonDownCheckComplete();
     void ConditionalBranchButtonDownCheckComplete();
@@ -130,6 +134,7 @@ extern int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool);
 extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
+extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
 // Patch addresses.
 extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_BH;
@@ -142,6 +147,9 @@ extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
 extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_BH;
 extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_EH;
+extern const int32_t g_battleAcMain_ButtonDown_WrongButton_BH;
+extern const int32_t g_battleAcMain_ButtonDown_WrongButton_EH;
+extern const int32_t g_battleAcMain_ButtonDown_WrongButton_CH1;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_BH;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_EH;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_CH1;
@@ -978,26 +986,47 @@ void ApplyFixedPatches() {
                 unit_idx, target, part, original_damage, fp_damage, 
                 unk0, damage_pattern, unk1);
         });
-            
+
     // Add support for Snow Whirled-like variant of button pressing AC.
     // Override choosing buttons:
     mod::patch::writeBranchPair(
         reinterpret_cast<void*>(g_battleAcMain_ButtonDown_ChooseButtons_BH),
         reinterpret_cast<void*>(StartButtonDownChooseButtons),
         reinterpret_cast<void*>(BranchBackButtonDownChooseButtons));
+    // Don't end attack early on wrong button.
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(g_battleAcMain_ButtonDown_WrongButton_BH),
+        reinterpret_cast<void*>(StartButtonDownWrongButton));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(BranchBackButtonDownWrongButton),
+        reinterpret_cast<void*>(g_battleAcMain_ButtonDown_WrongButton_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ConditionalBranchButtonDownWrongButton),
+        reinterpret_cast<void*>(g_battleAcMain_ButtonDown_WrongButton_CH1));
     // Reset buttons instead of ending attack when completed:
     mod::patch::writeBranch(
-        reinterpret_cast<void*>(
-            g_battleAcMain_ButtonDown_CheckComplete_BH),
+        reinterpret_cast<void*>(g_battleAcMain_ButtonDown_CheckComplete_BH),
         reinterpret_cast<void*>(StartButtonDownCheckComplete));
     mod::patch::writeBranch(
         reinterpret_cast<void*>(BranchBackButtonDownCheckComplete),
-        reinterpret_cast<void*>(
-            g_battleAcMain_ButtonDown_CheckComplete_EH));
+        reinterpret_cast<void*>(g_battleAcMain_ButtonDown_CheckComplete_EH));
     mod::patch::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchButtonDownCheckComplete),
-        reinterpret_cast<void*>(
-            g_battleAcMain_ButtonDown_CheckComplete_CH1));
+        reinterpret_cast<void*>(g_battleAcMain_ButtonDown_CheckComplete_CH1));
+    // Override what the 'success' criteria for the move is.
+    g_battleAcMain_ButtonDown_trampoline = patch::hookFunction(
+        ttyd::ac_button_down::battleAcMain_ButtonDown,
+        [](BattleWork* battleWork) {
+            // Run original code.
+            uint32_t result = g_battleAcMain_ButtonDown_trampoline(battleWork);
+            if (battleWork->ac_manager_work.ac_state == 1002 &&    
+                battleWork->ac_manager_work.ac_params[4] == -417U) {
+                // Override AC result.
+                battleWork->ac_manager_work.ac_result =
+                    battleWork->ac_manager_work.ac_output_params[1] >= 4 ? 2 : 0;
+            }
+            return result;
+        });
             
     // Add support for "permanent statuses" (turn count >= 100):
     // Skip drawing status icon if 100 or over:

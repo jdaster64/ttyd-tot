@@ -150,6 +150,8 @@ void (*g_BtlActRec_AddCount_trampoline)(uint8_t*) = nullptr;
 void (*g_BattleAudienceSetThrowItemMax_trampoline)() = nullptr;
 // battle_enemy_item.o  801f9658
 void* (*g_BattleEnemyUseItemCheck_trampoline)(BattleWorkUnit*) = nullptr;
+// ac_button_down.o  80202164
+uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*) = nullptr;
 // battle_seq_end.o  802166a4
 const char* (*g_BattleGetRankNameLabel_trampoline)(int32_t) = nullptr;
 // sac_bakugame.o  8022f990
@@ -308,6 +310,9 @@ extern const int32_t g_BattleAudience_End_SaveAmountAlways_BH = 0x801a6b68;
 extern const int32_t g_BattleAudience_Disp_EnableAlways_BH = 0x801a6cb0;
 extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_BH = 0x80202414;
 extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_EH = 0x80202418;
+extern const int32_t g_battleAcMain_ButtonDown_WrongButton_BH = 0x80202574;
+extern const int32_t g_battleAcMain_ButtonDown_WrongButton_EH = 0x80202578;
+extern const int32_t g_battleAcMain_ButtonDown_WrongButton_CH1 = 0x802025c8;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_BH = 0x80202614;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_EH = 0x80202618;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_CH1 = 0x8020263c;

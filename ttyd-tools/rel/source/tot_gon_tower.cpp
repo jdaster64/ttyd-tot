@@ -243,10 +243,10 @@ EVT_BEGIN(Tower_SpawnHeartBlock)
             -100, 60, -80, 0)
     END_IF()
     
-    // Coin price = 20 + 5 for each boss floor after the first.
+    // Coin price = 10 + 5 for each boss floor after the first.
     USER_FUNC(evtTot_GetFloor, LW(3))
     DIV(LW(3), 8)
-    ADD(LW(3), 3)
+    ADD(LW(3), 1)
     MUL(LW(3), 5)
     // Spawn heart block.
     USER_FUNC(evt_mobj_recovery_blk, PTR("hbox"), LW(3), LW(0), LW(1), LW(2), 0, 0)

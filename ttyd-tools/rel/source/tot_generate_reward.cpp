@@ -95,7 +95,7 @@ int32_t g_MoveSelections[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 int32_t g_NumMovesSelected = 0;
 
 // Returns the option flag to check for whether the badge was already obtained.
-uint32_t GetUniqueBadgeObtainedIndex(int32_t item_type) {
+int32_t GetUniqueBadgeObtainedIndex(int32_t item_type) {
     switch (item_type) {
         case ItemType::CHILL_OUT:       return 0;
         case ItemType::DOUBLE_DIP:      return 1;
@@ -631,7 +631,7 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
 }
 
 void RewardManager::AfterItemPickup(int32_t item_type) {
-    uint32_t index = GetUniqueBadgeObtainedIndex(item_type);
+    int32_t index = GetUniqueBadgeObtainedIndex(item_type);
     if (index >= 0) {
         g_Mod->state_.SetOption(STAT_RUN_UNIQUE_BADGE_FLAGS, 1, index);
     }

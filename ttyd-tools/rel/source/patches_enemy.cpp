@@ -79,6 +79,7 @@ void ApplyMidbossStats(BattleWorkUnit* unit) {
         unit->size_change_turns = 100;
         
         // Turn off weaknesses that incapacitate the enemy.
+        // TODO: Hook BattleCheckEndUnitInitEvent and do this there!
         for (BattleWorkUnitPart* part = unit->parts; 
              part != nullptr; part = part->next_part) {
              part->part_attribute_flags &= ~(

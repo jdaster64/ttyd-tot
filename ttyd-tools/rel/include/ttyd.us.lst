@@ -2600,6 +2600,13 @@
 // evt_johoya.o
 801fb068:johoya_init
 
+// ac_button_down.o
+80201d7c:actionCommandDisp
+802020cc:battleAcDelete_ButtonDown
+802020d8:battleAcDisp_ButtonDown
+8020215c:battleAcResult_ButtonDown
+80202164:battleAcMain_ButtonDown
+
 // evt_window.o
 80209a0c:evt_win_coin_wait
 80209aac:evt_win_coin_off

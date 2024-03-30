@@ -350,10 +350,13 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             USER_FUNC(btlevtcmd_SetupAC, -2, 14, 1, 0)
         CASE_ETC()
             // Snow Whirled action command; 1 damage per cycle.
+            // 3.5 seconds at default difficulty, close to Tidal Wave.
             SUB(LW(1), 3)
-            MUL(LW(1), -10)
-            ADD(LW(1), 180)
+            MUL(LW(1), -20)
+            ADD(LW(1), 210)
             USER_FUNC(btlevtcmd_AcSetParamAll, LW(1), 1, 4, -3, -417, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+            // Make sure cycle count doesn't carry over from previous attacks.
+            USER_FUNC(btlevtcmd_AcSetOutputParam, 1, 0)
             USER_FUNC(btlevtcmd_AcSetFlag, 7)
     END_SWITCH()
        

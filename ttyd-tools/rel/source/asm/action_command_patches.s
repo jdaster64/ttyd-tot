@@ -1,8 +1,12 @@
 .global StartButtonDownChooseButtons
 .global BranchBackButtonDownChooseButtons
+.global StartButtonDownWrongButton
+.global BranchBackButtonDownWrongButton
+.global ConditionalBranchButtonDownWrongButton
 .global StartButtonDownCheckComplete
 .global BranchBackButtonDownCheckComplete
 .global ConditionalBranchButtonDownCheckComplete
+
 
 # Override button choices if using custom mode...
 StartButtonDownChooseButtons:
@@ -24,31 +28,46 @@ li %r0, 99
 BranchBackButtonDownChooseButtons:
 b 0
 
+# Don't end Action command early on wrong button if using custom mode.
+StartButtonDownWrongButton:
+lwz %r0, 0x1cd8 (%r22)
+cmpwi %r0, -417
+bne+ SnowWhirled_end_attack
+ConditionalBranchButtonDownWrongButton:
+b 0
+SnowWhirled_end_attack:
+BranchBackButtonDownWrongButton:
+# Restore original opcode.
+li %r0, 0
+b 0
+
 # Reset buttons rather than ending command if using custom mode...
 StartButtonDownCheckComplete:
-# If AC param 4 = -417 and AC output param 0 is 4 (completed set of buttons)...
+# If AC param 4 = -417, run Snow Whirled logic, otherwise end attack.
 lwz %r3, 0x1cd8 (%r22)
 cmpwi %r3, -417
-bne+ check_end_attack
+bne+ SnowWhirled_check_end_attack
+# If number of buttons is < 4, don't end attack, but don't run logic either.
 lwz %r3, 0x1ce8 (%r22)
 cmpwi %r3, 4
-bne+ check_end_attack
-# Increment AC output param 1.
+bne+ SnowWhirled_dont_increment
+# If number of buttons == 4, Increment AC output param 1 (# complete cycles).
 lwz %r3, 0x1cec (%r22)
 addi %r3, %r3, 1
 stw %r3, 0x1cec (%r22)
 # If number of bars completed >= 10, then end attack anyway.
 cmpwi %r3, 10
-bge- check_end_attack
+bge- SnowWhirled_check_end_attack
 # Otherwise, clear button presses, readying for next bar.
 li %r3, 0
 stw %r3, 0x1f88 (%r22)
 stw %r3, 0x1f8c (%r22)
 stw %r3, 0x1f90 (%r22)
 stw %r3, 0x1f94 (%r22)
+SnowWhirled_dont_increment:
 ConditionalBranchButtonDownCheckComplete:
 b 0
-check_end_attack:
+SnowWhirled_check_end_attack:
 # Restore original opcode if not.
 lwz	%r3, 0x1cb8 (%r22)
 BranchBackButtonDownCheckComplete:

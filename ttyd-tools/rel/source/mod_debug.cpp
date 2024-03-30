@@ -33,6 +33,7 @@ enum DebugManagerMode {
     DEBUG_SEED,
     DEBUG_ENEMIES,
     DEBUG_FLOOR,
+    DEBUG_MAX_STATS,
     DEBUG_UNLOCK_ALL_MOVES,
     DEBUG_UNLOCK_ALL_PARTNERS,
     DEBUG_UNLOCK_ALL_BADGES,
@@ -143,6 +144,27 @@ void DebugManager::Update() {
                     g_DebugMode = g_CursorPos;
                     g_CursorPos = g_Mod->state_.floor_;
                     return;
+                }
+                case DEBUG_MAX_STATS: {
+                    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+                    pouch.current_hp = 100;
+                    pouch.max_hp = 100;
+                    pouch.base_max_hp = 100;
+                    pouch.current_fp = 100;
+                    pouch.max_fp = 100;
+                    pouch.base_max_fp = 100;
+                    int32_t bp = pouch.total_bp;
+                    if (bp < 100) {
+                        pouch.total_bp += (100 - bp);
+                        pouch.unallocated_bp += (100 - bp);
+                    }
+                    for (int32_t i = 1; i <= 7; ++i) {
+                        pouch.party_data[i].current_hp = 100;
+                        pouch.party_data[i].max_hp = 100;
+                        pouch.party_data[i].base_max_hp = 100;
+                    }
+                    pouch.coins = 999;
+                    break;
                 }
                 case DEBUG_UNLOCK_ALL_MOVES: {
                     // Unlock all moves and move levels.
@@ -363,6 +385,9 @@ void DebugManager::Draw() {
             }
             case DEBUG_FLOOR: {
                 strcpy(buf, "Set Current Floor");           break;
+            }
+            case DEBUG_MAX_STATS: {
+                strcpy(buf, "Max Stats");                   break;
             }
             case DEBUG_UNLOCK_ALL_MOVES: {
                 strcpy(buf, "Unlock All Moves");            break;
