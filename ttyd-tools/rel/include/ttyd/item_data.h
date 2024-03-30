@@ -366,6 +366,15 @@ namespace ItemType {
         SUPER_CHARGE_P,
         
         MAX_ITEM_TYPE,
+        
+        // Custom item types for TOT.
+        TOT_PERFECT_POWER = MEGA_JUMP,
+        TOT_PERFECT_POWER_P = MEGA_SMASH,
+        TOT_SUPER_START = MEGA_QUAKE,
+        TOT_PITY_STAR = SQUARE_DIAMOND_BADGE,
+        TOT_PITY_STAR_P = SQUARE_DIAMOND_BADGE_P,
+        TOT_TOUGHEN_UP = SUPER_CHARGE,
+        TOT_TOUGHEN_UP_P = SUPER_CHARGE_P,
     };
 }
 

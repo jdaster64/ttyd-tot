@@ -345,7 +345,8 @@ void ApplyFixedPatches() {
             battle::ResetPartySwitchCost();
             // Reset current Star Power to 0 + 50 per copy of Super Start.
             const int32_t sp = Min(
-                ttyd::mario_pouch::pouchEquipCheckBadge(0x14e) * 50,
+                ttyd::mario_pouch::pouchEquipCheckBadge(
+                    ItemType::TOT_SUPER_START) * 50,
                 static_cast<int32_t>(ttyd::mario_pouch::pouchGetPtr()->max_sp));
             ttyd::mario_pouch::pouchGetPtr()->current_sp = sp;
             g_seq_battleInit_trampoline();

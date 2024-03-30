@@ -167,8 +167,8 @@ int32_t GetWeaponLevelSelectionIndex(int16_t badge_id) {
     switch (badge_id) {
         case ItemType::CHARGE: return 0;
         case ItemType::CHARGE_P: return 1;
-        case ItemType::SUPER_CHARGE: return 2;
-        case ItemType::SUPER_CHARGE_P: return 3;
+        case ItemType::TOT_TOUGHEN_UP: return 2;
+        case ItemType::TOT_TOUGHEN_UP_P: return 3;
     }
     return -1;
 }

@@ -587,6 +587,10 @@ namespace IconType {
         PERFECT_POWER,
         PERFECT_POWER_P,
         TOT_TIMER_COLON,
+        TOT_TIMER_POINT,
+        TOT_BLANK,
+        PITY_STAR,
+        PITY_STAR_P,
     };
 }
 

@@ -338,8 +338,8 @@ void GetStatusParams(
                     attacker->current_kind == BattleUnitType::MARIO) - 1;
             }
             break;
-        case ItemType::SUPER_CHARGE:
-        case ItemType::SUPER_CHARGE_P:
+        case ItemType::TOT_TOUGHEN_UP:
+        case ItemType::TOT_TOUGHEN_UP_P:
             if (status_type == StatusEffectType::DEFENSE_UP) {
                 strength += mario_move::GetStrategyBadgeLevel(
                     /* is_charge = */ false,
@@ -1097,27 +1097,35 @@ void ApplyFixedPatches() {
     g__EquipItem_trampoline = patch::hookFunction(
         ttyd::battle::_EquipItem, 
         [](BattleWorkUnit* unit, uint32_t flags, int32_t item) {
-            // Handle vanilla badges.
-            g__EquipItem_trampoline(unit, flags, item);
-            
             // Mario or enemies:
             if ((flags & 4) == 0) {
-                if (item == 0x14c) ++unit->badges_equipped.unk_03;
+                if (item == ItemType::TOT_PERFECT_POWER) {
+                    ++unit->badges_equipped.unk_03;
+                }
+                return;
             }
             // Partner or enemies:
             if ((flags & 2) == 0) {
-                if (item == 0x14d) ++unit->badges_equipped.unk_03;
+                if (item == ItemType::TOT_PERFECT_POWER_P) {
+                    ++unit->badges_equipped.unk_03;
+                }
+                return;
             }
             
             // Enable Triple Dip action for any # of copies of Double Dip (P).
             if ((flags & 6) == 2 && item == ItemType::DOUBLE_DIP) {
                 unit->badges_equipped.double_dip = 1;
                 unit->badges_equipped.triple_dip = 1;
+                return;
             }
             if ((flags & 6) == 4 && item == ItemType::DOUBLE_DIP_P) {
                 unit->badges_equipped.double_dip = 1;
                 unit->badges_equipped.triple_dip = 1;
+                return;
             }
+            
+            // Handle vanilla badges.
+            g__EquipItem_trampoline(unit, flags, item);
         });
             
     // Disable Super Charge / Toughen Up as menu option.

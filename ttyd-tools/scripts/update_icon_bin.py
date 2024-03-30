@@ -39,6 +39,14 @@ g_NewIconDefs = [
     [(619, 0)],
     # Timer colon
     [(620, 0)],
+    # Timer decimal point
+    [(621, 0)],
+    # White square
+    [(622, 0)],
+    # Pity Star badge
+    [(623, 0)],
+    # Pity Star P badge
+    [(624, 0)],
 ]
 g_IconDefs = []
 

@@ -292,28 +292,28 @@ void ApplyFixedPatches() {
     
     // New badges:
     // Toughen Up (P): a move that grants a single-turn +DEF buff.
-    itemDataTable[ItemType::SUPER_CHARGE].icon_id = IconType::DEFEND_BADGE;
-    itemDataTable[ItemType::SUPER_CHARGE].name = "in_toughen_up";
-    itemDataTable[ItemType::SUPER_CHARGE].description = "msg_toughen_up";
-    itemDataTable[ItemType::SUPER_CHARGE].menu_description = "msg_toughen_up_menu";
-    itemDataTable[ItemType::SUPER_CHARGE_P].icon_id = IconType::DEFEND_BADGE_P;
-    itemDataTable[ItemType::SUPER_CHARGE_P].name = "in_toughen_up_p";
-    itemDataTable[ItemType::SUPER_CHARGE_P].description = "msg_toughen_up_p";
-    itemDataTable[ItemType::SUPER_CHARGE_P].menu_description = "msg_toughen_up_p_menu";
+    itemDataTable[ItemType::TOT_TOUGHEN_UP].icon_id = IconType::DEFEND_BADGE;
+    itemDataTable[ItemType::TOT_TOUGHEN_UP].name = "in_toughen_up";
+    itemDataTable[ItemType::TOT_TOUGHEN_UP].description = "msg_toughen_up";
+    itemDataTable[ItemType::TOT_TOUGHEN_UP].menu_description = "msg_toughen_up_menu";
+    itemDataTable[ItemType::TOT_TOUGHEN_UP_P].icon_id = IconType::DEFEND_BADGE_P;
+    itemDataTable[ItemType::TOT_TOUGHEN_UP_P].name = "in_toughen_up_p";
+    itemDataTable[ItemType::TOT_TOUGHEN_UP_P].description = "msg_toughen_up_p";
+    itemDataTable[ItemType::TOT_TOUGHEN_UP_P].menu_description = "msg_toughen_up_p_menu";
     // Perfect Power (P): gives +1 power for being at full health.
-    itemDataTable[ItemType::MEGA_JUMP].icon_id = IconType::PERFECT_POWER;
-    itemDataTable[ItemType::MEGA_JUMP].name = "in_perfect_power";
-    itemDataTable[ItemType::MEGA_JUMP].description = "msg_perfect_power";
-    itemDataTable[ItemType::MEGA_JUMP].menu_description = "msg_perfect_power";
-    itemDataTable[ItemType::MEGA_SMASH].icon_id = IconType::PERFECT_POWER_P;
-    itemDataTable[ItemType::MEGA_SMASH].name = "in_perfect_power_p";
-    itemDataTable[ItemType::MEGA_SMASH].description = "msg_perfect_power_p";
-    itemDataTable[ItemType::MEGA_SMASH].menu_description = "msg_perfect_power_p";
+    itemDataTable[ItemType::TOT_PERFECT_POWER].icon_id = IconType::PERFECT_POWER;
+    itemDataTable[ItemType::TOT_PERFECT_POWER].name = "in_perfect_power";
+    itemDataTable[ItemType::TOT_PERFECT_POWER].description = "msg_perfect_power";
+    itemDataTable[ItemType::TOT_PERFECT_POWER].menu_description = "msg_perfect_power";
+    itemDataTable[ItemType::TOT_PERFECT_POWER_P].icon_id = IconType::PERFECT_POWER_P;
+    itemDataTable[ItemType::TOT_PERFECT_POWER_P].name = "in_perfect_power_p";
+    itemDataTable[ItemType::TOT_PERFECT_POWER_P].description = "msg_perfect_power_p";
+    itemDataTable[ItemType::TOT_PERFECT_POWER_P].menu_description = "msg_perfect_power_p";
     // Super Start: gives +0.50 SP at the start of a battle.
-    itemDataTable[ItemType::MEGA_QUAKE].icon_id = IconType::SUPER_START;
-    itemDataTable[ItemType::MEGA_QUAKE].name = "in_super_start";
-    itemDataTable[ItemType::MEGA_QUAKE].description = "msg_super_start";
-    itemDataTable[ItemType::MEGA_QUAKE].menu_description = "msg_super_start";
+    itemDataTable[ItemType::TOT_SUPER_START].icon_id = IconType::SUPER_START;
+    itemDataTable[ItemType::TOT_SUPER_START].name = "in_super_start";
+    itemDataTable[ItemType::TOT_SUPER_START].description = "msg_super_start";
+    itemDataTable[ItemType::TOT_SUPER_START].menu_description = "msg_super_start";
         
     // Change Super Charge (P) weapons into Toughen Up (P).
     ttyd::battle_mario::badgeWeapon_SuperCharge.base_fp_cost = 1;
