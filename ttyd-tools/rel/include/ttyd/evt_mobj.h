@@ -55,7 +55,7 @@ extern "C" {
 // mobj_blk
 // evt_mobj_save_blk
 // mobj_save_blk
-// evt_mobj_recovery_blk
+EVT_DECLARE_USER_FUNC(evt_mobj_recovery_blk, 7)
 // mobj_recovery_blk
 EVT_DECLARE_USER_FUNC(evt_mobj_signboard, 6)
 // mobj_signboard

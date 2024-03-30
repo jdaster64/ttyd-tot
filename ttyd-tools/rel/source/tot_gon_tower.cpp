@@ -227,6 +227,33 @@ EVT_BEGIN(Tower_IncrementFloor)
     RETURN()
 EVT_END()
 
+// Spawn heart block. LW(15) = Whether to spawn it statically on load.
+EVT_BEGIN(Tower_SpawnHeartBlock)
+    SET(LW(0), 40)
+    SET(LW(1), 60)
+    SET(LW(2), -100)
+    IF_EQUAL(LW(15), 0)
+        // Wait and play bomb effect if spawning dynamically.
+        WAIT_MSEC(2000)
+        USER_FUNC(
+            evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
+            0, 0, 0, 0, 0, 0, 0)
+        USER_FUNC(
+            evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
+            -100, 60, -80, 0)
+    END_IF()
+    
+    // Coin price = 20 + 5 for each boss floor after the first.
+    USER_FUNC(evtTot_GetFloor, LW(3))
+    DIV(LW(3), 8)
+    ADD(LW(3), 3)
+    MUL(LW(3), 5)
+    // Spawn heart block.
+    USER_FUNC(evt_mobj_recovery_blk, PTR("hbox"), LW(3), LW(0), LW(1), LW(2), 0, 0)
+
+    RETURN()
+EVT_END()
+
 // Spawn chests. LW(15) = Whether to spawn them statically on load.
 EVT_BEGIN(Tower_SpawnChests)
     IF_EQUAL(LW(15), 0)
@@ -302,6 +329,15 @@ EVT_BEGIN(Tower_SpawnPipe)
         GOTO(0)
     END_IF()
     USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
+
+    // Spawn Heart Block on boss floors.
+    USER_FUNC(evtTot_GetFloor, LW(10))
+    IF_LARGE(LW(10), 0)
+        MOD(LW(10), 8)
+        IF_EQUAL(LW(10), 0)
+            RUN_EVT(Tower_SpawnHeartBlock)
+        END_IF()
+    END_IF()
     
     // Delete chest objects.
     SET(LW(10), 3)
@@ -683,6 +719,12 @@ EVT_BEGIN(gon_01_InitEvt)
         RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
     ELSE()
         RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
+        // Spawn Heart Block statically.
+        USER_FUNC(evtTot_GetFloor, LW(15))
+        IF_LARGE(LW(15), 0)
+            SET(LW(15), 1)
+            RUN_EVT(Tower_SpawnHeartBlock)
+        END_IF()
         // Enable exit pipe immediately.
         USER_FUNC(evt_hit_bind_mapobj, PTR("a_dokan_1"), PTR("dokan_1_s"))
         USER_FUNC(evt_mapobj_trans, 1, PTR("dokan_1_s"), 0, 30, 0)

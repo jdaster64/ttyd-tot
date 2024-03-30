@@ -689,8 +689,6 @@ void SelectChestContents() {
     // if one of them is rolled twice in one floor, picks a random stackable
     // badge in its place.
     bool others_picked[] = { false, false, false, false, false };
-    // Whether a full heal chest has been spawned (on boss floors).
-    bool full_heal_picked = false;
     
     for (ChestData* chest = g_Chests; chest->item; ++chest) {        
         int32_t sum_weights, weight, type;
@@ -700,12 +698,6 @@ void SelectChestContents() {
         if (state.floor_ == 0) {
             // Floor 0: Force a move.
             type = 0;
-        } else if (state.floor_ % 8 == 0 && !full_heal_picked) {
-            // Boss floors: Force a full heal for the first chest.
-            chest->item = REWARD_FULL_HEAL;
-            chest->pickup_script = (void*)Reward_FullHealEvt;
-            full_heal_picked = true;
-            continue;
         } else {
             // Otherwise, pick top-level reward category.
             sum_weights = 0;

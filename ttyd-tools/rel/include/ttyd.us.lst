@@ -535,6 +535,7 @@
 
 // evt_mobj.o
 // .text
+800670e4:evt_mobj_recovery_blk
 80067878:evt_mobj_signboard
 80067a4c:evt_mobj_itembox
 8006b948:evt_mobj_wait_animation_end
