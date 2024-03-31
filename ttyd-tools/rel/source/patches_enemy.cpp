@@ -89,7 +89,7 @@ void RemoveMidbossWeaknessAttributes() {
     auto* battleWork = ttyd::battle::g_BattleWork;
     for (int32_t i = 0; i < 64; ++i) {
         auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, i);
-        if (unit && unit->size_change_turns > 99) {
+        if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
             // Turn off weaknesses that incapacitate the enemy.
             for (BattleWorkUnitPart* part = unit->parts; 
                  part != nullptr; part = part->next_part) {
@@ -361,7 +361,7 @@ void ApplyFixedPatches() {
             id = ttyd::battle_sub::BattleTransID(evt, id);
             auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
             void* script = (void*)evt->evtArguments[1];
-            if (unit->size_change_turns > 99) {
+            if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
                 script = tot::GetMidbossAttackScript(script);
             }
             unit->attack_evt_code = script;
@@ -385,7 +385,7 @@ void ApplyFixedPatches() {
         ttyd::battle_unit::BtlUnit_GetCoin, [](BattleWorkUnit* unit) {
             int32_t coins = g_BtlUnit_GetCoin_trampoline(unit);
             // Coin multiplier for midbosses.
-            if (unit->size_change_turns > 99) coins *= 3;
+            if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) coins *= 3;
             // Extra coins from Trade Off.
             coins += unit->pad_00f;
             return coins;
