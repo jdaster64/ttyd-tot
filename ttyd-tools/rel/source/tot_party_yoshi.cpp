@@ -142,11 +142,16 @@ EVT_DEFINE_USER_FUNC(evtTot_SetGulpStruggleParam) {
     
     int32_t param = evtGetValue(evt, evt->evtArguments[1]);
     
-    if (unit->size_change_strength < 0 && unit->size_change_turns > 0) {
+    if (unit->status_flags & ttyd::battle_unit::BattleUnitStatus_Flags::MIDBOSS) {
+        // Midbosses always struggle heavily (1~5x, only swallowable when Tiny).
+        float factor = (float)unit->current_hp / unit->max_hp;
+        factor = 1.0f + 4.0f * factor;
+        param *= factor;
+    } else if (unit->size_change_strength < 0 && unit->size_change_turns > 0) {
         // Enemy struggles considerably less if Tiny.
         param /= 2;
     } else {
-        // Enemy struggles more at high HP.
+        // Enemy struggles more at high HP. (1x at half health ~ 2x at full).
         float factor = (float)unit->current_hp / unit->max_hp;
         if (factor < 0.5f) factor = 0.5f;
         param *= (factor * 2);

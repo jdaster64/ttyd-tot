@@ -33,6 +33,7 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_unit;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_eff;
@@ -110,7 +111,7 @@ EVT_DEFINE_USER_FUNC(evtTot_InfatuateChangeAlliance) {
             
         default: {
             // Infatuate should not work on midbosses.
-            if (unit->size_change_turns > 99) break;
+            if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) break;
             
             uint32_t dummy = 0;
             ttyd::battle_damage::BattleSetStatusDamage(

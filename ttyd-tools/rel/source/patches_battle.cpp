@@ -421,7 +421,7 @@ uint32_t GetStatusDamageFromWeapon(
             }
             
             // Make midbosses less susceptible to most negative statuses.
-            if (target->size_change_turns > 99) {
+            if (target->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
                 switch (type) {
                     case StatusEffectType::SLEEP:
                     case StatusEffectType::STOP:
@@ -433,14 +433,17 @@ uint32_t GetStatusDamageFromWeapon(
                     case StatusEffectType::SLOW:
                         chance = chance * 75 / 100;
                         break;
+                    case StatusEffectType::TINY:
                     case StatusEffectType::FRIGHT:
-                    case StatusEffectType::GALE_FORCE:
                     case StatusEffectType::OHKO:
                         chance /= 2;
                         break;
-                    // Immune to any changes in size.
+                    case StatusEffectType::GALE_FORCE:
+                        // Effectively 50% if shrunk, 0% otherwise.
+                        chance /= 3;
+                        break;
                     case StatusEffectType::HUGE:
-                    case StatusEffectType::TINY:
+                        // Immune to non-permanent Huge status.
                         chance = 0;
                         break;
                 }
@@ -497,6 +500,14 @@ uint32_t StatusEffectTick(BattleWorkUnit* unit, int8_t status_type) {
         // If expired, reset the effect strength to 0.
         strength = 0;
         result = 1;
+        
+        // Special case: for Tiny ending on midboss, go back to perma-Huge.
+        if (status_type == StatusEffectType::TINY &&
+            (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS)) {
+            status_type = StatusEffectType::HUGE;
+            strength = 1;
+            turns = 100;
+        }
     } else if (status_type == StatusEffectType::POISON && strength < 5) {
         // Poison strengthens every turn it remains active.
         ++strength;

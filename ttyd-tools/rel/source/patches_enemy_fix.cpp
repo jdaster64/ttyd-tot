@@ -74,12 +74,10 @@ namespace {
 
 // For convenience.
 using namespace ::mod::tot::custom;
+using namespace ::ttyd::battle_database_common;
+using namespace ::ttyd::battle_unit;
     
 using ::ttyd::battle::BattleWork;
-using ::ttyd::battle_database_common::BattleUnitKind;
-using ::ttyd::battle_database_common::BattleUnitKindPart;
-using ::ttyd::battle_unit::BattleWorkUnit;
-using ::ttyd::battle_unit::BtlUnit_CheckStatus;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
@@ -132,7 +130,9 @@ EVT_DEFINE_USER_FUNC(CheckNumEnemiesRemaining) {
         if (unit && unit->current_kind <= BattleUnitType::BONETAIL &&
             unit->alliance <= 1 && !BtlUnit_CheckStatus(unit, 27)) {
             ++num_enemies;
-            if (unit->size_change_turns > 99) is_midboss = true;
+            if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
+                is_midboss = true;
+            }
         }
     }
     // If there is a midboss, force enemies to use their AI for 2+ enemies.
@@ -291,7 +291,7 @@ void ApplyFixedPatches() {
                 for (int32_t i = 0; i < 64; ++i) {
                     auto* unit = battleWork->battle_units[i];
                     if (unit && !BtlUnit_CheckStatus(unit, 27) &&
-                        unit->size_change_turns > 99) {
+                        (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS)) {
                         // Treat the spot as full.
                         evtSetValue(evt, evt->evtArguments[0], 1);
                         return 2;

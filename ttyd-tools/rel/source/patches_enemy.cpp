@@ -27,12 +27,11 @@ namespace mod::infinite_pit {
 
 namespace {
 
+// For convenience.
+using namespace ::ttyd::battle_database_common;
+using namespace ::ttyd::battle_unit;
+
 using ::ttyd::battle::BattleWork;
-using ::ttyd::battle_database_common::BattleUnitKind;
-using ::ttyd::battle_database_common::BattleUnitSetup;
-using ::ttyd::battle_database_common::BattleWeapon;
-using ::ttyd::battle_unit::BattleWorkUnit;
-using ::ttyd::battle_unit::BattleWorkUnitPart;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
@@ -70,7 +69,7 @@ namespace {
 int32_t g_EnemyItem = 0;
 
 void ApplyMidbossStats(BattleWorkUnit* unit) {
-    // Unit work 3 is used as sentinel for 'is midboss'.
+    // Unit work 3 is used as sentinel in initialization for 'is midboss'.
     if (unit->unit_work[3] == 1) {
         unit->unit_work[3] = 0;
         
@@ -80,6 +79,9 @@ void ApplyMidbossStats(BattleWorkUnit* unit) {
         // Apply permanent Huge status.
         unit->size_change_strength = 1;
         unit->size_change_turns = 100;
+        
+        // Apply "MIDBOSS" status so Huge status can be ended if necessary.
+        unit->status_flags |= BattleUnitStatus_Flags::MIDBOSS;
     }
 }
 

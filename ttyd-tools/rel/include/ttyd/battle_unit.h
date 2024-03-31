@@ -118,6 +118,7 @@ namespace BattleUnitStatus_Flags {
         
         // Custom statuses for ToT.
         SCOPED                  = 0x400U,
+        MIDBOSS                 = 0x800U,
     };
 }
 
