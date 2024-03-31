@@ -45,6 +45,8 @@ extern "C" {
     void StartButtonDownCheckComplete();
     void BranchBackButtonDownCheckComplete();
     void ConditionalBranchButtonDownCheckComplete();
+    void StartGetGuardDifficulty();
+    void BranchBackGetGuardDifficulty();
     // action_menu_patches.s
     void StartSpendFpOnSwitchPartner();
     void BranchBackSpendFpOnSwitchPartner();
@@ -69,7 +71,10 @@ extern "C" {
     void StartToggleScopedAndCheckFreezeBreak();
     void BranchBackToggleScopedAndCheckFreezeBreak();
     
-    
+    int32_t getActionCommandDifficulty() {
+        // TODO: Make this an option?
+        return 3;
+    }        
     void signalPlayerInitiatedPartySwitch(ttyd::battle_unit::BattleWorkUnit* unit) {
         mod::infinite_pit::battle::SignalPlayerInitiatedPartySwitch();
     }
@@ -119,6 +124,8 @@ using WeaponDamageFn = uint32_t (*) (
 // Function hooks.
 extern void (*g_BattleStoreExp_trampoline)(BattleWork*, int32_t);
 extern void (*g__EquipItem_trampoline)(BattleWorkUnit*, uint32_t, int32_t);
+extern void (*g_BattleActionCommandSetDifficulty_trampoline)(
+    BattleWork*, BattleWorkUnit*, int32_t);
 extern int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
 extern int32_t (*g_BattlePreCheckDamage_trampoline)(
@@ -136,6 +143,8 @@ extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
 extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
 // Patch addresses.
+extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH;
+extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_EH;
 extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH;
@@ -883,7 +892,23 @@ void QueuePitySpRestoration(int32_t damage) {
     }
 }
 
-void ApplyFixedPatches() {    
+void ApplyFixedPatches() {
+    // Override Action Command difficulty with fixed option.
+    g_BattleActionCommandSetDifficulty_trampoline = patch::hookFunction(
+        ttyd::battle_ac::BattleActionCommandSetDifficulty,
+        [](BattleWork* battleWork, BattleWorkUnit* unit, int32_t base) {
+            // Replace original logic entirely.
+            // TODO: Make this an option?
+            battleWork->ac_manager_work.base_ac_difficulty = 3;
+            battleWork->ac_manager_work.ac_difficulty = 3;
+        });
+    // Override Action Command difficulty for guards.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_BattleActionCommandCheckDefence_GetDifficulty_BH),
+        reinterpret_cast<void*>(g_BattleActionCommandCheckDefence_GetDifficulty_EH),
+        reinterpret_cast<void*>(StartGetGuardDifficulty),
+        reinterpret_cast<void*>(BranchBackGetGuardDifficulty));
+    
     // Handle Superguard cost option.
     g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
         ttyd::battle_ac::BattleActionCommandCheckDefence,

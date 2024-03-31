@@ -20,7 +20,9 @@ extern "C" {
 // BattleAcDrawGauge
 // BattleACGetButtonIcon
 // BattleActionCommandGetPrizeLv
-// BattleActionCommandSetDifficulty
+void BattleActionCommandSetDifficulty(
+    battle::BattleWork* battleWork, battle_unit::BattleWorkUnit* unit,
+    int32_t base_difficulty);
 // BattleActionCommandGetDifficulty
 // BattleActionCommandResetDefenceResult
 // BattleActionCommandGetDefenceResult

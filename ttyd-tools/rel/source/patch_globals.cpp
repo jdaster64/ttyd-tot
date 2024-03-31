@@ -58,6 +58,9 @@ void (*g_stg0_00_init_trampoline)(void) = nullptr;
 void (*g_BattleStoreExp_trampoline)(BattleWork*, int32_t) = nullptr;
 // battle.o  800f7ca4
 void (*g__EquipItem_trampoline)(BattleWorkUnit*, uint32_t, int32_t) = nullptr;
+// battle_ac.o  800fa12c
+void (*g_BattleActionCommandSetDifficulty_trampoline)(
+    BattleWork*, BattleWorkUnit*, int32_t) = nullptr;
 // battle_ac.o  800fa1b8
 int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*) = nullptr;
@@ -204,6 +207,8 @@ extern const int32_t g_pouchGetEmptyHaveItemCnt_CheckMaxInv_BH = 0x800d5638;
 extern const int32_t g_pouchInit_FixAllocLeak_BH = 0x800d59dc;
 extern const int32_t g_continueGame_Patch_SkipZeroingGswfs = 0x800f3ecc;
 extern const int32_t g_loadMain_Patch_SkipZeroingGswfs = 0x800f6358;
+extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH = 0x800fa208;
+extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_EH = 0x800fa238;
 extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH = 0x800fb5bc;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_BH = 0x800fb7cc;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH = 0x800fb838;

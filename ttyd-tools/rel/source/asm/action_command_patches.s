@@ -6,7 +6,8 @@
 .global StartButtonDownCheckComplete
 .global BranchBackButtonDownCheckComplete
 .global ConditionalBranchButtonDownCheckComplete
-
+.global StartGetGuardDifficulty
+.global BranchBackGetGuardDifficulty
 
 # Override button choices if using custom mode...
 StartButtonDownChooseButtons:
@@ -71,4 +72,17 @@ SnowWhirled_check_end_attack:
 # Restore original opcode if not.
 lwz	%r3, 0x1cb8 (%r22)
 BranchBackButtonDownCheckComplete:
+b 0
+
+# Override the ac difficulty check in BattleActionCommandCheckDefence.
+StartGetGuardDifficulty:
+# For whatever reason, pretty much all volatile registers are used here.
+stwu %sp, -0x90 (%sp)
+stmw %r3, 0x8 (%sp)
+bl getActionCommandDifficulty
+mr %r0, %r3
+lmw %r3, 0x8 (%sp)
+addi %sp, %sp, 0x90
+mr %r11, %r0
+BranchBackGetGuardDifficulty:
 b 0

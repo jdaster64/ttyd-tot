@@ -1236,6 +1236,7 @@
 
 // battle_ac.o
 // .text
+800fa12c:BattleActionCommandSetDifficulty
 800fa1a0:BattleACPadCheckRecordTrigger
 800fa1b8:BattleActionCommandCheckDefence
 // .data
