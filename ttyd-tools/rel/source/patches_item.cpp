@@ -194,13 +194,13 @@ void ApplyFixedPatches() {
     // Rebalanced price tiers for items & badges (non-pool items may have 0s).
     static const constexpr uint32_t kPriceTiers[] = {
         // Items / recipes.
-        0x1a444662, 0x5b334343, 0xb7321253, 0x34453205, 0x00700665,
-        0x00700000, 0x30743250, 0xa7764353, 0x35078644, 0x00842420,
-        0x34703543, 0x30040740, 0x54444045, 0x00002045,
+        0x1a444662, 0x5b334333, 0xb7321243, 0x34473205, 0x00800666,
+        0x00700000, 0x30753250, 0xa8785474, 0x3407a753, 0x00852420,
+        0x35703743, 0x30060740, 0x84544045, 0x00002046,
         // Badges.
         0xb8a88dbb, 0xdd9d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,
         0xbbbebeeb, 0xaaaacdfc, 0xcaacccca, 0xd00edd7c, 0x0000000d,
-        0x0a77000a, 0x0dee0000, 0x00000bb0,
+        0x0a770007, 0xbdee0000, 0x00000bbb,
     };
     
     // Prices corresponding to the price tiers in the above array.
@@ -209,17 +209,17 @@ void ApplyFixedPatches() {
     };
     static const constexpr uint32_t kBpCost[] = {
         0x11111111, 0x44111111, 0x22662211, 0x22111144, 0x11224411,
-        0x33331441, 0x12226220, 0x62211111, 0x40043316, 0x00000004,
-        0x03110001, 0x03220100, 0x00000110,
+        0x33331441, 0x12226220, 0x62211111, 0x40042216, 0x00000004,
+        0x03110001, 0x23220100, 0x00000112,
     };
     static const constexpr int8_t kBadgeSortOrder[] = {
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 33, 34, 
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 33, 34,
         29, 30, 27, 28,  1,  2,  9, 10,  3,  4, 20, 21, 18, 19, 11, 12,
-        22, 23, 13, 14, 15, 16, -1, -1, -1, 46, 47, 57, 58, 61, 62, 59,
-        17,  7,  8, 60, 43, 44, 45, 50, 51, 52, 53, 24, 25, 38, 39, 40,
-        41, 56, 48, 49, 26, 98, 99, 54, 55, -1, -1, 80, 81, 82, 83, 84,
-        63, -1, -1, -1, 36, 37, 42, 85, 86, -1, -1, -1,  5,  6, 35, -1,
-        -1, 31, 32,
+        22, 23, 13, 14, 15, 16, -1, -1, -1, 43, 44, 57, 58, 61, 62, 59,
+        17,  7,  8, 60, 40, 41, 42, 50, 51, 52, 53, 24, 25, 35, 36, 37,
+        38, 56, 45, 46, 26, 98, 99, 54, 55, -1, -1, 80, 81, 82, 83, 84,
+        63, -1, -1, -1, -1, -1, 39, 85, 86, -1, -1, -1,  5,  6, 49, 47,
+        48, 31, 32,
     };
     
     // - Set coin buy & sell (for Refund) prices based on above tiers.
@@ -309,6 +309,15 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_PERFECT_POWER_P].name = "in_perfect_power_p";
     itemDataTable[ItemType::TOT_PERFECT_POWER_P].description = "msg_perfect_power_p";
     itemDataTable[ItemType::TOT_PERFECT_POWER_P].menu_description = "msg_perfect_power_p";
+    // Pity Star (P): gives +50% extra Star Power from taking hits from enemies.
+    itemDataTable[ItemType::TOT_PITY_STAR].icon_id = IconType::PITY_STAR;
+    itemDataTable[ItemType::TOT_PITY_STAR].name = "in_pity_star";
+    itemDataTable[ItemType::TOT_PITY_STAR].description = "msg_pity_star";
+    itemDataTable[ItemType::TOT_PITY_STAR].menu_description = "msg_pity_star";
+    itemDataTable[ItemType::TOT_PITY_STAR_P].icon_id = IconType::PITY_STAR_P;
+    itemDataTable[ItemType::TOT_PITY_STAR_P].name = "in_pity_star_p";
+    itemDataTable[ItemType::TOT_PITY_STAR_P].description = "msg_pity_star_p";
+    itemDataTable[ItemType::TOT_PITY_STAR_P].menu_description = "msg_pity_star_p";
     // Super Start: gives +0.50 SP at the start of a battle.
     itemDataTable[ItemType::TOT_SUPER_START].icon_id = IconType::SUPER_START;
     itemDataTable[ItemType::TOT_SUPER_START].name = "in_super_start";

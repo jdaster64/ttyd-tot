@@ -26,6 +26,8 @@ g_StringMap = {
         b"in_super_start":      b"Super Start",
         b"in_perfect_power":    b"Perfect Power",
         b"in_perfect_power_p":  b"Perfect Power P",
+        b"in_pity_star":        b"Pity Star",
+        b"in_pity_star_p":      b"Pity Star P",
         
         # Item descriptions.
         b"msg_super_coin":
@@ -303,6 +305,14 @@ g_StringMap = {
         b"msg_toughen_up_p_menu":
             b"Increases the defense given by\n"
             b"allies' Defend command by 1.",
+            
+        b"msg_pity_star":
+            b"Increases Star Power gained\n"
+            b"when enemies attack Mario.",
+            
+        b"msg_pity_star_p":
+            b"Increases Star Power gained\n"
+            b"when enemies attack allies.",
             
         b"btl_hlp_cmd_operation_super_charge":
             b"Briefly increases DEF by\n"

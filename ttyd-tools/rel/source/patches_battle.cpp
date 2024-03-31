@@ -724,6 +724,26 @@ int32_t CalculateBaseDamage(
         }
     }
     
+    // If an enemy is attacking the player, and not during the player attack
+    // phase, queue pity Star Power restoration based on enemy's ATK.
+    if (attacker->current_kind <= BattleUnitType::BONETAIL &&
+        (target->current_kind == BattleUnitType::MARIO ||
+         target->current_kind > BattleUnitType::GOOMBELLA)) {
+        if (atk > 0 && ttyd::battle::BattleGetSeq(battleWork, 4) != 0x400'0002) {
+            uintptr_t audience_work_base =
+                reinterpret_cast<uintptr_t>(battleWork->audience_work);
+            int32_t current_audience =
+                *reinterpret_cast<int32_t*>(audience_work_base + 0x13784);
+                
+            // Regen 0.10 SP per damage, up to 0.01x the current audience count;
+            // increased by 50% per Pity Star (P) equipped.
+            int32_t sp_regen = Min(atk * 10, current_audience);
+            sp_regen = sp_regen * (target->badges_equipped.simplifier + 2) / 2;
+            
+            *reinterpret_cast<int32_t*>(audience_work_base + 0x137c4) += sp_regen;
+        }
+    }
+    
     int32_t def = part->defense[element];
     int32_t def_attr = part->defense_attr[element];
     switch (element) {
@@ -878,20 +898,6 @@ void SpendAndIncrementPartySwitchCost() {
     }
 }
 
-void QueuePitySpRestoration(int32_t damage) {
-    // Only damage taken during the enemy attack phase counts.
-    if (ttyd::battle::BattleGetSeq(ttyd::battle::g_BattleWork, 4) == 0x400'0004) {
-        uintptr_t audience_work_base =
-            reinterpret_cast<uintptr_t>(ttyd::battle::g_BattleWork->audience_work);
-        int32_t current_audience =
-            *reinterpret_cast<int32_t*>(audience_work_base + 0x13784);
-        
-        // Restore 0.10 SP per damage, up to 0.01x the current audience count.
-        int32_t sp_regen = Min(damage * 10, current_audience);
-        *reinterpret_cast<int32_t*>(audience_work_base + 0x137c4) += sp_regen;
-    }
-}
-
 void ApplyFixedPatches() {
     // Override Action Command difficulty with fixed option.
     g_BattleActionCommandSetDifficulty_trampoline = patch::hookFunction(
@@ -998,9 +1004,6 @@ void ApplyFixedPatches() {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
                 g_Mod->inf_state_.ChangeOption(STAT_PLAYER_DAMAGE, damage);
-                
-                // Handle pity sp restoration based on damage taken.
-                QueuePitySpRestoration(damage);
             } else if (target->current_kind <= BattleUnitType::BONETAIL) {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
@@ -1127,14 +1130,18 @@ void ApplyFixedPatches() {
                 if (item == ItemType::TOT_PERFECT_POWER) {
                     ++unit->badges_equipped.unk_03;
                 }
-                return;
+                if (item == ItemType::TOT_PITY_STAR) {
+                    ++unit->badges_equipped.simplifier;
+                }
             }
             // Partner or enemies:
             if ((flags & 2) == 0) {
                 if (item == ItemType::TOT_PERFECT_POWER_P) {
                     ++unit->badges_equipped.unk_03;
                 }
-                return;
+                if (item == ItemType::TOT_PITY_STAR_P) {
+                    ++unit->badges_equipped.simplifier;
+                }
             }
             
             // Enable Triple Dip action for any # of copies of Double Dip (P).
@@ -1146,6 +1153,11 @@ void ApplyFixedPatches() {
             if ((flags & 6) == 4 && item == ItemType::DOUBLE_DIP_P) {
                 unit->badges_equipped.double_dip = 1;
                 unit->badges_equipped.triple_dip = 1;
+                return;
+            }
+            
+            // Disable badges.
+            if (item == ItemType::SIMPLIFIER || item == ItemType::UNSIMPLIFIER) {
                 return;
             }
             
