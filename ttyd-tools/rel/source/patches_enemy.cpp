@@ -14,6 +14,7 @@
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
+#include <ttyd/battle_unit_event.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
@@ -25,7 +26,8 @@
 namespace mod::infinite_pit {
 
 namespace {
-    
+
+using ::ttyd::battle::BattleWork;
 using ::ttyd::battle_database_common::BattleUnitKind;
 using ::ttyd::battle_database_common::BattleUnitSetup;
 using ::ttyd::battle_database_common::BattleWeapon;
@@ -43,6 +45,7 @@ namespace PartsAttribute_Flags = ::ttyd::battle_unit::PartsAttribute_Flags;
 
 // Function hooks.
 extern BattleWorkUnit* (*g_BtlUnit_Entry_trampoline)(BattleUnitSetup*);
+extern bool (*g_BattleCheckEndUnitInitEvent_trampoline)(BattleWork*);
 extern int32_t (*g_BattleCalculateDamage_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,
     uint32_t*, uint32_t);
@@ -77,16 +80,23 @@ void ApplyMidbossStats(BattleWorkUnit* unit) {
         // Apply permanent Huge status.
         unit->size_change_strength = 1;
         unit->size_change_turns = 100;
-        
-        // Turn off weaknesses that incapacitate the enemy.
-        // TODO: Hook BattleCheckEndUnitInitEvent and do this there!
-        for (BattleWorkUnitPart* part = unit->parts; 
-             part != nullptr; part = part->next_part) {
-             part->part_attribute_flags &= ~(
-                PartsAttribute_Flags::WINGED |
-                PartsAttribute_Flags::SHELLED |
-                PartsAttribute_Flags::BOMB_FLIPPABLE
-             );
+    }
+}
+
+void RemoveMidbossWeaknessAttributes() {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    for (int32_t i = 0; i < 64; ++i) {
+        auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, i);
+        if (unit && unit->size_change_turns > 99) {
+            // Turn off weaknesses that incapacitate the enemy.
+            for (BattleWorkUnitPart* part = unit->parts; 
+                 part != nullptr; part = part->next_part) {
+                 part->part_attribute_flags &= ~(
+                    PartsAttribute_Flags::WINGED |
+                    PartsAttribute_Flags::SHELLED |
+                    PartsAttribute_Flags::BOMB_FLIPPABLE
+                 );
+            }
         }
     }
 }
@@ -283,6 +293,8 @@ void* EnemyUseAdditionalItemsCheck(BattleWorkUnit* unit) {
 }
     
 void ApplyFixedPatches() {
+    // Alter unit kind params in accordance with scaled stats, and apply
+    // increased stats for midbosses.
     g_BtlUnit_Entry_trampoline = patch::hookFunction(
         ttyd::battle_unit::BtlUnit_Entry, [](BattleUnitSetup* unit_setup) {
             AlterUnitKindParams(unit_setup->unit_kind_params);
@@ -353,6 +365,17 @@ void ApplyFixedPatches() {
             unit->attack_evt_code = script;
             unit->battle_menu_state = 0;
             return 2;
+        });
+    
+    // Hook 'init events finished' check to clear midboss weakness attributes.
+    g_BattleCheckEndUnitInitEvent_trampoline = patch::hookFunction(
+        ttyd::battle_unit_event::BattleCheckEndUnitInitEvent,
+        [](BattleWork* battleWork) {
+            bool result = g_BattleCheckEndUnitInitEvent_trampoline(battleWork);
+            if (result) {
+                RemoveMidbossWeaknessAttributes();
+            }
+            return result;
         });
     
     // Override the number of coins earned from an enemy.

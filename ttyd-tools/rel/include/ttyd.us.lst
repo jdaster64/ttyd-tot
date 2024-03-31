@@ -1806,6 +1806,14 @@
 80128cd8:BtlUnit_GetPartsPtr
 80128fe0:BtlUnit_Entry
 
+// battle_unit_event.o
+801296e0:BattleRunWaitEvent
+8012974c:BattlePhaseEventStartDeclare
+801297bc:BattleRunPhaseEvent
+8012984c:BattleRunHitEvent
+801298d0:BattleRunHitEventDirect
+80129994:BattleCheckEndUnitInitEvent
+
 // battle_monosiri.o
 8012ed2c:battleSetUnitMonosiriFlag
 8012ee3c:battleCheckUnitMonosiriFlag
