@@ -89,7 +89,7 @@ void RemoveMidbossWeaknessAttributes() {
     auto* battleWork = ttyd::battle::g_BattleWork;
     for (int32_t i = 0; i < 64; ++i) {
         auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, i);
-        if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
+        if (unit && (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS)) {
             // Turn off weaknesses that incapacitate the enemy.
             for (BattleWorkUnitPart* part = unit->parts; 
                  part != nullptr; part = part->next_part) {

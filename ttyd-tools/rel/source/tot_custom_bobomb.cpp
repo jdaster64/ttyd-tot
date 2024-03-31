@@ -290,6 +290,29 @@ EVT_BEGIN(unitBobOmb_attack_event_spark)
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+    
+    // If Hyper Bob-omb, apply Charge status before attacking.
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(5))
+    IF_EQUAL(LW(5), (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB)
+        // Idle pose.
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+        // Apply Charge status and effect.
+        // TODO: Make Charge strength based on current scaling.
+        // TODO: spawn eff_updown effect so the amount of extra damage is clear.
+        USER_FUNC(btlevtcmd_OnOffStatus, -2, 16, 5, 5, 1)
+        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_CONDITION_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        // Wait a bit, then jump again before attacking.
+        WAIT_MSEC(1200)
+        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+    END_IF()
+    
     USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
     USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
     USER_FUNC(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
