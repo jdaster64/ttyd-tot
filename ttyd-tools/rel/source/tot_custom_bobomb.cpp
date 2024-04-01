@@ -1,14 +1,19 @@
 #include "tot_custom_rel.h"     // For externed units
 
 #include "evt_cmd.h"
+#include "tot_generate_enemy.h"
 
 #include <gc/types.h>
+#include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
 #include <ttyd/battle_event_subset.h>
+#include <ttyd/battle_sub.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
+#include <ttyd/eff_updown.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
@@ -36,9 +41,13 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 
 }  // namespace
 
+// Function / USER_FUNC declarations.
+EVT_DECLARE_USER_FUNC(evtTot_SpawnUpDownEffect, 2)
+
 // Unit work variable definitions.
 constexpr const int32_t UW_BattleUnitType = 0;
-constexpr const int32_t UW_FuseLit = 1;
+constexpr const int32_t UW_FuseLitSfx = 1;
+constexpr const int32_t UW_Angered = 2;
 
 // Unit data.
 int8_t unitBobOmb_defense[] = { 1, 1, 1, 1, 1 };
@@ -214,11 +223,11 @@ EVT_BEGIN(unitBobOmb_bomb_event)
     USER_FUNC(evt_btl_camera_shake_w, 0, 5, 0, 15, 0)
     USER_FUNC(btlevtcmd_OnAttribute, -2, 16777216)
     USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, 33554432)
-    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_FuseLit, LW(0))
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_FuseLitSfx, LW(0))
     IF_NOT_EQUAL(LW(0), -1)
         USER_FUNC(evt_snd_sfxoff, LW(0))
     END_IF()
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FuseLit, -1)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FuseLitSfx, -1)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_ENM_BOMB_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
@@ -291,26 +300,35 @@ EVT_BEGIN(unitBobOmb_attack_event_spark)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
     
-    // If Hyper Bob-omb, apply Charge status before attacking.
-    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(5))
-    IF_EQUAL(LW(5), (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB)
-        // Idle pose.
-        USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
-        // Apply Charge status and effect.
-        // TODO: Make Charge strength based on current scaling.
-        // TODO: spawn eff_updown effect so the amount of extra damage is clear.
-        USER_FUNC(btlevtcmd_OnOffStatus, -2, 16, 5, 5, 1)
-        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_CONDITION_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        // Wait a bit, then jump again before attacking.
-        WAIT_MSEC(1200)
-        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
-        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
-        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
-        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+    // If Hyper Bob-omb was attacked, apply Charge status before attacking.
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_Angered, LW(5))
+    IF_EQUAL(LW(5), 1)
+        USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(5))
+        IF_EQUAL(LW(5), (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB)
+            // Change to idle pose.
+            USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+            
+            // Apply Charge status directly.
+            USER_FUNC(
+                tot::evtTot_GetEnemyStats, 
+                (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB,
+                EVT_NULLPTR, LW(5), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR,
+                (int32_t)unitBobOmb_weaponBomb.damage_function_params[0])
+            USER_FUNC(btlevtcmd_OnOffStatus, -2, 16, LW(5), LW(5), 1)
+            USER_FUNC(evtTot_SpawnUpDownEffect, -2, LW(5))
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_CONDITION_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            
+            // Wait a bit, then jump again before attacking.
+            WAIT_MSEC(1000)
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
+            USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
+            USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+        END_IF()
     END_IF()
     
     USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
@@ -365,15 +383,32 @@ EVT_END()
 
 EVT_BEGIN(unitBobOmb_wait_event_spark)
     USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_FuseLit, LW(15))
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_FuseLitSfx, LW(15))
     IF_EQUAL(LW(15), -1)
         USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_WAIT1"), EVT_NULLPTR, 0, LW(15))
-        USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FuseLit, LW(15))
+        USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FuseLitSfx, LW(15))
     END_IF()
     RETURN()
 EVT_END()
 
 EVT_BEGIN(unitBobOmb_attack_event)
+    // If Hyper Bob-omb, immediately light fuse and attack.
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(5))
+    IF_EQUAL(LW(5), (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB)
+        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_SPARK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_SetEventWait, -2, PTR(&unitBobOmb_wait_event_spark))
+        USER_FUNC(btlevtcmd_SetEventAttack, -2, PTR(&unitBobOmb_attack_event_spark))
+        USER_FUNC(btlevtcmd_SetEventDamage, -2, PTR(&unitBobOmb_damage_event_spark))
+        USER_FUNC(btlevtcmd_SetEventConfusion, -2, PTR(&unitBobOmb_attack_event_spark))
+        USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBobOmb_pose_table_angry))
+        USER_FUNC(btlevtcmd_OnPartsCounterAttribute, -2, 1, 8192)
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+        WAIT_MSEC(400)
+        
+        RUN_CHILD_EVT(PTR(&unitBobOmb_attack_event_spark))
+        RETURN()
+    END_IF()
+
     SET(LW(9), PTR(&unitBobOmb_weapon))
     USER_FUNC(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
     IF_NOT_EQUAL(LW(0), 0)
@@ -496,6 +531,7 @@ EVT_BEGIN(unitBobOmb_change_spark_event)
         USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBobOmb_pose_table_angry))
         USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 39)
         USER_FUNC(btlevtcmd_OnPartsCounterAttribute, -2, 1, 8192)
+        USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Angered, 1)
     END_IF()
 LBL(99)
     RETURN()
@@ -538,7 +574,8 @@ EVT_BEGIN(unitBobOmb_common_init_event)
     USER_FUNC(btlevtcmd_SetEventAttack, -2, PTR(&unitBobOmb_attack_event))
     USER_FUNC(btlevtcmd_SetEventDamage, -2, PTR(&unitBobOmb_damage_event))
     USER_FUNC(btlevtcmd_SetEventConfusion, -2, PTR(&unitBobOmb_attack_event))
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FuseLit, -1)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_FuseLitSfx, -1)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Angered, 0)
     USER_FUNC(btlevtcmd_SetRunSound, -2, PTR("SFX_ENM_BOMB_MOVE2"), PTR("SFX_ENM_BOMB_MOVE2"), 0, 4, 4)
     USER_FUNC(btlevtcmd_SetWalkSound, -2, PTR("SFX_ENM_BOMB_MOVE2"), PTR("SFX_ENM_BOMB_MOVE2"), 0, 10, 10)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
@@ -689,5 +726,23 @@ BattleUnitKind unit_HyperBobOmb = {
     .init_evt_code = (void*)unitHyperBobOmb_init_event,
     .data_table = unitBobOmb_data_table,
 };
+
+EVT_DEFINE_USER_FUNC(evtTot_SpawnUpDownEffect) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    id = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    
+    int32_t strength = evtGetValue(evt, evt->evtArguments[1]);
+    
+    float x, y, z;
+    ttyd::battle_unit::BtlUnit_GetPos(unit, &x, &y, &z);
+    y += 0.5f * ttyd::battle_unit::BtlUnit_GetHeight(unit);
+    z += 40.0f;
+    
+    ttyd::eff_updown::effUpdownEntry(x, y, z, 0, strength, 60);
+    
+    return 2;        
+}
 
 }  // namespace mod::tot::custom

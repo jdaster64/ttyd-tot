@@ -1798,6 +1798,7 @@
 80127890:BtlUnit_CheckRecoveryStatus
 80127bac:BtlUnit_SetStatus
 80127f34:BtlUnit_GetStatus
+80128414:BtlUnit_GetHeight
 80128524:BtlUnit_SetScale
 80128558:BtlUnit_GetScale
 801289ec:BtlUnit_GetHitPos
@@ -2534,6 +2535,7 @@
 // eff_updown.o
 // .text
 80193ce8:polygon
+801940a8:effUpdownEntry
 // .data
 80418560:icon_id
 

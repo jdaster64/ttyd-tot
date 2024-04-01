@@ -1429,15 +1429,17 @@ void SignalPlayerInitiatedPartySwitch() {
 }
 
 int32_t GetCurrentEnemyAtk(BattleWorkUnit* unit, int32_t reference_atk) {
+    bool should_scale = true;
     if (reference_atk < 0) {
         int32_t atk, def;
         tot::GetTattleDisplayStats(unit->current_kind, &atk, &def);
         reference_atk = atk;
+        should_scale = false;
     }
     return CalculateAtkImpl(
         unit, reference_atk, 
         /* sp flags */ AttackSpecialProperty_Flags::ALL_BUFFABLE,
-        /* should scale */ true, /* ice power? */ false);
+        should_scale, /* ice power? */ false);
 }
 
 int32_t GetCurrentEnemyDef(BattleWorkUnit* unit) {

@@ -532,7 +532,7 @@ void BtlUnit_GetStatus(
 // BtlUnit_GetPartsOffsetPos
 // BtlUnit_SetOffsetPos
 // BtlUnit_SetHeight
-// BtlUnit_GetHeight
+int32_t BtlUnit_GetHeight(BattleWorkUnit* unit);
 // BtlUnit_GetWidth
 // BtlUnit_AddPartsScale
 // BtlUnit_SetPartsScale

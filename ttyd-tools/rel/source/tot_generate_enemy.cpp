@@ -120,7 +120,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_Paratroopa, 1, 243, 0x08, 11, 14, 7, 2, 2, 0, 4, 8, 0, 0, 40, 50 },
     { &custom::unit_Fuzzy, 1, 248, 0x10, 47, 11, 5, 0, 1, 0, 2, -1, 0, 0, 0, 0 },
     { &custom::unit_DullBones, 1, 39, 0x0e, 20, 7, 5, 1, 1, 1, 2, 4, 0, 0, 0, 0 },
-    { &custom::unit_HyperBobOmb, 0, 238, 0x04, 78, 15, 8, 2, 1, 1, 7, 9, 1, 2, 0, 0 },
+    { &custom::unit_HyperBobOmb, 0, 238, 0x04, 78, 15, 7, 2, 2, 0, 7, 9, 1, 2, 0, 0 },
     { &custom::unit_Bristle, 1, 258, 0x17, 75, 6, 6, 4, 1, 0, 4, -1, 0, 1, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -1141,6 +1141,20 @@ bool GetEnemyStats(
     }
     
     return true;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetEnemyStats) {
+    int32_t unit_type = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t base_atk = evtGetValue(evt, evt->evtArguments[6]);
+    int32_t hp, atk, def, level, coinlvl;
+    GetEnemyStats(unit_type, &hp, &atk, &def, &level, &coinlvl, base_atk);
+    
+    evtSetValue(evt, evt->evtArguments[1], hp);
+    evtSetValue(evt, evt->evtArguments[2], atk);
+    evtSetValue(evt, evt->evtArguments[3], def);
+    evtSetValue(evt, evt->evtArguments[4], level);
+    evtSetValue(evt, evt->evtArguments[5], coinlvl);
+    return 2;
 }
 
 int32_t GetBattleRewardTier() {
