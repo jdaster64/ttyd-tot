@@ -25,7 +25,6 @@ namespace MsgKey {
         MSG_JON_KANBAN_3,
         MSG_JON_MOVER_SELECT,
         RIPPO_TOP_MENU,
-        TIK_06_02,
         ZZ_TEST_WIN_SELECT,
     };
 }
@@ -41,7 +40,6 @@ constexpr const char* kKeyLookups[] = {
     "msg_jon_kanban_3",
     "msg_jon_mover_select",
     "rippo_top_menu",
-    "tik_06_02",
     "zz_test_win_select",
 };
 
@@ -110,7 +108,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
     
     if (!found) return nullptr;
     
-    // TODO: Order of case statements shouldn't matter, but consider either
+    // Order of case statements shouldn't matter, but consider either
     // ordering them alphabetically or putting logically similar ones together?
     switch (idx) {
         case MsgKey::CUSTOM_TATTLE_BATTLE:
@@ -123,21 +121,11 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                    "of your play stats here!\n<k>";
         }
         case MsgKey::MSG_JON_KANBAN_3: {
-            sprintf(buf, "<kanban>\nYour seed: <col %sff>%s\n</col>"
-                "Currently selected options:\n<col 0000ffff>%s\n</col><k>",
+            sprintf(buf, "<kanban>\nYour seed: <col %sff>\n%s\n</col>"
+                "Currently selected options:\n<col 0000ffff>\n%s\n</col><k>",
                 GetYoshiTextColor(),
                 (const char*)ttyd::mariost::g_MarioSt->saveFileName, 
                 g_Mod->inf_state_.GetEncodedOptions());
-            return buf;
-        }
-        case MsgKey::TIK_06_02: {
-            sprintf(buf, "<kanban>\n"
-                "Thanks for playing the PM:TTYD\n"
-                "Infinite Pit mod! Check the \n"
-                "sign in back for your seed,\n<k><p>\n"
-                "and currently selected options.\n"
-                "If you want a random seed,\n"
-                "name your file \"random\" or \"\xde\".\n<k>");
             return buf;
         }
         case MsgKey::MSG_JON_MOVER_SELECT:

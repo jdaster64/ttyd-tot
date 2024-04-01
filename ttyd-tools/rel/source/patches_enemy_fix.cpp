@@ -169,7 +169,7 @@ void ReorderWeaponTargets() {
     auto& twork = ttyd::battle::g_BattleWork->weapon_targets_work;
     
     // If Trade Off, reorder targets so attacker (if present) is targeted last.
-    // TODO: Apply this change for any other weapons with similar issues.
+    // Apply this change for any other weapons with similar issues in the future.
     if (twork.weapon == &ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka) {
         if (twork.num_targets > 1) {
             for (int32_t i = 0; i < twork.num_targets - 1; ++i) {

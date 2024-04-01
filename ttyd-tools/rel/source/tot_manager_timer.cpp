@@ -59,7 +59,6 @@ void TimerManager::Draw() {
     mtx.m[0][3] = 120.0f;
     mtx.m[1][3] = -228.0f;
     
-    // TODO: Draw colons, use different sizes, etc.
     for (int32_t i = 0; i < 4; ++i) {
         float offset = i < 3 ? 20.0f : 16.0f;
         int32_t icon_base = i < 3 ? IconType::NUMBER_0 : IconType::NUMBER_0_SMALL;

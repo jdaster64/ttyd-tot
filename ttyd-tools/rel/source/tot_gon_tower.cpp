@@ -586,7 +586,7 @@ EVT_BEGIN(Tower_FinalBossEvent)
     END_INLINE()
     WAIT_MSEC(5000)
     
-    // TODO: Victory animation, results, ...
+    // TODO: Add victory animation, results, ...
     
     // Despawn partner.
     USER_FUNC(evt_mario_goodbye_party, 0)

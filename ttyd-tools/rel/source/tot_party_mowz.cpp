@@ -150,7 +150,6 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeTeaseWeapon) {
 }
 
 // Replaces vanilla logic for choosing items to steal.
-// TODO: Rework as appropriate for TOT.
 EVT_DECLARE_USER_FUNC(evtTot_GetKissThiefResult, 3)
 EVT_DEFINE_USER_FUNC(evtTot_GetKissThiefResult) {
     auto* battleWork = ttyd::battle::g_BattleWork;

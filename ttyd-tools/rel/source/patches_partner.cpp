@@ -365,7 +365,7 @@ void DisplayTattleStats(
     bool show_atk_def =
         (ttyd::swdrv::swGet(0x117a + unit->true_kind) ||
         ttyd::swdrv::swGet(0x117a + unit->current_kind));
-    // If cheat is enabled, force it to be on. (TODO: toggle on/off with Z?)
+    // If option is enabled, default to it being on (can toggle with Z).
     if (g_Mod->inf_state_.GetOptionNumericValue(OPT_SHOW_ATK_DEF) ||
         g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
         show_atk_def = true;

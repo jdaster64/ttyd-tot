@@ -72,7 +72,6 @@ extern "C" {
     void BranchBackToggleScopedAndCheckFreezeBreak();
     
     int32_t getActionCommandDifficulty() {
-        // TODO: Make this an option?
         return 3;
     }        
     void signalPlayerInitiatedPartySwitch(ttyd::battle_unit::BattleWorkUnit* unit) {
@@ -1013,9 +1012,9 @@ void ApplyFixedPatches() {
         ttyd::battle_ac::BattleActionCommandSetDifficulty,
         [](BattleWork* battleWork, BattleWorkUnit* unit, int32_t base) {
             // Replace original logic entirely.
-            // TODO: Make this an option?
-            battleWork->ac_manager_work.base_ac_difficulty = 3;
-            battleWork->ac_manager_work.ac_difficulty = 3;
+            int32_t difficulty = getActionCommandDifficulty();
+            battleWork->ac_manager_work.base_ac_difficulty = difficulty;
+            battleWork->ac_manager_work.ac_difficulty = difficulty;
         });
     // Override Action Command difficulty for guards.
     mod::patch::writeBranchPair(

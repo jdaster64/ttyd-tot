@@ -90,7 +90,6 @@ EVT_BEGIN(TowerNpc_CharlietonInit)
 EVT_END()
 
 // Talk script for Charlieton.
-// TODO: Add necessary dialogue to update_text_strings.
 EVT_BEGIN(TowerNpc_CharlietonTalk)
     USER_FUNC(evt_msg_print, 0, PTR("tot_charlieton_intro"), 0, PTR("me"))
     USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
@@ -101,7 +100,6 @@ EVT_BEGIN(TowerNpc_CharlietonTalk)
     USER_FUNC(evt_msg_continue)
 LBL(0)
     USER_FUNC(evt_win_coin_on, 0, LW(12))
-    // TODO: Custom window to account for different prices based on floor.
     USER_FUNC(evt_win_other_select, 
         (uint32_t)window_select::MenuType::TOT_CHARLIETON_SHOP)
     IF_EQUAL(LW(0), 0)

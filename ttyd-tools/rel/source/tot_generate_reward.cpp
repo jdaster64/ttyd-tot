@@ -537,7 +537,8 @@ EVT_BEGIN(Reward_PartnerOrMove)
         END_BROTHER()
         RUN_EVT_ID(Reward_PartnerFanfareEvt, LW(7))
         
-        // TODO: Move from evt_eff and system text to evt_sub_get_coin-like event?
+        // Could write custom evt_sub_get_coin-like event in the future,
+        // but this looks good enough as is.
         USER_FUNC(
             evt_eff, PTR("sub_bg"), PTR("itemget"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         USER_FUNC(evt_msg_toge, 1, 0, 0, 0)
@@ -833,7 +834,8 @@ void SelectChestContents() {
 
 // Selects the contents of the chests.
 EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
-    // TODO: Set positions based on Mario's current position?
+    // Could set positions based on Mario's current position, but final maps
+    // will probably have them behind a gate, so they wouldn't be in the way.
     const gc::vec3 positions[] = {
         { 0.0, 0.0, -100.0 },
         { -80.0, 0.0, -100.0 },

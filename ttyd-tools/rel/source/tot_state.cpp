@@ -58,7 +58,7 @@ void ComputeChecksum(TotSaveSlot& save) {
 
 // Loading / saving functions.
 bool StateManager::Load(TotSaveSlot* save) {
-    // TODO: Compatibility check to make sure ToT data is valid before loading.
+    // TODO: Check version to make sure ToT data is valid before loading.
     memcpy(this, &save->data.tot_state, sizeof(StateManager));
     
     auto* mariost = ttyd::mariost::g_MarioSt;
@@ -98,7 +98,7 @@ bool StateManager::Load(TotSaveSlot* save) {
     mariost->bDvdHasError = 0;
     mariost->lastFrameRetraceTime = gc::OSTime::OSGetTime();
     
-    // TODO: Only do this if not loading from backup?
+    // TODO: Is this required if loading from a hard save?
     // strcpy(mariost->currentAreaName, "123");
     // mariost->pRelFileBase = nullptr;
     
@@ -120,6 +120,8 @@ bool StateManager::Load(TotSaveSlot* save) {
     // Restore the previous active partner (or none).
     player->prevFollowerId[0] = mariost->saveParty0Id;
     player->prevFollowerId[1] = mariost->saveParty1Id;
+    
+    // TODO: Add 1 to number of continues.
     
     return true;
 }

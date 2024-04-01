@@ -914,8 +914,6 @@ void BuildBattle(
                 break;
         }
     }
-    
-    // TODO: Special setup for boss floors.
 
     NpcSetupInfo& npc = npc_setup_info[0];
     memset(&npc, 0, sizeof(NpcSetupInfo));
@@ -1005,7 +1003,8 @@ void BuildBattle(
     if (state.IsFinalBossFloor()) {
         battle->music_name = "BGM_BOSS_STG1_GONBABA1";
     } else if (state.floor_ == 32) {
-        battle->music_name = "BGM_BOSS_STG4_RUNPELL1";  // "BGM_CHUBOSS_BATTLE1"
+        battle->music_name = "BGM_BOSS_STG4_RUNPELL1";
+        // "BGM_CHUBOSS_BATTLE1" = regular midboss theme, I prefer Doopliss's.
     } else if (IsMidbossFloor(state.floor_)) {
         battle->music_name = "BGM_KOBOSS_BATTLE1";
     } else {
@@ -1018,6 +1017,8 @@ void BuildBattle(
     } else {
         battle->battle_setup_flags &= ~0x10;
     }
+    
+    // TODO: Additional setup (different stage props, etc.) for boss floors?
 }
 
 }  // namespace
