@@ -10,6 +10,7 @@ ttyd-tools/rel/*symbols.txt
 ttyd-tools/rel/*.elf
 ttyd-tools/rel/*.gci
 ttyd-tools/rel/*.rel
+ttyd-tools/rel/.vscode/*
 
 # User-specific files
 *.suo
