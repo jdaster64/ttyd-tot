@@ -82,6 +82,11 @@ void SetBaseStats() {
 }
 
 void OptionsManager::InitLobby() {
+    // Un-obfuscate items if previously enabled.
+    if (g_Mod->state_.GetOption(tot::OPT_OBFUSCATE_ITEMS)) {
+        ObfuscateItems(false);
+    }
+
     g_Mod->state_.InitDefaultOptions();
     
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
@@ -110,17 +115,8 @@ void OptionsManager::InitLobby() {
     ttyd::mario_pouch::pouchGetItem(ItemType::W_EMBLEM);
     ttyd::mario_pouch::pouchGetItem(ItemType::L_EMBLEM);
     
-    // Start with FX badges equipped if InfPit option is set.
-    if (g_Mod->inf_state_.GetOptionNumericValue(infinite_pit::OPT_START_WITH_FX)) {
-        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_P);
-        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_G);
-        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_B);
-        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_Y);
-        ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_R);
-    }
-    
     // Assign Yoshi a totally random color.
-    ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->inf_state_.Rand(7));
+    ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));
     
     // Assign Peekaboo and Timing Tutor (for testing; might make optional).
     ttyd::mario_pouch::pouchGetItem(ItemType::TIMING_TUTOR);
@@ -136,6 +132,7 @@ void OptionsManager::InitLobby() {
     
     // Set run to not having started.
     g_Mod->state_.SetOption(OPT_RUN_STARTED, 0);
+    g_Mod->state_.SetOption(OPT_DEBUG_MODE_USED, 0);
 }
 
 void OptionsManager::InitFromSelectedOptions() {
@@ -175,9 +172,29 @@ void OptionsManager::InitFromSelectedOptions() {
         }
     }
     
+    // Start with Merlee curse, if enabled.
+    // TODO: Make ToT Merlee unable to buff EXP gain.
+    if (state.GetOption(tot::OPT_MERLEE_CURSE)) {
+        pouch.merlee_curse_uses_remaining = 99;
+        pouch.turns_until_merlee_activation = -1;
+    } else {
+        pouch.merlee_curse_uses_remaining = 0;
+        pouch.turns_until_merlee_activation = 0;
+    }
+
+    ApplyOptionsOnLoad();
+    
     // Start timers and mark run as started.
     state.SetOption(OPT_RUN_STARTED, 1);
     state.TimerStart();
+}
+
+void OptionsManager::ApplyOptionsOnLoad() {
+    // Force item obfuscation, if enabled.
+    if (g_Mod->state_.GetOption(tot::OPT_OBFUSCATE_ITEMS)) {
+        g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION] = 0;
+        ObfuscateItems(true);
+    }
 }
 
 void OptionsManager::UpdateLevelupStats() {

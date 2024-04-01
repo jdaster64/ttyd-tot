@@ -1,8 +1,6 @@
 #include "patches_field_start.h"
 
 #include "common_types.h"
-#include "custom_chest_reward.h"
-#include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
@@ -82,7 +80,7 @@ EVT_END()
 
 EVT_DEFINE_USER_FUNC(CheckHasSaved) {
     if (g_ReadyForPitSaveWrite &&
-        !g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN)) {
+        !g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_HAS_STARTED_RUN)) {
         // If save already declined, return true.
         ttyd::evtmgr_cmd::evtSetValue(evt, evt->evtArguments[0], true);
     } else {
@@ -100,12 +98,12 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
     PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
     // Initialize number of upgrades per partner.
-    const int32_t starting_rank = state.GetOptionNumericValue(OPT_PARTNER_RANK);
+    const int32_t starting_rank = state.GetOptionNumericValue(INF_OPT_PARTNER_RANK);
     for (int32_t i = 0; i < 7; ++i) {
         state.partner_upgrades_[i] = starting_rank;
     }
-    switch (state.GetOptionValue(OPT_PARTNERS_OBTAINED)) {
-        case OPTVAL_PARTNERS_ALL_START: {
+    switch (state.GetOptionValue(INF_OPT_PARTNERS_OBTAINED)) {
+        case INF_OPTVAL_PARTNERS_ALL_START: {
             // Enable and initialize all partners.
             for (int32_t i = 1; i <= 7; ++i) {
                 evt->evtArguments[0] = i;
@@ -123,9 +121,10 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
             // replaced with extra Shine Sprites.
             break;
         }
-        case OPTVAL_PARTNERS_ONE_START: {
+        case INF_OPTVAL_PARTNERS_ONE_START: {
             // Enable and initialize a random partner.
-            int32_t starting_partner = -PickPartnerReward();
+            // DEPRECATED: Set to Goombella always.
+            int32_t starting_partner = 1;
             evt->evtArguments[0] = starting_partner;
             ttyd::evt_pouch::evt_pouch_party_join(evt, isFirstCall);
             partner::InitializePartyMember(evt, isFirstCall);
@@ -138,17 +137,17 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
             ttyd::evt_mario::evt_mario_set_party_pos(evt, isFirstCall);
             break;
         }
-        case OPTVAL_PARTNERS_NEVER: {
+        case INF_OPTVAL_PARTNERS_NEVER: {
             // See if the player selected a single starting partner.
             int32_t first_partner = 0;
-            switch (state.GetOptionValue(OPT_FIRST_PARTNER)) {
-                case OPTVAL_GOOMBELLA_FIRST:    first_partner = 1; break;
-                case OPTVAL_KOOPS_FIRST:        first_partner = 2; break;
-                case OPTVAL_FLURRIE_FIRST:      first_partner = 5; break;
-                case OPTVAL_YOSHI_FIRST:        first_partner = 4; break;
-                case OPTVAL_VIVIAN_FIRST:       first_partner = 6; break;
-                case OPTVAL_BOBBERY_FIRST:      first_partner = 3; break;
-                case OPTVAL_MS_MOWZ_FIRST:      first_partner = 7; break;
+            switch (state.GetOptionValue(INF_OPT_FIRST_PARTNER)) {
+                case INF_OPTVAL_GOOMBELLA_FIRST:    first_partner = 1; break;
+                case INF_OPTVAL_KOOPS_FIRST:        first_partner = 2; break;
+                case INF_OPTVAL_FLURRIE_FIRST:      first_partner = 5; break;
+                case INF_OPTVAL_YOSHI_FIRST:        first_partner = 4; break;
+                case INF_OPTVAL_VIVIAN_FIRST:       first_partner = 6; break;
+                case INF_OPTVAL_BOBBERY_FIRST:      first_partner = 3; break;
+                case INF_OPTVAL_MS_MOWZ_FIRST:      first_partner = 7; break;
             }
             if (first_partner) {
                 evt->evtArguments[0] = first_partner;
@@ -174,15 +173,15 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
     }
     
     // Set up starting item inventory.
-    switch (state.GetOptionValue(OPT_STARTER_ITEMS)) {
-        case OPTVAL_STARTER_ITEMS_BASIC: {
+    switch (state.GetOptionValue(INF_OPT_STARTER_ITEMS)) {
+        case INF_OPTVAL_STARTER_ITEMS_BASIC: {
             ttyd::mario_pouch::pouchGetItem(ItemType::THUNDER_BOLT);
             ttyd::mario_pouch::pouchGetItem(ItemType::FIRE_FLOWER);
             ttyd::mario_pouch::pouchGetItem(ItemType::HONEY_SYRUP);
             ttyd::mario_pouch::pouchGetItem(ItemType::MUSHROOM);
             break;
         }
-        case OPTVAL_STARTER_ITEMS_STRONG: {
+        case INF_OPTVAL_STARTER_ITEMS_STRONG: {
             ttyd::mario_pouch::pouchGetItem(ItemType::LIFE_SHROOM);
             ttyd::mario_pouch::pouchGetItem(ItemType::CAKE);
             ttyd::mario_pouch::pouchGetItem(ItemType::THUNDER_RAGE);
@@ -191,13 +190,14 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
             ttyd::mario_pouch::pouchGetItem(ItemType::SUPER_SHROOM);
             break;
         }
-        case OPTVAL_STARTER_ITEMS_RANDOM: {
+        case INF_OPTVAL_STARTER_ITEMS_RANDOM: {
             // Set sequence forward so the items won't be the same as floor 1's.
-            state.rng_sequences_[RNG_ITEM] = 100;
+            state.rng_sequences_[INF_RNG_ITEM] = 100;
             // Give 4 to 6 random items, based on the seed.
-            int32_t num_items = state.Rand(3, RNG_ITEM) + 4;
+            int32_t num_items = state.Rand(3, INF_RNG_ITEM) + 4;
             for (int32_t i = 0; i < num_items; ++i) {
-                int32_t item_type = PickRandomItem(RNG_ITEM, 10, 5, 0, 0);
+                // DEPRECATED: Deleted custom_item.h.
+                int32_t item_type = ItemType::MUSHROOM;
                 ttyd::mario_pouch::pouchGetItem(item_type);
             }
             break;
@@ -205,14 +205,14 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
     }
     
     // Start with 99 BP if using either variant of no-EXP mode.
-    if (state.GetOptionNumericValue(OPT_NO_EXP_MODE)) {
+    if (state.GetOptionNumericValue(INF_OPT_NO_EXP_MODE)) {
         pouch.level = 99;
         pouch.unallocated_bp += 90;
         pouch.total_bp += 90;
     }
     
     // Start with Merlee curse, if enabled.
-    if (state.GetOptionNumericValue(OPT_MERLEE_CURSE)) {
+    if (state.GetOptionNumericValue(INF_OPT_MERLEE_CURSE)) {
         pouch.merlee_curse_uses_remaining = 99;
         pouch.turns_until_merlee_activation = -1;
     } else {
@@ -221,7 +221,7 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
     }
     
     // Start at max stage-rank, if enabled.
-    if (state.CheckOptionValue(OPTVAL_STAGE_RANK_ALWAYSMAX)) {
+    if (state.CheckOptionValue(INF_OPTVAL_STAGE_RANK_ALWAYSMAX)) {
         ttyd::mario_pouch::pouchGetPtr()->rank = 3;
     }
     
@@ -237,8 +237,8 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
     
     // Set the 'run started' flag to true, and start the run timer, if the
     // player didn't choose to save.
-    if (!state.GetOptionNumericValue(OPT_HAS_STARTED_RUN)) {
-        state.SetOption(OPT_HAS_STARTED_RUN, true);
+    if (!state.GetOptionNumericValue(INF_OPT_HAS_STARTED_RUN)) {
+        state.SetOption(INF_OPT_HAS_STARTED_RUN, true);
         g_Mod->inf_state_.SaveCurrentTime(/* pit_start = */ true);
     }
     
@@ -249,7 +249,7 @@ EVT_DEFINE_USER_FUNC(InitOptionsOnPitEntry) {
 
 // Increments the randomly selected Yoshi color & marks it as manually changed.
 EVT_DEFINE_USER_FUNC(IncrementYoshiColor) {
-    g_Mod->inf_state_.SetOption(OPT_YOSHI_COLOR_SELECT, true);
+    g_Mod->inf_state_.SetOption(INF_OPT_YOSHI_COLOR_SELECT, true);
     int32_t color = ttyd::mario_pouch::pouchGetPartyColor(4);
     ttyd::mario_pouch::pouchSetPartyColor(4, (color + 1) % 7);
     return 2;
@@ -266,7 +266,7 @@ void ApplyFixedPatches() {
                 g_AttemptingPitSaveWrite = true;
                 g_Mod->inf_state_.SaveCurrentTime(/* pit_start = */ true);
                 // Mark run as "started", assuming the save will succeed.
-                g_Mod->inf_state_.SetOption(OPT_HAS_STARTED_RUN, true);
+                g_Mod->inf_state_.SetOption(INF_OPT_HAS_STARTED_RUN, true);
                 // Copy state to save file location.
                 g_Mod->inf_state_.Save();
             }
@@ -292,7 +292,7 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
     g_ReadyForPitSaveWrite = false;
     g_AttemptingPitSaveWrite = false;
     g_SuccessfullySaved =
-        g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN);
+        g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_HAS_STARTED_RUN);
     
     if (module_id != ModuleId::TIK || !module_ptr) return;
     const uint32_t module_start = reinterpret_cast<uint32_t>(module_ptr);

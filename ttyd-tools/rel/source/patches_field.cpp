@@ -2,8 +2,6 @@
 
 #include "common_functions.h"
 #include "common_types.h"
-#include "custom_chest_reward.h"
-#include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
@@ -612,13 +610,13 @@ EVT_END()
 
 // Returns the number of chest rewards to spawn based on the floor number.
 EVT_DEFINE_USER_FUNC(GetNumChestRewards) {
-    int32_t num_rewards = g_Mod->inf_state_.GetOptionNumericValue(OPT_CHEST_REWARDS);
+    int32_t num_rewards = g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_CHEST_REWARDS);
     if (num_rewards > 0) {
         // Add a bonus reward for beating a boss (Atomic Boo or Bonetail).
         if (g_Mod->inf_state_.floor_ % 50 == 49) ++num_rewards;
     } else {
         // Pick a number of rewards randomly from 1 ~ 7.
-        num_rewards = g_Mod->inf_state_.Rand(7, RNG_CHEST) + 1;
+        num_rewards = g_Mod->inf_state_.Rand(7, INF_RNG_CHEST) + 1;
     }
     evtSetValue(evt, evt->evtArguments[0], num_rewards);
     return 2;
@@ -626,13 +624,14 @@ EVT_DEFINE_USER_FUNC(GetNumChestRewards) {
 
 // Returns the item or partner to spawn from the chest on a Pit reward floor.
 EVT_DEFINE_USER_FUNC(GetChestReward) {
-    evtSetValue(evt, evt->evtArguments[0], PickChestReward());
+    // DEPRECATED: Deleted custom_chest_reward.
+    evtSetValue(evt, evt->evtArguments[0], ItemType::QUICK_CHANGE);
     return 2;
 }
 
 // Fully heals the player's party.
 EVT_DEFINE_USER_FUNC(FullyHealParty) {
-    if (!g_Mod->inf_state_.GetOptionNumericValue(OPT_DISABLE_CHEST_HEAL)) {
+    if (!g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_DISABLE_CHEST_HEAL)) {
         PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
         pouch.current_hp = pouch.max_hp;
         pouch.current_fp = pouch.max_fp;
@@ -677,7 +676,7 @@ EVT_DEFINE_USER_FUNC(IncrementInfinitePitFloor) {
         gsw_floor += ((actual_floor / 10) % 10 == 9) ? 90 : 80;
     }
     ttyd::swdrv::swByteSet(1321, gsw_floor);
-    if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_STAGE_RANK_30_FLOORS)) {
+    if (g_Mod->inf_state_.CheckOptionValue(INF_OPTVAL_STAGE_RANK_30_FLOORS)) {
         // Set stage rank based on passing floors 30, 60, 90.
         int32_t rank = 0;
         if (actual_floor >= 90) {
@@ -691,12 +690,12 @@ EVT_DEFINE_USER_FUNC(IncrementInfinitePitFloor) {
     }
     if (inc > 1) {
         // If more than one floor incremented, a Mover must have been used.
-        g_Mod->inf_state_.ChangeOption(STAT_MOVERS_USED, 1);
+        g_Mod->inf_state_.ChangeOption(INF_STAT_MOVERS_USED, 1);
         // Track how many battles were skipped by taking a Mover.
         // Ignore the current floor, as well as a rest floor if one was passed.
         int32_t skipped_battles = inc - 1;
         if (actual_floor % 10 < inc) --skipped_battles;
-        g_Mod->inf_state_.ChangeOption(STAT_BATTLES_SKIPPED, skipped_battles);
+        g_Mod->inf_state_.ChangeOption(INF_STAT_BATTLES_SKIPPED, skipped_battles);
     }
     return 2;
 }
@@ -729,9 +728,9 @@ EVT_DEFINE_USER_FUNC(AddItemStarPower) {
         
         // Check whether to show the Star Power level tutorial.
         if (g_Mod->inf_state_.GetStarPowerLevel(star_power_type) > 1 &&
-            !g_Mod->inf_state_.GetOptionNumericValue(OPT_SEEN_MOVE_LEVEL_TUT)) {
+            !g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_SEEN_MOVE_LEVEL_TUT)) {
             evtSetValue(evt, evt->evtArguments[1], 1);
-            g_Mod->inf_state_.SetOption(OPT_SEEN_MOVE_LEVEL_TUT, true);
+            g_Mod->inf_state_.SetOption(INF_OPT_SEEN_MOVE_LEVEL_TUT, true);
         }
     }
     return 2;
@@ -740,16 +739,16 @@ EVT_DEFINE_USER_FUNC(AddItemStarPower) {
 EVT_DEFINE_USER_FUNC(CheckChetRippoSpawn) {
     uint32_t floor = g_Mod->inf_state_.floor_ + 1;
     bool can_spawn = floor % 10 == 0 && floor % 100 != 0;
-    switch (g_Mod->inf_state_.GetOptionValue(OPT_CHET_RIPPO_APPEARANCE)) {
-        case OPTVAL_CHET_RIPPO_GUARANTEE: {
+    switch (g_Mod->inf_state_.GetOptionValue(INF_OPT_CHET_RIPPO_APPEARANCE)) {
+        case INF_OPTVAL_CHET_RIPPO_GUARANTEE: {
             break;
         }
-        case OPTVAL_CHET_RIPPO_RANDOM: {
+        case INF_OPTVAL_CHET_RIPPO_RANDOM: {
             // Chance of spawning is higher the farther you progress into the
             // Pit, capping at 75% per reward floor.
             if (can_spawn) {
                 if (floor > 75) floor = 75;
-                can_spawn = g_Mod->inf_state_.Rand(100, RNG_CHET_RIPPO) < floor;
+                can_spawn = g_Mod->inf_state_.Rand(100, INF_RNG_CHET_RIPPO) < floor;
             }
             break;
         }
@@ -763,7 +762,7 @@ EVT_DEFINE_USER_FUNC(CheckMoverSpawn) {
     evtSetValue(evt, evt->evtArguments[0], false);
     
     // If Movers are disabled, they cannot spawn.
-    if (!g_Mod->inf_state_.GetOptionNumericValue(OPT_MOVERS_ENABLED)) return 2;
+    if (!g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_MOVERS_ENABLED)) return 2;
     
     uint32_t floor = g_Mod->inf_state_.floor_ + 1;
     // Cannot spawn on rest floors.
@@ -782,9 +781,9 @@ EVT_DEFINE_USER_FUNC(CheckMoverSpawn) {
     // TTYD, without allowing them to appear in quick succession if skipped.
     
     // Failed the RNG check for this floor.
-    if (g_Mod->inf_state_.Rand(100, RNG_MOVER) >= 10) return 2;
+    if (g_Mod->inf_state_.Rand(100, INF_RNG_MOVER) >= 10) return 2;
     for (int32_t i = 0; i < 5; ++i) {
-        if (g_Mod->inf_state_.Rand(100, RNG_MOVER) < 10) {
+        if (g_Mod->inf_state_.Rand(100, INF_RNG_MOVER) < 10) {
             // Passed the RNG check for a recent prior floor.
             return 2;
         }
@@ -792,14 +791,14 @@ EVT_DEFINE_USER_FUNC(CheckMoverSpawn) {
 
     // A Mover should spawn; mark one battle skipped automatically (this floor).
     evtSetValue(evt, evt->evtArguments[0], true);
-    g_Mod->inf_state_.ChangeOption(STAT_BATTLES_SKIPPED, 1);
+    g_Mod->inf_state_.ChangeOption(INF_STAT_BATTLES_SKIPPED, 1);
     return 2;
 }
 
 // Returns whether any stat upgrades can be sold.
 EVT_DEFINE_USER_FUNC(CheckAnyStatsDowngradeable) {
     bool can_downgrade = ttyd::mario_pouch::pouchGetPtr()->level > 1 &&
-        !g_Mod->inf_state_.GetOptionNumericValue(OPT_NO_EXP_MODE);
+        !g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_NO_EXP_MODE);
     evtSetValue(evt, evt->evtArguments[0], can_downgrade);
     return 2;
 }
@@ -855,9 +854,9 @@ EVT_DEFINE_USER_FUNC(DowngradeStat) {
 // Tracks item / badge / level sold actions in play stats.
 EVT_DEFINE_USER_FUNC(TrackChetRippoSellActionType) {
     switch (evtGetValue(evt, evt->evtArguments[0])) {
-        case 0:     g_Mod->inf_state_.ChangeOption(STAT_ITEMS_SOLD);    break;
-        case 1:     g_Mod->inf_state_.ChangeOption(STAT_BADGES_SOLD);   break;
-        case 2:     g_Mod->inf_state_.ChangeOption(STAT_LEVELS_SOLD);   break;
+        case 0:     g_Mod->inf_state_.ChangeOption(INF_STAT_ITEMS_SOLD);    break;
+        case 1:     g_Mod->inf_state_.ChangeOption(INF_STAT_BADGES_SOLD);   break;
+        case 2:     g_Mod->inf_state_.ChangeOption(INF_STAT_LEVELS_SOLD);   break;
     }
     return 2;
 }
@@ -999,15 +998,15 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
     
     // Reset RNG states that reset every floor.
     StateManager_v2& state = g_Mod->inf_state_;
-    state.rng_sequences_[RNG_CHEST] = 0;
-    state.rng_sequences_[RNG_ENEMY] = 0;
-    state.rng_sequences_[RNG_ITEM] = 0;
-    state.rng_sequences_[RNG_CONDITION] = 0;
-    state.rng_sequences_[RNG_CONDITION_ITEM] = 0;
-    state.rng_sequences_[RNG_CHET_RIPPO] = 0;
+    state.rng_sequences_[INF_RNG_CHEST] = 0;
+    state.rng_sequences_[INF_RNG_ENEMY] = 0;
+    state.rng_sequences_[INF_RNG_ITEM] = 0;
+    state.rng_sequences_[INF_RNG_CONDITION] = 0;
+    state.rng_sequences_[INF_RNG_CONDITION_ITEM] = 0;
+    state.rng_sequences_[INF_RNG_CHET_RIPPO] = 0;
         
     // Clear current floor turn count.
-    state.SetOption(STAT_MOST_TURNS_CURRENT, 0);
+    state.SetOption(INF_STAT_MOST_TURNS_CURRENT, 0);
     
     // Apply custom logic to box opening event to allow spawning partners.
     mod::patch::writePatch(
@@ -1078,11 +1077,11 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
             }
         }
         // Enable "P" badges only after obtaining the first one.
-        state.SetOption(OPT_ENABLE_P_BADGES, has_partner);
+        state.SetOption(INF_OPT_ENABLE_P_BADGES, has_partner);
         // Only one partner / upgrade reward each allowed per reward floor,
         // re-enable them for the next reward floor.
-        state.SetOption(OPT_ENABLE_UPGRADE_REWARD, true);
-        state.SetOption(OPT_ENABLE_PARTNER_REWARD, true);
+        state.SetOption(INF_OPT_ENABLE_UPGRADE_REWARD, true);
+        state.SetOption(INF_OPT_ENABLE_PARTNER_REWARD, true);
     } else if (state.floor_ % 100 == 99) {
         // If Bonetail floor, patch in the Mario-alone variant of the
         // battle entry event if partners are not available.

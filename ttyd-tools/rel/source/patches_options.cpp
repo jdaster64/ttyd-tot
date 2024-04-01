@@ -1,10 +1,10 @@
 #include "patches_options.h"
 
 #include "common_functions.h"
-#include "custom_item.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
+#include "tot_generate_item.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_actrecord.h>
@@ -99,7 +99,6 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 }
 
 // Function hooks.
-extern void (*g_pouchReviseMarioParam_trampoline)();
 extern int32_t (*g_btlevtcmd_WeaponAftereffect_trampoline)(EvtEntry*, bool);
 extern void (*g_BattleAudienceSetThrowItemMax_trampoline)();
 // Patch addresses.
@@ -144,20 +143,20 @@ void ApplyFixedPatches() {
             
             // Get the percentage to scale original chances by.
             int32_t scale = 100;
-            switch (g_Mod->inf_state_.GetOptionValue(OPT_STAGE_HAZARDS)) {
-                case OPTVAL_STAGE_HAZARDS_HIGH: {
+            switch (g_Mod->state_.GetOptionValue(tot::OPT_STAGE_HAZARDS)) {
+                case tot::OPTVAL_STAGE_HAZARDS_HIGH: {
                     scale = 250;
                     break;
                 }
-                case OPTVAL_STAGE_HAZARDS_LOW: {
+                case tot::OPTVAL_STAGE_HAZARDS_LOW: {
                     scale = 50;
                     break;
                 }
-                case OPTVAL_STAGE_HAZARDS_OFF: {
+                case tot::OPTVAL_STAGE_HAZARDS_OFF: {
                     scale = 0;
                     break;
                 }
-                case OPTVAL_STAGE_HAZARDS_NO_FOG: {
+                case tot::OPTVAL_STAGE_HAZARDS_NO_FOG: {
                     // If stage jets are uninitialized or fog-type jets,
                     // make them unable to fire.
                     if (battleWork->stage_hazard_work.current_stage_jet_type
@@ -202,23 +201,12 @@ void ApplyFixedPatches() {
     g_BattleAudienceSetThrowItemMax_trampoline = mod::patch::hookFunction(
         ttyd::battle_audience::BattleAudienceSetThrowItemMax, [](){
             g_BattleAudienceSetThrowItemMax_trampoline();
-            if (g_Mod->inf_state_.GetOptionNumericValue(
-                OPT_AUDIENCE_RANDOM_THROWS)) {
+            if (g_Mod->state_.GetOption(tot::OPT_AUDIENCE_RANDOM_THROWS)) {
                 // Always set 'max thrown items' value to 1.
                 uintptr_t audience_work_base =
                     reinterpret_cast<uintptr_t>(
                         ttyd::battle::g_BattleWork->audience_work);
                 *reinterpret_cast<int32_t*>(audience_work_base + 0x137f4) = 1;
-            }
-        });
-    
-    // Apply patch to give the player infinite BP if enabled.
-    g_pouchReviseMarioParam_trampoline = mod::patch::hookFunction(
-        ttyd::mario_pouch::pouchReviseMarioParam, [](){
-            g_pouchReviseMarioParam_trampoline();
-            if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_NO_EXP_MODE_INFINITE) &&
-                !strcmp(GetCurrentArea(), "jon")) {
-                ttyd::mario_pouch::pouchGetPtr()->unallocated_bp = 99;
             }
         });
         
@@ -309,21 +297,7 @@ void ApplyFixedPatches() {
 }
 
 void ApplySettingBasedPatches() {
-    // Change stage rank-up levels (set to 100 to force no rank-up on level-up).
-    auto* rankup_data = ttyd::battle_seq_end::_rank_up_data;
-    switch (g_Mod->inf_state_.GetOptionValue(OPT_STAGE_RANK)) {
-        case OPTVAL_STAGE_RANK_30_FLOORS:
-        case OPTVAL_STAGE_RANK_ALWAYSMAX: {
-            rankup_data[1].level = 100;
-            rankup_data[2].level = 100;
-            rankup_data[3].level = 100;
-            break;
-        }
-    }
-    
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_OBFUSCATE_ITEMS)) {
-        ObfuscateItems(true);
-    }
+    // TODO: delete.
 }
 
 int32_t GetPinchThresholdForMaxHp(int32_t max_hp, bool peril) {
@@ -346,11 +320,11 @@ void SetPinchThreshold(BattleUnitKind* kind, int32_t max_hp, bool peril) {
 }
 
 int32_t GetRandomAudienceItem(int32_t item_type) {
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_AUDIENCE_RANDOM_THROWS)) {
-        item_type = PickRandomItem(RNG_AUDIENCE_ITEM, 20, 10, 5, 15);
+    if (g_Mod->state_.GetOption(tot::OPT_AUDIENCE_RANDOM_THROWS)) {
+        item_type = PickRandomItem(tot::RNG_AUDIENCE_ITEM, 20, 10, 5, 15);
         if (item_type <= 0) {
             // Pick a coin, heart, flower, or random bad item if "none" selected.
-            switch (g_Mod->inf_state_.Rand(10, RNG_AUDIENCE_ITEM)) {
+            switch (g_Mod->state_.Rand(10, tot::RNG_AUDIENCE_ITEM)) {
                 case 0:  return ItemType::AUDIENCE_CAN;
                 case 1:  return ItemType::AUDIENCE_ROCK;
                 case 2:  return ItemType::AUDIENCE_BONE;

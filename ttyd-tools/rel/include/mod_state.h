@@ -114,152 +114,152 @@ static_assert(sizeof(StateManager_v2) <= 0x120);
 enum Options_v2 {
     // Non-cosmetic (menu-visible) flag-based options.
     // How many rewards are obtained per chest (1 to 7, or 0 = random).
-    OPT_CHEST_REWARDS           = 0x1'00'4'8'008,
-    OPTVAL_CHEST_REWARDS_RANDOM = 0x2'00'4'8'000,
+    INF_OPT_CHEST_REWARDS           = 0x1'00'4'8'008,
+    INF_OPTVAL_CHEST_REWARDS_RANDOM = 0x2'00'4'8'000,
     // If enabled, Mario starts at level 99 with base HP/FP and 99/Infinite BP.
-    OPT_NO_EXP_MODE             = 0x1'04'2'0'003,
-    OPTVAL_NO_EXP_MODE_OFF      = 0x2'04'2'0'000,
-    OPTVAL_NO_EXP_MODE_ON       = 0x2'04'2'0'001,
-    OPTVAL_NO_EXP_MODE_INFINITE = 0x2'04'2'0'002,
+    INF_OPT_NO_EXP_MODE             = 0x1'04'2'0'003,
+    INF_OPTVAL_NO_EXP_MODE_OFF      = 0x2'04'2'0'000,
+    INF_OPTVAL_NO_EXP_MODE_ON       = 0x2'04'2'0'001,
+    INF_OPTVAL_NO_EXP_MODE_INFINITE = 0x2'04'2'0'002,
     // How enemies hold / drop items, and whether there are challenges.
-    OPT_BATTLE_REWARD_MODE      = 0x1'06'2'8'004,
-    OPTVAL_DROP_STANDARD        = 0x2'06'2'8'000,   // 1 drop + bonus chance
-    OPTVAL_DROP_HELD_FROM_BONUS = 0x2'06'2'8'001,   // held drop from bonus
-    OPTVAL_DROP_NO_HELD_W_BONUS = 0x2'06'2'8'002,   // no held, only bonus
-    OPTVAL_DROP_ALL_HELD        = 0x2'06'2'8'003,   // all drop + bonus chance
+    INF_OPT_BATTLE_REWARD_MODE      = 0x1'06'2'8'004,
+    INF_OPTVAL_DROP_STANDARD        = 0x2'06'2'8'000,   // 1 drop + bonus chance
+    INF_OPTVAL_DROP_HELD_FROM_BONUS = 0x2'06'2'8'001,   // held drop from bonus
+    INF_OPTVAL_DROP_NO_HELD_W_BONUS = 0x2'06'2'8'002,   // no held, only bonus
+    INF_OPTVAL_DROP_ALL_HELD        = 0x2'06'2'8'003,   // all drop + bonus chance
     // How partners are obtained.
-    OPT_PARTNERS_OBTAINED       = 0x1'08'2'8'004,
-    OPTVAL_PARTNERS_ALL_REWARDS = 0x2'08'2'8'000,   // all from chest rewards
-    OPTVAL_PARTNERS_ONE_START   = 0x2'08'2'8'001,   // one at start, rest later
-    OPTVAL_PARTNERS_ALL_START   = 0x2'08'2'8'002,   // all at start
-    OPTVAL_PARTNERS_NEVER       = 0x2'08'2'8'003,   // no partner rewards
+    INF_OPT_PARTNERS_OBTAINED       = 0x1'08'2'8'004,
+    INF_OPTVAL_PARTNERS_ALL_REWARDS = 0x2'08'2'8'000,   // all from chest rewards
+    INF_OPTVAL_PARTNERS_ONE_START   = 0x2'08'2'8'001,   // one at start, rest later
+    INF_OPTVAL_PARTNERS_ALL_START   = 0x2'08'2'8'002,   // all at start
+    INF_OPTVAL_PARTNERS_NEVER       = 0x2'08'2'8'003,   // no partner rewards
     // Which rank partners start at.
-    OPT_PARTNER_RANK            = 0x1'0a'2'0'003,
-    OPTVAL_PARTNER_RANK_NORMAL  = 0x2'0a'2'0'000,
-    OPTVAL_PARTNER_RANK_SUPER   = 0x2'0a'2'0'001,
-    OPTVAL_PARTNER_RANK_ULTRA   = 0x2'0a'2'0'002,
+    INF_OPT_PARTNER_RANK            = 0x1'0a'2'0'003,
+    INF_OPTVAL_PARTNER_RANK_NORMAL  = 0x2'0a'2'0'000,
+    INF_OPTVAL_PARTNER_RANK_SUPER   = 0x2'0a'2'0'001,
+    INF_OPTVAL_PARTNER_RANK_ULTRA   = 0x2'0a'2'0'002,
     // How high a level of each badge-based move can be used.
-    OPT_BADGE_MOVE_LEVEL        = 0x1'0c'2'0'004,
-    OPTVAL_BADGE_MOVE_1X        = 0x2'0c'2'0'000,   // up to 1x badges equipped
-    OPTVAL_BADGE_MOVE_2X        = 0x2'0c'2'0'001,   // up to 2x badges equipped
-    OPTVAL_BADGE_MOVE_RANK      = 0x2'0c'2'0'002,   // up to Mario's rank + 1
-    OPTVAL_BADGE_MOVE_INFINITE  = 0x2'0c'2'0'003,   // up to lv. 99 always
+    INF_OPT_BADGE_MOVE_LEVEL        = 0x1'0c'2'0'004,
+    INF_OPTVAL_BADGE_MOVE_1X        = 0x2'0c'2'0'000,   // up to 1x badges equipped
+    INF_OPTVAL_BADGE_MOVE_2X        = 0x2'0c'2'0'001,   // up to 2x badges equipped
+    INF_OPTVAL_BADGE_MOVE_RANK      = 0x2'0c'2'0'002,   // up to Mario's rank + 1
+    INF_OPTVAL_BADGE_MOVE_INFINITE  = 0x2'0c'2'0'003,   // up to lv. 99 always
     // Which set of items the player starts the pit with.
-    OPT_STARTER_ITEMS           = 0x1'0e'2'0'004,
-    OPTVAL_STARTER_ITEMS_OFF    = 0x2'0e'2'0'000,
-    OPTVAL_STARTER_ITEMS_BASIC  = 0x2'0e'2'0'001,
-    OPTVAL_STARTER_ITEMS_STRONG = 0x2'0e'2'0'002,
-    OPTVAL_STARTER_ITEMS_RANDOM = 0x2'0e'2'0'003,
+    INF_OPT_STARTER_ITEMS           = 0x1'0e'2'0'004,
+    INF_OPTVAL_STARTER_ITEMS_OFF    = 0x2'0e'2'0'000,
+    INF_OPTVAL_STARTER_ITEMS_BASIC  = 0x2'0e'2'0'001,
+    INF_OPTVAL_STARTER_ITEMS_STRONG = 0x2'0e'2'0'002,
+    INF_OPTVAL_STARTER_ITEMS_RANDOM = 0x2'0e'2'0'003,
     // Whether to use faster enemy HP/ATK scaling after floor 100.
-    OPT_FLOOR_100_SCALING       = 0x1'10'1'0'002,
+    INF_OPT_FLOOR_100_SCALING       = 0x1'10'1'0'002,
     // Whether to increase bosses' HP/ATK stats by 25% / 50% / 100%.
-    OPT_BOSS_SCALING            = 0x1'11'2'0'004,
-    OPTVAL_BOSS_SCALING_NORMAL  = 0x2'11'2'0'000,
-    OPTVAL_BOSS_SCALING_1_25X   = 0x2'11'2'0'001,
-    OPTVAL_BOSS_SCALING_1_50X   = 0x2'11'2'0'002,
-    OPTVAL_BOSS_SCALING_2_00X   = 0x2'11'2'0'003,
+    INF_OPT_BOSS_SCALING            = 0x1'11'2'0'004,
+    INF_OPTVAL_BOSS_SCALING_NORMAL  = 0x2'11'2'0'000,
+    INF_OPTVAL_BOSS_SCALING_1_25X   = 0x2'11'2'0'001,
+    INF_OPTVAL_BOSS_SCALING_1_50X   = 0x2'11'2'0'002,
+    INF_OPTVAL_BOSS_SCALING_2_00X   = 0x2'11'2'0'003,
     // How the stage's rank increases.
-    OPT_STAGE_RANK              = 0x1'13'1'0'002,
-    OPTVAL_STAGE_RANK_30_FLOORS = 0x2'13'1'0'000,
-    OPTVAL_STAGE_RANK_ALWAYSMAX = 0x2'13'1'0'001,
+    INF_OPT_STAGE_RANK              = 0x1'13'1'0'002,
+    INF_OPTVAL_STAGE_RANK_30_FLOORS = 0x2'13'1'0'000,
+    INF_OPTVAL_STAGE_RANK_ALWAYSMAX = 0x2'13'1'0'001,
     // Alternate balance options.
-    OPT_PERCENT_BASED_DANGER    = 0x1'14'1'0'002,
-    OPT_WEAKER_RUSH_BADGES      = 0x1'15'1'0'002,
-    OPT_EVASION_BADGES_CAP      = 0x1'16'1'0'002,
-    OPT_64_STYLE_HP_FP_DRAIN    = 0x1'17'1'0'002,
+    INF_OPT_PERCENT_BASED_DANGER    = 0x1'14'1'0'002,
+    INF_OPT_WEAKER_RUSH_BADGES      = 0x1'15'1'0'002,
+    INF_OPT_EVASION_BADGES_CAP      = 0x1'16'1'0'002,
+    INF_OPT_64_STYLE_HP_FP_DRAIN    = 0x1'17'1'0'002,
     // Changes to stage hazard rates.
-    OPT_STAGE_HAZARDS           = 0x1'18'3'0'005,
-    OPTVAL_STAGE_HAZARDS_NORMAL = 0x2'18'3'0'000,
-    OPTVAL_STAGE_HAZARDS_HIGH   = 0x2'18'3'0'001,
-    OPTVAL_STAGE_HAZARDS_LOW    = 0x2'18'3'0'002,
-    OPTVAL_STAGE_HAZARDS_NO_FOG = 0x2'18'3'0'003,
-    OPTVAL_STAGE_HAZARDS_OFF    = 0x2'18'3'0'004,
+    INF_OPT_STAGE_HAZARDS           = 0x1'18'3'0'005,
+    INF_OPTVAL_STAGE_HAZARDS_NORMAL = 0x2'18'3'0'000,
+    INF_OPTVAL_STAGE_HAZARDS_HIGH   = 0x2'18'3'0'001,
+    INF_OPTVAL_STAGE_HAZARDS_LOW    = 0x2'18'3'0'002,
+    INF_OPTVAL_STAGE_HAZARDS_NO_FOG = 0x2'18'3'0'003,
+    INF_OPTVAL_STAGE_HAZARDS_OFF    = 0x2'18'3'0'004,
     // Whether to enable variance on all sources of variable damage.
-    OPT_RANDOM_DAMAGE           = 0x1'1b'2'0'003,
-    OPTVAL_RANDOM_DAMAGE_NONE   = 0x2'1b'2'0'000,
-    OPTVAL_RANDOM_DAMAGE_25     = 0x2'1b'2'0'001,
-    OPTVAL_RANDOM_DAMAGE_50     = 0x2'1b'2'0'002,
+    INF_OPT_RANDOM_DAMAGE           = 0x1'1b'2'0'003,
+    INF_OPTVAL_RANDOM_DAMAGE_NONE   = 0x2'1b'2'0'000,
+    INF_OPTVAL_RANDOM_DAMAGE_25     = 0x2'1b'2'0'001,
+    INF_OPTVAL_RANDOM_DAMAGE_50     = 0x2'1b'2'0'002,
     // Random items from thrown audience items.
-    OPT_AUDIENCE_RANDOM_THROWS  = 0x1'1d'1'0'002,
+    INF_OPT_AUDIENCE_RANDOM_THROWS  = 0x1'1d'1'0'002,
     // Whether Chet Rippo should appear early.
-    OPT_CHET_RIPPO_APPEARANCE   = 0x1'1e'1'0'002,
-    OPTVAL_CHET_RIPPO_RANDOM    = 0x2'1e'1'0'000,
-    OPTVAL_CHET_RIPPO_GUARANTEE = 0x2'1e'1'0'001,
+    INF_OPT_CHET_RIPPO_APPEARANCE   = 0x1'1e'1'0'002,
+    INF_OPTVAL_CHET_RIPPO_RANDOM    = 0x2'1e'1'0'000,
+    INF_OPTVAL_CHET_RIPPO_GUARANTEE = 0x2'1e'1'0'001,
     // Whether Merlee's curse should be enabled.
-    OPT_MERLEE_CURSE            = 0x1'1f'1'0'002,
+    INF_OPT_MERLEE_CURSE            = 0x1'1f'1'0'002,
     // Whether to disable full-healing the party after collecting a chest.
-    OPT_DISABLE_CHEST_HEAL      = 0x1'20'1'0'002,
+    INF_OPT_DISABLE_CHEST_HEAL      = 0x1'20'1'0'002,
     // Whether to allow Movers to spawn or not.
-    OPT_MOVERS_ENABLED          = 0x1'21'1'8'002,
+    INF_OPT_MOVERS_ENABLED          = 0x1'21'1'8'002,
     // Whether to override which partner is rewarded first.
-    OPT_FIRST_PARTNER           = 0x1'22'3'0'008,
-    OPTVAL_NONE_FIRST           = 0x2'22'3'0'000,
-    OPTVAL_GOOMBELLA_FIRST      = 0x2'22'3'0'001,
-    OPTVAL_KOOPS_FIRST          = 0x2'22'3'0'002,
-    OPTVAL_FLURRIE_FIRST        = 0x2'22'3'0'003,
-    OPTVAL_YOSHI_FIRST          = 0x2'22'3'0'004,
-    OPTVAL_VIVIAN_FIRST         = 0x2'22'3'0'005,
-    OPTVAL_BOBBERY_FIRST        = 0x2'22'3'0'006,
-    OPTVAL_MS_MOWZ_FIRST        = 0x2'22'3'0'007,
+    INF_OPT_FIRST_PARTNER           = 0x1'22'3'0'008,
+    INF_OPTVAL_NONE_FIRST           = 0x2'22'3'0'000,
+    INF_OPTVAL_GOOMBELLA_FIRST      = 0x2'22'3'0'001,
+    INF_OPTVAL_KOOPS_FIRST          = 0x2'22'3'0'002,
+    INF_OPTVAL_FLURRIE_FIRST        = 0x2'22'3'0'003,
+    INF_OPTVAL_YOSHI_FIRST          = 0x2'22'3'0'004,
+    INF_OPTVAL_VIVIAN_FIRST         = 0x2'22'3'0'005,
+    INF_OPTVAL_BOBBERY_FIRST        = 0x2'22'3'0'006,
+    INF_OPTVAL_MS_MOWZ_FIRST        = 0x2'22'3'0'007,
     // Hidden option; shuffles the appearance and description of items.
-    OPT_OBFUSCATE_ITEMS         = 0x1'25'1'0'002,
+    INF_OPT_OBFUSCATE_ITEMS         = 0x1'25'1'0'002,
     // Turns on options for community races and disables option changes.
-    OPT_RACE_MODE               = 0x1'26'1'0'002,
+    INF_OPT_RACE_MODE               = 0x1'26'1'0'002,
     // Next: 0x1/2'27...
     
     // Cosmetic / internal-only flag-based options.
-    OPT_RTA_TIMER               = 0x1'60'1'0'002,
-    OPT_YOSHI_COLOR_SELECT      = 0x1'61'1'0'002,
-    OPT_START_WITH_FX           = 0x1'62'1'0'002,
-    OPT_BGM_DISABLED            = 0x1'63'1'0'002,
-    OPT_ENABLE_P_BADGES         = 0x1'64'1'0'002,
-    OPT_ENABLE_PARTNER_REWARD   = 0x1'65'1'0'002,
-    OPT_DEBUG_MODE_USED         = 0x1'66'1'0'002,
-    OPT_ENABLE_UPGRADE_REWARD   = 0x1'67'1'0'002,   // Boots, Hammer, S. Sack
+    INF_OPT_RTA_TIMER               = 0x1'60'1'0'002,
+    INF_OPT_YOSHI_COLOR_SELECT      = 0x1'61'1'0'002,
+    INF_OPT_START_WITH_FX           = 0x1'62'1'0'002,
+    INF_OPT_BGM_DISABLED            = 0x1'63'1'0'002,
+    INF_OPT_ENABLE_P_BADGES         = 0x1'64'1'0'002,
+    INF_OPT_ENABLE_PARTNER_REWARD   = 0x1'65'1'0'002,
+    INF_OPT_DEBUG_MODE_USED         = 0x1'66'1'0'002,
+    INF_OPT_ENABLE_UPGRADE_REWARD   = 0x1'67'1'0'002,   // Boots, Hammer, S. Sack
     // Used to ensure similar partner order if using non-zero OPT_FIRST_PARTNER.
-    OPT_LAST_PARTNER_INTENDED   = 0x1'68'3'0'008,
+    INF_OPT_LAST_PARTNER_INTENDED   = 0x1'68'3'0'008,
     // v2.22, determines whether the player has saved at the start of a run.
     // (disables changing options any further, including after a reload)
-    OPT_HAS_STARTED_RUN         = 0x1'6b'1'0'002,
+    INF_OPT_HAS_STARTED_RUN         = 0x1'6b'1'0'002,
     // v2.23, shows a one-time tutorial when picking up a Lv. 2 Special Move.
-    OPT_SEEN_MOVE_LEVEL_TUT     = 0x1'6c'1'0'002,
-    OPT_SHOW_ATK_DEF            = 0x1'6d'1'0'002,
+    INF_OPT_SEEN_MOVE_LEVEL_TUT     = 0x1'6c'1'0'002,
+    INF_OPT_SHOW_ATK_DEF            = 0x1'6d'1'0'002,
     // Next: 0x1'6e...
     
     // Numeric options.
     // Global HP and ATK scaling (in percentage).
-    OPTNUM_ENEMY_HP             = 0x3'00'2'1'3e8,
-    OPTNUM_ENEMY_ATK            = 0x3'02'2'1'3e8,
+    INF_OPTNUM_ENEMY_HP             = 0x3'00'2'1'3e8,
+    INF_OPTNUM_ENEMY_ATK            = 0x3'02'2'1'3e8,
     // SP cost for Superguarding (in increments of 0.01 SP).
-    OPTNUM_SUPERGUARD_SP_COST   = 0x3'04'1'0'096,
+    INF_OPTNUM_SUPERGUARD_SP_COST   = 0x3'04'1'0'096,
     // FP cost for switching partners.
-    OPTNUM_SWITCH_PARTY_FP_COST = 0x3'05'1'0'00a,
+    INF_OPTNUM_SWITCH_PARTY_FP_COST = 0x3'05'1'0'00a,
     // Multiplier for attacks' SP regen (in increments of 0.05 SP, up to 3.00).
-    OPTNUM_SP_REGEN_MODIFIER    = 0x3'06'1'0'03c,
+    INF_OPTNUM_SP_REGEN_MODIFIER    = 0x3'06'1'0'03c,
     // Next: 0x3'07...
     
     // Gameplay stats.
-    STAT_TURNS_SPENT            = 0x4'00'3'2'007,
-    STAT_MOST_TURNS_RECORD      = 0x4'03'2'2'004,
-    STAT_MOST_TURNS_CURRENT     = 0x4'05'2'2'004,
-    STAT_MOST_TURNS_FLOOR       = 0x4'07'4'7'fff,
-    STAT_TIMES_RAN_AWAY         = 0x4'0b'2'2'004,
-    STAT_ENEMY_DAMAGE           = 0x4'0d'3'2'007,
-    STAT_PLAYER_DAMAGE          = 0x4'10'3'2'007,
-    STAT_ITEMS_USED             = 0x4'13'3'2'007,
-    STAT_COINS_EARNED           = 0x4'16'3'2'007,
-    STAT_COINS_SPENT            = 0x4'19'3'2'007,
-    STAT_FP_SPENT               = 0x4'1c'3'2'007,
-    STAT_SP_SPENT               = 0x4'1f'3'2'007,
-    STAT_SUPERGUARDS            = 0x4'22'3'2'007,
-    STAT_ITEMS_SOLD             = 0x4'25'3'2'007,
-    STAT_BADGES_SOLD            = 0x4'28'3'2'007,
-    STAT_LEVELS_SOLD            = 0x4'2b'2'2'004,
-    STAT_SHINE_SPRITES          = 0x4'2d'2'2'003,
-    STAT_CONDITIONS_MET         = 0x4'2f'3'2'007,
-    STAT_CONDITIONS_TOTAL       = 0x4'32'3'2'007,
-    STAT_MOVERS_USED            = 0x4'35'2'2'004,
-    STAT_BATTLES_SKIPPED        = 0x4'37'3'2'007,
+    INF_STAT_TURNS_SPENT            = 0x4'00'3'2'007,
+    INF_STAT_MOST_TURNS_RECORD      = 0x4'03'2'2'004,
+    INF_STAT_MOST_TURNS_CURRENT     = 0x4'05'2'2'004,
+    INF_STAT_MOST_TURNS_FLOOR       = 0x4'07'4'7'fff,
+    INF_STAT_TIMES_RAN_AWAY         = 0x4'0b'2'2'004,
+    INF_STAT_ENEMY_DAMAGE           = 0x4'0d'3'2'007,
+    INF_STAT_PLAYER_DAMAGE          = 0x4'10'3'2'007,
+    INF_STAT_ITEMS_USED             = 0x4'13'3'2'007,
+    INF_STAT_COINS_EARNED           = 0x4'16'3'2'007,
+    INF_STAT_COINS_SPENT            = 0x4'19'3'2'007,
+    INF_STAT_FP_SPENT               = 0x4'1c'3'2'007,
+    INF_STAT_SP_SPENT               = 0x4'1f'3'2'007,
+    INF_STAT_SUPERGUARDS            = 0x4'22'3'2'007,
+    INF_STAT_ITEMS_SOLD             = 0x4'25'3'2'007,
+    INF_STAT_BADGES_SOLD            = 0x4'28'3'2'007,
+    INF_STAT_LEVELS_SOLD            = 0x4'2b'2'2'004,
+    INF_STAT_SHINE_SPRITES          = 0x4'2d'2'2'003,
+    INF_STAT_CONDITIONS_MET         = 0x4'2f'3'2'007,
+    INF_STAT_CONDITIONS_TOTAL       = 0x4'32'3'2'007,
+    INF_STAT_MOVERS_USED            = 0x4'35'2'2'004,
+    INF_STAT_BATTLES_SKIPPED        = 0x4'37'3'2'007,
     // Next: 0x4'3a...
     
     // Non-option values (used for menu, etc.)
@@ -273,48 +273,48 @@ enum Options_v2 {
 // so results should differ between seeds, but be consistent on the same seed.
 enum RngSequence {
     // "Totally random"; not reproducible run-to-run.
-    RNG_VANILLA             = -1,    // Calls ttyd::system::irand().
+    INF_RNG_VANILLA             = -1,    // Calls ttyd::system::irand().
     
     // Mangled w/floor number and OPT_CHEST_REWARDS; will change dramatically
     // if using options that change seeding or if skipping floors with Movers,
     // but will be consistent otherwise.
-    RNG_CHEST               = 0,    // Chest top-level weighting.
+    INF_RNG_CHEST               = 0,    // Chest top-level weighting.
     
     // Mangled w/floor number; may stay reasonably consistent even if using
     // options that change seeding for unrelated features.
-    RNG_ENEMY               = 1,    // Enemy loadout generation (+ item drop).
-    RNG_ITEM                = 2,    // Items (for enemy loadouts or shops).
-    RNG_CONDITION           = 3,    // Bonus challenge condition.
-    RNG_CONDITION_ITEM      = 4,    // Bonus challenge reward.
+    INF_RNG_ENEMY               = 1,    // Enemy loadout generation (+ item drop).
+    INF_RNG_ITEM                = 2,    // Items (for enemy loadouts or shops).
+    INF_RNG_CONDITION           = 3,    // Bonus challenge condition.
+    INF_RNG_CONDITION_ITEM      = 4,    // Bonus challenge reward.
     
     // Mangled w/floor number; completely consistent per filename.
-    RNG_CHET_RIPPO          = 13,   // Chet Rippo appearance chance.
+    INF_RNG_CHET_RIPPO          = 13,   // Chet Rippo appearance chance.
     
     // Not mangled w/ floor number; order should stay completely consistent,
     // independent of all seeding options (unless partners are disabled).
-    RNG_INVENTORY_UPGRADE   = 5,    // Boots and Hammer upgrades.
-    RNG_CHEST_BADGE_FIXED   = 6,    // Chest one-time badges' order.
-    RNG_PARTNER             = 7,    // Partners' obtained order.
-    RNG_STAR_POWER          = 8,    // Star powers' obtained order.
-    RNG_KISS_THIEF          = 9,    // Kiss Thief reward order.
+    INF_RNG_INVENTORY_UPGRADE   = 5,    // Boots and Hammer upgrades.
+    INF_RNG_CHEST_BADGE_FIXED   = 6,    // Chest one-time badges' order.
+    INF_RNG_PARTNER             = 7,    // Partners' obtained order.
+    INF_RNG_STAR_POWER          = 8,    // Star powers' obtained order.
+    INF_RNG_KISS_THIEF          = 9,    // Kiss Thief reward order.
     
     // Not mangled w/ floor number; will stay more or less consistent depending
     // on when partners are first unlocked, but independent of other options.
-    RNG_CHEST_BADGE_RANDOM  = 10,   // Chest random badge order.
-    RNG_AUDIENCE_ITEM       = 11,   // Random audience items (if using option).
+    INF_RNG_CHEST_BADGE_RANDOM  = 10,   // Chest random badge order.
+    INF_RNG_AUDIENCE_ITEM       = 11,   // Random audience items (if using option).
     
     // Used for picking random filenames; should NOT be used for anything else.
-    RNG_FILENAME            = 12,
+    INF_RNG_FILENAME            = 12,
     
     // Used for Movers; unlike other RNG calls, this is used as an offset to the
     // floor number, to make sure Movers don't appear too close in succession.
     // Completely consistent per filename.
-    RNG_MOVER               = 14,
+    INF_RNG_MOVER               = 14,
     
     // Used to seed the shuffles used for item obfuscation option.
-    RNG_ITEM_OBFUSCATION    = 15,
+    INF_RNG_ITEM_OBFUSCATION    = 15,
 
-    RNG_SEQUENCE_MAX        = 16,
+    INF_RNG_SEQUENCE_MAX        = 16,
 };
 
 }

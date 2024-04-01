@@ -29,14 +29,11 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Constants for secret codes.
 uint32_t secretCode_BumpAttack      = 043652131;
 uint32_t secretCode_BgmOnOff        = 031313141;
-uint32_t secretCode_RaceMode        = 013341336;
 uint32_t secretCode_RtaTimer        = 034345566;
 uint32_t secretCode_ShowAtkDef      = 023122312;
 uint32_t secretCode_UnlockFxBadges  = 026122146;
 uint32_t secretCode_ObfuscateItems  = 046362123;
 uint32_t secretCode_DebugMode       = 036363636;
-
-bool g_DrawRtaTimer = false;
 
 }
 
@@ -52,22 +49,6 @@ void CheatsManager::Update() {
     if (ttyd::system::keyGetButtonTrg(0) & ButtonId::Y) code = 6;
     if (code) code_history = (code_history << 3) | code;
     
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
-        // Automatically turn on RTA timer if loading race mode file.
-        g_DrawRtaTimer = true;
-    }
-    
-    if ((code_history & 0xFFFFFF) == secretCode_RaceMode) {
-        code_history = 0;
-        if (InMainGameModes() && 
-            !g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN) &&
-            !g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
-            // Enable standard options for community races.
-            g_DrawRtaTimer = true;
-            g_Mod->inf_state_.EnableRaceOptions();
-            ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
-        }
-    }
     if ((code_history & 0xFFFFFF) == secretCode_RtaTimer) {
         code_history = 0;
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
@@ -79,19 +60,17 @@ void CheatsManager::Update() {
     if ((code_history & 0xFFFFFF) == secretCode_BgmOnOff) {
         code_history = 0;
         // Toggle on/off background music from playing or starting.
-        g_Mod->inf_state_.ChangeOption(OPT_BGM_DISABLED);
-        if (g_Mod->inf_state_.GetOptionNumericValue(OPT_BGM_DISABLED)) {
+        bool toggle = !g_Mod->state_.GetOption(tot::OPT_BGM_DISABLED);
+        g_Mod->state_.SetOption(tot::OPT_BGM_DISABLED, toggle);
+        if (toggle) {
             ttyd::pmario_sound::psndStopAllFadeOut();
         }
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
     }
     if ((code_history & 0xFFFFFF) == secretCode_ShowAtkDef) {
         code_history = 0;
-        // Toggle on/off ability to show ATK/DEF of enemies by default.
-        // (Cannot be turned off if in race mode)
-        if (!g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
-            g_Mod->inf_state_.ChangeOption(OPT_SHOW_ATK_DEF);
-        }
+        bool toggle = !g_Mod->state_.GetOption(tot::OPT_SHOW_ATK_DEF);
+        g_Mod->state_.SetOption(tot::OPT_SHOW_ATK_DEF, toggle);
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
     }
     if ((code_history & 0xFFFFFF) == secretCode_UnlockFxBadges) {
@@ -121,32 +100,20 @@ void CheatsManager::Update() {
     if ((code_history & 0xFFFFFF) == secretCode_ObfuscateItems) {
         code_history = 0;
         if (InMainGameModes() && 
-            !g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN)) {
-            g_Mod->inf_state_.ChangeOption(OPT_OBFUSCATE_ITEMS);
+            !g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) {
+            g_Mod->state_.ChangeOption(tot::OPT_OBFUSCATE_ITEMS);
             ttyd::sound::SoundEfxPlayEx(0x3c, 0, 0x64, 0x40);
         }
     }
-    // TODO: Turn off before releases?
+
+    // TODO: Disable this before public releases.
     if ((code_history & 0xFFFFFF) == secretCode_DebugMode) {
         code_history = 0;
         DebugManager::ChangeMode();
-        g_Mod->inf_state_.SetOption(OPT_DEBUG_MODE_USED, 1);
+        g_Mod->state_.SetOption(tot::OPT_DEBUG_MODE_USED, 1);
     }
 }
 
-void CheatsManager::Draw() {
-    if (InMainGameModes() && g_DrawRtaTimer &&
-        g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN)) {
-        // Print the current RTA timer and floor number to the screen.
-        char buf[32];
-        sprintf(buf, "%s", g_Mod->inf_state_.GetCurrentTimeString());
-        DrawText(buf, -260, -195, 0xFF, true, ~0U, 0.75f, /* center-left */ 3);
-        if (!strcmp(GetCurrentArea(), "jon")) {
-            sprintf(buf, "Floor %" PRId32, g_Mod->inf_state_.floor_ + 1);
-            DrawText(
-                buf, 260, -195, 0xFF, true, ~0U, 0.75f, /* center-right */ 5);
-        }
-    }
-}
+void CheatsManager::Draw() {}
 
 }

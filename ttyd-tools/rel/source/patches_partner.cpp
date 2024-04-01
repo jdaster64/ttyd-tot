@@ -1,7 +1,6 @@
 #include "patches_partner.h"
 
 #include "common_functions.h"
-#include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
@@ -15,6 +14,7 @@
 #include "tot_party_mowz.h"
 #include "tot_party_vivian.h"
 #include "tot_party_yoshi.h"
+#include "tot_state.h"
 
 #include <gc/types.h>
 #include <ttyd/battle.h>
@@ -366,8 +366,7 @@ void DisplayTattleStats(
         (ttyd::swdrv::swGet(0x117a + unit->true_kind) ||
         ttyd::swdrv::swGet(0x117a + unit->current_kind));
     // If option is enabled, default to it being on (can toggle with Z).
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_SHOW_ATK_DEF) ||
-        g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
+    if (g_Mod->state_.GetOption(tot::OPT_SHOW_ATK_DEF)) {
         show_atk_def = true;
     }
     // Hide ATK / DEF outside player action phase (or if hidden for this floor).
@@ -419,7 +418,7 @@ void RefreshExtraTattleStats() {
 
 EVT_DEFINE_USER_FUNC(InitializePartyMember) {
     const int32_t starting_rank =
-        g_Mod->inf_state_.GetOptionNumericValue(OPT_PARTNER_RANK);
+        g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_PARTNER_RANK);
     const int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
     const int16_t starting_hp =
         ttyd::mario_pouch::_party_max_hp_table[idx * 4 + starting_rank];

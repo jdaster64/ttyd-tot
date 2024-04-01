@@ -58,7 +58,7 @@ bool ShouldDisplayMenu() {
 
 bool ShouldControlMenu() {
     return ShouldDisplayMenu() && !strcmp(GetNextMap(), kStartRoomName) &&
-           !g_Mod->inf_state_.GetOptionNumericValue(OPT_HAS_STARTED_RUN);
+           !g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_HAS_STARTED_RUN);
 }
 
 bool ShouldTickOrAutotick(int32_t time_held) {
@@ -72,40 +72,40 @@ bool ShouldTickOrAutotick(int32_t time_held) {
 
 int32_t GetMenuState(int32_t page, int32_t selection) {
     switch (100 * page + selection) {
-        case 101: return OPT_CHEST_REWARDS;
-        case 102: return OPT_NO_EXP_MODE;
-        case 103: return OPT_BATTLE_REWARD_MODE;
-        case 104: return OPT_DISABLE_CHEST_HEAL;
+        case 101: return INF_OPT_CHEST_REWARDS;
+        case 102: return INF_OPT_NO_EXP_MODE;
+        case 103: return INF_OPT_BATTLE_REWARD_MODE;
+        case 104: return INF_OPT_DISABLE_CHEST_HEAL;
         
-        case 201: return OPT_PARTNERS_OBTAINED;
-        case 202: return OPT_FIRST_PARTNER;
-        case 203: return OPT_PARTNER_RANK;
-        case 204: return OPT_BADGE_MOVE_LEVEL;
+        case 201: return INF_OPT_PARTNERS_OBTAINED;
+        case 202: return INF_OPT_FIRST_PARTNER;
+        case 203: return INF_OPT_PARTNER_RANK;
+        case 204: return INF_OPT_BADGE_MOVE_LEVEL;
         
-        case 301: return OPT_MOVERS_ENABLED;
-        case 302: return OPT_CHET_RIPPO_APPEARANCE;
-        case 303: return OPT_MERLEE_CURSE;
-        case 304: return OPT_STARTER_ITEMS;
+        case 301: return INF_OPT_MOVERS_ENABLED;
+        case 302: return INF_OPT_CHET_RIPPO_APPEARANCE;
+        case 303: return INF_OPT_MERLEE_CURSE;
+        case 304: return INF_OPT_STARTER_ITEMS;
         
-        case 401: return OPTNUM_ENEMY_HP;
-        case 402: return OPTNUM_ENEMY_ATK;
-        case 403: return OPT_BOSS_SCALING;
-        case 404: return OPT_FLOOR_100_SCALING;
+        case 401: return INF_OPTNUM_ENEMY_HP;
+        case 402: return INF_OPTNUM_ENEMY_ATK;
+        case 403: return INF_OPT_BOSS_SCALING;
+        case 404: return INF_OPT_FLOOR_100_SCALING;
         
-        case 501: return OPTNUM_SP_REGEN_MODIFIER;
-        case 502: return OPTNUM_SUPERGUARD_SP_COST;
-        case 503: return OPTNUM_SWITCH_PARTY_FP_COST;
+        case 501: return INF_OPTNUM_SP_REGEN_MODIFIER;
+        case 502: return INF_OPTNUM_SUPERGUARD_SP_COST;
+        case 503: return INF_OPTNUM_SWITCH_PARTY_FP_COST;
         case 504: return MENU_SET_DEFAULT;
         
-        case 601: return OPT_PERCENT_BASED_DANGER;
-        case 602: return OPT_WEAKER_RUSH_BADGES;
-        case 603: return OPT_EVASION_BADGES_CAP;
-        case 604: return OPT_64_STYLE_HP_FP_DRAIN;
+        case 601: return INF_OPT_PERCENT_BASED_DANGER;
+        case 602: return INF_OPT_WEAKER_RUSH_BADGES;
+        case 603: return INF_OPT_EVASION_BADGES_CAP;
+        case 604: return INF_OPT_64_STYLE_HP_FP_DRAIN;
         
-        case 701: return OPT_STAGE_HAZARDS;
-        case 702: return OPT_STAGE_RANK;
-        case 703: return OPT_RANDOM_DAMAGE;
-        case 704: return OPT_AUDIENCE_RANDOM_THROWS;
+        case 701: return INF_OPT_STAGE_HAZARDS;
+        case 702: return INF_OPT_STAGE_RANK;
+        case 703: return INF_OPT_RANDOM_DAMAGE;
+        case 704: return INF_OPT_AUDIENCE_RANDOM_THROWS;
         
         default:  return MENU_CHANGE_PAGE;
     }
@@ -160,7 +160,7 @@ void MenuManager::Update() {
     }
     
     // If race mode is enabled, prevent input and force-close menu.
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
+    if (g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_RACE_MODE)) {
         if (time_button_held_ < kFadeoutStartTime) {
             time_button_held_ = kFadeoutStartTime;
         }
@@ -264,7 +264,7 @@ void MenuManager::Draw() {
                      / (kFadeinTextEndTime - kFadeinTextStartTime);
         if (alpha > 0xff) alpha = 0xff;
         
-        if (g_Mod->inf_state_.GetOptionNumericValue(OPT_RACE_MODE)) {
+        if (g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_RACE_MODE)) {
             DrawText(
                 "Glitz Pit community race settings activated.\n"
                 "Options can no longer be changed.",

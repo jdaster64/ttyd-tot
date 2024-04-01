@@ -55,16 +55,12 @@ bool LoadFromPreviousVersion(StateManager_v2* state) {
     // InitPartyMaxHpTable(state->partner_upgrades_);
     
     // Reset item obfuscation RNG position in case it needs to be performed.
-    g_Mod->inf_state_.rng_sequences_[RNG_ITEM_OBFUSCATION] = 0;
+    g_Mod->inf_state_.rng_sequences_[INF_RNG_ITEM_OBFUSCATION] = 0;
     
     // Set "has started" flag if loading into an already-in-progress file.
     if (state->floor_ > 0) {
-        state->SetOption(OPT_HAS_STARTED_RUN, true);
+        state->SetOption(INF_OPT_HAS_STARTED_RUN, true);
     }
-    
-    // If playing Mario-alone, make sure all "P" variants of collected Mario
-    // badges are marked off in the badge log.
-    AchievementsManager::UpdatePartnerVariantBadgesCollected();
     
     return true;
 }
@@ -122,9 +118,9 @@ bool StateManager_v2::Load(bool new_save) {
     // InitPartyMaxHpTable(partner_upgrades_);
     
     // Turn off "has started" bit, so it won't carry over from previous files.
-    SetOption(OPT_HAS_STARTED_RUN, 0);
+    SetOption(INF_OPT_HAS_STARTED_RUN, 0);
     // Turn off Debug Mode flag, so it won't carry over from previous files.
-    SetOption(OPT_DEBUG_MODE_USED, 0);
+    SetOption(INF_OPT_DEBUG_MODE_USED, 0);
     
     // Start new files with Lv. 1 Sweet Treat and Earth Tremor.
     star_power_levels_ = 0b00'00'00'00'00'00'01'01;
@@ -135,7 +131,7 @@ bool StateManager_v2::Load(bool new_save) {
     const char* filename = GetSavefileName();
     for (const char* ch = filename; *ch; ++ch) {
         // If the filename contains a 'heart' character, start w/FX badges.
-        if (*ch == '\xd0') SetOption(OPT_START_WITH_FX, 1);
+        if (*ch == '\xd0') SetOption(INF_OPT_START_WITH_FX, 1);
     }
     if (!strcmp(filename, "random") || !strcmp(filename, "Random") ||
         !strcmp(filename, "RANDOM") || !strcmp(filename, "\xde") ||
@@ -147,7 +143,7 @@ bool StateManager_v2::Load(bool new_save) {
         filename_seed_ = static_cast<uint32_t>(gc::OSTime::OSGetTime());
         for (int32_t i = 0; i < 8; ++i) {
             // Pick uppercase / lowercase characters randomly (excluding I / l).
-            int32_t ch = Rand(50, RNG_FILENAME);
+            int32_t ch = Rand(50, INF_RNG_FILENAME);
             if (ch < 25) {
                 filenameChars[i] = ch + 'a';
                 if (filenameChars[i] == 'l') filenameChars[i] = 'z';
@@ -158,7 +154,7 @@ bool StateManager_v2::Load(bool new_save) {
         }
         // If a heart was in the initial filename, put one at the end of the
         // random one as well.
-        if (GetOptionNumericValue(OPT_START_WITH_FX)) {
+        if (GetOptionNumericValue(INF_OPT_START_WITH_FX)) {
             filenameChars[7] = '\xd0';
         }
         filenameChars[8] = 0;
@@ -183,7 +179,7 @@ int32_t StateManager_v2::GetStarPowerLevel(int32_t star_power_type) const {
 }
 
 uint32_t StateManager_v2::Rand(uint32_t range, int32_t sequence) {
-    if (sequence > RNG_VANILLA && sequence < RNG_SEQUENCE_MAX) {
+    if (sequence > INF_RNG_VANILLA && sequence < INF_RNG_SEQUENCE_MAX) {
         uint32_t data[2] = { 0, 0 };
         uint16_t* seq_val = rng_sequences_ + sequence;
         // Include the sequence id and current position, so the beginnings of
@@ -191,22 +187,22 @@ uint32_t StateManager_v2::Rand(uint32_t range, int32_t sequence) {
         // (e.g. chest random badge rewards + first floor's enemy items)
         data[0] = (*seq_val)++ | (sequence << 16);
         switch (sequence) {
-            case RNG_CHEST: {
+            case INF_RNG_CHEST: {
                 // Mix in the number of rewards, so the types of rewards are
                 // totally differently ordered for each setting.
-                data[0] |= GetOptionNumericValue(OPT_CHEST_REWARDS) << 24;
+                data[0] |= GetOptionNumericValue(INF_OPT_CHEST_REWARDS) << 24;
                 data[1] = floor_;
                 break;
             }
-            case RNG_ENEMY:
-            case RNG_ITEM:
-            case RNG_CONDITION:
-            case RNG_CONDITION_ITEM:
-            case RNG_CHET_RIPPO: {
+            case INF_RNG_ENEMY:
+            case INF_RNG_ITEM:
+            case INF_RNG_CONDITION:
+            case INF_RNG_CONDITION_ITEM:
+            case INF_RNG_CHET_RIPPO: {
                 data[1] = floor_;
                 break;
             }
-            case RNG_MOVER: {
+            case INF_RNG_MOVER: {
                 // Special-case; for Movers, have the data just be the floor #,
                 // with higher `seq_val` simulating values from earlier floors.
                 // Calling code will use this to limit how close together
@@ -214,15 +210,15 @@ uint32_t StateManager_v2::Rand(uint32_t range, int32_t sequence) {
                 data[0] = floor_ - *seq_val;
                 break;
             }
-            case RNG_INVENTORY_UPGRADE:
-            case RNG_CHEST_BADGE_FIXED:
-            case RNG_PARTNER:
-            case RNG_STAR_POWER:
-            case RNG_KISS_THIEF:
-            case RNG_CHEST_BADGE_RANDOM:
-            case RNG_AUDIENCE_ITEM:
-            case RNG_FILENAME:
-            case RNG_ITEM_OBFUSCATION:
+            case INF_RNG_INVENTORY_UPGRADE:
+            case INF_RNG_CHEST_BADGE_FIXED:
+            case INF_RNG_PARTNER:
+            case INF_RNG_STAR_POWER:
+            case INF_RNG_KISS_THIEF:
+            case INF_RNG_CHEST_BADGE_RANDOM:
+            case INF_RNG_AUDIENCE_ITEM:
+            case INF_RNG_FILENAME:
+            case INF_RNG_ITEM_OBFUSCATION:
                 break;
         }
         return third_party::fasthash64(
@@ -241,14 +237,11 @@ void StateManager_v2::SetDefaultOptions() {
     memset(option_flags_, 0, 12);
     memset(option_bytes_, 0, 6);
     // Set non-zero default values to their proper values.
-    SetOption(OPT_CHEST_REWARDS, 3);
-    SetOption(OPTVAL_STARTER_ITEMS_BASIC);
-    SetOption(OPTNUM_ENEMY_HP, 100);
-    SetOption(OPTNUM_ENEMY_ATK, 100);
-    SetOption(OPTNUM_SP_REGEN_MODIFIER, 20);  // 1.00x
-    
-    // TOT: For ease of testing.
-    SetOption(OPTVAL_PARTNERS_ALL_START);
+    SetOption(INF_OPT_CHEST_REWARDS, 3);
+    SetOption(INF_OPTVAL_STARTER_ITEMS_BASIC);
+    SetOption(INF_OPTNUM_ENEMY_HP, 100);
+    SetOption(INF_OPTNUM_ENEMY_ATK, 100);
+    SetOption(INF_OPTNUM_SP_REGEN_MODIFIER, 20);  // 1.00x
 }
 
 void StateManager_v2::ChangeOption(int32_t option, int32_t change) {
@@ -397,98 +390,98 @@ void StateManager_v2::GetOptionStrings(
     
     // Set name.
     switch (option) {
-        case OPT_CHEST_REWARDS: {
+        case INF_OPT_CHEST_REWARDS: {
             strcpy(name_buf, "Rewards per chest:");         break;
         }
-        case OPT_NO_EXP_MODE: {
+        case INF_OPT_NO_EXP_MODE: {
             strcpy(name_buf, "No-EXP mode:");               break;
         }
-        case OPT_BATTLE_REWARD_MODE: {
+        case INF_OPT_BATTLE_REWARD_MODE: {
             strcpy(name_buf, "Battle drops:");              break;
         }
-        case OPT_PARTNERS_OBTAINED: {
+        case INF_OPT_PARTNERS_OBTAINED: {
             strcpy(name_buf, "Partners obtained:");         break;
         }
-        case OPT_PARTNER_RANK: {
+        case INF_OPT_PARTNER_RANK: {
             strcpy(name_buf, "Partner starting rank:");     break;
         }
-        case OPT_BADGE_MOVE_LEVEL: {
+        case INF_OPT_BADGE_MOVE_LEVEL: {
             strcpy(name_buf, "Max badge move level:");      break;
         }
-        case OPT_STARTER_ITEMS: {
+        case INF_OPT_STARTER_ITEMS: {
             strcpy(name_buf, "Starter item set:");          break;
         }
-        case OPT_FLOOR_100_SCALING: {
+        case INF_OPT_FLOOR_100_SCALING: {
             strcpy(name_buf, "Floor 100+ stat scaling:");   break;
         }
-        case OPT_BOSS_SCALING: {
+        case INF_OPT_BOSS_SCALING: {
             strcpy(name_buf, "Boss HP/ATK stat scaling:");  break;
         }
-        case OPT_MERLEE_CURSE: {
+        case INF_OPT_MERLEE_CURSE: {
             strcpy(name_buf, "Infinite Merlee curses:");    break;
         }
-        case OPT_STAGE_RANK: {
+        case INF_OPT_STAGE_RANK: {
             strcpy(name_buf, "Stage rank-up:");             break;
         }
-        case OPT_PERCENT_BASED_DANGER: {
+        case INF_OPT_PERCENT_BASED_DANGER: {
             strcpy(name_buf, "Danger/Peril thresholds:");   break;
         }
-        case OPT_WEAKER_RUSH_BADGES: {
+        case INF_OPT_WEAKER_RUSH_BADGES: {
             strcpy(name_buf, "Power/Mega Rush power:");     break;
         }
-        case OPT_EVASION_BADGES_CAP: {
+        case INF_OPT_EVASION_BADGES_CAP: {
             strcpy(name_buf, "Cap badge evasion at 80%:");  break;
         }
-        case OPT_64_STYLE_HP_FP_DRAIN: {
+        case INF_OPT_64_STYLE_HP_FP_DRAIN: {
             strcpy(name_buf, "PM64-style Drain badges:");   break;
         }
-        case OPT_STAGE_HAZARDS: {
+        case INF_OPT_STAGE_HAZARDS: {
             strcpy(name_buf, "Stage hazard frequency:");    break;
         }
-        case OPT_RANDOM_DAMAGE: {
+        case INF_OPT_RANDOM_DAMAGE: {
             strcpy(name_buf, "Damage randomization:");      break;
         }
-        case OPT_AUDIENCE_RANDOM_THROWS: {
+        case INF_OPT_AUDIENCE_RANDOM_THROWS: {
             strcpy(name_buf, "Random audience items:");     break;
         }
-        case OPT_CHET_RIPPO_APPEARANCE: {
+        case INF_OPT_CHET_RIPPO_APPEARANCE: {
             strcpy(name_buf, "Chet Rippo appear %:");       break;
         }
-        case OPT_DISABLE_CHEST_HEAL: {
+        case INF_OPT_DISABLE_CHEST_HEAL: {
             strcpy(name_buf, "Full heal from chests:");     break;
         }
-        case OPT_MOVERS_ENABLED: {
+        case INF_OPT_MOVERS_ENABLED: {
             strcpy(name_buf, "Mover appearance:");          break;
         }
-        case OPT_FIRST_PARTNER: {
+        case INF_OPT_FIRST_PARTNER: {
             strcpy(name_buf, "Pick first partner:");        break;
         }
-        case OPTNUM_ENEMY_HP: {
+        case INF_OPTNUM_ENEMY_HP: {
             strcpy(name_buf, "Enemy HP multiplier:");       break;
         }
-        case OPTNUM_ENEMY_ATK: {
+        case INF_OPTNUM_ENEMY_ATK: {
             strcpy(name_buf, "Enemy ATK multiplier:");      break;
         }
-        case OPTNUM_SUPERGUARD_SP_COST: {
+        case INF_OPTNUM_SUPERGUARD_SP_COST: {
             strcpy(name_buf, "Superguard cost:");           break;
         }
-        case OPTNUM_SWITCH_PARTY_FP_COST: {
+        case INF_OPTNUM_SWITCH_PARTY_FP_COST: {
             strcpy(name_buf, "Partner switch cost:");       break;
         }
-        case OPTNUM_SP_REGEN_MODIFIER: {
+        case INF_OPTNUM_SP_REGEN_MODIFIER: {
             strcpy(name_buf, "SP regen from attacks:");     break;
         }
     }
     
     // Check if option is default.
-    if (option == OPTNUM_ENEMY_ATK || option == OPTNUM_ENEMY_HP) {
+    if (option == INF_OPTNUM_ENEMY_ATK || option == INF_OPTNUM_ENEMY_HP) {
         *is_default = value == 100;
-    } else if (option == OPTNUM_SP_REGEN_MODIFIER) {
+    } else if (option == INF_OPTNUM_SP_REGEN_MODIFIER) {
         *is_default = value == 20;
-    } else if (option == OPT_CHEST_REWARDS) {
+    } else if (option == INF_OPT_CHEST_REWARDS) {
         *is_default = num_value == 3;
-    } else if (option == OPT_STARTER_ITEMS) {
-        *is_default = value == OPTVAL_STARTER_ITEMS_BASIC;
+    } else if (option == INF_OPT_STARTER_ITEMS) {
+        *is_default = value == INF_OPTVAL_STARTER_ITEMS_BASIC;
     } else {
         *is_default = num_value == 0;
     }
@@ -500,183 +493,183 @@ void StateManager_v2::GetOptionStrings(
     
     // Options with special text.
     switch (value) {
-        case OPTVAL_CHEST_REWARDS_RANDOM: {
+        case INF_OPTVAL_CHEST_REWARDS_RANDOM: {
             strcpy(value_buf, "Varies");                return;
         }
-        case OPTVAL_NO_EXP_MODE_ON: {
+        case INF_OPTVAL_NO_EXP_MODE_ON: {
             strcpy(value_buf, "On (99 BP)");            return;
         }
-        case OPTVAL_NO_EXP_MODE_INFINITE: {
+        case INF_OPTVAL_NO_EXP_MODE_INFINITE: {
             strcpy(value_buf, "On (Infinite BP)");      return;
         }
-        case OPTVAL_DROP_STANDARD: {
+        case INF_OPTVAL_DROP_STANDARD: {
             strcpy(value_buf, "One held + bonus");      return;
         }
-        case OPTVAL_DROP_HELD_FROM_BONUS: {
+        case INF_OPTVAL_DROP_HELD_FROM_BONUS: {
             strcpy(value_buf, "Held gated by bonus");   return;
         }
-        case OPTVAL_DROP_NO_HELD_W_BONUS: {
+        case INF_OPTVAL_DROP_NO_HELD_W_BONUS: {
             strcpy(value_buf, "No held, bonus only");   return;
         }
-        case OPTVAL_DROP_ALL_HELD: {
+        case INF_OPTVAL_DROP_ALL_HELD: {
             strcpy(value_buf, "All held + bonus");      return;
         }
-        case OPTVAL_PARTNERS_ALL_REWARDS: {
+        case INF_OPTVAL_PARTNERS_ALL_REWARDS: {
             strcpy(value_buf, "All as rewards");        return;
         }
-        case OPTVAL_PARTNERS_ALL_START: {
+        case INF_OPTVAL_PARTNERS_ALL_START: {
             strcpy(value_buf, "Start with all");        return;
         }
-        case OPTVAL_PARTNERS_ONE_START: {
+        case INF_OPTVAL_PARTNERS_ONE_START: {
             strcpy(value_buf, "Start with one");        return;
         }
-        case OPTVAL_PARTNERS_NEVER: {
+        case INF_OPTVAL_PARTNERS_NEVER: {
             // If a 'first partner' is selected, rather than disabling them
             // entirely, start with that one and never receive any others.
-            if (GetOptionNumericValue(OPT_FIRST_PARTNER)) {
+            if (GetOptionNumericValue(INF_OPT_FIRST_PARTNER)) {
                 strcpy(value_buf, "Starter only");
             } else {
                 strcpy(value_buf, "Never");
             }
             return;
         }
-        case OPTVAL_PARTNER_RANK_NORMAL: {
+        case INF_OPTVAL_PARTNER_RANK_NORMAL: {
             strcpy(value_buf, "Normal");                return;
         }
-        case OPTVAL_PARTNER_RANK_SUPER: {
+        case INF_OPTVAL_PARTNER_RANK_SUPER: {
             strcpy(value_buf, "Super");                 return;
         }
-        case OPTVAL_PARTNER_RANK_ULTRA: {
+        case INF_OPTVAL_PARTNER_RANK_ULTRA: {
             strcpy(value_buf, "Ultra");                 return;
         }
-        case OPTVAL_BADGE_MOVE_1X: {
+        case INF_OPTVAL_BADGE_MOVE_1X: {
             strcpy(value_buf, "1 per copy");            return;
         }
-        case OPTVAL_BADGE_MOVE_2X: {
+        case INF_OPTVAL_BADGE_MOVE_2X: {
             strcpy(value_buf, "2 per copy");            return;
         }
-        case OPTVAL_BADGE_MOVE_RANK: {
+        case INF_OPTVAL_BADGE_MOVE_RANK: {
             strcpy(value_buf, "Rank-based");            return;
         }
-        case OPTVAL_BADGE_MOVE_INFINITE: {
+        case INF_OPTVAL_BADGE_MOVE_INFINITE: {
             strcpy(value_buf, "Always 99");             return;
         }
-        case OPTVAL_STARTER_ITEMS_BASIC: {
+        case INF_OPTVAL_STARTER_ITEMS_BASIC: {
             strcpy(value_buf, "Basic");                 return;
         }
-        case OPTVAL_STARTER_ITEMS_STRONG: {
+        case INF_OPTVAL_STARTER_ITEMS_STRONG: {
             strcpy(value_buf, "Strong");                return;
         }
-        case OPTVAL_STARTER_ITEMS_RANDOM: {
+        case INF_OPTVAL_STARTER_ITEMS_RANDOM: {
             strcpy(value_buf, "Random");                return;
         }
-        case OPTVAL_BOSS_SCALING_NORMAL: {
+        case INF_OPTVAL_BOSS_SCALING_NORMAL: {
             strcpy(value_buf, "Default");               return;
         }
-        case OPTVAL_BOSS_SCALING_1_25X: {
+        case INF_OPTVAL_BOSS_SCALING_1_25X: {
             strcpy(value_buf, "x1.25");                 return;
         }
-        case OPTVAL_BOSS_SCALING_1_50X: {
+        case INF_OPTVAL_BOSS_SCALING_1_50X: {
             strcpy(value_buf, "x1.5");                  return;
         }
-        case OPTVAL_BOSS_SCALING_2_00X: {
+        case INF_OPTVAL_BOSS_SCALING_2_00X: {
             strcpy(value_buf, "x2.0");                  return;
         }
-        case OPTVAL_STAGE_RANK_30_FLOORS: {
+        case INF_OPTVAL_STAGE_RANK_30_FLOORS: {
             strcpy(value_buf, "Floor 30/60/90");        return;
         }
-        case OPTVAL_STAGE_RANK_ALWAYSMAX: {
+        case INF_OPTVAL_STAGE_RANK_ALWAYSMAX: {
             strcpy(value_buf, "Always Superstar");      return;
         }
-        case OPTVAL_STAGE_HAZARDS_NORMAL: {
+        case INF_OPTVAL_STAGE_HAZARDS_NORMAL: {
             strcpy(value_buf, "Default");               return;
         }
-        case OPTVAL_STAGE_HAZARDS_HIGH: {
+        case INF_OPTVAL_STAGE_HAZARDS_HIGH: {
             strcpy(value_buf, "High");                  return;
         }
-        case OPTVAL_STAGE_HAZARDS_LOW: {
+        case INF_OPTVAL_STAGE_HAZARDS_LOW: {
             strcpy(value_buf, "Low");                   return;
         }
-        case OPTVAL_STAGE_HAZARDS_NO_FOG: {
+        case INF_OPTVAL_STAGE_HAZARDS_NO_FOG: {
             strcpy(value_buf, "No Fog");                return;
         }
-        case OPTVAL_STAGE_HAZARDS_OFF: {
+        case INF_OPTVAL_STAGE_HAZARDS_OFF: {
             strcpy(value_buf, "None");                  return;
         }
-        case OPTVAL_RANDOM_DAMAGE_25: {
+        case INF_OPTVAL_RANDOM_DAMAGE_25: {
             strcpy(value_buf, "+/-25%");                return;
         }
-        case OPTVAL_RANDOM_DAMAGE_50: {
+        case INF_OPTVAL_RANDOM_DAMAGE_50: {
             strcpy(value_buf, "+/-50%");                return;
         }
-        case OPTVAL_CHET_RIPPO_RANDOM: {
+        case INF_OPTVAL_CHET_RIPPO_RANDOM: {
             strcpy(value_buf, "Floor-based");           return;
         }
-        case OPTVAL_CHET_RIPPO_GUARANTEE: {
+        case INF_OPTVAL_CHET_RIPPO_GUARANTEE: {
             strcpy(value_buf, "Guaranteed");            return;
         }
-        case OPTVAL_NONE_FIRST: {
+        case INF_OPTVAL_NONE_FIRST: {
             strcpy(value_buf, "Default");               return;
         }
-        case OPTVAL_GOOMBELLA_FIRST: {
+        case INF_OPTVAL_GOOMBELLA_FIRST: {
             strcpy(value_buf, "Goombella");             return;
         }
-        case OPTVAL_KOOPS_FIRST: {
+        case INF_OPTVAL_KOOPS_FIRST: {
             strcpy(value_buf, "Koops");                 return;
         }
-        case OPTVAL_FLURRIE_FIRST: {
+        case INF_OPTVAL_FLURRIE_FIRST: {
             strcpy(value_buf, "Flurrie");               return;
         }
-        case OPTVAL_YOSHI_FIRST: {
+        case INF_OPTVAL_YOSHI_FIRST: {
             strcpy(value_buf, "Yoshi");                 return;
         }
-        case OPTVAL_VIVIAN_FIRST: {
+        case INF_OPTVAL_VIVIAN_FIRST: {
             strcpy(value_buf, "Vivian");                return;
         }
-        case OPTVAL_BOBBERY_FIRST: {
+        case INF_OPTVAL_BOBBERY_FIRST: {
             strcpy(value_buf, "Bobbery");               return;
         }
-        case OPTVAL_MS_MOWZ_FIRST: {
+        case INF_OPTVAL_MS_MOWZ_FIRST: {
             strcpy(value_buf, "Ms. Mowz");              return;
         }
     }
     // Options with special formatting.
     switch (option) {
-        case OPT_CHEST_REWARDS: {
+        case INF_OPT_CHEST_REWARDS: {
             sprintf(value_buf, "%" PRId32, num_value);
             return;
         }
-        case OPT_FLOOR_100_SCALING: {
+        case INF_OPT_FLOOR_100_SCALING: {
             strcpy(value_buf, num_value ? "+10% / set" : "+5% / set");
             return;
         }
-        case OPT_PERCENT_BASED_DANGER: {
+        case INF_OPT_PERCENT_BASED_DANGER: {
             strcpy(value_buf, num_value ? "%-based" : "Fixed");
             return;
         }
-        case OPT_WEAKER_RUSH_BADGES: {
+        case INF_OPT_WEAKER_RUSH_BADGES: {
             strcpy(value_buf, num_value ? "+1/+2" : "+2/+5");
             return;
         }
-        case OPT_DISABLE_CHEST_HEAL: {
+        case INF_OPT_DISABLE_CHEST_HEAL: {
             // Reverse conditions, since healing is defaulted to be on.
             strcpy(value_buf, num_value ? "Off" : "On");
             return;
         }
-        case OPTNUM_ENEMY_HP:
-        case OPTNUM_ENEMY_ATK: {
+        case INF_OPTNUM_ENEMY_HP:
+        case INF_OPTNUM_ENEMY_ATK: {
             sprintf(value_buf, "%" PRId32 "%s", num_value, "%");
             return;
         }
-        case OPTNUM_SUPERGUARD_SP_COST: {
+        case INF_OPTNUM_SUPERGUARD_SP_COST: {
             sprintf(value_buf, "%.2f SP", num_value / 100.0f);
             return;
         }
-        case OPTNUM_SWITCH_PARTY_FP_COST: {
+        case INF_OPTNUM_SWITCH_PARTY_FP_COST: {
             sprintf(value_buf, "%" PRId32 " FP", num_value);
             return;
         }
-        case OPTNUM_SP_REGEN_MODIFIER: {
+        case INF_OPTNUM_SP_REGEN_MODIFIER: {
             sprintf(value_buf, "%.2fx", num_value / 20.0f);
             return;
         }
@@ -688,21 +681,21 @@ void StateManager_v2::GetOptionStrings(
 const char* StateManager_v2::GetEncodedOptions() const {    
     static char enc_options[24];
     
-    if (GetOptionNumericValue(OPT_RACE_MODE)) {
+    if (GetOptionNumericValue(INF_OPT_RACE_MODE)) {
         // Return special string for race mode.
         sprintf(enc_options, "Community Race (v.%" PRId32 ")", version_);
         return enc_options;
     }
 
-    uint64_t numeric_options = GetOptionValue(OPTNUM_ENEMY_HP);
+    uint64_t numeric_options = GetOptionValue(INF_OPTNUM_ENEMY_HP);
     numeric_options <<= 12;
-    numeric_options += GetOptionValue(OPTNUM_ENEMY_ATK);
+    numeric_options += GetOptionValue(INF_OPTNUM_ENEMY_ATK);
     numeric_options <<= 8;
-    numeric_options += GetOptionValue(OPTNUM_SUPERGUARD_SP_COST);
+    numeric_options += GetOptionValue(INF_OPTNUM_SUPERGUARD_SP_COST);
     numeric_options <<= 4;
-    numeric_options += GetOptionValue(OPTNUM_SWITCH_PARTY_FP_COST);
+    numeric_options += GetOptionValue(INF_OPTNUM_SWITCH_PARTY_FP_COST);
     numeric_options <<= 6;
-    numeric_options += GetOptionValue(OPTNUM_SP_REGEN_MODIFIER);
+    numeric_options += GetOptionValue(INF_OPTNUM_SP_REGEN_MODIFIER);
     // Flip "starting items" flag off to make default options look simpler.
     uint64_t flag_options = option_flags_[1];
     flag_options <<= 32;
@@ -741,7 +734,7 @@ bool StateManager_v2::GetPlayStatsString(char* out_buf) {
     }
     
     // Lock timer value when the player reads the sign on floor 100 w/race mode.
-    if (GetOptionNumericValue(OPT_RACE_MODE) && floor_ + 1 == 100) {
+    if (GetOptionNumericValue(INF_OPT_RACE_MODE) && floor_ + 1 == 100) {
         if (!g_RtaTimerStopped) {
             g_RtaTimerStopped = true;
             g_RtaTimer100 = current_time;
@@ -752,11 +745,11 @@ bool StateManager_v2::GetPlayStatsString(char* out_buf) {
     
     const int64_t start_diff =
         (g_RtaTimerStopped ? g_RtaTimer100 : current_time) - pit_start_time_;
-    const int32_t turn_total    = GetOptionValue(STAT_TURNS_SPENT);
+    const int32_t turn_total    = GetOptionValue(INF_STAT_TURNS_SPENT);
     const int64_t battle_time   = 
         mariost->animationTimeIncludingBattle - mariost->animationTimeNoBattle;
     int32_t battles_won   = (floor_ + 1) * 91 / 100;
-    battles_won -= GetOptionValue(STAT_BATTLES_SKIPPED);
+    battles_won -= GetOptionValue(INF_STAT_BATTLES_SKIPPED);
     
     // Page 1: Seed, floor, options & total play time.
     out_buf += sprintf(
@@ -781,40 +774,40 @@ bool StateManager_v2::GetPlayStatsString(char* out_buf) {
     out_buf += IntegerToFmtString(turn_total, out_buf);
     out_buf += sprintf(
         out_buf, "\nMax turns: %" PRId32 " (Floor %" PRId32 ")", 
-        GetOptionValue(STAT_MOST_TURNS_RECORD),
-        GetOptionValue(STAT_MOST_TURNS_FLOOR));
+        GetOptionValue(INF_STAT_MOST_TURNS_RECORD),
+        GetOptionValue(INF_STAT_MOST_TURNS_FLOOR));
     out_buf += sprintf(out_buf, "\nTimes ran away: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_TIMES_RAN_AWAY), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_TIMES_RAN_AWAY), out_buf);
     
     // Page 4: Damage dealt / taken, Superguards hit.
     out_buf += sprintf(out_buf, "\n<k><p>Enemy damage taken: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_ENEMY_DAMAGE), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_ENEMY_DAMAGE), out_buf);
     out_buf += sprintf(out_buf, "\nPlayer damage taken: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_PLAYER_DAMAGE), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_PLAYER_DAMAGE), out_buf);
     out_buf += sprintf(out_buf, "\nSuperguards hit: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_SUPERGUARDS), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_SUPERGUARDS), out_buf);
     
     // Page 5: FP spent, SP spent, Items (& shine sprites) used.
     out_buf += sprintf(out_buf, "\n<k><p>FP spent: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_FP_SPENT), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_FP_SPENT), out_buf);
     out_buf += sprintf(out_buf, "\nSP spent: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_SP_SPENT), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_SP_SPENT), out_buf);
     out_buf += sprintf(out_buf, "\nItems used: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_ITEMS_USED), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_ITEMS_USED), out_buf);
     out_buf += sprintf(out_buf, " (");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_SHINE_SPRITES), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_SHINE_SPRITES), out_buf);
     out_buf += sprintf(out_buf, " Shines)");
     
     // Page 6: Coins earned / spent, bonus battle conditions met.
     out_buf += sprintf(out_buf, "\n<k><p>Coins earned: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_COINS_EARNED), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_COINS_EARNED), out_buf);
     out_buf += sprintf(out_buf, "\nCoins spent: ");
-    out_buf += IntegerToFmtString(GetOptionValue(STAT_COINS_SPENT), out_buf);
+    out_buf += IntegerToFmtString(GetOptionValue(INF_STAT_COINS_SPENT), out_buf);
     out_buf += sprintf(out_buf, "\nConditions met: ");
     out_buf += PrintCompletionPercentage(
         out_buf,
-        GetOptionValue(STAT_CONDITIONS_MET), 
-        GetOptionValue(STAT_CONDITIONS_TOTAL));
+        GetOptionValue(INF_STAT_CONDITIONS_MET), 
+        GetOptionValue(INF_STAT_CONDITIONS_TOTAL));
     
     // Page 7: Achievement progress.
     out_buf += sprintf(out_buf, "\n<k><p>Chest rewards: ");
@@ -861,7 +854,7 @@ const char* StateManager_v2::GetCurrentTimeString() {
     // is negative (implying the time was rolled back), or time was never set,
     // return the empty string and clear the timebases previously set.
     if (last_save_diff < 0 || !pit_start_time_ ||
-        g_Mod->inf_state_.GetOptionNumericValue(OPT_DEBUG_MODE_USED)) {
+        g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_DEBUG_MODE_USED)) {
         pit_start_time_ = 0;
         last_save_time_ = 0;
         return "";
@@ -873,10 +866,10 @@ const char* StateManager_v2::GetCurrentTimeString() {
 
 void StateManager_v2::EnableRaceOptions() {
     SetDefaultOptions();
-    SetOption(OPT_RACE_MODE, 1);
-    SetOption(OPT_CHEST_REWARDS, 4);
-    SetOption(OPT_DISABLE_CHEST_HEAL, 1);
-    SetOption(OPTVAL_STARTER_ITEMS_RANDOM);
+    SetOption(INF_OPT_RACE_MODE, 1);
+    SetOption(INF_OPT_CHEST_REWARDS, 4);
+    SetOption(INF_OPT_DISABLE_CHEST_HEAL, 1);
+    SetOption(INF_OPTVAL_STARTER_ITEMS_RANDOM);
 }
 
 }

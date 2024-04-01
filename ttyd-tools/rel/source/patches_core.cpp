@@ -2,7 +2,6 @@
 
 #include "common_functions.h"
 #include "common_types.h"
-#include "custom_item.h"
 #include "custom_strings.h"
 #include "mod.h"
 #include "mod_state.h"
@@ -98,7 +97,7 @@ void OnModuleLoaded(OSModuleInfo* module) {
     if (module_id == ModuleId::JON) g_PitModulePtr = module_ptr;
     
     // Regardless of module loaded, reset Merlee curses if enabled.
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_MERLEE_CURSE)) {
+    if (g_Mod->state_.GetOption(tot::OPT_MERLEE_CURSE)) {
         PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
         // If the player somehow managed to run out of curses, reset completely.
         if (pouch.merlee_curse_uses_remaining < 1) {
@@ -135,7 +134,7 @@ void OnFileLoad(bool new_file = true) {
         ttyd::swdrv::swSet(0xec);           // Save Block tutorial-related
         ttyd::swdrv::swSet(0x15d9);         // Star piece in Pit room collected
         
-        // Initializes the mod's state and copies it to the pouch.
+        // Initializes the mod's InfPit state and copies it to the pouch.
         g_Mod->inf_state_.Load(/* new_save = */ true);
         g_Mod->inf_state_.Save();
         
@@ -143,12 +142,6 @@ void OnFileLoad(bool new_file = true) {
         tot::OptionsManager::InitLobby();
     }
     g_PromptSave = false;
-    
-    // If previous file loaded had obfuscated items, turn off and wipe flag.
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_OBFUSCATE_ITEMS)) {
-        g_Mod->inf_state_.SetOption(OPT_OBFUSCATE_ITEMS, 0);
-        ObfuscateItems(false);
-    }
 }
 
 }
@@ -158,18 +151,18 @@ void ApplyFixedPatches() {
         ttyd::event::stg0_00_init, []() {
             // Replaces existing logic, includes loading the mod's state.
             OnFileLoad(/* new_file = */ true);
-            options::ApplySettingBasedPatches();
         });
         
     g_cardCopy2Main_trampoline = patch::hookFunction(
         ttyd::cardmgr::cardCopy2Main, [](int32_t save_file_number) {
             g_cardCopy2Main_trampoline(save_file_number);
             OnFileLoad(/* new_file = */ false);
-            // If invalid Infinite Pit file loaded, give the player a Game Over.
+            // If invalid InfPit file loaded, give the player a Game Over.
             if (!g_Mod->inf_state_.Load(/* new_save = */ false)) {
                 g_CueGameOver = true;
             }
-            options::ApplySettingBasedPatches();
+            // TODO: Apply options if loading file in-progress.
+            // tot::OptionsManager::ApplyOptionsOnLoad();
         });
     
     g_OSLink_trampoline = patch::hookFunction(
@@ -193,9 +186,6 @@ void ApplyFixedPatches() {
                 mapName = reinterpret_cast<const char*>(1);
                 beroName = 0;
                 g_CueGameOver = false;
-                // Reset RTA timer variables so they don't carry across files.
-                g_Mod->inf_state_.pit_start_time_ = 0;
-                g_Mod->inf_state_.last_save_time_ = 0;
             } else if (
                 seq == SeqIndex::kMapChange && !strcmp(mapName, "aaa_00") && 
                 !strcmp(beroName, "prologue")) {
@@ -218,7 +208,7 @@ void ApplyFixedPatches() {
         ttyd::pmario_sound::psndBGMOn_f_d, [](
             uint32_t unk0, const char* name, uint32_t fadein_time,
             uint16_t unk1) {
-            if (g_Mod->inf_state_.GetOptionNumericValue(OPT_BGM_DISABLED)) {
+            if (g_Mod->state_.GetOption(tot::OPT_BGM_DISABLED)) {
                 return 0U;
             }
             return g_psndBGMOn_f_d_trampoline(unk0, name, fadein_time, unk1);

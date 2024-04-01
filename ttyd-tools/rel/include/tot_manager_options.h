@@ -16,6 +16,9 @@ public:
     // Sets up starting stats, etc. from tot_state options.
     static void InitFromSelectedOptions();
 
+    // Sets up options that need to be initialized on loading a file.
+    static void ApplyOptionsOnLoad();
+
     // Sets HP, FP, and BP according to current fields in tot_state.
     static void UpdateLevelupStats();
 };

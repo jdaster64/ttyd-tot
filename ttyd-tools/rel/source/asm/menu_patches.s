@@ -105,7 +105,7 @@ BranchBackFixItemWinPartySelectOrder:
 b 0
 
 StartCheckForUnusableItemInMenu:
-# Check to see if the player is trying to use an item on an invalid target.
+# Check to see if the player is allowed to use the item on a target.
 bl checkForUnusableItemInMenu
 cmpwi %r3, 0
 # If so, branch past code responsible for processing the item use.
@@ -117,8 +117,7 @@ ConditionalBranchCheckForUnusableItemInMenu:
 b 0
 
 StartUseSpecialItems:
-# Call C function to check whether the item being used is a Shine Sprite or
-# Strawberry Cake.
+# Call C function to check whether the item being used has special logic.
 addi %r3, %r1, 0x8
 bl useSpecialItems
 # Restore existing opcode.

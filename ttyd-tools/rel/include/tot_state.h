@@ -165,8 +165,8 @@ enum RngSequence {
     // "Totally random"; not reproducible run-to-run.
     RNG_VANILLA                 = -1,   // Calls ttyd::system::irand().
     
-    // Only for generating the random seed.
-    RNG_RANDOM_SEED             = 0,
+    // Not currently used.
+    RNG_RESERVED                = 0,
     
     // Battle generation; mangled with floor number + reset every floor.
     RNG_ENEMY                   = 1,    // Enemy loadout + which one drops item.
@@ -257,6 +257,7 @@ enum OptionsType {
 enum Options : uint32_t {
     // Flag-based options.
     // Select a set of settings all at once.
+    // TODO: Implement.
     OPT_PRESET                  = 0x400'2'00'01,
     OPTVAL_PRESET_CUSTOM        = 0x500'2'00'00,
     OPTVAL_PRESET_DEFAULT       = 0x500'2'00'01,
@@ -268,6 +269,7 @@ enum Options : uint32_t {
     OPTVAL_DIFFICULTY_FULL      = 0x502'2'00'02,
     OPTVAL_DIFFICULTY_FULL_EX   = 0x502'2'00'03,
     // Starting partner choice, or no partners.
+    // TODO: Implement.
     OPT_PARTNER                 = 0x404'4'00'08,
     OPTVAL_PARTNER_RANDOM       = 0x504'4'00'00,
     OPTVAL_PARTNER_GOOMBELLA    = 0x504'4'00'01,
@@ -319,6 +321,9 @@ enum Options : uint32_t {
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,
+    OPT_DEBUG_MODE_USED         = 0x461'1'00'01,
+    OPT_BGM_DISABLED            = 0x462'1'00'01,
+    OPT_SHOW_ATK_DEF            = 0x463'1'00'01,
     
     // Numeric options.
     // Stat increase per upgrade (0-10); at 0, you only ever have 1 point.
@@ -358,9 +363,12 @@ enum Options : uint32_t {
     STAT_RUN_FP_SPENT           = 0x01c'3'01'06,
     STAT_RUN_SP_SPENT           = 0x01f'3'01'06,
     STAT_RUN_SUPERGUARDS        = 0x022'3'01'06,
+    
+    // Not yet implemented.
     STAT_RUN_ITEMS_SOLD         = 0x025'2'01'04,
     STAT_RUN_BADGES_SOLD        = 0x027'2'01'04,
     STAT_RUN_LEVELS_SOLD        = 0x029'2'01'04,
+
     STAT_RUN_CONDITIONS_MET     = 0x02b'1'00'00,
     STAT_RUN_CONDITIONS_TOTAL   = 0x02c'1'00'00,
     STAT_RUN_UNIQUE_BADGE_FLAGS = 0x02d'1'00'0a,

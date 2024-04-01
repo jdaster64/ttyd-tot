@@ -4,12 +4,12 @@
 #include "common_types.h"
 #include "common_ui.h"
 #include "mod.h"
-#include "mod_state.h"
 #include "patches_field.h"
 #include "tot_generate_enemy.h"
 #include "tot_gon_tower.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
+#include "tot_state.h"
 
 #include <gc/OSTime.h>
 #include <ttyd/battle_database_common.h>
@@ -118,7 +118,7 @@ void DebugManager::Update() {
     const uint32_t button_trg = GetPressedButtons();
     
     // Continuously set the "used debug mode" flag on if in use.
-    g_Mod->inf_state_.SetOption(OPT_DEBUG_MODE_USED, 1);
+    g_Mod->state_.SetOption(tot::OPT_DEBUG_MODE_USED, 1);
     
     if (g_DebugMode == DEBUG_MAIN) {
         UpdateMainMenuPos(0);

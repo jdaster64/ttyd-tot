@@ -48,7 +48,7 @@ const char* GetYoshiTextColor() {
         "00c100", "e50000", "0000e5", "d07000",
         "e080d0", "404040", "90b0c0", "000000",
     };
-    if (!g_Mod->inf_state_.GetOptionNumericValue(OPT_YOSHI_COLOR_SELECT)) {
+    if (!g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_YOSHI_COLOR_SELECT)) {
         return kYoshiColorStrings[7];
     } else {
         return kYoshiColorStrings[ttyd::mario_pouch::pouchGetPartyColor(4)];
@@ -131,7 +131,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::MSG_JON_MOVER_SELECT:
             return GetMoverOptionsString(buf);
         case MsgKey::RIPPO_TOP_MENU: {
-            if (g_Mod->inf_state_.GetOptionNumericValue(OPT_NO_EXP_MODE)) {
+            if (g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_NO_EXP_MODE)) {
                 return "<select 0 3 0 40>\nItems\nBadges";
             }
             return "<select 0 3 0 40>\nItems\nBadges\nLevel-ups";

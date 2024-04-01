@@ -3,11 +3,11 @@
 #include "common_functions.h"
 #include "common_types.h"
 #include "mod.h"
-#include "mod_state.h"
 #include "patch.h"
 #include "patches_item.h"
 #include "tot_generate_enemy.h"
 #include "tot_manager_move.h"
+#include "tot_state.h"
 #include "tot_window_select.h"
 
 #include <gc/mtx.h>
@@ -956,8 +956,8 @@ void UseSpecialItemsInMenu(WinPartyData** party_data) {
     void* winPtr = ttyd::win_main::winGetPtr();
     const int32_t item = reinterpret_cast<int32_t*>(winPtr)[0x2d4 / 4];
     
-    // If the item is a Strawberry Cake or Shine Sprite...
-    if (item == ItemType::CAKE || item == ItemType::GOLD_BAR_X3) {
+    // If the item is a special item (currently just Strawberry Cake)...
+    if (item == ItemType::CAKE) {
         int32_t& party_member_target =
             reinterpret_cast<int32_t*>(winPtr)[0x2dc / 4];
         int32_t selected_party_id = 0;
@@ -981,54 +981,11 @@ void UseSpecialItemsInMenu(WinPartyData** party_data) {
             ttyd::mario_pouch::pouchSetFP(
                 ttyd::mario_pouch::pouchGetFP() +
                 item::GetBonusCakeRestoration());
-        } else if (item == ItemType::GOLD_BAR_X3) {
-            if (selected_party_id == 0) {
-                // Mario selected; add +0.5 max SP (up to 10) and restore SP.
-                PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
-                if (pouch.max_sp < 1000) pouch.max_sp += 50;
-                pouch.current_sp = pouch.max_sp;
-            } else {
-                ttyd::mario_pouch::PouchPartyData* pouch_data =
-                    ttyd::mario_pouch::pouchGetPtr()->party_data +
-                    selected_party_id;
-                int16_t* hp_table = 
-                    ttyd::mario_pouch::_party_max_hp_table +
-                    selected_party_id * 4;
-                    
-                // Rank the selected party member up and fully heal them.
-                if (pouch_data->hp_level < 2) {
-                    ++pouch_data->hp_level;
-                    ++pouch_data->attack_level;
-                    ++pouch_data->tech_level;
-                } else {
-                    // Increase the Ultra Rank's max HP by 5.
-                    if (hp_table[2] < 200) hp_table[2] += 5;
-                }
-                pouch_data->base_max_hp = hp_table[pouch_data->hp_level];
-                pouch_data->current_hp = hp_table[pouch_data->hp_level];
-                pouch_data->max_hp = hp_table[pouch_data->hp_level];
-                // Include HP Plus P in current / max stats.
-                const int32_t hp_plus_p_cnt =
-                    ttyd::mario_pouch::pouchEquipCheckBadge(ItemType::HP_PLUS_P);
-                pouch_data->current_hp += 5 * hp_plus_p_cnt;
-                pouch_data->max_hp += 5 * hp_plus_p_cnt;
-                
-                // Save the partner upgrade count to the mod's state.
-                ++g_Mod->inf_state_.partner_upgrades_[selected_party_id - 1];
-            }
-            
-            // Increment the number of actual Shine Sprites, so it shows
-            // the total count used in the Mario menu.
-            if (ttyd::mario_pouch::pouchGetPtr()->shine_sprites < 999) {
-                ++ttyd::mario_pouch::pouchGetPtr()->shine_sprites;
-                // Track Shine Sprites used in StateManager.
-                g_Mod->inf_state_.ChangeOption(STAT_SHINE_SPRITES);
-            }
         }
     }
     
     // Track items used in the menu.
-    g_Mod->inf_state_.ChangeOption(STAT_ITEMS_USED);
+    g_Mod->state_.ChangeOption(tot::STAT_RUN_ITEMS_USED);
     
     // Run normal logic to add HP, FP, and SP afterwards...
 }

@@ -2,7 +2,6 @@
 
 #include "common_functions.h"
 #include "common_ui.h"
-#include "custom_item.h"
 #include "mod.h"
 #include "mod_state.h"
 #include "tot_generate_enemy.h"
@@ -59,7 +58,7 @@ void AchievementsManager::Update() {
     StateManager_v2& state = g_Mod->inf_state_;
     
     // Remove awarded items if debug mode was used at any point.
-    if (state.GetOptionNumericValue(OPT_DEBUG_MODE_USED)) {
+    if (state.GetOptionNumericValue(INF_OPT_DEBUG_MODE_USED)) {
         ttyd::mario_pouch::pouchRemoveItem(kChestRewardItem);
         ttyd::mario_pouch::pouchRemoveItem(kBadgeLogItem);
         ttyd::mario_pouch::pouchRemoveItem(kTattleLogItem);
@@ -72,7 +71,7 @@ void AchievementsManager::Update() {
         num_rewards += state.GetStarPowerLevel(i);
     }
     const int32_t total_rewards =
-        state.CheckOptionValue(OPTVAL_PARTNERS_NEVER) ? 39 : 46;
+        state.CheckOptionValue(INF_OPTVAL_PARTNERS_NEVER) ? 39 : 46;
     if (num_rewards == total_rewards) GetAchievement(kChestRewardItem);
     g_CurrentTaskPoints[0] = num_rewards;
     g_MaxTaskPoints[0] = total_rewards;
@@ -136,19 +135,6 @@ int32_t AchievementsManager::GetMaxCompletionPoints(int32_t task_type) {
         case kBadgeLogItem:     return g_MaxTaskPoints[1];
         case kTattleLogItem:    return g_MaxTaskPoints[2];
         default:                return -1;
-    }
-}
-
-void AchievementsManager::UpdatePartnerVariantBadgesCollected() {
-    // Only mark P badges collected if playing without partners.
-    if (!g_Mod->inf_state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER) ||
-        g_Mod->inf_state_.GetOptionNumericValue(OPT_FIRST_PARTNER)) return;
-    
-    for (int32_t i = ItemType::POWER_JUMP; i < ItemType::MAX_ITEM_TYPE; ++i) {
-        bool collected = ttyd::swdrv::swGet(0x80 + i - ItemType::POWER_JUMP);
-        if (collected && IsStackableMarioBadge(i)) {
-            ttyd::swdrv::swSet(0x81 + i - ItemType::POWER_JUMP);
-        }
     }
 }
 

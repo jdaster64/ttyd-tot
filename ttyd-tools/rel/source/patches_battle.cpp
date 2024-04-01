@@ -525,7 +525,8 @@ uint32_t StatusEffectTick(BattleWorkUnit* unit, int8_t status_type) {
 
 // Handles Lucky chance from evasion badges.
 bool CheckEvasionBadges(BattleWorkUnit* unit) {
-    if (g_Mod->inf_state_.GetOptionNumericValue(OPT_EVASION_BADGES_CAP)) {
+    bool cap_badge_evasion = false;
+    if (cap_badge_evasion) {
         float hit_chance = 100.f;
         for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
             hit_chance *= 0.90f;
@@ -1029,13 +1030,13 @@ void ApplyFixedPatches() {
         [](BattleWorkUnit* unit, BattleWeapon* weapon) {
             // Run normal logic if option turned off.
             const int32_t sp_cost =
-                g_Mod->inf_state_.GetOptionValue(OPTNUM_SUPERGUARD_SP_COST);
+                g_Mod->state_.GetOption(tot::OPTNUM_SUPERGUARD_SP_COST);
             if (sp_cost <= 0) {
                 const int32_t defense_result =
                     g_BattleActionCommandCheckDefence_trampoline(unit, weapon);
                 if (defense_result == 5) {
                     // Successful Superguard, track in play stats.
-                    g_Mod->inf_state_.ChangeOption(STAT_SUPERGUARDS);
+                    g_Mod->state_.ChangeOption(tot::STAT_RUN_SUPERGUARDS);
                 }
                 return defense_result;
             }
@@ -1055,7 +1056,7 @@ void ApplyFixedPatches() {
             if (defense_result == 5) {
                 // Successful Superguard, subtract SP and track in play stats.
                 ttyd::mario_pouch::pouchAddAP(-sp_cost);
-                g_Mod->inf_state_.ChangeOption(STAT_SUPERGUARDS);
+                g_Mod->state_.ChangeOption(tot::STAT_RUN_SUPERGUARDS);
             }
             if (restore_superguard_frames) {
                 memcpy(ttyd::battle_ac::superguard_frames, superguard_frames, 7);
@@ -1103,7 +1104,7 @@ void ApplyFixedPatches() {
             }
             
             // Randomize damage dealt, if option enabled.
-            int32_t damage_scale = g_Mod->state_.GetOption(OPT_RANDOM_DAMAGE);
+            int32_t damage_scale = g_Mod->state_.GetOption(tot::OPT_RANDOM_DAMAGE);
             if (damage_scale != 0) {
                 // Generate a number from -25 to 25 in increments of 5.
                 int32_t scale = (ttyd::system::irand(11) - 5) * 5;
@@ -1125,7 +1126,7 @@ void ApplyFixedPatches() {
                 attacker, target, target_part, weapon, unk0, unk1);
             
             // Randomize damage dealt, if option enabled.
-            int32_t damage_scale = g_Mod->state_.GetOption(OPT_RANDOM_DAMAGE);
+            int32_t damage_scale = g_Mod->state_.GetOption(tot::OPT_RANDOM_DAMAGE);
             if (damage_scale != 0) {
                 // Generate a number from -25 to 25 in increments of 5.
                 int32_t scale = (ttyd::system::irand(11) - 5) * 5;
@@ -1160,11 +1161,11 @@ void ApplyFixedPatches() {
                 target->current_kind >= BattleUnitType::GOOMBELLA) {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
-                g_Mod->inf_state_.ChangeOption(STAT_PLAYER_DAMAGE, damage);
+                g_Mod->state_.ChangeOption(tot::STAT_RUN_PLAYER_DAMAGE, damage);
             } else if (target->current_kind <= BattleUnitType::BONETAIL) {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
-                g_Mod->inf_state_.ChangeOption(STAT_ENEMY_DAMAGE, damage);
+                g_Mod->state_.ChangeOption(tot::STAT_RUN_ENEMY_DAMAGE, damage);
             }
             // Run normal damage logic.
             g_BattleDamageDirect_trampoline(
@@ -1367,8 +1368,8 @@ void SetTargetAudienceAmount() {
 }
 
 double ApplySpRegenMultiplier(double base_regen) {
-    return base_regen * 
-        g_Mod->inf_state_.GetOptionNumericValue(OPTNUM_SP_REGEN_MODIFIER) / 20.0;
+    // Leaving as stub function in case this ends up being a ToT option.
+    return base_regen;
 }
 
 void ToggleScopedStatus(

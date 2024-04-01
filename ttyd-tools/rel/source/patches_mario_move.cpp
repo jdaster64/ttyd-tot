@@ -9,6 +9,7 @@
 #include "tot_manager_move.h"
 #include "tot_party_mario.h"
 #include "tot_party_yoshi.h"
+#include "tot_state.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
@@ -136,30 +137,6 @@ EVT_BEGIN(DeclareStarPowerPatch)
 DEBUG_REM(0) DEBUG_REM(0)
 EVT_PATCH_END()
 static_assert(sizeof(DeclareStarPowerPatch) == 0x10);
-
-// Returns the max level of a move badge based on the number of copies equipped.
-int32_t MaxLevelForMoveBadges(int32_t badge_count) {
-    int32_t max_level = badge_count;
-    switch (g_Mod->inf_state_.GetOptionValue(OPT_BADGE_MOVE_LEVEL)) {
-        case OPTVAL_BADGE_MOVE_1X: {
-            break;
-        }
-        case OPTVAL_BADGE_MOVE_2X: {
-            max_level *= 2;
-            break;
-        }
-        case OPTVAL_BADGE_MOVE_RANK: {
-            if (!badge_count) return 0;
-            return ttyd::mario_pouch::pouchGetPtr()->rank + 1;
-        }
-        case OPTVAL_BADGE_MOVE_INFINITE: {
-            if (!badge_count) return 0;
-            return 99;
-        }
-    }
-    if (max_level > 99) max_level = 99;
-    return max_level;
-}
 
 // If the badge is one that can have its power level selected, returns the
 // index of the value controlling its level; otherwise, returns -1.
@@ -624,19 +601,18 @@ void ApplyFixedPatches() {
 
 void OnEnterExitBattle(bool is_start) {
     if (is_start) {
-        int8_t badge_count;
-        int32_t max_level;
+        int32_t badge_count;
         for (int32_t i = 0; i < 2; ++i) {
+            // Charge.
             badge_count = ttyd::mario_pouch::pouchEquipCheckBadge(
                 ItemType::CHARGE + i);
-            max_level = MaxLevelForMoveBadges(badge_count);
-            g_MaxMoveBadgeCounts[i] = max_level;
-            g_CurMoveBadgeCounts[i] = max_level < 99 ? max_level : 1;
+            g_MaxMoveBadgeCounts[i] = badge_count;
+            g_CurMoveBadgeCounts[i] = badge_count < 99 ? badge_count : 1;
+            // Toughen Up (move); currently no longer used.
             badge_count = ttyd::mario_pouch::pouchEquipCheckBadge(
                 ItemType::SUPER_CHARGE + i);
-            max_level = MaxLevelForMoveBadges(badge_count);
-            g_MaxMoveBadgeCounts[2 + i] = max_level;
-            g_CurMoveBadgeCounts[2 + i] = max_level < 99 ? max_level : 1;
+            g_MaxMoveBadgeCounts[2 + i] = badge_count;
+            g_CurMoveBadgeCounts[2 + i] = badge_count < 99 ? badge_count : 1;
         }
         g_InBattle = true;
     } else {

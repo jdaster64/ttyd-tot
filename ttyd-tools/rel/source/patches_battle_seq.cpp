@@ -180,26 +180,27 @@ void CheckBattleCondition() {
     NpcBattleInfo* npc_info = fbat_info->wBattleInfo;
 
     // Track the number of turns spent / number of run aways at fight's end.
-    StateManager_v2& state = g_Mod->inf_state_;
+    auto& state = g_Mod->state_;
     state.ChangeOption(
-        STAT_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
+        tot::STAT_RUN_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
     state.ChangeOption(
-        STAT_MOST_TURNS_CURRENT, ttyd::battle::g_BattleWork->turn_count);
-    if (state.GetOptionValue(STAT_MOST_TURNS_CURRENT) >
-        state.GetOptionValue(STAT_MOST_TURNS_RECORD)) {
-        // Update max turn count record (use 1-indexed floor count).
-        state.SetOption(STAT_MOST_TURNS_RECORD,
-            state.GetOptionValue(STAT_MOST_TURNS_CURRENT));
-        state.SetOption(STAT_MOST_TURNS_FLOOR, state.floor_ + 1);
+        tot::STAT_RUN_MOST_TURNS_CURRENT, ttyd::battle::g_BattleWork->turn_count);
+    if (state.GetOption(tot::STAT_RUN_MOST_TURNS_CURRENT) >
+        state.GetOption(tot::STAT_RUN_MOST_TURNS_RECORD)) {
+        // Update max turn count record.
+        state.SetOption(tot::STAT_RUN_MOST_TURNS_RECORD,
+            state.GetOption(tot::STAT_RUN_MOST_TURNS_CURRENT));
+        state.SetOption(tot::STAT_RUN_MOST_TURNS_FLOOR, state.floor_);
     }
     if (fbat_info->wResult != 1) {
-        state.ChangeOption(STAT_TIMES_RAN_AWAY);
+        state.ChangeOption(tot::STAT_RUN_TIMES_RAN_AWAY);
     }
     
     // Did not win the fight (e.g. ran away).
     if (fbat_info->wResult != 1) return;
     
     // Did not win the fight (an enemy still has a stolen item).
+    // TODO: Consider disabling this outcome to make Bandits less annoying?
     for (int32_t i = 0; i < 8; ++i) {
         if (npc_info->wStolenItems[i] != 0) return;
     }
@@ -207,7 +208,7 @@ void CheckBattleCondition() {
     // If condition is a success and rule is not 0, add a bonus item.
     if (fbat_info->wBtlActRecCondition && fbat_info->wRuleKeepResult == 6) {
         int32_t item_reward = 0;
-        if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_DROP_HELD_FROM_BONUS)) {
+        if (state.CheckOptionValue(tot::OPTVAL_DROP_HELD_FROM_BONUS)) {
             // If using "drop gated by bonus" option, use the held item that
             // would otherwise normally drop instead of the random item.
             // (If that item was stolen, the player receives nothing.)
@@ -223,12 +224,12 @@ void CheckBattleCondition() {
             }
         }
         // Increment the count of successful challenges.
-        state.ChangeOption(STAT_CONDITIONS_MET);
+        state.ChangeOption(tot::STAT_RUN_CONDITIONS_MET);
     }
     
     // If battle reward mode is "drop all held", award items other than the
     // natural drop ones until there are no "recovered items" slots left.
-    if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_DROP_ALL_HELD)) {
+    if (state.CheckOptionValue(tot::OPTVAL_DROP_ALL_HELD)) {
         for (int32_t i = 0; i < 8; ++i) {
             const int32_t held_item = npc_info->wHeldItems[i];
             // If there is a held item, and this isn't the natural drop...
@@ -239,30 +240,6 @@ void CheckBattleCondition() {
                         break;
                     }
                 }
-            }
-        }
-    }
-    
-    // If playing with the "no partners" option, give the player the Tattle logs 
-    // for all enemies present at the start of the fight.
-    if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER) &&
-        !g_Mod->inf_state_.GetOptionNumericValue(OPT_FIRST_PARTNER)) {
-        const auto* group = npc_info->pConfiguration;
-        for (int32_t i = 0; i < group->num_enemies; ++i) {
-            int32_t type = group->enemy_data[i].unit_kind_params->unit_type;
-            switch (type) {
-                case BattleUnitType::LAKITU:
-                case BattleUnitType::DARK_LAKITU:
-                case BattleUnitType::YUX:
-                case BattleUnitType::Z_YUX:
-                case BattleUnitType::X_YUX:
-                    // For enemy types that spawn minions, assume that they
-                    // were also present (as they're never there at the start,
-                    // and as such would otherwise never be marked).
-                    ttyd::battle_monosiri::battleSetUnitMonosiriFlag(type + 1);
-                    // fallthrough to default case...
-                default:
-                    ttyd::battle_monosiri::battleSetUnitMonosiriFlag(type);
             }
         }
     }
@@ -318,11 +295,11 @@ void GetDropMaterials(FbatBattleInformation* fbat_info) {
         }
     }
     
-    switch (g_Mod->inf_state_.GetOptionValue(OPT_BATTLE_REWARD_MODE)) {
+    switch (g_Mod->state_.GetOptionValue(tot::OPT_BATTLE_DROPS)) {
         // If using default battle drop behavior, select the item drop based on
         // the previously determined enemy held item index.
-        case OPTVAL_DROP_STANDARD:
-        case OPTVAL_DROP_ALL_HELD: {
+        case tot::OPTVAL_DROP_STANDARD:
+        case tot::OPTVAL_DROP_ALL_HELD: {
             battle_info->wItemDropped = 
                 battle_info->wHeldItems[party_setup->held_item_weight];
             break;

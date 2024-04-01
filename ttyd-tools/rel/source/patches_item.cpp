@@ -1,6 +1,5 @@
 #include "patches_item.h"
 
-#include "custom_item.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_achievements.h"
@@ -167,6 +166,7 @@ int32_t GetDrainRestoration(EvtEntry* evt, bool hp_drain) {
     id = ttyd::battle_sub::BattleTransID(evt, id);
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
     
+    bool use_64_style_drain = false;
     int32_t drain = 0;
     if (unit) {
         int32_t num_badges = 0;
@@ -175,7 +175,7 @@ int32_t GetDrainRestoration(EvtEntry* evt, bool hp_drain) {
         } else {
             num_badges = unit->badges_equipped.fp_drain;
         }
-        if (g_Mod->inf_state_.GetOptionNumericValue(OPT_64_STYLE_HP_FP_DRAIN)) {
+        if (use_64_style_drain) {
             // 1 point per damaging hit x num badges, max of 5.
             drain = unit->total_damage_dealt_this_attack * num_badges;
             if (drain > 5) drain = 5;
@@ -559,17 +559,15 @@ void ApplyFixedPatches() {
     // Override item-get logic for special items.
     g_pouchGetItem_trampoline = mod::patch::hookFunction(
         ttyd::mario_pouch::pouchGetItem, [](int32_t item_type) {
-            // Track coins gained.
+            // Track coins, Star Pieces, and Shine Sprites gained.
             if (item_type == ItemType::COIN) {
-                g_Mod->inf_state_.ChangeOption(STAT_COINS_EARNED);
+                g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED);
             }
-            
-            // If badge is a "P" badge and playing Mario-alone, also mark
-            // off the relevant "P" badge in the badge log.
-            if (g_Mod->inf_state_.CheckOptionValue(OPTVAL_PARTNERS_NEVER)
-                && !g_Mod->inf_state_.GetOptionNumericValue(OPT_FIRST_PARTNER)
-                && IsStackableMarioBadge(item_type)) {
-                ttyd::swdrv::swSet(0x81 + item_type - ItemType::POWER_JUMP);
+            if (item_type == ItemType::STAR_PIECE) {
+                g_Mod->state_.ChangeOption(tot::STAT_RUN_STAR_PIECES);
+            }
+            if (item_type == ItemType::SHINE_SPRITE) {
+                g_Mod->state_.ChangeOption(tot::STAT_RUN_SHINE_SPRITES);
             }
             
             // Handle items with special effects in ToT.
