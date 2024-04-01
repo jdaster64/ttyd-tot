@@ -1131,23 +1131,9 @@ bool GetEnemyStats(
         }
     }
     if (out_level) {
-        // Note: in ToT, none of this should matter?
-        int32_t mario_level = ttyd::mario_pouch::pouchGetPtr()->level;
-        if (mario_level >= 99) {
-            *out_level = 0;
-        } else if (ei.level == 0) {
-            // Enemies like Mini-Yuxes should never grant EXP.
-            *out_level = 0;
-        } else {
-            // Enemies' level will always be the same relative to than Mario,
-            // typically giving 3 ~ 10 EXP depending on strength and group size.
-            if (ei.level <= 10) {
-                *out_level = mario_level + ei.level + 5;
-            } else {
-                // Bosses / special enemies get fixed bonus Star Points instead.
-                *out_level = -ei.level / 2;
-            }
-        }
+        // Practically doesn't matter anymore, aside from audience calculations.
+        // Return level 0 for minion enemies (e.g. mini-Yuxes), 2 otherwise.
+        *out_level = ei.level == 0 ? 0 : 2;
     }
     if (out_coinlvl) {
         // Return the level directly.

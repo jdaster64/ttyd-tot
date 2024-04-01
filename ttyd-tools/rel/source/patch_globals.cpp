@@ -88,8 +88,6 @@ void (*g_BattleDamageDirect_trampoline)(
 int32_t (*g_btlevtcmd_WeaponAftereffect_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_cmd.o  801056f4
 int32_t (*g_btlevtcmd_GetItemRecoverParam_trampoline)(EvtEntry*, bool) = nullptr;
-// battle_event_cmd.o  8010a32c
-int32_t (*g_btlevtcmd_SetEventConfusion_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_cmd.o  8010a388
 int32_t (*g_btlevtcmd_SetEventAttack_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_cmd.o  8010af58

@@ -134,6 +134,12 @@ extern int32_t (*g_BattlePreCheckDamage_trampoline)(
 extern uint32_t (*g_BattleSetStatusDamageFromWeapon_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
     BattleWeapon*, uint32_t);
+extern int32_t (*g_BattleCalculateDamage_trampoline)(
+    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,
+    uint32_t*, uint32_t);
+extern int32_t (*g_BattleCalculateFpDamage_trampoline)(
+    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,
+    uint32_t*, uint32_t);
 extern void (*g_BattleDamageDirect_trampoline)(
     int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
     uint32_t, uint32_t, uint32_t);
@@ -618,8 +624,137 @@ int32_t PreCheckDamage(
     return ttyd::system::irand(100) < accuracy ? 1 : 2;
 }
 
-// Replaces the original damage function used by TTYD, for ease of editing.
-// Called by Alter(Fp)DamageCalculation in patches_enemy.
+// Calculates an actor's current ATK given base power + special property flags.
+int32_t CalculateAtkImpl(
+    BattleWorkUnit* attacker, int32_t atk, int32_t sp_flags,
+    bool enemy_scale, bool ice_power_bonus) {
+    
+    // Modify enemy ATK based on current scaling.
+    if (enemy_scale) {
+        int32_t altered_atk = atk;
+        tot::GetEnemyStats(
+            attacker->current_kind, nullptr, &altered_atk, nullptr, 
+            nullptr, nullptr, atk);
+        atk = Clamp(altered_atk, 1, 99);
+    }
+    
+    // Positive attack modifiers (badges and statuses).
+    if (sp_flags & AttackSpecialProperty_Flags::BADGE_BUFFABLE) {
+        atk += attacker->badges_equipped.all_or_nothing;
+        atk += attacker->badges_equipped.power_plus;
+        atk += attacker->badges_equipped.p_up_d_down;
+        
+        // Perfect Power.
+        if (attacker->current_hp == attacker->max_hp) {
+            atk += attacker->badges_equipped.unk_03;
+        }
+        
+        // Danger / Peril badges (weaker than in original).
+        // Will not activate if the actor is at 1/1 (max) HP.
+        if (attacker->current_hp <= attacker->unit_kind_params->danger_hp &&
+            attacker->current_hp < attacker->max_hp) {
+            atk += 1 * attacker->badges_equipped.power_rush;
+        }
+        if (attacker->current_hp <= attacker->unit_kind_params->peril_hp &&
+            attacker->current_hp < attacker->max_hp) {
+            atk += 3 * attacker->badges_equipped.mega_rush;
+        }
+        if (ice_power_bonus) {
+            atk += attacker->badges_equipped.ice_power;
+        }
+    }
+    if (sp_flags & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
+        int8_t strength = 0;
+        BtlUnit_GetStatus(
+            attacker, StatusEffectType::ATTACK_UP, nullptr, &strength);
+        atk += strength;
+        // ATK spell activated (doesn't check if Mario is attacker!)
+        if (ttyd::battle::g_BattleWork->impending_merlee_spell_type == 1) {
+            atk += 3;
+        }
+    }
+    if (sp_flags & AttackSpecialProperty_Flags::CHARGE_BUFFABLE) {
+        if (BtlUnit_CheckStatus(attacker, StatusEffectType::CHARGE)) {
+            int8_t strength = 0;
+            BtlUnit_GetStatus(
+                attacker, StatusEffectType::CHARGE, nullptr, &strength);
+            atk += strength;
+            attacker->token_flags |= BattleUnitToken_Flags::CHARGE_EXPENDED;
+        }
+    }
+    
+    // Negative attack modifiers (badges and statuses).
+    if (sp_flags & AttackSpecialProperty_Flags::BADGE_BUFFABLE) {
+        atk -= attacker->badges_equipped.p_down_d_up;
+        // Only drop by 1, regardless of number equipped.
+        atk -= attacker->badges_equipped.hp_drain ? 1 : 0;
+        atk -= attacker->badges_equipped.fp_drain ? 1 : 0;
+    }
+    if (sp_flags & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
+        int8_t strength = 0;
+        BtlUnit_GetStatus(
+            attacker, StatusEffectType::ATTACK_DOWN, nullptr, &strength);
+        atk += strength;
+        
+        if (BtlUnit_CheckStatus(attacker, StatusEffectType::BURN)) {
+            atk -= 1;
+        }
+    }
+    if (atk < 0) atk = 0;
+    
+    // Attack multiplier statuses.
+    if (sp_flags & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
+        if (BtlUnit_CheckStatus(attacker, StatusEffectType::HUGE)) {
+            // 1.5x, rounded up.
+            atk = ((atk * 3) + 1) / 2;
+        } else if (atk > 1 &&
+            BtlUnit_CheckStatus(attacker, StatusEffectType::TINY)) {
+            // 0.5x, rounded down (unless base is 1).
+            atk /= 2;
+        }
+    }
+    
+    return atk;
+}
+
+// Calculates an actor's current default DEF power.
+int32_t CalculateDefImpl(
+    BattleWorkUnit* target, BattleWorkUnitPart* part, int32_t element) {
+    int32_t def = part->defense[element];
+    
+    // Modify enemy DEF based on current scaling.
+    if (target->current_kind <= BattleUnitType::BONETAIL && def > 0 && def < 99) {
+        int32_t altered_def = def;
+        tot::GetEnemyStats(
+            target->current_kind, nullptr, nullptr, &altered_def, 
+            nullptr, nullptr);
+        def = Clamp(altered_def, 1, 99);
+    }
+    
+    // Defense modifiers.
+    
+    def += target->badges_equipped.defend_plus;
+    if (target->status_flags & BattleUnitStatus_Flags::DEFENDING) {
+        // Toughen Up buffs the "Defend" action.
+        def += 1 + target->badges_equipped.super_charge;
+    }
+    
+    int8_t strength = 0;
+    BtlUnit_GetStatus(target, StatusEffectType::DEFENSE_UP, nullptr, &strength);
+    def += strength;
+    BtlUnit_GetStatus(target, StatusEffectType::DEFENSE_DOWN, nullptr, &strength);
+    def += strength;
+    if (def < 0) def = 0;
+    
+    if (part->part_attribute_flags & PartsAttribute_Flags::WEAK_TO_ATTACK_FX_R) {
+        def += target->unit_work[1];
+        if (def < 0) def = 0;
+    }
+    
+    return def;
+}
+
+// Replaces the original core damage function used by TTYD.
 int32_t CalculateBaseDamage(
     BattleWorkUnit* attacker, BattleWorkUnit* target, BattleWorkUnitPart* part,
     BattleWeapon* weapon, uint32_t* unk0, uint32_t unk1) {
@@ -655,85 +790,20 @@ int32_t CalculateBaseDamage(
     }
     
     int32_t atk = weapon->damage_function_params[0];
-    
     auto weapon_fn = (WeaponDamageFn)weapon->damage_function;
     if (weapon_fn) atk = weapon_fn(attacker, weapon, target, part);
     
-    // Positive attack modifiers (badges and statuses).
-    if (sp & AttackSpecialProperty_Flags::BADGE_BUFFABLE) {
-        atk += attacker->badges_equipped.all_or_nothing;
-        atk += attacker->badges_equipped.power_plus;
-        atk += attacker->badges_equipped.p_up_d_down;
-        
-        // Perfect Power.
-        if (attacker->current_hp == attacker->max_hp) {
-            atk += attacker->badges_equipped.unk_03;
-        }
-        
-        // Danger / Peril badges (weaker than in original).
-        // Will not activate if the actor is at 1/1 (max) HP.
-        if (attacker->current_hp <= attacker->unit_kind_params->danger_hp &&
-            attacker->current_hp < attacker->max_hp) {
-            atk += 1 * attacker->badges_equipped.power_rush;
-        }
-        if (attacker->current_hp <= attacker->unit_kind_params->peril_hp &&
-            attacker->current_hp < attacker->max_hp) {
-            atk += 3 * attacker->badges_equipped.mega_rush;
-        }
-        if (part->part_attribute_flags & PartsAttribute_Flags::WEAK_TO_ICE_POWER) {
-            atk += attacker->badges_equipped.ice_power;
-        }
-    }
-    if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
-        int8_t strength = 0;
-        BtlUnit_GetStatus(
-            attacker, StatusEffectType::ATTACK_UP, nullptr, &strength);
-        atk += strength;
-        // ATK spell activated (doesn't check if Mario is attacker!)
-        if (battleWork->impending_merlee_spell_type == 1) {
-            atk += 3;
-        }
-    }
-    if (sp & AttackSpecialProperty_Flags::CHARGE_BUFFABLE) {
-        if (BtlUnit_CheckStatus(attacker, StatusEffectType::CHARGE)) {
-            int8_t strength = 0;
-            BtlUnit_GetStatus(
-                attacker, StatusEffectType::CHARGE, nullptr, &strength);
-            atk += strength;
-            attacker->token_flags |= BattleUnitToken_Flags::CHARGE_EXPENDED;
-        }
-    }
+    int32_t should_scale_atk =
+        attacker->current_kind <= BattleUnitType::BONETAIL 
+        && !(weapon->target_property_flags & AttackTargetProperty_Flags::RECOIL_DAMAGE)
+        && !weapon->item_id
+        && atk > 0;
+    bool ice_power_bonus = 
+        part->part_attribute_flags & PartsAttribute_Flags::WEAK_TO_ICE_POWER;
     
-    // Negative attack modifiers (badges and statuses).
-    if (sp & AttackSpecialProperty_Flags::BADGE_BUFFABLE) {
-        atk -= attacker->badges_equipped.p_down_d_up;
-        // Only drop by 1, regardless of number equipped.
-        atk -= attacker->badges_equipped.hp_drain ? 1 : 0;
-        atk -= attacker->badges_equipped.fp_drain ? 1 : 0;
-    }
-    if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
-        int8_t strength = 0;
-        BtlUnit_GetStatus(
-            attacker, StatusEffectType::ATTACK_DOWN, nullptr, &strength);
-        atk += strength;
-        
-        if (BtlUnit_CheckStatus(attacker, StatusEffectType::BURN)) {
-            atk -= 1;
-        }
-    }
-    if (atk < 0) atk = 0;
+    atk = CalculateAtkImpl(attacker, atk, sp, should_scale_atk, ice_power_bonus);
     
-    // Attack multiplier statuses.
-    if (sp & AttackSpecialProperty_Flags::STATUS_BUFFABLE) {
-        if (BtlUnit_CheckStatus(attacker, StatusEffectType::HUGE)) {
-            // 1.5x, rounded up.
-            atk = ((atk * 3) + 1) / 2;
-        } else if (atk > 1 &&
-            BtlUnit_CheckStatus(attacker, StatusEffectType::TINY)) {
-            // 0.5x, rounded down (unless base is 1).
-            atk /= 2;
-        }
-    }
+    // Special case handled outside base ATK function.
     
     // If an enemy is attacking the player, and not during the player attack
     // phase, queue pity Star Power restoration based on enemy's ATK.
@@ -755,8 +825,19 @@ int32_t CalculateBaseDamage(
         }
     }
     
-    int32_t def = part->defense[element];
+    int32_t def = CalculateDefImpl(target, part, element);
     int32_t def_attr = part->defense_attr[element];
+        
+    if (battleWork->impending_merlee_spell_type == 2 &&
+        target->current_kind == BattleUnitType::MARIO) {
+        def += 3;
+    }
+    
+    // If defense-piercing or elemental healing, set DEF to 0.
+    if (sp & AttackSpecialProperty_Flags::DEFENSE_PIERCING or def_attr == 3) {
+        def = 0;
+    }
+    
     switch (element) {
         case AttackElement::NORMAL:
             *unk0 = unk1 | 0x17;
@@ -773,38 +854,6 @@ int32_t CalculateBaseDamage(
         case AttackElement::ELECTRIC:
             *unk0 = unk1 | 0x1b;
             break;
-    }
-    
-    // Defense modifiers.
-    // If defense-piercing or elemental healing, set DEF to 0.
-    if (sp & AttackSpecialProperty_Flags::DEFENSE_PIERCING or def_attr == 3) {
-        def = 0;
-    } else {
-        def += target->badges_equipped.defend_plus;
-        if (target->status_flags & BattleUnitStatus_Flags::DEFENDING) {
-            // Toughen Up buffs the "Defend" action.
-            def += 1 + target->badges_equipped.super_charge;
-        }
-        
-        int8_t strength = 0;
-        BtlUnit_GetStatus(
-            target, StatusEffectType::DEFENSE_UP, nullptr, &strength);
-        def += strength;
-        BtlUnit_GetStatus(
-            target, StatusEffectType::DEFENSE_DOWN, nullptr, &strength);
-        def += strength;
-        if (def < 0) def = 0;
-        
-        if (battleWork->impending_merlee_spell_type == 2 &&
-            target->current_kind == BattleUnitType::MARIO) {
-            def += 3;
-        }
-        
-        if (part->part_attribute_flags & 
-            PartsAttribute_Flags::WEAK_TO_ATTACK_FX_R) {
-            def += target->unit_work[1];
-            if (def < 0) def = 0;
-        }
     }
     
     int32_t damage = atk - def;
@@ -870,6 +919,55 @@ int32_t CalculateBaseDamage(
     }
     
     return damage;
+}
+
+// Replaces the original core FP damage function used by TTYD.
+int32_t CalculateBaseFpDamage(
+    BattleWorkUnit* attacker, BattleWorkUnit* target, BattleWorkUnitPart* part,
+    BattleWeapon* weapon, uint32_t* unk0, uint32_t unk1) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    // For shorter / more readable code lines, lol.
+    const auto& sp = weapon->special_property_flags;
+    int32_t result = 0;
+    
+    if (!weapon->fp_damage_function) {
+        return 0;
+    }
+    if (attacker &&
+        (sp & AttackSpecialProperty_Flags::BADGE_BUFFABLE) &&
+        attacker->badges_equipped.all_or_nothing > 0 &&
+        !(battleWork->ac_manager_work.ac_result & 2) &&
+        !(unk1 & 0x20000)) {
+        return 0;
+    }
+    // Immune to damage/status.
+    if (part->part_attribute_flags & PartsAttribute_Flags::UNK_2000_0000) {
+        return 0;
+    }
+    
+    if (!(*unk0 & 0x2000)) {
+        auto weapon_fn = (WeaponDamageFn)weapon->fp_damage_function;
+        if (weapon_fn) result = weapon_fn(attacker, weapon, target, part);
+        
+        // Modify base FP damage for enemies based on current scaling.
+        if (attacker->current_kind <= BattleUnitType::BONETAIL
+            && !weapon->item_id && result > 0) {
+            int32_t altered_atk = result;
+            tot::GetEnemyStats(
+                attacker->current_kind, nullptr, &altered_atk, nullptr,
+                nullptr, nullptr, result);
+            result = Clamp(altered_atk, 1, 99);
+        }
+        
+        // If guarded, reduce damage by one.
+        if (unk1 & 0x40000) --result;
+        
+        if (result < 1) result = 0;
+        if (result > 1 && ((*unk0 & 0xff) == 0x1e)) {
+            *unk0 = (*unk0 & 0xffffff00U) | 0x17;
+        }
+    }
+    return result;
 }
 
 void CalculateCounterDamage(
@@ -991,6 +1089,55 @@ void ApplyFixedPatches() {
                 // Replaces vanilla logic completely.
                 return StatusEffectTick(unit, status_type);
             });
+    g_BattleCalculateDamage_trampoline = patch::hookFunction(
+        ttyd::battle_damage::BattleCalculateDamage, [](
+            BattleWorkUnit* attacker, BattleWorkUnit* target,
+            BattleWorkUnitPart* target_part, BattleWeapon* weapon,
+            uint32_t* unk0, uint32_t unk1) {
+            // Replaces vanilla logic completely.
+            int32_t damage = CalculateBaseDamage(
+                attacker, target, target_part, weapon, unk0, unk1);
+                
+            // Increment HP/FP Drain counter if the move can be damaging.
+            if (weapon->damage_function) {
+                ++attacker->total_damage_dealt_this_attack;
+            }
+            
+            // Randomize damage dealt, if option enabled.
+            int32_t damage_scale = g_Mod->state_.GetOption(OPT_RANDOM_DAMAGE);
+            if (damage_scale != 0) {
+                // Generate a number from -25 to 25 in increments of 5.
+                int32_t scale = (ttyd::system::irand(11) - 5) * 5;
+                // Scale by 1x or 2x based on the setting.
+                scale *= damage_scale;
+                // Round damage modifier away from 0.
+                damage += (damage * scale + (scale > 0 ? 50 : -50)) / 100;
+            }
+            
+            return damage;
+        });
+    g_BattleCalculateFpDamage_trampoline = patch::hookFunction(
+        ttyd::battle_damage::BattleCalculateFpDamage, [](
+            BattleWorkUnit* attacker, BattleWorkUnit* target,
+            BattleWorkUnitPart* target_part, BattleWeapon* weapon,
+            uint32_t* unk0, uint32_t unk1) {
+            // Replaces vanilla logic completely.
+            int32_t damage = CalculateBaseFpDamage(
+                attacker, target, target_part, weapon, unk0, unk1);
+            
+            // Randomize damage dealt, if option enabled.
+            int32_t damage_scale = g_Mod->state_.GetOption(OPT_RANDOM_DAMAGE);
+            if (damage_scale != 0) {
+                // Generate a number from -25 to 25 in increments of 5.
+                int32_t scale = (ttyd::system::irand(11) - 5) * 5;
+                // Scale by 1x or 2x based on the setting.
+                scale *= damage_scale;
+                // Round damage modifier away from 0.
+                damage += (damage * scale + (scale > 0 ? 50 : -50)) / 100;
+            }
+            
+            return damage;
+        });
         
     // Replace damage calculation for counters to make Payback, Hold Fast
     // and Return Postage deal 1x damage, and make Bob-omb counters
@@ -1001,7 +1148,7 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(StartCalculateCounterDamage),
         reinterpret_cast<void*>(BranchBackCalculateCounterDamage));
             
-    // Track damage taken, and queue SP restoration based on damage taken.
+    // Track damage taken.
     g_BattleDamageDirect_trampoline = mod::patch::hookFunction(
         ttyd::battle_damage::BattleDamageDirect, [](
             int32_t unit_idx, BattleWorkUnit* target, BattleWorkUnitPart* part,
@@ -1279,6 +1426,24 @@ void SignalPlayerInitiatedPartySwitch() {
     if (ttyd::mario_pouch::pouchEquipCheckBadge(ItemType::QUICK_CHANGE)) {
         g_PartySwitchPlayerInitiated = true;
     }
+}
+
+int32_t GetCurrentEnemyAtk(BattleWorkUnit* unit, int32_t reference_atk) {
+    if (reference_atk < 0) {
+        int32_t atk, def;
+        tot::GetTattleDisplayStats(unit->current_kind, &atk, &def);
+        reference_atk = atk;
+    }
+    return CalculateAtkImpl(
+        unit, reference_atk, 
+        /* sp flags */ AttackSpecialProperty_Flags::ALL_BUFFABLE,
+        /* should scale */ true, /* ice power? */ false);
+}
+
+int32_t GetCurrentEnemyDef(BattleWorkUnit* unit) {
+    int32_t part_id = BtlUnit_GetBodyPartsId(unit);
+    auto* part = BtlUnit_GetPartsPtr(unit, part_id);
+    return CalculateDefImpl(unit, part, /* element */ 0);
 }
 
 // Applies a custom status effect to the target.

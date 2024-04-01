@@ -34,14 +34,6 @@ void SetTargetAudienceAmount();
 // Applies the option to change the SP amount regained from attacks.
 double ApplySpRegenMultiplier(double base_regen);
 
-// Calculates the base damage for an attack, replacing the original TTYD func.
-int32_t CalculateBaseDamage(
-    ttyd::battle_unit::BattleWorkUnit* attacker, 
-    ttyd::battle_unit::BattleWorkUnit* target, 
-    ttyd::battle_unit::BattleWorkUnitPart* part,
-    ttyd::battle_database_common::BattleWeapon* weapon, 
-    uint32_t* unk0, uint32_t unk1);
-
 // Calculates the damage dealt by a counterattack.
 void CalculateCounterDamage(
     ttyd::battle_damage::CounterattackWork* counter_work,
@@ -66,6 +58,14 @@ int32_t GetPartySwitchCost();
 void ResetPartySwitchCost();
 // Signals that a party switch should cost FP unless cancelled by Confusion.
 void SignalPlayerInitiatedPartySwitch();
+
+// Calculates an enemy's current ATK, including statuses.
+// Uses the default reference ATK value if `reference_atk` < 0.
+int32_t GetCurrentEnemyAtk(
+    ttyd::battle_unit::BattleWorkUnit* unit, int32_t reference_atk = -1);
+// Calculates an enemy's current DEF (to normal attacks), including statuses.
+int32_t GetCurrentEnemyDef(
+    ttyd::battle_unit::BattleWorkUnit* unit);
 
 // Applies a custom status effect to the target.
 // Params: unit, part, status_flag, color1 & color2 (rgb), sfx, announce_msg

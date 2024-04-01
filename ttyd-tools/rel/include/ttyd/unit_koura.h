@@ -10,8 +10,8 @@ extern "C" {
 
 // .data
 extern battle_database_common::BattleUnitKind unit_koura;
-extern int8_t defence[5];
-extern int8_t defence_attr[5];
+extern int8_t unitKoura_defense[5];
+extern int8_t unitKoura_defense_attr[5];
 extern battle_database_common::StatusVulnerability regist;
 // pose_table
 // pose_table_crack_lv1

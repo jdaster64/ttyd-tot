@@ -3094,8 +3094,8 @@
 // unit_koura.o
 // .data
 8039bc20:unit_koura
-80418958:defence
-80418960:defence_attr
+80418958:unitKoura_defense
+80418960:unitKoura_defense_attr
 80418968:regist
 80418980:pose_table
 804189a8:pose_table_crack_lv1

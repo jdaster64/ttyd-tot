@@ -45,13 +45,6 @@ namespace PartsAttribute_Flags = ::ttyd::battle_unit::PartsAttribute_Flags;
 // Function hooks.
 extern BattleWorkUnit* (*g_BtlUnit_Entry_trampoline)(BattleUnitSetup*);
 extern bool (*g_BattleCheckEndUnitInitEvent_trampoline)(BattleWork*);
-extern int32_t (*g_BattleCalculateDamage_trampoline)(
-    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,
-    uint32_t*, uint32_t);
-extern int32_t (*g_BattleCalculateFpDamage_trampoline)(
-    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,
-    uint32_t*, uint32_t);
-extern int32_t (*g_btlevtcmd_SetEventConfusion_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_SetEventAttack_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_ConsumeItem_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_GetConsumeItem_trampoline)(EvtEntry*, bool);
@@ -133,107 +126,6 @@ void AlterUnitKindParams(BattleUnitKind* unit) {
     unit->itemsteal_param = 20;
 }
 
-int32_t AlterDamageCalculation(
-    BattleWorkUnit* attacker, BattleWorkUnit* target,
-    BattleWorkUnitPart* target_part, BattleWeapon* weapon,
-    uint32_t* unk0, uint32_t unk1) {
-    int32_t base_atk = weapon->damage_function_params[0];
-    int8_t* def_ptr  = target_part->defense;
-    int32_t base_def = def_ptr[weapon->element];
-    
-    int32_t altered_atk = base_atk, altered_def = base_def;
-    // Alter ATK power for enemy attacks.
-    if (attacker->current_kind <= BattleUnitType::BONETAIL
-        && !(weapon->target_property_flags & 0x100000)  // not a recoil attack
-        && !weapon->item_id && base_atk > 0) {
-        tot::GetEnemyStats(
-            attacker->current_kind, nullptr, &altered_atk, nullptr, 
-            nullptr, nullptr, base_atk);
-        if (altered_atk < 1) altered_atk = 1;
-        if (altered_atk > 99) altered_atk = 99;
-        weapon->damage_function_params[0] = altered_atk;
-    }
-    // Alter DEF power for enemies on defense.
-    if (target->current_kind <= BattleUnitType::BONETAIL
-        && base_def >= 0 && base_def < 99) {
-        if (base_def > 0) {
-            tot::GetEnemyStats(
-                target->current_kind, nullptr, nullptr, &altered_def, 
-                nullptr, nullptr);
-        }
-        if (altered_def > 99) altered_def = 99;
-        def_ptr[weapon->element] = altered_def;
-    }
-    
-    // Run base damage calculation (similar to vanilla BattleCalculateDamage).
-    int32_t damage = battle::CalculateBaseDamage(
-        attacker, target, target_part, weapon, unk0, unk1);
-        
-    // Set Shell Shield max damage to 1 (essentially making its HP hit-based).
-    if (damage > 0 && target->current_kind == BattleUnitType::SHELL_SHIELD) {
-        damage = 1;
-    }
-    
-    // Increment HP/FP Drain counter if this was intended to be a damaging move.
-    if (weapon->damage_function) ++attacker->total_damage_dealt_this_attack;
-    
-    // Randomize damage dealt, if option enabled.
-    const int32_t damage_scale =
-        g_Mod->inf_state_.GetOptionNumericValue(OPT_RANDOM_DAMAGE);
-    if (damage_scale != 0) {
-        // Generate a number from -25 to 25 in increments of 5.
-        int32_t scale = (ttyd::system::irand(11) - 5) * 5;
-        // Scale by 1x or 2x based on the setting.
-        scale *= damage_scale;
-        // Round damage modifier away from 0, based on the sign of the scale.
-        damage += (damage * scale + (scale > 0 ? 50 : -50)) / 100;
-    }
-        
-    // Change ATK and DEF back, and return calculated damage.
-    weapon->damage_function_params[0] = base_atk;
-    def_ptr[weapon->element] = base_def;
-    return damage;
-}
-
-int32_t AlterFpDamageCalculation(
-    BattleWorkUnit* attacker, BattleWorkUnit* target,
-    BattleWorkUnitPart* target_part, BattleWeapon* weapon,
-    uint32_t* unk0, uint32_t unk1) {
-    int32_t base_atk = weapon->fp_damage_function_params[0];
-    
-    int32_t altered_atk = base_atk;
-    // Alter FP damage for enemy attacks.
-    if (attacker->current_kind <= BattleUnitType::BONETAIL
-        && !weapon->item_id && base_atk > 0) {
-        tot::GetEnemyStats(
-            attacker->current_kind, nullptr, &altered_atk, nullptr,
-            nullptr, nullptr, base_atk);
-        if (altered_atk < 1) altered_atk = 1;
-        if (altered_atk > 99) altered_atk = 99;
-        weapon->fp_damage_function_params[0] = altered_atk;
-    }
-    
-    // Run vanilla damage calculation.
-    int32_t damage = g_BattleCalculateFpDamage_trampoline(
-        attacker, target, target_part, weapon, unk0, unk1);
-    
-    // Randomize damage dealt, if option enabled.
-    const int32_t damage_scale =
-        g_Mod->inf_state_.GetOptionNumericValue(OPT_RANDOM_DAMAGE);
-    if (damage_scale != 0) {
-        // Generate a number from -25 to 25 in increments of 5.
-        int32_t scale = (ttyd::system::irand(11) - 5) * 5;
-        // Scale by 1x or 2x based on the setting.
-        scale *= damage_scale;
-        // Round damage modifier away from 0, based on the sign of the scale.
-        damage += (damage * scale + (scale > 0 ? 50 : -50)) / 100;
-    }
-        
-    // Change FP damage value back, and return calculated FP loss.
-    weapon->fp_damage_function_params[0] = base_atk;
-    return damage;
-}
-
 // Runs extra code on consuming an item and getting the item to be consumed,
 // allowing for enemies to use generic cooking items.
 void EnemyConsumeItem(ttyd::evtmgr::EvtEntry* evt) {
@@ -303,24 +195,6 @@ void ApplyFixedPatches() {
             BattleWorkUnit* unit = g_BtlUnit_Entry_trampoline(unit_setup);
             ApplyMidbossStats(unit);
             return unit;
-        });
-        
-    g_BattleCalculateDamage_trampoline = patch::hookFunction(
-        ttyd::battle_damage::BattleCalculateDamage, [](
-            BattleWorkUnit* attacker, BattleWorkUnit* target,
-            BattleWorkUnitPart* target_part, BattleWeapon* weapon,
-            uint32_t* unk0, uint32_t unk1) {
-            return AlterDamageCalculation(
-                attacker, target, target_part, weapon, unk0, unk1);
-        });
-        
-    g_BattleCalculateFpDamage_trampoline = patch::hookFunction(
-        ttyd::battle_damage::BattleCalculateFpDamage, [](
-            BattleWorkUnit* attacker, BattleWorkUnit* target,
-            BattleWorkUnitPart* target_part, BattleWeapon* weapon,
-            uint32_t* unk0, uint32_t unk1) {
-            return AlterFpDamageCalculation(
-                attacker, target, target_part, weapon, unk0, unk1);
         });
         
     g_btlevtcmd_ConsumeItem_trampoline = patch::hookFunction(

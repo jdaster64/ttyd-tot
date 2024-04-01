@@ -340,6 +340,11 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_partyChuchurina_makeTechMenuFuncPtr),
         reinterpret_cast<int32_t>(tot::party_mowz::MakeSelectWeaponTable));
+    
+    // Make Shell Shield only take one damage per hit.
+    for (int32_t i = 0; i < 5; ++i) {
+        ttyd::unit_koura::unitKoura_defense_attr[i] = 4;
+    }
 }
 
 void DisplayTattleStats(
@@ -373,11 +378,17 @@ void DisplayTattleStats(
        
     if (show_atk_def) {
         int32_t atk, def;
-        // If the enemy's atk and def aren't fetched, just draw HP normally.
+        
+        // If the enemy's ATK and DEF can't be fetched, just draw HP normally.
         if (!tot::GetTattleDisplayStats(unit->current_kind, &atk, &def)) {
             ttyd::icondrv::iconNumberDispGx(matrix, number, is_small, color);
             return;
         }
+        
+        // Get current ATK and DEF, including statuses, badges, etc.
+        atk = battle::GetCurrentEnemyAtk(unit);
+        def = battle::GetCurrentEnemyDef(unit);
+        
         atk = Clamp(atk, 0, 99);
         def = Clamp(def, 0, 99);
 
