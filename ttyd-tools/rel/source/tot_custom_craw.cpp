@@ -76,6 +76,61 @@ PoseSoundTimingEntry unitCraw_pose_sound_timing_table[] = {
     { nullptr, 0.0f, 0, nullptr, 1 },
 };
 
+BattleWeapon unitCraw_weaponThrow = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    .superguards_allowed = 2,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 1,
+    .unk_1b = 1,
+    .damage_function = (void*)ttyd::battle_weapon_power::weaponGetPowerDefault,
+    .damage_function_params = { 6, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_SELECT_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::ALL_BUFFABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM,
+        
+    // status chances
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
 BattleWeapon unitCraw_weaponRam = {
     .name = nullptr,
     .icon = 0,
@@ -134,7 +189,7 @@ BattleWeapon unitCraw_weaponRam = {
     .object_fall_chance = 0,
 };
 
-BattleWeapon unitCraw_weaponThrow = {
+BattleWeapon unitCraw_weaponMultiRam = {
     .name = nullptr,
     .icon = 0,
     .item_id = 0,
@@ -142,7 +197,7 @@ BattleWeapon unitCraw_weaponThrow = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 2,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -153,14 +208,15 @@ BattleWeapon unitCraw_weaponThrow = {
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_SELECT_PARTS |
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::HAMMERLIKE,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0,
     .weapon_ac_level = 3,
@@ -168,12 +224,12 @@ BattleWeapon unitCraw_weaponThrow = {
     .ac_help_msg = nullptr,
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
-        AttackSpecialProperty_Flags::FREEZE_BREAK |
-        AttackSpecialProperty_Flags::GROUNDS_WINGED,
-    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+        AttackSpecialProperty_Flags::FREEZE_BREAK,
+    .counter_resistance_flags = 
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
-        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
-        AttackTargetWeighting_Flags::WEIGHTED_RANDOM,
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000,
         
     // status chances
     
@@ -328,6 +384,125 @@ LBL(99)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(unitCraw_multi_attack_event)
+    USER_FUNC(btlevtcmd_check_battleflag, LW(0), 2)
+    IF_NOT_EQUAL(LW(0), 0)
+        RUN_CHILD_EVT(unitCraw_normal_attack_event)
+        RETURN()
+    END_IF()
+        
+    USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_EQUAL(LW(3), -1)
+        USER_FUNC(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_NOT_EQUAL(LW(0), 0)
+            RUN_CHILD_EVT(PTR(&subsetevt_confuse_flustered))
+            RETURN()
+        END_IF()
+        GOTO(99)
+    END_IF()    
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(9))
+    USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_WaitGuardMove)
+    USER_FUNC(btlevtcmd_PayWeaponCost, -2, LW(9))
+    USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    USER_FUNC(evt_btl_camera_set_mode, 0, 8)
+    USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 250)
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_MONBAN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("A_1"))
+    WAIT_FRM(20)
+    BROTHER_EVT()
+        DO(6)
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_MONBAN_MOVE2R"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            WAIT_FRM(5)
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_MONBAN_MOVE2L"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            WAIT_FRM(5)
+        WHILE()
+    END_BROTHER()
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("R_2"))
+    WAIT_FRM(60)
+    
+    // Do a little hop before attack as tell.
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
+    USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 0, -1)
+    
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_MONBAN_MOVE3"), EVT_NULLPTR, 0, LW(15))
+    USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    SET(LW(5), 30)
+    USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(6))
+    MULF(LW(5), LW(6))
+    USER_FUNC(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(5))
+    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
+    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, -1, 0)
+    // For tracking defensive AC check.
+    SET(LW(13), 0)
+LBL(10)
+    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
+    USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    SWITCH(LW(5))
+        CASE_OR(4)
+            GOTO(90)
+            CASE_END()
+        CASE_EQUAL(3)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 38)
+            GOTO(90)
+            CASE_END()
+        CASE_EQUAL(6)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 39)
+            GOTO(90)
+        CASE_EQUAL(2)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 40)
+            GOTO(90)
+        CASE_EQUAL(1)
+            GOTO(91)
+            CASE_END()
+        CASE_ETC()
+            GOTO(98)
+            CASE_END()
+    END_SWITCH()
+LBL(90)
+    USER_FUNC(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 100)
+    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, 0, 0)
+    GOTO(97)
+LBL(91)    
+    IF_EQUAL(LW(13), 0)
+        USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        SET(LW(13), 1)
+    END_IF()
+    USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+LBL(97)
+    USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_NOT_EQUAL(LW(3), -1)
+        GOTO(10)
+    END_IF()
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_FaceDirectionAdd, -2, LW(0), 500)
+    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
+    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
+    WAIT_MSEC(300)
+    USER_FUNC(btlevtcmd_SetPos, -2, 250, LW(1), LW(2))
+LBL(98)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
+    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, -1, 0)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("T_1"))
+    DO(3)
+        USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_MONBAN_LAUGH1"), EVT_NULLPTR, 0, LW(15))
+        WAIT_FRM(10)
+    WHILE()
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("S_2"))
+LBL(99)
+    USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(unitCraw_throw_attack_event)
     USER_FUNC(btlevtcmd_check_battleflag, LW(0), 2)
     IF_NOT_EQUAL(LW(0), 0)
@@ -436,17 +611,25 @@ EVT_BEGIN(unitCraw_attack_event)
         USER_FUNC(btlevtcmd_StartWaitEvent, -2)
         RETURN()
     END_IF()
-    SET(LW(0), 50)
-    ADD(LW(0), 50)
-    SUB(LW(0), 1)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(0))
+    IF_EQUAL(LW(0), (int32_t)BattleUnitType::DARK_CRAW)
+        SET(LW(0), 50 + 50 + 20 - 1)
+    ELSE()
+        SET(LW(0), 50 + 50 - 1)
+    END_IF()
     USER_FUNC(evt_sub_random, LW(0), LW(1))
     IF_SMALL(LW(1), 50)
+        SET(LW(9), PTR(&unitCraw_weaponThrow))
+        RUN_CHILD_EVT(PTR(&unitCraw_throw_attack_event))
+        GOTO(99)
+    END_IF()
+    IF_SMALL(LW(1), 100)
         SET(LW(9), PTR(&unitCraw_weaponRam))
         RUN_CHILD_EVT(PTR(&unitCraw_normal_attack_event))
         GOTO(99)
     END_IF()
-    SET(LW(9), PTR(&unitCraw_weaponThrow))
-    RUN_CHILD_EVT(PTR(&unitCraw_throw_attack_event))
+    SET(LW(9), PTR(&unitCraw_weaponMultiRam))
+    RUN_CHILD_EVT(PTR(&unitCraw_multi_attack_event))
 LBL(99)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
     RETURN()
