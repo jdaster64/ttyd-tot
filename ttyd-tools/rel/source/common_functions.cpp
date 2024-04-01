@@ -110,16 +110,21 @@ uint32_t GetShiftedBitMask(uint32_t x, uint32_t start_bit, uint32_t end_bit) {
 }
 
 int32_t IntegerToFmtString(int32_t val, char* out_buf, int32_t max_val) {
-    // TODO: Add support for negative values?
-    if (val < 0) return 0;
+    bool is_negative = false;
+    if (val < 0) {
+        val = -val;
+        is_negative = true;
+    }
     if (val > max_val) val = max_val;
     if (val >= 1'000'000) {
         return sprintf(
-            out_buf, "%" PRId32 ",%03" PRId32 ",%03" PRId32, 
+            out_buf, "%s%" PRId32 ",%03" PRId32 ",%03" PRId32,
+            is_negative ? "-" : "",
             val / 1'000'000, val / 1000 % 1000, val % 1000);
     } else if (val >= 1'000) {
         return sprintf(
-            out_buf, "%" PRId32 ",%03" PRId32, val / 1000, val % 1000);
+            out_buf, "%s%" PRId32 ",%03" PRId32,
+            is_negative ? "-" : "", val / 1000, val % 1000);
     }
     return sprintf(out_buf, "%" PRId32, val);
 }
