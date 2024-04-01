@@ -1759,11 +1759,10 @@ BattleWeapon customWeapon_MowzLoveSlapL = {
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    // Removed Payback, added Front-spiky.
     .counter_resistance_flags =
         AttackCounterResistance_Flags::TOP_SPIKY |
-        // Additional resistances (and removed Payback).
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::FIERY,
+        AttackCounterResistance_Flags::FRONT_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1824,11 +1823,10 @@ BattleWeapon customWeapon_MowzLoveSlapR = {
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    // Removed Payback, added Front-spiky.
     .counter_resistance_flags =
         AttackCounterResistance_Flags::TOP_SPIKY |
-        // Additional resistances (and removed Payback).
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::FIERY,
+        AttackCounterResistance_Flags::FRONT_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1889,11 +1887,10 @@ BattleWeapon customWeapon_MowzLoveSlapLFinal = {
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    // Removed Payback, added Front-spiky.
     .counter_resistance_flags =
         AttackCounterResistance_Flags::TOP_SPIKY |
-        // Additional resistances.
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::FIERY,
+        AttackCounterResistance_Flags::FRONT_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -1954,11 +1951,10 @@ BattleWeapon customWeapon_MowzLoveSlapRFinal = {
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
+    // Removed Payback, added Front-spiky.
     .counter_resistance_flags =
         AttackCounterResistance_Flags::TOP_SPIKY |
-        // Additional resistances.
-        AttackCounterResistance_Flags::FRONT_SPIKY |
-        AttackCounterResistance_Flags::FIERY,
+        AttackCounterResistance_Flags::FRONT_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -2101,7 +2097,7 @@ BattleWeapon customWeapon_MowzSmooch = {
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
-    .stylish_multiplier = 1,
+    .stylish_multiplier = 3,
     .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,

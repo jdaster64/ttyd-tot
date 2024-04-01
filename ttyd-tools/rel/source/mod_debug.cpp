@@ -9,6 +9,7 @@
 #include "tot_generate_enemy.h"
 #include "tot_gon_tower.h"
 #include "tot_manager_move.h"
+#include "tot_manager_options.h"
 
 #include <gc/OSTime.h>
 #include <ttyd/battle_database_common.h>
@@ -146,24 +147,14 @@ void DebugManager::Update() {
                     return;
                 }
                 case DEBUG_MAX_STATS: {
-                    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-                    pouch.current_hp = 100;
-                    pouch.max_hp = 100;
-                    pouch.base_max_hp = 100;
-                    pouch.current_fp = 100;
-                    pouch.max_fp = 100;
-                    pouch.base_max_fp = 100;
-                    int32_t bp = pouch.total_bp;
-                    if (bp < 100) {
-                        pouch.total_bp += (100 - bp);
-                        pouch.unallocated_bp += (100 - bp);
-                    }
-                    for (int32_t i = 1; i <= 7; ++i) {
-                        pouch.party_data[i].current_hp = 100;
-                        pouch.party_data[i].max_hp = 100;
-                        pouch.party_data[i].base_max_hp = 100;
-                    }
-                    pouch.coins = 999;
+                    auto& state = g_Mod->state_;
+                    state.hp_level_ = 99;
+                    state.fp_level_ = 99;
+                    state.bp_level_ = 99;
+                    state.hp_p_level_ = 99;
+                    state.num_sack_upgrades_ = 99;
+                    tot::OptionsManager::UpdateLevelupStats();
+                    ttyd::mario_pouch::pouchGetPtr()->coins = 999;
                     break;
                 }
                 case DEBUG_UNLOCK_ALL_MOVES: {

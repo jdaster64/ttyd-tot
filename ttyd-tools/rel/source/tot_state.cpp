@@ -190,7 +190,7 @@ TotSaveSlot* StateManager::GetBackupSave() const {
 }
 
 void StateManager::InitDefaultOptions() {
-    seed_ = 765;
+    seed_ = 654;
     // Pick a random seed, and reset all RNG states to the start.
     // seed_ = static_cast<uint32_t>(gc::OSTime::OSGetTime()) % 1'000'000'000;
     for (int32_t i = 0; i < 56; ++i) rng_states_[i] = 0;

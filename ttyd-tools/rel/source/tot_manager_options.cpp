@@ -1,5 +1,6 @@
 #include "tot_manager_options.h"
 
+#include "common_functions.h"
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_state.h"
@@ -43,8 +44,8 @@ int32_t GetBaseStat(uint32_t option, int32_t party = 0) {
         default:
             return -1;
     }
-    // Stat values can never go below 1.
-    return value > 0 ? value : 1;
+    // Stat values can never go below 1 or above 99.
+    return Clamp(value, 1, 99);
 }
 
 void SetBaseStats() {
