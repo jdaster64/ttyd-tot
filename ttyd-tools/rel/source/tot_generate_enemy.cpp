@@ -517,8 +517,8 @@ const int8_t kBaseWeights[21][9] = {
     { 3, 5, 10, 7, 5, 1, 0, 0, 0 },
     { 1, 1, 7, 10, 10, 3, 2, 0, 0 },
     { 1, 1, 5, 10, 10, 5, 3, 0, 0 },
-    { 1, 1, 2, 5, 10, 10, 5, 1, 1 },
-    { 0, 0, 2, 3, 7, 10, 10, 5, 3 },
+    { 1, 1, 2, 5, 10, 10, 5, 2, 1 },
+    { 0, 0, 2, 3, 7, 10, 10, 6, 3 },
     { 0, 0, 1, 3, 6, 8, 10, 10, 6 },
     { 0, 0, 1, 2, 5, 7, 10, 10, 10 },
     // Full EX
@@ -690,6 +690,12 @@ void SelectEnemies() {
             weights[i] = base_wt;
         }
         
+        // Disable picking midbosses that were already used.
+        for (int32_t i = 0; i < 7; ++i) {
+            int32_t enemy = state.GetOption(STAT_RUN_MIDBOSSES_USED, i);
+            weights[enemy] = 0;
+        }
+        
         // Pick a single enemy to make into a mid-boss.
         int32_t sum_weights = 0;
         for (int32_t i = 0; i < kNumEnemyTypes; ++i) sum_weights += weights[i];
@@ -698,9 +704,13 @@ void SelectEnemies() {
         int32_t idx = 0;
         for (; (weight -= weights[idx]) >= 0; ++idx);
         
-        g_Enemies[0] = idx;
+        g_Enemies[0] = idx;        
         for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
         g_NumEnemies = 1;
+        
+        // Save the enemy selected, so it won't show up again in the same run.
+        int32_t boss_num = (state.floor_ / 8) - 1;
+        state.SetOption(STAT_RUN_MIDBOSSES_USED, idx, boss_num);
         
         return;
     }
@@ -1000,6 +1010,13 @@ void BuildBattle(
         battle->music_name = "BGM_KOBOSS_BATTLE1";
     } else {
         battle->music_name = "BGM_ZAKO_BATTLE1";
+    }
+    
+    // Disallow running from the final boss fight.
+    if (state.IsFinalBossFloor()) {
+        battle->battle_setup_flags |= 0x10;
+    } else {
+        battle->battle_setup_flags &= ~0x10;
     }
 }
 
