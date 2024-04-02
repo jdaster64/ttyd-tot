@@ -55,7 +55,6 @@ struct OptionMenuData {
 OptionMenuData g_OptionMenuData[] = {
     { STAT_RUN_TURNS_SPENT, "tot_optr_turnsspent", 1, false, true },
     { STAT_RUN_MOST_TURNS_RECORD, "tot_optr_turnsmost", 2, false, true },
-    { STAT_RUN_MOST_TURNS_FLOOR, "tot_optr_turnsmostfloor", 3, false, true },
     { STAT_RUN_TIMES_RAN_AWAY, "tot_optr_timesran", 4, false, true },
     { STAT_RUN_ENEMY_DAMAGE, "tot_optr_enemydamage", 5, false, true },
     { STAT_RUN_PLAYER_DAMAGE, "tot_optr_playerdamage", 6, false, true },
@@ -68,7 +67,6 @@ OptionMenuData g_OptionMenuData[] = {
     { STAT_RUN_SP_SPENT, "tot_optr_spspent", 13, false, true },
     { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", 14, false, true },
     { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", 15, false, true },
-    { STAT_RUN_CONDITIONS_TOTAL, "tot_optr_conditionstotal", 16, false, true },
 };
 
 const char* OptionName(uint16_t lookup_key) {
@@ -82,17 +80,38 @@ const char* OptionName(uint16_t lookup_key) {
 }
 
 const char* OptionValue(uint16_t lookup_key) {
-    static char buf[16];
+    static char buf[32];
     // Set to empty string by default.
     buf[0] = 0;
+    uint32_t option = 0;
     for (const auto& data : g_OptionMenuData) {
         if (data.lookup_key == lookup_key) {
-            int32_t val = g_Mod->state_.GetOption(data.option);
-            IntegerToFmtString(val, buf);
+            option = data.option;
             break;
         }
     }
-    // TODO: Implement exceptions (named OPTVALs, etc.)
+    switch (option) {
+        case STAT_RUN_MOST_TURNS_RECORD: {
+            int32_t most = g_Mod->state_.GetOption(STAT_RUN_MOST_TURNS_RECORD);
+            int32_t floor = g_Mod->state_.GetOption(STAT_RUN_MOST_TURNS_FLOOR);
+            sprintf(buf, "%" PRId32 " (Floor %" PRId32 ")", most, floor);
+            break;
+        }
+        case STAT_RUN_CONDITIONS_MET: {
+            int32_t met = g_Mod->state_.GetOption(STAT_RUN_CONDITIONS_MET);
+            int32_t total = g_Mod->state_.GetOption(STAT_RUN_CONDITIONS_TOTAL);
+            sprintf(buf, "%" PRId32 " / %" PRId32, met, total);
+            break;
+        }
+        default: {
+            int32_t val = g_Mod->state_.GetOption(option);
+            IntegerToFmtString(val, buf);
+            break;
+        }
+        case 0:
+            break;
+    }
+
     return buf;
 }
 
@@ -297,8 +316,10 @@ void DispMainWindow(WinMgrEntry* entry) {
             break;
         case MenuType::MOVE_UNLOCK:
         case MenuType::MOVE_UPGRADE:
-            // MOVE_UNLOCK, MOVE_UPGRADE
             title = msgSearch("tot_winsel_titlemove");
+            break;
+        case MenuType::RUN_RESULTS_STATS:
+            title = msgSearch("tot_winsel_runresults_header");
             break;
     }
     if (title) {
@@ -455,6 +476,49 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
     ttyd::fontmgr::FontDrawMessageMtx(&mtx, msg);
 }
 
+void DispOptionsWindowBottomBar(WinMgrEntry* entry) {
+    // In the future: slightly different variants for different windows?
+
+    auto* sel_entry = (WinMgrSelectEntry*)entry->param;
+    if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
+        WinMgrEntry_Flags::IN_FADE) != 0) return;
+
+    uint32_t kBlack = 0x0000'00FFU;
+    uint32_t kWhite = 0xFFFF'FFFFU;
+    const float kContinueOffset = 0.17f;
+    const float kBackOffset = 0.64f;
+
+    ttyd::fontmgr::FontDrawStart();
+
+    const char* msg = "Continue";
+    int32_t length = ttyd::fontmgr::FontGetMessageWidth(msg);
+    gc::vec3 text_pos = {
+        entry->x + entry->width * (kContinueOffset + 0.22f) - length * 0.5f,
+        entry->y - 9.f,
+        0.0f
+    };
+    gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, msg);
+
+    msg = "Back";
+    length = ttyd::fontmgr::FontGetMessageWidth(msg);
+    text_pos.x = entry->x + entry->width * (kBackOffset + 0.15f) - length * 0.5f;    
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, msg);
+
+    // Draw A and B button icons.
+    ttyd::win_main::winIconInit();
+    gc::vec3 pos = { 
+        entry->x + entry->width * kContinueOffset, 
+        entry->y - 20.0f,
+        0.0f
+    };
+    gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+    ttyd::win_main::winIconSet(IconType::A_BUTTON, &pos, &scale, &kWhite);
+
+    pos.x = entry->x + entry->width * kBackOffset;
+    ttyd::win_main::winIconSet(IconType::B_BUTTON, &pos, &scale, &kWhite);
+}
+
 WinMgrSelectDescList g_SelectDescList[MenuType::MAX_MENU_TYPE];
 
 WinMgrDesc g_CustomDescs[] = {
@@ -476,7 +540,7 @@ WinMgrDesc g_CustomDescs[] = {
         .heading_type = WinMgrDesc_HeadingType::NONE,
         .camera_id = (int32_t)CameraId::k2d,
         .x = -280,
-        .y = 120,
+        .y = 118,
         .width = 240,
         .height = 45,
         .color = 0xFFFFFFFFU,
@@ -495,10 +559,10 @@ WinMgrDesc g_CustomDescs[] = {
         .main_func = (void*)select_main3,
         .disp_func = (void*)DispSelectionHelp,
     },
-    // Descs 3-4: "stats" / "options"-like windows. (WIP)
+    // Descs 3-5: "stats" / "options"-like windows. (WIP)
     {
         .fade_mode = WinMgrDesc_FadeMode::SCALE_AND_ROTATE,
-        .heading_type = WinMgrDesc_HeadingType::NONE,
+        .heading_type = WinMgrDesc_HeadingType::SINGLE_CENTERED,
         .camera_id = (int32_t)CameraId::k2d,
         .x = -250,
         .y = 120,
@@ -513,12 +577,24 @@ WinMgrDesc g_CustomDescs[] = {
         .heading_type = WinMgrDesc_HeadingType::NONE,
         .camera_id = (int32_t)CameraId::k2d,
         .x = -200,
-        .y = 180,
+        .y = 185,
         .width = 400,
         .height = 45,
         .color = 0xC4ECF2FFU,
         .main_func = nullptr,
         .disp_func = (void*)DispOptionsWindowTopBar,
+    },
+    {
+        .fade_mode = WinMgrDesc_FadeMode::INSTANT,
+        .heading_type = WinMgrDesc_HeadingType::NONE,
+        .camera_id = (int32_t)CameraId::k2d,
+        .x = -200,
+        .y = -140,
+        .width = 400,
+        .height = 45,
+        .color = 0xC4ECF2FFU,
+        .main_func = nullptr,
+        .disp_func = (void*)DispOptionsWindowBottomBar,
     },
 };
 
@@ -543,7 +619,7 @@ void* InitNewSelectDescTable() {
         .num_descs = 3, .descs = &g_CustomDescs[0] 
     };
     g_SelectDescList[MenuType::RUN_RESULTS_STATS] = WinMgrSelectDescList{
-        .num_descs = 2, .descs = &g_CustomDescs[3]
+        .num_descs = 3, .descs = &g_CustomDescs[3]
     };
     return g_SelectDescList;
 }

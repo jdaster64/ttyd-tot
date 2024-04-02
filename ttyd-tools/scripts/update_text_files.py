@@ -1019,9 +1019,11 @@ g_StringMap = {
         b"tot_winsel_runstats_topbar":
             b"Run Results",
             
+        b"tot_winsel_runresults_header":
+            b"Stats",
+            
         b"tot_optr_turnsspent":         b"Total Turns Spent",
-        b"tot_optr_turnsmost":          b"Most Turns",
-        b"tot_optr_turnsmostfloor":     b"Most Turns Floor",
+        b"tot_optr_turnsmost":          b"Most Turns Spent",
         b"tot_optr_timesran":           b"Times Ran Away",
         b"tot_optr_enemydamage":        b"Enemy Damage",
         b"tot_optr_playerdamage":       b"Player Damage",
@@ -1034,7 +1036,6 @@ g_StringMap = {
         b"tot_optr_spspent":            b"SP Spent",
         b"tot_optr_superguards":        b"Superguards",
         b"tot_optr_conditionsmet":      b"Conditions Met",
-        b"tot_optr_conditionstotal":    b"Conditions Total",
         
         # Dragon fight dialogue.
         

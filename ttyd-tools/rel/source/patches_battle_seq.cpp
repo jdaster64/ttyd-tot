@@ -183,7 +183,7 @@ void CheckBattleCondition() {
     auto& state = g_Mod->state_;
     state.ChangeOption(
         tot::STAT_RUN_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
-    state.SetOption(
+    state.ChangeOption(
         tot::STAT_RUN_MOST_TURNS_CURRENT, ttyd::battle::g_BattleWork->turn_count);
     if (state.GetOption(tot::STAT_RUN_MOST_TURNS_CURRENT) >
         state.GetOption(tot::STAT_RUN_MOST_TURNS_RECORD)) {
