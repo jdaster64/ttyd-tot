@@ -25,7 +25,7 @@ namespace MenuType {
         // Run results: general stats.
         RUN_RESULTS_STATS,
         // Run results: timer splits.
-        // RUN_RESULTS_SPLITS,
+        RUN_RESULTS_SPLITS,
         
         MAX_MENU_TYPE,
     };

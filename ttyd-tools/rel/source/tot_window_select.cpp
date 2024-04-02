@@ -122,6 +122,105 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
     ttyd::statuswindow::statusWinForceOff();
 }
 
+void DispTimerSplits(WinMgrEntry* entry) {
+    uint32_t kBlack = 0x0000'00FFU;
+    uint32_t kRed1  = 0xFF00'00FFU;
+    uint32_t kRed2  = 0xFF22'44FFU;
+    uint32_t kBlue1 = 0x0000'FFFFU;
+    uint32_t kBlue2 = 0x2266'FFFFU;
+
+    // TODO: These are approximate max bounds of actual graph; refine.
+    float x_min = entry->x + 70.f;
+    float x_max = entry->x + entry->width - 10.f;
+    float y_min = entry->y - entry->height + 30.f;
+    float y_max = entry->y - 20.f;
+
+    // TODO: Allow for toggling between IGT and RTA main splits.
+    uint32_t* main_splits = g_Mod->state_.splits_igt_;
+    uint32_t* battle_splits = g_Mod->state_.splits_battle_igt_;
+
+    // Get the maximum time, rounded up to the nearest half-minute.
+    uint32_t max_time = 0;
+    for (int32_t i = 0; i <= 64; ++i) {
+        max_time = Max(max_time, main_splits[i]);
+    }
+    max_time = (max_time + 2999) / 3000;
+    // Maximum of 10 minutes.
+    if (max_time > 20) max_time = 20;
+
+    ttyd::win_main::winFontInit();
+
+    char buf[8] = { 0 };
+    // Draw reference strings for 25%, 50%, 75%, 100% of time scale.
+    for (int32_t i = 0; i <= 4; ++i) {
+        int32_t mins = max_time * i / 8;
+        int32_t secs = (max_time * i % 8) * 7.5f;
+        sprintf(buf, "%" PRId32 "\"%02" PRId32, mins, secs);
+
+        gc::vec3 pos = {
+            entry->x + 10.f,
+            y_min + i * (y_max - y_min) / 4 + 12.f,
+            0.0f
+        };
+        gc::vec3 scale = { 1.0f, 0.8f, 1.0f };
+        ttyd::win_main::winFontSetWidth(&pos, &scale, &kBlack, 40.0f, buf);
+    }
+
+    // Write strings for legend.
+    gc::vec3 text_pos = { x_min + 33.f, y_min - 5.f, 0.0f };
+    gc::vec3 text_scale = { 0.6f, 0.6f, 0.6f };
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kRed1, "In-Battle Time");
+    text_pos.x += 160.f;
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue1, "Out-of-Battle Time");
+
+    ttyd::win_main::winIconInit();
+
+    // Draw colored square icons for legend.
+    gc::mtx34 mtx, mtx_s, mtx_t;
+    gc::mtx::PSMTXScale(&mtx_s, 0.5f, 0.5f, 0.5f);
+
+    gc::vec3 icon_pos = { x_min + 15.f, y_min - 20.f, 0.0f };
+    gc::mtx::PSMTXTrans(&mtx_t, icon_pos.x, icon_pos.y, icon_pos.z);
+    gc::mtx::PSMTXConcat(&mtx_t, &mtx_s, &mtx);
+    ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kRed1);
+
+    icon_pos.x += 160.f;
+    gc::mtx::PSMTXTrans(&mtx_t, icon_pos.x, icon_pos.y, icon_pos.z);
+    gc::mtx::PSMTXConcat(&mtx_t, &mtx_s, &mtx);
+    ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kBlue1);
+    
+    // Draw actual graph based on splits / max time.
+    // TODO: Parametrize based on actual maximum floor.
+    for (int32_t i = 0; i <= 64; ++i) {
+        const int32_t kIconSize = 32.0f;
+        uint32_t* red = i / 8 % 2 == 0 ? &kRed1 : &kRed2;
+        uint32_t* blue = i / 8 % 2 == 0 ? &kBlue1 : &kBlue2;
+
+        gc::mtx34 mtx, mtx_s, mtx_t;
+        gc::mtx::PSMTXTrans(
+            &mtx_t, x_min + (x_max - x_min) * i / 65, y_min, 0.0f);
+
+        float scale_x = (x_max - x_min) / 65.0f / kIconSize;
+        float scale_y;
+
+        scale_y =
+            Clamp(main_splits[i] / (max_time * 3000.0f), 0.0f, 1.0f) * 
+            (y_max - y_min) / kIconSize;
+
+        gc::mtx::PSMTXScale(&mtx_s, scale_x, scale_y, 1.0f);
+        gc::mtx::PSMTXConcat(&mtx_t, &mtx_s, &mtx);
+        ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, blue);
+
+        scale_y =
+            Clamp(battle_splits[i] / (max_time * 3000.0f), 0.0f, 1.0f) * 
+            (y_max - y_min) / kIconSize;
+
+        gc::mtx::PSMTXScale(&mtx_s, scale_x, scale_y, 1.0f);
+        gc::mtx::PSMTXConcat(&mtx_t, &mtx_s, &mtx);
+        ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, red);
+    }
+}
+
 void DispMainWindow(WinMgrEntry* entry) {
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[0]].flags & 
@@ -305,6 +404,11 @@ void DispMainWindow(WinMgrEntry* entry) {
     // Restore previous scissor boundaries.
     ttyd::gx::GXTransform::GXSetScissor(
         scissor_0, scissor_1, scissor_2, scissor_3);
+
+    // Draw timer splits.
+    if (sel_entry->type == MenuType::RUN_RESULTS_SPLITS) {
+        DispTimerSplits(entry);
+    }
     
     const char* title = nullptr;
     switch (sel_entry->type) {
@@ -320,6 +424,9 @@ void DispMainWindow(WinMgrEntry* entry) {
             break;
         case MenuType::RUN_RESULTS_STATS:
             title = msgSearch("tot_winsel_runresults_header");
+            break;
+        case MenuType::RUN_RESULTS_SPLITS:
+            title = msgSearch("tot_winsel_runsplits_header");
             break;
     }
     if (title) {
@@ -355,8 +462,14 @@ void DispMainWindow(WinMgrEntry* entry) {
     }
     
     // Draw cursor and scrolling arrows, if necessary.
-    gc::vec3 cursor_pos = { sel_entry->cursor_x, sel_entry->cursor_y, 1.0f };
-    ttyd::icondrv::iconDispGx(1.0f, &cursor_pos, 0x14, IconType::GLOVE_POINTER_H);
+
+    if (sel_entry->type != MenuType::RUN_RESULTS_SPLITS) {
+        gc::vec3 cursor_pos = { 
+            sel_entry->cursor_x, sel_entry->cursor_y, 1.0f 
+        };
+        ttyd::icondrv::iconDispGx(
+            1.0f, &cursor_pos, 0x14, IconType::GLOVE_POINTER_H);
+    }
     
     if (sel_entry->num_rows > 8 &&
         (g_MarioSt->currentRetraceCount & 0x1f) < 20) {
@@ -387,14 +500,17 @@ void DispWindow2(WinMgrEntry* entry) {
         WinMgrEntry_Flags::IN_FADE) != 0) return;
     
     const char* msg = "";
-    if (sel_entry->type == MenuType::CUSTOM_START) {
-        msg = msgSearch("in_konran_hammer");
-    } else if (sel_entry->type == MenuType::TOT_CHARLIETON_SHOP) {
-        msg = msgSearch("msg_window_select_6");     // "Buy which one?"
-    } else if (sel_entry->type == MenuType::MOVE_UNLOCK) {
-        msg = msgSearch("tot_winsel_whichunlock");
-    } else if (sel_entry->type == MenuType::MOVE_UPGRADE) {
-        msg = msgSearch("tot_winsel_whichunlock");
+    switch (sel_entry->type) {
+        case MenuType::CUSTOM_START:
+            msg = msgSearch("in_konran_hammer");
+            break;
+        case MenuType::TOT_CHARLIETON_SHOP:
+            msg = msgSearch("msg_window_select_6");     // "Buy which one?"
+            break;
+        case MenuType::MOVE_UNLOCK:
+        case MenuType::MOVE_UPGRADE:
+            msg = msgSearch("tot_winsel_whichunlock");
+            break;
     }
     
     uint16_t lines;
@@ -431,16 +547,21 @@ void DispSelectionHelp(WinMgrEntry* entry) {
         int32_t value = sel_entry->row_data[sel_entry->cursor_index].value;
         
         const char* help_msg = "";
-        if (sel_entry->type == MenuType::CUSTOM_START) {
-            help_msg = msgSearch("in_konran_hammer");
-        } else if (sel_entry->type == MenuType::TOT_CHARLIETON_SHOP) { 
-            help_msg = msgSearch(itemDataTable[value].description);
-        } else if (sel_entry->type == MenuType::MOVE_UNLOCK) {
-            help_msg = msgSearch(
-                MoveManager::GetMoveData(value)->desc_msg);
-        } else if (sel_entry->type == MenuType::MOVE_UPGRADE) {
-            help_msg = msgSearch(
-                MoveManager::GetMoveData(value)->upgrade_msg);
+        switch (sel_entry->type) {
+            case MenuType::CUSTOM_START:
+                help_msg = msgSearch("in_konran_hammer");
+                break;
+            case MenuType::TOT_CHARLIETON_SHOP:
+                help_msg = msgSearch(itemDataTable[value].description);
+                break;
+            case MenuType::MOVE_UNLOCK:
+                help_msg = msgSearch(
+                    MoveManager::GetMoveData(value)->desc_msg);
+                break;
+            case MenuType::MOVE_UPGRADE:
+                help_msg = msgSearch(
+                    MoveManager::GetMoveData(value)->upgrade_msg);
+                break;
         }
         entry->help_msg = help_msg;
         winMgrHelpDraw(entry);
@@ -621,6 +742,9 @@ void* InitNewSelectDescTable() {
     g_SelectDescList[MenuType::RUN_RESULTS_STATS] = WinMgrSelectDescList{
         .num_descs = 3, .descs = &g_CustomDescs[3]
     };
+    g_SelectDescList[MenuType::RUN_RESULTS_SPLITS] = WinMgrSelectDescList{
+        .num_descs = 3, .descs = &g_CustomDescs[3]
+    };
     return g_SelectDescList;
 }
 
@@ -759,10 +883,19 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             }
             break;
         }
+        case MenuType::RUN_RESULTS_SPLITS: {
+            // Add a single dummy entry.
+            sel_entry->num_rows = 1;
+            sel_entry->row_data =
+                (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
+                    0, sizeof(WinMgrSelectEntryRow));
+            memset(sel_entry->row_data, 0, sizeof(WinMgrSelectEntryRow));
+            break;
+        }
     }
     
     // Shrink the window if it's fewer than eight entries.
-    if (sel_entry->num_rows < 8) {
+    if (type != MenuType::RUN_RESULTS_SPLITS && sel_entry->num_rows < 8) {
         int32_t height_reduction = (8 - sel_entry->num_rows) * 24;
         auto& entry = winmgr_work->entries[sel_entry->entry_indices[0]];
         entry.height -= height_reduction;

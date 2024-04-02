@@ -589,11 +589,21 @@ EVT_BEGIN(Tower_FinalBossEvent)
     
     // TODO: Flesh out victory animations, results, ...
 
-    // Show run stats dialog.
+    // Show run stats + timer splits dialog.
+LBL(10)
     USER_FUNC(evt_win_other_select,
         (uint32_t)window_select::MenuType::RUN_RESULTS_STATS)
-    WAIT_MSEC(1000)
-    
+LBL(20)
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_other_select,
+        (uint32_t)window_select::MenuType::RUN_RESULTS_SPLITS)
+    IF_EQUAL(LW(0), 0)
+        // If "cancelled", go back to regular stats window.
+        WAIT_MSEC(200)
+        GOTO(10)
+    END_IF()
+
+    WAIT_MSEC(500)
     // Despawn partner.
     USER_FUNC(evt_mario_goodbye_party, 0)
     // Reload into lobby.

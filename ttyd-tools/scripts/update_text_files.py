@@ -1022,11 +1022,14 @@ g_StringMap = {
         b"tot_winsel_runresults_header":
             b"Stats",
             
+        b"tot_winsel_runsplits_header":
+            b"Splits",
+            
         b"tot_optr_turnsspent":         b"Total Turns Spent",
         b"tot_optr_turnsmost":          b"Most Turns Spent",
         b"tot_optr_timesran":           b"Times Ran Away",
-        b"tot_optr_enemydamage":        b"Enemy Damage",
-        b"tot_optr_playerdamage":       b"Player Damage",
+        b"tot_optr_enemydamage":        b"Damage Dealt",
+        b"tot_optr_playerdamage":       b"Damage Taken",
         b"tot_optr_itemsused":          b"Items Used",
         b"tot_optr_shinesprites":       b"Shine Sprites",
         b"tot_optr_starpieces":         b"Star Pieces",
