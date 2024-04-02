@@ -2041,6 +2041,7 @@
 // statuswindow.o
 // .text
 8013c110:statusWinForceUpdate
+8013c234:statusWinForceOff
 8013cb24:statusWinDisp
 8013d440:gaugeDisp
 // .data

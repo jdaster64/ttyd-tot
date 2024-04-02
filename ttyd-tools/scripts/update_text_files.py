@@ -1013,6 +1013,28 @@ g_StringMap = {
     
     # Tower final floor.
     'gon_05': {
+    
+        # Final results window.
+        
+        b"tot_winsel_runstats_topbar":
+            b"Run Results",
+            
+        b"tot_optr_turnsspent":         b"Total Turns Spent",
+        b"tot_optr_turnsmost":          b"Most Turns",
+        b"tot_optr_turnsmostfloor":     b"Most Turns Floor",
+        b"tot_optr_timesran":           b"Times Ran Away",
+        b"tot_optr_enemydamage":        b"Enemy Damage",
+        b"tot_optr_playerdamage":       b"Player Damage",
+        b"tot_optr_itemsused":          b"Items Used",
+        b"tot_optr_shinesprites":       b"Shine Sprites",
+        b"tot_optr_starpieces":         b"Star Pieces",
+        b"tot_optr_coinsearned":        b"Coins Earned",
+        b"tot_optr_coinsspent":         b"Coins Spent",
+        b"tot_optr_fpspent":            b"FP Spent",
+        b"tot_optr_spspent":            b"SP Spent",
+        b"tot_optr_superguards":        b"Superguards",
+        b"tot_optr_conditionsmet":      b"Conditions Met",
+        b"tot_optr_conditionstotal":    b"Conditions Total",
         
         # Dragon fight dialogue.
         

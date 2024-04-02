@@ -51,6 +51,7 @@ void ApplyFixedPatches() {
         ttyd::mario_pouch::pouchAddCoin, [](int16_t coins) {
             // Track coins gained / lost; if a reward floor, assume lost
             // coins were spent on purchasing badges / items from an NPC.
+            // TODO: This assumption is not 100% true; look into disambiguating.
             if (coins < 0 && g_Mod->state_.floor_ % 8 == 7) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_SPENT, -coins);
             } else {

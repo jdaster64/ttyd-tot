@@ -434,6 +434,9 @@ void StateManager::IncrementFloor(int32_t change) {
     
     // Clear RNG state values that should reset every floor.
     for (int32_t i = RNG_ENEMY; i <= RNG_REWARD; ++i) rng_states_[i] = 0;
+
+    // Set current floor's turn count to 0.
+    SetOption(STAT_RUN_MOST_TURNS_CURRENT, 0);
     
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     // Set stage rank based on floor.

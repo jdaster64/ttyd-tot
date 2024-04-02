@@ -26,6 +26,7 @@ void TimerManager::Update() {
 }
 
 void TimerManager::Draw() {
+    // TODO: Handle end of run.
     auto& state = g_Mod->state_;
     if (!state.GetOption(OPT_RUN_STARTED)) return;
     uint32_t color = ~0U;

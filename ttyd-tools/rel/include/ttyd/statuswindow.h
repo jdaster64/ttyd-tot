@@ -19,7 +19,7 @@ void statusWinForceUpdate();
 // statusWinCheck
 // statusWinDispOff
 // statusWinDispOn
-// statusWinForceOff
+void statusWinForceOff();
 // statusWinForceCloseClear
 // statusWinForceClose
 // statusWinForceOpen

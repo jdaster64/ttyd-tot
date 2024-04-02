@@ -9,6 +9,7 @@
 #include "tot_gon_tower_npcs.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
+#include "tot_window_select.h"
 
 #include <gc/types.h>
 #include <ttyd/battle_database_common.h>
@@ -586,7 +587,12 @@ EVT_BEGIN(Tower_FinalBossEvent)
     END_INLINE()
     WAIT_MSEC(5000)
     
-    // TODO: Add victory animation, results, ...
+    // TODO: Flesh out victory animations, results, ...
+
+    // Show run stats dialog.
+    USER_FUNC(evt_win_other_select,
+        (uint32_t)window_select::MenuType::RUN_RESULTS_STATS)
+    WAIT_MSEC(1000)
     
     // Despawn partner.
     USER_FUNC(evt_mario_goodbye_party, 0)
