@@ -12,7 +12,7 @@ struct filemgr__File {
     filemgr__File*  mpNextFile;
     void**          mpDoneCallback;
     int32_t         unk_ac;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(filemgr__File) == 0xb0);
 

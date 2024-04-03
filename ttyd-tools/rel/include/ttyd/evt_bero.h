@@ -71,7 +71,7 @@ struct BeroEntry {
     int16_t     out_anim_type;          // BeroAnimType
     void*       entry_anim_args;
     void*       out_anim_args;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BeroEntry) == 0x3c);
 

@@ -105,7 +105,7 @@ struct WinMgrDesc {
     uint32_t    color;
     void*       main_func;
     void*       disp_func;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(WinMgrDesc) == 0x28);
 
@@ -113,7 +113,7 @@ struct WinMgrSelectDescList {
     int16_t     num_descs;
     int16_t     pad_0x02;
     WinMgrDesc* descs;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(WinMgrSelectDescList) == 8);
 
@@ -135,14 +135,14 @@ struct WinMgrEntry {
     int32_t     help_line_cursor_index;
     int32_t     help_line_count;
     int32_t     unk_0x40;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(WinMgrEntry) == 0x44);
 
 struct WinMgrSelectEntryRow {
     uint16_t    flags;  // WinMgrSelectEntryRow_Flags
     uint16_t    value;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(WinMgrSelectEntryRow) == 4);
 
@@ -161,14 +161,14 @@ struct WinMgrSelectEntry {
     WinMgrSelectEntryRow* row_data;
     int32_t     num_rows;
     int32_t     new_item;  // when tossing items away, this is the one picked up
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(WinMgrSelectEntry) == 0x3c);
 
 struct WinMgrWork {
     int32_t         num_entries;
     WinMgrEntry*    entries;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(WinMgrWork) == 8);
 

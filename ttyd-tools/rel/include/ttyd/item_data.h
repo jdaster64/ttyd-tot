@@ -404,7 +404,7 @@ struct ItemData {
     int16_t         icon_id;
     int16_t         unk_022;
     ttyd::battle_database_common::BattleWeapon* weapon_params;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(ItemData) == 0x28);
 

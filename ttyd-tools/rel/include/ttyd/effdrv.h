@@ -12,7 +12,7 @@ struct EffEntry {
     void*           main_func;
     const char*     type_name;
     char            name[16];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(EffEntry) == 0x28);
 

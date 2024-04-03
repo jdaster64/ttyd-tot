@@ -16,7 +16,7 @@ struct WinPartyData {
     const char* unk_18;         // "d_mario" for all partners
     const char* unk_1c;         // animation-related?
     void*       weapon_table;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(WinPartyData) == 0x24);
 

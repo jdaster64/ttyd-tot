@@ -20,14 +20,13 @@ struct EvtEntry
 	int8_t wNpcEventType;
 	uint8_t pad_10[3];
 	int32_t nextCommandPtr;
-	int32_t *evtArguments;
+	int32_t* evtArguments;
 	int8_t labelIdTable[16];
-	void *labelAddressTable[16];
-	EvtEntry *waitingEvt;
-	EvtEntry *waitingOnEvt;
-	EvtEntry *parentEvt;
-	int32_t sleepTimeMs;
-	int64_t sleepStartTime;
+	void* labelAddressTable[16];
+	EvtEntry* waitingEvt;
+	EvtEntry* waitingOnEvt;
+	EvtEntry* prevBrotherEvt;
+	int8_t userData[12];
 	int32_t wInterpolationStartedNpcFlag;
 	int64_t wInterpRelatedTime;
 	int32_t unk_90;
@@ -37,20 +36,20 @@ struct EvtEntry
 	uint32_t lfData;
 	int32_t unk_e0;
 	int32_t unk_e4;
-	void *loopStartAddressStack[8];
+	void* loopStartAddressStack[8];
 	int32_t loopIterationsLeftStack[8];
 	int8_t switchStateStack[8];
 	int32_t switchValueStack[8];
-	void *memoryCmdBase;
-	void *uwBase;
-	void *ufBase;
+	void* memoryCmdBase;
+	void* uwBase;
+	void* ufBase;
 	int32_t threadId;
-	void *wActorThisPtr;
+	void* wActorThisPtr;
 	float timescale;
 	int32_t timeScheduledToRun;
 	int32_t unk_16c;
-	void *wThisPtr;
-	void *wThisObjPtr;
+	void* wThisPtr;
+	void* wThisObjPtr;
 	int32_t wActiveMsgWindowId;
 	int32_t unk_17c;
 	int32_t unk_180;
@@ -60,11 +59,11 @@ struct EvtEntry
 	int32_t msgPriority;
 	int32_t unk_194;
 	int64_t wInterpolationStartTime2;
-	void *restartFromLocation;
-	char *name;
-	void *wCurrentCommandPtr;
+	void* restartFromLocation;
+	char* name;
+	void* wCurrentCommandPtr;
 	int32_t unk_1ac;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(EvtEntry) == 0x1b0);
 
@@ -76,7 +75,7 @@ struct EvtWork
 	EvtEntry *entries;
 	uint32_t pad_94;
 	int64_t currentEvtTime;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(EvtWork) == 0xa0);
 

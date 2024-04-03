@@ -19,7 +19,7 @@ struct MonosiriMsgEntry {
     const char*     model_name;
     const char*     pose_name;
     const char*     location_name;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(MonosiriMsgEntry) == 0x18);
 

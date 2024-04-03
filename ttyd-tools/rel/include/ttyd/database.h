@@ -8,7 +8,7 @@ struct DatabaseDefinition
 {
 	const char *name;
 	int32_t id;
-} __attribute__((__packed__));
+} ;
 
 extern "C" {
 

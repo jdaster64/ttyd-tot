@@ -96,7 +96,7 @@ struct PartyEntry {
     int32_t     unk_0x16c;
     void*       user_data;
     uint32_t    misc_work[5];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(PartyEntry) == 0x188);
 

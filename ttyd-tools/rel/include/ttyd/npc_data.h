@@ -20,7 +20,7 @@ struct NpcAiTypeTable {
     void*       lostEvtCode;
     void*       returnEvtCode;
     void*       blowEvtCode;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(NpcAiTypeTable) == 0x24);
 

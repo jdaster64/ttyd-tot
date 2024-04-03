@@ -10,7 +10,7 @@ struct ExtEntryData {
     const char* model_name;
     const char* pose_name;
     float       f;              // Frame count / frame number?
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(ExtEntryData) == 0xc);
 
@@ -21,7 +21,7 @@ struct ExtPoseWork {
     gc::mtx34*  mtx;
     int32_t     anim_frame;
     int8_t      unk_0x14[12];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(ExtPoseWork) == 0x20);
 

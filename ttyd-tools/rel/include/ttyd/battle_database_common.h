@@ -506,7 +506,7 @@ struct BattleWeapon {
     int8_t      object_fall_chance;
     int8_t      unused_stage_hazard_chance;
     int8_t      pad_be[2];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWeapon) == 0xc0);
 
@@ -514,7 +514,7 @@ struct ItemDropData {
     int32_t item_id;
     int16_t hold_weight;
     int16_t drop_weight;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(ItemDropData) == 0x8);
     
@@ -523,7 +523,7 @@ struct PointDropData {
     int32_t overall_drop_rate;
     int32_t drop_count;
     int32_t individual_drop_rate;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(PointDropData) == 0x10);
 
@@ -550,19 +550,19 @@ struct StatusVulnerability {
     uint8_t dodgy;
     uint8_t invisible;
     uint8_t ohko;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(StatusVulnerability) == 0x16);
 
 struct PoseTableEntry {
     uint32_t    id;
     const char* name;
-} __attribute__((__packed__));
+} ;
 
 struct DataTableEntry {
     uint32_t    id;
     void*       data;
-} __attribute__((__packed__));
+} ;
 
 struct PoseSoundTimingEntry {
     const char* pose_name;
@@ -570,7 +570,7 @@ struct PoseSoundTimingEntry {
     int32_t     unk_int0;
     const char* sfx_name;
     int32_t     unk_int1;
-} __attribute__((__packed__));
+} ;
 
 struct BattleUnitKindPart {
     int32_t     index;  // one-indexed
@@ -589,7 +589,7 @@ struct BattleUnitKindPart {
     uint32_t    attribute_flags;
     uint32_t    counter_attribute_flags;
     PoseTableEntry* pose_table;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleUnitKindPart) == 0x4c);
 
@@ -643,7 +643,7 @@ struct BattleUnitKind {
     BattleUnitKindPart* parts;
     void*       init_evt_code;
     DataTableEntry* data_table;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleUnitKind) == 0xc4);
 
@@ -656,7 +656,7 @@ struct BattleUnitSetup {
     uint32_t        addl_target_offset_x;
     uint32_t        unit_work[4];
     ItemDropData*   item_drop_table;        // Zero-terminated
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleUnitSetup) == 0x30);
     
@@ -669,7 +669,7 @@ struct BattleGroupSetup {
     PointDropData*  hp_drop_table;
     PointDropData*  fp_drop_table;
     uint32_t        unk_1c;    
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleGroupSetup) == 0x20);
 
@@ -681,7 +681,7 @@ struct BattleStageObjectData {
     int8_t      num_frames_before_falling;
     int8_t      num_frames_to_fall;
     int8_t      pad_16[2];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleStageObjectData) == 0x18);
 
@@ -704,7 +704,7 @@ struct BattleStageData {
     uint8_t         disallow_destroying_bg_a1;
     uint8_t         disallow_destroying_bg_a2;
     uint8_t         disallow_destroying_bg_b;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleStageData) == 0x1b4);
     
@@ -712,14 +712,14 @@ struct BattleSetupWeightedLoadout {
     int32_t             weight;
     BattleGroupSetup*   group_data;
     BattleStageData*    stage_data;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleSetupWeightedLoadout) == 0xc);
     
 struct AudienceTypeWeights {
     int8_t min_weight;
     int8_t max_weight;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(AudienceTypeWeights) == 0x2);
 
@@ -739,7 +739,7 @@ struct BattleSetupData {
     uint32_t        audience_setting_mode;
     AudienceTypeWeights audience_type_weights[16];
     const char*     music_name;    
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleSetupData) == 0x44);
 

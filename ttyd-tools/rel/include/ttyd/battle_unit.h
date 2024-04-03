@@ -134,7 +134,7 @@ struct MovementSoundControl {
     int16_t         sound_to_play_next;
     int16_t         pad_16;
     int32_t         psnd_sfx_idx;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(MovementSoundControl) == 0x1c);
     
@@ -159,7 +159,7 @@ struct MovementSoundData {
     int16_t         dive_repeat_wait_timer_left;
     int16_t         dive_repeat_wait_timer_right;
     int16_t         pad_36;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(MovementSoundData) == 0x38);
 
@@ -186,7 +186,7 @@ struct MovementParams {
     float           jump_current_position_y;  // ?
     int8_t          unk_78[4];
     MovementSoundData sound_data_table;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(MovementParams) == 0xb4);
 
@@ -235,7 +235,7 @@ struct BadgesEquipped {
     int8_t      simplifier;
     int8_t      unsimplifier;
     int8_t      auto_command_badge;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BadgesEquipped) == 0x28);
 
@@ -296,7 +296,7 @@ struct BattleWorkUnitPart {
     float               unk_4f8;  // some sort of z-offset?  Used in btlDispMain
     int8_t              unk_4fc;  // axis order to apply rotations?
     int8_t              unk_4fd[3];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkUnitPart) == 0x500);
 
@@ -444,7 +444,7 @@ struct BattleWorkUnit {
     battle_database_common::ItemDropData* held_item_table;
     
     int8_t          misc_310[0x824];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkUnit) == 0xb34);
 

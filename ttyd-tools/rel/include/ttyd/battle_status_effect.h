@@ -16,7 +16,7 @@ struct BattleStatusChangeMsgData {
     const char*     status_id;
     const char*     msg_effect;
     const char*     msg_no_effect;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleStatusChangeMsgData) == 0x10);
 

@@ -11,7 +11,7 @@ struct RankupData {
     int16_t     rank;
     const char* mario_menu_msg;
     const char* rankup_msg;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(RankupData) == 0xc);
     

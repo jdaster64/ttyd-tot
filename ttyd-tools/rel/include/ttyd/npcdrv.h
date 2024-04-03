@@ -20,7 +20,7 @@ struct NpcWork
 	uint32_t wFlags;
 	NpcEntry *entries;
 	NpcEntry *wTalkCheckRelatedNpc;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(NpcWork) == 0x14);
 
@@ -48,7 +48,7 @@ struct NpcTribeDescription
 	uint8_t pad_4a[2];
 	const char *jumpSfxId;
 	const char *landingSfxId;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(NpcTribeDescription) == 0x54);
 
@@ -74,7 +74,7 @@ struct NpcBattleInfo
 	uint8_t ruleParameter1;
 
 	uint8_t pad_c7[0x1];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(NpcBattleInfo) == 0xc8);
 
@@ -112,7 +112,7 @@ struct NpcSetupInfo {
     float       homingRange;
     float       homingAngle;
     int32_t     battleInfoId;
-}  __attribute__((__packed__));
+}  ;
 
 static_assert(sizeof(NpcSetupInfo) == 0x5c);
 
@@ -222,7 +222,7 @@ struct NpcEntry
 	NpcEntry *linkTo;
 	NpcEntry *master;
 	NpcEntry *slaves[4];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(NpcEntry) == 0x340);
 
@@ -232,7 +232,7 @@ struct FbatHitInfo
 	uint32_t wAttackMode;
 	float wDistance;
 	uint32_t wUnknownFlags;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(FbatHitInfo) == 0x10);
 
@@ -248,7 +248,7 @@ struct FbatBattleInformation
 	uint8_t wRuleKeepResult;
     uint8_t wBtlActRecParam0;
     uint8_t wBtlActRecParam1;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(FbatBattleInformation) == 0x1c);
 
@@ -256,7 +256,7 @@ struct FbatDatabaseNpcDeadInfo
 {
 	char mapName[16];
 	uint32_t deadNpcMask;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(FbatDatabaseNpcDeadInfo) == 0x14);
 
@@ -270,7 +270,7 @@ struct FbatAttackAnnounceInfo
 	float field_14;
 	char *wMsg;
 	gc::color4 wColor;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(FbatAttackAnnounceInfo) == 0x20);
 
@@ -303,7 +303,7 @@ struct FbatData
 	int32_t wKpaComboLength;
 	int32_t wKpaScoreChangeCounter;
 	int32_t wKpaTotalScore;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(FbatData) == 0x580);
 

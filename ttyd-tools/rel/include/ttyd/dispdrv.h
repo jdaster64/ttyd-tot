@@ -31,7 +31,7 @@ struct DisplayWork
 	float order;
 	PFN_dispCallback callback;
 	void *user;
-} __attribute__((__packed__));
+} ;
 
 extern "C" {
 

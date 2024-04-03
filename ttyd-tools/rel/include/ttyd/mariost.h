@@ -76,7 +76,7 @@ struct MarioSt_Globals {
     int32_t     saveCounter;
     int8_t      unk_11f4[0x134];
     int8_t      misc_gamepad_related_1328[0xb0];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(MarioSt_Globals) == 0x13d8);
 	

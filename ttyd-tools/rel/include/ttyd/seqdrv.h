@@ -26,7 +26,7 @@ struct SeqInfo
 	uint32_t unk_14;
 	uint32_t unk_18;
 	uint32_t unk_1c;
-} __attribute__((__packed__));
+} ;
 
 extern "C" {
 

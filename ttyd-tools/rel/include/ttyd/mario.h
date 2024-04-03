@@ -113,7 +113,7 @@ struct Player
 	float wResetPosition[3];
 	uint32_t unk_2f0;
 	uint32_t unk_2f4;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(Player) == 0x2F8);
 

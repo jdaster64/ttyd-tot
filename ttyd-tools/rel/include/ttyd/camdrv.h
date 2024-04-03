@@ -25,7 +25,7 @@ struct Camera {
     gc::mtx44   projection_mtx;
     int32_t     projection_type;
     int8_t      unk_0x1a0[0xc0];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(Camera) == 0x260);
 

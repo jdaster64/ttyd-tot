@@ -39,7 +39,7 @@ struct BattleWorkTarget {
     bool        fg_or_bg_layer;
     int16_t     pad_1e;
     int32_t     unk_20;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkTarget) == 0x24);
 
@@ -54,7 +54,7 @@ struct BattleWorkWeaponTargets {
     uint32_t            weapon_target_class_flags;
     uint32_t            weapon_target_property_flags;
     int32_t             attacking_direction;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkWeaponTargets) == 0xacc);
 
@@ -65,7 +65,7 @@ struct BattleWorkCommandAction {
     int16_t         icon;
     int16_t         pad_0e;
     uint32_t        unk_10;  // has to do with greying out?
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkCommandAction) == 0x14);
 
@@ -78,7 +78,7 @@ struct BattleWorkCommandWeapon {
     int32_t         index;
     uint32_t        item_id;
     uint32_t        unk_18;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkCommandWeapon) == 0x1c);
 
@@ -91,7 +91,7 @@ struct BattleWorkCommandOperation {
     int16_t         pad_12;
     const char*     help_message;
     int32_t         cost;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkCommandOperation) == 0x1c);
 
@@ -104,7 +104,7 @@ struct BattleWorkCommandParty {
     const char*     help_message;
     int16_t         current_hp;
     int16_t         max_hp;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkCommandParty) == 0x18);
 
@@ -116,7 +116,7 @@ struct BattleWorkCommandMultiItem {
     int16_t         unk_0e;
     int32_t         cost;
     uint32_t        unk_14;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkCommandMultiItem) == 0x18);
 
@@ -124,7 +124,7 @@ struct BattleWorkCommandCursor {
     int32_t         abs_position;
     int32_t         rel_position;
     int32_t         num_options;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkCommandCursor) == 0xc);
     
@@ -140,7 +140,7 @@ struct BattleWorkCommand {
     int8_t          unk_540[0x1c];
     void*           window_work;
     int8_t          unk_560[0x14];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkCommand) == 0x574);
 
@@ -177,7 +177,7 @@ struct BattleWorkActionCommandManager {
     uint32_t    stylish_unit_idx;
     int32_t     stylish_result;
     uint32_t    stylish_early_frames;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWorkActionCommandManager) == 0xaa8);
 
@@ -328,7 +328,7 @@ struct BattleWork {
     int32_t         debug_audience_monotype_kind;
     int32_t         debug_force_bingo_slot_type;
     int8_t          unk_19090[8];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(BattleWork) == 0x19098);
 

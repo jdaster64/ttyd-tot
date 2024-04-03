@@ -25,7 +25,7 @@ struct CounterattackWork {
     int32_t counter_type_2;         // Same as counter_type_1 + 0x100 flag?
     int32_t total_damage;
     int32_t target_hit_event;       // Run on target after successful counter?
-}  __attribute__((__packed__));
+}  ;
 
 static_assert(sizeof(CounterattackWork) == 0x30);
 

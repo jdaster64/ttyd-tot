@@ -28,7 +28,7 @@ struct NpcSetupInfo
 	float homingRange;
 	float homingAngle;
 	int32_t battleInfoId;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(NpcSetupInfo) == 0x5c);
 

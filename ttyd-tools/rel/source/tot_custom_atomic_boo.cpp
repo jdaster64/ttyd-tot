@@ -65,7 +65,7 @@ struct ExtBooWork {
     gc::vec3    unk_0x28;
     int8_t      ease_mode;
     int8_t      pad_0x35[3];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(ExtBooWork) == 0x38);
 

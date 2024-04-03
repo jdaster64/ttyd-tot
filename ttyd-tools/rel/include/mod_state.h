@@ -81,7 +81,7 @@ public:
     // Enables standard settings for community races, including showing ATK/DEF,
     // and disables the menu so changes cannot be made.
     void EnableRaceOptions();
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(StateManager_v2) <= 0x120);
 

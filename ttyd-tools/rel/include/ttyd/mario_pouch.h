@@ -14,7 +14,7 @@ struct PouchPartyData {
     int16_t     hp_level;
     int16_t     attack_level;
     int16_t     tech_level;
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(PouchPartyData) == 0xe);
     
@@ -59,7 +59,7 @@ struct PouchData {
     int32_t     super_bowser_score;
     char        yoshi_name[16];
     int8_t      unk_5d0[4];
-} __attribute__((__packed__));
+} ;
 
 static_assert(sizeof(PouchData) == 0x5d4);
 
