@@ -121,7 +121,8 @@ bool StateManager::Load(TotSaveSlot* save) {
     player->prevFollowerId[0] = mariost->saveParty0Id;
     player->prevFollowerId[1] = mariost->saveParty1Id;
     
-    // TODO: Add 1 to number of continues.
+    // Add 1 to number of times the current run was continued.
+    if (GetOption(OPT_RUN_STARTED)) ChangeOption(STAT_RUN_CONTINUES);
     
     return true;
 }
@@ -192,10 +193,9 @@ TotSaveSlot* StateManager::GetBackupSave() const {
 }
 
 void StateManager::InitDefaultOptions() {
-    seed_ = 654;
     // Pick a random seed, and reset all RNG states to the start.
-    // seed_ = static_cast<uint32_t>(gc::OSTime::OSGetTime()) % 1'000'000'000;
-    for (int32_t i = 0; i < 56; ++i) rng_states_[i] = 0;
+    seed_ = static_cast<uint32_t>(gc::OSTime::OSGetTime()) % 1'000'000'000;
+    for (int32_t i = 0; i < RNG_SEQUENCE_MAX; ++i) rng_states_[i] = 0;
     
     // Set floor to 0 (starting floor that only gives a partner).
     floor_ = 0;

@@ -158,4 +158,14 @@ int32_t DurationTicksToFmtString(int64_t val, char* out_buf) {
         h, m, s, cs);
 }
 
+int32_t DurationCentisToFmtString(int32_t cs_val, char* out_buf) {
+    int32_t h = cs_val / (60 * 60 * 100);
+    int32_t m = cs_val / (60 * 100) % 60;
+    int32_t s = cs_val / 100 % 60;
+    int32_t cs = cs_val % 100;
+    return sprintf(
+        out_buf, "%02" PRId32 ":%02" PRId32 ":%02" PRId32 ".%02" PRId32,
+        h, m, s, cs);
+}
+
 }

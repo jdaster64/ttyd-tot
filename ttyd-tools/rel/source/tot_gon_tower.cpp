@@ -585,6 +585,10 @@ EVT_BEGIN(Tower_FinalBossEvent)
         USER_FUNC(evt_cam_shake, 4, FLOAT(0.005), FLOAT(0.0), 2000)
         USER_FUNC(evt_snd_sfxoff, LW(3))
     END_INLINE()
+
+    // Increment floor to lock timer.
+    USER_FUNC(evtTot_ToggleIGT, 0)
+    USER_FUNC(evtTot_IncrementFloor, 1)
     WAIT_MSEC(5000)
     
     // TODO: Flesh out victory animations, results, ...

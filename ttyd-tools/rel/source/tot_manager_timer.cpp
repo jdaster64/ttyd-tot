@@ -19,6 +19,15 @@ using ::ttyd::evtmgr_cmd::evtGetValue;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 
+uint64_t GetRTATime() {
+    // Freeze RTA timer after ending floor.
+    auto& state = g_Mod->state_;
+    if (state.IsFinalBossFloor() && state.splits_rta_[state.floor_]) {
+        return state.last_floor_rta_;
+    }
+    return ttyd::mariost::g_MarioSt->lastFrameRetraceTime;
+}
+
 }  // namespace
 
 void TimerManager::Update() {
@@ -26,7 +35,6 @@ void TimerManager::Update() {
 }
 
 void TimerManager::Draw() {
-    // TODO: Handle end of run.
     auto& state = g_Mod->state_;
     if (!state.GetOption(OPT_RUN_STARTED)) return;
     uint32_t color = ~0U;
@@ -39,9 +47,7 @@ void TimerManager::Draw() {
             break;
         }
         case OPTVAL_TIMER_RTA: {
-            time_ticks = 
-                ttyd::mariost::g_MarioSt->lastFrameRetraceTime -
-                state.run_start_time_rta_;
+            time_ticks = GetRTATime() - state.run_start_time_rta_;
             color = 0xd0d0ffffU;
             break;
         }
@@ -76,6 +82,31 @@ void TimerManager::Draw() {
             mtx.m[0][3] += 20.0f - 4.0f;
         }
     }
+}
+
+int32_t TimerManager::GetCurrentRunTotalTimeCentis() {
+    auto& state = g_Mod->state_;
+    if (state.CheckOptionValue(OPTVAL_TIMER_RTA)) {
+        return DurationTicksToCentiseconds(
+            GetRTATime() - state.run_start_time_rta_);
+    }
+    return DurationTicksToCentiseconds(state.current_total_igt_);
+}
+
+int32_t TimerManager::GetCurrentRunTotalBattleTimeCentis() {
+    int32_t total = 0;
+    for (int32_t i = 0; i <= 64; ++i) {
+        total += g_Mod->state_.splits_battle_igt_[i];
+    }
+    return total;
+}
+
+int32_t TimerManager::GetNumberOfBattles() {
+    int32_t battles = 0;
+    for (int32_t i = 0; i <= 64; ++i) {
+        battles += g_Mod->state_.splits_battle_igt_[i] ? 1 : 0;
+    }
+    return battles;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_ToggleIGT) {

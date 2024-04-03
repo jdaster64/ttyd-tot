@@ -59,6 +59,9 @@ void DurationTicksToParts(
 // Converts a duration expressed in OSTicks (40.5M / sec) to HH:MM:SS.ss format.
 // Returns the number of characters printed to the string.
 int32_t DurationTicksToFmtString(int64_t val, char* out_buf);
+// Converts a duration expressed in centiseconds to HH:MM:SS.ss format.
+// Returns the number of characters printed to the string.
+int32_t DurationCentisToFmtString(int32_t val, char* out_buf);
 
 // Template functions for min / max / clamping a value to a range.
 template <class T> inline T Min(const T& lhs, const T& rhs) {

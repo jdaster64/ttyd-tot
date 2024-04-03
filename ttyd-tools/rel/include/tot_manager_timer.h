@@ -12,6 +12,11 @@ public:
     static void Update();
     // Function that draws the current time to the screen.
     static void Draw();
+
+    // Useful wrapper functions.
+    static int32_t GetCurrentRunTotalTimeCentis();
+    static int32_t GetCurrentRunTotalBattleTimeCentis();
+    static int32_t GetNumberOfBattles();
 };
 
 // Toggles the in-game timer on or off.

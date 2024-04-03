@@ -373,7 +373,8 @@ enum Options : uint32_t {
     STAT_RUN_CONDITIONS_TOTAL   = 0x02c'1'00'00,
     STAT_RUN_UNIQUE_BADGE_FLAGS = 0x02d'1'00'0a,
     STAT_RUN_MIDBOSSES_USED     = 0x037'1'00'07,
-    // Next: 0x03e
+    STAT_RUN_CONTINUES          = 0x03e'1'01'03,
+    // Next: 0x03f
     // TODO: Add versions of most stats that persist across runs.
 };
 

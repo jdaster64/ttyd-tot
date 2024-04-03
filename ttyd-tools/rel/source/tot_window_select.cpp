@@ -5,6 +5,7 @@
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
 #include "tot_manager_move.h"
+#include "tot_manager_timer.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -125,9 +126,9 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
 void DispTimerSplits(WinMgrEntry* entry) {
     uint32_t kBlack = 0x0000'00FFU;
     uint32_t kReds[] = { 0xFF00'00FFU, 0xAA00'00FFU, 0xFF55'AAFFU, 0xCC2080FFU };
-    uint32_t kBlues[] = { 0x0000'FFFFU, 0x0000'A0FFU, 0x1094'FFFFU, 0x0070'C8FFU };
+    uint32_t kBlues[] = { 0x0000'FFFFU, 0x0000'A0FFU, 0x1094'FFFFU, 0x0060'C0FFU };
 
-    // TODO: These are approximate max bounds of actual graph; refine.
+    // Approximate max bounds of actual graph.
     float x_min = entry->x + 70.f;
     float x_max = entry->x + entry->width - 10.f;
     float y_min = entry->y - entry->height + 30.f;
@@ -188,10 +189,9 @@ void DispTimerSplits(WinMgrEntry* entry) {
     ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kBlues[0]);
     
     // Draw actual graph based on splits / max time.
-    // TODO: Parametrize based on actual maximum floor.
-    for (int32_t i = 0; i <= 64; ++i) {
-        const int32_t kIconSize = 32.0f;
-
+    const int32_t kIconSize = 32.0f;
+    const int32_t max_floor = g_Mod->state_.floor_;
+    for (int32_t i = 0; i <= max_floor; ++i) {
         // Choose color index; odd numbers are lighter shades, 
         // odd floor groups are lighter base colors.
         int32_t c = (i-1) / 8 % 2 == 0 ? 0 : 2;
@@ -199,9 +199,9 @@ void DispTimerSplits(WinMgrEntry* entry) {
 
         gc::mtx34 mtx, mtx_s, mtx_t;
         gc::mtx::PSMTXTrans(
-            &mtx_t, x_min + (x_max - x_min) * i / 65, y_min, 0.0f);
+            &mtx_t, x_min + (x_max - x_min) * i / (max_floor + 1), y_min, 0.0f);
 
-        float scale_x = (x_max - x_min) / 65.0f / kIconSize;
+        float scale_x = (x_max - x_min) / (max_floor + 1) / kIconSize;
         float scale_y;
 
         scale_y =
@@ -570,32 +570,75 @@ void DispSelectionHelp(WinMgrEntry* entry) {
 }
 
 void DispOptionsWindowTopBar(WinMgrEntry* entry) {
-    // TODO: Update to include seed, final timer, etc.
+    // TODO: Non-hardcoded options-related strings, RTA time support.
 
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
         WinMgrEntry_Flags::IN_FADE) != 0) return;
+
+    uint32_t kBlack = 0x0000'00FFU;
+    uint32_t kBlue  = 0x0000'C0FFU;
+    const float min_x = entry->x + 12.f;
+    const float max_x = entry->x + entry->width - 12.f;
+    const float top_y = entry->y - 10.f;
+    const float space_y = -24.0f;
     
-    const char* msg = msgSearch("tot_winsel_runstats_topbar");
+    char text[24];
+    gc::vec3 text_pos = { min_x, top_y, 0.0f };
+    gc::vec3 text_scale = { 0.9f, 1.0f, 1.0f };
     
-    uint16_t lines;
-    int32_t length = ttyd::fontmgr::FontGetMessageWidthLine(msg, &lines);
-    
-    gc::mtx34 mtx, mtx2;
-    if (length <= entry->width - 30) {
-        gc::mtx::PSMTXScale(&mtx2, 1.0, 1.0, 1.0);
-    } else {
-        gc::mtx::PSMTXScale(&mtx2, (entry->width - 30.0) / length, 1.0, 1.0);
-        length = entry->width - 30;
-    }
-    gc::mtx::PSMTXTrans(
-        &mtx,
-        entry->x + (entry->width - length) * 0.5,
-        entry->y - (entry->height - (lines + 1) * 24) / 2,
-        0.0);
-    gc::mtx::PSMTXConcat(&mtx, &mtx2, &mtx);
     ttyd::fontmgr::FontDrawStart();
-    ttyd::fontmgr::FontDrawMessageMtx(&mtx, msg);
+    
+    sprintf(text, "Seed: ");
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
+    text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    sprintf(text, "%09" PRId32, g_Mod->state_.seed_);
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+
+    text_pos.x = min_x;
+    text_pos.y += space_y;
+    sprintf(text, "Options: ");
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
+    text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    sprintf(text, "Default");
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+
+    text_pos.x = min_x;
+    text_pos.y += space_y;
+    sprintf(text, "Difficulty: ");
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
+    text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    sprintf(text, "64-Floor");
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+
+    text_pos.x = max_x;
+    text_pos.y = top_y;
+    DurationCentisToFmtString(
+        TimerManager::GetCurrentRunTotalTimeCentis(), text);
+    text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+    sprintf(text, "Total Time: ");
+    text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
+
+    text_pos.x = max_x;
+    text_pos.y += space_y;
+    DurationCentisToFmtString(
+        TimerManager::GetCurrentRunTotalBattleTimeCentis(), text);
+    text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+    sprintf(text, "Battle Time: ");
+    text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
+
+    text_pos.x = max_x;
+    text_pos.y += space_y;
+    sprintf(text, "%" PRId32, g_Mod->state_.GetOption(STAT_RUN_CONTINUES));
+    text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+    sprintf(text, "Continues: ");
+    text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
 }
 
 void DispOptionsWindowBottomBar(WinMgrEntry* entry) {
@@ -687,7 +730,7 @@ WinMgrDesc g_CustomDescs[] = {
         .heading_type = WinMgrDesc_HeadingType::SINGLE_CENTERED,
         .camera_id = (int32_t)CameraId::k2d,
         .x = -250,
-        .y = 120,
+        .y = 96,
         .width = 500,
         .height = 240,
         .color = 0xFFFFFFFFU,
@@ -698,10 +741,10 @@ WinMgrDesc g_CustomDescs[] = {
         .fade_mode = WinMgrDesc_FadeMode::INSTANT,
         .heading_type = WinMgrDesc_HeadingType::NONE,
         .camera_id = (int32_t)CameraId::k2d,
-        .x = -200,
-        .y = 185,
-        .width = 400,
-        .height = 45,
+        .x = -275,
+        .y = 209,
+        .width = 550,
+        .height = 93,
         .color = 0xC4ECF2FFU,
         .main_func = nullptr,
         .disp_func = (void*)DispOptionsWindowTopBar,
@@ -711,7 +754,7 @@ WinMgrDesc g_CustomDescs[] = {
         .heading_type = WinMgrDesc_HeadingType::NONE,
         .camera_id = (int32_t)CameraId::k2d,
         .x = -200,
-        .y = -140,
+        .y = -164,
         .width = 400,
         .height = 45,
         .color = 0xC4ECF2FFU,
