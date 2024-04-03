@@ -124,16 +124,14 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
 
 void DispTimerSplits(WinMgrEntry* entry) {
     uint32_t kBlack = 0x0000'00FFU;
-    uint32_t kRed1  = 0xFF00'00FFU;
-    uint32_t kRed2  = 0xFF22'44FFU;
-    uint32_t kBlue1 = 0x0000'FFFFU;
-    uint32_t kBlue2 = 0x2266'FFFFU;
+    uint32_t kReds[] = { 0xFF00'00FFU, 0xAA00'00FFU, 0xFF55'AAFFU, 0xCC2080FFU };
+    uint32_t kBlues[] = { 0x0000'FFFFU, 0x0000'A0FFU, 0x1094'FFFFU, 0x0070'C8FFU };
 
     // TODO: These are approximate max bounds of actual graph; refine.
     float x_min = entry->x + 70.f;
     float x_max = entry->x + entry->width - 10.f;
     float y_min = entry->y - entry->height + 30.f;
-    float y_max = entry->y - 20.f;
+    float y_max = entry->y - 25.f;
 
     // TODO: Allow for toggling between IGT and RTA main splits.
     uint32_t* main_splits = g_Mod->state_.splits_igt_;
@@ -158,7 +156,7 @@ void DispTimerSplits(WinMgrEntry* entry) {
         sprintf(buf, "%" PRId32 "\"%02" PRId32, mins, secs);
 
         gc::vec3 pos = {
-            entry->x + 10.f,
+            entry->x + 15.f,
             y_min + i * (y_max - y_min) / 4 + 12.f,
             0.0f
         };
@@ -169,9 +167,9 @@ void DispTimerSplits(WinMgrEntry* entry) {
     // Write strings for legend.
     gc::vec3 text_pos = { x_min + 33.f, y_min - 5.f, 0.0f };
     gc::vec3 text_scale = { 0.6f, 0.6f, 0.6f };
-    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kRed1, "In-Battle Time");
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kReds[0], "In-Battle Time");
     text_pos.x += 160.f;
-    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue1, "Out-of-Battle Time");
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlues[0], "Out-of-Battle Time");
 
     ttyd::win_main::winIconInit();
 
@@ -182,19 +180,22 @@ void DispTimerSplits(WinMgrEntry* entry) {
     gc::vec3 icon_pos = { x_min + 15.f, y_min - 20.f, 0.0f };
     gc::mtx::PSMTXTrans(&mtx_t, icon_pos.x, icon_pos.y, icon_pos.z);
     gc::mtx::PSMTXConcat(&mtx_t, &mtx_s, &mtx);
-    ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kRed1);
+    ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kReds[0]);
 
     icon_pos.x += 160.f;
     gc::mtx::PSMTXTrans(&mtx_t, icon_pos.x, icon_pos.y, icon_pos.z);
     gc::mtx::PSMTXConcat(&mtx_t, &mtx_s, &mtx);
-    ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kBlue1);
+    ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kBlues[0]);
     
     // Draw actual graph based on splits / max time.
     // TODO: Parametrize based on actual maximum floor.
     for (int32_t i = 0; i <= 64; ++i) {
         const int32_t kIconSize = 32.0f;
-        uint32_t* red = i / 8 % 2 == 0 ? &kRed1 : &kRed2;
-        uint32_t* blue = i / 8 % 2 == 0 ? &kBlue1 : &kBlue2;
+
+        // Choose color index; odd numbers are lighter shades, 
+        // odd floor groups are lighter base colors.
+        int32_t c = (i-1) / 8 % 2 == 0 ? 0 : 2;
+        c += (i % 2 == 1) ? 0 : 1;
 
         gc::mtx34 mtx, mtx_s, mtx_t;
         gc::mtx::PSMTXTrans(
@@ -209,7 +210,7 @@ void DispTimerSplits(WinMgrEntry* entry) {
 
         gc::mtx::PSMTXScale(&mtx_s, scale_x, scale_y, 1.0f);
         gc::mtx::PSMTXConcat(&mtx_t, &mtx_s, &mtx);
-        ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, blue);
+        ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kBlues[c]);
 
         scale_y =
             Clamp(battle_splits[i] / (max_time * 3000.0f), 0.0f, 1.0f) * 
@@ -217,7 +218,7 @@ void DispTimerSplits(WinMgrEntry* entry) {
 
         gc::mtx::PSMTXScale(&mtx_s, scale_x, scale_y, 1.0f);
         gc::mtx::PSMTXConcat(&mtx_t, &mtx_s, &mtx);
-        ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, red);
+        ttyd::icondrv::iconDispGxCol(&mtx, 0x10, IconType::TOT_BLANK, &kReds[c]);
     }
 }
 
