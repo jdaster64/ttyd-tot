@@ -631,25 +631,6 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
     }
 }
 
-void RewardManager::AfterItemPickup(int32_t item_type) {
-    int32_t index = GetUniqueBadgeObtainedIndex(item_type);
-    if (index >= 0) {
-        g_Mod->state_.SetOption(STAT_RUN_UNIQUE_BADGE_FLAGS, 1, index);
-    }
-    if (index >= 0 || item_type == ItemType::STAR_PIECE) {
-        // Search Charlieton's array for the item id and remove it.
-        int16_t* charlieton_data = GetCharlietonInventoryPtr();
-        int16_t* last = charlieton_data;
-        while (*charlieton_data >= 0) {
-            if (*charlieton_data != item_type) {
-                *last++ = *charlieton_data;
-            }
-            ++charlieton_data;
-        }
-        *last = -1;
-    }
-}
-
 int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
     if (num_moves) *num_moves = g_NumMovesSelected;
     return g_MoveSelections;
@@ -873,6 +854,29 @@ EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
 EVT_DEFINE_USER_FUNC(evtTot_DisplayChestIcons) {
     ttyd::dispdrv::dispEntry(
         CameraId::k3d, 1, /* order = */ 900.f, DisplayIcons, g_Chests);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_AfterItemBought) {
+    int32_t item_type = evtGetValue(evt, evt->evtArguments[0]);
+
+    int32_t index = GetUniqueBadgeObtainedIndex(item_type);
+    if (index >= 0) {
+        // Mark badge as collected once, so it's not offered again.
+        g_Mod->state_.SetOption(STAT_RUN_UNIQUE_BADGE_FLAGS, 1, index);
+    }
+    if (index >= 0 || item_type == ItemType::STAR_PIECE) {
+        // Search Charlieton's array for the item id and remove it.
+        int16_t* charlieton_data = GetCharlietonInventoryPtr();
+        int16_t* last = charlieton_data;
+        while (*charlieton_data >= 0) {
+            if (*charlieton_data != item_type) {
+                *last++ = *charlieton_data;
+            }
+            ++charlieton_data;
+        }
+        *last = -1;
+    }
     return 2;
 }
 
