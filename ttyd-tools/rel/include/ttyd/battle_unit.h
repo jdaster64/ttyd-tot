@@ -388,7 +388,8 @@ struct BattleWorkUnit {
     int8_t          fp_regen_turns;
     int8_t          fp_regen_strength;
     int8_t          knocked_out;        // OHKO strength?
-    int8_t          unk_136[2];
+    int8_t          unk_136;
+    int8_t          unk_137;
     
     uint32_t        status_flags;
     int8_t          unk_13c[4];

@@ -228,6 +228,7 @@ extern const int32_t g_DrawMenuPartyPinchMark_Patch_CheckResult2 = 0x80117e9c;
 extern const int32_t g_DrawMenuMarioPinchMark_CheckThreshold_BH = 0x80118074;
 extern const int32_t g_DrawMenuMarioPinchMark_Patch_CheckResult1 = 0x8011807c;
 extern const int32_t g_DrawMenuMarioPinchMark_Patch_CheckResult2 = 0x80118080;
+extern const int32_t g_btlSeqAct_SetConfuseProcRate_BH = 0x8011b75c;
 extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_BH = 0x8011c05c;
 extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_EH = 0x8011c11c;
 extern const int32_t g_btlseqTurn_Patch_RuleDispShowLonger = 0x8011c5ec;

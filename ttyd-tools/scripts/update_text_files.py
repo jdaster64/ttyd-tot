@@ -695,6 +695,10 @@ g_StringMap = {
             b"Upgrading this move will\n"
             b"increase the number of bombs.",
             
+        b"tot_upg_tease":
+            b"Upgrading this move makes\n"
+            b"each action likelier to fail.",
+            
         b"tot_upg_smooch":
             b"Upgrading this move will\n"
             b"increase the max HP healed.",

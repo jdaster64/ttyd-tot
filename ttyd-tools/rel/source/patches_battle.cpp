@@ -50,6 +50,9 @@ extern "C" {
     // action_menu_patches.s
     void StartSpendFpOnSwitchPartner();
     void BranchBackSpendFpOnSwitchPartner();
+    // action_seq_patches.s
+    void StartSetConfuseProcRate();
+    void BranchBackSetConfuseProcRate();
     // audience_level_patches.s
     void StartSetTargetAudienceCount();
     void BranchBackSetTargetAudienceCount();
@@ -154,6 +157,7 @@ extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH;
 extern const int32_t g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows;
+extern const int32_t g_btlSeqAct_SetConfuseProcRate_BH;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
 extern const int32_t g__btlcmd_MakeOperationTable_Patch_NoSuperCharge;
 extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH;
@@ -477,6 +481,16 @@ uint32_t GetStatusDamageFromWeapon(
 
                 if (damage_result && type == StatusEffectType::INVISIBLE) {
                     ttyd::battle_disp::btlDispPoseAnime(part);
+                }
+
+                // Use unk_136 as "proc rate" for Confusion.
+                if (damage_result && type == StatusEffectType::CONFUSE) {
+                    target->unk_136 = 50;
+                    if (weapon->pad_ae == tot::MoveType::MOWZ_TEASE) {
+                        target->unk_136 = 
+                            30 + 20 * tot::MoveManager::GetSelectedLevel(
+                                tot::MoveType::MOWZ_TEASE);
+                    }
                 }
             }
         }
@@ -1344,6 +1358,12 @@ void ApplyFixedPatches() {
             // Run vanilla logic.
             return g_btlevtcmd_ChangeParty_trampoline(evt, isFirstCall);
         });
+
+    // Set rate of confusion proc dynamically.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_btlSeqAct_SetConfuseProcRate_BH),
+        reinterpret_cast<void*>(StartSetConfuseProcRate),
+        reinterpret_cast<void*>(BranchBackSetConfuseProcRate));
         
     // Run additional logic on confusion proc.
     g_BattleSetConfuseAct_trampoline = patch::hookFunction(

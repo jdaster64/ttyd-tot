@@ -138,7 +138,7 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeTeaseWeapon) {
     // Make changes in place, since the parameters are unchanged between uses.
     if (move_type == MoveType::MOWZ_TEASE) {
         weapon->confuse_chance = ac_result * 1.27;
-        weapon->confuse_time = 3;
+        weapon->confuse_time = 2;
     } else {  // Smoke Bomb
         int32_t success_level = 1 + (move_level + 2) * ac_result / 100;
         weapon->damage_function_params[0] = success_level;
@@ -2073,6 +2073,8 @@ BattleWeapon customWeapon_MowzTease = {
     // status chances
     .confuse_chance = 100,
     .confuse_time = 1,
+    // unused field - use this to determine confuse proc rate.
+    .pad_ae = MoveType::MOWZ_TEASE,
     
     .attack_evt_code = (void*)partyChuchurinaAttack_MadowaseAttack,
     .bg_a1_a2_fall_weight = 0,

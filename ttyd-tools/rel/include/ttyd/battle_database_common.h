@@ -492,7 +492,8 @@ struct BattleWeapon {
     int8_t      hp_regen_strength;
     int8_t      fp_regen_time;
     int8_t      fp_regen_strength;
-    int8_t      pad_ae[2];
+    int8_t      pad_ae;
+    int8_t      pad_af;
     
     void*       attack_evt_code;
     int8_t      bg_a1_a2_fall_weight;
