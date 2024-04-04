@@ -325,7 +325,7 @@ void GetStatusParams(
         case ItemType::HEAD_RATTLE:
             if (status_type == StatusEffectType::TINY) {
                 turns += tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::HAMMER_SHRINK_SMASH) * 2 - 2;
+                    tot::MoveType::HAMMER_SHRINK_SMASH) * 1 - 1;
             }
             break;
         case ItemType::ICE_SMASH:
@@ -462,8 +462,10 @@ uint32_t GetStatusDamageFromWeapon(
                     case StatusEffectType::OHKO:
                         break;
                     default:
+                        if (chance > 0) chance = 100;
                         special_properties |=
                             AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE;
+                        break;
                 }
             }
 
