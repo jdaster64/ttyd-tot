@@ -575,6 +575,11 @@ void ApplyFixedPatches() {
                 return 1U;
             
             uint32_t return_value = g_pouchGetItem_trampoline(item_type);
+
+            // Mark unique items as being collected.
+            if (return_value) {
+                tot::RewardManager::MarkUniqueItemCollected(item_type);
+            }
             
             return return_value;
         });

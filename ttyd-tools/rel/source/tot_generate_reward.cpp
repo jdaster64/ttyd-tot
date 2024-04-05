@@ -652,6 +652,13 @@ int32_t RewardManager::GetUniqueBadgeForShop() {
     return unique_badge;
 }
 
+void RewardManager::MarkUniqueItemCollected(int32_t item_id) {
+    int32_t index = GetUniqueBadgeObtainedIndex(item_id);
+    if (index >= 0) {
+        g_Mod->state_.SetOption(STAT_RUN_UNIQUE_BADGE_FLAGS, 1, index);
+    }
+}
+
 // Assigns reward types and corresponding pickup scripts to all chests.
 void SelectChestContents() {
     auto& state = g_Mod->state_;
@@ -862,8 +869,8 @@ EVT_DEFINE_USER_FUNC(evtTot_AfterItemBought) {
 
     int32_t index = GetUniqueBadgeObtainedIndex(item_type);
     if (index >= 0) {
-        // Mark badge as collected once, so it's not offered again.
-        g_Mod->state_.SetOption(STAT_RUN_UNIQUE_BADGE_FLAGS, 1, index);
+        // Mark unique badges as collected even if the player throws it away.
+        RewardManager::MarkUniqueItemCollected(item_type);
     }
     if (index >= 0 || item_type == ItemType::STAR_PIECE) {
         // Search Charlieton's array for the item id and remove it.
