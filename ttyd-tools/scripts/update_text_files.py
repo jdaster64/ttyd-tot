@@ -529,8 +529,8 @@ g_StringMap = {
             b"piercing their defense.",
             
         b"msg_pkr_monosiri":
-            b"View enemies' descriptions\n"
-            b"and see their stats in battle.",
+            b"A super-stylish move that\n"
+            b"describes an enemy's stats.",
             
         b"tot_ptr1_ironbonk_desc":
             b"Attack with an invulnerable,\n"
@@ -808,6 +808,18 @@ g_StringMap = {
     
     # Tower floor 1; TODO: Copy to other tower maps as needed.
     'gon_01': {
+        # Sign information. (TODO: Might not even exist in final game)
+
+        b'tot_floor_sign':
+            b'<kanban>\n'
+            b'<pos 100 13>\n'
+            b'Seed: <col 0000ffff>\n'
+            b'%09d\n</col>\n'
+            b'<pos 162 38>\n'
+            b'Floor: <col 0000ffff>\n'
+            b'%02d\n</col>\n'
+            b'<k>',
+    
         # Area tattle. (TODO: Write final script)
         
         b"msg_kuri_map":

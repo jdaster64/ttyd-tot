@@ -258,8 +258,8 @@ void ApplyFixedPatches() {
     g_BtlUnit_GetCoin_trampoline = patch::hookFunction(
         ttyd::battle_unit::BtlUnit_GetCoin, [](BattleWorkUnit* unit) {
             int32_t coins = g_BtlUnit_GetCoin_trampoline(unit);
-            // Coin multiplier for midbosses.
-            if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) coins *= 3;
+            // 5x coin multiplier for midbosses.
+            if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) coins *= 5;
             // Extra coins from Trade Off.
             coins += unit->pad_00f;
             return coins;

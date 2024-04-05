@@ -1149,9 +1149,11 @@ bool GetEnemyStats(
         }
     }
     if (out_level) {
-        // Practically doesn't matter anymore, aside from audience calculations.
-        // Return level 0 for minion enemies (e.g. mini-Yuxes), 2 otherwise.
-        *out_level = ei.level == 0 ? 0 : 2;
+        // Practically doesn't matter anymore, aside from audience calculations
+        // and displaying coins when enemies are defeated.
+        // Return level 0 for minion enemies (e.g. mini-Yuxes),
+        // or enemy's level + Mario's fixed level 20 otherwise.
+        *out_level = ei.level == 0 ? 0 : ei.level + 20 + 1;
     }
     if (out_coinlvl) {
         // Return the level directly.

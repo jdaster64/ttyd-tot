@@ -105,6 +105,8 @@ void OptionsManager::InitLobby() {
     pouch.rank = 0;
     pouch.jump_level = 1;
     pouch.hammer_level = 1;
+    // Only relevant to calculating "long fight" turn counts.
+    pouch.level = 20;
     
     // Give a small amount of audience by default.
     pouch.audience_level = 10.0f;
