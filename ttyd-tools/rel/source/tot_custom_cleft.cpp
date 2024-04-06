@@ -43,8 +43,8 @@ constexpr const int32_t UW_BattleUnitType = 0;
 int8_t unitCleft_defense[] = { 1, 99, 1, 1, 1 };
 int8_t unitCleft_defense_turn[] = { 0, 0, 0, 0, 0 };
 int8_t unitCleft_defense_attr[] = { 0, 2, 0, 0, 0 };
-// Immune to special elements, only takes 1 damage from normal-element attacks.
-int8_t unitIronCleft_defense_attr[] = { 4, 2, 2, 2, 2 };
+// Immune to fire/ice/elec, only takes 1 damage from other attacks.
+int8_t unitIronCleft_defense_attr[] = { 4, 2, 2, 4, 2 };
 
 StatusVulnerability unitCleft_status = {
      50, 100,  50, 100,  50, 100,   0,  70, 

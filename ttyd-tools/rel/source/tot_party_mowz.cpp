@@ -137,8 +137,8 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeTeaseWeapon) {
     
     // Make changes in place, since the parameters are unchanged between uses.
     if (move_type == MoveType::MOWZ_TEASE) {
-        weapon->confuse_chance = ac_result * 1.27;
-        weapon->confuse_time = 2;
+        weapon->confuse_chance = ac_result * 1.2;
+        weapon->confuse_time = 1;
     } else {  // Smoke Bomb
         int32_t success_level = 1 + (move_level + 2) * ac_result / 100;
         weapon->damage_function_params[0] = success_level;

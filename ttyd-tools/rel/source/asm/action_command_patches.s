@@ -37,9 +37,9 @@ bne+ SnowWhirled_end_attack
 ConditionalBranchButtonDownWrongButton:
 b 0
 SnowWhirled_end_attack:
+li %r0, 0
 BranchBackButtonDownWrongButton:
 # Restore original opcode.
-li %r0, 0
 b 0
 
 # Reset buttons rather than ending command if using custom mode...

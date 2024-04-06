@@ -240,7 +240,7 @@ void GetStatusParams(
             }
             break;
         case StatusEffectType::TINY:
-            if (weapon->size_change_strength < 0) {
+            if (weapon->size_change_strength <= 0) {
                 chance = weapon->size_change_chance;
                 turns = weapon->size_change_time;
                 strength = weapon->size_change_strength;
@@ -254,7 +254,7 @@ void GetStatusParams(
             }
             break;
         case StatusEffectType::ATTACK_DOWN:
-            if (weapon->atk_change_strength < 0) {
+            if (weapon->atk_change_strength <= 0) {
                 chance = weapon->atk_change_chance;
                 turns = weapon->atk_change_time;
                 strength = weapon->atk_change_strength;
@@ -268,7 +268,7 @@ void GetStatusParams(
             }
             break;
         case StatusEffectType::DEFENSE_DOWN:
-            if (weapon->def_change_strength < 0) {
+            if (weapon->def_change_strength <= 0) {
                 chance = weapon->def_change_chance;
                 turns = weapon->def_change_time;
                 strength = weapon->def_change_strength;
@@ -428,9 +428,10 @@ uint32_t GetStatusDamageFromWeapon(
                     always_update = false;
                     break;
             }
-            
+
             // Make midbosses less susceptible to most negative statuses.
-            if (target->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
+            if ((turns != 0 || strength != 0) &&
+                (target->status_flags & BattleUnitStatus_Flags::MIDBOSS)) {
                 switch (type) {
                     case StatusEffectType::SLEEP:
                     case StatusEffectType::STOP:
@@ -458,8 +459,8 @@ uint32_t GetStatusDamageFromWeapon(
                 }
             }
             
-            // Non-KO statuses are guaranteed to land if target is Scoped.
-            if (target->status_flags & BattleUnitStatus_Flags::SCOPED) {
+            // Non-KO statuses are guaranteed to land if target is Scoped+.
+            if (target->status_flags & BattleUnitStatus_Flags::SCOPED_PLUS) {
                 switch (type) {
                     case StatusEffectType::FRIGHT:
                     case StatusEffectType::GALE_FORCE:
@@ -473,11 +474,28 @@ uint32_t GetStatusDamageFromWeapon(
                 }
             }
 
+            // Make midbosses and bosses receive Slow status in place of Stop.
+            int32_t actual_type = type;
+            if (type == StatusEffectType::STOP) {
+                switch (target->current_kind) {
+                    case BattleUnitType::HOOKTAIL:
+                    case BattleUnitType::GLOOMTAIL:
+                    case BattleUnitType::BONETAIL:
+                    case BattleUnitType::ATOMIC_BOO:
+                    case BattleUnitType::TOT_COSMIC_BOO:
+                        actual_type = StatusEffectType::SLOW;
+                        break;
+                }
+                if (target->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
+                    actual_type = StatusEffectType::SLOW;
+                }
+            }
+
             if (always_update || turns != 0 || strength != 0) {
                 int32_t damage_result = 
                     ttyd::battle_damage::BattleSetStatusDamage(
-                        &result, target, part, special_properties,
-                        type, chance, /* gale_factor */ 0, turns, strength);
+                        &result, target, part, special_properties, actual_type,
+                        chance, /* gale_factor */ 0, turns, strength);
 
                 if (damage_result && type == StatusEffectType::INVISIBLE) {
                     ttyd::battle_disp::btlDispPoseAnime(part);
@@ -491,6 +509,13 @@ uint32_t GetStatusDamageFromWeapon(
                             30 + 20 * tot::MoveManager::GetSelectedLevel(
                                 tot::MoveType::MOWZ_TEASE);
                     }
+                }
+
+                // Special case: for Tiny cure on midboss, go back to perma-Huge.
+                if (damage_result && type == StatusEffectType::TINY &&
+                    (target->status_flags & BattleUnitStatus_Flags::MIDBOSS) &&
+                    turns == 0 && strength == 0) {
+                    BtlUnit_SetStatus(target, StatusEffectType::HUGE, 100, 1);
                 }
             }
         }
@@ -597,7 +622,8 @@ int32_t PreCheckDamage(
     }
     
     // Scoped status guarantees a hit.
-    if (target->status_flags & BattleUnitStatus_Flags::SCOPED) {
+    if ((target->status_flags & BattleUnitStatus_Flags::SCOPED) ||
+        (target->status_flags & BattleUnitStatus_Flags::SCOPED_PLUS)) {
         return 1;
     }
     if (weapon->special_property_flags & 
@@ -1423,6 +1449,7 @@ void ToggleScopedStatus(
     }
     if (player_attempted_attack) {
         target->status_flags &= ~BattleUnitStatus_Flags::SCOPED;
+        target->status_flags &= ~BattleUnitStatus_Flags::SCOPED_PLUS;
     }
 }
 

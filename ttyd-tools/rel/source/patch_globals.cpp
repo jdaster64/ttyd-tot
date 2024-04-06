@@ -327,6 +327,7 @@ extern const int32_t g_btlseqEnd_Patch_CheckDisableExpLevel = 0x802157e0;
 extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule = 0x80216678;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_BH = 0x80231cc0;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_EH = 0x80231d38;
+extern const int32_t g_scissor_damage_Patch_ArtAttackCheckImmunity = 0x80231e50;
 extern const int32_t g_select_disp_Patch_PitListPriceHook = 0x8023c120;
 extern const int32_t g_select_disp_Patch_PitItemPriceHook = 0x8023d2e0;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblHi16 = 0x8023d6b4;

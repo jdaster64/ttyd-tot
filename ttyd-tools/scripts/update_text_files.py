@@ -459,8 +459,16 @@ g_StringMap = {
         b"msg_super_genki":
             b"Restores Mario and his ally's\n"
             b"HP and FP over 5 turns.",
+
+        b'msg_bakugame':
+            b'Immobilizes enemies and slows\n'
+            b'bosses for a few turns.',
             
-        b"tot_ptr1_scope_out_effect_msg":
+        b"tot_ptr1_scope_out_effect_msg1":
+            b"Scoped! The next attack is\n"
+            b"guaranteed to land!",
+            
+        b"tot_ptr1_scope_out_effect_msg2":
             b"Scoped! The next attack and\n"
             b"non-KO status will succeed!",
             
@@ -529,16 +537,16 @@ g_StringMap = {
             b"piercing their defense.",
             
         b"msg_pkr_monosiri":
-            b"A super-stylish move that\n"
-            b"describes an enemy's stats.",
+            b"View enemies' descriptions\n"
+            b"and see their stats in battle.",
             
         b"tot_ptr1_ironbonk_desc":
             b"Attack with an invulnerable,\n"
             b"defense-piercing Headbonk.",
             
         b"tot_ptr1_scope_out_desc":
-            b"Ensures the next attack lands\n"
-            b"and guarantees most statuses.",
+            b"Ensures the next attack will\n"
+            b"successfully hit its target.",
             
         b"msg_pnk_normal_attack":
             b"Attack the front enemy with\n"
@@ -682,6 +690,10 @@ g_StringMap = {
         b"tot_upg_hits":
             b"Upgrading this move will\n"
             b"increase the number of hits.",
+            
+        b"tot_upg_scope_out":
+            b"Upgrading this move makes it\n"
+            b"also guarantee most statuses.",
             
         b"tot_upg_shellsh":
             b"Upgrading this move will\n"

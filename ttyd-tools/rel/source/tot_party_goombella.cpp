@@ -1039,14 +1039,23 @@ EVT_BEGIN(customAttack_ScopeOut)
         USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
         
-        // Fake a damaged state + apply the custom "Scoped" status.
+        // Fake a damaged state + apply the custom "Scoped" / "Scoped+" status.
         USER_FUNC(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::GOOMBELLA_SCOPE_OUT, LW(15))
+        IF_EQUAL(LW(15), 1)
+            USER_FUNC(infinite_pit::battle::evtTot_ApplyCustomStatus,
+                LW(3), LW(4), ttyd::battle_unit::BattleUnitStatus_Flags::SCOPED,
+                /* splash colors */ 0xdcdcdc, 0x605000,
+                PTR("SFX_CONDITION_COUNTER1"), 
+                PTR("tot_ptr1_scope_out_effect_msg1"))
+        ELSE()
+            USER_FUNC(infinite_pit::battle::evtTot_ApplyCustomStatus,
+                LW(3), LW(4), ttyd::battle_unit::BattleUnitStatus_Flags::SCOPED_PLUS,
+                /* splash colors */ 0xdcdcdc, 0x605000,
+                PTR("SFX_CONDITION_COUNTER1"), 
+                PTR("tot_ptr1_scope_out_effect_msg2"))
+        END_IF()
         SET(LW(15), 1)
-        USER_FUNC(infinite_pit::battle::evtTot_ApplyCustomStatus,
-            LW(3), LW(4), ttyd::battle_unit::BattleUnitStatus_Flags::SCOPED,
-            /* splash colors */ 0xdcdcdc, 0x605000,
-            PTR("SFX_CONDITION_COUNTER1"), 
-            PTR("tot_ptr1_scope_out_effect_msg"))
     ELSE()
         // Disappointed AC result / animation.
         USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
@@ -1145,8 +1154,7 @@ BattleWeapon customWeapon_GoombellaTattle = {
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
-    // Additional Stylish power to give some incentive to use the move again.
-    .stylish_multiplier = 3,
+    .stylish_multiplier = 1,
     .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,

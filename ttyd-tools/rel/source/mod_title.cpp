@@ -14,7 +14,7 @@ namespace mod::infinite_pit {
 
 namespace {
 
-constexpr const char* kTitleInfo = "Project ToT alpha r7 2024-04-04";
+constexpr const char* kTitleInfo = "Project ToT alpha r9 2024-04-06";
     
 // constexpr const char* kTitleInfo =
     // "PM:TTYD Infinite Pit v2.40 r64 by jdaster64\n"

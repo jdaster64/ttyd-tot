@@ -112,6 +112,7 @@ extern const int32_t g_genki_evt_common_SweetTreatResultJumpPoint;
 extern const int32_t g_sac_deka_main_base_GetNumberOfBars_BH;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_BH;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_EH;
+extern const int32_t g_scissor_damage_Patch_ArtAttackCheckImmunity;
 
 namespace mario_move {
 
@@ -565,6 +566,10 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_scissor_damage_sub_ArtAttackDamage_EH),
         reinterpret_cast<void*>(StartArtAttackCalculateDamage),
         reinterpret_cast<void*>(BranchBackArtAttackCalculateDamage));
+    // Make Art Attack not ignore enemies with "Gulp immunity".
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_scissor_damage_Patch_ArtAttackCheckImmunity),
+            0x2c000002U  /* cmpwi r0, 0x2 - check normal immunity again */);
 
     // Change Showstopper's OHKO rate based on power level.
     g_sac_suki_set_weapon_trampoline = patch::hookFunction(
