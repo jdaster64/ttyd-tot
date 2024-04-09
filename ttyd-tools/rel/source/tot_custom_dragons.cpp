@@ -1,6 +1,8 @@
 #include "tot_custom_rel.h"     // For externed unit declarations
 
 #include "evt_cmd.h"
+#include "mod.h"
+#include "tot_state.h"
 
 #include <gc/types.h>
 #include <ttyd/battle.h>
@@ -47,10 +49,11 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 }  // namespace
 
 // Unit work variable definitions.
-constexpr const int32_t UW_AiState = 0;
-constexpr const int32_t UW_LowHealthMsg = 1;
-constexpr const int32_t UW_NumHeals = 2;
-constexpr const int32_t UW_DragonType = 3;
+constexpr const int32_t UW_DragonType = 0;
+constexpr const int32_t UW_AiState = 1;
+constexpr const int32_t UW_LowHealthMsg = 2;
+constexpr const int32_t UW_NumHeals = 4;
+constexpr const int32_t UW_FakeDeathPlayed = 5;
 
 // Handles phase changes + determines available moves.
 namespace DragonAiState {
@@ -115,6 +118,8 @@ EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetAttackWeights, 10)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetBreathWeights, 9)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_SetupConversation, 2)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetNextDialogue, 2)
+
+extern BattleUnitSetup unitBonetail_spawnSetup;
 
 // Unit data.
 int8_t unitHooktail_defense[] = { 1, 1, 1, 1, 1 };
@@ -1087,6 +1092,52 @@ LBL(99)
     RETURN()
 EVT_END()
 
+// TODO: Add support for partnerless / partner stunned version of script.
+EVT_BEGIN(unitDragon_battle_entry_sub_event)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_F_3"))
+    WAIT_FRM(1)
+    USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    WAIT_MSEC(166)
+    INLINE_EVT()
+        WAIT_MSEC(83)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_I_O"))
+        USER_FUNC(btlevtcmd_SetFallAccel, -3, FLOAT(0.3))
+        USER_FUNC(btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_snd_se, -3, PTR("SFX_VOICE_MARIO_SURPRISED2_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_JumpPosition, -3, LW(0), LW(1), LW(2), 25, -1)
+    END_INLINE()
+    INLINE_EVT()
+        WAIT_MSEC(83)
+        USER_FUNC(btlevtcmd_SetFallAccel, -4, FLOAT(0.3))
+        USER_FUNC(btlevtcmd_GetPos, -4, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_JumpPosition, -4, LW(0), LW(1), LW(2), 25, -1)
+        USER_FUNC(btlevtcmd_GetBodyId, -4, LW(0))
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, LW(0), 5)
+    END_INLINE()
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_BOSS_GNB_APPEAR1"), 0)
+    USER_FUNC(evt_btl_camera_shake_h, 1, 8, 0, 20, 13)
+    WAIT_MSEC(500)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_I_Y"))
+    USER_FUNC(btlevtcmd_GetBodyId, -4, LW(0))
+    USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, LW(0), 43)
+    USER_FUNC(evt_btl_camera_set_mode, 1, 3)
+    USER_FUNC(evt_btl_camera_set_moveto, 1, -233, 45, 452, 56, 125, 37, 60, 0)
+    WAIT_MSEC(1000)
+    USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_T_3"))
+    USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_S_3"))
+    SET(LW(0), (int32_t)ConversationType::BATTLE_ENTRY)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
+    RUN_CHILD_EVT(unitDragon_conversation_event)
+    USER_FUNC(btlevtcmd_StartWaitEvent, -3)
+    USER_FUNC(btlevtcmd_StartWaitEvent, -4)
+    USER_FUNC(btlevtcmd_StartWaitEvent, LW(10))
+    USER_FUNC(evt_btl_camera_set_prilimit, 0)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 3)
+    RETURN()
+EVT_END()
+
 // TODO: Add support for partnerless version of script.
 EVT_BEGIN(unitDragon_battle_entry_event)
     USER_FUNC(evt_btl_camera_set_prilimit, 1)
@@ -1131,47 +1182,7 @@ EVT_BEGIN(unitDragon_battle_entry_event)
     USER_FUNC(btlevtcmd_MovePosition, -3, LW(0), LW(1), LW(2), 0, -1, 0)
     USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_I_Y"))
     WAIT_MSEC(33)
-    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_F_3"))
-    WAIT_FRM(1)
-    USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    USER_FUNC(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
-    WAIT_MSEC(166)
-    INLINE_EVT()
-        WAIT_MSEC(83)
-        USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_I_O"))
-        USER_FUNC(btlevtcmd_SetFallAccel, -3, FLOAT(0.3))
-        USER_FUNC(btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
-        USER_FUNC(btlevtcmd_snd_se, -3, PTR("SFX_VOICE_MARIO_SURPRISED2_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        USER_FUNC(btlevtcmd_JumpPosition, -3, LW(0), LW(1), LW(2), 25, -1)
-    END_INLINE()
-    INLINE_EVT()
-        WAIT_MSEC(83)
-        USER_FUNC(btlevtcmd_SetFallAccel, -4, FLOAT(0.3))
-        USER_FUNC(btlevtcmd_GetPos, -4, LW(0), LW(1), LW(2))
-        USER_FUNC(btlevtcmd_JumpPosition, -4, LW(0), LW(1), LW(2), 25, -1)
-        USER_FUNC(btlevtcmd_GetBodyId, -4, LW(0))
-        USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, LW(0), 5)
-    END_INLINE()
-    USER_FUNC(evt_snd_sfxon, PTR("SFX_BOSS_GNB_APPEAR1"), 0)
-    USER_FUNC(evt_btl_camera_shake_h, 1, 8, 0, 20, 13)
-    WAIT_MSEC(500)
-    USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_I_Y"))
-    USER_FUNC(btlevtcmd_GetBodyId, -4, LW(0))
-    USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, LW(0), 43)
-    USER_FUNC(evt_btl_camera_set_mode, 1, 3)
-    USER_FUNC(evt_btl_camera_set_moveto, 1, -233, 45, 452, 56, 125, 37, 60, 0)
-    WAIT_MSEC(1000)
-    USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_T_3"))
-    USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_S_3"))
-    SET(LW(0), (int32_t)ConversationType::BATTLE_ENTRY)
-    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
-    RUN_CHILD_EVT(unitDragon_conversation_event)
-    USER_FUNC(btlevtcmd_StartWaitEvent, -3)
-    USER_FUNC(btlevtcmd_StartWaitEvent, -4)
-    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
-    USER_FUNC(evt_btl_camera_set_prilimit, 0)
-    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
-    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 3)
+    RUN_CHILD_EVT(unitDragon_battle_entry_sub_event)
     RETURN()
 EVT_END()
 
@@ -1198,7 +1209,98 @@ EVT_BEGIN(unitDragon_damage_sub_event)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(unitDragon_fake_victory_event)
+    // TODO: Fake victory sequence. (TODO: Support partner-less version)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0x11)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    USER_FUNC(evt_snd_bgmoff, 0x400)
+    USER_FUNC(evt_snd_bgmon, 1, PTR("BGM_BATTLE_WIN1"))
+    WAIT_MSEC(1000)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_V_1"))
+    WAIT_MSEC(1500)
+
+    // TODO: Add "surprised" effects, zoom camera back out.
+    USER_FUNC(evt_snd_bgmoff, 0x400)
+    USER_FUNC(btlevtcmd_AnimeChangePoseType, -3, 1, 69)
+    USER_FUNC(btlevtcmd_CheckActStatus, -4, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, 1, 69)
+    END_IF()
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_ITEM_QUAKE1"), LW(14))
+    USER_FUNC(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
+    WAIT_MSEC(2000)
+    USER_FUNC(evt_snd_sfxoff, LW(14))
+    USER_FUNC(evt_btl_camera_noshake, 0)
+
+    // Spawn Bonetail actor and run battle entry event.
+    USER_FUNC(btlevtcmd_SpawnUnit, LW(10), PTR(&unitBonetail_spawnSetup), 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, LW(10), UW_FakeDeathPlayed, 1)
+    WAIT_MSEC(100)
+    USER_FUNC(btlevtcmd_RunDataEventChild, LW(10), 100)
+    // Reset turn or not?  - USER_FUNC(btlevtcmd_reset_turn)
+    // Kill Gloomtail actor.
+    USER_FUNC(btlevtcmd_KillUnit, -2, 0)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitDragon_fake_dead_event)
+    // TODO: Very work-in-progress "death" conversation (fix camera angle!)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_X_1"))
+    USER_FUNC(btlevtcmd_WaitAttackEnd)
+    USER_FUNC(evt_btl_camera_set_mode, 1, 3)
+    USER_FUNC(evt_btl_camera_set_moveto, 1, -233, 45, 452, 56, 125, 37, 20, 0)
+
+    USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_X_1"))
+    USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_X_1"))
+    SET(LW(0), (int32_t)ConversationType::DEAD)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
+    RUN_CHILD_EVT(unitDragon_conversation_event)
+
+    // Walk off stage.
+    USER_FUNC(evt_btl_camera_set_mode, 1, 0)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_W_4"))
+    USER_FUNC(btlevtcmd_ftomsec, 35, LW(0))
+    
+    USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -75, 0, 30, EVT_NULLPTR)
+    USER_FUNC(evt_btl_camera_shake_h, 1, 2, 0, 10, 13)
+    USER_FUNC(btlevtcmd_ftomsec, 23, LW(0))
+    WAIT_MSEC(LW(0))
+    USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -12, 0, -30, EVT_NULLPTR)
+    USER_FUNC(evt_btl_camera_shake_h, 1, 2, 0, 10, 13)
+    USER_FUNC(btlevtcmd_ftomsec, 34, LW(0))
+    WAIT_MSEC(LW(0))
+    USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -31, 0, 30, EVT_NULLPTR)
+    USER_FUNC(evt_btl_camera_shake_h, 1, 2, 0, 10, 13)
+    USER_FUNC(btlevtcmd_ftomsec, 23, LW(0))
+    WAIT_MSEC(LW(0))
+    USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, 125, 0, -30, EVT_NULLPTR)
+    USER_FUNC(evt_btl_camera_shake_h, 1, 2, 0, 10, 13)
+    USER_FUNC(btlevtcmd_ftomsec, 34, LW(0))
+    WAIT_MSEC(LW(0))
+    USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, 137, 0, 30, EVT_NULLPTR)
+    USER_FUNC(evt_btl_camera_shake_h, 1, 2, 0, 10, 13)
+    USER_FUNC(btlevtcmd_ftomsec, 17, LW(0))
+    WAIT_MSEC(LW(0))
+    WAIT_MSEC(500)
+
+    // Run fake victory animation + spawn Bonetail actor in / run entry event.
+    RUN_CHILD_EVT(unitDragon_fake_victory_event)
+
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(unitDragon_dead_event)
+    // Run different, fakeout event for hardest difficulty.
+    // TODO: Change difficulty trigger to FULL_EX.
+    USER_FUNC(evtTot_GetDifficulty, LW(1))
+    IF_EQUAL(LW(1), (int32_t)OPTVAL_DIFFICULTY_FULL)
+        USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_FakeDeathPlayed, LW(1))
+        IF_EQUAL(LW(1), 0)
+            RUN_CHILD_EVT(unitDragon_fake_dead_event)
+            RETURN()
+        END_IF()
+    END_IF()
+
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_snd_se_offset, -2, PTR("SFX_BOSS_GNB_DOWN1"), EVT_NULLPTR, 0, -250, 0, 0, LW(13))
     USER_FUNC(btlevtcmd_WaitAttackEnd)
@@ -1318,6 +1420,8 @@ EVT_END()
 DataTableEntry unitDragon_data_table[] = {
     9, (void*)unitDragon_damage_sub_event,
     49, (void*)unitDragon_dead_event,
+    // Ids 100+ should not be used by vanilla code.
+    100, (void*)unitDragon_battle_entry_sub_event,
     0, nullptr,
 };
 
@@ -1613,6 +1717,14 @@ BattleUnitKind unit_Bonetail = {
     .parts = unitBonetail_parts,
     .init_evt_code = (void*)unitBonetail_init_event,
     .data_table = unitDragon_data_table,
+};
+
+// For spawning Bonetail dynamically mid-fight.
+BattleUnitSetup unitBonetail_spawnSetup = {
+    .unit_kind_params = &unit_Bonetail,
+    .alliance = 1,
+    .attack_phase = 0x400'0004,
+    .position = { 365.f, 0.f, 0.f },
 };
 
 // arg0-2: x, y, z position of effect

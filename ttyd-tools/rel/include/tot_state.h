@@ -133,6 +133,9 @@ EVT_DECLARE_USER_FUNC(evtTot_GetFloor, 1)
 // Returns the current seed.
 EVT_DECLARE_USER_FUNC(evtTot_GetSeed, 1)
 
+// Returns the current difficulty setting.
+EVT_DECLARE_USER_FUNC(evtTot_GetDifficulty, 1)
+
 // Format of save data used by Tower of Trials mod.
 struct TotSaveData {
     uint16_t    flags;                  // 0x0

@@ -899,8 +899,9 @@ void BuildBattle(
     
     auto& state = g_Mod->state_;
         
-    // Special case overworld NPC for dragons, for testing purposes.
+    int32_t num_npcs = 1;
     if (!state.IsFinalBossFloor()) {
+        // Special case overworld NPC for dragons, for testing purposes.
         switch (g_Enemies[0]) {
             case BattleUnitType::HOOKTAIL:
             case BattleUnitType::GLOOMTAIL:
@@ -913,29 +914,34 @@ void BuildBattle(
                     kEnemyInfo[1].ai_type_idx;
                 break;
         }
+    } else {
+        // Make a copy of NPC so type can be swapped to Bonetail after fight.
+        num_npcs = 2;
     }
-
-    NpcSetupInfo& npc = npc_setup_info[0];
-    memset(&npc, 0, sizeof(NpcSetupInfo));
-    npc.nameJp            = "\x93\x47";  // enemy
-    npc.flags             = 0x1000000a;
-    npc.reactionFlags     = 0;
-    npc.initEvtCode       = npc_ai->initEvtCode;
-    npc.regularEvtCode    = npc_ai->moveEvtCode;
-    npc.talkEvtCode       = nullptr;
-    npc.deadEvtCode       = npc_ai->deadEvtCode;
-    npc.findEvtCode       = npc_ai->findEvtCode;
-    npc.lostEvtCode       = npc_ai->lostEvtCode;
-    npc.returnEvtCode     = npc_ai->returnEvtCode;
-    npc.blowEvtCode       = npc_ai->blowEvtCode;
-    npc.territoryType     = ttyd::npcdrv::NpcTerritoryType::kSquare;
-    npc.territoryBase     = { 0.0f, 0.0f, 0.0f };
-    npc.territoryLoiter   = { 150.0f, 100.0f, 100.0f };
-    npc.searchRange       = 200.0f;
-    npc.searchAngle       = 300.0f;
-    npc.homingRange       = 1000.0f;
-    npc.homingAngle       = 360.0f;
-    npc.battleInfoId      = 1;
+    
+    memset(npc_setup_info, 0, sizeof(NpcSetupInfo) * 3);
+    for (int32_t i = 0; i < num_npcs; ++i) {
+        NpcSetupInfo& npc = npc_setup_info[i];
+        npc.nameJp            = i == 0 ? "\x93\x47" : "enemy_2";
+        npc.flags             = 0x1000000a;
+        npc.reactionFlags     = 0;
+        npc.initEvtCode       = npc_ai->initEvtCode;
+        npc.regularEvtCode    = npc_ai->moveEvtCode;
+        npc.talkEvtCode       = nullptr;
+        npc.deadEvtCode       = npc_ai->deadEvtCode;
+        npc.findEvtCode       = npc_ai->findEvtCode;
+        npc.lostEvtCode       = npc_ai->lostEvtCode;
+        npc.returnEvtCode     = npc_ai->returnEvtCode;
+        npc.blowEvtCode       = npc_ai->blowEvtCode;
+        npc.territoryType     = ttyd::npcdrv::NpcTerritoryType::kSquare;
+        npc.territoryBase     = { 0.0f, 0.0f, 0.0f };
+        npc.territoryLoiter   = { 150.0f, 100.0f, 100.0f };
+        npc.searchRange       = 200.0f;
+        npc.searchAngle       = 300.0f;
+        npc.homingRange       = 1000.0f;
+        npc.homingAngle       = 360.0f;
+        npc.battleInfoId      = 1;
+    }
     
     // Set output variables.
     *out_npc_tribe_description = npc_tribe;

@@ -580,4 +580,10 @@ EVT_DEFINE_USER_FUNC(evtTot_GetSeed) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_GetDifficulty) {
+    evtSetValue(
+        evt, evt->evtArguments[0], g_Mod->state_.GetOptionValue(OPT_DIFFICULTY));
+    return 2;
+}
+
 }  // namespace mod::tot

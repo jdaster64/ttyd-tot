@@ -84,12 +84,15 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 const char kPitNpcName[] = "\x93\x47";  // "enemy"
+const char kBonetailNpcName[] = "enemy_2";
 const char kPiderName[] = "\x83\x70\x83\x43\x83\x5f\x81\x5b\x83\x58";
 const char kArantulaName[] = 
     "\x83\x60\x83\x85\x83\x89\x83\x93\x83\x5e\x83\x89\x81\x5b";
+const char kBonetailModelName[] = "c_gonbaba_z";
+const char kBonetailTribeName[] = "\x83\x5d\x83\x93\x83\x6f\x83\x6f";
 
 // Info for custom NPCs.
-NpcSetupInfo g_EnemyNpcSetup[2];
+NpcSetupInfo g_EnemyNpcSetup[3];
 
 }  // namespace
 
@@ -101,7 +104,7 @@ EVT_DECLARE_USER_FUNC(evtTot_IsFinalFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
 EVT_DECLARE_USER_FUNC(evtTot_UpdateDestinationMap, 0)
-EVT_DECLARE_USER_FUNC(evtTot_WaitForDragonLanding, 0)
+EVT_DECLARE_USER_FUNC(evtTot_WaitForDragonLanding, 1)
 
 // Other declarations.
 extern BeroEntry normal_room_entry_data[3];
@@ -427,7 +430,7 @@ EVT_BEGIN(Tower_CheckGameOver)
 EVT_END()
 
 EVT_BEGIN(Tower_DragonFelledShake)
-    USER_FUNC(evt_npc_get_position, PTR(kPitNpcName), LW(0), LW(1), LW(2))
+    USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
     USER_FUNC(evt_snd_sfxon, PTR("SFX_STG1_GNB_DOWN1"), 0)
     USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_GNB_DOWN2"), LW(0), LW(1), LW(2), LW(8))
     INLINE_EVT()
@@ -555,10 +558,16 @@ EVT_BEGIN(Tower_FinalBossEvent)
     END_IF()
     
     // Otherwise, play dragon death animation.
+    
+    // TODO: Only on full difficulty eventually, swap main and Bonetail NPCs.
+    SET(LW(13), PTR(kPitNpcName))
+    USER_FUNC(evt_npc_set_position, LW(13), 0, -1000, 0)
+    SET(LW(13), PTR(kBonetailNpcName))
+
     USER_FUNC(evt_cam3d_evt_set, -769, 50, 527, -22, 114, 7, 1, 11)
-    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_1"))
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("GNB_H_1"))
     USER_FUNC(evt_map_fog_onoff, 0)
-    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 60, 0)
+    USER_FUNC(evt_npc_set_position, LW(13), 0, 60, 0)
     USER_FUNC(evt_mario_set_pos, 25, 10, 150)
     USER_FUNC(evt_party_set_pos, 0, -25, 10, 150)
     USER_FUNC(evt_mario_set_dir, 270, 0, 0)
@@ -566,11 +575,11 @@ EVT_BEGIN(Tower_FinalBossEvent)
     RUN_EVT(PTR(&Tower_DragonFelledShake))
     INLINE_EVT()
         WAIT_MSEC(300)
-        USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 131088)
-        USER_FUNC(evtTot_WaitForDragonLanding)
-        USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_2"))
+        USER_FUNC(evt_npc_flag_onoff, 1, LW(13), 131088)
+        USER_FUNC(evtTot_WaitForDragonLanding, LW(13))
+        USER_FUNC(evt_npc_set_anim, LW(13), PTR("GNB_H_2"))
     END_INLINE()
-    USER_FUNC(evt_npc_get_position, PTR(kPitNpcName), LW(0), LW(1), LW(2))
+    USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
     INLINE_EVT()
         USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG8_GNB_DOWN2"), LW(0), LW(1), LW(2), LW(3))
         USER_FUNC(evt_cam_shake, 4, FLOAT(0.05), FLOAT(0.0), 500)
@@ -627,17 +636,25 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evtTot_GetEnemyNpcInfo, 
         LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
     
-    // Set up NPC.
+    // Set up main NPC, and Bonetail NPC to swap to for EX difficulty.
     USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
     USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
+    USER_FUNC(evt_npc_entry, PTR(kBonetailNpcName), PTR(kBonetailModelName))
+    USER_FUNC(evt_npc_set_tribe, PTR(kBonetailNpcName), PTR(kBonetailTribeName))
     USER_FUNC(evt_npc_setup, LW(1))
+
     USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 0, 0)
     USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
-    
     USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_3"))
     USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 33554496)
     USER_FUNC(evt_npc_pera_onoff, PTR(kPitNpcName), 0)
     USER_FUNC(evt_npc_set_ry, PTR(kPitNpcName), 0)
+
+    USER_FUNC(evt_npc_set_position, PTR(kBonetailNpcName), 0, -1000, 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kBonetailNpcName), PTR("GNB_H_3"))
+    USER_FUNC(evt_npc_flag_onoff, 1, PTR(kBonetailNpcName), 33554496)
+    USER_FUNC(evt_npc_pera_onoff, PTR(kBonetailNpcName), 0)
+    USER_FUNC(evt_npc_set_ry, PTR(kBonetailNpcName), 0)
     
     RUN_EVT(&Tower_FinalBossEvent)
     RETURN()
@@ -864,8 +881,9 @@ EVT_DEFINE_USER_FUNC(evtTot_SetPreviousPartner) {
 
 // Wait for the dragon to hit the ground.
 EVT_DEFINE_USER_FUNC(evtTot_WaitForDragonLanding) {
-  ttyd::npcdrv::NpcEntry* npc = ttyd::npcdrv::npcNameToPtr(kPitNpcName);
-  return npc->wKpaMobjDeadCheck ? 2 : 0;
+    auto npc_name = (const char*)evtGetValue(evt, evt->evtArguments[0]);
+    ttyd::npcdrv::NpcEntry* npc = ttyd::npcdrv::npcNameToPtr(npc_name);
+    return npc->wKpaMobjDeadCheck ? 2 : 0;
 }
 
 // Dynamically change the destination of the exit pipe.
