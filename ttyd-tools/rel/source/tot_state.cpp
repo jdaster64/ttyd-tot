@@ -430,7 +430,16 @@ void StateManager::IncrementFloor(int32_t change) {
         Save(&g_BackupSave);
     }
     
-    floor_ = Clamp(floor_ + change, 0, 64);
+    int32_t max_floor = 64;
+    switch (GetOptionValue(tot::OPT_DIFFICULTY)) {
+        case tot::OPTVAL_DIFFICULTY_TUTORIAL:
+            max_floor = 8;
+            break;
+        case tot::OPTVAL_DIFFICULTY_HALF:
+            max_floor = 32;
+            break;
+    }
+    floor_ = Clamp(floor_ + change, 0, max_floor);
     
     // Clear RNG state values that should reset every floor.
     for (int32_t i = RNG_ENEMY; i <= RNG_REWARD; ++i) rng_states_[i] = 0;

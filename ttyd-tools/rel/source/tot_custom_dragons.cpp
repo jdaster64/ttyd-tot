@@ -101,12 +101,15 @@ namespace BreathType {
 namespace ConversationType {
     enum e {
         BATTLE_ENTRY = 0,
-        PHASE_2_START,
-        PHASE_3_START,
-        LOW_HEALTH,
-        MEGABREATH,
-        HEAL,
-        DEAD,
+        LOW_HEALTH = 10,
+        PHASE_2_START = 20,
+        PHASE_3_START = 30,
+        MEGABREATH = 40,
+        HEAL = 50,
+        BITE_REACTION = 60,
+        BITE_REACTION_PARTNER = 70,
+        DEATH = 80,
+        FAKE_DEATH = 90,
     };
 }
 
@@ -608,6 +611,32 @@ LBL(99)
     RETURN()
 EVT_END()
 
+// One-time dialogue after getting bitten by Hooktail for the first time.
+EVT_BEGIN(unitDragon_bite_reaction_event)
+    // TODO: non-canted angle?
+    USER_FUNC(evt_btl_camera_set_mode, 1, 3)
+    USER_FUNC(evt_btl_camera_set_moveto, 1, -431, 10, 735, 56, 125, 37, 20, 0)
+    SET(LW(0), (int32_t)ConversationType::BITE_REACTION)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
+    RUN_CHILD_EVT(unitDragon_conversation_event)
+
+    USER_FUNC(evt_btl_camera_set_mode, 1, 3)
+    USER_FUNC(evt_btl_camera_set_moveto, 1, -115, 50, 200, -115, -30, -670, 1, 0)
+    WAIT_MSEC(500)
+    SET(LW(0), (int32_t)ConversationType::BITE_REACTION_PARTNER)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
+    RUN_CHILD_EVT(unitDragon_conversation_event)
+    
+    // TODO: Don't snap into place.
+    USER_FUNC(evt_btl_camera_set_prilimit, 0)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 3)
+
+    SET((int32_t)GSW_Battle_Hooktail_BiteReactionSeen, 1)
+
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(unitDragon_bite_event)
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
@@ -1044,13 +1073,13 @@ LBL(99)
 EVT_END()
 
 EVT_BEGIN(unitDragon_phase_event)
-    USER_FUNC(btlevtcmd_CheckPhase, LW(0), 0x400'0004)
-    IF_EQUAL(LW(0), 0)
-        GOTO(99)
-    END_IF()
     USER_FUNC(btlevtcmd_CheckActStatus, -2, LW(0))
     IF_EQUAL(LW(0), 0)
         GOTO(99)
+    END_IF()
+    USER_FUNC(btlevtcmd_CheckPhase, LW(0), 0x400'0004)
+    IF_EQUAL(LW(0), 0)
+        GOTO(90)
     END_IF()
     // Get current HP, dragon type, and current AI phase.
     USER_FUNC(btlevtcmd_GetHp, -2, LW(0))
@@ -1079,6 +1108,10 @@ EVT_BEGIN(unitDragon_phase_event)
     END_IF()
     // Check for low-health message.
     IF_SMALL_EQUAL(LW(0), LW(5))
+        // Skip if Charged up for Megabreath.
+        IF_EQUAL(LW(2), (int32_t)DragonAiState::PHASE_3_2)
+            GOTO(99)
+        END_IF()
         USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_LowHealthMsg, LW(2))
         IF_NOT_EQUAL(LW(2), 1)
             SET(LW(0), (int32_t)ConversationType::LOW_HEALTH)
@@ -1088,6 +1121,19 @@ EVT_BEGIN(unitDragon_phase_event)
         END_IF()
     END_IF()
     
+LBL(90)
+    // Check for one-time bite reaction event during Hooktail's second phase.
+    USER_FUNC(btlevtcmd_CheckPhase, LW(0), 0x400'0005)
+    IF_EQUAL(LW(0), 0)
+        GOTO(99)
+    END_IF()
+    IF_EQUAL((int32_t)GSW_Battle_Hooktail_BiteReactionSeen, 0)
+        USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(0))
+        IF_EQUAL(LW(0), 0)
+            RUN_CHILD_EVT(unitDragon_bite_reaction_event)
+        END_IF()
+    END_IF()
+
 LBL(99)
     RETURN()
 EVT_END()
@@ -1096,6 +1142,8 @@ EVT_END()
 EVT_BEGIN(unitDragon_battle_entry_sub_event)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_F_3"))
     WAIT_FRM(1)
+    // Make boss visible, if not already.
+    USER_FUNC(btlevtcmd_OffAttribute, -2, 16777216)
     USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
     WAIT_MSEC(166)
@@ -1129,6 +1177,8 @@ EVT_BEGIN(unitDragon_battle_entry_sub_event)
     SET(LW(0), (int32_t)ConversationType::BATTLE_ENTRY)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
+    // Trigger music in case it faded out in earlier phase.
+    USER_FUNC(evt_snd_bgmon, 1, PTR("BGM_BOSS_STG1_GONBABA1"))
     USER_FUNC(btlevtcmd_StartWaitEvent, -3)
     USER_FUNC(btlevtcmd_StartWaitEvent, -4)
     USER_FUNC(btlevtcmd_StartWaitEvent, LW(10))
@@ -1209,26 +1259,29 @@ EVT_BEGIN(unitDragon_damage_sub_event)
     RETURN()
 EVT_END()
 
+// TODO: Support partner-less version of fake death sequence.
 EVT_BEGIN(unitDragon_fake_victory_event)
-    // TODO: Fake victory sequence. (TODO: Support partner-less version)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0x11)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
-    USER_FUNC(evt_snd_bgmoff, 0x400)
-    USER_FUNC(evt_snd_bgmon, 1, PTR("BGM_BATTLE_WIN1"))
     WAIT_MSEC(1000)
     USER_FUNC(btlevtcmd_AnimeChangePose, -3, 1, PTR("M_V_1"))
-    WAIT_MSEC(1500)
+    WAIT_MSEC(1000)
+    USER_FUNC(evt_snd_bgmoff, 0x201)
+    WAIT_MSEC(500)
 
-    // TODO: Add "surprised" effects, zoom camera back out.
-    USER_FUNC(evt_snd_bgmoff, 0x400)
+    // TODO: Add victory animation, "surprised" effects for party member?
     USER_FUNC(btlevtcmd_AnimeChangePoseType, -3, 1, 69)
+    USER_FUNC(btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
+    SUB(LW(1), 10)
+    USER_FUNC(evt_snd_sfxon_3d, 0x5d, LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_eff_fukidashi, 2, PTR(""), 0, 0, 0, LW(0), LW(1), LW(2), 50, 0, 60)
     USER_FUNC(btlevtcmd_CheckActStatus, -4, LW(0))
     IF_EQUAL(LW(0), 1)
         USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, 1, 69)
     END_IF()
     USER_FUNC(evt_snd_sfxon, PTR("SFX_ITEM_QUAKE1"), LW(14))
     USER_FUNC(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
-    WAIT_MSEC(2000)
+    WAIT_MSEC(2500)
     USER_FUNC(evt_snd_sfxoff, LW(14))
     USER_FUNC(evt_btl_camera_noshake, 0)
 
@@ -1237,14 +1290,13 @@ EVT_BEGIN(unitDragon_fake_victory_event)
     USER_FUNC(btlevtcmd_SetUnitWork, LW(10), UW_FakeDeathPlayed, 1)
     WAIT_MSEC(100)
     USER_FUNC(btlevtcmd_RunDataEventChild, LW(10), 100)
-    // Reset turn or not?  - USER_FUNC(btlevtcmd_reset_turn)
+    // Reset turn, if desired - USER_FUNC(btlevtcmd_reset_turn)
     // Kill Gloomtail actor.
     USER_FUNC(btlevtcmd_KillUnit, -2, 0)
     RETURN()
 EVT_END()
 
 EVT_BEGIN(unitDragon_fake_dead_event)
-    // TODO: Very work-in-progress "death" conversation (fix camera angle!)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_WaitAttackEnd)
     USER_FUNC(evt_btl_camera_set_mode, 1, 3)
@@ -1252,7 +1304,8 @@ EVT_BEGIN(unitDragon_fake_dead_event)
 
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_X_1"))
-    SET(LW(0), (int32_t)ConversationType::DEAD)
+
+    SET(LW(0), (int32_t)ConversationType::FAKE_DEATH)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
 
@@ -1290,10 +1343,9 @@ EVT_BEGIN(unitDragon_fake_dead_event)
 EVT_END()
 
 EVT_BEGIN(unitDragon_dead_event)
-    // Run different, fakeout event for hardest difficulty.
-    // TODO: Change difficulty trigger to FULL_EX.
+    // Run different, fakeout death event for hardest difficulty.
     USER_FUNC(evtTot_GetDifficulty, LW(1))
-    IF_EQUAL(LW(1), (int32_t)OPTVAL_DIFFICULTY_FULL)
+    IF_EQUAL(LW(1), (int32_t)OPTVAL_DIFFICULTY_FULL_EX)
         USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_FakeDeathPlayed, LW(1))
         IF_EQUAL(LW(1), 0)
             RUN_CHILD_EVT(unitDragon_fake_dead_event)
@@ -1322,7 +1374,7 @@ EVT_BEGIN(unitDragon_dead_event)
     WAIT_MSEC(1500)
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_X_1"))
-    SET(LW(0), (int32_t)ConversationType::DEAD)
+    SET(LW(0), (int32_t)ConversationType::DEATH)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
     
@@ -1413,6 +1465,8 @@ EVT_BEGIN(unitBonetail_init_event)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_LowHealthMsg, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_DragonType, 2)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_NumHeals, 2)
+    // Make invisible initially.
+    USER_FUNC(btlevtcmd_OnAttribute, -2, 16777216)
     RUN_CHILD_EVT(unitDragon_init_event)
     RETURN()
 EVT_END()

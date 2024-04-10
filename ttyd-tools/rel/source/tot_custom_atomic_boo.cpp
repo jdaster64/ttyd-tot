@@ -1,6 +1,7 @@
 #include "tot_custom_rel.h"     // For externed unit definitions.
 
 #include "evt_cmd.h"
+#include "tot_state.h"
 
 #include <gc/mtx.h>
 #include <gc/types.h>
@@ -764,26 +765,26 @@ LBL(91)
     // taken place; just setting this here could cause race-condition issues,
     // but for this particular attack hits happen ~simultaneously for all
     // targets so it shouldn't be an issue.
-    SET(GSW(821), 0)
+    SET((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 0)
     
     WAIT_FRM(15)
-    IF_SMALL(GSW(821), 1)
+    IF_SMALL((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 1)
         USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        SET(GSW(821), 1)
+        SET((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 1)
     END_IF()
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 0, LW(5))
         
     WAIT_FRM(30)
-    IF_SMALL(GSW(821), 2)
+    IF_SMALL((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 2)
         USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        SET(GSW(821), 2)
+        SET((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 2)
     END_IF()
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 0, LW(5))
     
     WAIT_FRM(30)
-    IF_SMALL(GSW(821), 3)
+    IF_SMALL((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 3)
         USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        SET(GSW(821), 3)
+        SET((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 3)
     END_IF()
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 0x100, LW(5))
         

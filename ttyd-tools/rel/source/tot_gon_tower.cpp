@@ -134,11 +134,11 @@ EVT_END()
 // Script that runs when opening a chest.
 EVT_BEGIN(Tower_ChestEvt_Core)
     // Don't allow getting a reward from more than one chest.
-    IF_EQUAL(GSW(1000), 1)
+    IF_EQUAL((int32_t)GSW_Tower_ChestClaimed, 1)
         RETURN()
     END_IF()
     // Disable drawing item icons above chests.
-    SET(GSW(1001), 2)
+    SET((int32_t)GSW_Tower_DisplayChestIcons, 2)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13), LW(14))
     SWITCH(LW(13))
@@ -190,7 +190,7 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     IF_EQUAL(LW(14), 0)
         USER_FUNC(evtTot_ToggleIGT, 1)
         USER_FUNC(evt_mario_key_onoff, 1)
-        SET(GSW(1000), 1)
+        SET((int32_t)GSW_Tower_ChestClaimed, 1)
     END_IF()
     RETURN()
 EVT_END()
@@ -292,15 +292,15 @@ EVT_BEGIN(Tower_SpawnChests)
             CASE_EQUAL(0)
                 USER_FUNC(
                     evt_mobj_itembox, PTR("box_0"), LW(0), LW(1), LW(2), 1, 0, 
-                    PTR(&Tower_ChestEvt_0), GSWF(5075))
+                    PTR(&Tower_ChestEvt_0), (int32_t)GSWF_Chest_0)
             CASE_EQUAL(1)
                 USER_FUNC(
                     evt_mobj_itembox, PTR("box_1"), LW(0), LW(1), LW(2), 1, 0, 
-                    PTR(&Tower_ChestEvt_1), GSWF(5076))
+                    PTR(&Tower_ChestEvt_1), (int32_t)GSWF_Chest_1)
             CASE_ETC()
                 USER_FUNC(
                     evt_mobj_itembox, PTR("box_2"), LW(0), LW(1), LW(2), 1, 0, 
-                    PTR(&Tower_ChestEvt_2), GSWF(5077))
+                    PTR(&Tower_ChestEvt_2), (int32_t)GSWF_Chest_2)
         END_SWITCH()
     WHILE()
 
@@ -308,7 +308,7 @@ EVT_BEGIN(Tower_SpawnChests)
         WAIT_MSEC(1000)
         USER_FUNC(evt_mario_key_onoff, 1)
     END_IF()
-    SET(GSW(1001), 1)
+    SET((int32_t)GSW_Tower_DisplayChestIcons, 1)
     RETURN()
 EVT_END()
 
@@ -404,7 +404,7 @@ EVT_BEGIN(Tower_RunGameOverScript)
         // Resets floor-based stats without making saves, etc.
         USER_FUNC(evtTot_IncrementFloor, 0)
         // Set flag to spawn player in room with pipe already spawned.
-        SET(GSW(1002), 1)
+        SET((int32_t)GSW_Tower_ContinuingFromGameOver, 1)
         USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
         USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("dokan_2"))
     ELSE()
@@ -559,10 +559,13 @@ EVT_BEGIN(Tower_FinalBossEvent)
     
     // Otherwise, play dragon death animation.
     
-    // TODO: Only on full difficulty eventually, swap main and Bonetail NPCs.
     SET(LW(13), PTR(kPitNpcName))
-    USER_FUNC(evt_npc_set_position, LW(13), 0, -1000, 0)
-    SET(LW(13), PTR(kBonetailNpcName))
+    // On FULL_EX difficulty only, swap main and Bonetail NPCs.
+    USER_FUNC(evtTot_GetDifficulty, LW(1))
+    IF_EQUAL(LW(1), (int32_t)OPTVAL_DIFFICULTY_FULL_EX)
+        USER_FUNC(evt_npc_set_position, LW(13), 0, -1000, 0)
+        SET(LW(13), PTR(kBonetailNpcName))
+    END_IF()
 
     USER_FUNC(evt_cam3d_evt_set, -769, 50, 527, -22, 114, 7, 1, 11)
     USER_FUNC(evt_npc_set_anim, LW(13), PTR("GNB_H_1"))
@@ -720,8 +723,8 @@ EVT_BEGIN(Tower_NpcSetup)
     INLINE_EVT()
         LBL(2)
         WAIT_FRM(1)
-        IF_EQUAL(GSW(1000), 0)
-            IF_LARGE_EQUAL(GSW(1001), 1)
+        IF_EQUAL((int32_t)GSW_Tower_ChestClaimed, 0)
+            IF_LARGE_EQUAL((int32_t)GSW_Tower_DisplayChestIcons, 1)
                 USER_FUNC(evtTot_DisplayChestIcons)
             END_IF()
             GOTO(2)
@@ -735,17 +738,17 @@ EVT_END()
 // Main room initialization event.
 EVT_BEGIN(gon_01_InitEvt)
     // Random unused bytes, used to track chest collection and icon display.
-    SET(GSW(1000), 0)
-    SET(GSW(1001), 0)
+    SET((int32_t)GSW_Tower_ChestClaimed, 0)
+    SET((int32_t)GSW_Tower_DisplayChestIcons, 0)
     // Flags to track chest opening.
-    SET(GSWF(5075), 0)
-    SET(GSWF(5076), 0)
-    SET(GSWF(5077), 0)
+    SET((int32_t)GSWF_Chest_0, 0)
+    SET((int32_t)GSWF_Chest_1, 0)
+    SET((int32_t)GSWF_Chest_2, 0)
 
     USER_FUNC(evt_run_case_evt, 9, 1, PTR("a_kanban"), 0, PTR(Tower_SignEvt), 0)
     
     // Is the player continuing from a Game Over?
-    IF_EQUAL(GSW(1002), 0)
+    IF_EQUAL((int32_t)GSW_Tower_ContinuingFromGameOver, 0)
         // If not, set up NPCs, enemies, etc.
         USER_FUNC(evtTot_IsFinalFloor, LW(0))
         IF_EQUAL(LW(0), 1)
@@ -769,7 +772,7 @@ EVT_BEGIN(gon_01_InitEvt)
         USER_FUNC(evt_hit_bind_update, PTR("a_dokan_1"))
         USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
         
-        SET(GSW(1002), 0)
+        SET((int32_t)GSW_Tower_ContinuingFromGameOver, 0)
     END_IF()
         
     // Dynamically update the destination of the exit loading zone.

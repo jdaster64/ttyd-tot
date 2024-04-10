@@ -637,14 +637,12 @@ void SelectEnemies() {
     if (state.IsFinalBossFloor()) {
         int32_t enemy_type;
         switch (state.GetOptionValue(OPT_DIFFICULTY)) {
-            case OPTVAL_DIFFICULTY_FULL_EX:
-                enemy_type = BattleUnitType::BONETAIL;
-                break;
-            case OPTVAL_DIFFICULTY_FULL:
-                enemy_type = BattleUnitType::GLOOMTAIL;
+            case OPTVAL_DIFFICULTY_HALF:
+                enemy_type = BattleUnitType::HOOKTAIL;
                 break;
             default:
-                enemy_type = BattleUnitType::HOOKTAIL;
+                // On EX, you fight Gloomtail, then Bonetail.
+                enemy_type = BattleUnitType::GLOOMTAIL;
                 break;
         }
         for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;

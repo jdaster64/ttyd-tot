@@ -31,14 +31,15 @@ enum DebugManagerMode {
     DEBUG_MAIN      = 0,
     
     DEBUG_MIN       = 100,
-    DEBUG_SEED,
-    DEBUG_ENEMIES,
-    DEBUG_FLOOR,
-    DEBUG_MAX_STATS,
-    DEBUG_UNLOCK_ALL_MOVES,
-    DEBUG_UNLOCK_ALL_PARTNERS,
+    DEBUG_SEED,                 // Lobby only
+    DEBUG_ENEMIES,              // Tower only
+    DEBUG_FLOOR,                // Tower only
+    DEBUG_UNLOCK_ALL_MOVES,     // Tower only
+    DEBUG_UNLOCK_ALL_PARTNERS,  // Tower only
     DEBUG_UNLOCK_ALL_BADGES,
     DEBUG_UNLOCK_TATTLE_LOG,
+    DEBUG_DIFFICULTY,
+    DEBUG_MAX_STATS,
     DEBUG_EXIT,
     DEBUG_MAX
 };
@@ -144,6 +145,12 @@ void DebugManager::Update() {
                     // Go to submenu on next frame.
                     g_DebugMode = g_CursorPos;
                     g_CursorPos = g_Mod->state_.floor_;
+                    return;
+                }
+                case DEBUG_DIFFICULTY: {
+                    // Go to submenu on next frame.
+                    g_DebugMode = g_CursorPos;
+                    g_CursorPos = g_Mod->state_.GetOption(tot::OPT_DIFFICULTY);
                     return;
                 }
                 case DEBUG_MAX_STATS: {
@@ -355,8 +362,27 @@ void DebugManager::Update() {
         
         if (dir == 0) return;
         if (buttons & ButtonId::L) dir *= 8;
-        g_CursorPos = Clamp(g_CursorPos + dir, 0, 64);
+
+        int32_t max_floor = 64;
+        switch (g_Mod->state_.GetOptionValue(tot::OPT_DIFFICULTY)) {
+            case tot::OPTVAL_DIFFICULTY_TUTORIAL:
+                max_floor = 8;
+                break;
+            case tot::OPTVAL_DIFFICULTY_HALF:
+                max_floor = 32;
+                break;
+        }
+        g_CursorPos = Clamp(g_CursorPos + dir, 0, max_floor);
         if (g_CursorPos < 0) g_CursorPos = 0;
+    } else if (g_DebugMode == DEBUG_DIFFICULTY) {
+        if (button_trg & (ButtonId::DPAD_UP | ButtonId::DPAD_RIGHT)) {
+            g_Mod->state_.ChangeOption(tot::OPT_DIFFICULTY, 1);
+        } else if (button_trg & (ButtonId::DPAD_DOWN | ButtonId::DPAD_LEFT)) {
+            g_Mod->state_.ChangeOption(tot::OPT_DIFFICULTY, -1);
+        } else if (button_trg & ButtonId::Y) {
+            g_DebugMode = DEBUG_OFF;
+            return;
+        }
     }
 }
 
@@ -379,6 +405,9 @@ void DebugManager::Draw() {
             }
             case DEBUG_MAX_STATS: {
                 strcpy(buf, "Max Stats");                   break;
+            }
+            case DEBUG_DIFFICULTY: {
+                strcpy(buf, "Change Difficulty");           break;
             }
             case DEBUG_UNLOCK_ALL_MOVES: {
                 strcpy(buf, "Unlock All Moves");            break;
@@ -411,6 +440,28 @@ void DebugManager::Draw() {
             "Hold L to multiply / divide by 10 instead of adding.\n"
             "Set seed to 0 to have one chosen randomly.",
             0, -90, 0xFFu, true, ~0U, 0.6f, /* top-middle */ 1);
+    } else if (g_DebugMode == DEBUG_DIFFICULTY) {
+        const char* opt = "Invalid";
+        switch (g_Mod->state_.GetOptionValue(tot::OPT_DIFFICULTY)) {
+            case tot::OPTVAL_DIFFICULTY_TUTORIAL:
+                opt = "Tutorial (not supported)";
+                break;
+            case tot::OPTVAL_DIFFICULTY_HALF:
+                opt = "32-Floor";
+                break;
+            case tot::OPTVAL_DIFFICULTY_FULL:
+                opt = "64-Floor";
+                break;
+            case tot::OPTVAL_DIFFICULTY_FULL_EX:
+                opt = "64-Floor EX";
+                break;
+        }
+        DrawCenteredTextWindow(
+            opt, 0, -60, 0xFFu, true, 0xFFFFFFFFu, 0.7f, red_alpha, 10, 7);
+        // Draw main menu text to make it look like a contextual menu.
+        DrawCenteredTextWindow(
+            "Change Difficulty",
+            0, -20, 0xFFu, true, 0xFFFFFFFFu, 0.7f, black_alpha, 10, 7);
     } else if (g_DebugMode == DEBUG_ENEMIES) {
         for (int32_t i = 0; i < 5; ++i) {
             int32_t bg_color = i == g_CursorPos ? red_alpha : black_alpha;
