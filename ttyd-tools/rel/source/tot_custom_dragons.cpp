@@ -613,10 +613,6 @@ EVT_END()
 
 // One-time dialogue after getting bitten by Hooktail for the first time.
 EVT_BEGIN(unitDragon_bite_reaction_event)
-    // TODO: non-canted angle?
-    // USER_FUNC(evt_btl_camera_set_mode, 1, 3)
-    // USER_FUNC(evt_btl_camera_set_moveto, 1, -431, 10, 735, 56, 125, 37, 20, 0)
-
     USER_FUNC(evt_btl_camera_set_mode, 0, 7)
     USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -1)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -633,7 +629,6 @@ EVT_BEGIN(unitDragon_bite_reaction_event)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
     
-    // TODO: Don't snap into place?
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
 
@@ -996,12 +991,23 @@ EVT_BEGIN(unitDragon_recover_event)
         USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_NumHeals, LW(0))
     END_IF()
     USER_FUNC(btlevtcmd_PayWeaponCost, -2, LW(9))
-    USER_FUNC(btlevtcmd_RecoverHp, -2, 1, 20)
+
+    // Determine amount to heal (1/4 of max health, clamped to 1, 99).
+    USER_FUNC(btlevtcmd_GetMaxHp, -2, LW(3))
+    DIV(LW(3), 4)
+    IF_SMALL(LW(3), 1)
+        SET(LW(3), 1)
+    END_IF()
+    IF_LARGE(LW(3), 99)
+        SET(LW(3), 99)
+    END_IF()
+
+    USER_FUNC(btlevtcmd_RecoverHp, -2, 1, LW(3))
     USER_FUNC(btlevtcmd_GetHitPos, -2, 1, LW(0), LW(1), LW(2))
     ADD(LW(0), -27)
     ADD(LW(1), 15)
     ADD(LW(2), 10)
-    USER_FUNC(evt_eff, PTR(""), PTR("recovery"), 0, LW(0), LW(1), LW(2), 20, 0, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(evt_eff, PTR(""), PTR("recovery"), 0, LW(0), LW(1), LW(2), LW(3), 0, 0, 0, 0, 0, 0, 0)
     WAIT_FRM(40)
     RETURN()
 EVT_END()
@@ -1015,9 +1021,22 @@ EVT_BEGIN(unitDragon_attack_event)
         LW(2), LW(3), LW(4), LW(5), LW(6), LW(7), LW(8),    // weights
         LW(10))                                             // next ai state
         
-    // Disable healing weight if out of healing uses.
+    // Disable healing if out of heals.
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_NumHeals, LW(13))
     IF_SMALL_EQUAL(LW(13), 0)
+        SET(LW(8), 0)
+    END_IF()
+    // Disable healing if Mario is too low on HP (<= 30% healthier than boss).
+    USER_FUNC(btlevtcmd_GetHp, -2, LW(11))
+    USER_FUNC(btlevtcmd_GetMaxHp, -2, LW(12))
+    MUL(LW(11), 100)
+    DIV(LW(11), LW(12))
+    USER_FUNC(btlevtcmd_GetHp, -3, LW(12))
+    USER_FUNC(btlevtcmd_GetMaxHp, -3, LW(13))
+    MUL(LW(12), 100)
+    DIV(LW(12), LW(13))
+    SUB(LW(12), LW(11))
+    IF_SMALL_EQUAL(LW(12), 30)
         SET(LW(8), 0)
     END_IF()
     
@@ -1309,9 +1328,6 @@ EVT_BEGIN(unitDragon_fake_dead_event)
     USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -1)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
     USER_FUNC(evt_btl_camera_set_zoom, 0, 200)
-
-    // USER_FUNC(evt_btl_camera_set_mode, 1, 3)
-    // USER_FUNC(evt_btl_camera_set_moveto, 1, -233, 45, 452, 56, 125, 37, 20, 0)
 
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_X_1"))
@@ -1963,7 +1979,8 @@ EVT_DEFINE_USER_FUNC(evtTot_Dragon_GetAttackWeights) {
                     next_ai_type = DragonAiState::PHASE_2_RANDOM;
                     break;
                 case DragonAiState::PHASE_2_RANDOM:
-                    weights[AttackType::RECOVER] = 20;
+                    // Fairly likely to heal (if allowed).
+                    weights[AttackType::RECOVER] = 50;
                     // fallthrough
                 default:
                     weights[AttackType::BREATH] = 40;
