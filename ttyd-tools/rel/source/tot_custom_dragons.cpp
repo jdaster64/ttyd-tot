@@ -614,8 +614,14 @@ EVT_END()
 // One-time dialogue after getting bitten by Hooktail for the first time.
 EVT_BEGIN(unitDragon_bite_reaction_event)
     // TODO: non-canted angle?
-    USER_FUNC(evt_btl_camera_set_mode, 1, 3)
-    USER_FUNC(evt_btl_camera_set_moveto, 1, -431, 10, 735, 56, 125, 37, 20, 0)
+    // USER_FUNC(evt_btl_camera_set_mode, 1, 3)
+    // USER_FUNC(evt_btl_camera_set_moveto, 1, -431, 10, 735, 56, 125, 37, 20, 0)
+
+    USER_FUNC(evt_btl_camera_set_mode, 0, 7)
+    USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 200)
+
     SET(LW(0), (int32_t)ConversationType::BITE_REACTION)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
@@ -627,10 +633,9 @@ EVT_BEGIN(unitDragon_bite_reaction_event)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
     
-    // TODO: Don't snap into place.
-    USER_FUNC(evt_btl_camera_set_prilimit, 0)
+    // TODO: Don't snap into place?
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
-    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 3)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
 
     SET((int32_t)GSW_Battle_Hooktail_BiteReactionSeen, 1)
 
@@ -1299,8 +1304,14 @@ EVT_END()
 EVT_BEGIN(unitDragon_fake_dead_event)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_WaitAttackEnd)
-    USER_FUNC(evt_btl_camera_set_mode, 1, 3)
-    USER_FUNC(evt_btl_camera_set_moveto, 1, -233, 45, 452, 56, 125, 37, 20, 0)
+
+    USER_FUNC(evt_btl_camera_set_mode, 0, 7)
+    USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 200)
+
+    // USER_FUNC(evt_btl_camera_set_mode, 1, 3)
+    // USER_FUNC(evt_btl_camera_set_moveto, 1, -233, 45, 452, 56, 125, 37, 20, 0)
 
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_X_1"))
