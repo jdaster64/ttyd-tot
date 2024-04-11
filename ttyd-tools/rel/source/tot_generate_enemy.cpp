@@ -1311,8 +1311,12 @@ EVT_BEGIN(MidbossEvt)
             USER_FUNC(evt_btl_camera_set_mode, 0, 0)
             WAIT_MSEC(300)
             
-            USER_FUNC(btlevtcmd_StartWaitEvent, -2)
-            RETURN()
+            // Unless on EX difficulty, skip attack after spawning.
+            USER_FUNC(evtTot_GetDifficulty, LW(0))
+            IF_NOT_EQUAL(LW(0), (int32_t)OPTVAL_DIFFICULTY_FULL_EX)
+                USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+                RETURN()
+            END_IF()
         END_IF()
     END_IF()
     // Fall back to running normal attack event.
