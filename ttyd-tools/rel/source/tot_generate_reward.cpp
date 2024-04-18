@@ -239,36 +239,47 @@ bool HasAllMovesUnlocked(int32_t reward_type) {
     return true;
 }
 
+int32_t PartnerRewardTypeToPouchIndex(int32_t reward_type) {
+    switch (reward_type) {
+        case REWARD_GOOMBELLA:  return 1;
+        case REWARD_KOOPS:      return 2;
+        case REWARD_FLURRIE:    return 5;
+        case REWARD_YOSHI:      return 4;
+        case REWARD_VIVIAN:     return 6;
+        case REWARD_BOBBERY:    return 3;
+        case REWARD_MOWZ:       return 7;
+    }
+    return 0;
+}
+
 // Selects which partner to offer as a reward.
 int32_t SelectPartner() {
     auto& state = g_Mod->state_;
-    
-    if (GetNumActivePartners() == 4) {
-        // Once the player has taken four partners, choose from among them.
-        int32_t value = state.Rand(4, RNG_REWARD_PARTNER_LOOP);
-        int32_t option = 0;
-        for (int32_t i = 1; i <= 7; ++i) {
-            if (ttyd::mario_pouch::pouchGetPtr()->party_data[i].flags & 1) {
-                if (option == value) {
-                    switch (i) {
-                        case 1: return REWARD_GOOMBELLA;
-                        case 2: return REWARD_KOOPS;
-                        case 3: return REWARD_BOBBERY;
-                        case 4: return REWARD_YOSHI;
-                        case 5: return REWARD_FLURRIE;
-                        case 6: return REWARD_VIVIAN;
-                        case 7: return REWARD_MOWZ;
-                    }
-                }
-                ++option;
+
+    for (int32_t i = 0; i < 50; ++i) {
+        int32_t value = state.Rand(7, RNG_REWARD_PARTNER);
+        int32_t reward_type = -(value + 1);
+        
+        // Once the player has filled their partner pool...
+        if (GetNumActivePartners() >= 4) {
+            // If the chosen partner is not in the pool; try rolling again.
+            int32_t partner_idx = PartnerRewardTypeToPouchIndex(reward_type);
+            if (!(ttyd::mario_pouch::pouchGetPtr()->
+                    party_data[partner_idx].flags & 1)) {
+                continue;
             }
         }
-    } else {
-        int32_t value = state.Rand(7, RNG_REWARD_PARTNER);
-        return -(value + 1);
+
+        // Skip next roll if it yields the same value, to make it less likely
+        // you see consecutive upgrades for the same partner.
+        if (state.Rand(7, RNG_REWARD_PARTNER) != (uint32_t)value) {
+            --state.rng_states_[RNG_REWARD_PARTNER];
+        }
+
+        return reward_type;
     }
     
-    // Should never be reached.
+    // If no partners could be found, return 0 as a backup.
     return 0;
 }
 
@@ -669,7 +680,7 @@ void SelectChestContents() {
     static constexpr const uint16_t kStatWeights[] = { 20, 20, 20, 15, 10 };
     // Weights for different types of other rewards
     // (coins, Star Piece, Shine Sprite, unique badge, stackable badge).
-    static constexpr const uint16_t kOtherWeights[] = { 20, 25, 30, 20, 10 };
+    static constexpr const uint16_t kOtherWeights[] = { 20, 20, 30, 20, 10 };
     
     // Top-level weight for choosing a move, stat-up, or other reward.
     // The former two categories cannot be chosen more than once per floor.
@@ -679,7 +690,7 @@ void SelectChestContents() {
     // badge in its place.
     bool others_picked[] = { false, false, false, false, false };
     
-    for (ChestData* chest = g_Chests; chest->item; ++chest) {        
+    for (ChestData* chest = g_Chests; chest->item; ++chest) {       
         int32_t sum_weights, weight, type;
         int32_t reward = 0;
         const void* pickup_script = nullptr;
@@ -743,7 +754,7 @@ void SelectChestContents() {
             if (reward == 0 || (reward < 0 && HasAllMovesUnlocked(reward))) {
                 reward = 0;
                 pickup_script = nullptr;
-                top_level_weights[type] = 10;
+                top_level_weights[0] = 10;
             }
         } else if (type == 1) {
             // Pick type of stat-up reward.
@@ -797,10 +808,16 @@ void SelectChestContents() {
                     case 1:
                         reward = REWARD_STAR_PIECE;
                         pickup_script = Reward_StarPieceChestEvt;
+                        // Don't offer Star Piece and Shine Sprite together.
+                        others_picked[1] = true;
+                        others_picked[2] = true;
                         break;
                     case 2:
                         reward = REWARD_SHINE_SPRITE;
                         pickup_script = Reward_ShineSpriteChestEvt;
+                        // Don't offer Star Piece and Shine Sprite together.
+                        others_picked[1] = true;
+                        others_picked[2] = true;
                         break;
                     case 3:
                         reward = SelectUniqueBadge();
@@ -901,17 +918,8 @@ EVT_DEFINE_USER_FUNC(evtTot_FullRecover) {
 // Returns whether a partner needs unlocking given the reward id.
 // arg0 = reward id, arg1 = (out) needs unlock
 EVT_DEFINE_USER_FUNC(evtTot_ShouldUnlockPartner) {
-    int32_t idx = 0;
-    switch((int32_t)evtGetValue(evt, evt->evtArguments[0])) {
-        case -1:    idx = 1;    break;
-        case -2:    idx = 2;    break;
-        case -3:    idx = 5;    break;
-        case -4:    idx = 4;    break;
-        case -5:    idx = 6;    break;
-        case -6:    idx = 3;    break;
-        case -7:    idx = 7;    break;
-        default:                break;
-    }
+    int32_t reward_type = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t idx = PartnerRewardTypeToPouchIndex(reward_type);
     int32_t should_unlock =
         idx && !(ttyd::mario_pouch::pouchGetPtr()->party_data[idx].flags & 1);
     evtSetValue(evt, evt->evtArguments[1], should_unlock);
@@ -923,14 +931,13 @@ EVT_DEFINE_USER_FUNC(evtTot_ShouldUnlockPartner) {
 EVT_DEFINE_USER_FUNC(evtTot_GetPartnerName) {
     const char* str = "A new member";
     switch((int32_t)evtGetValue(evt, evt->evtArguments[0])) {
-        case -1:    str = "Goombella";  break;
-        case -2:    str = "Koops";      break;
-        case -3:    str = "Flurrie";    break;
-        case -4:    str = "Yoshi";      break;
-        case -5:    str = "Vivian";     break;
-        case -6:    str = "Bobbery";    break;
-        case -7:    str = "Ms. Mowz";   break;
-        default:                        break;
+        case REWARD_GOOMBELLA:  str = "Goombella";  break;
+        case REWARD_KOOPS:      str = "Koops";      break;
+        case REWARD_FLURRIE:    str = "Flurrie";    break;
+        case REWARD_YOSHI:      str = "Yoshi";      break;
+        case REWARD_VIVIAN:     str = "Vivian";     break;
+        case REWARD_BOBBERY:    str = "Bobbery";    break;
+        case REWARD_MOWZ:       str = "Ms. Mowz";   break;
     }
     evtSetValue(evt, evt->evtArguments[1], PTR(str));
     return 2;
@@ -941,16 +948,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetPartnerName) {
 // arg1 = (out) idx in internal party order.
 EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
     int32_t reward_type = evtGetValue(evt, evt->evtArguments[0]);
-    int32_t idx = 1;
-    switch(reward_type) {
-        case -1:    idx = 1;    break;
-        case -2:    idx = 2;    break;
-        case -3:    idx = 5;    break;
-        case -4:    idx = 4;    break;
-        case -5:    idx = 6;    break;
-        case -6:    idx = 3;    break;
-        case -7:    idx = 7;    break;
-    }
+    int32_t idx = PartnerRewardTypeToPouchIndex(reward_type);
     auto& party_data = ttyd::mario_pouch::pouchGetPtr()->party_data[idx];
     
     party_data.flags |= 1;
@@ -980,13 +978,13 @@ EVT_DEFINE_USER_FUNC(evtTot_PartyVictoryPose) {
     if (party_ptr) {
         const char* pose_name = nullptr;
         switch((int32_t)evtGetValue(evt, evt->evtArguments[0])) {
-            case -1:    pose_name = "PKR_Y_1";  break;
-            case -2:    pose_name = "PNK_Y_1";  break;
-            case -3:    pose_name = "PWD_Y_1";  break;
-            case -4:    pose_name = "PYS_Y_1";  break;
-            case -5:    pose_name = "PTR_Y_1";  break;
-            case -6:    pose_name = "Y_1";      break;
-            case -7:    pose_name = "PCH_Y_1";  break;
+            case REWARD_GOOMBELLA:  pose_name = "PKR_Y_1";  break;
+            case REWARD_KOOPS:      pose_name = "PNK_Y_1";  break;
+            case REWARD_FLURRIE:    pose_name = "PWD_Y_1";  break;
+            case REWARD_YOSHI:      pose_name = "PYS_Y_1";  break;
+            case REWARD_VIVIAN:     pose_name = "PTR_Y_1";  break;
+            case REWARD_BOBBERY:    pose_name = "Y_1";      break;
+            case REWARD_MOWZ:       pose_name = "PCH_Y_1";  break;
         }
         if (pose_name) ttyd::party::partyChgPose(party_ptr, pose_name);
     }

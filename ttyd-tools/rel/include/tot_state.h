@@ -187,8 +187,8 @@ enum RngSequence {
     // Choosing reward subtypes; not mangled with floor number.
     RNG_REWARD_MOVE             = 9,    // Jump, Hammer, Special, or partner.
     RNG_REWARD_PARTNER          = 10,   // Partner, from all seven options.
-    RNG_REWARD_PARTNER_LOOP     = 11,   // Partner, from chosen pool of four.
-    RNG_REWARD_PARTNER_FALLBACK = 12,   // Partner, if prior choice was invalid.
+    RNG_REWARD_PARTNER_UNUSED_1 = 11,   // Partner, alternate RNG (placeholder).
+    RNG_REWARD_PARTNER_UNUSED_2 = 12,   // Partner, alternate RNG (placeholder).
     RNG_REWARD_STAT_UP          = 13,   // HP, FP, BP, HP-P, or item inv.
     RNG_REWARD_OTHER            = 14,   // Coins, SP, SS, unique/stackable badge.
     RNG_REWARD_BADGE_SPECIAL    = 15,   // Which unique badge.
