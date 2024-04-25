@@ -917,7 +917,7 @@ BattleWeapon customWeapon_VivianInfatuate = {
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances
-    .confuse_chance = 100,
+    .confuse_chance = 127,
     .confuse_time = 3,
     
     .attack_evt_code = (void*)partyVivianAttack_CharmKissAttack,
@@ -973,7 +973,7 @@ BattleWeapon customWeapon_VivianCurse = {
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances
-    .slow_chance = 100,
+    .slow_chance = 127,
     .slow_time = 3,
     
     .attack_evt_code = (void*)partyVivianAttack_CharmKissAttack,
@@ -1029,7 +1029,7 @@ BattleWeapon customWeapon_VivianNeutralize = {
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances
-    .allergic_chance = 100,
+    .allergic_chance = 127,
     .allergic_time = 3,
     
     .attack_evt_code = (void*)partyVivianAttack_CharmKissAttack,

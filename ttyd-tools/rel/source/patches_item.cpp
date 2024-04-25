@@ -210,7 +210,7 @@ void ApplyFixedPatches() {
     static const constexpr uint32_t kBpCost[] = {
         0x11111111, 0x44111111, 0x22662211, 0x22111144, 0x11224411,
         0x33331441, 0x12226220, 0x62211111, 0x40042216, 0x00000004,
-        0x03110001, 0x23220100, 0x00000112,
+        0x03110001, 0x24220100, 0x00000112,
     };
     static const constexpr int8_t kBadgeSortOrder[] = {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 33, 34,

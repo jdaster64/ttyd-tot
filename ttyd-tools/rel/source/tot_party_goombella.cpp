@@ -911,19 +911,23 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     END_INLINE()
     USER_FUNC(btlevtcmd_ftof, 24, LW(0))
     USER_FUNC(btlevtcmd_ftof, 48, LW(1))
-    USER_FUNC(btlevtcmd_ACRStart, -2, LW(0), LW(1), LW(1), 0)
-    USER_FUNC(btlevtcmd_ACRGetResult, LW(7), LW(8))
-    IF_LARGE_EQUAL(LW(7), 2)
-        USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
-        USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
-        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PKR_J_1B"))
-        WAIT_MSEC(166)
-        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PKR_Y_1"))
-        WAIT_MSEC(167)
-    ELSE()
-        USER_FUNC(evt_audience_acrobat_notry)
-        WAIT_FRM(20)
-    END_IF()
+
+    WAIT_FRM(LW(0))
+    // Disable Stylish entirely.
+    // USER_FUNC(btlevtcmd_ACRStart, -2, LW(0), LW(1), LW(1), 0)
+    // USER_FUNC(btlevtcmd_ACRGetResult, LW(7), LW(8))
+    // IF_LARGE_EQUAL(LW(7), 2)
+    //     USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    //     USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
+    //     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PKR_J_1B"))
+    //     WAIT_MSEC(166)
+    //     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PKR_Y_1"))
+    //     WAIT_MSEC(167)
+    // ELSE()
+    //     USER_FUNC(evt_audience_acrobat_notry)
+    //     WAIT_FRM(20)
+    // END_IF()
+
     IF_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_AnnounceMessage, 0, 0, 0, PTR("msg_st_chg_mario_quick"), 60)
     ELSE()
@@ -1269,7 +1273,7 @@ BattleWeapon customWeapon_GoombellaRallyWink = {
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
-    .stylish_multiplier = 1,
+    .stylish_multiplier = 0,
     .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,

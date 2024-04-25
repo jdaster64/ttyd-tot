@@ -86,7 +86,7 @@ const MoveData g_MoveData[] = {
     { { 1, 1, 1 }, 1, 1, 6, IconType::PARTNER_MOVE_1, "btl_wn_ptr_lv1", nullptr, "msg_ptr_kagegakure", "msg_ac_kagegakure", "tot_upg_none", },
     { { 2, 5, 5 }, 2, 1, 6, IconType::PARTNER_MOVE_1, "tot_ptr5_curse", nullptr, "tot_ptr5_curse_desc", "msg_ac_meromero_kiss", "tot_upg_multi", },
     { { 2, 5, 5 }, 2, 1, 6, IconType::PARTNER_MOVE_1, "tot_ptr5_neutralize", nullptr, "tot_ptr5_neutralize_desc", "msg_ac_meromero_kiss", "tot_upg_multi", },
-    { { 4, 6, 9 }, 3, 2, 6, IconType::PARTNER_MOVE_2, "btl_wn_ptr_lv2", nullptr, "msg_ptr_mahou_no_kona", "msg_ac_mahou_no_kona", "tot_upg_damage", },
+    { { 4, 6, 8 }, 3, 2, 6, IconType::PARTNER_MOVE_2, "btl_wn_ptr_lv2", nullptr, "msg_ptr_mahou_no_kona", "msg_ac_mahou_no_kona", "tot_upg_damage", },
     { { 5, 5, 5 }, 1, 3, 6, IconType::PARTNER_MOVE_3, "btl_wn_ptr_lv3", nullptr, "msg_ptr_meromero_kiss", "msg_ac_meromero_kiss", "tot_upg_none", },
     { { 0, 2, 4 }, 3, 0, 3, IconType::PARTNER_MOVE_0, "btl_wn_pbm_normal", nullptr, "msg_pbm_bakuhatsu", "msg_ac_bakuhatsu", "tot_upg_damage", },
     { { 2, 4, 6 }, 3, 1, 3, IconType::PARTNER_MOVE_1, "btl_wn_pbm_lv1", "tot_ptr6_bsquad_abb", "msg_pbm_jigen_bakudan", "msg_ac_jigen_bakudan", "tot_upg_bombs", },
