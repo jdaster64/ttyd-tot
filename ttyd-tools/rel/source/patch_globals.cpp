@@ -19,6 +19,7 @@ using ::gc::OSLink::OSModuleInfo;
 using ::ttyd::battle_database_common::BattleUnitSetup;
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::battle::BattleWork;
+using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::battle_unit::BattleWorkUnitPart;
 using ::ttyd::evtmgr::EvtEntry;
@@ -145,8 +146,10 @@ int32_t (*g__make_madowase_weapon_trampoline)(EvtEntry*, bool) = nullptr;
 int32_t (*g_btlevtcmd_get_monosiri_msg_no_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_actrecord.o  8018ef8c
 void (*g_BtlActRec_JudgeRuleKeep_trampoline)(void) = nullptr;
-// battle_actrecord.o 8018f990
+// battle_actrecord.o  8018f990
 void (*g_BtlActRec_AddCount_trampoline)(uint8_t*) = nullptr;
+// battle_audience.o  801a1d0c
+void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*) = nullptr;
 // battle_audience.o  801a5a0c
 void (*g_BattleAudienceSetThrowItemMax_trampoline)() = nullptr;
 // battle_enemy_item.o  801f9658
@@ -307,8 +310,6 @@ extern const int32_t g_BattleAudienceSettingAudience_EnableAlways_BH = 0x801a61a
 extern const int32_t g__object_fall_attack_AudienceEnableAlways_BH = 0x801469e4;
 extern const int32_t g_effUpdownDisp_TwoDigitSupport_BH = 0x80193aec;
 extern const int32_t g_effUpdownDisp_TwoDigitSupport_EH = 0x80193cd4;
-extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH = 0x801a1ef4;
-extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH = 0x801a1f30;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH = 0x801a61ec;
 extern const int32_t g_BattleAudience_End_SaveAmountAlways_BH = 0x801a6b68;
 extern const int32_t g_BattleAudience_Disp_EnableAlways_BH = 0x801a6cb0;

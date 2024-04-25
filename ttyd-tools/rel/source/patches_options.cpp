@@ -202,11 +202,8 @@ void ApplyFixedPatches() {
         ttyd::battle_audience::BattleAudienceSetThrowItemMax, [](){
             g_BattleAudienceSetThrowItemMax_trampoline();
             if (g_Mod->state_.GetOption(tot::OPT_AUDIENCE_RANDOM_THROWS)) {
-                // Always set 'max thrown items' value to 1.
-                uintptr_t audience_work_base =
-                    reinterpret_cast<uintptr_t>(
-                        ttyd::battle::g_BattleWork->audience_work);
-                *reinterpret_cast<int32_t*>(audience_work_base + 0x137f4) = 1;
+                auto& audience_work = ttyd::battle::g_BattleWork->audience_work;
+                audience_work.max_items_this_turn = 1;
             }
         });
         

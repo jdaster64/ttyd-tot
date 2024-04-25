@@ -2,6 +2,10 @@
 
 #include <cstdint>
 
+namespace ttyd::battle {
+struct SpBonusInfo;
+}
+
 namespace ttyd::battle_audience {
 
 extern "C" {
@@ -88,12 +92,12 @@ extern "C" {
 // BattleAudienceNumToTargetSub
 // BattleAudienceNumToTarget
 // BattleAudience_WinSetActive
-// BattleAudience_ApRecoveryBuild
+void BattleAudience_ApRecoveryBuild(battle::SpBonusInfo* bonus_info);
 // BattleAudience_GetPPAudienceNum_Sub
 // BattleAudience_GetPPAudienceNum_RL_Sub
 // BattleAudience_GetPPAudienceNum_L
 // BattleAudience_GetPPAudienceNum_R
-// BattleAudience_GetPPAudienceNumKind
+int32_t BattleAudience_GetPPAudienceNumKind(int32_t audience_kind);
 // BattleAudience_GetPPAudienceNum
 // BattleAudience_GetAudienceNum
 // BattleAudience_NoUsedFCHaitiRand

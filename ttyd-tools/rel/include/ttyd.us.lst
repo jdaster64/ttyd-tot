@@ -2551,6 +2551,8 @@
 80199098:evt_env_blur_on
 
 // battle_audience.o
+801a1d0c:BattleAudience_ApRecoveryBuild
+801a20d8:BattleAudience_GetPPAudienceNumKind
 801a5a0c:BattleAudienceSetThrowItemMax
 
 // battle_icon.o
@@ -2618,6 +2620,22 @@
 802020d8:battleAcDisp_ButtonDown
 8020215c:battleAcResult_ButtonDown
 80202164:battleAcMain_ButtonDown
+
+// battle_break_slot.o
+80203284:item_appear_force
+802032d8:BattleBreakSlot_HideReel
+80203330:BattleBreakSlot_DecBreakTurn
+80203370:BattleBreakSlot_GetBreakTurn
+80203394:BattleBreakSlot_CheckReaction
+8020342c:BattleBreakSlot_Start
+80203490:BattleBreakSlot_PointInc
+80203688:BattleBreakSlot_End
+802036d4:BattleBreakSlotDispReel
+80203a68:BattleBreakSlot_Disp
+80203aa0:BattleBreakSlot_Main
+8020507c:BattleBreakSlot_Init
+80205210:BattleBreakSlotReelGetPtr
+8020524c:BattleBreakSlotGetPtr
 
 // evt_window.o
 80209a0c:evt_win_coin_wait
@@ -2811,6 +2829,10 @@
 8026d5b8:strncpy
 8026d5fc:strcpy
 8026d6b4:strlen
+
+// Various core C libraries.
+// sqrt
+802728d0:_core_sqrt
 
 // os.a
 // OSAlloc.c
@@ -3116,6 +3138,10 @@
 8039c2d0:pose_tbl_reset
 8039c3b8:dead_event
 8039c784:destroy_event
+
+// battle_audience_kind_data.o
+// .data
+803b4de4:audience_kind
 
 // custom.rel (40)
 

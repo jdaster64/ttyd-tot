@@ -181,6 +181,235 @@ struct BattleWorkActionCommandManager {
 
 static_assert(sizeof(BattleWorkActionCommandManager) == 0xaa8);
 
+struct SpBonusInfo {
+    battle_database_common::BattleWeapon* weapon;
+    float       ac_success_multiplier;
+    int8_t      stylish_multiplier;
+    int8_t      unk_from_weapon_0x19;
+    int8_t      bingo_slot_chance;
+    int8_t      unk_from_weapon_0x1b;
+};
+static_assert(sizeof(SpBonusInfo) == 0xc);
+
+struct BattleWorkAudienceMember {
+    uint32_t    flags;
+    int32_t     unk_0x004;  // substate?
+    int32_t     unk_0x008;  // substate / timer?
+    float       unk_0x00c;
+    float       unk_0x010;
+    float       unk_0x014;
+    uint8_t     unk_0x018;
+    int8_t      status;     // BattleAudienceCtrlProcessKinopio subroutine type
+    uint8_t     tpl_idx;    // ?    
+    int8_t      member_kind;
+    int16_t     item_idx;   // index into BattleWorkAudienceItem array
+    int16_t     pad_0x1e;
+    
+    void*       anim_data;
+    void*       unk_anim_related;
+    void*       unk_current_anim_command;
+    uint32_t    unk_anim_command_timer;
+    uint32_t    unk_0x030;
+    uint32_t    unk_0x034[3];
+    uint8_t     unk_0x040;  // index into 0x034, anim-command related
+    uint8_t     unk_0x041;
+    uint8_t     unk_0x042;
+    uint8_t     unk_0x043;
+    uint8_t     unk_0x044;
+    uint8_t     pad_0x045[3];
+    
+    gc::vec3    position;
+    gc::vec3    final_scale;
+    gc::vec3    scale;
+    gc::vec3    skew_stretch;   // ?
+    gc::vec3    velocity;
+    gc::vec3    acceleration;
+    gc::vec3    facing_dir;     // ?
+    gc::vec3    rotation;
+    gc::vec3    rotation_offset;
+    gc::vec3    home_position;
+    gc::vec3    disp_position;
+    gc::vec3    relative_position;
+    gc::vec3    relative_velocity;
+    float       relative_accel_y;
+    float       unk_dir;
+    battle_unit::BattleWorkUnit* target_unit;
+    int32_t     audience_eat_idx;
+    int32_t     sleep_turns;
+    
+    int32_t     evt_move_frames_remaining;
+    int32_t     evt_move_frames_total;
+    float       evt_move_start_pos_x;
+    float       evt_move_target_pos_x;
+    float       evt_move_start_pos_y;
+    float       evt_move_target_pos_y;
+    float       evt_move_start_pos_z;
+    float       evt_move_target_pos_z;
+    gc::vec3    evt_move_delta_pos;
+    float       evt_move_gravity_y;
+    uint32_t    evt_move_interpolation_type;
+    
+    // Various purposes based on member's type.
+    uint32_t    audience_work;
+    float       boo_float_displacement;
+};
+
+static_assert(sizeof(BattleWorkAudienceMember) == 0x134);
+
+struct BattleWorkAudienceItem {
+    uint32_t    flags;
+    int32_t     state;
+    int32_t     state_timer;
+    uint32_t    audience_owner_idx;
+    int32_t     item_type;
+    gc::vec3    position;
+    float       uniform_scale;
+    float       rotation_deg_z;
+    gc::vec3    velocity;
+    gc::vec3    acceleration;
+    battle_unit::BattleWorkUnit* target;
+    uint32_t    unk_interactable;
+};
+
+static_assert(sizeof(BattleWorkAudienceItem) == 0x48);
+
+struct BattleWorkAudienceApSrc {
+    uint32_t    flags;
+    int32_t     state;
+    gc::vec3    position;
+    gc::vec3    unk_0x14;   // unused?
+    gc::vec3    move_start_pos;
+    gc::vec3    move_target_pos;
+    gc::vec3    scale;
+    int32_t     move_timer;
+    int32_t     move_total_time;
+    float       dist_current_to_status_bar;
+    float       dist_start_to_status_bar;
+    float       angle_to_status_bar;
+    float       delta_angle_to_status_bar;
+    uint8_t     alpha;
+    uint8_t     pad_0x5d[3];
+};
+
+static_assert(sizeof(BattleWorkAudienceApSrc) == 0x60);
+
+struct BattleWorkAudienceSound {
+    uint32_t    flags;
+    uint32_t    psndsfx_idx;
+    uint8_t     sound_level;
+    uint8_t     pad_0x09[3];
+    int32_t     sound_length;
+    int32_t     fadeout_length;
+    int32_t     force_fade_timer;
+    int32_t     force_fade_length;
+    uint8_t     base_volume;
+    uint8_t     current_base_volume;
+    uint8_t     volume_multiplier;
+    uint8_t     fade_start_volume_multiplier;
+    uint8_t     fade_end_volume_multiplier;
+    uint8_t     pad_0x21[3];
+};
+
+static_assert(sizeof(BattleWorkAudienceSound) == 0x24);
+
+struct BattleWorkAudienceWin {
+    uint8_t     enable;
+    uint8_t     unk_0x01[7];
+    gc::vec3    position;
+    int32_t     slide_in_timer;
+    float       audience_count_disp;    // lags behind actual count
+};
+
+static_assert(sizeof(BattleWorkAudienceWin) == 0x1c);
+
+struct BattleWorkAudience {
+    uint32_t    flags;
+    void*       current_evt_id;
+    uint32_t    ap_src_sfx_idx;
+    void*       normal_audience_tpl;
+    void*       guest_audience_tpls[2];
+    uint8_t     guest_audience_kinds[2];
+    
+    uint8_t     pad_0x0001a[0x1bc - 0x1a];
+    
+    BattleWorkAudienceMember members[200];
+    BattleWorkAudienceItem items[100];
+    BattleWorkAudienceApSrc sp_stars[100];
+    BattleWorkAudienceSound sounds[24];
+    BattleWorkAudienceWin window_work;
+    
+    // Read from battle_audience.o 0x802f9eac (US), indexed by Mario's level.
+    float       base_target_audience;
+    float       target_audience_value;
+    float       bonus_audience_value;
+    int32_t     current_audience_count_int;
+    int32_t     current_audience_count_int_left;
+    int32_t     current_audience_count_int_right;
+    int32_t     max_audience_for_stage_rank;
+    int32_t     new_audience_member_weights[12];
+    int32_t     impending_star_power;               // In increments of 0.01 SP.
+    SpBonusInfo* impending_bonus_info;
+    int32_t     crowd_pleasing_events_streak;       // max of 2
+    int32_t     crowd_displeasing_events_streak;    // max of 5
+    int32_t     num_stylishes_performed;            // max of 5, per attack
+    int32_t     unk_0x137d8;
+    uint32_t    check_phase_reaction_state;
+    uint32_t    check_phase_reaction_substate;
+    
+    int32_t     present_item_kind;
+    int32_t     present_item_class;                 // 0 for good, 1 for bad
+    int32_t     present_item_target_unit_idx;
+    int32_t     items_spawned_this_turn;
+    int32_t     max_items_this_turn;
+    int32_t     items_thrown_this_burst;
+    battle_database_common::BattleWeapon item_throw_weapon;
+    int32_t     item_on_member_idx;
+    gc::vec3    item_on_member_pos;
+    
+    uint32_t    possible_phase_event_types[14];
+    int32_t     num_possible_phase_events;
+    int32_t     turn_end_phase_event_trigger_chance;
+    int32_t     audience_joy_level;
+    int32_t     audience_excited;       // set to 1 during bingos?, levelups
+};
+
+static_assert(sizeof(BattleWorkAudience) == 0x13914);
+
+struct BattleWorkBreakSlotReel {
+    int32_t     index;
+    int32_t     flags;
+    int32_t     state;
+    int32_t     unk_0x0c;  // substate / timer?
+    int32_t     icon;
+    int32_t*    possible_icons;
+    int32_t     num_possible_icons;
+    int32_t     possible_icons_idx;
+    gc::vec3    icon_position;
+    gc::vec3    icon_rotation;
+    gc::vec3    icon_scale;
+    gc::vec3    unk_0x44;  // some kind of translation offset
+    float       unk_0x50;
+    float       unk_0x54;
+    uint8_t     unk_0x58;
+    uint8_t     unk_0x59[3];
+};
+
+static_assert(sizeof(BattleWorkBreakSlotReel) == 0x5c);
+
+struct BattleWorkBreakSlot {
+    uint32_t    flags;
+    int32_t     state;
+    int32_t     unk_0x008;  // substate / timer?
+    int32_t     slot;
+    int32_t     active_bingo_turn_count;
+    float       active_bingo_sp_multiplier;
+    BattleWorkBreakSlotReel reels[3];
+    int32_t     psndsfx_idx;
+    void*       evt_entry;    
+};
+
+static_assert(sizeof(BattleWorkBreakSlot) == 0x134);
+
 struct BattleWorkActRecord {
     uint8_t mario_times_jump_moves_used;
     uint8_t mario_times_hammer_moves_used;
@@ -286,8 +515,8 @@ struct BattleWork {
     int8_t          status_window_related[0x14];
     int8_t          unk_02750[4];
     int8_t          camera_work[0x104];
-    int8_t          audience_work[0x13914];
-    int8_t          bingo_work[0x134];
+    BattleWorkAudience audience_work;
+    BattleWorkBreakSlot bingo_work;
     int8_t          party_info_work[0x2c * 7];
     
     uint32_t        tattled_unit_type_flags[8];
@@ -306,15 +535,17 @@ struct BattleWork {
     int8_t          unk_18ff8;
     int8_t          impending_merlee_spell_type;
     uint16_t        unk_18ffa;  // frame counter for something in btlseqFirstAct
+
+    // These fields comprise a SpBonusInfo struct:
     battle_database_common::BattleWeapon* impending_bonus_weapon;
     float           impending_sp_ac_success_multiplier;
     int8_t          impending_sp_stylish_multiplier;
     int8_t          unk_19005;
     int8_t          impending_sp_bingo_card_chance;
     int8_t          unk_19007;
+
     const char*     weapon_ac_help_msg;
     uint32_t        battle_ac_help_disp_type;
-    
     int8_t          unk_19010[0x4c];
     int32_t         lucky_start_evt_tid;
     int32_t         reserve_items[4];

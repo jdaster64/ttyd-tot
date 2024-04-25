@@ -10,10 +10,14 @@
 #include "tot_generate_enemy.h"
 #include "tot_manager_move.h"
 
+#include <ttyd/_core_language_libs.h>
 #include <ttyd/ac_button_down.h>
 #include <ttyd/battle.h>
 #include <ttyd/battle_ac.h>
 #include <ttyd/battle_actrecord.h>
+#include <ttyd/battle_audience.h>
+#include <ttyd/battle_audience_kind_data.h>
+#include <ttyd/battle_break_slot.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_damage.h>
 #include <ttyd/battle_disp.h>
@@ -63,11 +67,6 @@ extern "C" {
     void StartStatusIconDisplay();
     void BranchBackStatusIconDisplay();
     void ConditionalBranchStatusIconDisplay();
-    // star_power_patches.s
-    void StartApplySpRegenMultiplierNoBingo();
-    void BranchBackApplySpRegenMultiplierNoBingo();
-    void StartApplySpRegenMultiplierBingo();
-    void BranchBackApplySpRegenMultiplierBingo();
     // status_effect_patches.s
     void StartCalculateCounterDamage();
     void BranchBackCalculateCounterDamage();
@@ -111,6 +110,7 @@ using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_unit;
 
 using ::ttyd::battle::BattleWork;
+using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_damage::CounterattackWork;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
@@ -149,6 +149,7 @@ extern int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool);
 extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
+extern void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*);
 extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
 // Patch addresses.
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH;
@@ -160,8 +161,6 @@ extern const int32_t g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows;
 extern const int32_t g_btlSeqAct_SetConfuseProcRate_BH;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
 extern const int32_t g__btlcmd_MakeOperationTable_Patch_NoSuperCharge;
-extern const int32_t g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH;
-extern const int32_t g_BattleAudience_ApRecoveryBuild_BingoRegen_BH;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
 extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_BH;
 extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_EH;
@@ -853,17 +852,15 @@ int32_t CalculateBaseDamage(
         (target->current_kind == BattleUnitType::MARIO ||
          target->current_kind > BattleUnitType::GOOMBELLA)) {
         if (atk > 0 && ttyd::battle::BattleGetSeq(battleWork, 4) != 0x400'0002) {
-            uintptr_t audience_work_base =
-                reinterpret_cast<uintptr_t>(battleWork->audience_work);
-            int32_t current_audience =
-                *reinterpret_cast<int32_t*>(audience_work_base + 0x13784);
+            auto& audience_work = battleWork->audience_work;
+            int32_t current_audience = audience_work.current_audience_count_int;
                 
             // Regen 0.10 SP per damage, up to 0.01x the current audience count;
             // increased by 50% per Pity Star (P) equipped.
             int32_t sp_regen = Min(atk * 10, current_audience);
             sp_regen = sp_regen * (target->badges_equipped.simplifier + 2) / 2;
             
-            *reinterpret_cast<int32_t*>(audience_work_base + 0x137c4) += sp_regen;
+            audience_work.impending_star_power += sp_regen;
         }
     }
     
@@ -1029,6 +1026,73 @@ void CalculateCounterDamage(
         uint32_t unk0 = 0U;
         cw->total_damage = ttyd::battle_damage::BattleCalculateDamage(
             target, attacker, attacker_part, weapon, &unk0, 0x20000U);
+    }
+}
+
+// Replaces the original TTYD logic in BattleAudience_ApRecoveryBuild.
+void ApplyAttackSuccessBonuses(SpBonusInfo* bonus_info) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto& audience_work = battleWork->audience_work;
+    auto& bingo_work = battleWork->bingo_work;
+
+    // Don't give SP or bingo card bonuses for First Strikes.
+    if (battleWork->turn_count < 1) return;
+
+    if (!audience_work.impending_bonus_info) {
+        audience_work.impending_bonus_info =
+            (SpBonusInfo*)ttyd::battle::BattleAlloc(sizeof(SpBonusInfo));
+    }
+    memcpy(audience_work.impending_bonus_info, bonus_info, sizeof(SpBonusInfo));
+
+    BattleWorkUnit* mario = ttyd::battle::BattleGetMarioPtr(battleWork);
+    BattleWorkUnit* party = ttyd::battle::BattleGetPartyPtr(battleWork);
+    
+    // Calculate the square root of the audience value used for attacks.
+    float total_audience_value = 0.0f;
+    auto* audience_kind_tbl = ttyd::battle_audience_kind_data::audience_kind;
+    for (int32_t i = 0; i < 13; ++i) {
+        total_audience_value += 
+            ttyd::battle_audience::BattleAudience_GetPPAudienceNumKind(i) * 
+            audience_kind_tbl[i].attack_sp_multiplier;
+    }
+    float sqrt_audience_value = ttyd::_core_sqrt(total_audience_value);
+    
+    // Multipliers for AC difficulty (if successful) / Stylish completion.
+    float ac_diff_multiplier = bonus_info->ac_success_multiplier;
+    float stylish_multiplier = bonus_info->stylish_multiplier;
+
+    // Multiplier of 1x if one of AC or Stylish was successful, 2x if both were.
+    float success_multiplier = 0.0f;
+    if (ac_diff_multiplier > 0) success_multiplier += 1.0f;
+    if (stylish_multiplier > 0) success_multiplier += 1.0f;
+
+    // Bonus multipliers are now additive instead of multiplicative.
+    float bonus_multiplier = 1.0f;
+    // Mario Danger/Peril adds 50%, 100% (slight nerf to original 2x, 3x).
+    if (mario->status_flags & BattleUnitStatus_Flags::IN_PERIL) {
+      bonus_multiplier += 1.0f;
+    } else if (mario->status_flags & BattleUnitStatus_Flags::IN_DANGER) {
+      bonus_multiplier += 0.5f;
+    }
+    // Partner Danger/Peril adds 50%, 100%.
+    if (party) {
+      if (party->status_flags & BattleUnitStatus_Flags::IN_PERIL) {
+          bonus_multiplier += 1.0f;
+      } else if (party->status_flags & BattleUnitStatus_Flags::IN_DANGER) {
+          bonus_multiplier += 0.5f;
+      }
+    }
+    // Having an active BINGO frenzy adds 100%, or 200% for Shine bingo.
+    if (bingo_work.active_bingo_turn_count > 0) {
+        bonus_multiplier += bingo_work.active_bingo_sp_multiplier - 1.0f;
+    }
+
+    audience_work.impending_star_power +=
+        sqrt_audience_value * (ac_diff_multiplier + stylish_multiplier)
+        * success_multiplier * bonus_multiplier;
+
+    if (ttyd::system::irand(100) < (uint32_t)bonus_info->bingo_slot_chance) {
+        ttyd::battle_break_slot::BattleBreakSlot_PointInc();
     }
 }
 
@@ -1298,16 +1362,14 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleAudience_SetTargetAmount_BH),
         reinterpret_cast<void*>(StartSetTargetAudienceCount),
         reinterpret_cast<void*>(BranchBackSetTargetAudienceCount));
-        
-    // Apply the option to change the amount of SP regained from attacks.
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_BattleAudience_ApRecoveryBuild_NoBingoRegen_BH),
-        reinterpret_cast<void*>(StartApplySpRegenMultiplierNoBingo),
-        reinterpret_cast<void*>(BranchBackApplySpRegenMultiplierNoBingo));
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_BattleAudience_ApRecoveryBuild_BingoRegen_BH),
-        reinterpret_cast<void*>(StartApplySpRegenMultiplierBingo),
-        reinterpret_cast<void*>(BranchBackApplySpRegenMultiplierBingo));
+
+    // Replace the logic for applying attack SP / Bingo card bonuses.
+    g_BattleAudience_ApRecoveryBuild_trampoline = patch::hookFunction(
+        ttyd::battle_audience::BattleAudience_ApRecoveryBuild,
+        [](SpBonusInfo* bonus_info) {
+            // Replaces vanilla logic completely.
+            ApplyAttackSuccessBonuses(bonus_info);
+        });
         
     // Disable stored EXP at all levels.
     g_BattleStoreExp_trampoline = patch::hookFunction(
@@ -1410,9 +1472,8 @@ void SetTargetAudienceAmount() {
     float target_amount = floor * 2.0f + 5.0f;
     if (target_amount > 200.f) target_amount = 200.f;
     
-    uintptr_t audience_work_base =
-        reinterpret_cast<uintptr_t>(ttyd::battle::g_BattleWork->audience_work);
-    *reinterpret_cast<float*>(audience_work_base + 0x13778) = target_amount;
+    auto& audience_work = ttyd::battle::g_BattleWork->audience_work;
+    audience_work.base_target_audience = target_amount;
 }
 
 double ApplySpRegenMultiplier(double base_regen) {
