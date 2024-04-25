@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_generate_item.h"
+#include "tot_generate_reward.h"
 #include "tot_manager_move.h"
 #include "tot_state.h"
 
@@ -165,10 +166,8 @@ EVT_DEFINE_USER_FUNC(evtTot_GetKissThiefResult) {
         item = PickRandomItem(RNG_STOLEN_ITEM, 20, 10, 10, 60);
         if (!item) item = ItemType::COIN;
     }
-    if ((ac_result & 2) == 0 || item == ItemType::STAR_PIECE ||
-        !ttyd::mario_pouch::pouchGetItem(item)) {
-        // Action command unsuccessful, item = Star Piece (can't be stolen),
-        // or the player's inventory cannot hold the item.
+    if ((ac_result & 2) == 0 || !ttyd::mario_pouch::pouchGetItem(item)) {
+        // Action command unsuccessful, or out of inventory space for the item.
         evtSetValue(evt, evt->evtArguments[1], 0);
     } else {
         // Remove the unit's held item.
@@ -963,6 +962,14 @@ EVT_BEGIN(partyChuchurinaAttack_ItemSteal)
         WAIT_FRM(4)
         USER_FUNC(btlevtcmd_AnnounceSetParam, 0, LW(14))
         USER_FUNC(btlevtcmd_AnnounceMessage, 1, 0, 0, PTR("btl_msg_steal_item_get"), 90)
+        // If a Star Piece was stolen, award the player a move rank-up.
+        IF_EQUAL(LW(14), (int32_t)ItemType::STAR_PIECE)
+            USER_FUNC(evtTot_RankUpRandomMoveInBattle, LW(14))
+            IF_NOT_EQUAL(LW(14), 0)
+                WAIT_FRM(5)
+                USER_FUNC(btlevtcmd_AnnounceMessage, 2, 0, 0, LW(14), 120)
+            END_IF()
+        END_IF()
         USER_FUNC(btlevtcmd_BtlIconDelete, LW(8))
     ELSE()
         USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0))
@@ -1999,9 +2006,8 @@ BattleWeapon customWeapon_MowzKissThief = {
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        // Removed Hammer-like range check.
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        AttackTargetProperty_Flags::ONLY_FRONT,
+        // Can now target any enemy, not just front ground-level one.
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0x14,
     .weapon_ac_level = 3,

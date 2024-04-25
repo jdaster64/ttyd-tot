@@ -433,6 +433,9 @@ g_StringMap = {
             
         b"tot_reward_upgrademove":
             b"<system>\n<p>\n%s's max level\nwent up by 1!\n<k>",
+            
+        b"tot_reward_upgrademove_inbattle":
+            b"<col c00000ff>\n%s</col>\n's max level\nwent up by 1!",
         
         b"tot_reward_fullrecovery":
             b"<system>\n<p>\nYour party fully recovered!\n<k>",

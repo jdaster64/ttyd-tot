@@ -22,6 +22,7 @@
 #include <ttyd/battle_damage.h>
 #include <ttyd/battle_disp.h>
 #include <ttyd/battle_event_cmd.h>
+#include <ttyd/battle_message.h>
 #include <ttyd/battle_seq_command.h>
 #include <ttyd/battle_status_effect.h>
 #include <ttyd/battle_sub.h>
@@ -36,6 +37,7 @@
 #include <ttyd/system.h>
 
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 
 // Assembly patch functions.
@@ -150,6 +152,7 @@ extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
 extern void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*);
+extern int32_t (*g_btlevtcmd_AnnounceMessage_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
 // Patch addresses.
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH;
@@ -1463,6 +1466,24 @@ void ApplyFixedPatches() {
             tot::MoveManager::ResetSelectedLevels();
             // Run vanilla logic.
             return g_BattleSetConfuseAct_trampoline(battleWork, unit);
+        });
+
+    // Display battle messages (add support for printing text directly).
+    g_btlevtcmd_AnnounceMessage_trampoline = patch::hookFunction(
+        ttyd::battle_message::btlevtcmd_AnnounceMessage,
+        [](EvtEntry* evt, bool isFirstCall) {
+            // Run original logic.
+            int32_t result = 
+                g_btlevtcmd_AnnounceMessage_trampoline(evt, isFirstCall);
+
+            // Replace string if using custom 'direct' mode.
+            int32_t mode = evtGetValue(evt, evt->evtArguments[0]);
+            if (mode == 2) {
+                sprintf(
+                    ttyd::battle::g_BattleWork->announce_msg_buf,
+                    (const char*)evtGetValue(evt, evt->evtArguments[3]));
+            }
+            return result;
         });
 }
 

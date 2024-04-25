@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_generate_item.h"
+#include "tot_generate_reward.h"
 #include "tot_manager_move.h"
 #include "tot_state.h"
 
@@ -108,8 +109,8 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEggLayItem) {
         item = PickRandomItem(RNG_STOLEN_ITEM, 20, 10, 10, 60);
         if (!item) item = ItemType::COIN;
     }
-    if (item == ItemType::STAR_PIECE || !ttyd::mario_pouch::pouchGetItem(item)) {
-        // Item = Star Piece (can't be stolen), or player's inventory is full.
+    if (!ttyd::mario_pouch::pouchGetItem(item)) {
+        // Player's inventory is full; grant a coin instead.
         evtSetValue(evt, evt->evtArguments[1], ItemType::COIN);
     } else {
         // Remove the corresponding held/stolen item from the NPC setup,
@@ -1555,6 +1556,14 @@ EVT_BEGIN(customAttack_Gulp)
     USER_FUNC(btlevtcmd_BtlIconEntryItemId, LW(14), LW(0), LW(1), LW(2), LW(8))
     USER_FUNC(btlevtcmd_AnnounceSetParam, 0, LW(14))
     USER_FUNC(btlevtcmd_AnnounceMessage, 1, 0, 0, PTR("btl_msg_steal_item_get"), 90)
+    // If a Star Piece was stolen, award the player a move rank-up.
+    IF_EQUAL(LW(14), (int32_t)ItemType::STAR_PIECE)
+        USER_FUNC(evtTot_RankUpRandomMoveInBattle, LW(14))
+        IF_NOT_EQUAL(LW(14), 0)
+            WAIT_FRM(5)
+            USER_FUNC(btlevtcmd_AnnounceMessage, 2, 0, 0, LW(14), 120)
+        END_IF()
+    END_IF()
     USER_FUNC(btlevtcmd_BtlIconDelete, LW(8))
     
     IF_NOT_EQUAL(LW(15), 0)

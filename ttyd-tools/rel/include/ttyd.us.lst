@@ -2571,7 +2571,7 @@
 
 // battle_message.o
 801abc10:btlevtcmd_AnnounceSetParam
-801abc70:_disp
+801abc70:battle_message_disp
 801abdd0:btlevtcmd_AnnounceMessage
 
 // eff_kemuri9_n64.o

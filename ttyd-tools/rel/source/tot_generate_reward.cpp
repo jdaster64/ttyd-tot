@@ -29,6 +29,8 @@
 #include <ttyd/party.h>
 #include <ttyd/swdrv.h>
 
+#include <cinttypes>
+#include <cstdio>
 #include <cstring>
 
 namespace mod::tot {
@@ -871,6 +873,29 @@ EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
     evtSetValue(evt, evt->evtArguments[3], g_Chests[idx].home_pos.z);
     evtSetValue(evt, evt->evtArguments[4], g_Chests[idx].item);
     evtSetValue(evt, evt->evtArguments[5], PTR(g_Chests[idx].pickup_script));
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_RankUpRandomMoveInBattle) {
+    static char buf[128] = { 0 };
+
+    SelectMoves(/* reward_type */ 0, /* is_upgrade_mode*/ 1);
+
+    if (g_NumMovesSelected > 0) {
+        // Upgrade first move selected.
+        MoveManager::UpgradeMove(g_MoveSelections[0]);
+
+        // Get message to display in-battle.
+        const char* move_name = ttyd::msgdrv::msgSearch(
+            MoveManager::GetMoveData(g_MoveSelections[0])->name_msg);
+        const char* msg = 
+            ttyd::msgdrv::msgSearch("tot_reward_upgrademove_inbattle");
+        sprintf(buf, msg, move_name);
+
+        evtSetValue(evt, evt->evtArguments[0], PTR(buf));
+    } else {
+        evtSetValue(evt, evt->evtArguments[0], 0);
+    }
     return 2;
 }
 

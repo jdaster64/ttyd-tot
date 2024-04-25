@@ -9,7 +9,7 @@ namespace ttyd::battle_message {
 extern "C" {
 
 EVT_DECLARE_USER_FUNC(btlevtcmd_AnnounceSetParam, 2)
-// _disp
+void battle_message_disp(void);
 EVT_DECLARE_USER_FUNC(btlevtcmd_AnnounceMessage, 5)
 
 }

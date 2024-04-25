@@ -529,9 +529,14 @@ struct BattleWork {
     int8_t          stage_object_work[0x7c * 32];
     BattleWorkStageHazards stage_hazard_work;
     int8_t          icon_work[0x9c * 16];
-    int8_t          unk_18c8c[0x114];
+
+    int16_t         announce_msg_width;     // ?
+    int16_t         announce_msg_height;    // ?
+    int32_t         announce_msg_item_type;
+    int8_t          unk_18c94[0xc];
+    char            announce_msg_buf[0x100];
+
     int8_t          status_change_msg_work[0x258];
-    
     int8_t          unk_18ff8;
     int8_t          impending_merlee_spell_type;
     uint16_t        unk_18ffa;  // frame counter for something in btlseqFirstAct

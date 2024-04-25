@@ -152,6 +152,8 @@ void (*g_BtlActRec_AddCount_trampoline)(uint8_t*) = nullptr;
 void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*) = nullptr;
 // battle_audience.o  801a5a0c
 void (*g_BattleAudienceSetThrowItemMax_trampoline)() = nullptr;
+// battle_message.o  801abdd0
+int32_t (*g_btlevtcmd_AnnounceMessage_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_enemy_item.o  801f9658
 void* (*g_BattleEnemyUseItemCheck_trampoline)(BattleWorkUnit*) = nullptr;
 // ac_button_down.o  80202164
