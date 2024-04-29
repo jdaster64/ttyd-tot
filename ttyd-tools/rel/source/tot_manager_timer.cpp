@@ -37,6 +37,8 @@ void TimerManager::Update() {
 void TimerManager::Draw() {
     auto& state = g_Mod->state_;
     if (!state.GetOption(OPT_RUN_STARTED)) return;
+    // If splits have been saved for final floor, don't show timer.
+    if (state.IsFinalBossFloor() && state.splits_rta_[state.floor_]) return;
     uint32_t color = ~0U;
     
     uint64_t time_ticks;

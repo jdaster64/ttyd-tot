@@ -570,8 +570,6 @@ void DispSelectionHelp(WinMgrEntry* entry) {
 }
 
 void DispOptionsWindowTopBar(WinMgrEntry* entry) {
-    // TODO: Non-hardcoded options-related strings, RTA time support.
-
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
         WinMgrEntry_Flags::IN_FADE) != 0) return;
@@ -597,18 +595,29 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
 
     text_pos.x = min_x;
     text_pos.y += space_y;
-    sprintf(text, "Options: ");
+    sprintf(text, "Difficulty: ");
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
-    sprintf(text, "Default");
+    switch (g_Mod->state_.GetOptionValue(OPT_DIFFICULTY)) {
+        case OPTVAL_DIFFICULTY_HALF:
+            sprintf(text, "32F");
+            break;
+        case OPTVAL_DIFFICULTY_FULL:
+            sprintf(text, "64F");
+            break;
+        case OPTVAL_DIFFICULTY_FULL_EX:
+            sprintf(text, "64F (EX)");
+            break;
+    }
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
 
     text_pos.x = min_x;
     text_pos.y += space_y;
-    sprintf(text, "Difficulty: ");
+    sprintf(text, "Options: ");
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
-    sprintf(text, "64-Floor");
+    // TODO: Actual options string.
+    sprintf(text, "Default");
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
 
     text_pos.x = max_x;
@@ -617,7 +626,14 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
         TimerManager::GetCurrentRunTotalTimeCentis(), text);
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
-    sprintf(text, "Total Time: ");
+    switch (g_Mod->state_.GetOptionValue(OPT_TIMER_DISPLAY)) {
+        case OPTVAL_TIMER_RTA:
+            sprintf(text, "RTA Time: ");
+            break;
+        default:
+            sprintf(text, "Total Time: ");
+            break;
+    }
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
 
@@ -627,7 +643,7 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
         TimerManager::GetCurrentRunTotalBattleTimeCentis(), text);
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
-    sprintf(text, "Battle Time: ");
+    sprintf(text, "In-Battle: ");
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
 
