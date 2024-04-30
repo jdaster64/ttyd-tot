@@ -1057,7 +1057,10 @@ g_StringMap = {
             b"Splits",
             
         b"tot_optr_turnsspent":         b"Total Turns Spent",
-        b"tot_optr_turnsmost":          b"Most Turns Spent",
+        b"tot_optr_turnsavg":           b"Average Turns",
+        b"tot_optr_turnsmost":          b"Most Turns",
+        b"tot_optr_battletimeavg":      b"Average Battle Time",
+        b"tot_optr_battletimemost":     b"Longest Battle",
         b"tot_optr_timesran":           b"Times Ran Away",
         b"tot_optr_enemydamage":        b"Damage Dealt",
         b"tot_optr_playerdamage":       b"Damage Taken",

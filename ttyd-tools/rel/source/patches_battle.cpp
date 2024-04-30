@@ -1478,7 +1478,7 @@ void ApplyFixedPatches() {
 
             // Replace string if using custom 'direct' mode.
             int32_t mode = evtGetValue(evt, evt->evtArguments[0]);
-            if (mode == 2) {
+            if (mode == 3) {
                 sprintf(
                     ttyd::battle::g_BattleWork->announce_msg_buf,
                     (const char*)evtGetValue(evt, evt->evtArguments[3]));

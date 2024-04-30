@@ -46,28 +46,38 @@ using ::ttyd::msgdrv::msgSearch;
 namespace IconType = ::ttyd::icondrv::IconType;
 
 struct OptionMenuData {
-    uint32_t    option;
+    int32_t     option;     // Either ToT state Options or WindowOptions.
     const char* name_msg;
     uint16_t    lookup_key;
     bool        in_run_options;
     bool        in_run_stats;
 };
 
+enum WindowOptions {
+    // All window-specific options should have negative values.
+    WIN_STAT_RUN_AVG_TURNS = -100000,
+    WIN_STAT_RUN_AVG_BATTLE_TIME,
+    WIN_STAT_RUN_MOST_BATTLE_TIME,
+};
+
 OptionMenuData g_OptionMenuData[] = {
     { STAT_RUN_TURNS_SPENT, "tot_optr_turnsspent", 1, false, true },
-    { STAT_RUN_MOST_TURNS_RECORD, "tot_optr_turnsmost", 2, false, true },
-    { STAT_RUN_TIMES_RAN_AWAY, "tot_optr_timesran", 4, false, true },
-    { STAT_RUN_ENEMY_DAMAGE, "tot_optr_enemydamage", 5, false, true },
-    { STAT_RUN_PLAYER_DAMAGE, "tot_optr_playerdamage", 6, false, true },
-    { STAT_RUN_ITEMS_USED, "tot_optr_itemsused", 7, false, true },
-    { STAT_RUN_SHINE_SPRITES, "tot_optr_shinesprites", 8, false, true },
-    { STAT_RUN_STAR_PIECES, "tot_optr_starpieces", 9, false, true },
-    { STAT_RUN_COINS_EARNED, "tot_optr_coinsearned", 10, false, true },
-    { STAT_RUN_COINS_SPENT, "tot_optr_coinsspent", 11, false, true },
-    { STAT_RUN_FP_SPENT, "tot_optr_fpspent", 12, false, true },
-    { STAT_RUN_SP_SPENT, "tot_optr_spspent", 13, false, true },
-    { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", 14, false, true },
-    { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", 15, false, true },
+    { WIN_STAT_RUN_AVG_TURNS, "tot_optr_turnsavg", 2, false, true },
+    { WIN_STAT_RUN_AVG_BATTLE_TIME, "tot_optr_battletimeavg", 3, false, true },
+    { STAT_RUN_MOST_TURNS_RECORD, "tot_optr_turnsmost", 4, false, true },
+    { WIN_STAT_RUN_MOST_BATTLE_TIME, "tot_optr_battletimemost", 5, false, true },
+    { STAT_RUN_TIMES_RAN_AWAY, "tot_optr_timesran", 6, false, true },
+    { STAT_RUN_ENEMY_DAMAGE, "tot_optr_enemydamage", 7, false, true },
+    { STAT_RUN_PLAYER_DAMAGE, "tot_optr_playerdamage", 8, false, true },
+    { STAT_RUN_ITEMS_USED, "tot_optr_itemsused", 9, false, true },
+    { STAT_RUN_SHINE_SPRITES, "tot_optr_shinesprites", 10, false, true },
+    { STAT_RUN_STAR_PIECES, "tot_optr_starpieces", 11, false, true },
+    { STAT_RUN_COINS_EARNED, "tot_optr_coinsearned", 12, false, true },
+    { STAT_RUN_COINS_SPENT, "tot_optr_coinsspent", 13, false, true },
+    { STAT_RUN_FP_SPENT, "tot_optr_fpspent", 14, false, true },
+    { STAT_RUN_SP_SPENT, "tot_optr_spspent", 15, false, true },
+    { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", 16, false, true },
+    { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", 17, false, true },
 };
 
 const char* OptionName(uint16_t lookup_key) {
@@ -82,9 +92,12 @@ const char* OptionName(uint16_t lookup_key) {
 
 const char* OptionValue(uint16_t lookup_key) {
     static char buf[32];
-    // Set to empty string by default.
+    // Set to empty string every invocation, by default.
     buf[0] = 0;
-    uint32_t option = 0;
+
+    const auto& state = g_Mod->state_;
+    
+    int32_t option = 0;
     for (const auto& data : g_OptionMenuData) {
         if (data.lookup_key == lookup_key) {
             option = data.option;
@@ -92,20 +105,74 @@ const char* OptionValue(uint16_t lookup_key) {
         }
     }
     switch (option) {
+        case WIN_STAT_RUN_AVG_BATTLE_TIME: {
+            int32_t total_time_centis = 0;
+            int32_t battles = 0;
+            for (int32_t i = 0; i <= 64; ++i) {
+                const int32_t floor_time = state.splits_battle_igt_[i];
+                if (floor_time > 0) {
+                    total_time_centis += floor_time;
+                    ++battles;
+                }
+            }
+            if (battles == 0) battles = 1;
+            total_time_centis /= battles;
+            // Print only minutes and seconds, up to 1000 minutes.
+            constexpr const int32_t kMaxLongestBattleTime = 1000 * 60 * 100;
+            if (total_time_centis >= kMaxLongestBattleTime) { 
+                total_time_centis = kMaxLongestBattleTime - 1;
+            }
+            const int32_t s = (total_time_centis / 100) % 60;
+            const int32_t m = (total_time_centis / (60 * 100));
+            sprintf(buf, "%" PRId32 ":%02" PRId32, m, s);
+            break;
+        }
+        case WIN_STAT_RUN_MOST_BATTLE_TIME: {
+            int32_t max_time_centis = 0;
+            int32_t floor = 0;
+            for (int32_t i = 0; i <= 64; ++i) {
+                const int32_t floor_time = state.splits_battle_igt_[i];
+                if (floor_time > max_time_centis) {
+                    max_time_centis = floor_time;
+                    floor = i;
+                }
+            }
+            // Print only minutes and seconds, up to 1000 minutes.
+            constexpr const int32_t kMaxLongestBattleTime = 1000 * 60 * 100;
+            if (max_time_centis >= kMaxLongestBattleTime) { 
+                max_time_centis = kMaxLongestBattleTime - 1;
+            }
+            const int32_t s = (max_time_centis / 100) % 60;
+            const int32_t m = (max_time_centis / (60 * 100));
+            sprintf(buf, 
+                "%" PRId32 ":%02" PRId32 " (Fl. %" PRId32 ")", 
+                m, s, floor);
+            break;
+        }
+        case WIN_STAT_RUN_AVG_TURNS: {
+            int32_t turns = state.GetOption(STAT_RUN_TURNS_SPENT);
+            int32_t battles = 0;
+            for (int32_t i = 0; i <= 64; ++i) {
+                if (state.splits_battle_igt_[i] > 0) ++battles;
+            }
+            if (battles == 0) battles = 1;
+            sprintf(buf, "%.02f", static_cast<float>(turns) / battles);
+            break;
+        }
         case STAT_RUN_MOST_TURNS_RECORD: {
-            int32_t most = g_Mod->state_.GetOption(STAT_RUN_MOST_TURNS_RECORD);
-            int32_t floor = g_Mod->state_.GetOption(STAT_RUN_MOST_TURNS_FLOOR);
-            sprintf(buf, "%" PRId32 " (Floor %" PRId32 ")", most, floor);
+            int32_t most = state.GetOption(STAT_RUN_MOST_TURNS_RECORD);
+            int32_t floor = state.GetOption(STAT_RUN_MOST_TURNS_FLOOR);
+            sprintf(buf, "%" PRId32 " (Fl. %" PRId32 ")", most, floor);
             break;
         }
         case STAT_RUN_CONDITIONS_MET: {
-            int32_t met = g_Mod->state_.GetOption(STAT_RUN_CONDITIONS_MET);
-            int32_t total = g_Mod->state_.GetOption(STAT_RUN_CONDITIONS_TOTAL);
+            int32_t met = state.GetOption(STAT_RUN_CONDITIONS_MET);
+            int32_t total = state.GetOption(STAT_RUN_CONDITIONS_TOTAL);
             sprintf(buf, "%" PRId32 " / %" PRId32, met, total);
             break;
         }
         default: {
-            int32_t val = g_Mod->state_.GetOption(option);
+            int32_t val = state.GetOption(option);
             IntegerToFmtString(val, buf);
             break;
         }
