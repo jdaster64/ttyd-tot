@@ -946,6 +946,7 @@
 
 // pmario_sound.o
 800d9848:psndSFXOn_3D
+800d98bc:psndSFXOn
 800daf24:psndBGMOn_f_d
 800dc214:psndStopAllFadeOut
 

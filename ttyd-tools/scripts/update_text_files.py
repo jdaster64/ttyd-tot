@@ -801,6 +801,27 @@ g_StringMap = {
         b"msg_kuri_map":
             b"Placeholder area tattle \xd0\n<k>",
             
+        # Run options menu.
+            
+        b"tot_winsel_runoptions_header":    b"Options",
+        
+        b"tot_optr_difficulty":         b"Difficulty:",
+        b"tot_optr_diff_half":          b"Half (32 floors)",
+        b"tot_optr_diff_full":          b"Full (64 floors)",
+        b"tot_optr_diff_ex":            b"EX (64 floors)",
+        b"tot_optr_timertype":          b"Timer Display:",
+        b"tot_optr_timer_none":         b"None",
+        b"tot_optr_timer_igt":          b"In-Game Time",
+        b"tot_optr_timer_rta":          b"Real-Time",
+        
+        b"tot_opth_difficulty":
+            b"Determines how many floors\n"
+            b"tall the tower will be.",
+        
+        b"tot_opth_timertype":
+            b"Whether to show IGT, RTA,\n"
+            b"or no timer during the run.",
+            
         # Map text.
         
         b"tot_lobby_frontsign":

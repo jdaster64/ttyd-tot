@@ -22,6 +22,8 @@ namespace MenuType {
         MOVE_UPGRADE,
         // Charlieton.
         TOT_CHARLIETON_SHOP,
+        // Run options menu (in lobby):
+        RUN_OPTIONS,
         // Run results: general stats.
         RUN_RESULTS_STATS,
         // Run results: timer splits.

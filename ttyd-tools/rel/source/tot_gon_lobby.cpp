@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
+#include "tot_window_select.h"
 
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/database.h>
@@ -73,15 +74,8 @@ EVT_END()
 EVT_BEGIN(Lobby_FrontSignEvt)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_normalize)
-    
-    USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_frontsign"), 0, 0)
-    
-    // "Shrink Smash" window test
-    // USER_FUNC(evt_win_other_select, 19)
-    // USER_FUNC(
-        // evt_msg_print_insert, 0, PTR("zz_test_win_select"), 0, 0,
-        // LW(1), LW(2), LW(3), LW(4))
-
+    // Pull up 'run options' dialog.
+    USER_FUNC(evt_win_other_select, window_select::MenuType::RUN_OPTIONS)
     USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()

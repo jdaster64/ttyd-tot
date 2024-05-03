@@ -266,7 +266,7 @@ enum Options : uint32_t {
     OPTVAL_PRESET_DEFAULT       = 0x500'2'00'01,
     // Reserved: OPTVAL_PRESET_RACE, possibly another?
     // Tower difficulty.
-    OPT_DIFFICULTY              = 0x402'2'00'03,
+    OPT_DIFFICULTY              = 0x402'2'01'03,
     OPTVAL_DIFFICULTY_TUTORIAL  = 0x502'2'00'00,
     OPTVAL_DIFFICULTY_HALF      = 0x502'2'00'01,
     OPTVAL_DIFFICULTY_FULL      = 0x502'2'00'02,

@@ -19,7 +19,9 @@
 #include <ttyd/mariost.h>
 #include <ttyd/memory.h>
 #include <ttyd/msgdrv.h>
+#include <ttyd/pmario_sound.h>
 #include <ttyd/statuswindow.h>
+#include <ttyd/system.h>
 #include <ttyd/win_main.h>
 #include <ttyd/winmgr.h>
 #include <ttyd/gx/GXPixel.h>
@@ -48,6 +50,7 @@ namespace IconType = ::ttyd::icondrv::IconType;
 struct OptionMenuData {
     int32_t     option;     // Either ToT state Options or WindowOptions.
     const char* name_msg;
+    const char* help_msg;
     uint16_t    lookup_key;
     bool        in_run_options;
     bool        in_run_stats;
@@ -61,24 +64,42 @@ enum WindowOptions {
 };
 
 OptionMenuData g_OptionMenuData[] = {
-    { STAT_RUN_TURNS_SPENT, "tot_optr_turnsspent", 1, false, true },
-    { WIN_STAT_RUN_AVG_TURNS, "tot_optr_turnsavg", 2, false, true },
-    { WIN_STAT_RUN_AVG_BATTLE_TIME, "tot_optr_battletimeavg", 3, false, true },
-    { STAT_RUN_MOST_TURNS_RECORD, "tot_optr_turnsmost", 4, false, true },
-    { WIN_STAT_RUN_MOST_BATTLE_TIME, "tot_optr_battletimemost", 5, false, true },
-    { STAT_RUN_TIMES_RAN_AWAY, "tot_optr_timesran", 6, false, true },
-    { STAT_RUN_ENEMY_DAMAGE, "tot_optr_enemydamage", 7, false, true },
-    { STAT_RUN_PLAYER_DAMAGE, "tot_optr_playerdamage", 8, false, true },
-    { STAT_RUN_ITEMS_USED, "tot_optr_itemsused", 9, false, true },
-    { STAT_RUN_SHINE_SPRITES, "tot_optr_shinesprites", 10, false, true },
-    { STAT_RUN_STAR_PIECES, "tot_optr_starpieces", 11, false, true },
-    { STAT_RUN_COINS_EARNED, "tot_optr_coinsearned", 12, false, true },
-    { STAT_RUN_COINS_SPENT, "tot_optr_coinsspent", 13, false, true },
-    { STAT_RUN_FP_SPENT, "tot_optr_fpspent", 14, false, true },
-    { STAT_RUN_SP_SPENT, "tot_optr_spspent", 15, false, true },
-    { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", 16, false, true },
-    { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", 17, false, true },
+    { STAT_RUN_TURNS_SPENT, "tot_optr_turnsspent", nullptr, 1, false, true },
+    { WIN_STAT_RUN_AVG_TURNS, "tot_optr_turnsavg", nullptr, 2, false, true },
+    { WIN_STAT_RUN_AVG_BATTLE_TIME, "tot_optr_battletimeavg", nullptr, 3, false, true },
+    { STAT_RUN_MOST_TURNS_RECORD, "tot_optr_turnsmost", nullptr, 4, false, true },
+    { WIN_STAT_RUN_MOST_BATTLE_TIME, "tot_optr_battletimemost", nullptr, 5, false, true },
+    { STAT_RUN_TIMES_RAN_AWAY, "tot_optr_timesran", nullptr, 6, false, true },
+    { STAT_RUN_ENEMY_DAMAGE, "tot_optr_enemydamage", nullptr, 7, false, true },
+    { STAT_RUN_PLAYER_DAMAGE, "tot_optr_playerdamage", nullptr, 8, false, true },
+    { STAT_RUN_ITEMS_USED, "tot_optr_itemsused", nullptr, 9, false, true },
+    { STAT_RUN_SHINE_SPRITES, "tot_optr_shinesprites", nullptr, 10, false, true },
+    { STAT_RUN_STAR_PIECES, "tot_optr_starpieces", nullptr, 11, false, true },
+    { STAT_RUN_COINS_EARNED, "tot_optr_coinsearned", nullptr, 12, false, true },
+    { STAT_RUN_COINS_SPENT, "tot_optr_coinsspent", nullptr, 13, false, true },
+    { STAT_RUN_FP_SPENT, "tot_optr_fpspent", nullptr, 14, false, true },
+    { STAT_RUN_SP_SPENT, "tot_optr_spspent", nullptr, 15, false, true },
+    { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", nullptr, 16, false, true },
+    { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", nullptr, 17, false, true },
+    { OPT_DIFFICULTY, "tot_optr_difficulty", "tot_opth_difficulty", 18, true, false },
+    { OPTVAL_DIFFICULTY_TUTORIAL, "tot_optr_diff_tutorial", nullptr, 19, false, false },
+    { OPTVAL_DIFFICULTY_HALF, "tot_optr_diff_half", nullptr, 20, false, false },
+    { OPTVAL_DIFFICULTY_FULL, "tot_optr_diff_full", nullptr, 21, false, false },
+    { OPTVAL_DIFFICULTY_FULL_EX, "tot_optr_diff_ex", nullptr, 22, false, false },
+    { OPT_TIMER_DISPLAY, "tot_optr_timertype", "tot_opth_timertype", 23, true, false },
+    { OPTVAL_TIMER_NONE, "tot_optr_timer_none", nullptr, 24, false, false },
+    { OPTVAL_TIMER_IGT, "tot_optr_timer_igt", nullptr, 25, false, false },
+    { OPTVAL_TIMER_RTA, "tot_optr_timer_rta", nullptr, 26, false, false },
 };
+
+uint32_t OptionLookup(uint16_t lookup_key) {
+    for (const auto& data : g_OptionMenuData) {
+        if (data.lookup_key == lookup_key) {
+            return data.option;
+        }
+    }
+    return -1;
+}
 
 const char* OptionName(uint16_t lookup_key) {
     for (const auto& data : g_OptionMenuData) {
@@ -98,12 +119,29 @@ const char* OptionValue(uint16_t lookup_key) {
     const auto& state = g_Mod->state_;
     
     int32_t option = 0;
+    int32_t option_index = 0;
     for (const auto& data : g_OptionMenuData) {
         if (data.lookup_key == lookup_key) {
             option = data.option;
             break;
         }
+        ++option_index;
     }
+
+    // For run options, get the string representation instead, if applicable.
+    if (option && g_OptionMenuData[option_index].in_run_options) {
+        int32_t option_value = g_Mod->state_.GetOptionValue(option);
+        if (option_value > 0) {
+            constexpr const int32_t num_options =
+                sizeof(g_OptionMenuData) / sizeof(OptionMenuData);
+            for (int32_t i = option_index + 1; i < num_options; ++i) {
+                if (option_value == g_OptionMenuData[i].option) {
+                    return msgSearch(g_OptionMenuData[i].name_msg);
+                }
+            }
+        }
+    }
+
     switch (option) {
         case WIN_STAT_RUN_AVG_BATTLE_TIME: {
             int32_t total_time_centis = 0;
@@ -184,8 +222,35 @@ const char* OptionValue(uint16_t lookup_key) {
 }
 
 void SelectMainOptionsWrapper(WinMgrEntry* entry) {
+    auto* sel_entry = (WinMgrSelectEntry*)entry->param;
+
+    // Handle special inputs for run options window.
+    if (sel_entry->type == MenuType::RUN_OPTIONS) {
+        // Incredibly hacky: Replace A presses with B presses.
+        if (g_MarioSt->gamepad_buttons_pressed[0] & ButtonId::A) {
+            g_MarioSt->gamepad_buttons_pressed[0] &= ~ButtonId::A;
+            g_MarioSt->gamepad_buttons_pressed[0] |= ButtonId::B;
+        }
+        // Handle left/right presses (changing option).
+        uint16_t dir_rep = ttyd::system::keyGetDirRep(0);
+        int32_t change = 0;
+        if (dir_rep & DirectionInputId::ANALOG_LEFT) {
+            --change;
+        } else if (dir_rep & DirectionInputId::ANALOG_RIGHT) {
+            ++change;
+        }
+        if (change) {
+            int32_t value = sel_entry->row_data[sel_entry->cursor_index].value;
+            uint32_t option = OptionLookup(value);
+            if (g_Mod->state_.ChangeOption(option, change)) {
+                ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+            }
+        }
+    }
+
     // Run vanilla selection main function.
     select_main(entry);
+
     // Force status window to be closed.
     ttyd::statuswindow::statusWinForceOff();
 }
@@ -201,9 +266,11 @@ void DispTimerSplits(WinMgrEntry* entry) {
     float y_min = entry->y - entry->height + 30.f;
     float y_max = entry->y - 25.f;
 
-    // TODO: Allow for toggling between IGT and RTA main splits.
-    uint32_t* main_splits = g_Mod->state_.splits_igt_;
     uint32_t* battle_splits = g_Mod->state_.splits_battle_igt_;
+    uint32_t* main_splits = g_Mod->state_.splits_igt_;
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_TIMER_RTA)) {
+        main_splits = g_Mod->state_.splits_rta_;
+    }
 
     // Get the maximum time, rounded up to the nearest half-minute.
     uint32_t max_time = 0;
@@ -344,6 +411,11 @@ void DispMainWindow(WinMgrEntry* entry) {
                         max_width -= 13.f;
                     break;
                 }
+                case MenuType::RUN_OPTIONS: {
+                    entry_text = OptionName(row.value);
+                    max_width = 200.f;
+                    break;
+                }
                 case MenuType::RUN_RESULTS_STATS: {
                     entry_text = OptionName(row.value);
                     max_width = 300.f;
@@ -431,9 +503,18 @@ void DispMainWindow(WinMgrEntry* entry) {
                 
                 break;
             }
+            case MenuType::RUN_OPTIONS:
             case MenuType::RUN_RESULTS_STATS: {
                 // Draw the value / string representation of the stat.
                 const char* stat_text = OptionValue(row.value);
+
+                // Options has longer option strings, is centered.
+                const float length_factor =
+                    sel_entry->type == MenuType::RUN_OPTIONS ? 0.5f : 1.0f;
+                const int32_t max_length =
+                    sel_entry->type == MenuType::RUN_OPTIONS ? 220 : 140;
+                const int32_t offset =
+                    sel_entry->type == MenuType::RUN_OPTIONS ? 130 : 20;
 
                 if (stat_text) {
                     ttyd::win_main::winFontInit();
@@ -441,9 +522,9 @@ void DispMainWindow(WinMgrEntry* entry) {
                     int32_t length = 
                         ttyd::fontmgr::FontGetMessageWidth(stat_text);
                     float x_scale = 1.0f;
-                    if (length > 140) {
-                        x_scale = 140.0f / length;
-                        length = 140;
+                    if (length > max_length) {
+                        x_scale = static_cast<float>(max_length) / length;
+                        length = max_length;
                     }
                     
                     uint32_t* text_color;
@@ -453,7 +534,7 @@ void DispMainWindow(WinMgrEntry* entry) {
                         text_color = &kBlack;
                     }
                     gc::vec3 text_pos = {
-                        entry->x + entry->width - 20.0f - length,
+                        entry->x + entry->width - offset - length * length_factor,
                         y_trans + 12.0f,
                         0.0f
                     };
@@ -489,6 +570,9 @@ void DispMainWindow(WinMgrEntry* entry) {
         case MenuType::MOVE_UNLOCK:
         case MenuType::MOVE_UPGRADE:
             title = msgSearch("tot_winsel_titlemove");
+            break;
+        case MenuType::RUN_OPTIONS:
+            title = msgSearch("tot_winsel_runoptions_header");
             break;
         case MenuType::RUN_RESULTS_STATS:
             title = msgSearch("tot_winsel_runresults_header");
@@ -630,6 +714,16 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                 help_msg = msgSearch(
                     MoveManager::GetMoveData(value)->upgrade_msg);
                 break;
+            case MenuType::RUN_OPTIONS: {
+                help_msg = "No option selected.";
+                for (const auto& data : g_OptionMenuData) {
+                    if (data.lookup_key == value) {
+                        help_msg = msgSearch(data.help_msg);
+                        break;
+                    }
+                }
+                break;
+            }
         }
         entry->help_msg = help_msg;
         winMgrHelpDraw(entry);
@@ -725,12 +819,11 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
 }
 
 void DispOptionsWindowBottomBar(WinMgrEntry* entry) {
-    // In the future: slightly different variants for different windows?
-
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
         WinMgrEntry_Flags::IN_FADE) != 0) return;
 
+    bool kIsOptions = sel_entry->type == MenuType::RUN_OPTIONS;
     uint32_t kBlack = 0x0000'00FFU;
     uint32_t kWhite = 0xFFFF'FFFFU;
     const float kContinueOffset = 0.17f;
@@ -738,7 +831,7 @@ void DispOptionsWindowBottomBar(WinMgrEntry* entry) {
 
     ttyd::fontmgr::FontDrawStart();
 
-    const char* msg = "Continue";
+    const char* msg = kIsOptions ? "Selection" : "Continue";
     int32_t length = ttyd::fontmgr::FontGetMessageWidth(msg);
     gc::vec3 text_pos = {
         entry->x + entry->width * (kContinueOffset + 0.22f) - length * 0.5f,
@@ -761,7 +854,9 @@ void DispOptionsWindowBottomBar(WinMgrEntry* entry) {
         0.0f
     };
     gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
-    ttyd::win_main::winIconSet(IconType::A_BUTTON, &pos, &scale, &kWhite);
+    ttyd::win_main::winIconSet(
+        kIsOptions ? IconType::CONTROL_STICK_CENTER : IconType::A_BUTTON, 
+        &pos, &scale, &kWhite);
 
     pos.x = entry->x + entry->width * kBackOffset;
     ttyd::win_main::winIconSet(IconType::B_BUTTON, &pos, &scale, &kWhite);
@@ -807,7 +902,44 @@ WinMgrDesc g_CustomDescs[] = {
         .main_func = (void*)select_main3,
         .disp_func = (void*)DispSelectionHelp,
     },
-    // Descs 3-5: "stats" / "options"-like windows. (WIP)
+    // Descs 3-5: Run options windows.
+    {
+        .fade_mode = WinMgrDesc_FadeMode::SCALE_AND_ROTATE,
+        .heading_type = WinMgrDesc_HeadingType::SINGLE_CENTERED,
+        .camera_id = (int32_t)CameraId::k2d,
+        .x = -250,
+        .y = 135,
+        .width = 500,
+        .height = 240,
+        .color = 0xFFFFFFFFU,
+        .main_func = (void*)SelectMainOptionsWrapper,
+        .disp_func = (void*)DispMainWindow,
+    },
+    {
+        .fade_mode = WinMgrDesc_FadeMode::INSTANT,
+        .heading_type = WinMgrDesc_HeadingType::NONE,
+        .camera_id = (int32_t)CameraId::k2d,
+        .x = -200,
+        .y = 200,
+        .width = 400,
+        .height = 45,
+        .color = 0xC4ECF2FFU,
+        .main_func = nullptr,
+        .disp_func = (void*)DispOptionsWindowBottomBar,
+    },
+    {
+        .fade_mode = WinMgrDesc_FadeMode::INSTANT,
+        .heading_type = WinMgrDesc_HeadingType::NONE,
+        .camera_id = (int32_t)CameraId::k2d,
+        .x = -240,
+        .y = -130,
+        .width = 500,
+        .height = 80,
+        .color = 0xFFFFFFFFU,
+        .main_func = (void*)select_main3,
+        .disp_func = (void*)DispSelectionHelp,
+    },
+    // Descs 6-8: Run stats windows.
     {
         .fade_mode = WinMgrDesc_FadeMode::SCALE_AND_ROTATE,
         .heading_type = WinMgrDesc_HeadingType::SINGLE_CENTERED,
@@ -866,11 +998,14 @@ void* InitNewSelectDescTable() {
     g_SelectDescList[MenuType::TOT_CHARLIETON_SHOP] = WinMgrSelectDescList{ 
         .num_descs = 3, .descs = &g_CustomDescs[0] 
     };
-    g_SelectDescList[MenuType::RUN_RESULTS_STATS] = WinMgrSelectDescList{
+    g_SelectDescList[MenuType::RUN_OPTIONS] = WinMgrSelectDescList{
         .num_descs = 3, .descs = &g_CustomDescs[3]
     };
+    g_SelectDescList[MenuType::RUN_RESULTS_STATS] = WinMgrSelectDescList{
+        .num_descs = 3, .descs = &g_CustomDescs[6]
+    };
     g_SelectDescList[MenuType::RUN_RESULTS_SPLITS] = WinMgrSelectDescList{
-        .num_descs = 3, .descs = &g_CustomDescs[3]
+        .num_descs = 3, .descs = &g_CustomDescs[6]
     };
     return g_SelectDescList;
 }
@@ -896,7 +1031,9 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             break;
         case MenuType::CUSTOM_START:
         case MenuType::TOT_CHARLIETON_SHOP:
+        case MenuType::RUN_OPTIONS:
         case MenuType::RUN_RESULTS_STATS:
+        case MenuType::RUN_RESULTS_SPLITS:
         default:
             sel_entry->flags |= WinMgrSelectEntry_Flags::CANCELLABLE;
             break;
@@ -989,11 +1126,16 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             }
             break;
         }
+        case MenuType::RUN_OPTIONS:
         case MenuType::RUN_RESULTS_STATS: {
             // Assign options from g_OptionMenuData.
             int32_t num_options = 0;
             for (const auto& data : g_OptionMenuData) {
-                if (data.in_run_stats) ++num_options;
+                if (sel_entry->type == MenuType::RUN_OPTIONS) {
+                    if (data.in_run_options) ++num_options;
+                } else {
+                    if (data.in_run_stats) ++num_options;
+                }
             }
             sel_entry->num_rows = num_options;
             sel_entry->row_data =
@@ -1004,7 +1146,11 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
                 sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
             int32_t i = 0;
             for (const auto& data : g_OptionMenuData) {
-                if (!data.in_run_stats) continue;
+                if (sel_entry->type == MenuType::RUN_OPTIONS) {
+                    if (!data.in_run_options) continue;
+                } else {
+                    if (!data.in_run_stats) continue;
+                }
                 sel_entry->row_data[i].value = data.lookup_key;
                 ++i;
             }

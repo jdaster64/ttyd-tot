@@ -75,7 +75,9 @@ struct MarioSt_Globals {
     uint64_t    lastSaveTime;
     int32_t     saveCounter;
     int8_t      unk_11f4[0x134];
-    int8_t      misc_gamepad_related_1328[0xb0];
+    uint32_t    gamepad_buttons[4];
+    uint16_t    gamepad_buttons_pressed[4];
+    int8_t      misc_gamepad_related_1340[0x98];
 } ;
 
 static_assert(sizeof(MarioSt_Globals) == 0x13d8);

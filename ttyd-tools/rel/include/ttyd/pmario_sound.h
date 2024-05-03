@@ -25,7 +25,7 @@ extern "C" {
 // psndSFXOnEx_3D
 uint32_t psndSFXOn_3D(const char* id, gc::vec3* position);
 // psndSFXOnVol
-// psndSFXOn
+void psndSFXOn(const char* id);
 // psndSFXOn_
 // __psndSFXOn
 // psndSFXMain
