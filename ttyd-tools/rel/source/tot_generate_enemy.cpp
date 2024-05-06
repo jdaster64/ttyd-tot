@@ -1182,9 +1182,11 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyStats) {
 }
 
 int32_t GetBattleRewardTier() {
-    // For midboss or boss floors, always return the maximum number.
     int32_t floor = g_Mod->state_.floor_;
+    // For midboss or boss floors, always return the maximum number.
     if (floor > 0 && floor % 8 == 0) return 3;
+    // For the starter floor, you only have one choice.
+    if (floor == 0) return 1;
     
     int32_t level_target_sum = kTargetLevelSums[GetDifficulty()];
     int32_t level_sum = 0;
@@ -1195,6 +1197,11 @@ int32_t GetBattleRewardTier() {
     level_sum *= 100;
     if (level_sum / level_target_sum >= 70) return 3;
     if (level_sum / level_target_sum >= 55) return 2;
+
+    // Always guarantee 2 choices on EX, even on shop floors.
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX))
+        return 2;
+
     return 1;
 }
 

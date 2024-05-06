@@ -852,11 +852,10 @@ EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
     };
     memset(g_Chests, 0, sizeof(g_Chests));
     
-    // Implicitly, will only provide one reward for floors with no enemies.
-    int32_t max_chests = GetBattleRewardTier();
+    int32_t num_chests = GetBattleRewardTier();
     
-    int32_t start_position = (max_chests == 2) ? 3 : 0;
-    for (int32_t i = 0; i < max_chests; ++i) {
+    int32_t start_position = (num_chests == 2) ? 3 : 0;
+    for (int32_t i = 0; i < num_chests; ++i) {
         g_Chests[i].home_pos = positions[start_position + i];
         g_Chests[i].item = REWARD_PLACEHOLDER;
     }
