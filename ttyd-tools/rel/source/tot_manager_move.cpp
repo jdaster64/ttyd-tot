@@ -105,7 +105,27 @@ const MoveData g_MoveData[] = {
 void MoveManager::Init() {
     // Set unlocked levels of moves.
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
-        int32_t default_level = g_MoveData[i].move_tier == 0 ? 1 : 0;
+        int32_t default_level = 0;
+        switch (i) {
+            case MoveType::JUMP_BASE:
+            case MoveType::HAMMER_BASE:
+            case MoveType::GOOMBELLA_BASE:
+            case MoveType::KOOPS_BASE:
+            case MoveType::FLURRIE_BASE:
+            case MoveType::YOSHI_BASE:
+            case MoveType::VIVIAN_BASE:
+            case MoveType::BOBBERY_BASE:
+            case MoveType::MOWZ_BASE:
+                // Base attacks start with 2 levels unlocked.
+                default_level = 2;
+                break;
+            case MoveType::GOOMBELLA_TATTLE:
+            case MoveType::SP_SWEET_TREAT:
+            case MoveType::SP_EARTH_TREMOR:
+                // Star Powers start with only first level unlocked.
+                default_level = 1;
+                break;
+        }
         g_Mod->state_.level_unlocked_[i] = default_level;
         g_Mod->state_.level_selected_[i] = default_level;
     }
