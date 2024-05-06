@@ -76,13 +76,13 @@ b 0
 
 # Override the ac difficulty check in BattleActionCommandCheckDefence.
 StartGetGuardDifficulty:
-# For whatever reason, pretty much all volatile registers are used here.
-stwu %sp, -0x90 (%sp)
-stmw %r3, 0x8 (%sp)
+stwu %sp, -0x10 (%sp)
+stw %r3, 0x8 (%sp)
+stw %r4, 0xc (%sp)
 bl getActionCommandDifficulty
-mr %r0, %r3
-lmw %r3, 0x8 (%sp)
-addi %sp, %sp, 0x90
-mr %r11, %r0
+mr %r11, %r3
+lwz %r3, 0x8 (%sp)
+lwz %r4, 0xc (%sp)
+addi %sp, %sp, 0x10
 BranchBackGetGuardDifficulty:
 b 0
