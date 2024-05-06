@@ -72,6 +72,10 @@ void ApplyMidbossStats(BattleWorkUnit* unit) {
         // Apply permanent Huge status.
         unit->size_change_strength = 1;
         unit->size_change_turns = 100;
+
+        // Change held item display offset to be more easily visible.
+        unit->held_item_base_offset.x *= 2;
+        unit->held_item_base_offset.y *= 2;
         
         // Apply "MIDBOSS" status so Huge status can be ended if necessary.
         unit->status_flags |= BattleUnitStatus_Flags::MIDBOSS;
