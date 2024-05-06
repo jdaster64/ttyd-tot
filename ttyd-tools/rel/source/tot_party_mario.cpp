@@ -13,11 +13,13 @@
 #include <ttyd/battle_mario.h>
 #include <ttyd/battle_seq_command.h>
 #include <ttyd/battle_unit.h>
+#include <ttyd/battle_unit_event.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
@@ -44,6 +46,9 @@ using ::ttyd::battle::BattleWorkCommand;
 using ::ttyd::battle::BattleWorkCommandCursor;
 using ::ttyd::battle_seq_command::_btlcmd_GetCursorPtr;
 using ::ttyd::battle_unit::BattleWorkUnit;
+using ::ttyd::evtmgr_cmd::evtGetFloat;
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::item_data::itemDataTable;
 using ::ttyd::mario_pouch::PouchData;
 using ::ttyd::msgdrv::msgSearch;
@@ -302,6 +307,31 @@ BattleWeapon* GetFirstAttackWeapon(int32_t attack_type) {
         case 8: return party_bobbery::GetFirstAttackWeapon();
     }
     return nullptr;
+}
+
+EVT_DECLARE_USER_FUNC(evtTot_CheckBombSquadHit, 2)
+EVT_DEFINE_USER_FUNC(evtTot_CheckBombSquadHit) {
+    float last_position = evtGetFloat(evt, evt->evtArguments[0]);
+    float cur_position = evtGetFloat(evt, evt->evtArguments[1]);
+    if (cur_position < last_position) {
+        float temp = cur_position;
+        cur_position = last_position;
+        last_position = temp;
+    }
+
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    for (int32_t i = 0; i < 64; ++i) {
+        auto* unit = battleWork->battle_units[i];
+        if (unit && unit->current_kind == BattleUnitType::BOMB_SQUAD_BOMB &&
+            unit->unit_work[2] < 2 &&   // Not Megaton bomb.
+            unit->position.x >= last_position &&
+            unit->position.x < cur_position) {
+            // Run explosion event.
+            ttyd::battle_unit_event::BattleRunHitEvent(unit, 0x717);
+        }
+    }
+
+    return 2;
 }
 
 EVT_BEGIN(marioAttackEvent_NormalJump)
@@ -3765,32 +3795,51 @@ EVT_BEGIN(marioAttackEvent_FireNaguri_object)
     USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(0))
     USER_FUNC(btlevtcmd_GetResultAC, LW(0))
+    SET(LW(14), 0)
     IF_FLAG(LW(0), 0x2)
         USER_FUNC(btlevtcmd_GetResultPrizeLv, -5, 0, LW(6))
         USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), 0, 50, 0)
         USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
         USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
+        SET(LW(14), 1)
     ELSE()
         USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
         USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
     END_IF()
     USER_FUNC(btlevtcmd_GetPartsPos, -2, 3, LW(7), LW(8), LW(9))
     USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, -1, -1, 2, LW(12))
-    MUL(LW(12), 16)
+    MUL(LW(12), 15)
     SET(LW(13), 5)
+
+    // Run concurrent evt that handles igniting Bomb Squad bombs.
+    IF_EQUAL(LW(14), 1)
+        BROTHER_EVT()
+            SETF(LW(10), LW(7))
+            SETF(LW(11), LW(7))
+            DIVF(LW(12), 6)
+            ADDF(LW(11), LW(12))
+            DO(0)
+                USER_FUNC(evtTot_CheckBombSquadHit, LW(10), LW(11))
+                SETF(LW(10), LW(11))
+                ADDF(LW(11), LW(12))
+                WAIT_FRM(1)
+            WHILE()
+        END_BROTHER()
+    END_IF()
+
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
         USER_FUNC(btlevtcmd_StopAC)
         GOTO(90)
     END_IF()
     GOTO(51)
-    LBL(50)
+LBL(50)
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
         USER_FUNC(btlevtcmd_StopAC)
         GOTO(90)
     END_IF()
-    LBL(51)
+LBL(51)
     USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(11), EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, -1, -1, 2, LW(14))
     IF_LARGE_EQUAL(LW(14), 0)
@@ -3835,8 +3884,8 @@ EVT_BEGIN(marioAttackEvent_FireNaguri_object)
         END_IF()
     END_IF()
     GOTO(50)
-    LBL(90)
-    LBL(92)
+LBL(90)
+LBL(92)
     USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, -1, -1, 2, LW(10))
     USER_FUNC(btlevtcmd_GetStageSize, LW(11), EVT_NULLPTR, EVT_NULLPTR)
     MUL(LW(11), LW(10))

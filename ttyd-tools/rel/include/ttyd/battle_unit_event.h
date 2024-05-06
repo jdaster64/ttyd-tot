@@ -5,6 +5,9 @@
 namespace ttyd::battle {
 struct BattleWork;
 }
+namespace ttyd::battle_unit {
+struct BattleWorkUnit;
+}
 
 namespace ttyd::battle_unit_event {
 
@@ -13,7 +16,10 @@ extern "C" {
 // BattleRunWaitEvent
 // BattlePhaseEventStartDeclare
 // BattleRunPhaseEvent
-// BattleRunHitEvent
+
+int32_t BattleRunHitEvent(
+    ttyd::battle_unit::BattleWorkUnit* unit, uint32_t damage_code);
+
 // BattleRunHitEventDirect
 bool BattleCheckEndUnitInitEvent(ttyd::battle::BattleWork* battleWork);
 
