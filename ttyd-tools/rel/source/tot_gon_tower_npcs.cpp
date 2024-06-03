@@ -18,6 +18,7 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
+#include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/system.h>
 
@@ -39,19 +40,12 @@ using namespace ::ttyd::evt_window;
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
+using ::ttyd::npc_data::npcTribe;
 using ::ttyd::npcdrv::NpcSetupInfo;
 using ::ttyd::system::qqsort;
 
 namespace ItemType = ::ttyd::item_data::ItemType;
-
-const char kCharlietonName[] = 
-    "\x8d\x73\x8f\xa4\x90\x6c";  // "gyoushounin" / "peddler"
-const char kCharlietonTribe[] =
-    "\x83\x7b\x83\x62\x83\x5e\x83\x4e\x81\x5b\x83\x8b";
-const char kChetRippoTribe[] =
-    "\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae";
-const char kMoverTribeName[] = 
-    "\x83\x76\x83\x6a\x8f\xee\x95\xf1\x89\xae";
+namespace NpcTribeType = ::ttyd::npc_data::NpcTribeType;
 
 }  // namespace
 
@@ -174,7 +168,7 @@ EVT_END()
 
 NpcSetupInfo g_CharlietonNpcSetup[2] = {
     {
-        .nameJp = kCharlietonName,
+        .name = "npc_shop",
         .flags = 0x1000'0600,
         .initEvtCode = (void*)TowerNpc_CharlietonInit,
         .regularEvtCode = (void*)TowerNpc_GenericMove,
@@ -185,7 +179,7 @@ NpcSetupInfo g_CharlietonNpcSetup[2] = {
 
 NpcSetupInfo g_ChetRippoNpcSetup[2] = {
     {
-        .nameJp = kChetRippoTribe,
+        .name = npcTribe[NpcTribeType::CHET_RIPPO].nameJp,
         .flags = 0x1000'0600,
         .regularEvtCode = nullptr,
         .talkEvtCode = nullptr,  // (void*)TowerNpc_ChetRippoTalk,
@@ -247,9 +241,12 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_GetCharlietonNpcParams) {
-    evtSetValue(evt, evt->evtArguments[0], PTR(kCharlietonName));
-    evtSetValue(evt, evt->evtArguments[1], PTR(kCharlietonTribe));
-    evtSetValue(evt, evt->evtArguments[2], PTR(g_CharlietonNpcSetup));
+    evtSetValue(evt, evt->evtArguments[0], PTR("npc_shop"));
+    evtSetValue(evt, evt->evtArguments[1], PTR(
+        npcTribe[NpcTribeType::CHARLIETON].nameJp));
+    evtSetValue(evt, evt->evtArguments[2], PTR(
+        npcTribe[NpcTribeType::CHARLIETON].modelName));
+    evtSetValue(evt, evt->evtArguments[3], PTR(g_CharlietonNpcSetup));
     return 2;
 }
 

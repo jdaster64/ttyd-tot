@@ -93,7 +93,7 @@ namespace {
 
 // Global variables and constants.
 
-const char kPitNpcName[] = "\x93\x47";  // "enemy"
+const char kPitNpcName[] = "npc_enemy";
 const char kPiderName[] = "\x83\x70\x83\x43\x83\x5f\x81\x5b\x83\x58";
 const char kArantulaName[] = 
     "\x83\x60\x83\x85\x83\x89\x83\x93\x83\x5e\x83\x89\x81\x5b";
@@ -1042,7 +1042,7 @@ void ApplyModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
             
     // Set Chet Rippo NPC information.
     memset(&g_ChetRippoNpcSetupInfo, 0, sizeof(g_ChetRippoNpcSetupInfo));
-    g_ChetRippoNpcSetupInfo[0].nameJp = kChetRippoName;
+    g_ChetRippoNpcSetupInfo[0].name = kChetRippoName;
     g_ChetRippoNpcSetupInfo[0].flags = 0x10000600;
     g_ChetRippoNpcSetupInfo[0].regularEvtCode = nullptr;
     g_ChetRippoNpcSetupInfo[0].talkEvtCode =

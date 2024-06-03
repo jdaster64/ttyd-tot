@@ -9,7 +9,7 @@
 namespace mod::tot::gon {
 
 // Returns setup info for NPCs.
-// out arg0 - NPC name, arg1 - tribe name, arg2 - NpcSetupInfo
-EVT_DECLARE_USER_FUNC(evtTot_GetCharlietonNpcParams, 3)
+// out arg0 - NPC name, arg1 - tribe name, arg2 - model, arg3 - NpcSetupInfo
+EVT_DECLARE_USER_FUNC(evtTot_GetCharlietonNpcParams, 4)
 
 }

@@ -863,7 +863,7 @@ g_StringMap = {
         
         # NPC tattles.
 
-        b"\x8d\x73\x8f\xa4\x90\x6c":
+        b"npc_shop":
             b"<keyxon>\nThat's Charlieton, the\n"
             b"merchant.<dkey><wait 300></dkey> I guess he sells his\n"
             b"wares here, too.\n<k>\n<p>\n"

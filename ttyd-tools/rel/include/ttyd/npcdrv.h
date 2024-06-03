@@ -93,7 +93,7 @@ enum class NpcTerritoryType : int32_t
 };
 
 struct NpcSetupInfo {
-    const char* nameJp;
+    const char* name;
     uint32_t    flags;
     uint32_t    reactionFlags;
     void*       initEvtCode;

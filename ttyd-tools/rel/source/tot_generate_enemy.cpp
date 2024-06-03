@@ -920,7 +920,7 @@ void BuildBattle(
     memset(npc_setup_info, 0, sizeof(NpcSetupInfo) * 3);
     for (int32_t i = 0; i < num_npcs; ++i) {
         NpcSetupInfo& npc = npc_setup_info[i];
-        npc.nameJp            = i == 0 ? "\x93\x47" : "enemy_2";
+        npc.name              = i == 0 ? "npc_enemy" : "npc_enemy_2";
         npc.flags             = 0x1000000a;
         npc.reactionFlags     = 0;
         npc.initEvtCode       = npc_ai->initEvtCode;

@@ -40,6 +40,7 @@
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
 #include <ttyd/mario.h>
+#include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/swdrv.h>
 
@@ -76,18 +77,20 @@ using ::ttyd::evt_bero::BeroEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::item_data::itemDataTable;
+using ::ttyd::npc_data::npcTribe;
 using ::ttyd::npcdrv::NpcSetupInfo;
 
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
 namespace BeroType = ::ttyd::evt_bero::BeroType;
 namespace ItemType = ::ttyd::item_data::ItemType;
+namespace NpcTribeType = ::ttyd::npc_data::NpcTribeType;
 
-const char kPitNpcName[] = "\x93\x47";  // "enemy"
-const char kBonetailNpcName[] = "enemy_2";
+const char kPitNpcName[] = "npc_enemy";
 const char kPiderName[] = "\x83\x70\x83\x43\x83\x5f\x81\x5b\x83\x58";
 const char kArantulaName[] = 
     "\x83\x60\x83\x85\x83\x89\x83\x93\x83\x5e\x83\x89\x81\x5b";
+const char kBonetailNpcName[] = "npc_enemy_2";
 const char kBonetailModelName[] = "c_gonbaba_z";
 const char kBonetailTribeName[] = "\x83\x5d\x83\x93\x83\x6f\x83\x6f";
 
@@ -676,10 +679,10 @@ EVT_BEGIN(Tower_NpcSetup)
         // Spawn one or more NPCs as well, if floor > 0.
         USER_FUNC(evtTot_GetFloor, LW(0))
         IF_LARGE(LW(0), 0)
-            USER_FUNC(evtTot_GetCharlietonNpcParams, LW(0), LW(1), LW(2))
-            USER_FUNC(evt_npc_entry, LW(0), PTR("c_botta"))
+            USER_FUNC(evtTot_GetCharlietonNpcParams, LW(0), LW(1), LW(2), LW(3))
+            USER_FUNC(evt_npc_entry, LW(0), LW(2))
             USER_FUNC(evt_npc_set_tribe, LW(0), LW(1))
-            USER_FUNC(evt_npc_setup, LW(2))
+            USER_FUNC(evt_npc_setup, LW(3))
             USER_FUNC(evt_npc_set_position, LW(0), 100, 0, 0)
         END_IF()
     ELSE()
