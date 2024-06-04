@@ -679,10 +679,13 @@ EVT_BEGIN(Tower_NpcSetup)
         // Spawn one or more NPCs as well, if floor > 0.
         USER_FUNC(evtTot_GetFloor, LW(0))
         IF_LARGE(LW(0), 0)
-            USER_FUNC(evtTot_GetCharlietonNpcParams, LW(0), LW(1), LW(2), LW(3))
+            USER_FUNC(evtTot_GetTowerNpcParams,
+                LW(0), LW(1), LW(2),  // Charlieton name, tribe name, model
+                LW(3), LW(4), LW(5),  // Secondary name, tribe name, model
+                LW(6))
             USER_FUNC(evt_npc_entry, LW(0), LW(2))
             USER_FUNC(evt_npc_set_tribe, LW(0), LW(1))
-            USER_FUNC(evt_npc_setup, LW(3))
+            USER_FUNC(evt_npc_setup, LW(6))
             USER_FUNC(evt_npc_set_position, LW(0), 100, 0, 0)
         END_IF()
     ELSE()

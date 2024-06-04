@@ -6,7 +6,8 @@ namespace ttyd {
 
 extern "C" {
 
-// double sqrt(double)
+double _core_cos(double);
+double _core_sin(double);
 double _core_sqrt(double);
 
 }

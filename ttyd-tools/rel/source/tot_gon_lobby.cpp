@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_gon_tower_npcs.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
@@ -48,6 +49,8 @@ EVT_DECLARE_USER_FUNC(evtTot_TowerInitFromOptions, 0)
 EVT_BEGIN(Lobby_EnterTowerEvt)
     // Initialize stats, etc. based on selected options.
     USER_FUNC(evtTot_TowerInitFromOptions)
+    // Select secondary NPCs that will be encountered during the run.
+    USER_FUNC(evtTot_SelectSecondaryNpcs)
     RETURN()
 EVT_END()
 

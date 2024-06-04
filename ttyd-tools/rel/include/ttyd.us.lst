@@ -2832,7 +2832,8 @@
 8026d6b4:strlen
 
 // Various core C libraries.
-// sqrt
+80271ea8:_core_cos
+80272410:_core_sin
 802728d0:_core_sqrt
 
 // os.a

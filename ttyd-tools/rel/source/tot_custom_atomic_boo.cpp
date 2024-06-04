@@ -5,6 +5,7 @@
 
 #include <gc/mtx.h>
 #include <gc/types.h>
+#include <ttyd/_core_language_libs.h>
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
 #include <ttyd/battle_database_common.h>
@@ -26,7 +27,6 @@
 #include <ttyd/system.h>
 
 #include <cstdint>
-#include <cmath>
 
 namespace mod::tot::custom {
 
@@ -1205,8 +1205,8 @@ void ext_boo_main() {
                     mtx->m[1][1] = 0.0f;
                     
                     double angle = kPiOver4 * i;
-                    booWork.unk_0x10.x = 2.0f * cos(angle);
-                    booWork.unk_0x10.y = 2.0f * sin(angle);
+                    booWork.unk_0x10.x = 2.0f * ttyd::_core_cos(angle);
+                    booWork.unk_0x10.y = 2.0f * ttyd::_core_sin(angle);
                     booWork.unk_0x10.z = 0.0f;
                     
                     booWork.delay = kDelayFrames[i];
@@ -1247,9 +1247,9 @@ void ext_boo_main() {
                 case 10: {
                     double angle = k2Pi * (0.125 * i + 2.0 * g_BooCircleAngle / 360.0);
                     
-                    booWork.unk_0x28.x = 90.0 * cos(angle) - 100.0;
+                    booWork.unk_0x28.x = 90.0 * ttyd::_core_cos(angle) - 100.0;
                     booWork.unk_0x28.y = 10.0f;
-                    booWork.unk_0x28.z = 90.0 * sin(angle);
+                    booWork.unk_0x28.z = 90.0 * ttyd::_core_sin(angle);
                     
                     if (mtx->m[0][3] < -100.0f) {
                         poseWork.facing_dir = 270.0f;
@@ -1272,9 +1272,9 @@ void ext_boo_main() {
                 case 15: {
                     double angle = k2Pi * (0.125 * i + 2.0 * g_BooCircleAngle / 360.0);
                     
-                    booWork.unk_0x28.x = 90.0 * cos(angle) - 100.0;
+                    booWork.unk_0x28.x = 90.0 * ttyd::_core_cos(angle) - 100.0;
                     booWork.unk_0x28.y = 10.0f;
-                    booWork.unk_0x28.z = 90.0 * sin(angle);
+                    booWork.unk_0x28.z = 90.0 * ttyd::_core_sin(angle);
                     
                     if (mtx->m[0][3] < -100.0f) {
                         poseWork.facing_dir = 270.0f;

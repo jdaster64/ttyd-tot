@@ -240,13 +240,23 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     return 2;
 }
 
-EVT_DEFINE_USER_FUNC(evtTot_GetCharlietonNpcParams) {
+EVT_DEFINE_USER_FUNC(evtTot_GetTowerNpcParams) {
     evtSetValue(evt, evt->evtArguments[0], PTR("npc_shop"));
     evtSetValue(evt, evt->evtArguments[1], PTR(
         npcTribe[NpcTribeType::CHARLIETON].nameJp));
     evtSetValue(evt, evt->evtArguments[2], PTR(
         npcTribe[NpcTribeType::CHARLIETON].modelName));
-    evtSetValue(evt, evt->evtArguments[3], PTR(g_CharlietonNpcSetup));
+
+    // TODO: Add parameters for secondary NPC.
+    evtSetValue(evt, evt->evtArguments[3], 0);
+
+    evtSetValue(evt, evt->evtArguments[6], PTR(g_CharlietonNpcSetup));
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
+    // TODO: Implement.
+
     return 2;
 }
 
