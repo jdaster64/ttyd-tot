@@ -875,6 +875,42 @@ g_StringMap = {
             b"<wait 300>\n"
             b"Well, it's your money.\n<k>",
             
+        b"npc_lumpy":
+            b"<keyxon>\n[Placeholder] That's Lumpy.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"If you invest coins, it might pay\n"
+            b"back dividends later... <dkey><wait 200></dkey>or not.\n<k>",
+            
+        b"npc_doopliss":
+            b"<keyxon>\n[Placeholder] That's Doopliss.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"He'll make the next floors tougher,\n"
+            b"but more chests will appear.\n<k>",
+            
+        b"npc_grubba":
+            b"<keyxon>\n[Placeholder] That's Grubba.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"Meeting his conditions yields\n"
+            b"2x coins, but fail, and get 0!\n<k>",
+            
+        b"npc_chet":
+            b"<keyxon>\n[Placeholder] That's Chet Rippo.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"You can pay him to swap levels\n"
+            b"for extra Shine Sprites.\n<k>",
+            
+        b"npc_wonky":
+            b"<keyxon>\n[Placeholder] That's Wonky.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"He'll take our unwanted items or\n"
+            b"badges for a few coins.\n<k>",
+            
+        b"npc_dazzle":
+            b"<keyxon>\n[Placeholder] That's Dazzle.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"He'll sell us extra Star Pieces\n"
+            b"to help rank up our moves.\n<k>",
+            
         b"\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae":
             b"<keyxon>\nThat's Chet Rippo, the\n"
             b"adjuster.<dkey><wait 300></dkey> Seems he's found a\n"
@@ -892,6 +928,9 @@ g_StringMap = {
         
         b"tot_npc_yesnoopt":
             b"<select 0 1 0 40>\nYes\nNo",
+            
+        b"tot_npc_generic":
+            b"[Placeholder] I'm interactable.\n<k>",
         
         # Charlieton
         

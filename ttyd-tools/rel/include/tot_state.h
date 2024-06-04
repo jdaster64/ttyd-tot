@@ -105,6 +105,8 @@ public:
     void IncrementFloor(int32_t change = 1);
     // Returns whether the floor (or current, if -1) contains the final boss.
     bool IsFinalBossFloor(int32_t floor = -1) const;
+    // Returns how many floors the tower has.
+    int32_t GetNumFloors() const;
     
     // Functions for time-tracking...
     void TimerStart();
@@ -214,8 +216,9 @@ enum RngSequence {
     RNG_STOLEN_ITEM             = 29,
     RNG_AUDIENCE_ITEM           = 30,
     RNG_ITEM_OBFUSCATION        = 31,
+    RNG_SECONDARY_NPC           = 32,
     
-    RNG_SEQUENCE_MAX            = 32,
+    RNG_SEQUENCE_MAX            = 33,
 };
 
 // Different types of option values (see below for descriptions of each).

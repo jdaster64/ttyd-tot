@@ -468,6 +468,11 @@ bool StateManager::IsFinalBossFloor(int32_t floor) const {
     return floor >= (is_full ? 64 : 32);
 }
 
+int32_t StateManager::GetNumFloors() const {
+    bool is_full = GetOptionValue(OPT_DIFFICULTY) >= OPTVAL_DIFFICULTY_FULL;
+    return is_full ? 64 : 32;
+}
+
 // Functions for time-tracking...
 void StateManager::TimerStart() {
     auto* mariost = ttyd::mariost::g_MarioSt;

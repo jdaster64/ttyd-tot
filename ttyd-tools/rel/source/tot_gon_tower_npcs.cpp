@@ -49,12 +49,27 @@ namespace NpcTribeType = ::ttyd::npc_data::NpcTribeType;
 
 }  // namespace
 
+namespace SecondaryNpcType {
+    enum e {
+        NONE = -1,
+        LUMPY = 0,
+        DOOPLISS,
+        GRUBBA,
+        CHET_RIPPO,
+        WONKY,
+        DAZZLE,
+        
+        NUM_NPC_TYPES
+    };
+}
+
 // Declarations for USER_FUNCs.
 EVT_DECLARE_USER_FUNC(evtTot_SelectCharlietonItems, 0)
 
 // Declarations for NPCs.
-extern NpcSetupInfo g_CharlietonNpcSetup[2];
-extern NpcSetupInfo g_ChetRippoNpcSetup[2];
+extern int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES];
+extern NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES];
+extern NpcSetupInfo g_NpcSetup[3];
 
 // Generic move script that can be shared by all mobile npcs.
 EVT_BEGIN(TowerNpc_GenericMove)
@@ -74,6 +89,12 @@ LBL(0)
     USER_FUNC(evt_npc_add_dirdist, LW(0), LW(2), LW(3), FLOAT(100.0))
     USER_FUNC(evt_npc_move_position, PTR("me"), LW(0), LW(2), 2000, FLOAT(40.0), 4)
     GOTO(0)
+    RETURN()
+EVT_END()
+
+// Generic talk script - TODO: Move all NPCs to their own scripts.
+EVT_BEGIN(TowerNpc_GenericTalk)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, PTR("me"))
     RETURN()
 EVT_END()
 
@@ -166,23 +187,73 @@ LBL(10)
     RETURN()
 EVT_END()
 
-NpcSetupInfo g_CharlietonNpcSetup[2] = {
+int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
+    NpcTribeType::LUMPY,
+    NpcTribeType::DOOPLISS,
+    NpcTribeType::GRUBBA,
+    NpcTribeType::CHET_RIPPO,
+    NpcTribeType::WONKY,
+    NpcTribeType::DAZZLE,
+};
+
+NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
+    {
+        .name = "npc_lumpy",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = nullptr,
+        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_doopliss",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_grubba",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_chet",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = nullptr,
+        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_wonky",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_dazzle",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .battleInfoId = -1,
+    },
+};
+
+NpcSetupInfo g_NpcSetup[3] = {
     {
         .name = "npc_shop",
         .flags = 0x1000'0600,
         .initEvtCode = (void*)TowerNpc_CharlietonInit,
         .regularEvtCode = (void*)TowerNpc_GenericMove,
         .talkEvtCode = (void*)TowerNpc_CharlietonTalk,
-        .battleInfoId = -1,
-    },
-};
-
-NpcSetupInfo g_ChetRippoNpcSetup[2] = {
-    {
-        .name = npcTribe[NpcTribeType::CHET_RIPPO].nameJp,
-        .flags = 0x1000'0600,
-        .regularEvtCode = nullptr,
-        .talkEvtCode = nullptr,  // (void*)TowerNpc_ChetRippoTalk,
         .battleInfoId = -1,
     },
 };
@@ -241,21 +312,111 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_GetTowerNpcParams) {
-    evtSetValue(evt, evt->evtArguments[0], PTR("npc_shop"));
+    // Charlieton parameters.
+    evtSetValue(evt, evt->evtArguments[0], PTR(g_NpcSetup[0].name));
     evtSetValue(evt, evt->evtArguments[1], PTR(
         npcTribe[NpcTribeType::CHARLIETON].nameJp));
     evtSetValue(evt, evt->evtArguments[2], PTR(
         npcTribe[NpcTribeType::CHARLIETON].modelName));
 
-    // TODO: Add parameters for secondary NPC.
-    evtSetValue(evt, evt->evtArguments[3], 0);
+    // Secondary NPC parameters (if one exists).
+    int32_t floor = g_Mod->state_.floor_ / 8;
+    int32_t npc_type = g_Mod->state_.GetOption(STAT_RUN_NPCS_SELECTED, floor);
+    if (npc_type == SecondaryNpcType::NONE) {
+        memset(&g_NpcSetup[1], 0, sizeof(NpcSetupInfo));
+        evtSetValue(evt, evt->evtArguments[3], 0);
+        evtSetValue(evt, evt->evtArguments[4], 0);
+        evtSetValue(evt, evt->evtArguments[5], 0);
+    } else {
+        memcpy(
+            &g_NpcSetup[1], &g_SecondaryNpcTemplates[npc_type],
+            sizeof(NpcSetupInfo));
+        evtSetValue(evt, evt->evtArguments[3], PTR(g_NpcSetup[1].name));
+        evtSetValue(evt, evt->evtArguments[4], PTR(
+            npcTribe[g_SecondaryNpcTribeIndices[npc_type]].nameJp));
+        evtSetValue(evt, evt->evtArguments[5], PTR(
+            npcTribe[g_SecondaryNpcTribeIndices[npc_type]].modelName));
+    }
 
-    evtSetValue(evt, evt->evtArguments[6], PTR(g_CharlietonNpcSetup));
+    evtSetValue(evt, evt->evtArguments[6], PTR(g_NpcSetup));
     return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
-    // TODO: Implement.
+    // TODO: Make new options for whether to allow every individudal NPC type?
+    int32_t npc_types = 0;
+    int32_t base_weights[SecondaryNpcType::NUM_NPC_TYPES];
+    for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
+        base_weights[i] = 10;
+        ++npc_types;
+    }
+    bool selected_lumpy = false;
+
+    // Select at most four types of NPC to spawn.
+    while (npc_types > 4) {
+        int32_t disable = g_Mod->state_.Rand(npc_types, RNG_SECONDARY_NPC);
+        int32_t weight_idx = 0;
+        for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
+            if (base_weights[weight_idx] > 0) {
+                if (disable == weight_idx) {
+                    base_weights[weight_idx] = 0;
+                    --npc_types;
+                    break;
+                }
+                ++weight_idx;
+            }
+        }
+    }
+
+    // Select NPCs for every floor.
+    const int32_t num_rest_floors = g_Mod->state_.GetNumFloors() / 8;
+    for (int32_t floor = 0; floor < num_rest_floors; ++floor) {
+        // Make Lumpy slightly likelier to show up at the beginning.
+        if (base_weights[SecondaryNpcType::LUMPY]) {
+            if (floor < num_rest_floors / 4) {
+                base_weights[SecondaryNpcType::LUMPY] = 15;
+            } else {
+                base_weights[SecondaryNpcType::LUMPY] = 10;
+            }
+        }
+
+        // Disable Doopliss and Grubba on last floor, as well as Lumpy if he's
+        // never showed up before (as it's impossible for him to show up later).
+        if (floor == num_rest_floors - 1) {
+            if (base_weights[SecondaryNpcType::GRUBBA]) {
+                base_weights[SecondaryNpcType::GRUBBA] = 0;
+                --npc_types;
+            }
+            if (base_weights[SecondaryNpcType::DOOPLISS]) {
+                base_weights[SecondaryNpcType::DOOPLISS] = 0;
+                --npc_types;
+            }
+            if (base_weights[SecondaryNpcType::LUMPY] && !selected_lumpy) {
+                base_weights[SecondaryNpcType::LUMPY] = 0;
+                --npc_types;
+            }
+        }
+
+        // Pick an NPC at random (if there are fewer than 4 options, add some
+        // chance that no NPC shows up so you aren't guaranteed one).
+        int32_t weight = 0;
+        for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
+            weight += base_weights[i];
+        }
+        if (npc_types < 4) weight += (4 - npc_types) * 10;
+        weight = g_Mod->state_.Rand(weight, RNG_SECONDARY_NPC);
+
+        g_Mod->state_.SetOption(
+            STAT_RUN_NPCS_SELECTED, SecondaryNpcType::NONE, floor);
+        for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
+            weight -= base_weights[i];
+            if (weight < 0) {
+                g_Mod->state_.SetOption(STAT_RUN_NPCS_SELECTED, i, floor);
+                if (i == SecondaryNpcType::LUMPY) selected_lumpy = true;
+                break;
+            }
+        }
+    }
 
     return 2;
 }
