@@ -996,7 +996,45 @@ g_StringMap = {
             b"stuff, my man. You sure you\n"
             b"want to buy this anyway?\n<o>",
             
-        # Miscellaneous.
+        # Other NPCs
+        
+        b"tot_wonky_intro":
+            b"<shake>\n"
+            b"Hee hee hee!</shake><wait 300> I can help\n"
+            b"lighten your load if you've\n"
+            b"got junk weighing you down!\n<k>\n<p>\n"
+            b"What're you selling?\n<o>",
+        
+        b"tot_wonky_topmenu":
+            b"<select 0 2 0 40>\nItems\nBadges",
+            
+        b"tot_wonky_noitems":
+            b"<p>\n[Placeholder] No items!\n<k>",
+            
+        b"tot_wonky_nobadges":
+            b"<p>\n[Placeholder] No badges!\n<k>",
+            
+        b"tot_wonky_whichitem":
+            b"<p>\n[Placeholder] Which one?\n<k>",
+            
+        b"tot_wonky_itemok":
+            b"[Placeholder] How about I\n"
+            b"give <NUM> coin<S> for your\n"
+            b"<ITEM>. Deal?\n<o>",
+            
+        b"tot_wonky_itemdifferent":
+            b"<p>\n[Placeholder] Anything else?\n<k>",
+            
+        b"tot_wonky_thanksnext":
+            b"<p>\n[Placeholder] Any more?\n<o>",
+            
+        b"tot_wonky_thankslast":
+            b"<p>\n[Placeholder] Thanks!\n<k>",
+        
+        b"tot_wonky_exit":
+            b"<p>\n[Placeholder] Exit text\n<k>",
+            
+        # Miscellaneous unused stuff from Infinite Pit.
             
         b"pit_move_level":
             b"<system>\n<p>\n"

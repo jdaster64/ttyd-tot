@@ -10,10 +10,13 @@
 
 #include <ttyd/evt_badgeshop.h>
 #include <ttyd/evt_item.h>
+#include <ttyd/evt_mario.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
 #include <ttyd/evt_pouch.h>
+#include <ttyd/evt_shop.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evt_win.h>
 #include <ttyd/evt_window.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
@@ -32,10 +35,13 @@ namespace {
 
 // Including entire namespaces for convenience.
 using namespace ::ttyd::evt_item;
+using namespace ::ttyd::evt_mario;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
 using namespace ::ttyd::evt_pouch;
+using namespace ::ttyd::evt_shop;
 using namespace ::ttyd::evt_sub;
+using namespace ::ttyd::evt_win;
 using namespace ::ttyd::evt_window;
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
@@ -65,6 +71,7 @@ namespace SecondaryNpcType {
 
 // Declarations for USER_FUNCs.
 EVT_DECLARE_USER_FUNC(evtTot_SelectCharlietonItems, 0)
+EVT_DECLARE_USER_FUNC(evtTot_TrackNpcAction, 2)
 
 // Declarations for NPCs.
 extern int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES];
@@ -187,6 +194,185 @@ LBL(10)
     RETURN()
 EVT_END()
 
+// Selling items event.
+EVT_BEGIN(TowerNpc_SellItems)
+    USER_FUNC(ttyd::evt_shop::sell_pouchcheck_func)
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_noitems"))
+        RETURN()
+    END_IF()
+    USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_whichitem"))
+    USER_FUNC(ttyd::evt_window::evt_win_coin_on, 0, LW(8))
+LBL(0)
+    USER_FUNC(ttyd::evt_window::evt_win_item_select, 1, 3, LW(1), LW(4))
+    IF_SMALL_EQUAL(LW(1), 0)
+        USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
+        USER_FUNC(ttyd::evt_msg::evt_msg_print,
+            0, PTR("tot_wonky_exit"), 0, PTR("npc_wonky"))
+        RETURN()
+    END_IF()
+    USER_FUNC(ttyd::evt_shop::name_price, LW(1), LW(2), LW(3))
+    USER_FUNC(ttyd::evt_msg::evt_msg_fill_num, 0, LW(14), PTR("tot_wonky_itemok"), LW(3))
+    USER_FUNC(ttyd::evt_msg::evt_msg_fill_item, 1, LW(14), LW(14), LW(2))
+    USER_FUNC(ttyd::evt_msg::evt_msg_print, 1, LW(14), 0, PTR("npc_wonky"))
+    USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_itemdifferent"))
+        GOTO(0)
+    END_IF()
+    USER_FUNC(ttyd::evt_pouch::N_evt_pouch_remove_item_index, LW(1), LW(4), LW(0))
+    USER_FUNC(ttyd::evt_pouch::evt_pouch_add_coin, LW(3))
+    USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_ITEMS_SOLD, 1)
+    USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
+    USER_FUNC(ttyd::evt_shop::sell_pouchcheck_func)
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_thankslast"))
+        RETURN()
+    END_IF()
+    USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_thanksnext"))
+    USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_exit"))
+        RETURN()
+    END_IF()
+    USER_FUNC(ttyd::evt_msg::evt_msg_continue)
+    USER_FUNC(ttyd::evt_window::evt_win_coin_on, 0, LW(8))
+    GOTO(0)
+    RETURN()
+EVT_END()
+
+// Chet Rippo badge-selling event.
+EVT_BEGIN(TowerNpc_SellBadges)
+    USER_FUNC(ttyd::evt_pouch::evt_pouch_get_havebadgecnt, LW(0))
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_nobadges"))
+        RETURN()
+    END_IF()
+    USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_whichitem"))
+    USER_FUNC(ttyd::evt_window::evt_win_coin_on, 0, LW(8))
+LBL(0)
+    USER_FUNC(ttyd::evt_window::evt_win_other_select, 12)
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
+        USER_FUNC(ttyd::evt_msg::evt_msg_print,
+            0, PTR("tot_wonky_exit"), 0, PTR("npc_wonky"))
+        RETURN()
+    END_IF()
+    USER_FUNC(ttyd::evt_msg::evt_msg_fill_num, 0, LW(14), PTR("tot_wonky_itemok"), LW(3))
+    USER_FUNC(ttyd::evt_msg::evt_msg_fill_item, 1, LW(14), LW(14), LW(2))
+    USER_FUNC(ttyd::evt_msg::evt_msg_print, 1, LW(14), 0, PTR("npc_wonky"))
+    USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_itemdifferent"))
+        GOTO(0)
+    END_IF()
+    USER_FUNC(ttyd::evt_pouch::N_evt_pouch_remove_item_index, LW(1), LW(4), LW(0))
+    USER_FUNC(ttyd::evt_pouch::evt_pouch_add_coin, LW(3))
+    USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_BADGES_SOLD, 1)
+    USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
+    USER_FUNC(ttyd::evt_pouch::evt_pouch_get_havebadgecnt, LW(0))
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_thankslast"))
+        RETURN()
+    END_IF()
+    USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_thanksnext"))
+    USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_exit"))
+        RETURN()
+    END_IF()
+    USER_FUNC(ttyd::evt_msg::evt_msg_continue)
+    USER_FUNC(ttyd::evt_window::evt_win_coin_on, 0, LW(8))
+    GOTO(0)
+    RETURN()
+EVT_END()
+
+// Talk script for Wonky.
+EVT_BEGIN(TowerNpc_WonkyTalk)
+    USER_FUNC(ttyd::evt_mario::evt_mario_key_onoff, 0)
+    USER_FUNC(ttyd::evt_win::unitwin_get_work_ptr, LW(10))
+    USER_FUNC(ttyd::evt_msg::evt_msg_print,
+        0, PTR("tot_wonky_intro"), 0, PTR("npc_wonky"))
+    USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("tot_wonky_topmenu"))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+            RUN_CHILD_EVT(TowerNpc_SellItems)
+        CASE_EQUAL(1)
+            RUN_CHILD_EVT(TowerNpc_SellBadges)
+        CASE_EQUAL(2)
+            USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_exit"))
+    END_SWITCH()
+    USER_FUNC(ttyd::evt_mario::evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
+// Talk script for Chet Rippo.
+// EVT_BEGIN(TowerNpc_ChetRippoTalk)
+//     USER_FUNC(CheckAnyStatsDowngradeable, LW(0))
+//     IF_EQUAL(LW(0), 0)
+//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_no_stats"))
+//         RETURN()
+//     END_IF()
+//     USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_which_stat"))
+//     LBL(0)
+//     USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("rippo_stat_menu"))
+//     SWITCH(LW(0))
+//         CASE_EQUAL(3)
+//             USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_exit"))
+//             RETURN()
+//     END_SWITCH()
+//     USER_FUNC(CheckStatDowngradeable, LW(0), LW(1))
+//     IF_EQUAL(LW(1), 0)
+//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_stat_too_low"))
+//         GOTO(0)
+//     END_IF()
+//     IF_EQUAL(LW(1), 2)
+//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_no_free_bp"))
+//         RETURN()
+//     END_IF()
+//     SWITCH(LW(0))
+//         CASE_EQUAL(0)
+//             SET(LW(1), PTR("rippo_confirm_hp"))
+//         CASE_EQUAL(1)
+//             SET(LW(1), PTR("rippo_confirm_fp"))
+//         CASE_ETC()
+//             SET(LW(1), PTR("rippo_confirm_bp"))
+//     END_SWITCH()
+//     SET(LW(2), LW(0))
+//     USER_FUNC(ttyd::evt_window::evt_win_coin_on, 0, LW(8))
+//     USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, LW(1))
+//     USER_FUNC(TrackChetRippoSellActionType, 2)
+//     USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("rippo_yes_no"))
+//     IF_EQUAL(LW(0), 1)
+//         USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
+//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_stat_different"))
+//         GOTO(0)
+//     END_IF()
+//     USER_FUNC(DowngradeStat, LW(2))
+//     USER_FUNC(ttyd::evt_pouch::evt_pouch_add_coin, 39)
+//     USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(8))
+//     WAIT_MSEC(200)
+//     USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
+//     USER_FUNC(CheckAnyStatsDowngradeable, LW(0))
+//     IF_EQUAL(LW(0), 0)
+//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_stat_thanks_last"))
+//         RETURN()
+//     END_IF()
+//     USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_stat_thanks_next"))
+//     USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("rippo_yes_no"))
+//     IF_EQUAL(LW(0), 1)
+//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_exit"))
+//         RETURN()
+//     END_IF()
+//     USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_which_stat"))
+//     GOTO(0)
+//     RETURN()
+// EVT_END()
+
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::LUMPY,
     NpcTribeType::DOOPLISS,
@@ -234,7 +420,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
         .regularEvtCode = (void*)TowerNpc_GenericMove,
-        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .talkEvtCode = (void*)TowerNpc_WonkyTalk,
         .battleInfoId = -1,
     },
     {
@@ -308,6 +494,13 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
         &inventory[kNumItemsPerType * 2], num_badges, sizeof(int16_t),
         (void*)BuyPriceComparator);
     
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_TrackNpcAction) {
+    uint32_t type = evtGetValue(evt, evt->evtArguments[0]);
+    uint32_t amount = evtGetValue(evt, evt->evtArguments[1]);
+    g_Mod->state_.ChangeOption(type, amount);
     return 2;
 }
 
