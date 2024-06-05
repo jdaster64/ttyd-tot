@@ -454,6 +454,18 @@ int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
         
         // Divide ultimate result by 2.
         result = base_coins * multiplier / 2;
+
+        // If Grubba's conditions are active, double or nothing, based on
+        // whether the condition was met.
+        int32_t grubba_floor =
+            g_Mod->state_.GetOption(tot::STAT_RUN_NPC_GRUBBA_FLOOR);
+        if (grubba_floor && g_Mod->state_.floor_ - grubba_floor < 8) {
+            if (battleInfo->wRuleKeepResult == 6) {
+                result *= 2;
+            } else {
+                result = 0;
+            }
+        }
     }
     return result < 100 ? result : 100;
 }

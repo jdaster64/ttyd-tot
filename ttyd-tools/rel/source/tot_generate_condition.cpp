@@ -87,6 +87,12 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
             break;
         }
     }
+    // If Grubba's effect is active, always guarantee a condition.
+    int32_t grubba_floor = state.GetOption(STAT_RUN_NPC_GRUBBA_FLOOR);
+    if (grubba_floor && state.floor_ - grubba_floor < 8) {
+        condition_chance = 4;
+    }
+
     if (state.Rand(4, RNG_ENEMY_CONDITION) >= condition_chance) return;
         
     const int32_t sp_rate =

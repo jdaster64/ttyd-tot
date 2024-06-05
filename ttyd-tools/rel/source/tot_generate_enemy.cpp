@@ -1128,11 +1128,21 @@ bool GetEnemyStats(
     
     // Change this if adding back a boss scaling option.
     int32_t boss_scale_factor = 4;
+
+    // Buff regular enemies' HP and ATK by 25% if Doopliss's effect is active.
+    int32_t doopliss_scale_factor = 4;
+    int32_t doopliss_floor = state.GetOption(STAT_RUN_NPC_DOOPLISS_FLOOR);
+    if (doopliss_floor && state.floor_ - doopliss_floor < 8) {
+        if (state.floor_ % 8 != 0) {
+            doopliss_scale_factor = 5;
+        }
+    }
             
     if (out_hp) {
         int32_t hp = Min(ei.base_hp * base_hp_pct, 1000000);
         hp *= state.GetOption(OPTNUM_ENEMY_HP);
         hp = hp * boss_scale_factor / 4;
+        hp = hp * doopliss_scale_factor / 4;
         *out_hp = Clamp((hp + 5000) / 10000, 1, 9999);
     }
     if (out_atk) {
@@ -1140,6 +1150,7 @@ bool GetEnemyStats(
         atk += (base_attack_power - ei.atk_reference) * 100;
         atk *= state.GetOption(OPTNUM_ENEMY_ATK);
         atk = atk * boss_scale_factor / 4;
+        atk = atk * doopliss_scale_factor / 4;
         *out_atk = Clamp((atk + 5000) / 10000, 1, 99);
     }
     if (out_def) {
@@ -1195,14 +1206,24 @@ int32_t GetBattleRewardTier() {
         level_sum += kEnemyInfo[g_Enemies[i]].level;
     }
     level_sum *= 100;
-    if (level_sum / level_target_sum >= 70) return 3;
-    if (level_sum / level_target_sum >= 55) return 2;
 
-    // Always guarantee 2 choices on EX, even on shop floors.
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX))
-        return 2;
+    int32_t num_chests = 1;
+    if (level_sum / level_target_sum >= 55) ++num_chests;
+    if (level_sum / level_target_sum >= 70) ++num_chests;
+    
+    // Give an extra chest on EX difficulty, even on shop floors.
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX)) {
+        ++num_chests;
+    }
 
-    return 1;
+    // Give an extra chest if Doopliss's effect is active.
+    int32_t doopliss_floor = g_Mod->state_.GetOption(STAT_RUN_NPC_DOOPLISS_FLOOR);
+    if (doopliss_floor && floor - doopliss_floor < 8) {
+        ++num_chests;
+    }
+
+    if (num_chests > 3) num_chests = 3;
+    return num_chests;
 }
 
 EVT_DECLARE_USER_FUNC(evtTot_GetMinionEntries, 2)

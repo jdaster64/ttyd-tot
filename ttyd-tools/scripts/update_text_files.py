@@ -1084,6 +1084,49 @@ g_StringMap = {
         b"tot_dazzle_decline":
             b"<p>\n[Placeholder] Oh, too bad!\n<k>",
             
+        b"tot_grubba_intro":
+            b"[Placeholder] Want conditions\n"
+            b"every floor? If you meet them,\n"
+            b"you'll double your winnings!\n<k>\n<p>\n"
+            b"If you don't meet them, you'll\n"
+            b"wind up with a fat sack o' nothin'.\n"
+            b"What say ya, Gonzales?\n<o>",
+            
+        b"tot_grubba_accept":
+            b"<p>\n[Placeholder] Now, THAT's\n"
+            b"what I'm talkin' about! Now get\n"
+            b"out there and whomp 'em!\n<k>",
+            
+        b"tot_grubba_decline":
+            b"<p>\n[Placeholder] Come on, son,\n"
+            b"where's yer fightin' spirit?\n<k>",
+            
+        b"tot_grubba_active":
+            b"[Placeholder] Get out there\n"
+            b"and show those yokels what\n"
+            b"yer made of, Gonzales!\n<k>",
+            
+        b"tot_doopliss_intro":
+            b"[Placeholder] Hey, Slick!\n"
+            b"Looking for a challenge?\n<k>\n<p>\n"
+            b"I'll use my magic to make\n"
+            b"the enemies on the next set of\n"
+            b"floors extra tough.\n<k>\n<p>\n"
+            b"In exchange, you might get\n"
+            b"more rewards to choose from\n"
+            b"after battle. You in?\n<o>",
+            
+        b"tot_doopliss_accept":
+            b"<p>\n[Placeholder] Hee hee!\n"
+            b"Don't get clobbered out there!\n<k>",
+            
+        b"tot_doopliss_decline":
+            b"<p>\n[Placeholder]\nAw, you're no fun!\n<k>",
+            
+        b"tot_doopliss_active":
+            b"[Placeholder] Hee hee!\n"
+            b"Don't get clobbered out there!\n<k>",
+            
         # NPC-related menu / help text.
         
         b"tot_desc_chet_adjusthp":

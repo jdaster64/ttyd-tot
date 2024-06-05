@@ -77,6 +77,8 @@ EVT_DECLARE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable, 1)
 EVT_DECLARE_USER_FUNC(evtTot_DowngradeStat, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetChetCost, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetDazzleCost, 1)
+EVT_DECLARE_USER_FUNC(evtTot_CheckNpcEffectEnabled, 2)
+EVT_DECLARE_USER_FUNC(evtTot_EnableNpcEffect, 1)
 
 // Declarations for NPCs.
 extern int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES];
@@ -425,6 +427,54 @@ LBL(99)
     RETURN()
 EVT_END()
 
+// Talk script for Doopliss.
+EVT_BEGIN(TowerNpc_DooplissTalk)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evtTot_CheckNpcEffectEnabled, (int32_t)SecondaryNpcType::DOOPLISS, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_doopliss_active"), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evt_msg_print, 0, PTR("tot_doopliss_intro"), 0, PTR("me"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_doopliss_decline"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::DOOPLISS)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_doopliss_accept"))
+
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
+// Talk script for Grubba.
+EVT_BEGIN(TowerNpc_GrubbaTalk)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evtTot_CheckNpcEffectEnabled, (int32_t)SecondaryNpcType::GRUBBA, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_grubba_active"), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evt_msg_print, 0, PTR("tot_grubba_intro"), 0, PTR("me"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_grubba_decline"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::GRUBBA)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_grubba_accept"))
+
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::LUMPY,
     NpcTribeType::DOOPLISS,
@@ -448,7 +498,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
         .regularEvtCode = (void*)TowerNpc_GenericMove,
-        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .talkEvtCode = (void*)TowerNpc_DooplissTalk,
         .battleInfoId = -1,
     },
     {
@@ -456,7 +506,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
         .regularEvtCode = (void*)TowerNpc_GenericMove,
-        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .talkEvtCode = (void*)TowerNpc_GrubbaTalk,
         .battleInfoId = -1,
     },
     {
@@ -599,6 +649,34 @@ EVT_DEFINE_USER_FUNC(evtTot_GetDazzleCost) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_CheckNpcEffectEnabled) {
+    const int32_t floor = g_Mod->state_.floor_;
+    bool effect = false;
+    switch (evtGetValue(evt, evt->evtArguments[0])) {
+        case SecondaryNpcType::GRUBBA:
+            effect = g_Mod->state_.GetOption(STAT_RUN_NPC_GRUBBA_FLOOR) == floor;
+            break;
+        case SecondaryNpcType::DOOPLISS:
+            effect = g_Mod->state_.GetOption(STAT_RUN_NPC_DOOPLISS_FLOOR) == floor;
+            break;
+    }
+    evtSetValue(evt, evt->evtArguments[1], effect);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
+    const int32_t floor = g_Mod->state_.floor_;
+    switch (evtGetValue(evt, evt->evtArguments[0])) {
+        case SecondaryNpcType::GRUBBA:
+            g_Mod->state_.SetOption(STAT_RUN_NPC_GRUBBA_FLOOR, floor);
+            break;
+        case SecondaryNpcType::DOOPLISS:
+            g_Mod->state_.SetOption(STAT_RUN_NPC_DOOPLISS_FLOOR, floor);
+            break;
+    }
+    return 2;
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_GetTowerNpcParams) {
     // Charlieton parameters.
     evtSetValue(evt, evt->evtArguments[0], PTR(g_NpcSetup[0].name));
@@ -631,27 +709,36 @@ EVT_DEFINE_USER_FUNC(evtTot_GetTowerNpcParams) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
-    // TODO: Make new options for whether to allow every individudal NPC type?
-    int32_t npc_types = 0;
+    int32_t active_npc_types = 0;
     int32_t base_weights[SecondaryNpcType::NUM_NPC_TYPES];
     for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
-        base_weights[i] = 10;
-        ++npc_types;
+        // TODO: Make new options for whether to allow every individudal NPC?
+        switch (i) {
+            case SecondaryNpcType::LUMPY:
+                // TODO: Add support for Lumpy.
+                base_weights[i] = 0;
+                break;
+            default:
+                base_weights[i] = 10;
+                ++active_npc_types;
+                break;
+        }
     }
     bool selected_lumpy = false;
 
     // Select at most four types of NPC to spawn.
-    while (npc_types > 4) {
-        int32_t disable = g_Mod->state_.Rand(npc_types, RNG_SECONDARY_NPC);
-        int32_t weight_idx = 0;
+    while (active_npc_types > 4) {
+        int32_t active_type_to_disable = 
+            g_Mod->state_.Rand(active_npc_types, RNG_SECONDARY_NPC);
+        int32_t active_type_idx = 0;
         for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
-            if (base_weights[weight_idx] > 0) {
-                if (disable == weight_idx) {
-                    base_weights[weight_idx] = 0;
-                    --npc_types;
+            if (base_weights[i] > 0) {
+                if (active_type_to_disable == active_type_idx) {
+                    base_weights[i] = 0;
+                    --active_npc_types;
                     break;
                 }
-                ++weight_idx;
+                ++active_type_idx;
             }
         }
     }
@@ -673,15 +760,15 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
         if (floor == num_rest_floors - 1) {
             if (base_weights[SecondaryNpcType::GRUBBA]) {
                 base_weights[SecondaryNpcType::GRUBBA] = 0;
-                --npc_types;
+                --active_npc_types;
             }
             if (base_weights[SecondaryNpcType::DOOPLISS]) {
                 base_weights[SecondaryNpcType::DOOPLISS] = 0;
-                --npc_types;
+                --active_npc_types;
             }
             if (base_weights[SecondaryNpcType::LUMPY] && !selected_lumpy) {
                 base_weights[SecondaryNpcType::LUMPY] = 0;
-                --npc_types;
+                --active_npc_types;
             }
         }
 
@@ -691,7 +778,7 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
         for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
             weight += base_weights[i];
         }
-        if (npc_types < 4) weight += (4 - npc_types) * 10;
+        if (active_npc_types < 4) weight += (4 - active_npc_types) * 10;
         weight = g_Mod->state_.Rand(weight, RNG_SECONDARY_NPC);
 
         g_Mod->state_.SetOption(
