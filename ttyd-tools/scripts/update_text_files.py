@@ -1065,6 +1065,25 @@ g_StringMap = {
         b"tot_chet_exit":
             b"<p>\nNow get outta here!\n<k>",
             
+        b"tot_dazzle_intro":
+            b"[Placeholder] I'm Dazzle,\n"
+            b"Star Piece collector\n"
+            b"extraordinaire!\n<k>\n<p>\n"
+            b"I can let you have one\n"
+            b"for free, but if you want\n"
+            b"more, it'll cost you! Deal?\n<o>",
+            
+        b"tot_dazzle_offer":
+            b"[Placeholder] I can let you\n"
+            b"have another Star Piece for\n"
+            b"%d coins. Deal?\n<o>",
+            
+        b"tot_dazzle_nocoins":
+            b"<p>\n[Placeholder] Not enough!\n<k>",
+            
+        b"tot_dazzle_decline":
+            b"<p>\n[Placeholder] Oh, too bad!\n<k>",
+            
         # NPC-related menu / help text.
         
         b"tot_desc_chet_adjusthp":

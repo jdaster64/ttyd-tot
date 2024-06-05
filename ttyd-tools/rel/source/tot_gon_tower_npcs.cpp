@@ -377,6 +377,54 @@ LBL(99)
     RETURN()
 EVT_END()
 
+// Talk script for Dazzle.
+EVT_BEGIN(TowerNpc_DazzleTalk)
+    USER_FUNC(evt_mario_key_onoff, 0)
+
+    USER_FUNC(evtTot_GetDazzleCost, LW(5))
+    IF_EQUAL(LW(5), 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_dazzle_intro"), 0, PTR("me"))
+        USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+        IF_EQUAL(LW(0), 1)
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_dazzle_decline"))
+            GOTO(99)
+        END_IF()
+        GOTO(10)
+    END_IF()
+
+    USER_FUNC(evt_win_coin_on, 0, LW(8))
+    USER_FUNC(evt_msg_print_insert, 0, PTR("tot_dazzle_offer"), 0, PTR("me"), LW(5))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_dazzle_decline"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+    USER_FUNC(evt_pouch_get_coin, LW(0))
+    IF_SMALL(LW(0), LW(5))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_dazzle_nocoins"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+    
+    MUL(LW(5), -1)
+    USER_FUNC(evt_pouch_add_coin, LW(5))
+    USER_FUNC(evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_coin_off, LW(8))
+
+LBL(10)
+    USER_FUNC(evt_msg_continue)
+    USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_SP_PURCHASED, 1)
+    USER_FUNC(evtTot_GetUniqueItemName, LW(0))
+    USER_FUNC(evt_item_entry, LW(0), ItemType::STAR_PIECE, FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+    USER_FUNC(evt_item_get_item, LW(0))
+
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::LUMPY,
     NpcTribeType::DOOPLISS,
@@ -432,7 +480,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
         .regularEvtCode = (void*)TowerNpc_GenericMove,
-        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .talkEvtCode = (void*)TowerNpc_DazzleTalk,
         .battleInfoId = -1,
     },
 };
@@ -452,6 +500,7 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     int16_t* inventory = GetCharlietonInventoryPtr();
     
     // Pick 5 normal items, 5 special items, and 5 badges.
+    // TODO: Add option to lower this to 3?
     const int32_t kNumItemsPerType = 5;
     for (int32_t i = 0; i < kNumItemsPerType * 3; ++i) {
         bool found = true;
@@ -478,13 +527,13 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     int32_t num_badges = kNumItemsPerType;
     int32_t special_badge = RewardManager::GetUniqueBadgeForShop();
     if (special_badge) {
-        inventory[kNumItemsPerType * 3] = special_badge;
-        inventory[kNumItemsPerType * 3 + 1] = ItemType::STAR_PIECE;
-        inventory[kNumItemsPerType * 3 + 2] = -1;
+        inventory[kNumItemsPerType * 3 + 0] = special_badge;
+        // inventory[kNumItemsPerType * 3 + 1] = ItemType::STAR_PIECE;
+        inventory[kNumItemsPerType * 3 + 1] = -1;
         ++num_badges;
     } else {
-        inventory[kNumItemsPerType * 3] = ItemType::STAR_PIECE;
-        inventory[kNumItemsPerType * 3 + 1] = -1;
+        // inventory[kNumItemsPerType * 3 + 0] = ItemType::STAR_PIECE;
+        inventory[kNumItemsPerType * 3 + 0] = -1;
     }
     
     // Sort each category by ascending price.
