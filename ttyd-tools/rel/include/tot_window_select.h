@@ -22,6 +22,8 @@ namespace MenuType {
         MOVE_UPGRADE,
         // Charlieton.
         TOT_CHARLIETON_SHOP,
+        // Chet Rippo stat downgrade.
+        TOT_CHET_RIPPO_TRADE,
         // Run options menu (in lobby):
         RUN_OPTIONS,
         // Run results: general stats.

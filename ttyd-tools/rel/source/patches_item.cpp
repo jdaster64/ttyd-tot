@@ -544,13 +544,16 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(StartGetEmptyItemSlotsMax),
         reinterpret_cast<void*>(BranchBackGetEmptyItemSlotsMax));
         
-    // Override item pickup script for Star Pieces that spawn as item drops.
+    // Override item pickup script for special items that spawn as item drops.
     g_itemEntry_trampoline = mod::patch::hookFunction(
         ttyd::itemdrv::itemEntry,
         [](const char* name, int32_t item, float x, float y, float z,
            uint32_t mode, int32_t collection_gswf, void* pickup_script) {
             if (item == ItemType::STAR_PIECE && !pickup_script) {
                 pickup_script = tot::RewardManager::GetStarPieceItemDropEvt();
+            }
+            if (item == ItemType::SHINE_SPRITE && !pickup_script) {
+                pickup_script = tot::RewardManager::GetShineSpriteItemDropEvt();
             }
             return g_itemEntry_trampoline(
                 name, item, x, y, z, mode, collection_gswf, pickup_script);

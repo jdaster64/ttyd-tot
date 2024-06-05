@@ -402,6 +402,28 @@ void DispMainWindow(WinMgrEntry* entry) {
                     entry_text = msgSearch(itemDataTable[row.value].name);
                     break;
                 }
+                case MenuType::TOT_CHET_RIPPO_TRADE: {
+                    switch (row.value) {
+                        case 1:
+                            entry_icon = IconType::HP_ICON;
+                            entry_text = "HP";
+                            break;
+                        case 2:
+                            entry_icon = IconType::HP_ICON;
+                            entry_text = "Partner HP";
+                            break;
+                        case 3:
+                            entry_icon = IconType::FP_ICON;
+                            entry_text = "FP";
+                            break;
+                        case 4:
+                            entry_icon = IconType::BP_ICON;
+                            entry_text = "BP";
+                            break;
+                    }
+                    max_width = 120.0f;
+                    break;
+                }
                 case MenuType::MOVE_UNLOCK:
                 case MenuType::MOVE_UPGRADE: {
                     auto* move_data = MoveManager::GetMoveData(row.value);
@@ -471,6 +493,71 @@ void DispMainWindow(WinMgrEntry* entry) {
                     ttyd::win_main::winFontSetWidth(
                         &text_pos, &text_scale, text_color, 30.0, buf);
                 }
+                break;
+            }
+            case MenuType::TOT_CHET_RIPPO_TRADE: {
+                // Draw current and destination stat level.
+                // TODO: Re-position stuff as needed, maybe use stat values?
+
+                char buf[8] = { 0 };
+                int current_level = 0;
+                switch (row.value) {
+                    case 1:
+                        current_level = g_Mod->state_.hp_level_;
+                        break;
+                    case 2:
+                        current_level = g_Mod->state_.hp_p_level_;
+                        break;
+                    case 3:
+                        current_level = g_Mod->state_.fp_level_;
+                        break;
+                    case 4:
+                        current_level = g_Mod->state_.bp_level_;
+                        break;
+                }
+
+                ttyd::win_main::winFontInit();
+                
+                sprintf(buf, "%" PRId32 "", current_level);
+                int32_t length = ttyd::fontmgr::FontGetMessageWidth(buf);
+                if (length > 30.0f) length = 30.f;
+
+                gc::vec3 text_pos = {
+                    entry->x + entry->width - 80.0f - length,
+                    y_trans + 12.0f,
+                    0.0f
+                };
+                gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
+                uint32_t* text_color;
+                if (row.flags & WinMgrSelectEntryRow_Flags::GREYED_OUT) {
+                    text_color = &kMedGrey;
+                } else {
+                    text_color = &kBlack;
+                }
+                
+                ttyd::win_main::winFontSetWidth(
+                    &text_pos, &text_scale, text_color, 30.0, buf);
+
+                if (current_level > 0) {
+                    sprintf(buf, "%" PRId32 "", current_level - 1);
+                    int32_t length = ttyd::fontmgr::FontGetMessageWidth(buf);
+                    if (length > 30.0f) length = 30.f;
+                    
+                    text_pos.x = entry->x + entry->width - 20.0f - length;
+                    ttyd::win_main::winFontSetWidth(
+                        &text_pos, &text_scale, text_color, 30.0, buf);
+
+                    ttyd::win_main::winIconInit();
+                    gc::vec3 pos = { 
+                        entry->x + entry->width - 65.f,
+                        y_trans,
+                        0.0f 
+                    };
+                    gc::vec3 scale = { -0.5f, 0.5f, 0.5f };
+                    ttyd::win_main::winIconSet(
+                        IconType::RUN_AWAY, &pos, &scale, &kWhite);
+                }
+                
                 break;
             }
             case MenuType::MOVE_UPGRADE: {
@@ -567,6 +654,9 @@ void DispMainWindow(WinMgrEntry* entry) {
         case MenuType::TOT_CHARLIETON_SHOP:
             title = msgSearch("msg_window_title_1");  // "Items"
             break;
+        case MenuType::TOT_CHET_RIPPO_TRADE:
+            title = msgSearch("tot_winsel_titlestat");
+            break;
         case MenuType::MOVE_UNLOCK:
         case MenuType::MOVE_UPGRADE:
             title = msgSearch("tot_winsel_titlemove");
@@ -659,6 +749,9 @@ void DispWindow2(WinMgrEntry* entry) {
         case MenuType::TOT_CHARLIETON_SHOP:
             msg = msgSearch("msg_window_select_6");     // "Buy which one?"
             break;
+        case MenuType::TOT_CHET_RIPPO_TRADE:
+            msg = msgSearch("tot_winsel_tradewhichstat");
+            break;
         case MenuType::MOVE_UNLOCK:
         case MenuType::MOVE_UPGRADE:
             msg = msgSearch("tot_winsel_whichunlock");
@@ -705,6 +798,31 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                 break;
             case MenuType::TOT_CHARLIETON_SHOP:
                 help_msg = msgSearch(itemDataTable[value].description);
+                break;
+            case MenuType::TOT_CHET_RIPPO_TRADE:
+                help_msg = msgSearch("tot_desc_chet_adjustnone");
+                switch (value) {
+                    case 1:
+                        if (g_Mod->state_.hp_level_ > 0) {
+                            help_msg = msgSearch("tot_desc_chet_adjusthp");
+                        }
+                        break;
+                    case 2:
+                        if (g_Mod->state_.hp_p_level_ > 0) {
+                            help_msg = msgSearch("tot_desc_chet_adjustphp");
+                        }
+                        break;
+                    case 3:
+                        if (g_Mod->state_.fp_level_ > 0) {
+                            help_msg = msgSearch("tot_desc_chet_adjustfp");
+                        }
+                        break;
+                    case 4:
+                        if (g_Mod->state_.bp_level_ > 0) {
+                            help_msg = msgSearch("tot_desc_chet_adjustbp");
+                        }
+                        break;
+                }
                 break;
             case MenuType::MOVE_UNLOCK:
                 help_msg = msgSearch(
@@ -987,16 +1105,19 @@ void* InitNewSelectDescTable() {
         sizeof(ttyd::winmgr::select_desc_tbl));
     // Initialize custom menu parameters.
     g_SelectDescList[MenuType::CUSTOM_START] = WinMgrSelectDescList{ 
-        .num_descs = 3, .descs = &g_CustomDescs[0] 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
     };
     g_SelectDescList[MenuType::MOVE_UNLOCK] = WinMgrSelectDescList{ 
-        .num_descs = 3, .descs = &g_CustomDescs[0] 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
     };
     g_SelectDescList[MenuType::MOVE_UPGRADE] = WinMgrSelectDescList{ 
-        .num_descs = 3, .descs = &g_CustomDescs[0] 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
     };
     g_SelectDescList[MenuType::TOT_CHARLIETON_SHOP] = WinMgrSelectDescList{ 
-        .num_descs = 3, .descs = &g_CustomDescs[0] 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
+    };
+    g_SelectDescList[MenuType::TOT_CHET_RIPPO_TRADE] = WinMgrSelectDescList{
+        .num_descs = 3, .descs = &g_CustomDescs[0]
     };
     g_SelectDescList[MenuType::RUN_OPTIONS] = WinMgrSelectDescList{
         .num_descs = 3, .descs = &g_CustomDescs[3]
@@ -1031,6 +1152,7 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             break;
         case MenuType::CUSTOM_START:
         case MenuType::TOT_CHARLIETON_SHOP:
+        case MenuType::TOT_CHET_RIPPO_TRADE:
         case MenuType::RUN_OPTIONS:
         case MenuType::RUN_RESULTS_STATS:
         case MenuType::RUN_RESULTS_SPLITS:
@@ -1106,6 +1228,42 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
                 sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
             for (int32_t i = 0; i < num_items; ++i) {
                 sel_entry->row_data[i].value = inventory[i];
+            }
+            break;
+        }
+        case MenuType::TOT_CHET_RIPPO_TRADE: {
+            // TODO: Omit partner HP row if playing with no partners.
+            sel_entry->num_rows = 4;
+            sel_entry->row_data =
+                (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
+                    0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+            memset(
+                sel_entry->row_data, 0,
+                sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+            for (int32_t i = 0; i < 4; ++i) {
+                sel_entry->row_data[i].value = i+1;
+
+                bool disable = false;
+                switch (i+1) {
+                    case 1:
+                        if (g_Mod->state_.hp_level_ <= 0) disable = true;
+                        break;
+                    case 2:
+                        if (g_Mod->state_.hp_p_level_ <= 0) disable = true;
+                        break;
+                    case 3:
+                        if (g_Mod->state_.fp_level_ <= 0) disable = true;
+                        break;
+                    case 4:
+                        if (g_Mod->state_.bp_level_ <= 0) disable = true;
+                        break;
+                }
+                if (disable) {
+                    sel_entry->row_data[i].flags |=
+                        WinMgrSelectEntryRow_Flags::GREYED_OUT;
+                    sel_entry->row_data[i].flags |=
+                        WinMgrSelectEntryRow_Flags::UNSELECTABLE;
+                }
             }
             break;
         }
@@ -1195,6 +1353,31 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
             evt->lwData[3] = 
                 itemDataTable[value].buy_price * GetBuyPriceScale() / 100;
             evt->lwData[4] = itemDataTable[value].bp_cost;
+            break;
+        case MenuType::TOT_CHET_RIPPO_TRADE:
+            evt->lwData[1] = value;
+            switch (value) {
+                case 1:
+                    evt->lwData[2] = PTR("HP");
+                    evt->lwData[3] = g_Mod->state_.hp_level_;
+                    evt->lwData[4] = g_Mod->state_.hp_level_ - 1;
+                    break;
+                case 2:
+                    evt->lwData[2] = PTR("partner's HP");
+                    evt->lwData[3] = g_Mod->state_.hp_p_level_;
+                    evt->lwData[4] = g_Mod->state_.hp_p_level_ - 1;
+                    break;
+                case 3:
+                    evt->lwData[2] = PTR("FP");
+                    evt->lwData[3] = g_Mod->state_.fp_level_;
+                    evt->lwData[4] = g_Mod->state_.fp_level_ - 1;
+                    break;
+                case 4:
+                    evt->lwData[2] = PTR("BP");
+                    evt->lwData[3] = g_Mod->state_.bp_level_;
+                    evt->lwData[4] = g_Mod->state_.bp_level_ - 1;
+                    break;
+            }
             break;
         case MenuType::MOVE_UNLOCK:
         case MenuType::MOVE_UPGRADE:

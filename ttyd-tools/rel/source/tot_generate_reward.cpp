@@ -455,6 +455,21 @@ EVT_BEGIN(Reward_StarPieceBaseEvt)
     RETURN()
 EVT_END()
 
+// Pickup script for Shine Sprites (base).
+EVT_BEGIN(Reward_ShineSpriteBaseEvt)
+    USER_FUNC(evtTot_SelectMoves, 1, 0, LW(0), LW(1), LW(2))
+    IF_LARGE(LW(0), 0)
+        // Open menu to select a move.
+        // Note that LW(1) and LW(2) are overwritten by result.
+        USER_FUNC(evt_win_other_select,
+            (uint32_t)window_select::MenuType::MOVE_UPGRADE)
+        USER_FUNC(evtTot_UpgradeMove, LW(1))
+        USER_FUNC(
+            evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
+    END_IF()
+    RETURN()
+EVT_END()
+
 // Pickup script for Star Pieces from chest.
 EVT_BEGIN(Reward_StarPieceChestEvt)
     RUN_CHILD_EVT(Reward_StarPieceBaseEvt)
@@ -474,21 +489,22 @@ EVT_BEGIN(Reward_StarPieceItemDropEvt)
     RETURN()
 EVT_END()
 
-// Pickup script for Shine Sprites.
+// Pickup script for Shine Sprites from chest.
 EVT_BEGIN(Reward_ShineSpriteChestEvt)
-    USER_FUNC(evtTot_SelectMoves, 1, 0, LW(0), LW(1), LW(2))
-    IF_LARGE(LW(0), 0)
-        // Open menu to select a move.
-        // Note that LW(1) and LW(2) are overwritten by result.
-        USER_FUNC(evt_win_other_select,
-            (uint32_t)window_select::MenuType::MOVE_UPGRADE)
-        USER_FUNC(evtTot_UpgradeMove, LW(1))
-        USER_FUNC(
-            evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
-    END_IF()
+    RUN_CHILD_EVT(Reward_ShineSpriteBaseEvt)
     USER_FUNC(evtTot_ToggleIGT, 1)
     USER_FUNC(evt_mario_key_onoff, 1)
     SET((int32_t)GSW_Tower_ChestClaimed, 1)
+    RETURN()
+EVT_END()
+
+// Pickup script for Shine Sprites as field item.
+EVT_BEGIN(Reward_ShineSpriteItemDropEvt)
+    USER_FUNC(evtTot_ToggleIGT, 0)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    RUN_CHILD_EVT(Reward_ShineSpriteBaseEvt)
+    USER_FUNC(evtTot_ToggleIGT, 1)
+    USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()
 
@@ -651,6 +667,10 @@ int32_t* RewardManager::GetSelectedMoves(int32_t* num_moves) {
 
 void* RewardManager::GetStarPieceItemDropEvt() {
     return (void*)Reward_StarPieceItemDropEvt;
+}
+
+void* RewardManager::GetShineSpriteItemDropEvt() {
+    return (void*)Reward_ShineSpriteItemDropEvt;
 }
 
 int32_t RewardManager::GetUniqueBadgeForShop() {

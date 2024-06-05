@@ -20,6 +20,7 @@ public:
     // Returns a pointer to the event that runs when picking up a Star Piece
     // on the field (as an item drop / condition reward).
     static void* GetStarPieceItemDropEvt();
+    static void* GetShineSpriteItemDropEvt();
     
     // Picks a random unique badge to add to Charlieton's shop.
     // Returns 0 if the attempted badge is already in a chest on the same floor.

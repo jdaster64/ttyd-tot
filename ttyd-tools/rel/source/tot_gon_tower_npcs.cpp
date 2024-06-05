@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
+#include "tot_manager_options.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
@@ -72,6 +73,10 @@ namespace SecondaryNpcType {
 // Declarations for USER_FUNCs.
 EVT_DECLARE_USER_FUNC(evtTot_SelectCharlietonItems, 0)
 EVT_DECLARE_USER_FUNC(evtTot_TrackNpcAction, 2)
+EVT_DECLARE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable, 1)
+EVT_DECLARE_USER_FUNC(evtTot_DowngradeStat, 1)
+EVT_DECLARE_USER_FUNC(evtTot_GetChetCost, 1)
+EVT_DECLARE_USER_FUNC(evtTot_GetDazzleCost, 1)
 
 // Declarations for NPCs.
 extern int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES];
@@ -243,7 +248,7 @@ LBL(0)
     RETURN()
 EVT_END()
 
-// Chet Rippo badge-selling event.
+// Selling badges event.
 EVT_BEGIN(TowerNpc_SellBadges)
     USER_FUNC(ttyd::evt_pouch::evt_pouch_get_havebadgecnt, LW(0))
     IF_EQUAL(LW(0), 0)
@@ -311,67 +316,66 @@ EVT_BEGIN(TowerNpc_WonkyTalk)
 EVT_END()
 
 // Talk script for Chet Rippo.
-// EVT_BEGIN(TowerNpc_ChetRippoTalk)
-//     USER_FUNC(CheckAnyStatsDowngradeable, LW(0))
-//     IF_EQUAL(LW(0), 0)
-//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_no_stats"))
-//         RETURN()
-//     END_IF()
-//     USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_which_stat"))
-//     LBL(0)
-//     USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("rippo_stat_menu"))
-//     SWITCH(LW(0))
-//         CASE_EQUAL(3)
-//             USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_exit"))
-//             RETURN()
-//     END_SWITCH()
-//     USER_FUNC(CheckStatDowngradeable, LW(0), LW(1))
-//     IF_EQUAL(LW(1), 0)
-//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_stat_too_low"))
-//         GOTO(0)
-//     END_IF()
-//     IF_EQUAL(LW(1), 2)
-//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_no_free_bp"))
-//         RETURN()
-//     END_IF()
-//     SWITCH(LW(0))
-//         CASE_EQUAL(0)
-//             SET(LW(1), PTR("rippo_confirm_hp"))
-//         CASE_EQUAL(1)
-//             SET(LW(1), PTR("rippo_confirm_fp"))
-//         CASE_ETC()
-//             SET(LW(1), PTR("rippo_confirm_bp"))
-//     END_SWITCH()
-//     SET(LW(2), LW(0))
-//     USER_FUNC(ttyd::evt_window::evt_win_coin_on, 0, LW(8))
-//     USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, LW(1))
-//     USER_FUNC(TrackChetRippoSellActionType, 2)
-//     USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("rippo_yes_no"))
-//     IF_EQUAL(LW(0), 1)
-//         USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
-//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_stat_different"))
-//         GOTO(0)
-//     END_IF()
-//     USER_FUNC(DowngradeStat, LW(2))
-//     USER_FUNC(ttyd::evt_pouch::evt_pouch_add_coin, 39)
-//     USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(8))
-//     WAIT_MSEC(200)
-//     USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
-//     USER_FUNC(CheckAnyStatsDowngradeable, LW(0))
-//     IF_EQUAL(LW(0), 0)
-//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_stat_thanks_last"))
-//         RETURN()
-//     END_IF()
-//     USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_stat_thanks_next"))
-//     USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("rippo_yes_no"))
-//     IF_EQUAL(LW(0), 1)
-//         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_exit"))
-//         RETURN()
-//     END_IF()
-//     USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("rippo_which_stat"))
-//     GOTO(0)
-//     RETURN()
-// EVT_END()
+EVT_BEGIN(TowerNpc_ChetRippoTalk)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_chet_intro"), 0, PTR("me"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_decline"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evtTot_CheckAnyStatsDowngradeable, LW(0))
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_nostats"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_whichstat"))
+LBL(0)
+    USER_FUNC(evt_win_other_select, window_select::MenuType::TOT_CHET_RIPPO_TRADE)
+    IF_EQUAL(LW(1), 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_chet_different"), 0, PTR("me"))
+        GOTO(0)
+    END_IF()
+
+    USER_FUNC(evt_win_coin_on, 0, LW(8))
+    USER_FUNC(evtTot_GetChetCost, LW(5))
+    USER_FUNC(
+        evt_msg_print_insert, 0, PTR("tot_chet_confirm"), 0, PTR("me"), 
+        LW(2), LW(3), LW(4), LW(5))
+
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_decline"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+    USER_FUNC(evt_pouch_get_coin, LW(0))
+    IF_SMALL(LW(0), LW(5))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_nocoins"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+
+    MUL(LW(5), -1)
+    // TODO: Play a sound effect or visual effect?
+    USER_FUNC(evt_pouch_add_coin, LW(5))
+    USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_LEVELS_SOLD, 1)
+    USER_FUNC(evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_coin_off, LW(8))
+
+    USER_FUNC(evtTot_DowngradeStat, LW(1))
+    USER_FUNC(evt_msg_continue)
+    USER_FUNC(evtTot_GetUniqueItemName, LW(0))
+    USER_FUNC(evt_item_entry, LW(0), ItemType::SHINE_SPRITE, FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+    USER_FUNC(evt_item_get_item, LW(0))
+
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
 
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::LUMPY,
@@ -412,7 +416,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
         .regularEvtCode = nullptr,
-        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .talkEvtCode = (void*)TowerNpc_ChetRippoTalk,
         .battleInfoId = -1,
     },
     {
@@ -501,6 +505,48 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackNpcAction) {
     uint32_t type = evtGetValue(evt, evt->evtArguments[0]);
     uint32_t amount = evtGetValue(evt, evt->evtArguments[1]);
     g_Mod->state_.ChangeOption(type, amount);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable) {
+    int32_t stats_downgradeable = 0;
+    if (g_Mod->state_.hp_level_ > 0) ++stats_downgradeable;
+    if (g_Mod->state_.fp_level_ > 0) ++stats_downgradeable;
+    if (g_Mod->state_.bp_level_ > 0) ++stats_downgradeable;
+    // TODO: Don't check this if partners are disabled.
+    if (g_Mod->state_.hp_p_level_ > 0) ++stats_downgradeable;
+
+    evtSetValue(evt, evt->evtArguments[0], stats_downgradeable > 0);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_DowngradeStat) {
+    switch (evtGetValue(evt, evt->evtArguments[0])) {
+        case 1:
+            --g_Mod->state_.hp_level_;
+            break;
+        case 2:
+            --g_Mod->state_.hp_p_level_;
+            break;
+        case 3:
+            --g_Mod->state_.fp_level_;
+            break;
+        case 4:
+            --g_Mod->state_.bp_level_;
+            break;
+    }
+    OptionsManager::UpdateLevelupStats();
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetChetCost) {
+    evtSetValue(evt, evt->evtArguments[0], 50 * GetBuyPriceScale() / 100);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetDazzleCost) {
+    int32_t num_sp_bought = g_Mod->state_.GetOption(STAT_RUN_NPC_SP_PURCHASED);
+    evtSetValue(evt, evt->evtArguments[0], num_sp_bought * 10);
     return 2;
 }
 

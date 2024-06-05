@@ -728,6 +728,8 @@ g_StringMap = {
         
         b"tot_winsel_titlemove":      b"Move",
         b"tot_winsel_whichunlock":    b"Which move?",
+        b"tot_winsel_titlestat":      b"Stat Lvl.",
+        b"tot_winsel_tradewhichstat": b"Trade which?",
             
         # Generic Map text.
         
@@ -1033,6 +1035,53 @@ g_StringMap = {
         
         b"tot_wonky_exit":
             b"<p>\n[Placeholder] Exit text\n<k>",
+            
+        b"tot_chet_intro":
+            b"[Placeholder] I can give you\n"
+            b"Shine Sprites in exchange for\n"
+            b"your stats. Deal?\n<o>",
+            
+        b"tot_chet_nostats":
+            b"<p>\n[Placeholder] No stats!\n<k>",
+            
+        b"tot_chet_nocoins":
+            b"<p>\n[Placeholder] Not enough!\n<k>",
+        
+        b"tot_chet_whichstat":
+            b"<p>\n[Placeholder] Which stat?\n<k>",
+        
+        b"tot_chet_different":
+            b"<p>\n[Placeholder] Anything else?\n<k>",
+        
+        b"tot_chet_confirm":
+            b"[Placeholder] Your %s?\n"
+            b"It'll fall from level %d to %d\n"
+            b"in exchange for a Shine Sprite.\n<k>\n<p>\n"
+            b"The fee will be %d coins.\nDeal?\n<o>",
+            
+        b"tot_chet_decline":
+            b"<p>\nThen get outta here!\n<k>",
+            
+        b"tot_chet_exit":
+            b"<p>\nNow get outta here!\n<k>",
+            
+        # NPC-related menu / help text.
+        
+        b"tot_desc_chet_adjusthp":
+            b"Lower Mario's HP by 1 level.",
+        
+        b"tot_desc_chet_adjustphp":
+            b"Lower partner HP by 1 level.",
+        
+        b"tot_desc_chet_adjustfp":
+            b"Lower FP by 1 level.",
+        
+        b"tot_desc_chet_adjustbp":
+            b"Lower BP by 1 level.",
+        
+        b"tot_desc_chet_adjustnone":
+            b"This stat can't be lowered\n"
+            b"any further!",
             
         # Miscellaneous unused stuff from Infinite Pit.
             
