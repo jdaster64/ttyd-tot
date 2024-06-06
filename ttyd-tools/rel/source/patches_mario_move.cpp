@@ -240,7 +240,7 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
         
         // Handle switch partner cost, if enabled.
         int32_t switch_fp_cost = battle::GetPartySwitchCost();
-        if (strats[0].type == 0 && switch_fp_cost) {           
+        if (strats[0].type == 0 && switch_fp_cost) {
             strats[0].cost = switch_fp_cost;
             strats[0].enabled =
                 ttyd::battle_unit::BtlUnit_GetFp(unit) >= switch_fp_cost;

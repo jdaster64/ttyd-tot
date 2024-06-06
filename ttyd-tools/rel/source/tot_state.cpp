@@ -208,6 +208,8 @@ void StateManager::InitDefaultOptions() {
     
     memset(option_flags_, 0, sizeof(option_flags_));
     memset(option_bytes_, 0, sizeof(option_bytes_));
+    // TODO: Only reset per-run play stats.
+    memset(play_stats_, 0, sizeof(play_stats_));
     // Set non-zero default values to their proper values.
     SetOption(OPTVAL_DIFFICULTY_FULL);
     SetOption(OPTVAL_STARTER_ITEMS_BASIC);

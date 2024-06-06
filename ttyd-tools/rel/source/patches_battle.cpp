@@ -1445,7 +1445,8 @@ void ApplyFixedPatches() {
     g_btlevtcmd_ChangeParty_trampoline = patch::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_ChangeParty,
         [](EvtEntry* evt, bool isFirstCall) {
-            SpendAndIncrementPartySwitchCost();
+            if (ttyd::mario_pouch::pouchEquipCheckBadge(ItemType::QUICK_CHANGE))
+                SpendAndIncrementPartySwitchCost();
             // Run vanilla logic.
             return g_btlevtcmd_ChangeParty_trampoline(evt, isFirstCall);
         });
