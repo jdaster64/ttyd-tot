@@ -210,9 +210,11 @@ void StateManager::InitDefaultOptions() {
     memset(option_bytes_, 0, sizeof(option_bytes_));
     // TODO: Only reset per-run play stats.
     memset(play_stats_, 0, sizeof(play_stats_));
-    // Set non-zero default values to their proper values.
+
+    // Set non-zero default values to their default values.
     SetOption(OPTVAL_DIFFICULTY_FULL);
     SetOption(OPTVAL_STARTER_ITEMS_BASIC);
+    SetOption(OPTVAL_REVIVE_PARTNERS_ON);
     SetOption(OPTNUM_MARIO_HP, 5);
     SetOption(OPTNUM_MARIO_FP, 5);
     SetOption(OPTNUM_MARIO_BP, 5);
@@ -456,10 +458,12 @@ void StateManager::IncrementFloor(int32_t change) {
     pouch.star_points = floor_;
     
     // Revive any fallen partners.
-    for (int32_t i = 1; i <= 7; ++i) {
-        auto& party_data = pouch.party_data[i];
-        if ((party_data.flags & 1) && party_data.current_hp == 0) {
-            party_data.current_hp = 1;
+    if (CheckOptionValue(OPTVAL_REVIVE_PARTNERS_ON)) {
+        for (int32_t i = 1; i <= 7; ++i) {
+            auto& party_data = pouch.party_data[i];
+            if ((party_data.flags & 1) && party_data.current_hp == 0) {
+                party_data.current_hp = 1;
+            }
         }
     }
 }

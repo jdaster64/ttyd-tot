@@ -73,6 +73,7 @@ namespace SecondaryNpcType {
 
 // Declarations for USER_FUNCs.
 EVT_DECLARE_USER_FUNC(evtTot_SelectCharlietonItems, 0)
+EVT_DECLARE_USER_FUNC(evtTot_CheckCharlietonSoldOut, 1)
 EVT_DECLARE_USER_FUNC(evtTot_TrackNpcAction, 2)
 EVT_DECLARE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable, 1)
 EVT_DECLARE_USER_FUNC(evtTot_DowngradeStat, 1)
@@ -123,6 +124,12 @@ EVT_END()
 
 // Talk script for Charlieton.
 EVT_BEGIN(TowerNpc_CharlietonTalk)
+    // Check for having no items left to sell.
+    USER_FUNC(evtTot_CheckCharlietonSoldOut, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_charlieton_nostock"), 0, PTR("me"))
+        RETURN()
+    END_IF()
     USER_FUNC(evt_msg_print, 0, PTR("tot_charlieton_intro"), 0, PTR("me"))
     USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
     IF_EQUAL(LW(0), 1)
@@ -188,11 +195,18 @@ LBL(10)
     WAIT_MSEC(200)
     USER_FUNC(evt_win_coin_off, LW(12))
     USER_FUNC(evtTot_AfterItemBought, LW(1))
+    // If out of coins, or Charlieton is out of items, end conversation.
     USER_FUNC(evt_pouch_get_coin, LW(0))
     IF_EQUAL(LW(0), 0)
         USER_FUNC(evt_msg_print_add, 0, PTR("tot_charlieton_success"))
         RETURN()
     END_IF()
+    USER_FUNC(evtTot_CheckCharlietonSoldOut, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_charlieton_success"))
+        RETURN()
+    END_IF()
+    // Otherwise, offer to sell another.
     USER_FUNC(evt_msg_print_add, 0, PTR("tot_charlieton_buyanother"))
     USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
     IF_EQUAL(LW(0), 1)
@@ -615,9 +629,12 @@ NpcSetupInfo g_NpcSetup[3] = {
 EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     int16_t* inventory = GetCharlietonInventoryPtr();
     
-    // Pick 5 normal items, 5 special items, and 5 badges.
-    // TODO: Add option to lower this to 3?
-    const int32_t kNumItemsPerType = 5;
+    // Pick N normal items, special items, and badges.
+    // Normal stock = 5 of each, smaller / limited = 3 of each.
+    int32_t kNumItemsPerType = 3;
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_CHARLIETON_NORMAL)) {
+        kNumItemsPerType = 5;
+    }
     for (int32_t i = 0; i < kNumItemsPerType * 3; ++i) {
         bool found = true;
         while (found) {
@@ -663,6 +680,12 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
         &inventory[kNumItemsPerType * 2], num_badges, sizeof(int16_t),
         (void*)BuyPriceComparator);
     
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_CheckCharlietonSoldOut) {
+    int16_t* inventory = GetCharlietonInventoryPtr();
+    evtSetValue(evt, evt->evtArguments[0], inventory[0] == -1);
     return 2;
 }
 

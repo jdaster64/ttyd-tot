@@ -90,6 +90,23 @@ OptionMenuData g_OptionMenuData[] = {
     { OPTVAL_TIMER_NONE, "tot_optr_timer_none", nullptr, 24, false, false },
     { OPTVAL_TIMER_IGT, "tot_optr_timer_igt", nullptr, 25, false, false },
     { OPTVAL_TIMER_RTA, "tot_optr_timer_rta", nullptr, 26, false, false },
+    { OPT_STARTER_ITEMS, "tot_optr_startitems", "tot_opth_startitems", 27, true, false },
+    { OPTVAL_STARTER_ITEMS_OFF, "tot_optr_startitems_off", nullptr, 28, false, false },
+    { OPTVAL_STARTER_ITEMS_BASIC, "tot_optr_startitems_basic", nullptr, 29, false, false },
+    { OPTVAL_STARTER_ITEMS_STRONG, "tot_optr_startitems_strong", nullptr, 30, false, false },
+    { OPTVAL_STARTER_ITEMS_RANDOM, "tot_optr_startitems_random", nullptr, 31, false, false },
+    { OPT_BATTLE_DROPS, "tot_optr_drops", "tot_opth_drops", 32, true, false },
+    { OPTVAL_DROP_STANDARD, "tot_optr_drops_def", nullptr, 33, false, false },
+    { OPTVAL_DROP_HELD_FROM_BONUS, "tot_optr_drops_gated", nullptr, 34, false, false },
+    { OPTVAL_DROP_NO_HELD_W_BONUS, "tot_optr_drops_noheld", nullptr, 35, false, false },
+    { OPTVAL_DROP_ALL_HELD, "tot_optr_drops_all", nullptr, 36, false, false },
+    { OPT_CHARLIETON_STOCK, "tot_optr_charlie", "tot_opth_charlie", 37, true, false },
+    { OPTVAL_CHARLIETON_NORMAL, "tot_optr_charlie_5", nullptr, 38, false, false },
+    { OPTVAL_CHARLIETON_SMALLER, "tot_optr_charlie_3", nullptr, 39, false, false },
+    { OPTVAL_CHARLIETON_LIMITED, "tot_optr_charlie_lim", nullptr, 40, false, false },
+    { OPT_REVIVE_PARTNERS, "tot_optr_revive", "tot_opth_revive", 41, true, false },
+    { OPTVAL_REVIVE_PARTNERS_OFF, "tot_optr_off", nullptr, 42, false, false },
+    { OPTVAL_REVIVE_PARTNERS_ON, "tot_optr_on", nullptr, 43, false, false },
 };
 
 uint32_t OptionLookup(uint16_t lookup_key) {

@@ -933,7 +933,8 @@ EVT_DEFINE_USER_FUNC(evtTot_AfterItemBought) {
         // Mark unique badges as collected even if the player throws it away.
         RewardManager::MarkUniqueItemCollected(item_type);
     }
-    if (index >= 0 || item_type == ItemType::STAR_PIECE) {
+    if (index >= 0 || item_type == ItemType::STAR_PIECE ||
+        g_Mod->state_.CheckOptionValue(OPTVAL_CHARLIETON_LIMITED)) {
         // Search Charlieton's array for the item id and remove it.
         int16_t* charlieton_data = GetCharlietonInventoryPtr();
         int16_t* last = charlieton_data;

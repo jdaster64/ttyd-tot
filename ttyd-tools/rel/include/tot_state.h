@@ -323,7 +323,16 @@ enum Options : uint32_t {
     OPTVAL_STAGE_HAZARDS_OFF    = 0x514'3'00'04,
     // Whether to shuffle the appearance and description of items.
     OPT_OBFUSCATE_ITEMS         = 0x417'1'00'01,
-    // Next: 0x418
+    // Whether to auto-revive partners after finishing a battle.
+    OPT_REVIVE_PARTNERS         = 0x418'1'00'01,
+    OPTVAL_REVIVE_PARTNERS_OFF  = 0x518'1'00'00,
+    OPTVAL_REVIVE_PARTNERS_ON   = 0x518'1'00'01,
+    // Whether Charlieton should have smaller or limited stock.
+    OPT_CHARLIETON_STOCK        = 0x419'2'00'02,
+    OPTVAL_CHARLIETON_NORMAL    = 0x519'2'00'00,
+    OPTVAL_CHARLIETON_SMALLER   = 0x519'2'00'01,
+    OPTVAL_CHARLIETON_LIMITED   = 0x519'2'00'02,
+    // Next: 0x41b
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,

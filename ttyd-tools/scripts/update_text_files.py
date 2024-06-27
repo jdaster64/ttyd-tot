@@ -815,6 +815,24 @@ g_StringMap = {
         b"tot_optr_timer_none":         b"None",
         b"tot_optr_timer_igt":          b"In-Game Time",
         b"tot_optr_timer_rta":          b"Real-Time",
+        b"tot_optr_startitems":         b"Starting Items",
+        b"tot_optr_startitems_off":     b"None",
+        b"tot_optr_startitems_basic":   b"Basic",
+        b"tot_optr_startitems_strong":  b"Strong",
+        b"tot_optr_startitems_random":  b"Random",
+        b"tot_optr_drops":              b"Battle Drops",
+        b"tot_optr_drops_def":          b"Default",
+        b"tot_optr_drops_gated":        b"Condition-Gated",
+        b"tot_optr_drops_noheld":       b"No Held, Bonus Only",
+        b"tot_optr_drops_all":          b"All Items Drop",
+        b"tot_optr_charlie":            b"Charlieton Stock",
+        b"tot_optr_charlie_5":          b"Default",
+        b"tot_optr_charlie_3":          b"Smaller",
+        b"tot_optr_charlie_lim":        b"Limited",
+        b"tot_optr_revive":             b"Partner Revive",
+        
+        b"tot_optr_off":                b"Off",
+        b"tot_optr_on":                 b"On",
         
         b"tot_opth_difficulty":
             b"Determines how many floors\n"
@@ -823,6 +841,22 @@ g_StringMap = {
         b"tot_opth_timertype":
             b"Whether to show IGT, RTA,\n"
             b"or no timer during the run.",
+            
+        b"tot_opth_startitems":
+            b"Determines the items\n"
+            b"you start the run with.",
+        
+        b"tot_opth_drops":
+            b"Determines how you get item\n"
+            b"drops from enemy battles.",
+        
+        b"tot_opth_charlie":
+            b"Determines how well-stocked\n"
+            b"Charlieton's shop is.",
+        
+        b"tot_opth_revive":
+            b"Determines whether partners\n"
+            b"revive to 1 HP after wins.",
             
         # Map text.
         
@@ -935,6 +969,11 @@ g_StringMap = {
             b"[Placeholder] I'm interactable.\n<k>",
         
         # Charlieton
+        
+        b"tot_charlieton_nostock":
+            b"Hey, thanks to you, I'm all\n"
+            b"sold out, my man! <wait 250>You put\n"
+            b"my kids through college!\n<k>",
         
         b"tot_charlieton_intro":
             b"Hey hey HEY-YO!<wait 250> I've got ALL\n"
