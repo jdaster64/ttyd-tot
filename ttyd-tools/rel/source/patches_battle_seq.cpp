@@ -108,10 +108,12 @@ extern void (*g_BattleCommandInit_trampoline)(BattleWork*);
 extern void (*g_BattleInformationSetDropMaterial_trampoline)(
     FbatBattleInformation*);
 // Patch addresses.
+extern const int32_t g_fbatBattleMode_Patch_SkipStolenCheck;
 extern const int32_t g_fbatBattleMode_CalculateCoinDrops_BH;
 extern const int32_t g_fbatBattleMode_CalculateCoinDrops_EH;
 extern const int32_t g_fbatBattleMode_GivePlayerInvuln_BH;
 extern const int32_t g_fbatBattleMode_GivePlayerInvuln_EH;
+extern const int32_t g_marioMain_Patch_SkipRunawayCoinDrop;
 extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_BH;
 extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_EH;
 extern const int32_t g_btlseqTurn_Patch_RuleDispShowLonger;
@@ -395,6 +397,17 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_fbatBattleMode_GivePlayerInvuln_EH),
         reinterpret_cast<void*>(StartGivePlayerInvuln),
         reinterpret_cast<void*>(BranchBackGivePlayerInvuln));
+
+    // TODO: Make this an option rather than forcing it on?
+    // Disable re-fighting enemies with stolen items entirely.
+    // mod::patch::writePatch(
+    //     reinterpret_cast<void*>(g_fbatBattleMode_Patch_SkipStolenCheck),
+    //     0x48000098U /* branch past stolen item checks */);
+
+    // Disable dropping coins after running away from a battle.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_marioMain_Patch_SkipRunawayCoinDrop),
+        0x60000000U /* nop */);
 
     // Check for battle conditions at the start of processing the battle end,
     // not the end; this way level-up heals don't factor into "final HP".

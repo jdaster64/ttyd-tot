@@ -1111,8 +1111,10 @@ void SpendAndIncrementPartySwitchCost() {
         ttyd::battle_actrecord::BtlActRec_AddPoint(
             &battleWork->act_record_work.mario_fp_spent, switch_fp_cost);
         
-        // Increment cost of next use, until it hits max FP.
-        if (switch_fp_cost < unit->max_fp) ++g_PartySwitchNextFpCost;
+        // Increment cost of next use, until it hits 5 FP, or the player's max.
+        if (switch_fp_cost < 5 && switch_fp_cost < unit->max_fp) {
+            ++g_PartySwitchNextFpCost;
+        }
     }
 }
 
