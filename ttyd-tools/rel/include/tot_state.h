@@ -275,8 +275,7 @@ enum Options : uint32_t {
     OPTVAL_DIFFICULTY_FULL      = 0x502'2'00'02,
     OPTVAL_DIFFICULTY_FULL_EX   = 0x502'2'00'03,
     // Starting partner choice, or no partners.
-    // TODO: Implement.
-    OPT_PARTNER                 = 0x404'4'00'08,
+    OPT_PARTNER                 = 0x404'4'00'07,
     OPTVAL_PARTNER_RANDOM       = 0x504'4'00'00,
     OPTVAL_PARTNER_GOOMBELLA    = 0x504'4'00'01,
     OPTVAL_PARTNER_KOOPS        = 0x504'4'00'02,
@@ -285,7 +284,7 @@ enum Options : uint32_t {
     OPTVAL_PARTNER_VIVIAN       = 0x504'4'00'05,
     OPTVAL_PARTNER_BOBBERY      = 0x504'4'00'06,
     OPTVAL_PARTNER_MOWZ         = 0x504'4'00'07,
-    OPTVAL_PARTNER_NONE         = 0x504'4'00'08,    // Partners disabled.
+    OPTVAL_PARTNER_NONE         = 0x504'4'00'08,    // Not used yet.
     // Starting item set.
     OPT_STARTER_ITEMS           = 0x408'3'00'03,
     OPTVAL_STARTER_ITEMS_OFF    = 0x508'3'00'00,
@@ -332,7 +331,26 @@ enum Options : uint32_t {
     OPTVAL_CHARLIETON_NORMAL    = 0x519'2'00'00,
     OPTVAL_CHARLIETON_SMALLER   = 0x519'2'00'01,
     OPTVAL_CHARLIETON_LIMITED   = 0x519'2'00'02,
-    // Next: 0x41b
+    // Booleans for enabling individual NPCs.
+    OPT_ENABLE_NPC_LUMPY        = 0x41b'1'00'01,
+    OPTVAL_NPC_LUMPY_OFF        = 0x51b'1'00'00,
+    OPTVAL_NPC_LUMPY_ON         = 0x51b'1'00'01,
+    OPT_ENABLE_NPC_DOOPLISS     = 0x41c'1'00'01,
+    OPTVAL_NPC_DOOPLISS_OFF     = 0x51c'1'00'00,
+    OPTVAL_NPC_DOOPLISS_ON      = 0x51c'1'00'01,
+    OPT_ENABLE_NPC_GRUBBA       = 0x41d'1'00'01,
+    OPTVAL_NPC_GRUBBA_OFF       = 0x51d'1'00'00,
+    OPTVAL_NPC_GRUBBA_ON        = 0x51d'1'00'01,
+    OPT_ENABLE_NPC_CHET_RIPPO   = 0x41e'1'00'01,
+    OPTVAL_NPC_CHET_RIPPO_OFF   = 0x51e'1'00'00,
+    OPTVAL_NPC_CHET_RIPPO_ON    = 0x51e'1'00'01,
+    OPT_ENABLE_NPC_WONKY        = 0x41f'1'00'01,
+    OPTVAL_NPC_WONKY_OFF        = 0x51f'1'00'00,
+    OPTVAL_NPC_WONKY_ON         = 0x51f'1'00'01,
+    OPT_ENABLE_NPC_DAZZLE       = 0x420'1'00'01,
+    OPTVAL_NPC_DAZZLE_OFF       = 0x520'1'00'00,
+    OPTVAL_NPC_DAZZLE_ON        = 0x520'1'00'01,
+    // Next: 0x421
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,

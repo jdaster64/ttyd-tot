@@ -258,6 +258,20 @@ int32_t PartnerRewardTypeToPouchIndex(int32_t reward_type) {
 int32_t SelectPartner() {
     auto& state = g_Mod->state_;
 
+    // Handle specific partner requests on floor 0.
+    if (state.floor_ == 0) {
+        switch (state.GetOptionValue(OPT_PARTNER)) {
+            case OPTVAL_PARTNER_GOOMBELLA:  return REWARD_GOOMBELLA;
+            case OPTVAL_PARTNER_KOOPS:      return REWARD_KOOPS;
+            case OPTVAL_PARTNER_FLURRIE:    return REWARD_FLURRIE;
+            case OPTVAL_PARTNER_YOSHI:      return REWARD_YOSHI;
+            case OPTVAL_PARTNER_VIVIAN:     return REWARD_VIVIAN;
+            case OPTVAL_PARTNER_BOBBERY:    return REWARD_BOBBERY;
+            case OPTVAL_PARTNER_MOWZ:       return REWARD_MOWZ;
+            // default: run normal logic.
+        }
+    }
+
     for (int32_t i = 0; i < 50; ++i) {
         int32_t value = state.Rand(7, RNG_REWARD_PARTNER);
         int32_t reward_type = -(value + 1);

@@ -110,7 +110,7 @@ LBL(0)
     RETURN()
 EVT_END()
 
-// Generic talk script - TODO: Move all NPCs to their own scripts.
+// Generic talk script, placeholder for implementing new NPCs.
 EVT_BEGIN(TowerNpc_GenericTalk)
     USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, PTR("me"))
     RETURN()
@@ -460,6 +460,7 @@ EVT_BEGIN(TowerNpc_DooplissTalk)
         GOTO(99)
     END_IF()
 
+    // TODO: Play a sound effect or visual effect?
     USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::DOOPLISS)
     USER_FUNC(evt_msg_print_add, 0, PTR("tot_doopliss_accept"))
 
@@ -829,14 +830,55 @@ EVT_DEFINE_USER_FUNC(evtTot_GetTowerNpcParams) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
+    auto& state = g_Mod->state_;
+
     int32_t active_npc_types = 0;
-    int32_t base_weights[SecondaryNpcType::NUM_NPC_TYPES];
+    int32_t base_weights[SecondaryNpcType::NUM_NPC_TYPES] = { 0 };
     for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
-        // TODO: Make new options for whether to allow every individudal NPC?
         switch (i) {
+            case SecondaryNpcType::LUMPY: {
+                if (state.CheckOptionValue(OPTVAL_NPC_LUMPY_ON)) {
+                    base_weights[i] = 10;
+                    ++active_npc_types;
+                }
+                break;
+            }
+            case SecondaryNpcType::DOOPLISS: {
+                if (state.CheckOptionValue(OPTVAL_NPC_DOOPLISS_ON)) {
+                    base_weights[i] = 10;
+                    ++active_npc_types;
+                }
+                break;
+            }
+            case SecondaryNpcType::GRUBBA: {
+                if (state.CheckOptionValue(OPTVAL_NPC_GRUBBA_ON)) {
+                    base_weights[i] = 10;
+                    ++active_npc_types;
+                }
+                break;
+            }
+            case SecondaryNpcType::CHET_RIPPO: {
+                if (state.CheckOptionValue(OPTVAL_NPC_CHET_RIPPO_ON)) {
+                    base_weights[i] = 10;
+                    ++active_npc_types;
+                }
+                break;
+            }
+            case SecondaryNpcType::WONKY: {
+                if (state.CheckOptionValue(OPTVAL_NPC_WONKY_ON)) {
+                    base_weights[i] = 10;
+                    ++active_npc_types;
+                }
+                break;
+            }
+            case SecondaryNpcType::DAZZLE: {
+                if (state.CheckOptionValue(OPTVAL_NPC_DAZZLE_ON)) {
+                    base_weights[i] = 10;
+                    ++active_npc_types;
+                }
+                break;
+            }
             default:
-                base_weights[i] = 10;
-                ++active_npc_types;
                 break;
         }
     }

@@ -215,6 +215,12 @@ void StateManager::InitDefaultOptions() {
     SetOption(OPTVAL_DIFFICULTY_FULL);
     SetOption(OPTVAL_STARTER_ITEMS_BASIC);
     SetOption(OPTVAL_REVIVE_PARTNERS_ON);
+    SetOption(OPTVAL_NPC_LUMPY_ON);
+    SetOption(OPTVAL_NPC_DOOPLISS_ON);
+    SetOption(OPTVAL_NPC_GRUBBA_ON);
+    SetOption(OPTVAL_NPC_CHET_RIPPO_ON);
+    SetOption(OPTVAL_NPC_WONKY_ON);
+    SetOption(OPTVAL_NPC_DAZZLE_ON);
     SetOption(OPTNUM_MARIO_HP, 5);
     SetOption(OPTNUM_MARIO_FP, 5);
     SetOption(OPTNUM_MARIO_BP, 5);

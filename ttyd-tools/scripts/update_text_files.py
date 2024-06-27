@@ -829,7 +829,7 @@ g_StringMap = {
         b"tot_optr_charlie_5":          b"Default",
         b"tot_optr_charlie_3":          b"Smaller",
         b"tot_optr_charlie_lim":        b"Limited",
-        b"tot_optr_revive":             b"Partner Revive",
+        b"tot_optr_revive":             b"Partner Revival",
         b"tot_optr_mhp":                b"HP / Level",
         b"tot_optr_mfp":                b"FP / Level",
         b"tot_optr_mbp":                b"BP / Level",
@@ -837,6 +837,22 @@ g_StringMap = {
         b"tot_optr_ehp":                b"Enemy HP %",
         b"tot_optr_eatk":               b"Enemy ATK %",
         b"tot_optr_supercost":          b"Superguard SP Cost",
+        b"tot_optr_partner":            b"Starting Partner",
+        b"tot_optr_partner_random":     b"Random",
+        b"tot_optr_partner_1":          b"Goombella",
+        b"tot_optr_partner_2":          b"Koops",
+        b"tot_optr_partner_3":          b"Flurrie",
+        b"tot_optr_partner_4":          b"Yoshi",
+        b"tot_optr_partner_5":          b"Vivian",
+        b"tot_optr_partner_6":          b"Bobbery",
+        b"tot_optr_partner_7":          b"Ms. Mowz",
+        
+        b"tot_optr_npc_wonky":          b"NPCs: Wonky",
+        b"tot_optr_npc_dazzle":         b"NPCs: Dazzle",
+        b"tot_optr_npc_chet":           b"NPCs: Chet Rippo",
+        b"tot_optr_npc_lumpy":          b"NPCs: Lumpy",
+        b"tot_optr_npc_doopliss":       b"NPCs: Doopliss",
+        b"tot_optr_npc_grubba":         b"NPCs: Grubba",
         
         b"tot_optr_off":                b"Off",
         b"tot_optr_on":                 b"On",
@@ -892,6 +908,34 @@ g_StringMap = {
         b"tot_opth_supercost":
             b"How much Star Power it costs\n"
             b"to perform a Superguard.",
+            
+        b"tot_opth_partner":
+            b"Which partner Mario receives\n"
+            b"at the start of the run.",
+            
+        b"tot_opth_npc_wonky":
+            b"He'll buy unwanted items or\n"
+            b"badges for a small amount.",
+            
+        b"tot_opth_npc_dazzle":
+            b"He'll sell you additional\n"
+            b"Star Pieces.",
+            
+        b"tot_opth_npc_chet":
+            b"He'll give you Shine Sprites\n"
+            b"in exchange for lowered stats.",
+            
+        b"tot_opth_npc_lumpy":
+            b"Loan him coins to get back\n"
+            b"double, if you see him again.",
+            
+        b"tot_opth_npc_doopliss":
+            b"He'll make enemies stronger,\n"
+            b"but more chests will appear.",
+            
+        b"tot_opth_npc_grubba":
+            b"He'll give you extra conditions\n"
+            b"for double-or-nothing winnings.",
             
         # Map text.
         
