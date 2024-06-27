@@ -830,6 +830,13 @@ g_StringMap = {
         b"tot_optr_charlie_3":          b"Smaller",
         b"tot_optr_charlie_lim":        b"Limited",
         b"tot_optr_revive":             b"Partner Revive",
+        b"tot_optr_mhp":                b"HP / Level",
+        b"tot_optr_mfp":                b"FP / Level",
+        b"tot_optr_mbp":                b"BP / Level",
+        b"tot_optr_php":                b"Party HP / Level",
+        b"tot_optr_ehp":                b"Enemy HP %",
+        b"tot_optr_eatk":               b"Enemy ATK %",
+        b"tot_optr_supercost":          b"Superguard SP Cost",
         
         b"tot_optr_off":                b"Off",
         b"tot_optr_on":                 b"On",
@@ -857,6 +864,34 @@ g_StringMap = {
         b"tot_opth_revive":
             b"Determines whether partners\n"
             b"revive to 1 HP after wins.",
+        
+        b"tot_opth_mhp":
+            b"How many Heart Points each\n"
+            b"stat level is worth.",
+        
+        b"tot_opth_mfp":
+            b"How many Flower Points each\n"
+            b"stat level is worth.",
+        
+        b"tot_opth_mbp":
+            b"How many Badge Points each\n"
+            b"stat level is worth.",
+        
+        b"tot_opth_php":
+            b"How much HP partners gain\n"
+            b"per stat level, on average.",
+        
+        b"tot_opth_ehp":
+            b"What percentage to scale\n"
+            b"enemy health by.",
+        
+        b"tot_opth_eatk":
+            b"What percentage to scale\n"
+            b"enemies' attack power by.",
+        
+        b"tot_opth_supercost":
+            b"How much Star Power it costs\n"
+            b"to perform a Superguard.",
             
         # Map text.
         

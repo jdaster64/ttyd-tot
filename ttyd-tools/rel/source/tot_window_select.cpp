@@ -107,6 +107,13 @@ OptionMenuData g_OptionMenuData[] = {
     { OPT_REVIVE_PARTNERS, "tot_optr_revive", "tot_opth_revive", 41, true, false },
     { OPTVAL_REVIVE_PARTNERS_OFF, "tot_optr_off", nullptr, 42, false, false },
     { OPTVAL_REVIVE_PARTNERS_ON, "tot_optr_on", nullptr, 43, false, false },
+    { OPTNUM_MARIO_HP, "tot_optr_mhp", "tot_opth_mhp", 44, true, false },
+    { OPTNUM_MARIO_FP, "tot_optr_mfp", "tot_opth_mfp", 45, true, false },
+    { OPTNUM_MARIO_BP, "tot_optr_mbp", "tot_opth_mbp", 46, true, false },
+    { OPTNUM_PARTNER_HP, "tot_optr_php", "tot_opth_php", 47, true, false },
+    { OPTNUM_ENEMY_HP, "tot_optr_ehp", "tot_opth_ehp", 48, true, false },
+    { OPTNUM_ENEMY_ATK, "tot_optr_eatk", "tot_opth_eatk", 49, true, false },
+    { OPTNUM_SUPERGUARD_SP_COST, "tot_optr_supercost", "tot_opth_supercost", 50, true, false },
 };
 
 uint32_t OptionLookup(uint16_t lookup_key) {
