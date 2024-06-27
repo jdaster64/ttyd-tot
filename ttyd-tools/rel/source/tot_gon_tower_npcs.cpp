@@ -22,6 +22,7 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
+#include <ttyd/mario_pouch.h>
 #include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/system.h>
@@ -77,6 +78,8 @@ EVT_DECLARE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable, 1)
 EVT_DECLARE_USER_FUNC(evtTot_DowngradeStat, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetChetCost, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetDazzleCost, 1)
+EVT_DECLARE_USER_FUNC(evtTot_GetLumpyInfo, 2)
+EVT_DECLARE_USER_FUNC(evtTot_ReturnLumpy, 0)
 EVT_DECLARE_USER_FUNC(evtTot_CheckNpcEffectEnabled, 2)
 EVT_DECLARE_USER_FUNC(evtTot_EnableNpcEffect, 1)
 
@@ -337,8 +340,8 @@ EVT_BEGIN(TowerNpc_ChetRippoTalk)
 LBL(0)
     USER_FUNC(evt_win_other_select, window_select::MenuType::TOT_CHET_RIPPO_TRADE)
     IF_EQUAL(LW(1), 0)
-        USER_FUNC(evt_msg_print, 0, PTR("tot_chet_different"), 0, PTR("me"))
-        GOTO(0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_chet_decline"), 0, PTR("me"))
+        GOTO(99)
     END_IF()
 
     USER_FUNC(evt_win_coin_on, 0, LW(8))
@@ -349,9 +352,9 @@ LBL(0)
 
     USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
     IF_EQUAL(LW(0), 1)
-        USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_decline"))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_different"))
         USER_FUNC(evt_win_coin_off, LW(8))
-        GOTO(99)
+        GOTO(0)
     END_IF()
     USER_FUNC(evt_pouch_get_coin, LW(0))
     IF_SMALL(LW(0), LW(5))
@@ -475,6 +478,69 @@ LBL(99)
     RETURN()
 EVT_END()
 
+// Talk script for Lumpy.
+EVT_BEGIN(TowerNpc_LumpyTalk)
+    USER_FUNC(evt_mario_key_onoff, 0)
+
+    // LW(5) = investment (0 if invested this floor), LW(6) = can invest.
+    USER_FUNC(evtTot_GetLumpyInfo, LW(5), LW(6))
+    IF_LARGE(LW(5), 0)
+        GOTO(50)
+    END_IF()
+    IF_EQUAL(LW(6), 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_lumpy_goodluck"), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+
+    // If no prior coins invested, explain but then acknowledge lack of coins.
+    USER_FUNC(evt_pouch_get_coin, LW(5))
+    IF_EQUAL(LW(5), 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_lumpy_intronocoin"), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+    
+    // Explain purpose and offer deal.
+    USER_FUNC(evt_win_coin_on, 0, LW(8))
+    USER_FUNC(evt_msg_print, 0, PTR("tot_lumpy_intro"), 0, PTR("me"))
+
+LBL(10)
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_win_coin_off, LW(8))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_lumpy_decline"))
+        GOTO(99)
+    END_IF()
+    // Enable (takes all coins away).
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::LUMPY)
+    USER_FUNC(evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_coin_off, LW(8))
+
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_lumpy_accept"))
+    GOTO(99)
+
+LBL(50)
+    // Return past investment with interest.
+    USER_FUNC(evt_win_coin_on, 0, LW(8))
+    USER_FUNC(evt_msg_print, 0, PTR("tot_lumpy_reward"), 0, PTR("me"))
+    USER_FUNC(evtTot_ReturnLumpy)
+    USER_FUNC(evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+
+    // Check whether the player can invest again.
+    IF_EQUAL(LW(6), 0)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_lumpy_goodluckadd"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_lumpy_doubleorno"))
+    GOTO(10)
+
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::LUMPY,
     NpcTribeType::DOOPLISS,
@@ -490,14 +556,14 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
         .regularEvtCode = nullptr,
-        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .talkEvtCode = (void*)TowerNpc_LumpyTalk,
         .battleInfoId = -1,
     },
     {
         .name = "npc_doopliss",
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
-        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .regularEvtCode = nullptr,
         .talkEvtCode = (void*)TowerNpc_DooplissTalk,
         .battleInfoId = -1,
     },
@@ -505,7 +571,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .name = "npc_grubba",
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
-        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .regularEvtCode = nullptr,
         .talkEvtCode = (void*)TowerNpc_GrubbaTalk,
         .battleInfoId = -1,
     },
@@ -529,7 +595,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .name = "npc_dazzle",
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
-        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .regularEvtCode = nullptr,
         .talkEvtCode = (void*)TowerNpc_DazzleTalk,
         .battleInfoId = -1,
     },
@@ -649,6 +715,28 @@ EVT_DEFINE_USER_FUNC(evtTot_GetDazzleCost) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_GetLumpyInfo) {
+    int32_t invested_coins = g_Mod->state_.GetOption(STAT_RUN_NPC_LUMPY_COINS);
+
+    int32_t floor = g_Mod->state_.floor_;
+    bool can_invest = !g_Mod->state_.IsFinalBossFloor(floor + 1);
+    if (floor == g_Mod->state_.GetOption(STAT_RUN_NPC_LUMPY_FLOOR)) {
+        invested_coins = 0;
+        can_invest = 0;
+    }
+
+    evtSetValue(evt, evt->evtArguments[0], invested_coins);
+    evtSetValue(evt, evt->evtArguments[1], can_invest);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_ReturnLumpy) {
+    int32_t num_coins = g_Mod->state_.GetOption(STAT_RUN_NPC_LUMPY_COINS);
+    ttyd::mario_pouch::pouchAddCoin(num_coins * 2);
+    g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_COINS, 0);
+    return 2;
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_CheckNpcEffectEnabled) {
     const int32_t floor = g_Mod->state_.floor_;
     bool effect = false;
@@ -667,12 +755,21 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckNpcEffectEnabled) {
 EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
     const int32_t floor = g_Mod->state_.floor_;
     switch (evtGetValue(evt, evt->evtArguments[0])) {
-        case SecondaryNpcType::GRUBBA:
+        case SecondaryNpcType::GRUBBA: {
             g_Mod->state_.SetOption(STAT_RUN_NPC_GRUBBA_FLOOR, floor);
             break;
-        case SecondaryNpcType::DOOPLISS:
+        }
+        case SecondaryNpcType::DOOPLISS: {
             g_Mod->state_.SetOption(STAT_RUN_NPC_DOOPLISS_FLOOR, floor);
             break;
+        }
+        case SecondaryNpcType::LUMPY: {
+            auto& coins = ttyd::mario_pouch::pouchGetPtr()->coins;
+            g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_COINS, coins);
+            g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_FLOOR, floor);
+            coins = 0;
+            break;
+        }
     }
     return 2;
 }
@@ -714,10 +811,6 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
     for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
         // TODO: Make new options for whether to allow every individudal NPC?
         switch (i) {
-            case SecondaryNpcType::LUMPY:
-                // TODO: Add support for Lumpy.
-                base_weights[i] = 0;
-                break;
             default:
                 base_weights[i] = 10;
                 ++active_npc_types;

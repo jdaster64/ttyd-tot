@@ -1114,7 +1114,7 @@ g_StringMap = {
             b"floors extra tough.\n<k>\n<p>\n"
             b"In exchange, you might get\n"
             b"more rewards to choose from\n"
-            b"after battle. You in?\n<o>",
+            b"after battle. Deal?\n<o>",
             
         b"tot_doopliss_accept":
             b"<p>\n[Placeholder] Hee hee!\n"
@@ -1126,6 +1126,44 @@ g_StringMap = {
         b"tot_doopliss_active":
             b"[Placeholder] Hee hee!\n"
             b"Don't get clobbered out there!\n<k>",
+            
+        b"tot_lumpy_intronocoin":
+            b"[Placeholder] Hello! I'm Lumpy.\n"
+            b"If you lend me all your coins,\n"
+            b"I'll pay you interest later.\n<k>\n<p>\n"
+            b"Or at least I would, if you\n"
+            b"had any coins on you right now.\n"
+            b"Good luck on your travels!\n<k>",
+            
+        b"tot_lumpy_intro":
+            b"[Placeholder] Hello! I'm Lumpy.\n"
+            b"If you lend me all your coins,\n"
+            b"I'll pay you interest later.\n<k>\n<p>\n"
+            b"Sound like a deal?\n<o>",
+            
+        b"tot_lumpy_reward":
+            b"[Placeholder] Oh, hey!\n"
+            b"Thanks for the loan earlier;\n"
+            b"here it is with 100% interest!\n<k>\n<o>",
+            
+        b"tot_lumpy_goodluck":
+            b"Good luck on your travels!\n<k>",
+            
+        b"tot_lumpy_goodluckadd":
+            b"<p>\nGood luck on your travels!\n<k>",
+            
+        b"tot_lumpy_decline":
+            b"<p>\nGood luck on your travels!\n<k>",
+            
+        b"tot_lumpy_accept":
+            b"<p>\nThanks a million!\n"
+            b"You won't regret it, I'm sure.\n"
+            b"Until we cross paths again!\n<k>",
+            
+        b"tot_lumpy_doubleorno":
+            b"<p>\nIf you'd care to lend me your\n"
+            b"cash again, I can offer you the\n"
+            b"same deal. What do you say?\n<o>",
             
         # NPC-related menu / help text.
         
