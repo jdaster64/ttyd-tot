@@ -949,7 +949,7 @@ g_StringMap = {
             b'Current seed: <col 0000ffff>\n'
             b'%09d\n</col>\n'
             b'Current options: <col 0000ffff>\n'
-            b'TBD\n</col>\n'
+            b'%s\n</col>\n'
             b'<k>',
         
         b"tot_lobby_reentry":
@@ -963,10 +963,10 @@ g_StringMap = {
 
         b'tot_floor_sign':
             b'<kanban>\n'
-            b'<pos 100 13>\n'
             b'Seed: <col 0000ffff>\n'
             b'%09d\n</col>\n'
-            b'<pos 162 38>\n'
+            b'Options: <col 0000ffff>\n'
+            b'%s\n</col>\n'
             b'Floor: <col 0000ffff>\n'
             b'%02d\n</col>\n'
             b'<k>',

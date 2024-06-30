@@ -89,7 +89,8 @@ EVT_BEGIN(Lobby_BackSignEvt)
     USER_FUNC(evt_mario_normalize)
     
     USER_FUNC(evtTot_GetSeed, LW(0))
-    USER_FUNC(evt_msg_print_insert, 0, PTR("tot_lobby_backsign"), 0, 0, LW(0))
+    USER_FUNC(evtTot_GetEncodedOptions, LW(1))
+    USER_FUNC(evt_msg_print_insert, 0, PTR("tot_lobby_backsign"), 0, 0, LW(0), LW(1))
 
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_npc_start_for_event)

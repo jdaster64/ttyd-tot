@@ -946,8 +946,7 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
     sprintf(text, "Options: ");
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
-    // TODO: Actual options string.
-    sprintf(text, "Default");
+    sprintf(text, g_Mod->state_.GetEncodedOptions());
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
 
     text_pos.x = max_x;

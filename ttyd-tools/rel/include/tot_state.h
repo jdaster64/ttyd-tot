@@ -18,7 +18,7 @@ struct TotSaveSlot;
 class StateManager {
 public:
     // State revision; will eventually be used for versioning.
-    uint8_t     version_;
+    uint8_t     version_ = 1;
     
     // Whether in-game run timer is currently active.
     uint8_t     igt_active_;
@@ -93,13 +93,8 @@ public:
     uint32_t GetOptionValue(uint32_t option) const;
     bool CheckOptionValue(uint32_t option_value) const;
     
-    // Gets menu information (raw strings, not msg keys) for a given option.
-    // void GetOptionStrings(
-    //      int32_t option, char* name_buf, char* value_buf, int32_t* cost,
-    //      bool* unlocked, bool* default, bool* affects_seeding) const;
-    
     // Returns a string representing the current options encoded.
-    // const char* GetEncodedOptions() const;
+    const char* GetEncodedOptions() const;
     
     // Sets/increments the current tower floor, and makes any necessary changes.
     void IncrementFloor(int32_t change = 1);
@@ -134,6 +129,9 @@ EVT_DECLARE_USER_FUNC(evtTot_GetFloor, 1)
 
 // Returns the current seed.
 EVT_DECLARE_USER_FUNC(evtTot_GetSeed, 1)
+
+// Returns a string encoding the currently selected options.
+EVT_DECLARE_USER_FUNC(evtTot_GetEncodedOptions, 1)
 
 // Returns the current difficulty setting.
 EVT_DECLARE_USER_FUNC(evtTot_GetDifficulty, 1)

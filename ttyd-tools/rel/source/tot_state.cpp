@@ -36,6 +36,29 @@ void GetOptionParts(
     *b = GetShiftedBitMask(v, 0, 7);
 }
 
+void EncodeOption(
+    int8_t* encoding_bytes, int32_t& encoded_bit_count, uint32_t option) {
+    int32_t t, x, y, a, b;
+    GetOptionParts(option, &t, &x, &y, &a, &b);
+    int32_t bits_left = 6 - (encoded_bit_count % 6);
+    int32_t num_bits  = t == TYPE_OPTNUM ? 8 : y;
+    int32_t divisor   = t == TYPE_OPTNUM ? a : 1;
+    int32_t value = g_Mod->state_.GetOption(option) / divisor;
+
+    while (num_bits > 0) {
+        encoding_bytes[encoded_bit_count / 6]
+            |= (value << (encoded_bit_count % 6)) & 63;
+        if (num_bits > bits_left) {
+            encoded_bit_count += bits_left;
+            value >>= bits_left;
+            bits_left = 6;
+        } else {
+            encoded_bit_count += num_bits;
+        }
+        num_bits -= bits_left;
+    }
+}
+
 // Holds backup save data (updated on floor 0 and after every boss floor).
 TotSaveSlot g_BackupSave;
 bool g_HasBackupSave = false;
@@ -423,13 +446,51 @@ bool StateManager::CheckOptionValue(uint32_t option_value) const {
     return value == b;
 }
 
-// Gets menu information (raw strings, not msg keys) for a given option.
-// void StateManager::GetOptionStrings(
-//      int32_t option, char* name_buf, char* value_buf, int32_t* cost,
-//      bool* unlocked, bool* default, bool* affects_seeding) const;
-
 // Returns a string representing the current options encoded.
-// const char* StateManager::GetEncodedOptions() const;
+const char* StateManager::GetEncodedOptions() const {
+    static char encoding_str[24] = { 0 };
+    int8_t encoding_bytes[24] = { (int8_t)version_, 99 };
+    int32_t encoded_bit_count = 12;
+
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_BATTLE_DROPS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_STARTER_ITEMS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_REVIVE_PARTNERS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_MARIO_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_MARIO_FP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_MARIO_BP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_PARTNER_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_ATK);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_SUPERGUARD_SP_COST);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_CHARLIETON_STOCK);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_WONKY);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_DAZZLE);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_CHET_RIPPO);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_LUMPY);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_DOOPLISS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_GRUBBA);
+
+    const int32_t kEncodedByteCount = (encoded_bit_count + 5) / 6;
+    for (int32_t i = 0; i < kEncodedByteCount; ++i) {
+        if (encoding_bytes[i] < 26) {
+            encoding_str[i] = 'A' + encoding_bytes[i];
+        } else if (encoding_bytes[i] < 52) {
+            encoding_str[i] = 'a' + encoding_bytes[i] - 26;
+        } else if (encoding_bytes[i] < 62) {
+            encoding_str[i] = '0' + encoding_bytes[i] - 52;
+        } else if (encoding_bytes[i] == 62) {
+            encoding_str[i] = '!';
+        } else if (encoding_bytes[i] == 63) {
+            encoding_str[i] = '?';
+        } else {
+            encoding_str[i] = '.';
+        }
+    }
+    encoding_str[kEncodedByteCount] = 0;
+
+    return encoding_str;
+}
 
 void StateManager::IncrementFloor(int32_t change) {
     // Update timer values for the current floor.
@@ -603,6 +664,12 @@ EVT_DEFINE_USER_FUNC(evtTot_GetFloor) {
 EVT_DEFINE_USER_FUNC(evtTot_GetSeed) {
     uint32_t seed = g_Mod->state_.seed_;
     evtSetValue(evt, evt->evtArguments[0], seed);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetEncodedOptions) {
+    const char* encoded_str = g_Mod->state_.GetEncodedOptions();
+    evtSetValue(evt, evt->evtArguments[0], PTR(encoded_str));
     return 2;
 }
 
