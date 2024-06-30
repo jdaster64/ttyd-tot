@@ -4,6 +4,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "mod_state.h"
+#include "patches_item.h"
 #include "tot_generate_enemy.h"
 #include "tot_generate_item.h"
 #include "tot_manager_move.h"
@@ -460,17 +461,20 @@ EVT_END()
 
 // Pickup script for Star Pieces (base).
 EVT_BEGIN(Reward_StarPieceBaseEvt)
+    USER_FUNC(infinite_pit::item::evtTot_FreezeFieldItemTimers, 1)
     USER_FUNC(evtTot_SelectMoves, 1, 0, LW(0), LW(1), LW(2))
     IF_LARGE(LW(0), 0)
         USER_FUNC(evtTot_UpgradeMove, LW(1))
         USER_FUNC(
             evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
     END_IF()
+    USER_FUNC(infinite_pit::item::evtTot_FreezeFieldItemTimers, 0)
     RETURN()
 EVT_END()
 
 // Pickup script for Shine Sprites (base).
 EVT_BEGIN(Reward_ShineSpriteBaseEvt)
+    USER_FUNC(infinite_pit::item::evtTot_FreezeFieldItemTimers, 1)
     USER_FUNC(evtTot_SelectMoves, 1, 0, LW(0), LW(1), LW(2))
     IF_LARGE(LW(0), 0)
         // Open menu to select a move.
@@ -481,6 +485,7 @@ EVT_BEGIN(Reward_ShineSpriteBaseEvt)
         USER_FUNC(
             evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
     END_IF()
+    USER_FUNC(infinite_pit::item::evtTot_FreezeFieldItemTimers, 0)
     RETURN()
 EVT_END()
 

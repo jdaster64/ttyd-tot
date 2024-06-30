@@ -1,6 +1,9 @@
 #pragma once
 
+#include "evt_cmd.h"
+
 #include <ttyd/battle_unit.h>
+#include <ttyd/evtmgr.h>
 
 #include <cstdint>
 
@@ -18,5 +21,8 @@ int32_t GetBonusCakeRestoration();
 
 // Gets the current size of the player's item inventory.
 int32_t GetItemInventorySize();
+
+// Toggles whether or not to stop field item drops from despawning.
+EVT_DECLARE_USER_FUNC(evtTot_FreezeFieldItemTimers, 1)
 
 }

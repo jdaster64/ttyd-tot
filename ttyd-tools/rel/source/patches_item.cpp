@@ -45,6 +45,8 @@ namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
 
+bool g_FreezeFieldItems = false;
+
 }
 
 // Function hooks.
@@ -56,6 +58,7 @@ extern int32_t (*g__get_flower_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_heart_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_BattleItemData_rank_up_trampoline)(EvtEntry*, bool);
 // Patch addresses.
+extern const int32_t g_itemMain_CheckItemFreeze_BH;
 extern const int32_t g_pouchRemoveItemIndex_CheckMaxInv_BH;
 extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH;
 extern const int32_t g_pouchGetItem_CheckMaxInv_BH;
@@ -79,6 +82,9 @@ extern const int32_t g_BattleAudience_Case_Appeal_Patch_AppealSp;
 
 // Assembly patch functions.
 extern "C" {
+    // field_item_patches.s
+    void StartCheckItemFreeze();
+    void BranchBackCheckItemFreeze();
     // happy_badge_patches.s
     void StartHappyHeartProc();
     void BranchBackHappyHeartProc();
@@ -93,6 +99,10 @@ extern "C" {
     void BranchBackRemoveItemIndexMax();
     void StartGetEmptyItemSlotsMax();
     void BranchBackGetEmptyItemSlotsMax();
+
+    bool checkItemFreeze() {
+        return g_FreezeFieldItems;
+    }
     
     int32_t getTotItemInventorySize() {
         return mod::infinite_pit::item::GetItemInventorySize();
@@ -586,6 +596,13 @@ void ApplyFixedPatches() {
             
             return return_value;
         });
+
+    // Add additional check for items not despawning while a Star Piece
+    // or Shine Sprite is being collected on the field.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_itemMain_CheckItemFreeze_BH),
+        reinterpret_cast<void*>(StartCheckItemFreeze),
+        reinterpret_cast<void*>(BranchBackCheckItemFreeze));
 }
 
 int32_t GetBonusCakeRestoration() {
@@ -597,6 +614,11 @@ int32_t GetItemInventorySize() {
     // Returns the current inventory size based on Strange Sack upgrades.
     int32_t items = g_Mod->state_.num_sack_upgrades_ * 2 + 6;
     return items < 20 ? items : 20;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_FreezeFieldItemTimers) {
+    g_FreezeFieldItems = evtGetValue(evt, evt->evtArguments[0]);
+    return 2;
 }
 
 }  // namespace item

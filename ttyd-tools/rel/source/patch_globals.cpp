@@ -205,6 +205,7 @@ extern const int32_t g_seq_logoMain_Patch_AlwaysSkipIntro = 0x800872c4;
 extern const int32_t g_itemseq_Bound_Patch_BounceRange = 0x800aac68;
 extern const int32_t g_itemseq_GetItem_Patch_SkipTutorials = 0x800abcd8;
 extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH = 0x800adae4;
+extern const int32_t g_itemMain_CheckItemFreeze_BH = 0x800ae0bc;
 extern const int32_t g_pouchRemoveItemIndex_CheckMaxInv_BH = 0x800d49d8;
 extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH = 0x800d4c94;
 extern const int32_t g_pouchGetItem_CheckMaxInv_BH = 0x800d533c;
