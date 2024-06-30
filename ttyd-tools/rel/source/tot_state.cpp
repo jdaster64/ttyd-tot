@@ -235,6 +235,7 @@ void StateManager::InitDefaultOptions() {
     memset(play_stats_, 0, sizeof(play_stats_));
 
     // Set non-zero default values to their default values.
+    SetOption(OPTVAL_PRESET_DEFAULT);
     SetOption(OPTVAL_DIFFICULTY_FULL);
     SetOption(OPTVAL_STARTER_ITEMS_BASIC);
     SetOption(OPTVAL_REVIVE_PARTNERS_ON);
@@ -252,6 +253,41 @@ void StateManager::InitDefaultOptions() {
     SetOption(OPTNUM_ENEMY_ATK, 100);
     
     g_HasBackupSave = false;
+}
+
+void StateManager::ApplyPresetOptions() {
+    switch (GetOptionValue(OPT_PRESET)) {
+        case OPTVAL_PRESET_DEFAULT: {
+            // Preserve preset, timer and difficulty settings, overwrite others.
+            uint32_t difficulty_option = GetOptionValue(OPT_DIFFICULTY);
+            uint32_t timer_option = GetOptionValue(OPT_TIMER_DISPLAY);
+
+            memset(option_flags_, 0, sizeof(option_flags_));
+            memset(option_bytes_, 0, sizeof(option_bytes_));
+
+            SetOption(OPTVAL_PRESET_DEFAULT);
+            SetOption(difficulty_option);
+            SetOption(timer_option);
+
+            // Set non-zero default values to their default values.
+            SetOption(OPTVAL_STARTER_ITEMS_BASIC);
+            SetOption(OPTVAL_REVIVE_PARTNERS_ON);
+            SetOption(OPTVAL_NPC_LUMPY_ON);
+            SetOption(OPTVAL_NPC_DOOPLISS_ON);
+            SetOption(OPTVAL_NPC_GRUBBA_ON);
+            SetOption(OPTVAL_NPC_CHET_RIPPO_ON);
+            SetOption(OPTVAL_NPC_WONKY_ON);
+            SetOption(OPTVAL_NPC_DAZZLE_ON);
+            SetOption(OPTNUM_MARIO_HP, 5);
+            SetOption(OPTNUM_MARIO_FP, 5);
+            SetOption(OPTNUM_MARIO_BP, 5);
+            SetOption(OPTNUM_PARTNER_HP, 5);
+            SetOption(OPTNUM_ENEMY_HP, 100);
+            SetOption(OPTNUM_ENEMY_ATK, 100);
+
+            break;
+        }
+    }
 }
 
 bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
@@ -451,6 +487,12 @@ const char* StateManager::GetEncodedOptions() const {
     static char encoding_str[24] = { 0 };
     int8_t encoding_bytes[24] = { (int8_t)version_, 99 };
     int32_t encoded_bit_count = 12;
+
+    // If a preset is selected, use its name instead.
+    switch (GetOptionValue(OPT_PRESET)) {
+        case OPTVAL_PRESET_DEFAULT:
+            return "Default";
+    }
 
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_BATTLE_DROPS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_STARTER_ITEMS);

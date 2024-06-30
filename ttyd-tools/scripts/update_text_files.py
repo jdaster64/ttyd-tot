@@ -807,11 +807,14 @@ g_StringMap = {
             
         b"tot_winsel_runoptions_header":    b"Options",
         
-        b"tot_optr_difficulty":         b"Difficulty:",
+        b"tot_optr_preset":             b"Preset",
+        b"tot_optr_preset_custom":      b"Custom",
+        b"tot_optr_preset_default":     b"Default",
+        b"tot_optr_difficulty":         b"Difficulty",
         b"tot_optr_diff_half":          b"Half (32 floors)",
         b"tot_optr_diff_full":          b"Full (64 floors)",
         b"tot_optr_diff_ex":            b"EX (64 floors)",
-        b"tot_optr_timertype":          b"Timer Display:",
+        b"tot_optr_timertype":          b"Timer Display",
         b"tot_optr_timer_none":         b"None",
         b"tot_optr_timer_igt":          b"In-Game Time",
         b"tot_optr_timer_rta":          b"Real-Time",
@@ -856,6 +859,10 @@ g_StringMap = {
         
         b"tot_optr_off":                b"Off",
         b"tot_optr_on":                 b"On",
+        
+        b"tot_opth_preset":
+            b"Whether to use custom settings\n"
+            b"or a predetermined setup.",
         
         b"tot_opth_difficulty":
             b"Determines how many floors\n"

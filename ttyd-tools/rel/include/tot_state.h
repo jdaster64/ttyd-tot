@@ -75,6 +75,8 @@ public:
     
     // Initialize all settings to default.
     void InitDefaultOptions();
+    // Resets settings based on the currently selected preset.
+    void ApplyPresetOptions();
     
     // Sets / adjusts options, play stats, achievements, etc.
     // If OPTVAL is provided for 'SetOption', value parameter is ignored.

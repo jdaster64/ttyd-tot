@@ -20,6 +20,7 @@
 #include <ttyd/memory.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/pmario_sound.h>
+#include <ttyd/sound.h>
 #include <ttyd/statuswindow.h>
 #include <ttyd/system.h>
 #include <ttyd/win_main.h>
@@ -81,66 +82,69 @@ OptionMenuData g_OptionMenuData[] = {
     { STAT_RUN_SP_SPENT, "tot_optr_spspent", nullptr, 15, false, true },
     { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", nullptr, 16, false, true },
     { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", nullptr, 17, false, true },
-    { OPT_DIFFICULTY, "tot_optr_difficulty", "tot_opth_difficulty", 18, true, false },
-    { OPTVAL_DIFFICULTY_TUTORIAL, "tot_optr_diff_tutorial", nullptr, 19, false, false },
-    { OPTVAL_DIFFICULTY_HALF, "tot_optr_diff_half", nullptr, 20, false, false },
-    { OPTVAL_DIFFICULTY_FULL, "tot_optr_diff_full", nullptr, 21, false, false },
-    { OPTVAL_DIFFICULTY_FULL_EX, "tot_optr_diff_ex", nullptr, 22, false, false },
-    { OPT_TIMER_DISPLAY, "tot_optr_timertype", "tot_opth_timertype", 23, true, false },
-    { OPTVAL_TIMER_NONE, "tot_optr_timer_none", nullptr, 24, false, false },
-    { OPTVAL_TIMER_IGT, "tot_optr_timer_igt", nullptr, 25, false, false },
-    { OPTVAL_TIMER_RTA, "tot_optr_timer_rta", nullptr, 26, false, false },
-    { OPT_BATTLE_DROPS, "tot_optr_drops", "tot_opth_drops", 27, true, false },
-    { OPTVAL_DROP_STANDARD, "tot_optr_drops_def", nullptr, 28, false, false },
-    { OPTVAL_DROP_HELD_FROM_BONUS, "tot_optr_drops_gated", nullptr, 29, false, false },
-    { OPTVAL_DROP_NO_HELD_W_BONUS, "tot_optr_drops_noheld", nullptr, 30, false, false },
-    { OPTVAL_DROP_ALL_HELD, "tot_optr_drops_all", nullptr, 31, false, false },
-    { OPT_STARTER_ITEMS, "tot_optr_startitems", "tot_opth_startitems", 32, true, false },
-    { OPTVAL_STARTER_ITEMS_OFF, "tot_optr_startitems_off", nullptr, 33, false, false },
-    { OPTVAL_STARTER_ITEMS_BASIC, "tot_optr_startitems_basic", nullptr, 34, false, false },
-    { OPTVAL_STARTER_ITEMS_STRONG, "tot_optr_startitems_strong", nullptr, 35, false, false },
-    { OPTVAL_STARTER_ITEMS_RANDOM, "tot_optr_startitems_random", nullptr, 36, false, false },
-    { OPT_PARTNER, "tot_optr_partner", "tot_opth_partner", 37, true, false },
-    { OPTVAL_PARTNER_RANDOM, "tot_optr_partner_random", nullptr, 38, false, false },
-    { OPTVAL_PARTNER_GOOMBELLA, "tot_optr_partner_1", nullptr, 39, false, false },
-    { OPTVAL_PARTNER_KOOPS, "tot_optr_partner_2", nullptr, 40, false, false },
-    { OPTVAL_PARTNER_FLURRIE, "tot_optr_partner_3", nullptr, 41, false, false },
-    { OPTVAL_PARTNER_YOSHI, "tot_optr_partner_4", nullptr, 42, false, false },
-    { OPTVAL_PARTNER_VIVIAN, "tot_optr_partner_5", nullptr, 43, false, false },
-    { OPTVAL_PARTNER_BOBBERY, "tot_optr_partner_6", nullptr, 44, false, false },
-    { OPTVAL_PARTNER_MOWZ, "tot_optr_partner_7", nullptr, 45, false, false },
-    { OPT_REVIVE_PARTNERS, "tot_optr_revive", "tot_opth_revive", 60, true, false },
-    { OPTVAL_REVIVE_PARTNERS_OFF, "tot_optr_off", nullptr, 61, false, false },
-    { OPTVAL_REVIVE_PARTNERS_ON, "tot_optr_on", nullptr, 62, false, false },
-    { OPTNUM_MARIO_HP, "tot_optr_mhp", "tot_opth_mhp", 70, true, false },
-    { OPTNUM_MARIO_FP, "tot_optr_mfp", "tot_opth_mfp", 71, true, false },
-    { OPTNUM_MARIO_BP, "tot_optr_mbp", "tot_opth_mbp", 72, true, false },
-    { OPTNUM_PARTNER_HP, "tot_optr_php", "tot_opth_php", 73, true, false },
-    { OPTNUM_ENEMY_HP, "tot_optr_ehp", "tot_opth_ehp", 74, true, false },
-    { OPTNUM_ENEMY_ATK, "tot_optr_eatk", "tot_opth_eatk", 75, true, false },
-    { OPTNUM_SUPERGUARD_SP_COST, "tot_optr_supercost", "tot_opth_supercost", 76, true, false },
-    { OPT_CHARLIETON_STOCK, "tot_optr_charlie", "tot_opth_charlie", 90, true, false },
-    { OPTVAL_CHARLIETON_NORMAL, "tot_optr_charlie_5", nullptr, 91, false, false },
-    { OPTVAL_CHARLIETON_SMALLER, "tot_optr_charlie_3", nullptr, 92, false, false },
-    { OPTVAL_CHARLIETON_LIMITED, "tot_optr_charlie_lim", nullptr, 93, false, false },
-    { OPT_ENABLE_NPC_WONKY, "tot_optr_npc_wonky", "tot_opth_npc_wonky", 94, true, false },
-    { OPTVAL_NPC_WONKY_OFF, "tot_optr_off", nullptr, 95, false, false },
-    { OPTVAL_NPC_WONKY_ON, "tot_optr_on", nullptr, 96, false, false },
-    { OPT_ENABLE_NPC_DAZZLE, "tot_optr_npc_dazzle", "tot_opth_npc_dazzle", 97, true, false },
-    { OPTVAL_NPC_DAZZLE_OFF, "tot_optr_off", nullptr, 98, false, false },
-    { OPTVAL_NPC_DAZZLE_ON, "tot_optr_on", nullptr, 99, false, false },
-    { OPT_ENABLE_NPC_CHET_RIPPO, "tot_optr_npc_chet", "tot_opth_npc_chet", 100, true, false },
-    { OPTVAL_NPC_CHET_RIPPO_OFF, "tot_optr_off", nullptr, 101, false, false },
-    { OPTVAL_NPC_CHET_RIPPO_ON, "tot_optr_on", nullptr, 102, false, false },
-    { OPT_ENABLE_NPC_LUMPY, "tot_optr_npc_lumpy", "tot_opth_npc_lumpy", 103, true, false },
-    { OPTVAL_NPC_LUMPY_OFF, "tot_optr_off", nullptr, 104, false, false },
-    { OPTVAL_NPC_LUMPY_ON, "tot_optr_on", nullptr, 105, false, false },
-    { OPT_ENABLE_NPC_DOOPLISS, "tot_optr_npc_doopliss", "tot_opth_npc_doopliss", 106, true, false },
-    { OPTVAL_NPC_DOOPLISS_OFF, "tot_optr_off", nullptr, 107, false, false },
-    { OPTVAL_NPC_DOOPLISS_ON, "tot_optr_on", nullptr, 108, false, false },
-    { OPT_ENABLE_NPC_GRUBBA, "tot_optr_npc_grubba", "tot_opth_npc_grubba", 109, true, false },
-    { OPTVAL_NPC_GRUBBA_OFF, "tot_optr_off", nullptr, 110, false, false },
-    { OPTVAL_NPC_GRUBBA_ON, "tot_optr_on", nullptr, 111, false, false },
+    { OPT_PRESET, "tot_optr_preset", "tot_opth_preset", 100, true, false },
+    { OPTVAL_PRESET_CUSTOM, "tot_optr_preset_custom", nullptr, 101, false, false },
+    { OPTVAL_PRESET_DEFAULT, "tot_optr_preset_default", nullptr, 102, false, false },
+    { OPT_DIFFICULTY, "tot_optr_difficulty", "tot_opth_difficulty", 118, true, false },
+    { OPTVAL_DIFFICULTY_TUTORIAL, "tot_optr_diff_tutorial", nullptr, 119, false, false },
+    { OPTVAL_DIFFICULTY_HALF, "tot_optr_diff_half", nullptr, 120, false, false },
+    { OPTVAL_DIFFICULTY_FULL, "tot_optr_diff_full", nullptr, 121, false, false },
+    { OPTVAL_DIFFICULTY_FULL_EX, "tot_optr_diff_ex", nullptr, 122, false, false },
+    { OPT_TIMER_DISPLAY, "tot_optr_timertype", "tot_opth_timertype", 123, true, false },
+    { OPTVAL_TIMER_NONE, "tot_optr_timer_none", nullptr, 124, false, false },
+    { OPTVAL_TIMER_IGT, "tot_optr_timer_igt", nullptr, 125, false, false },
+    { OPTVAL_TIMER_RTA, "tot_optr_timer_rta", nullptr, 126, false, false },
+    { OPT_BATTLE_DROPS, "tot_optr_drops", "tot_opth_drops", 127, true, false },
+    { OPTVAL_DROP_STANDARD, "tot_optr_drops_def", nullptr, 128, false, false },
+    { OPTVAL_DROP_HELD_FROM_BONUS, "tot_optr_drops_gated", nullptr, 129, false, false },
+    { OPTVAL_DROP_NO_HELD_W_BONUS, "tot_optr_drops_noheld", nullptr, 130, false, false },
+    { OPTVAL_DROP_ALL_HELD, "tot_optr_drops_all", nullptr, 131, false, false },
+    { OPT_STARTER_ITEMS, "tot_optr_startitems", "tot_opth_startitems", 132, true, false },
+    { OPTVAL_STARTER_ITEMS_OFF, "tot_optr_startitems_off", nullptr, 133, false, false },
+    { OPTVAL_STARTER_ITEMS_BASIC, "tot_optr_startitems_basic", nullptr, 134, false, false },
+    { OPTVAL_STARTER_ITEMS_STRONG, "tot_optr_startitems_strong", nullptr, 135, false, false },
+    { OPTVAL_STARTER_ITEMS_RANDOM, "tot_optr_startitems_random", nullptr, 136, false, false },
+    { OPT_PARTNER, "tot_optr_partner", "tot_opth_partner", 137, true, false },
+    { OPTVAL_PARTNER_RANDOM, "tot_optr_partner_random", nullptr, 138, false, false },
+    { OPTVAL_PARTNER_GOOMBELLA, "tot_optr_partner_1", nullptr, 139, false, false },
+    { OPTVAL_PARTNER_KOOPS, "tot_optr_partner_2", nullptr, 140, false, false },
+    { OPTVAL_PARTNER_FLURRIE, "tot_optr_partner_3", nullptr, 141, false, false },
+    { OPTVAL_PARTNER_YOSHI, "tot_optr_partner_4", nullptr, 142, false, false },
+    { OPTVAL_PARTNER_VIVIAN, "tot_optr_partner_5", nullptr, 143, false, false },
+    { OPTVAL_PARTNER_BOBBERY, "tot_optr_partner_6", nullptr, 144, false, false },
+    { OPTVAL_PARTNER_MOWZ, "tot_optr_partner_7", nullptr, 145, false, false },
+    { OPT_REVIVE_PARTNERS, "tot_optr_revive", "tot_opth_revive", 160, true, false },
+    { OPTVAL_REVIVE_PARTNERS_OFF, "tot_optr_off", nullptr, 161, false, false },
+    { OPTVAL_REVIVE_PARTNERS_ON, "tot_optr_on", nullptr, 162, false, false },
+    { OPTNUM_MARIO_HP, "tot_optr_mhp", "tot_opth_mhp", 170, true, false },
+    { OPTNUM_MARIO_FP, "tot_optr_mfp", "tot_opth_mfp", 171, true, false },
+    { OPTNUM_MARIO_BP, "tot_optr_mbp", "tot_opth_mbp", 172, true, false },
+    { OPTNUM_PARTNER_HP, "tot_optr_php", "tot_opth_php", 173, true, false },
+    { OPTNUM_ENEMY_HP, "tot_optr_ehp", "tot_opth_ehp", 174, true, false },
+    { OPTNUM_ENEMY_ATK, "tot_optr_eatk", "tot_opth_eatk", 175, true, false },
+    { OPTNUM_SUPERGUARD_SP_COST, "tot_optr_supercost", "tot_opth_supercost", 176, true, false },
+    { OPT_CHARLIETON_STOCK, "tot_optr_charlie", "tot_opth_charlie", 190, true, false },
+    { OPTVAL_CHARLIETON_NORMAL, "tot_optr_charlie_5", nullptr, 191, false, false },
+    { OPTVAL_CHARLIETON_SMALLER, "tot_optr_charlie_3", nullptr, 192, false, false },
+    { OPTVAL_CHARLIETON_LIMITED, "tot_optr_charlie_lim", nullptr, 193, false, false },
+    { OPT_ENABLE_NPC_WONKY, "tot_optr_npc_wonky", "tot_opth_npc_wonky", 194, true, false },
+    { OPTVAL_NPC_WONKY_OFF, "tot_optr_off", nullptr, 195, false, false },
+    { OPTVAL_NPC_WONKY_ON, "tot_optr_on", nullptr, 196, false, false },
+    { OPT_ENABLE_NPC_DAZZLE, "tot_optr_npc_dazzle", "tot_opth_npc_dazzle", 197, true, false },
+    { OPTVAL_NPC_DAZZLE_OFF, "tot_optr_off", nullptr, 198, false, false },
+    { OPTVAL_NPC_DAZZLE_ON, "tot_optr_on", nullptr, 199, false, false },
+    { OPT_ENABLE_NPC_CHET_RIPPO, "tot_optr_npc_chet", "tot_opth_npc_chet", 200, true, false },
+    { OPTVAL_NPC_CHET_RIPPO_OFF, "tot_optr_off", nullptr, 201, false, false },
+    { OPTVAL_NPC_CHET_RIPPO_ON, "tot_optr_on", nullptr, 202, false, false },
+    { OPT_ENABLE_NPC_LUMPY, "tot_optr_npc_lumpy", "tot_opth_npc_lumpy", 203, true, false },
+    { OPTVAL_NPC_LUMPY_OFF, "tot_optr_off", nullptr, 204, false, false },
+    { OPTVAL_NPC_LUMPY_ON, "tot_optr_on", nullptr, 205, false, false },
+    { OPT_ENABLE_NPC_DOOPLISS, "tot_optr_npc_doopliss", "tot_opth_npc_doopliss", 206, true, false },
+    { OPTVAL_NPC_DOOPLISS_OFF, "tot_optr_off", nullptr, 207, false, false },
+    { OPTVAL_NPC_DOOPLISS_ON, "tot_optr_on", nullptr, 208, false, false },
+    { OPT_ENABLE_NPC_GRUBBA, "tot_optr_npc_grubba", "tot_opth_npc_grubba", 209, true, false },
+    { OPTVAL_NPC_GRUBBA_OFF, "tot_optr_off", nullptr, 210, false, false },
+    { OPTVAL_NPC_GRUBBA_ON, "tot_optr_on", nullptr, 211, false, false },
 };
 
 uint32_t OptionLookup(uint16_t lookup_key) {
@@ -293,8 +297,20 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
         if (change) {
             int32_t value = sel_entry->row_data[sel_entry->cursor_index].value;
             uint32_t option = OptionLookup(value);
-            if (g_Mod->state_.ChangeOption(option, change)) {
+
+            // Only allow changing preset, difficulty and timer options if
+            // a non-custom preset is selected.
+            if (!g_Mod->state_.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
+                option != OPT_PRESET && option != OPT_DIFFICULTY &&
+                option != OPT_TIMER_DISPLAY) {
+                // Play "failure" sound.
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+            } else if (g_Mod->state_.ChangeOption(option, change)) {
+                // Play selection sound.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+                if (option == OPT_PRESET) {
+                    g_Mod->state_.ApplyPresetOptions();
+                }
             }
         }
     }
@@ -433,6 +449,19 @@ void DispMainWindow(WinMgrEntry* entry) {
         // Only draw info for rows that are visible.
         if (y_trans - 32 <= entry->y && 
             entry->y - entry->height <= y_trans + 32) {
+
+            // For RUN_OPTIONS, set greyed-out color based on preset / option.
+            if (sel_entry->type == MenuType::RUN_OPTIONS) {
+                uint32_t option = OptionLookup(row.value);
+                if (g_Mod->state_.CheckOptionValue(OPTVAL_PRESET_CUSTOM) ||
+                    option == OPT_PRESET || option == OPT_DIFFICULTY ||
+                    option == OPT_TIMER_DISPLAY) {
+                    row.flags &= ~WinMgrSelectEntryRow_Flags::GREYED_OUT;
+                } else {
+                    row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
+                }
+            }
+
             uint32_t* text_color;
             if (row.flags & WinMgrSelectEntryRow_Flags::GREYED_OUT) {
                 ttyd::win_main::winIconGrayInit();
