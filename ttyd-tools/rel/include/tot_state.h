@@ -85,6 +85,11 @@ public:
     // Returns false if the value is invalid or was not changed.
     bool SetOption(uint32_t option, int32_t value = 0, int32_t index = 0);
     bool ChangeOption(uint32_t option, int32_t change = 1, int32_t index = 0);
+
+    // Changes the option by 1 in either direction, wrapping around once it 
+    // hits its min or max.  Should only be used for menus, and only supports 
+    // OPT and OPTNUM type options.
+    void NextOption(uint32_t option, int32_t direction);
     
     // Gets the numeric value of options, play stats, achievements, etc.
     // `index` is only used as a parameter for option types that require it

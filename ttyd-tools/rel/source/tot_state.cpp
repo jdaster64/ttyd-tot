@@ -389,6 +389,22 @@ bool StateManager::ChangeOption(uint32_t option, int32_t change, int32_t index) 
     return SetOption(option, value + change, index);
 }
 
+void StateManager::NextOption(uint32_t option, int32_t direction) {
+    int32_t t, x, y, a, b;
+    GetOptionParts(option, &t, &x, &y, &a, &b);
+    if (t == TYPE_OPT) {
+        int32_t value = GetOption(option) + direction;
+        if (value > b) value = a;
+        if (value < a) value = b;
+        SetOption(option, value);
+    } else if (t == TYPE_OPTNUM) {
+        int32_t value = GetOption(option) + direction * a;
+        if (value > b * a) value = y * a;
+        if (value < y * a) value = b * a;
+        SetOption(option, value);
+    }
+}
+
 int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
     int32_t t, x, y, a, b;
     GetOptionParts(option, &t, &x, &y, &a, &b);

@@ -305,9 +305,12 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                 option != OPT_TIMER_DISPLAY) {
                 // Play "failure" sound.
                 ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
-            } else if (g_Mod->state_.ChangeOption(option, change)) {
+            } else {
+                // Change the option, wrapping around if necessary.
+                g_Mod->state_.NextOption(option, change);
                 // Play selection sound.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+                // If the option was presets, apply that preset's settings.
                 if (option == OPT_PRESET) {
                     g_Mod->state_.ApplyPresetOptions();
                 }
