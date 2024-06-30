@@ -320,9 +320,6 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
 
     // Run vanilla selection main function.
     select_main(entry);
-
-    // Force status window to be closed.
-    ttyd::statuswindow::statusWinForceOff();
 }
 
 void DispTimerSplits(WinMgrEntry* entry) {

@@ -80,6 +80,8 @@ extern "C" {
     void StartPreventDpadShortcutsOutsidePit();
     void ConditionalBranchPreventDpadShortcutsOutsidePit();
     void BranchBackPreventDpadShortcutsOutsidePit();
+    void StartHideTopBarInSomeWindows();
+    void BranchBackHideTopBarInSomeWindows();
   
     void dispUpdownNumberIcons(
         int32_t number, void* tex_obj, gc::mtx34* icon_mtx, gc::mtx34* view_mtx,
@@ -122,6 +124,17 @@ extern "C" {
     }
     void initTattleLog(void* win_log_ptr) {
         mod::infinite_pit::ui::InitializeTattleLog(win_log_ptr);
+    }
+
+    bool checkHideTopBarInWindow(ttyd::winmgr::WinMgrSelectEntry* sel_entry) {
+        switch (sel_entry->type) {
+            // Suppress forcing the top bar open for certain windows only.
+            case mod::tot::window_select::MenuType::RUN_OPTIONS:
+            case mod::tot::window_select::MenuType::RUN_RESULTS_SPLITS:
+            case mod::tot::window_select::MenuType::RUN_RESULTS_STATS:
+                return true;
+        }
+        return false;
     }
 }
 
@@ -182,6 +195,7 @@ extern const int32_t g_winMarioMain_MoveDescription_EH;
 extern const int32_t g_winMarioMain_CheckOpenMoveMenu_BH;
 extern const int32_t g_winLogInit_Patch_DisableCrystalStarLog;
 extern const int32_t g_winLogInit_InitTattleLog_BH;
+extern const int32_t g_select_main_CheckHideTopBar_BH;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblHi16;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblLo16;
 extern const int32_t g__btlcmd_MakeSelectWeaponTable_Patch_GetNameFromItem;
@@ -385,7 +399,6 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_winItemDisp_DispInventorySize_BH),
         reinterpret_cast<void*>(StartItemDispInventorySize),
         reinterpret_cast<void*>(BranchBackItemDispInventorySize));
-    
         
     // Apply patch to only include Infinite Pit enemies in the Tattle Log.
     mod::patch::writeBranchPair(
@@ -442,6 +455,13 @@ void ApplyFixedPatches() {
             }
             return g_winMgrSelectOther_trampoline(sel_entry, evt);
         });
+        
+    // Force the top bar closed instead of open for certain selection windows,
+    // e.g. run options.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_select_main_CheckHideTopBar_BH),
+        reinterpret_cast<void*>(StartHideTopBarInSomeWindows),
+        reinterpret_cast<void*>(BranchBackHideTopBarInSomeWindows));
 }
 
 void DisplayUpDownNumberIcons(

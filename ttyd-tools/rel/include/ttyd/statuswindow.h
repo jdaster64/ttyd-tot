@@ -22,7 +22,7 @@ void statusWinForceUpdate();
 void statusWinForceOff();
 // statusWinForceCloseClear
 // statusWinForceClose
-// statusWinForceOpen
+void statusWinForceOpen();
 // statusWinClose
 // statusWinOpen
 // valueUpdate
