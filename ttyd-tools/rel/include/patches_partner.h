@@ -24,9 +24,4 @@ void DisplayTattleStats(
 // Forces ATK/DEF to be shown at the start of an encounter.
 void RefreshExtraTattleStats();
 
-// Initializes + fully heals the selected party member.
-EVT_DECLARE_USER_FUNC(InitializePartyMember, 1)
-// Calculates the Action Command prize tier of Love Slap based on AC result.
-EVT_DECLARE_USER_FUNC(GetLoveSlapPrizeTier, 1)
-
 }

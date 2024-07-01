@@ -416,23 +416,5 @@ void RefreshExtraTattleStats() {
     g_ShowAtkDefThisFloor = true;
 }
 
-EVT_DEFINE_USER_FUNC(InitializePartyMember) {
-    const int32_t starting_rank =
-        g_Mod->inf_state_.GetOptionNumericValue(INF_OPT_PARTNER_RANK);
-    const int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
-    const int16_t starting_hp =
-        ttyd::mario_pouch::_party_max_hp_table[idx * 4 + starting_rank];
-    const int32_t hp_plus_p_cnt =
-        ttyd::mario_pouch::pouchEquipCheckBadge(ItemType::HP_PLUS_P);
-    auto& party_data = ttyd::mario_pouch::pouchGetPtr()->party_data[idx];
-    party_data.base_max_hp = starting_hp;
-    party_data.max_hp = starting_hp + hp_plus_p_cnt * 5;
-    party_data.current_hp = starting_hp + hp_plus_p_cnt * 5;
-    party_data.hp_level = starting_rank;
-    party_data.attack_level = starting_rank;
-    party_data.tech_level = starting_rank;
-    return 2;
-}
-
 }  // namespace partner
 }  // namespace mod::infinite_pit
