@@ -10,9 +10,6 @@ namespace mod::infinite_pit::options {
 // Apply patches to core game systems, such as save file I/O, file and module
 // loading, and string message lookup.
 void ApplyFixedPatches();
-
-// Apply balance changes that are based on the current file's settings.
-void ApplySettingBasedPatches();
     
 // Gets the Danger / Peril threshold to use based on a max HP value.
 int32_t GetPinchThresholdForMaxHp(int32_t max_hp, bool peril);

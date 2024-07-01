@@ -82,7 +82,6 @@ namespace {
 
 // Global variables.
 uintptr_t   g_PitModulePtr = 0;
-bool        g_PromptSave = false;
 bool        g_CueGameOver = false;
 
 // Code that runs after linking a new module.
@@ -138,7 +137,6 @@ void OnFileLoad(bool new_file = true) {
         // Initialize Tower of Trials-specific state & pouch stuff.
         tot::OptionsManager::InitLobby();
     }
-    g_PromptSave = false;
 }
 
 }
@@ -154,6 +152,8 @@ void ApplyFixedPatches() {
         ttyd::cardmgr::cardCopy2Main, [](int32_t save_file_number) {
             g_cardCopy2Main_trampoline(save_file_number);
             OnFileLoad(/* new_file = */ false);
+
+            // TODO: Remove this once ToT is changed to use its own save file.
             // If invalid InfPit file loaded, give the player a Game Over.
             if (!g_Mod->inf_state_.Load(/* new_save = */ false)) {
                 g_CueGameOver = true;
@@ -309,12 +309,6 @@ void OnMapUnloaded() {
         }
     }
 }
-
-uintptr_t GetPitModulePtr() { return g_PitModulePtr; }
-
-bool GetShouldPromptSave() { return g_PromptSave; }
-
-void SetShouldPromptSave(bool should_save) { g_PromptSave = should_save; }
 
 }  // namespace core
 }  // namespace mod::infinite_pit

@@ -293,10 +293,6 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(BranchBackAudienceItemSpaceFix));
 }
 
-void ApplySettingBasedPatches() {
-    // TODO: delete.
-}
-
 int32_t GetPinchThresholdForMaxHp(int32_t max_hp, bool peril) {
     // 10% of max health for Peril, 30% of max health for Danger, rounded 5/4.
     int32_t threshold =  (max_hp * (peril ? 1 : 3) + 5) / 10;
