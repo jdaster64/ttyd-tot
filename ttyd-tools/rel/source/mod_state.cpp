@@ -3,7 +3,6 @@
 #include "common_functions.h"
 #include "common_types.h"
 #include "mod.h"
-#include "mod_achievements.h"
 #include "patch.h"
 
 #include <gc/OSTime.h>
@@ -808,29 +807,6 @@ bool StateManager_v2::GetPlayStatsString(char* out_buf) {
         out_buf,
         GetOptionValue(INF_STAT_CONDITIONS_MET), 
         GetOptionValue(INF_STAT_CONDITIONS_TOTAL));
-    
-    // Page 7: Achievement progress.
-    out_buf += sprintf(out_buf, "\n<k><p>Chest rewards: ");
-    out_buf += PrintCompletionPercentage(
-        out_buf,
-        AchievementsManager::GetCurrentCompletionPoints(
-            AchievementsManager::kChestRewardItem),
-        AchievementsManager::GetMaxCompletionPoints(
-            AchievementsManager::kChestRewardItem));
-    out_buf += sprintf(out_buf, "\nBadge log: ");
-    out_buf += PrintCompletionPercentage(
-        out_buf,
-        AchievementsManager::GetCurrentCompletionPoints(
-            AchievementsManager::kBadgeLogItem),
-        AchievementsManager::GetMaxCompletionPoints(
-            AchievementsManager::kBadgeLogItem));
-    out_buf += sprintf(out_buf, "\nTattle log: ");
-    out_buf += PrintCompletionPercentage(
-        out_buf,
-        AchievementsManager::GetCurrentCompletionPoints(
-            AchievementsManager::kTattleLogItem),
-        AchievementsManager::GetMaxCompletionPoints(
-            AchievementsManager::kTattleLogItem));
     
     // TODO: Add page for Items, badges, level-ups sold or Mover use in future?
     out_buf += sprintf(out_buf, "\n<k>");

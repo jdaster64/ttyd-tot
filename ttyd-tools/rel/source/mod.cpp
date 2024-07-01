@@ -1,7 +1,6 @@
 #include "mod.h"
 
 #include "common_ui.h"
-#include "mod_achievements.h"
 #include "mod_cheats.h"
 #include "mod_debug.h"
 #include "mod_gfxtest.h"
@@ -73,7 +72,6 @@ void Mod::Init() {
 void Mod::Update() {
     infinite_pit::DebugManager::Update();
     infinite_pit::CheatsManager::Update();
-    infinite_pit::AchievementsManager::Update();
     infinite_pit::TitleScreenManager::Update();
     infinite_pit::MenuManager::Update();
     tot::TimerManager::Update();
@@ -84,8 +82,6 @@ void Mod::Draw() {
         infinite_pit::DebugManager::Draw, CameraId::kDebug3d);
     RegisterDrawCallback(
         infinite_pit::CheatsManager::Draw, CameraId::kDebug3d);
-    RegisterDrawCallback(
-        infinite_pit::AchievementsManager::Draw, CameraId::kDebug3d);
     RegisterDrawCallback(
         infinite_pit::TitleScreenManager::Draw, CameraId::k2d);
     RegisterDrawCallback(

@@ -126,10 +126,6 @@ char                g_MoveBadgeTextBuffer[24];
 const char*         kMoveBadgeAbbreviations[4] = {
     "Charge", "Charge", "Tough. Up", "Tough. Up"
 };
-const int8_t        kSpCostLevels[] = {
-    1, 3, 5,    1, 2, 3,    2, 3, 5,    3, 4, 6,
-    4, 5, 7,    3, 4, 6,    2, 4, 6,    7, 8, 9,
-};
 
 // Patch to disable getting Star Power early from certain attacks;
 // battle::AwardStarPowerAndResetFaceDirection will be used to award it
@@ -627,19 +623,6 @@ void OnEnterExitBattle(bool is_start) {
 
 int8_t GetStrategyBadgeLevel(bool is_charge, bool is_mario) {
     return g_CurMoveBadgeCounts[!is_charge * 2 + !is_mario];
-}
-
-bool CanUnlockNextLevel(int32_t star_power) {
-    int32_t current_level = g_Mod->inf_state_.GetStarPowerLevel(star_power);
-    if (current_level == 3) return false;
-    // Get the max SP the player would have without using any Shine Sprites.
-    int32_t max_sp = 50;
-    for (int32_t i = 0; i < 8; ++i) {
-        max_sp += g_Mod->inf_state_.GetStarPowerLevel(i) * 50;
-    }
-    // See if the next level of this star power could be affordable.
-    int32_t required_sp = kSpCostLevels[star_power * 3 + current_level];
-    return max_sp + 50 >= required_sp * 100;
 }
 
 void SweetTreatSetUpTargets() {

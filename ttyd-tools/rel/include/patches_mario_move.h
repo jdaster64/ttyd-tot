@@ -11,8 +11,6 @@ void ApplyFixedPatches();
 void OnEnterExitBattle(bool is_start);
 // Gets the current move level of Charge or Toughen Up for Mario or partner.
 int8_t GetStrategyBadgeLevel(bool is_charge, bool is_mario);
-// Checks whether the given Star Power has its next level available as a reward.
-bool CanUnlockNextLevel(int32_t star_power);
 
 // Sets up how many targets appear of each type for Sweet Treat / Feast.
 void SweetTreatSetUpTargets();

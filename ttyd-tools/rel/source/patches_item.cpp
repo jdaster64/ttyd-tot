@@ -2,7 +2,6 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
-#include "mod_achievements.h"
 #include "mod_state.h"
 #include "patch.h"
 #include "tot_generate_reward.h"
@@ -288,17 +287,6 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::ULTRA_BOOTS].description = "msg_custom_ultra_boots";
     itemDataTable[ItemType::SUPER_HAMMER].description = "msg_custom_super_hammer";
     itemDataTable[ItemType::ULTRA_HAMMER].description = "msg_custom_ultra_hammer";
-    
-    // Change item name / description lookup keys for achievement rewards.
-    itemDataTable[AchievementsManager::kChestRewardItem].name = "in_ach_1";
-    itemDataTable[AchievementsManager::kChestRewardItem].description = "msg_ach_1";
-    itemDataTable[AchievementsManager::kChestRewardItem].menu_description = "msg_ach_1";
-    itemDataTable[AchievementsManager::kBadgeLogItem].name = "in_ach_2";
-    itemDataTable[AchievementsManager::kBadgeLogItem].description = "msg_ach_2";
-    itemDataTable[AchievementsManager::kBadgeLogItem].menu_description = "msg_ach_2";
-    itemDataTable[AchievementsManager::kTattleLogItem].name = "in_ach_3";
-    itemDataTable[AchievementsManager::kTattleLogItem].description = "msg_ach_3";
-    itemDataTable[AchievementsManager::kTattleLogItem].menu_description = "msg_ach_3";
     
     // New badges:
     // Toughen Up (P): a move that grants a single-turn +DEF buff.
