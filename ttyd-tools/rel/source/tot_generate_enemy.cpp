@@ -3,11 +3,11 @@
 #include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
-#include "mod_debug.h"
 #include "mod_state.h"
 #include "tot_custom_rel.h"
 #include "tot_generate_condition.h"
 #include "tot_generate_item.h"
+#include "tot_manager_debug.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
@@ -39,8 +39,6 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::evt_sub;
-
-using ::mod::infinite_pit::DebugManager;
 
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::evtmgr_cmd::evtGetValue;

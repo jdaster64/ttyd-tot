@@ -1,4 +1,4 @@
-#include "mod_debug.h"
+#include "tot_manager_debug.h"
 
 #include "common_functions.h"
 #include "common_types.h"
@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <cstring>
 
-namespace mod::infinite_pit {
+namespace mod::tot {
     
 enum DebugManagerMode {
     DEBUG_OFF       = -1,

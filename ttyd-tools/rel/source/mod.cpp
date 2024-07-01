@@ -1,14 +1,14 @@
 #include "mod.h"
 
 #include "common_ui.h"
-#include "mod_cheats.h"
-#include "mod_debug.h"
 #include "mod_gfxtest.h"
-#include "mod_title.h"
 #include "patch.h"
 #include "patches_apply.h"
 #include "tot_gon.h"
+#include "tot_manager_cheats.h"
+#include "tot_manager_debug.h"
 #include "tot_manager_timer.h"
+#include "tot_manager_title.h"
 
 #include <ttyd/dispdrv.h>
 #include <ttyd/fontmgr.h>
@@ -69,21 +69,17 @@ void Mod::Init() {
 }
 
 void Mod::Update() {
-    infinite_pit::DebugManager::Update();
-    infinite_pit::CheatsManager::Update();
-    infinite_pit::TitleScreenManager::Update();
+    tot::DebugManager::Update();
+    tot::CheatsManager::Update();
     tot::TimerManager::Update();
+    tot::TitleScreenManager::Update();
 }
 
 void Mod::Draw() {
-    RegisterDrawCallback(
-        infinite_pit::DebugManager::Draw, CameraId::kDebug3d);
-    RegisterDrawCallback(
-        infinite_pit::CheatsManager::Draw, CameraId::kDebug3d);
-    RegisterDrawCallback(
-        infinite_pit::TitleScreenManager::Draw, CameraId::k2d);
-    RegisterDrawCallback(
-        tot::TimerManager::Draw, CameraId::k2d);
+    RegisterDrawCallback(tot::DebugManager::Draw, CameraId::kDebug3d);
+    RegisterDrawCallback(tot::CheatsManager::Draw, CameraId::kDebug3d);
+    RegisterDrawCallback(tot::TimerManager::Draw, CameraId::k2d);
+    RegisterDrawCallback(tot::TitleScreenManager::Draw, CameraId::k2d);
 }
 
 }

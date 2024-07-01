@@ -1,4 +1,4 @@
-#include "mod_title.h"
+#include "tot_manager_title.h"
 
 #include "common_functions.h"
 #include "common_ui.h"
@@ -10,11 +10,11 @@
 #include <cstdio>
 #include <cstring>
 
-namespace mod::infinite_pit {
+namespace mod::tot {
 
 namespace {
 
-constexpr const char* kTitleInfo = "Project ToT alpha r13 2024-06-29";
+constexpr const char* kTitleInfo = "Project ToT alpha r14 2024-07-01";
     
 // constexpr const char* kTitleInfo =
     // "PM:TTYD Infinite Pit v2.40 r64 by jdaster64\n"

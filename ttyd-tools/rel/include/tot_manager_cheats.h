@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit {
+namespace mod::tot {
 
-class TitleScreenManager {
+class CheatsManager {
 public:
     // Code that runs every frame.
     static void Update();

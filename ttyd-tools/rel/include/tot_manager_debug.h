@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit {
+namespace mod::tot {
 
 class DebugManager {
 public:

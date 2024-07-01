@@ -1,10 +1,10 @@
-#include "mod_cheats.h"
+#include "tot_manager_cheats.h"
 
 #include "common_functions.h"
 #include "common_types.h"
 #include "mod.h"
-#include "mod_debug.h"
 #include "mod_state.h"
+#include "tot_manager_debug.h"
 #include "tot_state.h"
 
 #include <ttyd/item_data.h>
@@ -18,7 +18,7 @@
 #include <cstdio>
 #include <cstring>
 
-namespace mod::infinite_pit {
+namespace mod::tot {
     
 namespace {
     
@@ -49,8 +49,8 @@ void CheatsManager::Update() {
     if ((code_history & 0xFFFFFF) == secretCode_BgmOnOff) {
         code_history = 0;
         // Toggle on/off background music from playing or starting.
-        bool toggle = !g_Mod->state_.GetOption(tot::OPT_BGM_DISABLED);
-        g_Mod->state_.SetOption(tot::OPT_BGM_DISABLED, toggle);
+        bool toggle = !g_Mod->state_.GetOption(OPT_BGM_DISABLED);
+        g_Mod->state_.SetOption(OPT_BGM_DISABLED, toggle);
         if (toggle) {
             ttyd::pmario_sound::psndStopAllFadeOut();
         }
@@ -58,8 +58,8 @@ void CheatsManager::Update() {
     }
     if ((code_history & 0xFFFFFF) == secretCode_ShowAtkDef) {
         code_history = 0;
-        bool toggle = !g_Mod->state_.GetOption(tot::OPT_SHOW_ATK_DEF);
-        g_Mod->state_.SetOption(tot::OPT_SHOW_ATK_DEF, toggle);
+        bool toggle = !g_Mod->state_.GetOption(OPT_SHOW_ATK_DEF);
+        g_Mod->state_.SetOption(OPT_SHOW_ATK_DEF, toggle);
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
     }
     if ((code_history & 0xFFFFFF) == secretCode_UnlockFxBadges) {
@@ -89,8 +89,8 @@ void CheatsManager::Update() {
     if ((code_history & 0xFFFFFF) == secretCode_ObfuscateItems) {
         code_history = 0;
         if (InMainGameModes() && 
-            !g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) {
-            g_Mod->state_.ChangeOption(tot::OPT_OBFUSCATE_ITEMS);
+            !g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
+            g_Mod->state_.ChangeOption(OPT_OBFUSCATE_ITEMS);
             ttyd::sound::SoundEfxPlayEx(0x3c, 0, 0x64, 0x40);
         }
     }
@@ -99,7 +99,7 @@ void CheatsManager::Update() {
     if ((code_history & 0xFFFFFF) == secretCode_DebugMode) {
         code_history = 0;
         DebugManager::ChangeMode();
-        g_Mod->state_.SetOption(tot::OPT_DEBUG_MODE_USED, 1);
+        g_Mod->state_.SetOption(OPT_DEBUG_MODE_USED, 1);
     }
 }
 
