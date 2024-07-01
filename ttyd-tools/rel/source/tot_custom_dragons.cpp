@@ -54,6 +54,7 @@ constexpr const int32_t UW_AiState = 1;
 constexpr const int32_t UW_LowHealthMsg = 2;
 constexpr const int32_t UW_NumHeals = 4;
 constexpr const int32_t UW_FakeDeathPlayed = 5;
+constexpr const int32_t UW_TriggerBiteEvent = 6;
 
 // Handles phase changes + determines available moves.
 namespace DragonAiState {
@@ -681,6 +682,7 @@ LBL(90)
 LBL(91)
     USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(9))
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_TriggerBiteEvent, 1)
 LBL(97)
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(9))
 LBL(99)
@@ -1152,9 +1154,12 @@ LBL(90)
         GOTO(99)
     END_IF()
     IF_EQUAL((int32_t)GSW_Battle_Hooktail_BiteReactionSeen, 0)
-        USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(0))
-        IF_EQUAL(LW(0), 0)
-            RUN_CHILD_EVT(unitDragon_bite_reaction_event)
+        USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_TriggerBiteEvent, LW(0))
+        IF_EQUAL(LW(0), 1)
+            USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(0))
+            IF_EQUAL(LW(0), 0)
+                RUN_CHILD_EVT(unitDragon_bite_reaction_event)
+            END_IF()
         END_IF()
     END_IF()
 
@@ -1474,6 +1479,7 @@ EVT_BEGIN(unitHooktail_init_event)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_LowHealthMsg, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_DragonType, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_NumHeals, 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_TriggerBiteEvent, 0)
     RUN_CHILD_EVT(unitDragon_init_event)
     RETURN()
 EVT_END()
@@ -2051,6 +2057,7 @@ EVT_DEFINE_USER_FUNC(evtTot_Dragon_SetupConversation) {
     int32_t conversation_type = evtGetValue(evt, evt->evtArguments[1]);
     
     // For now, assume every message is a single dragon dialogue box.
+    // TODO: Support partner messages when dialogue is finalized.
     g_DialogueList[0].speaker = 1;
     sprintf(
         g_DialogueList[0].msg, "tot_dragon%02" PRId32 "_%02" PRId32,
