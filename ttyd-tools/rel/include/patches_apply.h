@@ -7,7 +7,6 @@
 #include "patches_enemy.h"
 #include "patches_enemy_fix.h"
 #include "patches_field.h"
-#include "patches_field_start.h"
 #include "patches_item.h"
 #include "patches_mario_move.h"
 #include "patches_misc_fix.h"
@@ -26,7 +25,6 @@ inline void ApplyAllFixedPatches() {
     enemy::ApplyFixedPatches();
     enemy_fix::ApplyFixedPatches();
     field::ApplyFixedPatches();
-    field_start::ApplyFixedPatches();
     item::ApplyFixedPatches();
     mario_move::ApplyFixedPatches();
     misc_fix::ApplyFixedPatches();
@@ -39,7 +37,6 @@ inline void ApplyAllFixedPatches() {
 // Applies all patches that need to be applied once per module load.
 inline void ApplyAllModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
     field::ApplyModuleLevelPatches(module_ptr, module_id);
-    field_start::ApplyModuleLevelPatches(module_ptr, module_id);
 }
 
 // Links / unlinks all custom events that rely on code in TTYD's modules.

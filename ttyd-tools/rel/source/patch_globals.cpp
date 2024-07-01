@@ -378,6 +378,7 @@ extern const int32_t g_genki_evt_common_SweetTreatResultJumpPoint = 0x803b6be8;
 extern const int32_t g_crashHandler_Patch_FontScale = 0x80428bc0;
 
 // Patch offsets for data in modules (relative to REL base pointer).
+// Should all be obsolete eventually.
 
 // JON (Pit of 100 Trials)
 extern const int32_t g_jon_setup_npc_ex_para_FuncOffset = 0x388;
@@ -401,9 +402,5 @@ extern const int32_t g_jon_bero_return_ReturnBeroEntryOffset = 0x12520;
 extern const int32_t g_jon_zonbaba_first_event_EvtOffset = 0x14570;
 extern const int32_t g_jon_btlsetup_jon_tbl_Offset = 0x1d460;
 extern const int32_t g_jon_unit_boss_zonbaba_battle_entry_event = 0x1ebdc;
-
-// TIK (Rogueport Underground)
-extern const int32_t g_tik_06_PitBeroEntryOffset = 0x1f240;
-extern const int32_t g_tik_06_RightBeroEntryOffset = 0x1f2f4;
 
 }
