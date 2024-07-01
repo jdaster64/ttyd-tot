@@ -725,7 +725,7 @@ void SelectChestContents() {
     
     // Top-level weight for choosing a move, stat-up, or other reward.
     // The former two categories cannot be chosen more than once per floor.
-    uint16_t top_level_weights[] = { 10, 10, 10 };
+    uint16_t top_level_weights[] = { 12, 12, 12 };
     // Tracks which kind of 'other' categories have been chosen already;
     // if one of them is rolled twice in one floor, picks a random stackable
     // badge in its place.

@@ -342,8 +342,7 @@ void ApplyFixedPatches() {
     g_BtlActRec_JudgeRuleKeep_trampoline = patch::hookFunction(
         ttyd::battle_actrecord::BtlActRec_JudgeRuleKeep, []() {
             g_BtlActRec_JudgeRuleKeep_trampoline();
-            // Handle item drops from conditions / ALL_HELD_ITEMS mode,
-            // as well as marking Tattles in PARTNERS_NEVER mode.
+            // Handle item drops from conditions / "all held drops" mode.
             CheckBattleCondition();
         });
         
@@ -370,6 +369,7 @@ void ApplyFixedPatches() {
     g_BattleCommandInit_trampoline = patch::hookFunction(
         ttyd::battle_seq_command::BattleCommandInit, [](BattleWork* battleWork) {
             // Reset selected move levels before every player action.
+            // TODO: Reset Charge (P)'s selected move level.
             tot::MoveManager::ResetSelectedLevels();
             // Run original logic.
             g_BattleCommandInit_trampoline(battleWork);
