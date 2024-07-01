@@ -377,30 +377,4 @@ extern const int32_t g_genki_evt_common_Patch_SweetTreatFeastResult = 0x803b6bac
 extern const int32_t g_genki_evt_common_SweetTreatResultJumpPoint = 0x803b6be8;
 extern const int32_t g_crashHandler_Patch_FontScale = 0x80428bc0;
 
-// Patch offsets for data in modules (relative to REL base pointer).
-// Should all be obsolete eventually.
-
-// JON (Pit of 100 Trials)
-extern const int32_t g_jon_setup_npc_ex_para_FuncOffset = 0x388;
-extern const int32_t g_jon_yattukeFlag_FuncOffset = 0x3e8;
-extern const int32_t g_jon_evt_raster_FuncOffset = 0x500;
-extern const int32_t g_jon_init_evt_MoverSetupHookOffset = 0xeaa0;
-extern const int32_t g_jon_enemy_100_Offset = 0xef90;
-extern const int32_t g_jon_evt_open_box_EvtOffset = 0x11348;
-extern const int32_t g_jon_move_evt_EvtOffset = 0x11400;
-extern const int32_t g_jon_talk_idouya_EvtOffset = 0x11698;
-extern const int32_t g_jon_npcEnt_idouya_Offset = 0x118cc;
-extern const int32_t g_jon_talk_gyousyou_MinItemForBadgeDialogOffset = 0x11b1c;
-extern const int32_t g_jon_talk_gyousyou_NoInvSpaceBranchOffset = 0x11c7c;
-extern const int32_t g_jon_dokan_open_PipeOpenEvtOffset = 0x120d0;
-extern const int32_t g_jon_evt_kanban2_ReturnSignEvtOffset = 0x12374;
-extern const int32_t g_jon_floor_inc_EvtOffset = 0x123c4;
-extern const int32_t g_jon_bero_boss_EntryBeroEntryOffset = 0x1240c;
-extern const int32_t g_jon_bero_boss_ReturnBeroEntryOffset = 0x12448;
-extern const int32_t g_jon_setup_boss_EvtOffset = 0x124c0;
-extern const int32_t g_jon_bero_return_ReturnBeroEntryOffset = 0x12520;
-extern const int32_t g_jon_zonbaba_first_event_EvtOffset = 0x14570;
-extern const int32_t g_jon_btlsetup_jon_tbl_Offset = 0x1d460;
-extern const int32_t g_jon_unit_boss_zonbaba_battle_entry_event = 0x1ebdc;
-
 }

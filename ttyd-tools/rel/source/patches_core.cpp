@@ -91,9 +91,6 @@ void OnModuleLoaded(OSModuleInfo* module) {
     int32_t module_id = module->id;
     uintptr_t module_ptr = reinterpret_cast<uintptr_t>(module);
     
-    LinkAllCustomEvts(module, static_cast<ModuleId::e>(module_id), /* link */ true);
-    ApplyAllModuleLevelPatches(module, static_cast<ModuleId::e>(module_id));
-    
     if (module_id == ModuleId::JON) g_PitModulePtr = module_ptr;
     
     // Regardless of module loaded, reset Merlee curses if enabled.
@@ -300,14 +297,6 @@ int32_t LoadMap() {
 }
 
 void OnMapUnloaded() {
-    // TODO: Probably won't need this anymore.
-    if (g_PitModulePtr) {
-        LinkAllCustomEvts(
-            reinterpret_cast<void*>(g_PitModulePtr), ModuleId::JON,
-            /* link */ false);
-        g_PitModulePtr = 0;
-    }
-    
     // If it's not the main REL, run the epilog, and unlink/free it.
     auto* mario_st = ttyd::mariost::g_MarioSt;
     if (mario_st->pRelFileBase != nullptr) {

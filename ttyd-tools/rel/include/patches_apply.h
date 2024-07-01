@@ -34,15 +34,4 @@ inline void ApplyAllFixedPatches() {
     ui::ApplyFixedPatches();
 }
 
-// Applies all patches that need to be applied once per module load.
-inline void ApplyAllModuleLevelPatches(void* module_ptr, ModuleId::e module_id) {
-    field::ApplyModuleLevelPatches(module_ptr, module_id);
-}
-
-// Links / unlinks all custom events that rely on code in TTYD's modules.
-// Unlinks if `link` = false.
-inline void LinkAllCustomEvts(void* module_ptr, ModuleId::e module_id, bool link) {
-    field::LinkCustomEvts(module_ptr, module_id, link);
-}
-
 }
