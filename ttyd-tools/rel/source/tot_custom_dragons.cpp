@@ -1985,8 +1985,8 @@ EVT_DEFINE_USER_FUNC(evtTot_Dragon_GetAttackWeights) {
                     next_ai_type = DragonAiState::PHASE_2_RANDOM;
                     break;
                 case DragonAiState::PHASE_2_RANDOM:
-                    // Fairly likely to heal (if allowed).
-                    weights[AttackType::RECOVER] = 50;
+                    // Very likely to heal (if allowed).
+                    weights[AttackType::RECOVER] = 100;
                     // fallthrough
                 default:
                     weights[AttackType::BREATH] = 40;

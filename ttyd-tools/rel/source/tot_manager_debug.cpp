@@ -291,6 +291,7 @@ void DebugManager::Update() {
                 if (tot::IsEligibleFrontEnemy(enemy_type)) {
                     int32_t num_enemies = 3;
                     switch (enemy_type) {
+                        case BattleUnitType::GOLD_FUZZY:
                         case BattleUnitType::ATOMIC_BOO:
                         case BattleUnitType::TOT_COSMIC_BOO:
                         case BattleUnitType::HOOKTAIL:
@@ -308,6 +309,8 @@ void DebugManager::Update() {
                 if (tot::IsEligibleLoadoutEnemy(enemy_type) || enemy_type == -1) {
                     bool valid_back_enemy = true;
                     switch (enemy_type) {
+                        case BattleUnitType::GOLD_FUZZY:
+                        case BattleUnitType::FUZZY_HORDE:
                         case BattleUnitType::ATOMIC_BOO:
                         case BattleUnitType::TOT_COSMIC_BOO:
                         case BattleUnitType::HOOKTAIL:
@@ -317,6 +320,7 @@ void DebugManager::Update() {
                             break;
                     }
                     switch (g_DebugEnemies[0]) {
+                        case BattleUnitType::GOLD_FUZZY:
                         case BattleUnitType::ATOMIC_BOO:
                         case BattleUnitType::TOT_COSMIC_BOO:
                         case BattleUnitType::HOOKTAIL:

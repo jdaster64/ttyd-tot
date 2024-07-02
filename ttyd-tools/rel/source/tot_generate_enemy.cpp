@@ -120,8 +120,8 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_DullBones, 1, 39, 0x0e, 20, 7, 5, 1, 1, 1, 2, 4, 0, 0, 0, 0 },
     { &custom::unit_HyperBobOmb, 0, 238, 0x04, 78, 15, 7, 2, 2, 0, 7, 9, 1, 2, 0, 0 },
     { &custom::unit_Bristle, 1, 258, 0x17, 75, 6, 6, 4, 1, 0, 4, -1, 0, 1, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_GoldFuzzy, 0, 251, 0x10, -1, 150, 7, 0, 7, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_FuzzyHorde, 0, -1, -1, -1, 200, 7, 0, 7, 0, 50, -1, 3, 3, 0, 0 },
     { &custom::unit_RedBones, 1, 36, 0x0e, 21, 10, 7, 2, 3, 0, 5, 4, 0, 0, 0, 0 },
     { &custom::unit_Hooktail, 0, 33, 0x11, 98, 80, 6, 1, 8, 0, 100, -1, 0, 0, 0, 0 },
     { &custom::unit_DarkPuff, 1, 286, 0x1d, 62, 12, 7, 0, 2, 0, 3, -1, 0, 0, 40, 10 },
@@ -142,7 +142,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_Pokey, 1, 233, 0x14, 50, 12, 7, 0, 3, 0, 4, -1, 1, 0, 0, 0 },
     { &custom::unit_Lakitu, 1, 280, 0x24, 27, 13, 7, 0, 2, 0, 5, -1, 0, 1, 40, 20 },
     { &custom::unit_Spiny, 0, 287, -1, 29, 8, 7, 4, 2, 1, 1, -1, 0, 0, 0, 0 },
-    { &custom::unit_CosmicBoo, 0, 288, 0x21, 97, 70, 7, 0, 5, 0, 40, 2, 3, 3, 20, 30 },
+    { &custom::unit_CosmicBoo, 0, 288, 0x21, 97, 75, 6, 0, 5, 0, 50, 2, 3, 3, 20, 30 },
     { &custom::unit_BobOmb, 0, 283, 0x04, 77, 10, 7, 2, 2, 0, 5, 9, 1, 0, 0, 0 },
     { &custom::unit_Bandit, 0, 274, 0x04, 41, 12, 6, 0, 2, 0, 4, 5, 0, 0, 0, 0 },
     { &custom::unit_BigBandit, 0, 129, 0x04, 42, 15, 6, 0, 2, 1, 5, 5, 0, 0, 0, 0 },
@@ -232,7 +232,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { nullptr, 0, -1, -1, -1, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },
     { &custom::unit_DryBones, 1, 196, 0x0f, 22, 12, 7, 3, 5, 0, 7, 4, 0, 2, 0, 0 },
     { &custom::unit_DarkBones, 1, 197, 0x0f, 23, 20, 7, 3, 4, 1, 10, 4, 1, 2, 0, 0 },
-    { &custom::unit_Gloomtail, 0, 198, 0x11, 99, 160, 10, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
+    { &custom::unit_Gloomtail, 0, 198, 0x11, 99, 160, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -271,7 +271,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_BobUlk, 0, 305, 0x25, 80, 15, 5, 2, 4, 0, 7, 9, 3, 0, 0, 0 },
     { &custom::unit_EliteWizzerd, 1, 297, 0x26, 85, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
     { nullptr, 0, -1, -1, -1, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
-    { &custom::unit_Bonetail, 0, 325, 0x11, 100, 240, 10, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
+    { &custom::unit_Bonetail, 0, 325, 0x11, 100, 160, 10, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
 };
 
 struct PresetLoadoutInfo {
@@ -958,6 +958,9 @@ void BuildBattle(
         
         // Make sure bosses appear in the right position.
         switch (g_Enemies[i]) {
+            case BattleUnitType::GOLD_FUZZY:
+                x = 125.0f;
+                break;
             case BattleUnitType::ATOMIC_BOO:
             case BattleUnitType::TOT_COSMIC_BOO:
                 x = 70.0f;

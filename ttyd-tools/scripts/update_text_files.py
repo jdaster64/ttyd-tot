@@ -730,6 +730,15 @@ g_StringMap = {
         b"tot_winsel_whichunlock":    b"Which move?",
         b"tot_winsel_titlestat":      b"Stat Lvl.",
         b"tot_winsel_tradewhichstat": b"Trade which?",
+        
+        # TODO: Move this and other Gold Fuzzy dialogue to the final boss area.
+        
+        b"tot_gfz_call_horde":
+            b"Meee-OOOF!<wait 250> Hey!<wait 250> Ow!\n"
+            b"<wait 250>\nYou chumps are tougher than\n"
+            b"you look...\n<k>\n<p>\n"
+            b"But I'm not through yet!\n<wait 250>\n"
+            b"Everyone! GET 'EM!!!\n<k>",
             
         # Generic Map text.
         

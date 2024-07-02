@@ -1589,7 +1589,9 @@
 // battle_event_subset.o
 // .text
 // 80113d4c:_binta_effect
+80113f88:_add_star_point_disp_offset
 // .data
+8035149c:subsetevt_counter_damage
 803532b0:subsetevt_confuse_flustered
 803537c4:unk_evt_803537c4
 

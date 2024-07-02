@@ -119,6 +119,8 @@ extern ttyd::battle_database_common::BattleUnitKind unit_CosmicBoo;
 extern ttyd::battle_database_common::BattleUnitKind unit_Hooktail;
 extern ttyd::battle_database_common::BattleUnitKind unit_Gloomtail;
 extern ttyd::battle_database_common::BattleUnitKind unit_Bonetail;
+extern ttyd::battle_database_common::BattleUnitKind unit_GoldFuzzy;
+extern ttyd::battle_database_common::BattleUnitKind unit_FuzzyHorde;
 
 // Other structures referenced by patches, etc.
 extern ttyd::battle_database_common::BattleWeapon unitBobOmb_weaponBomb;
