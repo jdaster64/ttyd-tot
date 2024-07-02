@@ -159,7 +159,7 @@ void DebugManager::Update() {
                     state.fp_level_ = 99;
                     state.bp_level_ = 99;
                     state.hp_p_level_ = 99;
-                    state.num_sack_upgrades_ = 99;
+                    state.max_inventory_ = 99;
                     tot::OptionsManager::UpdateLevelupStats();
                     ttyd::mario_pouch::pouchGetPtr()->coins = 999;
                     break;

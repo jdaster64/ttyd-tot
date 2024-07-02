@@ -660,7 +660,8 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
             OptionsManager::UpdateLevelupStats();
             return true;
         case REWARD_INV_UP:
-            ++g_Mod->state_.num_sack_upgrades_;
+            g_Mod->state_.max_inventory_ 
+                += g_Mod->state_.GetOption(OPT_INVENTORY_SACK_SIZE);
             return true;
         case ItemType::DIAMOND_STAR:
         case ItemType::EMERALD_STAR:
@@ -716,20 +717,44 @@ void SelectChestContents() {
     auto& state = g_Mod->state_;
     
     // Weights for different types of moves (Jump, Hammer, Special, partner).
-    static constexpr const uint16_t kMoveWeights[] = { 17, 17, 12, 50 };
+    uint16_t kMoveWeights[] = { 17, 17, 12, 50 };
     // Weights for different types of stat upgrades (HP, FP, BP, HP P, inv.).
-    static constexpr const uint16_t kStatWeights[] = { 20, 20, 20, 15, 10 };
+    uint16_t kStatWeights[] = { 20, 20, 20, 15, 10 };
     // Weights for different types of other rewards
     // (coins, Star Piece, Shine Sprite, unique badge, stackable badge).
-    static constexpr const uint16_t kOtherWeights[] = { 20, 20, 30, 20, 10 };
+    uint16_t kOtherWeights[] = { 20, 20, 30, 20, 10 };
     
     // Top-level weight for choosing a move, stat-up, or other reward.
     // The former two categories cannot be chosen more than once per floor.
-    uint16_t top_level_weights[] = { 12, 12, 12 };
+    uint16_t top_level_weights[] = { 15, 15, 15 };
     // Tracks which kind of 'other' categories have been chosen already;
     // if one of them is rolled twice in one floor, picks a random stackable
     // badge in its place.
     bool others_picked[] = { false, false, false, false, false };
+
+    // Filter out stat-ups that are forced to 0 / have reached their maximum.
+    if (state.GetOption(OPT_MARIO_HP) == 0) {
+        top_level_weights[1] -= 3;
+        kStatWeights[0] = 0;
+    }
+    if (state.GetOption(OPT_MARIO_FP) == 0) {
+        top_level_weights[1] -= 3;
+        kStatWeights[1] = 0;
+    }
+    if (state.GetOption(OPT_MARIO_BP) == 0 ||
+        state.CheckOptionValue(OPTVAL_INFINITE_BP)) {
+        top_level_weights[1] -= 3;
+        kStatWeights[2] = 0;
+    }
+    if (state.GetOption(OPT_PARTNER_HP) == 0) {
+        top_level_weights[1] -= 3;
+        kStatWeights[3] = 0;
+    }
+    if (state.GetOption(OPT_INVENTORY_SACK_SIZE) == 0 || 
+        state.max_inventory_ >= 20) {
+        top_level_weights[1] -= 3;
+        kStatWeights[4] = 0;
+    }
     
     for (ChestData* chest = g_Chests; chest->item; ++chest) {       
         int32_t sum_weights, weight, type;

@@ -600,7 +600,7 @@ int32_t GetBonusCakeRestoration() {
 
 int32_t GetItemInventorySize() {
     // Returns the current inventory size based on Strange Sack upgrades.
-    int32_t items = g_Mod->state_.num_sack_upgrades_ * 2 + 6;
+    int32_t items = g_Mod->state_.max_inventory_;
     return items < 20 ? items : 20;
 }
 

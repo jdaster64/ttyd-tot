@@ -127,16 +127,19 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
             case SWAP_PARTNERS_LESS:
                 // Needs partners, and should only appear after a few floors,
                 // when you're more likely to have taken a second partner.
+                // TODO: Also remove if # of partners is forced to be 1.
                 if (num_partners < 1 || state.floor_ < 9) condition.weight = 0;
-                break;
-            case FP_MORE:
-                // "Use FP" shouldn't appear at the very beginning.
-                if (state.floor_ < 9) condition.weight = 0;
                 break;
             case MARIO_FINAL_HP_MORE:
             case MARIO_FINAL_HP_LESS:
-                // HP conditions shouldn't appear if Mario's HP is forced to 1.
-                if (!g_Mod->state_.GetOption(OPTNUM_MARIO_HP)) condition.weight = 0;
+                // HP conditions shouldn't appear if max HP is locked to 1.
+                if (!g_Mod->state_.GetOption(OPT_MARIO_HP)) condition.weight = 0;
+                break;
+            case FP_MORE:
+                // "Use FP" condition shouldn't appear if max FP is locked to 1,
+                // or too early on (in the first set of floors).
+                if (!g_Mod->state_.GetOption(OPT_MARIO_FP) || state.floor_ < 9)
+                    condition.weight = 0;
                 break;
         }
     }

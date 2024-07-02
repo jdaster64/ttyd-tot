@@ -116,13 +116,15 @@ OptionMenuData g_OptionMenuData[] = {
     { OPT_REVIVE_PARTNERS, "tot_optr_revive", "tot_opth_revive", 160, true, false },
     { OPTVAL_REVIVE_PARTNERS_OFF, "tot_optr_off", nullptr, 161, false, false },
     { OPTVAL_REVIVE_PARTNERS_ON, "tot_optr_on", nullptr, 162, false, false },
-    { OPTNUM_MARIO_HP, "tot_optr_mhp", "tot_opth_mhp", 170, true, false },
-    { OPTNUM_MARIO_FP, "tot_optr_mfp", "tot_opth_mfp", 171, true, false },
-    { OPTNUM_MARIO_BP, "tot_optr_mbp", "tot_opth_mbp", 172, true, false },
-    { OPTNUM_PARTNER_HP, "tot_optr_php", "tot_opth_php", 173, true, false },
-    { OPTNUM_ENEMY_HP, "tot_optr_ehp", "tot_opth_ehp", 174, true, false },
-    { OPTNUM_ENEMY_ATK, "tot_optr_eatk", "tot_opth_eatk", 175, true, false },
-    { OPTNUM_SUPERGUARD_SP_COST, "tot_optr_supercost", "tot_opth_supercost", 176, true, false },
+    { OPT_MARIO_HP, "tot_optr_mhp", "tot_opth_mhp", 170, true, false },
+    { OPT_MARIO_FP, "tot_optr_mfp", "tot_opth_mfp", 171, true, false },
+    { OPT_MARIO_BP, "tot_optr_mbp", "tot_opth_mbp", 172, true, false },
+    { OPTVAL_INFINITE_BP, "tot_optr_mbp_inf", nullptr, 173, false, false },
+    { OPT_PARTNER_HP, "tot_optr_php", "tot_opth_php", 174, true, false },
+    { OPT_INVENTORY_SACK_SIZE, "tot_optr_itemgain", "tot_opth_itemgain", 175, true, false },
+    { OPTNUM_ENEMY_HP, "tot_optr_ehp", "tot_opth_ehp", 176, true, false },
+    { OPTNUM_ENEMY_ATK, "tot_optr_eatk", "tot_opth_eatk", 177, true, false },
+    { OPTNUM_SUPERGUARD_SP_COST, "tot_optr_supercost", "tot_opth_supercost", 178, true, false },
     { OPT_CHARLIETON_STOCK, "tot_optr_charlie", "tot_opth_charlie", 190, true, false },
     { OPTVAL_CHARLIETON_NORMAL, "tot_optr_charlie_5", nullptr, 191, false, false },
     { OPTVAL_CHARLIETON_SMALLER, "tot_optr_charlie_3", nullptr, 192, false, false },
@@ -262,6 +264,11 @@ const char* OptionValue(uint16_t lookup_key) {
             int32_t met = state.GetOption(STAT_RUN_CONDITIONS_MET);
             int32_t total = state.GetOption(STAT_RUN_CONDITIONS_TOTAL);
             sprintf(buf, "%" PRId32 " / %" PRId32, met, total);
+            break;
+        }
+        case OPTNUM_SUPERGUARD_SP_COST: {
+            int32_t value = state.GetOption(OPTNUM_SUPERGUARD_SP_COST);
+            sprintf(buf, "%.02f", value * 0.01f);
             break;
         }
         default: {
@@ -1319,22 +1326,37 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             memset(
                 sel_entry->row_data, 0,
                 sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+
+            auto& state = g_Mod->state_;
             for (int32_t i = 0; i < 4; ++i) {
                 sel_entry->row_data[i].value = i+1;
 
                 bool disable = false;
                 switch (i+1) {
                     case 1:
-                        if (g_Mod->state_.hp_level_ <= 0) disable = true;
+                        if (state.hp_level_ <= 0 ||
+                            state.GetOption(OPT_MARIO_HP) == 0) {
+                            disable = true;
+                        }
                         break;
                     case 2:
-                        if (g_Mod->state_.hp_p_level_ <= 0) disable = true;
+                        if (state.hp_p_level_ <= 0 ||
+                            state.GetOption(OPT_PARTNER_HP) == 0) {
+                            disable = true;
+                        }
                         break;
                     case 3:
-                        if (g_Mod->state_.fp_level_ <= 0) disable = true;
+                        if (state.fp_level_ <= 0 ||
+                            state.GetOption(OPT_MARIO_FP) == 0) {
+                            disable = true;
+                        }
                         break;
                     case 4:
-                        if (g_Mod->state_.bp_level_ <= 0) disable = true;
+                        if (state.bp_level_ <= 0 ||
+                            state.GetOption(OPT_MARIO_BP) == 0 ||
+                            state.CheckOptionValue(OPTVAL_INFINITE_BP)) {
+                            disable = true;
+                        }
                         break;
                 }
                 if (disable) {

@@ -18,24 +18,24 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 const int32_t kHpMultipliers[] = { 100, 100, 80, 120, 80, 120, 100, 80 };
 
 // Returns the current expected base stat given its option value and
-// corresponding level (e.g. OPTNUM_MARIO_HP + hp_level_).
+// corresponding level (e.g. OPT_MARIO_HP + hp_level_).
 int32_t GetBaseStat(uint32_t option, int32_t party = 0) {
     auto& state = g_Mod->state_;
     int32_t value = state.GetOption(option);
     switch (option) {
-        case OPTNUM_MARIO_HP: {
+        case OPT_MARIO_HP: {
             value *= state.hp_level_;
             break;
         }
-        case OPTNUM_MARIO_FP: {
+        case OPT_MARIO_FP: {
             value *= state.fp_level_;
             break;
         }
-        case OPTNUM_MARIO_BP: {
+        case OPT_MARIO_BP: {
             value *= state.bp_level_;
             break;
         }
-        case OPTNUM_PARTNER_HP: {
+        case OPT_PARTNER_HP: {
             value *= state.hp_p_level_;
             // Scale the HP multiplier based on each party member's stats.
             value = (value * kHpMultipliers[party] + 50) / 100;
@@ -52,9 +52,10 @@ void SetBaseStats() {
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
     // Set starting HP, FP, BP.
-    const int32_t hp = GetBaseStat(OPTNUM_MARIO_HP);
-    const int32_t fp = GetBaseStat(OPTNUM_MARIO_FP);
-    const int32_t bp = GetBaseStat(OPTNUM_MARIO_BP);
+    int32_t hp = GetBaseStat(OPT_MARIO_HP);
+    int32_t fp = GetBaseStat(OPT_MARIO_FP);
+    int32_t bp = GetBaseStat(OPT_MARIO_BP);
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_INFINITE_BP)) bp = 99;
     
     pouch.current_hp = hp;
     pouch.max_hp = hp;
@@ -69,7 +70,7 @@ void SetBaseStats() {
     for (int32_t i = 1; i <= 7; ++i) {
         pouch.party_data[i].flags &= ~1;
         
-        const int32_t php = GetBaseStat(OPTNUM_PARTNER_HP, i);
+        const int32_t php = GetBaseStat(OPT_PARTNER_HP, i);
         pouch.party_data[i].current_hp = php;
         pouch.party_data[i].max_hp = php;
         pouch.party_data[i].base_max_hp = php;
@@ -203,11 +204,11 @@ void OptionsManager::UpdateLevelupStats() {
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
     // Get change HP, FP, BP, party HP (using Goombella by default).
-    const int32_t delta_hp = GetBaseStat(OPTNUM_MARIO_HP) - pouch.max_hp;
-    const int32_t delta_fp = GetBaseStat(OPTNUM_MARIO_FP) - pouch.max_fp;
-    const int32_t delta_bp = GetBaseStat(OPTNUM_MARIO_BP) - pouch.total_bp;
+    const int32_t delta_hp = GetBaseStat(OPT_MARIO_HP) - pouch.max_hp;
+    const int32_t delta_fp = GetBaseStat(OPT_MARIO_FP) - pouch.max_fp;
+    const int32_t delta_bp = GetBaseStat(OPT_MARIO_BP) - pouch.total_bp;
     const int32_t delta_php =
-        GetBaseStat(OPTNUM_PARTNER_HP, 1) - pouch.party_data[1].max_hp;
+        GetBaseStat(OPT_PARTNER_HP, 1) - pouch.party_data[1].max_hp;
     
     // Update stats that have changed.
     if (delta_hp > 0) {
@@ -242,8 +243,8 @@ void OptionsManager::UpdateLevelupStats() {
     
     if (delta_php != 0) {
         for (int32_t i = 1; i <= 7; ++i) {
-            int32_t delta_php = GetBaseStat(OPTNUM_PARTNER_HP, i)
-                              - pouch.party_data[i].max_hp;
+            int32_t delta_php = 
+                GetBaseStat(OPT_PARTNER_HP, i) - pouch.party_data[i].max_hp;
             pouch.party_data[i].max_hp += delta_php;
             pouch.party_data[i].base_max_hp += delta_php;
             if (delta_php > 0) {

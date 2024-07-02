@@ -698,12 +698,20 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackNpcAction) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable) {
+    auto& state = g_Mod->state_;
     int32_t stats_downgradeable = 0;
-    if (g_Mod->state_.hp_level_ > 0) ++stats_downgradeable;
-    if (g_Mod->state_.fp_level_ > 0) ++stats_downgradeable;
-    if (g_Mod->state_.bp_level_ > 0) ++stats_downgradeable;
+
+    // If stats aren't locked to 0 / infinite, and at least one level...
+    if (g_Mod->state_.hp_level_ > 0 && state.GetOption(OPT_MARIO_HP) > 0)
+        ++stats_downgradeable;
+    if (g_Mod->state_.fp_level_ > 0 && state.GetOption(OPT_MARIO_FP) > 0)
+        ++stats_downgradeable;
+    if (g_Mod->state_.bp_level_ > 0
+        && state.GetOption(OPT_MARIO_BP) > 0
+        && !state.CheckOptionValue(OPTVAL_INFINITE_BP)) ++stats_downgradeable;
     // TODO: Don't check this if partners are disabled.
-    if (g_Mod->state_.hp_p_level_ > 0) ++stats_downgradeable;
+    if (g_Mod->state_.hp_p_level_ > 0 && state.GetOption(OPT_PARTNER_HP) > 0)
+        ++stats_downgradeable;
 
     evtSetValue(evt, evt->evtArguments[0], stats_downgradeable > 0);
     return 2;

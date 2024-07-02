@@ -28,7 +28,7 @@ public:
     int16_t     fp_level_;
     int16_t     bp_level_;
     int16_t     hp_p_level_;
-    int16_t     num_sack_upgrades_;
+    int16_t     max_inventory_;
     
     // Used to track tower progression.
     int32_t     floor_;
@@ -336,26 +336,37 @@ enum Options : uint32_t {
     OPTVAL_CHARLIETON_NORMAL    = 0x519'2'00'00,
     OPTVAL_CHARLIETON_SMALLER   = 0x519'2'00'01,
     OPTVAL_CHARLIETON_LIMITED   = 0x519'2'00'02,
+    // Reserved for single-byte option, to avoid crossing word boundary.
+    // 0x41b...
+    // Stat increase per upgrade (0-10); at 0, you only ever have 1 point.
+    // BP increase of "11" treats BP as infinite.
+    OPT_MARIO_HP                = 0x41c'4'00'0a,
+    OPT_PARTNER_HP              = 0x420'4'00'0a,
+    OPT_MARIO_FP                = 0x424'4'00'0a,
+    OPT_MARIO_BP                = 0x428'4'00'0b,
+    OPTVAL_INFINITE_BP          = 0x528'4'00'0b,
+    // Increase per Strange Sack (0-3); base inventory is always 6.
+    OPT_INVENTORY_SACK_SIZE     = 0x42c'2'00'03,
     // Booleans for enabling individual NPCs.
-    OPT_ENABLE_NPC_LUMPY        = 0x41b'1'00'01,
-    OPTVAL_NPC_LUMPY_OFF        = 0x51b'1'00'00,
-    OPTVAL_NPC_LUMPY_ON         = 0x51b'1'00'01,
-    OPT_ENABLE_NPC_DOOPLISS     = 0x41c'1'00'01,
-    OPTVAL_NPC_DOOPLISS_OFF     = 0x51c'1'00'00,
-    OPTVAL_NPC_DOOPLISS_ON      = 0x51c'1'00'01,
-    OPT_ENABLE_NPC_GRUBBA       = 0x41d'1'00'01,
-    OPTVAL_NPC_GRUBBA_OFF       = 0x51d'1'00'00,
-    OPTVAL_NPC_GRUBBA_ON        = 0x51d'1'00'01,
-    OPT_ENABLE_NPC_CHET_RIPPO   = 0x41e'1'00'01,
-    OPTVAL_NPC_CHET_RIPPO_OFF   = 0x51e'1'00'00,
-    OPTVAL_NPC_CHET_RIPPO_ON    = 0x51e'1'00'01,
-    OPT_ENABLE_NPC_WONKY        = 0x41f'1'00'01,
-    OPTVAL_NPC_WONKY_OFF        = 0x51f'1'00'00,
-    OPTVAL_NPC_WONKY_ON         = 0x51f'1'00'01,
-    OPT_ENABLE_NPC_DAZZLE       = 0x420'1'00'01,
-    OPTVAL_NPC_DAZZLE_OFF       = 0x520'1'00'00,
-    OPTVAL_NPC_DAZZLE_ON        = 0x520'1'00'01,
-    // Next: 0x421
+    OPT_ENABLE_NPC_LUMPY        = 0x42e'1'00'01,
+    OPTVAL_NPC_LUMPY_OFF        = 0x52e'1'00'00,
+    OPTVAL_NPC_LUMPY_ON         = 0x52e'1'00'01,
+    OPT_ENABLE_NPC_DOOPLISS     = 0x42f'1'00'01,
+    OPTVAL_NPC_DOOPLISS_OFF     = 0x52f'1'00'00,
+    OPTVAL_NPC_DOOPLISS_ON      = 0x52f'1'00'01,
+    OPT_ENABLE_NPC_GRUBBA       = 0x430'1'00'01,
+    OPTVAL_NPC_GRUBBA_OFF       = 0x530'1'00'00,
+    OPTVAL_NPC_GRUBBA_ON        = 0x530'1'00'01,
+    OPT_ENABLE_NPC_CHET_RIPPO   = 0x431'1'00'01,
+    OPTVAL_NPC_CHET_RIPPO_OFF   = 0x531'1'00'00,
+    OPTVAL_NPC_CHET_RIPPO_ON    = 0x531'1'00'01,
+    OPT_ENABLE_NPC_WONKY        = 0x432'1'00'01,
+    OPTVAL_NPC_WONKY_OFF        = 0x532'1'00'00,
+    OPTVAL_NPC_WONKY_ON         = 0x532'1'00'01,
+    OPT_ENABLE_NPC_DAZZLE       = 0x433'1'00'01,
+    OPTVAL_NPC_DAZZLE_OFF       = 0x533'1'00'00,
+    OPTVAL_NPC_DAZZLE_ON        = 0x533'1'00'01,
+    // Next: 0x434
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,
@@ -364,19 +375,12 @@ enum Options : uint32_t {
     OPT_SHOW_ATK_DEF            = 0x463'1'00'01,
     
     // Numeric options.
-    // Stat increase per upgrade (0-10); at 0, you only ever have 1 point.
-    OPTNUM_MARIO_HP             = 0x600'0'01'0a,
-    OPTNUM_MARIO_FP             = 0x601'0'01'0a,
-    OPTNUM_MARIO_BP             = 0x602'0'01'0a,
-    OPTNUM_PARTNER_HP           = 0x603'0'01'0a,
-    // Reserved: option for inventory size?
-    // OPTNUM_INVENTORY_SIZE    = 0x604'???
     // Global enemy HP and ATK scaling (0.05x ~ 10.00x in increments of 0.05).
-    OPTNUM_ENEMY_HP             = 0x605'1'05'c8,
-    OPTNUM_ENEMY_ATK            = 0x606'1'05'c8,
+    OPTNUM_ENEMY_HP             = 0x600'1'05'c8,
+    OPTNUM_ENEMY_ATK            = 0x601'1'05'c8,
     // Superguard SP cost (0.00 ~ 1.00 in increments of 0.01).
-    OPTNUM_SUPERGUARD_SP_COST   = 0x607'0'01'64,
-    // Next: 0x608
+    OPTNUM_SUPERGUARD_SP_COST   = 0x602'0'01'64,
+    // Next: 0x603
     
     // Tracking flags (need to add on the flag to set / check manually).
     FLAGS_ACHIEVEMENT           = 0x700'0'00'00,

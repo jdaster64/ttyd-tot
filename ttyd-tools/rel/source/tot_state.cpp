@@ -227,7 +227,7 @@ void StateManager::InitDefaultOptions() {
     hp_p_level_ = 2;
     fp_level_ = 1;
     bp_level_ = 1;
-    num_sack_upgrades_ = 0;
+    max_inventory_ = 6;
     
     memset(option_flags_, 0, sizeof(option_flags_));
     memset(option_bytes_, 0, sizeof(option_bytes_));
@@ -245,10 +245,11 @@ void StateManager::InitDefaultOptions() {
     SetOption(OPTVAL_NPC_CHET_RIPPO_ON);
     SetOption(OPTVAL_NPC_WONKY_ON);
     SetOption(OPTVAL_NPC_DAZZLE_ON);
-    SetOption(OPTNUM_MARIO_HP, 5);
-    SetOption(OPTNUM_MARIO_FP, 5);
-    SetOption(OPTNUM_MARIO_BP, 5);
-    SetOption(OPTNUM_PARTNER_HP, 5);
+    SetOption(OPT_MARIO_HP, 5);
+    SetOption(OPT_MARIO_FP, 5);
+    SetOption(OPT_MARIO_BP, 5);
+    SetOption(OPT_PARTNER_HP, 5);
+    SetOption(OPT_INVENTORY_SACK_SIZE, 2);
     SetOption(OPTNUM_ENEMY_HP, 100);
     SetOption(OPTNUM_ENEMY_ATK, 100);
     
@@ -278,10 +279,11 @@ void StateManager::ApplyPresetOptions() {
             SetOption(OPTVAL_NPC_CHET_RIPPO_ON);
             SetOption(OPTVAL_NPC_WONKY_ON);
             SetOption(OPTVAL_NPC_DAZZLE_ON);
-            SetOption(OPTNUM_MARIO_HP, 5);
-            SetOption(OPTNUM_MARIO_FP, 5);
-            SetOption(OPTNUM_MARIO_BP, 5);
-            SetOption(OPTNUM_PARTNER_HP, 5);
+            SetOption(OPT_MARIO_HP, 5);
+            SetOption(OPT_MARIO_FP, 5);
+            SetOption(OPT_MARIO_BP, 5);
+            SetOption(OPT_PARTNER_HP, 5);
+            SetOption(OPT_INVENTORY_SACK_SIZE, 2);
             SetOption(OPTNUM_ENEMY_HP, 100);
             SetOption(OPTNUM_ENEMY_ATK, 100);
 
@@ -514,10 +516,11 @@ const char* StateManager::GetEncodedOptions() const {
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_STARTER_ITEMS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_REVIVE_PARTNERS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_MARIO_HP);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_MARIO_FP);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_MARIO_BP);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_PARTNER_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_FP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_BP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_INVENTORY_SACK_SIZE);
     EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_HP);
     EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_ATK);
     EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_SUPERGUARD_SP_COST);

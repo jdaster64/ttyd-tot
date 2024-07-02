@@ -99,6 +99,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 }
 
 // Function hooks.
+extern void (*g_pouchReviseMarioParam_trampoline)();
 extern int32_t (*g_btlevtcmd_WeaponAftereffect_trampoline)(EvtEntry*, bool);
 extern void (*g_BattleAudienceSetThrowItemMax_trampoline)();
 // Patch addresses.
@@ -291,6 +292,17 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleAudienceItemCtrlProcess_CheckSpace_BH),
         reinterpret_cast<void*>(StartAudienceItemSpaceFix),
         reinterpret_cast<void*>(BranchBackAudienceItemSpaceFix));
+    
+    // Apply patch to give the player infinite BP, if enabled.
+    g_pouchReviseMarioParam_trampoline = mod::patch::hookFunction(
+        ttyd::mario_pouch::pouchReviseMarioParam, [](){
+            g_pouchReviseMarioParam_trampoline();
+            if (g_Mod->state_.CheckOptionValue(tot::OPTVAL_INFINITE_BP) &&
+                g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) {
+                ttyd::mario_pouch::pouchGetPtr()->total_bp = 99;
+                ttyd::mario_pouch::pouchGetPtr()->unallocated_bp = 99;
+            }
+        });
 }
 
 int32_t GetPinchThresholdForMaxHp(int32_t max_hp, bool peril) {
