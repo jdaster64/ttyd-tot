@@ -15,4 +15,7 @@ namespace mod::tot::party_vivian {
 void MakeSelectWeaponTable(
     ttyd::battle::BattleWorkCommand* command_work, int32_t* num_options);
 
+// Returns a pointer to a custom override of Vivian's unhiding event.
+void* GetVivianUnhideEvt();
+
 }

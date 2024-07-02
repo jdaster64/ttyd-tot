@@ -697,6 +697,10 @@ g_StringMap = {
         b"tot_upg_scope_out":
             b"Upgrading this move makes it\n"
             b"also guarantee most statuses.",
+        
+        b"tot_upg_veil":
+            b"Upgrading this move makes it\n"
+            b"grant Mario an extra turn.",
             
         b"tot_upg_shellsh":
             b"Upgrading this move will\n"

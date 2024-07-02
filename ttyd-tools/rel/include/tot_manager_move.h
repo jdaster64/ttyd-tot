@@ -75,9 +75,9 @@ namespace MoveType {
         YOSHI_STAMPEDE,
         
         VIVIAN_BASE,
-        VIVIAN_VEIL,
         VIVIAN_CURSE,
         VIVIAN_NEUTRALIZE,
+        VIVIAN_VEIL,
         VIVIAN_FIERY_JINX,
         VIVIAN_INFATUATE,
         

@@ -1843,20 +1843,19 @@ EVT_DEFINE_USER_FUNC(evtTot_Dragon_SetBreathParams) {
             weapon.poison_strength = 1;
             break;
         case BreathType::FREEZE:
-            // Increased chance since it's easier to break out of.
             weapon.freeze_chance = 50;
             weapon.freeze_time = 3;
             break;
         case BreathType::CONFUSE:
-            weapon.confuse_chance = 30;
+            weapon.confuse_chance = 40;
             weapon.confuse_time = 3;
             break;
         case BreathType::SLEEP:
-            weapon.sleep_chance = 30;
+            weapon.sleep_chance = 40;
             weapon.sleep_time = 3;
             break;
         case BreathType::TINY:
-            weapon.size_change_chance = 30;
+            weapon.size_change_chance = 40;
             weapon.size_change_time = 3;
             weapon.size_change_strength = -2;
             break;

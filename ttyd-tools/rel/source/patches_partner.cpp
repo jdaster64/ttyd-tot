@@ -345,6 +345,10 @@ void ApplyFixedPatches() {
     for (int32_t i = 0; i < 5; ++i) {
         ttyd::unit_koura::unitKoura_defense_attr[i] = 4;
     }
+
+    // Replace Vivian's unveiling event with custom one.
+    ttyd::unit_party_vivian::data_table_Party_Vivian[0].data =
+        tot::party_vivian::GetVivianUnhideEvt();
 }
 
 void DisplayTattleStats(

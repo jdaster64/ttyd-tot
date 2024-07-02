@@ -118,9 +118,9 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeBulkUpWeapon) {
     
     // Make changes in place.
     weapon->atk_change_time = ac_result;
-    weapon->atk_change_strength = move_level;
+    weapon->atk_change_strength = move_level + 1;
     weapon->def_change_time = ac_result;
-    weapon->def_change_strength = move_level;
+    weapon->def_change_strength = move_level + 1;
     // Apply statuses one at a time.
     if (index == 0) {
         weapon->atk_change_chance = 100;

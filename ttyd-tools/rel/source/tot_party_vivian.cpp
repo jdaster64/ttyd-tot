@@ -10,6 +10,7 @@
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_message.h>
 #include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
@@ -20,6 +21,7 @@
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/msgdrv.h>
+#include <ttyd/unit_party_christine.h>
 #include <ttyd/unit_party_vivian.h>
 
 #include <cstring>
@@ -33,6 +35,7 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_message;
 using namespace ::ttyd::battle_unit;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
@@ -59,8 +62,8 @@ extern BattleWeapon customWeapon_VivianCurse;
 extern BattleWeapon customWeapon_VivianNeutralize;
 
 BattleWeapon* g_WeaponTable[] = {
-    &customWeapon_VivianShadeFist, &customWeapon_VivianVeil,  
-    &customWeapon_VivianCurse, &customWeapon_VivianNeutralize,
+    &customWeapon_VivianShadeFist, &customWeapon_VivianCurse,
+    &customWeapon_VivianNeutralize, &customWeapon_VivianVeil,
     &customWeapon_VivianFieryJinx, &customWeapon_VivianInfatuate
 };
 
@@ -372,6 +375,11 @@ EVT_BEGIN(partyVivianAttack_ShadowGuard)
     USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, 16842752)
     WAIT_FRM(1)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, 4, 1)
+
+    // Also set Unit Work var 5 to contain the level of the move.
+    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_VEIL, LW(0))
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
@@ -703,6 +711,85 @@ EVT_BEGIN(partyVivianAttack_CharmKissAttack)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(vivian_hide_event)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, 4, LW(0))
+    IF_LARGE_EQUAL(LW(0), 1)
+        SUB(LW(0), 1)
+    END_IF()
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, 4, LW(0))
+    IF_SMALL_EQUAL(LW(0), 0)
+        SET(LW(3), -3)
+        USER_FUNC(btlevtcmd_PhaseEventStartDeclare, LW(3))
+        USER_FUNC(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 15)
+        USER_FUNC(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+        INLINE_EVT()
+            USER_FUNC(btlevtcmd_OffAttribute, LW(3), 16)
+            USER_FUNC(btlevtcmd_OffPartsAttribute, LW(3), 1, 50331648)
+            USER_FUNC(battle_evt_majo_disp_on, LW(3), 1, LW(0), LW(1), LW(2), 1)
+            USER_FUNC(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
+            USER_FUNC(btlevtcmd_GetHomePos, LW(3), LW(0), LW(1), LW(2))
+            USER_FUNC(btlevtcmd_SetMoveSpeed, LW(3), FLOAT(2.0))
+            USER_FUNC(btlevtcmd_MovePosition, LW(3), LW(0), LW(1), LW(2), 0, -1, 0)
+        END_INLINE()
+        USER_FUNC(btlevtcmd_OffPartsAttribute, -2, 1, 65536)
+        USER_FUNC(btlevtcmd_OffPartsAttribute, -2, 1, 16777216)
+        USER_FUNC(battle_evt_majo_disp_on, -2, 1, LW(0), LW(1), LW(2), 1)
+        USER_FUNC(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_GetMoveFrame, -2, LW(0), LW(1), LW(2), FLOAT(2.0), LW(15))
+        BROTHER_EVT_ID(LW(14))
+            USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), LW(15), -1, 0)
+        END_BROTHER()
+        USER_FUNC(btlevtcmd_ACRStart, -2, 0, LW(15), LW(15), 15)
+        
+        // If level 2 of the move was used, also apply hustle status to Mario.
+        USER_FUNC(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        IF_EQUAL(LW(0), 2)
+            BROTHER_EVT_ID(LW(13))
+                USER_FUNC(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+                ADD(LW(2), 15)
+                USER_FUNC(btlevtcmd_GetHeight, LW(3), LW(11))
+                USER_FUNC(btlevtcmd_GetStatusMg, LW(3), LW(12))
+                MULF(LW(11), LW(12))
+                DIV(LW(11), 2)
+                ADD(LW(1), LW(11))
+                USER_FUNC(evt_eff, 0, PTR("recovery"), 6, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+                USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BTL_KURI_CHEER_KISS1"), LW(0), LW(1), LW(2), 0)
+                USER_FUNC(ttyd::unit_party_christine::_set_hustle, LW(3))
+                WAIT_FRM(40)
+                USER_FUNC(btlevtcmd_AnimeChangePoseType, LW(3), 1, 58)
+                USER_FUNC(btlevtcmd_AnnounceMessage, 0, 0, 0, PTR("msg_st_chg_mario_quick"), 60)
+            END_BROTHER()
+        ELSE()
+            SET(LW(13), -1)
+        END_IF()
+
+        USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
+        SWITCH(LW(6))
+            CASE_LARGE_EQUAL(2)
+                DELETE_EVT(LW(14))
+                USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, PTR(&partyWeapon_VivianShadowGuard), 1, 0, 0, 0)
+                USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PTR_Y_1"))
+                USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+                USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(2.0))
+                USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+                USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+            CASE_ETC()
+                USER_FUNC(evt_audience_acrobat_notry)
+                USER_FUNC(btlevtcmd_WaitEventEnd, LW(14))
+        END_SWITCH()
+        IF_NOT_EQUAL(LW(13), -1)
+            USER_FUNC(btlevtcmd_WaitEventEnd, LW(13))
+        END_IF()
+        USER_FUNC(evt_audience_ap_recovery)
+        USER_FUNC(btlevtcmd_InviteApInfoReport)
+        USER_FUNC(btlevtcmd_StartWaitEvent, LW(3))
+        USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    END_IF()
+    RETURN()
+EVT_END()
+
 BattleWeapon customWeapon_VivianShadeFist = {
     .name = "btl_wn_ptr_normal",
     .icon = IconType::PARTNER_MOVE_0,
@@ -718,7 +805,7 @@ BattleWeapon customWeapon_VivianShadeFist = {
     .bingo_card_chance = 100,
     .unk_1b = 50,
     .damage_function = (void*)GetWeaponPowerFromSelectedLevel,
-    .damage_function_params = { 3, 3, 4, 4, 6, 6, 0, MoveType::VIVIAN_BASE },
+    .damage_function_params = { 3, 3, 5, 5, 7, 7, 0, MoveType::VIVIAN_BASE },
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
@@ -1043,5 +1130,9 @@ BattleWeapon customWeapon_VivianNeutralize = {
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
+
+void* GetVivianUnhideEvt() {
+    return (void*)vivian_hide_event;
+}
 
 }  // namespace mod::tot::party_vivian
