@@ -849,7 +849,9 @@ g_StringMap = {
         b"tot_optr_mhp":                b"HP / Level",
         b"tot_optr_mfp":                b"FP / Level",
         b"tot_optr_mbp":                b"BP / Level",
+        b"tot_optr_mbp_inf":            b"Infinite",
         b"tot_optr_php":                b"Party HP / Level",
+        b"tot_optr_itemgain":           b"Items / Sack",
         b"tot_optr_ehp":                b"Enemy HP %",
         b"tot_optr_eatk":               b"Enemy ATK %",
         b"tot_optr_supercost":          b"Superguard SP Cost",
@@ -916,6 +918,10 @@ g_StringMap = {
         b"tot_opth_php":
             b"How much HP partners gain\n"
             b"per stat level, on average.",
+            
+        b"tot_opth_itemgain":
+            b"How many extra items each\n"
+            b"Strange Sack can carry.",
         
         b"tot_opth_ehp":
             b"What percentage to scale\n"
