@@ -52,10 +52,9 @@ void SetBaseStats() {
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
     // Set starting HP, FP, BP.
-    int32_t hp = GetBaseStat(OPT_MARIO_HP);
-    int32_t fp = GetBaseStat(OPT_MARIO_FP);
-    int32_t bp = GetBaseStat(OPT_MARIO_BP);
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_INFINITE_BP)) bp = 99;
+    const int32_t hp = GetBaseStat(OPT_MARIO_HP);
+    const int32_t fp = GetBaseStat(OPT_MARIO_FP);
+    const int32_t bp = GetBaseStat(OPT_MARIO_BP);
     
     pouch.current_hp = hp;
     pouch.max_hp = hp;
@@ -139,11 +138,19 @@ void OptionsManager::InitLobby() {
 }
 
 void OptionsManager::InitFromSelectedOptions() {
-    // Set starting HP, FP, BP.
-    SetBaseStats();
-    
     auto& state = g_Mod->state_;
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+
+    // Make levels for disabled / infinite stats 0 / 99 respectively.
+    if (state.GetOption(OPT_MARIO_HP) == 0) state.hp_level_ = 0;
+    if (state.GetOption(OPT_MARIO_FP) == 0) state.fp_level_ = 0;
+    if (state.GetOption(OPT_MARIO_BP) == 0) state.bp_level_ = 0;
+    if (state.GetOption(OPT_PARTNER_HP) == 0) state.hp_p_level_ = 0;
+    if (state.CheckOptionValue(OPTVAL_INFINITE_BP)) state.bp_level_ = 99;
+
+    // Set starting HP, FP, BP.
+    SetBaseStats();
+
     pouch.star_powers_obtained = 0b11;
     pouch.max_sp = 300;
     
@@ -176,7 +183,7 @@ void OptionsManager::InitFromSelectedOptions() {
     }
     
     // Start with Merlee curse, if enabled.
-    // TODO: Make ToT Merlee unable to buff EXP gain.
+    // TODO: If enabling Merlee, make ToT Merlee unable to buff EXP gain.
     if (state.GetOption(tot::OPT_MERLEE_CURSE)) {
         pouch.merlee_curse_uses_remaining = 99;
         pouch.turns_until_merlee_activation = -1;

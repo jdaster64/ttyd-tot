@@ -1318,8 +1318,21 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             break;
         }
         case MenuType::TOT_CHET_RIPPO_TRADE: {
-            // TODO: Omit partner HP row if playing with no partners.
-            sel_entry->num_rows = 4;
+            auto& state = g_Mod->state_;
+
+            // Determine which options should be visible.
+            int32_t ids[5] = { 0, 0, 0, 0, 0 };
+            int32_t num_options = 0;
+            // HP and FP should always be visible.
+            ids[num_options++] = 1;
+            ids[num_options++] = 3;
+            // Add BP unless it's set to infinite.
+            if (!state.CheckOptionValue(OPTVAL_INFINITE_BP))
+                ids[num_options++] = 4;
+            // TODO: Add Partner HP only if partners are enabled.
+            ids[num_options++] = 2;
+
+            sel_entry->num_rows = num_options;
             sel_entry->row_data =
                 (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
                     0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
@@ -1327,12 +1340,12 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
                 sel_entry->row_data, 0,
                 sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
 
-            auto& state = g_Mod->state_;
-            for (int32_t i = 0; i < 4; ++i) {
-                sel_entry->row_data[i].value = i+1;
+            for (int32_t i = 0; i < num_options; ++i) {
+                int32_t id = ids[i];
+                sel_entry->row_data[i].value = id;
 
                 bool disable = false;
-                switch (i+1) {
+                switch (id) {
                     case 1:
                         if (state.hp_level_ <= 0 ||
                             state.GetOption(OPT_MARIO_HP) == 0) {

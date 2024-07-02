@@ -939,12 +939,12 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
         }
 
         // Pick an NPC at random (if there are fewer than 4 options, add some
-        // chance that no NPC shows up so you aren't guaranteed one).
+        // chance that no NPC shows up so you aren't guaranteed one every floor).
         int32_t weight = 0;
         for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
             weight += base_weights[i];
         }
-        if (active_npc_types < 4) weight += (4 - active_npc_types) * 10;
+        if (active_npc_types < 4) weight += (4 - active_npc_types) * 8;
         weight = g_Mod->state_.Rand(weight, RNG_SECONDARY_NPC);
 
         g_Mod->state_.SetOption(
