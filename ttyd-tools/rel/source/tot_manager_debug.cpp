@@ -234,9 +234,7 @@ void DebugManager::Update() {
             }            
         } else if (button_trg & ButtonId::Y) {
             if (g_CursorPos == 0) {
-                g_Mod->state_.seed_ = 
-                    static_cast<uint32_t>(gc::OSTime::OSGetTime()) %
-                    1'000'000'000;
+                g_Mod->state_.PickRandomSeed();
             } else {
                 g_Mod->state_.seed_ = g_CursorPos;
             }

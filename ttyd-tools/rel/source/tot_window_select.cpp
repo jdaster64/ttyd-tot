@@ -58,10 +58,12 @@ struct OptionMenuData {
 };
 
 enum WindowOptions {
-    // All window-specific options should have negative values.
+    // All window-specific options should have low negative values.
     WIN_STAT_RUN_AVG_TURNS = -100000,
     WIN_STAT_RUN_AVG_BATTLE_TIME,
     WIN_STAT_RUN_MOST_BATTLE_TIME,
+    WIN_SEED_SELECT,
+    WIN_SEED_RANDOM,
 };
 
 OptionMenuData g_OptionMenuData[] = {
@@ -82,6 +84,8 @@ OptionMenuData g_OptionMenuData[] = {
     { STAT_RUN_SP_SPENT, "tot_optr_spspent", nullptr, 15, false, true },
     { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", nullptr, 16, false, true },
     { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", nullptr, 17, false, true },
+    { WIN_SEED_SELECT, "tot_optr_seed", "tot_opth_seed", 90, true, false },
+    { WIN_SEED_RANDOM, "tot_optr_seed_random", nullptr, 91, false, false },
     { OPT_PRESET, "tot_optr_preset", "tot_opth_preset", 100, true, false },
     { OPTVAL_PRESET_CUSTOM, "tot_optr_preset_custom", nullptr, 101, false, false },
     { OPTVAL_PRESET_DEFAULT, "tot_optr_preset_default", nullptr, 102, false, false },
@@ -213,6 +217,13 @@ const char* OptionValue(uint16_t lookup_key) {
     }
 
     switch (option) {
+        case WIN_SEED_SELECT: {
+            if (state.seed_ == 0) {
+                return msgSearch(g_OptionMenuData[option_index + 1].name_msg);
+            }
+            sprintf(buf, "%09" PRId32, state.seed_);
+            break;
+        }
         case WIN_STAT_RUN_AVG_BATTLE_TIME: {
             int32_t total_time_centis = 0;
             int32_t battles = 0;
@@ -298,9 +309,11 @@ const char* OptionValue(uint16_t lookup_key) {
 
 void SelectMainOptionsWrapper(WinMgrEntry* entry) {
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
+    auto& state = g_Mod->state_;
 
     // Handle special inputs for run options window.
-    if (sel_entry->type == MenuType::RUN_OPTIONS) {
+    if (sel_entry->type == MenuType::RUN_OPTIONS && 
+        sel_entry->state == WinMgrSelectEntry_State::IN_SELECTION) {
         // Incredibly hacky: Replace A presses with B presses.
         if (g_MarioSt->gamepad_buttons_pressed[0] & ButtonId::A) {
             g_MarioSt->gamepad_buttons_pressed[0] &= ~ButtonId::A;
@@ -314,25 +327,49 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
         } else if (dir_rep & DirectionInputId::ANALOG_RIGHT) {
             ++change;
         }
-        if (change) {
-            int32_t value = sel_entry->row_data[sel_entry->cursor_index].value;
-            uint32_t option = OptionLookup(value);
 
+        int32_t value = sel_entry->row_data[sel_entry->cursor_index].value;
+        uint32_t option = OptionLookup(value);
+
+        if ((int32_t)option == WIN_SEED_SELECT) {
+            // Modify the selected seed 
+            uint32_t buttons = g_MarioSt->gamepad_buttons_pressed[0];
+            if (buttons & ButtonId::X) {
+                state.PickRandomSeed();
+                // Play menu back-out sound to indicate randomization action.
+                ttyd::pmario_sound::psndSFXOn((const char*)0x2002b);
+            } else if (buttons & ButtonId::L) {
+                state.seed_ = (state.seed_ % 100'000'000) * 10;
+                ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+            } else if (buttons & ButtonId::R) {
+                state.seed_ /= 10;
+                ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+            } else if (change) {
+                if (change == 1 && state.seed_ == 999'999'999) {
+                    state.seed_ = 0;
+                } else if (change == -1 && state.seed_ == 0) {
+                    state.seed_ = 999'999'999;
+                } else {
+                    state.seed_ += change;
+                }
+                ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+            }
+        } else if (change) {
             // Only allow changing preset, difficulty and timer options if
             // a non-custom preset is selected.
-            if (!g_Mod->state_.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
+            if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
                 option != OPT_PRESET && option != OPT_DIFFICULTY &&
                 option != OPT_TIMER_DISPLAY) {
                 // Play "failure" sound.
                 ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
             } else {
                 // Change the option, wrapping around if necessary.
-                g_Mod->state_.NextOption(option, change);
+                state.NextOption(option, change);
                 // Play selection sound.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
                 // If the option was presets, apply that preset's settings.
                 if (option == OPT_PRESET) {
-                    g_Mod->state_.ApplyPresetOptions();
+                    state.ApplyPresetOptions();
                 }
             }
         }
@@ -475,7 +512,8 @@ void DispMainWindow(WinMgrEntry* entry) {
                 uint32_t option = OptionLookup(row.value);
                 if (g_Mod->state_.CheckOptionValue(OPTVAL_PRESET_CUSTOM) ||
                     option == OPT_PRESET || option == OPT_DIFFICULTY ||
-                    option == OPT_TIMER_DISPLAY) {
+                    option == OPT_TIMER_DISPLAY || 
+                    (int32_t)option == WIN_SEED_SELECT) {
                     row.flags &= ~WinMgrSelectEntryRow_Flags::GREYED_OUT;
                 } else {
                     row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;

@@ -72,7 +72,9 @@ public:
     void Save(TotSaveSlot* save);
     bool HasBackupSave() const;
     TotSaveSlot* GetBackupSave() const;
-    
+
+    // Picks a random seed.
+    void PickRandomSeed(); 
     // Initialize all settings to default.
     void InitDefaultOptions();
     // Resets settings based on the currently selected preset.
@@ -268,7 +270,6 @@ enum OptionsType {
 enum Options : uint32_t {
     // Flag-based options.
     // Select a set of settings all at once.
-    // TODO: Implement.
     OPT_PRESET                  = 0x400'2'00'01,
     OPTVAL_PRESET_CUSTOM        = 0x500'2'00'00,
     OPTVAL_PRESET_DEFAULT       = 0x500'2'00'01,

@@ -215,9 +215,14 @@ TotSaveSlot* StateManager::GetBackupSave() const {
     return &g_BackupSave;
 }
 
+void StateManager::PickRandomSeed() {
+    uint64_t time = gc::OSTime::OSGetTime();
+    seed_ = third_party::fasthash64(&time, sizeof(time), 417) % 999'999'999 + 1;
+}
+
 void StateManager::InitDefaultOptions() {
     // Pick a random seed, and reset all RNG states to the start.
-    seed_ = static_cast<uint32_t>(gc::OSTime::OSGetTime()) % 1'000'000'000;
+    PickRandomSeed();
     for (int32_t i = 0; i < RNG_SEQUENCE_MAX; ++i) rng_states_[i] = 0;
     
     // Set floor to 0 (starting floor that only gives a partner).

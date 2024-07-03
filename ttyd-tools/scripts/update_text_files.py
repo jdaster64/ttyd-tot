@@ -825,6 +825,8 @@ g_StringMap = {
             
         b"tot_winsel_runoptions_header":    b"Options",
         
+        b"tot_optr_seed":               b"Seed",
+        b"tot_optr_seed_random":        b"0 (Random)",
         b"tot_optr_preset":             b"Preset",
         b"tot_optr_preset_custom":      b"Custom",
         b"tot_optr_preset_default":     b"Default",
@@ -891,6 +893,10 @@ g_StringMap = {
         
         b"tot_optr_off":                b"Off",
         b"tot_optr_on":                 b"On",
+        
+        b"tot_opth_seed":
+            b"Seeds random events. Press X\n"
+            b"to randomize, L/R to shift 10x.",
         
         b"tot_opth_preset":
             b"Whether to use custom settings\n"
