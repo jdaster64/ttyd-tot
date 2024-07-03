@@ -220,6 +220,13 @@ EVT_BEGIN(Tower_ChestEvt_2)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Tower_ChestEvt_3)
+    SET(LW(8), PTR("box_3"))
+    SET(LW(9), 3)
+    RUN_CHILD_EVT(PTR(&Tower_ChestEvt_Core))
+    RETURN()
+EVT_END()
+
 // Setting up loading zones, etc. for regular room.
 EVT_BEGIN(Tower_BeroSetupNormal)
     SET(LW(0), PTR(&normal_room_entry_data))
@@ -271,10 +278,10 @@ EVT_BEGIN(Tower_SpawnChests)
     END_IF()
     USER_FUNC(evtTot_GenerateChestContents)
     
-    SET(LW(10), 3)
+    SET(LW(10), 4)
     DO(LW(10))
         // Get contents of next chest, and break from loop if empty.
-        SET(LW(11), 3)
+        SET(LW(11), 4)
         SUB(LW(11), LW(10))
         USER_FUNC(evtTot_GetChestData, LW(11), LW(0), LW(1), LW(2), LW(3), EVT_NULLPTR)
         IF_EQUAL(LW(3), 0)
@@ -301,10 +308,14 @@ EVT_BEGIN(Tower_SpawnChests)
                 USER_FUNC(
                     evt_mobj_itembox, PTR("box_1"), LW(0), LW(1), LW(2), 1, 0, 
                     PTR(&Tower_ChestEvt_1), (int32_t)GSWF_Chest_1)
-            CASE_ETC()
+            CASE_EQUAL(2)
                 USER_FUNC(
                     evt_mobj_itembox, PTR("box_2"), LW(0), LW(1), LW(2), 1, 0, 
                     PTR(&Tower_ChestEvt_2), (int32_t)GSWF_Chest_2)
+            CASE_ETC()
+                USER_FUNC(
+                    evt_mobj_itembox, PTR("box_3"), LW(0), LW(1), LW(2), 1, 0, 
+                    PTR(&Tower_ChestEvt_3), (int32_t)GSWF_Chest_3)
         END_SWITCH()
     WHILE()
 

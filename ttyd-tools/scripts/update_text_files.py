@@ -1504,43 +1504,44 @@ g_StringMap = {
         
         # Hooktail battle entry.
         b"tot_dragon00_00":
-            b"Placeholder text 0-00<k>",
+            b"[Placeholder] Battle entry<k>",
         
         # Hooktail low health.
         b"tot_dragon00_10":
-            b"Placeholder text 0-10<k>",
+            b"[Placeholder] Low health<k>",
         
         # Hooktail phase 2 start.
         b"tot_dragon00_20":
-            b"Placeholder text 0-20<k>",
+            b"[Placeholder] Phase 2<k>",
         
         # Hooktail phase 3 start (unused).
         b"tot_dragon00_30":
-            b"Placeholder text 0-30<k>",
+            b"[Placeholder] Phase 3<k>",
         
         # Hooktail megabreath (unused).
         b"tot_dragon00_40":
-            b"Placeholder text 0-40<k>",
+            b"[Placeholder] Megabreath!<k>",
         
         # Hooktail healing (unused).
         b"tot_dragon00_50":
-            b"Placeholder text 0-50<k>",
+            b"[Placeholder] Healing!<k>",
         
         # Hooktail bite reaction.
         b"tot_dragon00_60":
-            b"Placeholder text 0-60<k>",
+            b"[Placeholder] Bite gloating<k>",
         
         # Hooktail partner bite reaction.
         b"tot_dragon00_70":
-            b"Placeholder text 0-70<k>",
+            b"[Placeholder]\n"
+            b"You can Superguard that btw<k>",
         
         # Hooktail death.
         b"tot_dragon00_80":
-            b"Placeholder text 0-80<k>",
+            b"[Placeholder] Dead<k>",
         
         # Hooktail fake death (unused).
         b"tot_dragon00_90":
-            b"Placeholder text 0-90<k>",
+            b"[Placeholder] Dead?",
         
         # Gloomtail battle entry.
         b"tot_dragon01_00":
@@ -1620,51 +1621,52 @@ g_StringMap = {
             b"No... <wait 250>No...<wait 250> It can't be true!\n"
             b"<k>",
         
-        # Gloomtail fake death (placeholder).
+        # Gloomtail fake death.
         b"tot_dragon01_90":
             b"<boss>\n"
+            b"[Placeholder]\n"
             b"No... <wait 250>No...<wait 250> It can't be true!\n"
             b"<k>",
         
         # Bonetail battle entry.
         b"tot_dragon02_00":
-            b"Placeholder text 2-0<k>",
+            b"[Placeholder] Battle entry<k>",
         
         # Bonetail low health.
         b"tot_dragon02_10":
-            b"Placeholder text 2-10<k>",
+            b"[Placeholder] Low health<k>",
         
         # Bonetail phase 2 start.
         b"tot_dragon02_20":
-            b"Placeholder text 2-20<k>",
+            b"[Placeholder] Phase 2<k>",
         
         # Bonetail phase 3 start (unused).
         b"tot_dragon02_30":
-            b"Placeholder text 2-30<k>",
+            b"[Placeholder] Phase 3<k>",
         
         # Bonetail megabreath (unused).
         b"tot_dragon02_40":
-            b"Placeholder text 2-40<k>",
+            b"[Placeholder] Megabreath!<k>",
         
         # Bonetail healing.
         b"tot_dragon02_50":
-            b"Placeholder text 2-50<k>",
+            b"[Placeholder] Healing!<k>",
         
         # Bonetail bite reaction (unused).
         b"tot_dragon02_60":
-            b"Placeholder text 2-60<k>",
+            b"[Placeholder] Bite<k>",
         
         # Bonetail partner bite reaction (unused).
         b"tot_dragon02_70":
-            b"Placeholder text 2-70<k>",
+            b"[Placeholder] Reaction<k>",
         
         # Bonetail death.
         b"tot_dragon02_80":
-            b"Placeholder text 2-80<k>",
+            b"[Placeholder] Dead<k>",
         
         # Bonetail fake death (unused).
         b"tot_dragon02_90":
-            b"Placeholder text 2-90<k>",
+            b"[Placeholder] Dead?",
     }
 }
 

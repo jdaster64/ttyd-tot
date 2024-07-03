@@ -926,17 +926,26 @@ EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
     // Could set positions based on Mario's current position, but final maps
     // will probably have them behind a gate, so they wouldn't be in the way.
     const gc::vec3 positions[] = {
+        // 1 and 3 start
         { 0.0, 0.0, -100.0 },
         { -80.0, 0.0, -100.0 },
         { 80.0, 0.0, -100.0 },
+        // 4 start
+        { -120.0, 0.0, -100.0 },
+        // 2 start
         { -40.0, 0.0, -100.0 },
         { 40.0, 0.0, -100.0 },
+        { 120.0, 0.0, -100.0 },
     };
     memset(g_Chests, 0, sizeof(g_Chests));
     
     int32_t num_chests = GetBattleRewardTier();
-    
-    int32_t start_position = (num_chests == 2) ? 3 : 0;
+
+    int32_t start_position = 0;
+    switch (num_chests) {
+        case 2: start_position = 4; break;
+        case 4: start_position = 3; break;
+    }
     for (int32_t i = 0; i < num_chests; ++i) {
         g_Chests[i].home_pos = positions[start_position + i];
         g_Chests[i].item = REWARD_PLACEHOLDER;

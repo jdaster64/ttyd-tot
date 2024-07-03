@@ -1204,8 +1204,6 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyStats) {
 
 int32_t GetBattleRewardTier() {
     int32_t floor = g_Mod->state_.floor_;
-    // For midboss or boss floors, always return the maximum number.
-    if (floor > 0 && floor % 8 == 0) return 3;
     // For the starter floor, you only have one choice.
     if (floor == 0) return 1;
     
@@ -1218,21 +1216,27 @@ int32_t GetBattleRewardTier() {
     level_sum *= 100;
 
     int32_t num_chests = 1;
-    if (level_sum / level_target_sum >= 55) ++num_chests;
-    if (level_sum / level_target_sum >= 70) ++num_chests;
-    
-    // Give an extra chest on EX difficulty, even on shop floors.
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX)) {
-        ++num_chests;
+    if (floor > 0 && floor % 8 == 0) {
+        // For midboss or boss floors, always 3 options.
+        num_chests = 3;
+    } else if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX)) {
+        // Increased number of chests in EX mode, min of 2 even on rest floors.
+        if (level_sum / level_target_sum >= 0) ++num_chests;
+        if (level_sum / level_target_sum >= 62) ++num_chests;
+        // Exceptionally hard layouts can give 4 chests later in the Pit.
+        if (floor > 16 && level_sum / level_target_sum >= 83) ++num_chests;
+    } else {
+        if (level_sum / level_target_sum >= 55) ++num_chests;
+        if (level_sum / level_target_sum >= 70) ++num_chests;
     }
 
-    // Give an extra chest if Doopliss's effect is active.
+    // Give an extra chest if Doopliss's effect is active (up to the max of 4).
     int32_t doopliss_floor = g_Mod->state_.GetOption(STAT_RUN_NPC_DOOPLISS_FLOOR);
     if (doopliss_floor && floor - doopliss_floor < 8) {
         ++num_chests;
     }
 
-    if (num_chests > 3) num_chests = 3;
+    if (num_chests > 4) num_chests = 4;
     return num_chests;
 }
 
