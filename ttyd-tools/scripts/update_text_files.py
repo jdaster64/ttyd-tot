@@ -17,6 +17,9 @@ FLAGS.DefineString("out_msg_dir", "")
 
 g_StringMap = {
     'global': {
+        # Generic placeholder string.
+        b"tot_msg_dummy":       b"Placeholder",
+        
         # Item names.
         b"in_cake":             b"Strawberry Cake",
         b"in_suitoru":          b"HP-Sucker",
@@ -664,6 +667,8 @@ g_StringMap = {
         b"tot_ptr6_bsquad_abb": b"Bomb Sq.",
         b"tot_ptr6_poison_abb": b"Poison B.",
         b"tot_ptr7_smokeb_abb": b"Smoke B.",
+        
+        b"tot_toughen_up_abb":  b"Tough. Up",
         
         # Upgrade descriptions
         

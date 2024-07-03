@@ -353,17 +353,19 @@ void GetStatusParams(
         case ItemType::CHARGE:
         case ItemType::CHARGE_P:
             if (status_type == StatusEffectType::CHARGE) {
-                strength += mario_move::GetStrategyBadgeLevel(
-                    /* is_charge = */ true,
-                    attacker->current_kind == BattleUnitType::MARIO) - 1;
+                strength += tot::MoveManager::GetSelectedLevel(
+                    tot::MoveType::BADGE_MOVE_CHARGE +
+                    (attacker->current_kind == BattleUnitType::MARIO ? 0 : 1))
+                     - 1;
             }
             break;
         case ItemType::TOT_TOUGHEN_UP:
         case ItemType::TOT_TOUGHEN_UP_P:
             if (status_type == StatusEffectType::DEFENSE_UP) {
-                strength += mario_move::GetStrategyBadgeLevel(
-                    /* is_charge = */ false,
-                    attacker->current_kind == BattleUnitType::MARIO) - 1;
+                strength += tot::MoveManager::GetSelectedLevel(
+                    tot::MoveType::BADGE_MOVE_SUPER_CHARGE +
+                    (attacker->current_kind == BattleUnitType::MARIO ? 0 : 1))
+                     - 1;
             }
             break;
     }

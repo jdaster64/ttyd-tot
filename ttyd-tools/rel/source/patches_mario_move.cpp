@@ -85,7 +85,7 @@ namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
-}
+}  // namespace
 
 // Function hooks.
 extern int32_t (*g_BtlUnit_GetWeaponCost_trampoline)(BattleWorkUnit*, BattleWeapon*);
@@ -117,15 +117,9 @@ extern const int32_t g_scissor_damage_Patch_ArtAttackCheckImmunity;
 namespace mario_move {
 
 namespace {
-    
-// Global variables and constants.
-bool                g_InBattle = false;
-int8_t              g_MaxMoveBadgeCounts[4];
-int8_t              g_CurMoveBadgeCounts[4];
-char                g_MoveBadgeTextBuffer[24];
-const char*         kMoveBadgeAbbreviations[4] = {
-    "Charge", "Charge", "Tough. Up", "Tough. Up"
-};
+
+// Buffer for showing move names with levels.
+char g_MoveBadgeTextBuffer[24];
 
 // Patch to disable getting Star Power early from certain attacks;
 // battle::AwardStarPowerAndResetFaceDirection will be used to award it
@@ -135,24 +129,13 @@ DEBUG_REM(0) DEBUG_REM(0)
 EVT_PATCH_END()
 static_assert(sizeof(DeclareStarPowerPatch) == 0x10);
 
-// If the badge is one that can have its power level selected, returns the
-// index of the value controlling its level; otherwise, returns -1.
-int32_t GetWeaponLevelSelectionIndex(int16_t badge_id) {
-    switch (badge_id) {
-        case ItemType::CHARGE: return 0;
-        case ItemType::CHARGE_P: return 1;
-        case ItemType::TOT_TOUGHEN_UP: return 2;
-        case ItemType::TOT_TOUGHEN_UP_P: return 3;
-    }
-    return -1;
-}
-
 // Gets the FP cost of a move, factoring in stackability of Charge / Toughen Up
 // and Flower Savers if necessary.
 int32_t GetWeaponCost(BattleWorkUnit* unit, BattleWeapon* weapon) {
     int32_t cost = weapon->base_fp_cost;
-    if (int32_t idx = GetWeaponLevelSelectionIndex(weapon->item_id); idx >= 0) {
-        cost *= g_CurMoveBadgeCounts[idx];
+    if (int32_t type = tot::MoveManager::GetMoveTypeFromBadge(weapon->item_id); 
+        type != -1) {
+        cost *= tot::MoveManager::GetSelectedLevel(type);
     }
     if (cost > 0) {
         cost -= unit->badges_equipped.flower_saver;
@@ -185,7 +168,6 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
         BattleWorkUnit* unit =
             battleWork->battle_units[battleWork->active_unit_idx];
         BattleWeapon* weapon = nullptr;
-        int32_t idx = 0;
         for (int32_t i = 0; i < cursor->num_options; ++i) {
             // Not selecting Charge or Super Charge.
             if (strats[i].type < 1 || strats[i].type > 2) continue;
@@ -203,26 +185,27 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                     weapon = &ttyd::battle_mario::badgeWeapon_SuperChargeP;
                 }
             }
-            idx = GetWeaponLevelSelectionIndex(weapon->item_id);
-            if (idx < 0 || g_MaxMoveBadgeCounts[idx] <= 1) continue;
+            
+            int32_t move_type = 
+                tot::MoveManager::GetMoveTypeFromBadge(weapon->item_id);
+            if (move_type == -1) continue;
             
             // If current selection, and L/R pressed, change power level.
             if (i == cursor->abs_position) {
-                if (left_press && g_CurMoveBadgeCounts[idx] > 1) {
-                    --g_CurMoveBadgeCounts[idx];
+                if (left_press &&
+                    tot::MoveManager::ChangeSelectedLevel(move_type, -1)) {
                     ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                 } else if (
-                    right_press && 
-                    g_CurMoveBadgeCounts[idx] < g_MaxMoveBadgeCounts[idx]) {
-                    ++g_CurMoveBadgeCounts[idx];
+                    right_press &&
+                    tot::MoveManager::ChangeSelectedLevel(move_type, 1)) {
                     ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                 }
                 
                 // Overwrite default text based on current power level.
-                sprintf(
-                    g_MoveBadgeTextBuffer, "%s Lv. %" PRId8,
-                    kMoveBadgeAbbreviations[idx], g_CurMoveBadgeCounts[idx]);
-                strats[i].name = g_MoveBadgeTextBuffer;
+                if (tot::MoveManager::GetCurrentSelectionString(
+                    move_type, g_MoveBadgeTextBuffer)) {
+                    strats[i].name = g_MoveBadgeTextBuffer;
+                }
             } else {
                 strats[i].name = ttyd::msgdrv::msgSearch(
                     itemDataTable[weapon->item_id].name);
@@ -424,7 +407,7 @@ EVT_DEFINE_USER_FUNC(SetSweetFeastWeapon) {
     return 2;
 }
 
-}
+}  // namespace
     
 void ApplyFixedPatches() {
     g_BtlUnit_GetWeaponCost_trampoline = patch::hookFunction(
@@ -598,31 +581,6 @@ void ApplyFixedPatches() {
                 tot::MoveType::SP_SUPERNOVA);
             return static_cast<uint32_t>(level * multiplier);
         });
-}
-
-void OnEnterExitBattle(bool is_start) {
-    if (is_start) {
-        int32_t badge_count;
-        for (int32_t i = 0; i < 2; ++i) {
-            // Charge.
-            badge_count = ttyd::mario_pouch::pouchEquipCheckBadge(
-                ItemType::CHARGE + i);
-            g_MaxMoveBadgeCounts[i] = badge_count;
-            g_CurMoveBadgeCounts[i] = badge_count < 99 ? badge_count : 1;
-            // Toughen Up (move); currently no longer used.
-            badge_count = ttyd::mario_pouch::pouchEquipCheckBadge(
-                ItemType::SUPER_CHARGE + i);
-            g_MaxMoveBadgeCounts[2 + i] = badge_count;
-            g_CurMoveBadgeCounts[2 + i] = badge_count < 99 ? badge_count : 1;
-        }
-        g_InBattle = true;
-    } else {
-        g_InBattle = false;
-    }
-}
-
-int8_t GetStrategyBadgeLevel(bool is_charge, bool is_mario) {
-    return g_CurMoveBadgeCounts[!is_charge * 2 + !is_mario];
 }
 
 void SweetTreatSetUpTargets() {

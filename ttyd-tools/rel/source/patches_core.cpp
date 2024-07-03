@@ -174,9 +174,6 @@ void ApplyFixedPatches() {
     g_seqSetSeq_trampoline = patch::hookFunction(
         ttyd::seqdrv::seqSetSeq, 
         [](SeqIndex seq, const char* mapName, const char* beroName) {
-            // Initialize Mario's move power when entering/exiting a battle.
-            mario_move::OnEnterExitBattle(
-                /* is_start = */ seq == SeqIndex::kBattle);
             // Check for failed file load.
             if (g_CueGameOver) {
                 seq = SeqIndex::kGameOver;

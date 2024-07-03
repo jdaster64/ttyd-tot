@@ -30,6 +30,10 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
+
+// Globals for badge move levels.
+int8_t g_MaxBadgeMoveLevels[MoveType::BADGE_MOVE_MAX - MoveType::BADGE_MOVE_BASE];
+int8_t g_CurBadgeMoveLevels[MoveType::BADGE_MOVE_MAX - MoveType::BADGE_MOVE_BASE];
     
 }
 
@@ -100,6 +104,10 @@ const MoveData g_MoveData[] = {
     { { 5, 5, 5 }, 1, 1, 7, IconType::PARTNER_MOVE_1, "tot_ptr7_embargo", nullptr, "tot_ptr7_embargo_desc", "msg_ac_madowaseru", "tot_upg_none", },
     { { 4, 5, 6 }, 3, 2, 7, IconType::PARTNER_MOVE_2, "tot_ptr7_smokebomb", "tot_ptr7_smokeb_abb", "tot_ptr7_smokebomb_desc", "msg_ac_madowaseru", "tot_upg_damage", },
     { { 4, 7, 10 }, 3, 3, 7, IconType::PARTNER_MOVE_3, "btl_wn_pcr_kiss", nullptr, "msg_pch_kiss", "msg_ac_chuchurina_kiss", "tot_upg_smooch", },
+    { { 1, 1, 1 }, 1, 1, -1, IconType::CHARGE, "in_charge", nullptr, "tot_msg_dummy", "tot_msg_dummy", "tot_msg_dummy", },
+    { { 1, 1, 1 }, 1, 1, -1, IconType::CHARGE, "in_charge", nullptr, "tot_msg_dummy", "tot_msg_dummy", "tot_msg_dummy", },
+    { { 1, 1, 1 }, 1, 1, -1, IconType::DEFEND_BADGE, "in_toughen_up", "tot_toughen_up_abb", "tot_msg_dummy", "tot_msg_dummy", "tot_msg_dummy", },
+    { { 1, 1, 1 }, 1, 1, -1, IconType::DEFEND_BADGE, "in_toughen_up", "tot_toughen_up_abb", "tot_msg_dummy", "tot_msg_dummy", "tot_msg_dummy", },
 }; 
 
 void MoveManager::Init() {
@@ -139,11 +147,32 @@ const MoveData* MoveManager::GetMoveData(int32_t starting_move) {
     return g_MoveData + starting_move;
 }
 
+int32_t MoveManager::GetMoveTypeFromBadge(int32_t badge_id) {
+    switch (badge_id) {
+        case ItemType::CHARGE:
+            return MoveType::BADGE_MOVE_CHARGE;
+        case ItemType::CHARGE_P:
+            return MoveType::BADGE_MOVE_CHARGE_P;
+        case ItemType::SUPER_CHARGE:
+            return MoveType::BADGE_MOVE_SUPER_CHARGE;
+        case ItemType::SUPER_CHARGE_P:
+            return MoveType::BADGE_MOVE_SUPER_CHARGE_P;
+    }
+    // Should not be reached.
+    return -1;
+}
+
 int32_t MoveManager::GetUnlockedLevel(int32_t move_type) {
+    if (move_type >= MoveType::BADGE_MOVE_BASE) {
+        return g_MaxBadgeMoveLevels[move_type - MoveType::BADGE_MOVE_BASE];
+    }
     return g_Mod->state_.level_unlocked_[move_type];
 }
 
 int32_t MoveManager::GetSelectedLevel(int32_t move_type) {
+    if (move_type >= MoveType::BADGE_MOVE_BASE) {
+        return g_CurBadgeMoveLevels[move_type - MoveType::BADGE_MOVE_BASE];
+    }
     return g_Mod->state_.level_selected_[move_type];
 }
 
@@ -193,6 +222,20 @@ bool MoveManager::UpgradeMove(int32_t move_type) {
 }
 
 bool MoveManager::ChangeSelectedLevel(int32_t move_type, int32_t change) {
+    if (move_type >= MoveType::BADGE_MOVE_BASE) {
+        move_type -= MoveType::BADGE_MOVE_BASE;
+
+        int32_t old_level = g_CurBadgeMoveLevels[move_type];
+        int32_t max_level = g_MaxBadgeMoveLevels[move_type];
+        int32_t new_level = old_level + change;
+        
+        if (new_level < 1) new_level = 1;
+        if (new_level > max_level) new_level = max_level;
+        
+        g_CurBadgeMoveLevels[move_type] = new_level;
+        return new_level != old_level;
+    }
+
     int32_t old_level = g_Mod->state_.level_selected_[move_type];
     int32_t max_level = g_Mod->state_.level_unlocked_[move_type];
     int32_t new_level = old_level + change;
@@ -209,6 +252,12 @@ void MoveManager::ResetSelectedLevels() {
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
         if (g_Mod->state_.level_unlocked_[i])
             g_Mod->state_.level_selected_[i] = 1;
+    }
+    // Set all badge moves' selected level to 1.
+    int32_t num_badge_moves =
+        MoveType::BADGE_MOVE_MAX - MoveType::BADGE_MOVE_BASE;
+    for (int32_t i = 0; i < num_badge_moves; ++i) {
+        g_CurBadgeMoveLevels[i] = 1;
     }
 }
 
@@ -241,6 +290,22 @@ bool MoveManager::GetCurrentSelectionString(int32_t move_type, char* out_buf) {
     sprintf(
         out_buf, "%s Lv. %" PRId8, move_name, GetSelectedLevel(move_type));
     return true;
+}
+
+void MoveManager::InitBadgeMoveLevels() {
+    const int32_t badge_types[] = {
+        ItemType::CHARGE, ItemType::CHARGE_P, ItemType::SUPER_CHARGE,
+        ItemType::SUPER_CHARGE_P
+    };
+
+    int32_t num_badge_moves =
+        MoveType::BADGE_MOVE_MAX - MoveType::BADGE_MOVE_BASE;
+    for (int32_t i = 0; i < num_badge_moves; ++i) {
+        int32_t badge_count = ttyd::mario_pouch::pouchEquipCheckBadge(
+            badge_types[i]);
+        g_MaxBadgeMoveLevels[i] = badge_count;
+        g_CurBadgeMoveLevels[i] = 1;
+    }
 }
 
 uint32_t GetWeaponPowerFromSelectedLevel(

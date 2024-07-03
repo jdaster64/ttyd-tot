@@ -316,7 +316,8 @@ void ApplyFixedPatches() {
         ttyd::seq_battle::seq_battleInit, []() {
             // Copy information from parent npc before battle, if applicable.
             CopyChildBattleInfo(/* to_child = */ true);
-            // Reset selected move levels before start of battle.
+            // Init badge move levels and reset selected move levels.
+            tot::MoveManager::InitBadgeMoveLevels();
             tot::MoveManager::ResetSelectedLevels();
             // Force enemy ATK/DEF tattles to display at start of encounter.
             partner::RefreshExtraTattleStats();

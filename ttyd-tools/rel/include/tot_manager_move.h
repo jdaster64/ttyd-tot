@@ -95,7 +95,16 @@ namespace MoveType {
         MOWZ_SMOKE_BOMB,
         MOWZ_SMOOCH,
         
+        // For standard moves.
         MOVE_TYPE_MAX,
+
+        // Used only for badge-related moves.
+        BADGE_MOVE_BASE = MOVE_TYPE_MAX,
+        BADGE_MOVE_CHARGE = BADGE_MOVE_BASE,
+        BADGE_MOVE_CHARGE_P,
+        BADGE_MOVE_SUPER_CHARGE,
+        BADGE_MOVE_SUPER_CHARGE_P,
+        BADGE_MOVE_MAX,
     };
 }
 
@@ -120,6 +129,8 @@ public:
     
     // Returns a pointer to the move data array starting at starting_move.
     static const MoveData* GetMoveData(int32_t starting_move = MoveType::JUMP_BASE);
+    // Returns the move type corresponding to a particular badge.
+    static int32_t GetMoveTypeFromBadge(int32_t badge_id);
 
     // Gets the currently unlocked / selected move level.
     static int32_t GetUnlockedLevel(int32_t move_type);
@@ -142,6 +153,9 @@ public:
 
     // Returns whether or not the move name should be overridden.
     static bool GetCurrentSelectionString(int32_t move_type, char* out_buf);
+
+    // For badge-based moves only, sets unlock levels based on badges equipped.
+    static void InitBadgeMoveLevels();
 };
 
 // battle_weapon_power-like interface for scaling ATK based on a move.
