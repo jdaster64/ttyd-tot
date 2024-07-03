@@ -76,7 +76,7 @@ extern "C" {
     void BranchBackToggleScopedAndCheckFreezeBreak();
     
     int32_t getActionCommandDifficulty() {
-        return 3;
+        return mod::g_Mod->state_.GetOption(mod::tot::OPT_AC_DIFFICULTY);
     }        
     void signalPlayerInitiatedPartySwitch(ttyd::battle_unit::BattleWorkUnit* unit) {
         mod::infinite_pit::battle::SignalPlayerInitiatedPartySwitch();

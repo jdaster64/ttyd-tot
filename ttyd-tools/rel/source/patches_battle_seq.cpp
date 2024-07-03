@@ -42,6 +42,9 @@ extern "C" {
     void BranchBackBtlSeqEndJudgeRule();
     void StartCalculateCoinDrops();
     void BranchBackCalculateCoinDrops();
+    void StartSkipBanditEscapedCheck();
+    void BranchBackSkipBanditEscapedCheck();
+    void ConditionalBranchBackSkipBanditEscapedCheck();
     // currency_patches.s
     void StartCheckDeleteFieldItem();
     void BranchBackCheckDeleteFieldItem();
@@ -76,6 +79,10 @@ extern "C" {
         ttyd::npcdrv::NpcEntry* npc) {
         return mod::infinite_pit::battle_seq::CalculateCoinDrops(battleInfo, npc);
     }
+
+    int32_t checkLetBanditEscape() {
+        return mod::g_Mod->state_.CheckOptionValue(mod::tot::OPTVAL_BANDIT_NO_REFIGHT);
+    }
 }
 
 namespace mod::infinite_pit {
@@ -108,7 +115,9 @@ extern void (*g_BattleCommandInit_trampoline)(BattleWork*);
 extern void (*g_BattleInformationSetDropMaterial_trampoline)(
     FbatBattleInformation*);
 // Patch addresses.
-extern const int32_t g_fbatBattleMode_Patch_SkipStolenCheck;
+extern const int32_t g_fbatBattleMode_SkipStolenCheck_BH;
+extern const int32_t g_fbatBattleMode_SkipStolenCheck_EH;
+extern const int32_t g_fbatBattleMode_SkipStolenCheck_CH1;
 extern const int32_t g_fbatBattleMode_CalculateCoinDrops_BH;
 extern const int32_t g_fbatBattleMode_CalculateCoinDrops_EH;
 extern const int32_t g_fbatBattleMode_GivePlayerInvuln_BH;
@@ -201,10 +210,12 @@ void CheckBattleCondition() {
     // Did not win the fight (e.g. ran away).
     if (fbat_info->wResult != 1) return;
     
-    // Did not win the fight (an enemy still has a stolen item).
-    // TODO: Consider disabling this outcome to make Bandits less annoying?
-    for (int32_t i = 0; i < 8; ++i) {
-        if (npc_info->wStolenItems[i] != 0) return;
+    // Did not win the fight (an enemy still has a stolen item);
+    // Skip this check if forced refights are disabled.
+    if (state.CheckOptionValue(tot::OPTVAL_BANDIT_FORCE_REFIGHT)) {
+        for (int32_t i = 0; i < 8; ++i) {
+            if (npc_info->wStolenItems[i] != 0) return;
+        }
     }
     
     // If condition is a success and rule is not 0, add a bonus item.
@@ -370,7 +381,6 @@ void ApplyFixedPatches() {
     g_BattleCommandInit_trampoline = patch::hookFunction(
         ttyd::battle_seq_command::BattleCommandInit, [](BattleWork* battleWork) {
             // Reset selected move levels before every player action.
-            // TODO: Reset Charge (P)'s selected move level.
             tot::MoveManager::ResetSelectedLevels();
             // Run original logic.
             g_BattleCommandInit_trampoline(battleWork);
@@ -399,11 +409,16 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(StartGivePlayerInvuln),
         reinterpret_cast<void*>(BranchBackGivePlayerInvuln));
 
-    // TODO: Make this an option rather than forcing it on?
-    // Disable re-fighting enemies with stolen items entirely.
-    // mod::patch::writePatch(
-    //     reinterpret_cast<void*>(g_fbatBattleMode_Patch_SkipStolenCheck),
-    //     0x48000098U /* branch past stolen item checks */);
+    // Disable forced re-fights with enemies w/ stolen items, if option enabled.
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(g_fbatBattleMode_SkipStolenCheck_BH),
+        reinterpret_cast<void*>(StartSkipBanditEscapedCheck));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(BranchBackSkipBanditEscapedCheck),
+        reinterpret_cast<void*>(g_fbatBattleMode_SkipStolenCheck_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ConditionalBranchBackSkipBanditEscapedCheck),
+        reinterpret_cast<void*>(g_fbatBattleMode_SkipStolenCheck_CH1));
 
     // Disable dropping coins after running away from a battle.
     mod::patch::writePatch(

@@ -239,6 +239,7 @@ void StateManager::InitDefaultOptions() {
     SetOption(OPTVAL_DIFFICULTY_FULL);
     SetOption(OPTVAL_STARTER_ITEMS_BASIC);
     SetOption(OPTVAL_REVIVE_PARTNERS_ON);
+    SetOption(OPTVAL_AC_DEFAULT);
     SetOption(OPTVAL_NPC_LUMPY_ON);
     SetOption(OPTVAL_NPC_DOOPLISS_ON);
     SetOption(OPTVAL_NPC_GRUBBA_ON);
@@ -274,6 +275,7 @@ void StateManager::ApplyPresetOptions() {
             // Set non-zero default values to their default values.
             SetOption(OPTVAL_STARTER_ITEMS_BASIC);
             SetOption(OPTVAL_REVIVE_PARTNERS_ON);
+            SetOption(OPTVAL_AC_DEFAULT);
             SetOption(OPTVAL_NPC_LUMPY_ON);
             SetOption(OPTVAL_NPC_DOOPLISS_ON);
             SetOption(OPTVAL_NPC_GRUBBA_ON);
@@ -516,8 +518,8 @@ const char* StateManager::GetEncodedOptions() const {
 
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_BATTLE_DROPS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_STARTER_ITEMS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_MAX_PARTNERS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_REVIVE_PARTNERS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_HP);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_FP);
@@ -527,6 +529,8 @@ const char* StateManager::GetEncodedOptions() const {
     EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_HP);
     EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_ATK);
     EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_SUPERGUARD_SP_COST);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_AC_DIFFICULTY);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_BANDIT_ESCAPE);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_CHARLIETON_STOCK);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_WONKY);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_DAZZLE);

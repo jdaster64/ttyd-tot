@@ -871,7 +871,17 @@ g_StringMap = {
         b"tot_optr_partner_7":          b"Ms. Mowz",
         b"tot_optr_maxpartners":        b"Max Partners",
         b"tot_optr_nopartners":         b"None",
-        
+        b"tot_optr_ac":                 b"AC Difficulty",
+        b"tot_optr_ac_0":               b"3 Simplifiers",
+        b"tot_optr_ac_1":               b"2 Simplifiers",
+        b"tot_optr_ac_2":               b"1 Simplifier",
+        b"tot_optr_ac_3":               b"Default",
+        b"tot_optr_ac_4":               b"1 Unsimplifier",
+        b"tot_optr_ac_5":               b"2 Unsimplifiers",
+        b"tot_optr_ac_6":               b"3 Unsimplifiers",
+        b"tot_optr_bandit":             b"Bandit Behavior",
+        b"tot_optr_bandit_flee":        b"No Refight",
+        b"tot_optr_bandit_fight":       b"Forced Refight",
         b"tot_optr_npc_wonky":          b"NPCs: Wonky",
         b"tot_optr_npc_dazzle":         b"NPCs: Dazzle",
         b"tot_optr_npc_chet":           b"NPCs: Chet Rippo",
@@ -949,6 +959,14 @@ g_StringMap = {
         b"tot_opth_maxpartners":
             b"How many partners Mario\n"
             b"can recruit at once.",
+            
+        b"tot_opth_ac":
+            b"How difficult Action Commands\n"
+            b"are to perform.",
+            
+        b"tot_opth_bandit":
+            b"What happens after finishing a\n"
+            b"fight where a Bandit ran away.",
             
         b"tot_opth_npc_wonky":
             b"He'll buy unwanted items or\n"

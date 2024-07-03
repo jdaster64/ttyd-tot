@@ -336,8 +336,10 @@ enum Options : uint32_t {
     OPTVAL_CHARLIETON_NORMAL    = 0x519'2'00'00,
     OPTVAL_CHARLIETON_SMALLER   = 0x519'2'00'01,
     OPTVAL_CHARLIETON_LIMITED   = 0x519'2'00'02,
-    // Reserved for single-byte option, to avoid crossing word boundary.
-    // 0x41b...
+    // Whether to force the player to refight Bandits with stolen items.
+    OPT_BANDIT_ESCAPE           = 0x41b'1'00'01,
+    OPTVAL_BANDIT_NO_REFIGHT    = 0x51b'1'00'00,
+    OPTVAL_BANDIT_FORCE_REFIGHT = 0x51b'1'00'01,
     // Stat increase per upgrade (0-10); at 0, you only ever have 1 point.
     // BP increase of "11" treats BP as infinite.
     OPT_MARIO_HP                = 0x41c'4'00'0a,
@@ -370,7 +372,16 @@ enum Options : uint32_t {
     // from 1-7 (default of 4).  TODO: Implement "0 partner" mode.
     OPT_MAX_PARTNERS            = 0x434'3'00'07,
     OPTVAL_NO_PARTNERS          = 0x534'3'00'00,
-    // Next: 0x437
+    // Determines the difficulty of Action Commands.
+    OPT_AC_DIFFICULTY           = 0x437'3'00'06,
+    OPTVAL_AC_3_SIMP            = 0x537'3'00'00,
+    OPTVAL_AC_2_SIMP            = 0x537'3'00'01,
+    OPTVAL_AC_1_SIMP            = 0x537'3'00'02,
+    OPTVAL_AC_DEFAULT           = 0x537'3'00'03,
+    OPTVAL_AC_1_UNSIMP          = 0x537'3'00'04,
+    OPTVAL_AC_2_UNSIMP          = 0x537'3'00'05,
+    OPTVAL_AC_3_UNSIMP          = 0x537'3'00'06,
+    // Next: 0x43a
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,
