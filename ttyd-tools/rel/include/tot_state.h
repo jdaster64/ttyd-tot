@@ -366,7 +366,11 @@ enum Options : uint32_t {
     OPT_ENABLE_NPC_DAZZLE       = 0x433'1'00'01,
     OPTVAL_NPC_DAZZLE_OFF       = 0x533'1'00'00,
     OPTVAL_NPC_DAZZLE_ON        = 0x533'1'00'01,
-    // Next: 0x434
+    // Determines the maximum number of partners Mario can have in a run,
+    // from 1-7 (default of 4).  TODO: Implement "0 partner" mode.
+    OPT_MAX_PARTNERS            = 0x434'3'00'07,
+    OPTVAL_NO_PARTNERS          = 0x534'3'00'00,
+    // Next: 0x437
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,

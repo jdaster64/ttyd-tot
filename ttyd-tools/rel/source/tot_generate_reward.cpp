@@ -278,7 +278,7 @@ int32_t SelectPartner() {
         int32_t reward_type = -(value + 1);
         
         // Once the player has filled their partner pool...
-        if (GetNumActivePartners() >= 4) {
+        if (GetNumActivePartners() >= state.GetOption(OPT_MAX_PARTNERS)) {
             // If the chosen partner is not in the pool; try rolling again.
             int32_t partner_idx = PartnerRewardTypeToPouchIndex(reward_type);
             if (!(ttyd::mario_pouch::pouchGetPtr()->
@@ -717,20 +717,33 @@ void SelectChestContents() {
     auto& state = g_Mod->state_;
     
     // Weights for different types of moves (Jump, Hammer, Special, partner).
-    uint16_t kMoveWeights[] = { 17, 17, 12, 50 };
+    int32_t kMoveWeights[] = { 17, 17, 12, 50 };
     // Weights for different types of stat upgrades (HP, FP, BP, HP P, inv.).
-    uint16_t kStatWeights[] = { 20, 20, 20, 15, 10 };
+    int32_t kStatWeights[] = { 20, 20, 20, 15, 10 };
     // Weights for different types of other rewards
     // (coins, Star Piece, Shine Sprite, unique badge, stackable badge).
-    uint16_t kOtherWeights[] = { 20, 20, 30, 20, 10 };
+    int32_t kOtherWeights[] = { 20, 20, 30, 20, 10 };
     
     // Top-level weight for choosing a move, stat-up, or other reward.
     // The former two categories cannot be chosen more than once per floor.
-    uint16_t top_level_weights[] = { 15, 15, 15 };
+    int32_t top_level_weights[] = { 15, 15, 15 };
     // Tracks which kind of 'other' categories have been chosen already;
     // if one of them is rolled twice in one floor, picks a random stackable
     // badge in its place.
     bool others_picked[] = { false, false, false, false, false };
+
+    // Change weights for moves based on how many partners are in the pool.
+    const int32_t partner_pool_size = state.GetOption(OPT_MAX_PARTNERS);
+    if (partner_pool_size > 4) {
+        // Slightly increase partner weight.
+        kMoveWeights[3] += (partner_pool_size - 4) * 8;
+    } else if (partner_pool_size < 4) {
+        // Decrease partner weight, and increase jump/hammer accordingly.
+        const int32_t diff = kMoveWeights[3] * (4 - partner_pool_size) / 4;
+        kMoveWeights[3] -= diff;
+        kMoveWeights[0] += diff / 2;
+        kMoveWeights[1] += diff / 2;
+    }
 
     // Filter out stat-ups that are forced to 0 / have reached their maximum.
     if (state.GetOption(OPT_MARIO_HP) == 0) {
@@ -746,7 +759,8 @@ void SelectChestContents() {
         top_level_weights[1] -= 3;
         kStatWeights[2] = 0;
     }
-    if (state.GetOption(OPT_PARTNER_HP) == 0) {
+    if (state.GetOption(OPT_PARTNER_HP) == 0 ||
+        state.CheckOptionValue(OPTVAL_NO_PARTNERS)) {
         top_level_weights[1] -= 3;
         kStatWeights[3] = 0;
     }
@@ -794,8 +808,12 @@ void SelectChestContents() {
                 if (weight < sum_weights) break;
             }
             
-            // Floor 0: Force a partner.
-            if (state.floor_ == 0) type = 3;
+            // Floor 0: Force a partner, unless partners are disabled.
+            if (state.floor_ == 0) {
+                if (!state.CheckOptionValue(OPTVAL_NO_PARTNERS)) {
+                    type = 3;
+                }
+            }
             
             // Assign reward.
             switch (type) {

@@ -850,10 +850,9 @@ void PartyMenuDispStats(void* pWin) {
 }
 
 void ItemMenuDispInventory(void* pWin) {
-    // Don't display if not actively in tower.
-    // TODO: Ideally, check this in a better way!
-    if (!strcmp(GetCurrentMap(), "gon_00")) return;
-    // Only run if on regular item inventory screen.
+    // Don't display if not in the middle of a run.
+    if (!g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) return;
+    // Only display if on the regular item inventory screen.
     if (*(int32_t*)((uintptr_t)pWin + 0x210) != 0) return;
     
     float win_x = *(float*)((uintptr_t)pWin + 0xc4);

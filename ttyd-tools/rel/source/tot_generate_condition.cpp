@@ -125,10 +125,10 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
                 if (num_partners < 1) condition.weight = 0;
                 break;
             case SWAP_PARTNERS_LESS:
-                // Needs partners, and should only appear after a few floors,
-                // when you're more likely to have taken a second partner.
-                // TODO: Also remove if # of partners is forced to be 1.
-                if (num_partners < 1 || state.floor_ < 9) condition.weight = 0;
+                // Needs at least two partners, and shouldn't appear too early
+                // (as you're not as likely to have taken a second yet).
+                if (g_Mod->state_.GetOption(OPT_MAX_PARTNERS) < 2 ||
+                    state.floor_ < 9) condition.weight = 0;
                 break;
             case MARIO_FINAL_HP_MORE:
             case MARIO_FINAL_HP_LESS:

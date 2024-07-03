@@ -808,7 +808,6 @@ bool StateManager_v2::GetPlayStatsString(char* out_buf) {
         GetOptionValue(INF_STAT_CONDITIONS_MET), 
         GetOptionValue(INF_STAT_CONDITIONS_TOTAL));
     
-    // TODO: Add page for Items, badges, level-ups sold or Mover use in future?
     out_buf += sprintf(out_buf, "\n<k>");
     
     return true;

@@ -851,7 +851,7 @@ g_StringMap = {
         b"tot_optr_mbp":                b"BP / Level",
         b"tot_optr_mbp_inf":            b"Infinite",
         b"tot_optr_php":                b"Party HP / Level",
-        b"tot_optr_itemgain":           b"Items / Sack",
+        b"tot_optr_itemgain":           b"Items / Strange Sack",
         b"tot_optr_ehp":                b"Enemy HP %",
         b"tot_optr_eatk":               b"Enemy ATK %",
         b"tot_optr_supercost":          b"Superguard SP Cost",
@@ -864,6 +864,8 @@ g_StringMap = {
         b"tot_optr_partner_5":          b"Vivian",
         b"tot_optr_partner_6":          b"Bobbery",
         b"tot_optr_partner_7":          b"Ms. Mowz",
+        b"tot_optr_maxpartners":        b"Max Partners",
+        b"tot_optr_nopartners":         b"None",
         
         b"tot_optr_npc_wonky":          b"NPCs: Wonky",
         b"tot_optr_npc_dazzle":         b"NPCs: Dazzle",
@@ -938,6 +940,10 @@ g_StringMap = {
         b"tot_opth_partner":
             b"Which partner Mario receives\n"
             b"at the start of the run.",
+            
+        b"tot_opth_maxpartners":
+            b"How many partners Mario\n"
+            b"can recruit at once.",
             
         b"tot_opth_npc_wonky":
             b"He'll buy unwanted items or\n"

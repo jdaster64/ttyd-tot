@@ -1022,6 +1022,15 @@ void BuildBattle(
     } else {
         battle->battle_setup_flags &= ~0x10;
     }
+
+    // Set flag to suppress Mario and party's entry event for dragon fights.
+    switch (g_Enemies[0]) {
+        case BattleUnitType::HOOKTAIL:
+        case BattleUnitType::GLOOMTAIL:
+        case BattleUnitType::BONETAIL:
+            battle->battle_setup_flags |= 0x10'0000;
+            break;
+    }
     
     // TODO: Additional setup (different stage props, etc.) for boss floors?
 }

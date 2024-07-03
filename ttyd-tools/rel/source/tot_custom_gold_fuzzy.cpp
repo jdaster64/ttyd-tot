@@ -505,8 +505,6 @@ BattleWeapon unitGoldFuzzy_weaponMagic = {
     .object_fall_chance = 0,
 };
 
-// TODO: Implement EVTs.
-
 EVT_BEGIN(unitFuzzyHorde_death_sub_event)
     USER_FUNC(btlevtcmd_snd_se, LW(10), PTR("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))

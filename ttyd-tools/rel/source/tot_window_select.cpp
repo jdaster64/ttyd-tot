@@ -104,15 +104,17 @@ OptionMenuData g_OptionMenuData[] = {
     { OPTVAL_STARTER_ITEMS_BASIC, "tot_optr_startitems_basic", nullptr, 134, false, false },
     { OPTVAL_STARTER_ITEMS_STRONG, "tot_optr_startitems_strong", nullptr, 135, false, false },
     { OPTVAL_STARTER_ITEMS_RANDOM, "tot_optr_startitems_random", nullptr, 136, false, false },
-    { OPT_PARTNER, "tot_optr_partner", "tot_opth_partner", 137, true, false },
-    { OPTVAL_PARTNER_RANDOM, "tot_optr_partner_random", nullptr, 138, false, false },
-    { OPTVAL_PARTNER_GOOMBELLA, "tot_optr_partner_1", nullptr, 139, false, false },
-    { OPTVAL_PARTNER_KOOPS, "tot_optr_partner_2", nullptr, 140, false, false },
-    { OPTVAL_PARTNER_FLURRIE, "tot_optr_partner_3", nullptr, 141, false, false },
-    { OPTVAL_PARTNER_YOSHI, "tot_optr_partner_4", nullptr, 142, false, false },
-    { OPTVAL_PARTNER_VIVIAN, "tot_optr_partner_5", nullptr, 143, false, false },
-    { OPTVAL_PARTNER_BOBBERY, "tot_optr_partner_6", nullptr, 144, false, false },
-    { OPTVAL_PARTNER_MOWZ, "tot_optr_partner_7", nullptr, 145, false, false },
+    { OPT_MAX_PARTNERS, "tot_optr_maxpartners", "tot_opth_maxpartners", 140, true, false },
+    { OPTVAL_NO_PARTNERS, "tot_optr_nopartners", nullptr, 141, false, false },
+    { OPT_PARTNER, "tot_optr_partner", "tot_opth_partner", 150, true, false },
+    { OPTVAL_PARTNER_RANDOM, "tot_optr_partner_random", nullptr, 151, false, false },
+    { OPTVAL_PARTNER_GOOMBELLA, "tot_optr_partner_1", nullptr, 152, false, false },
+    { OPTVAL_PARTNER_KOOPS, "tot_optr_partner_2", nullptr, 153, false, false },
+    { OPTVAL_PARTNER_FLURRIE, "tot_optr_partner_3", nullptr, 154, false, false },
+    { OPTVAL_PARTNER_YOSHI, "tot_optr_partner_4", nullptr, 155, false, false },
+    { OPTVAL_PARTNER_VIVIAN, "tot_optr_partner_5", nullptr, 156, false, false },
+    { OPTVAL_PARTNER_BOBBERY, "tot_optr_partner_6", nullptr, 157, false, false },
+    { OPTVAL_PARTNER_MOWZ, "tot_optr_partner_7", nullptr, 158, false, false },
     { OPT_REVIVE_PARTNERS, "tot_optr_revive", "tot_opth_revive", 160, true, false },
     { OPTVAL_REVIVE_PARTNERS_OFF, "tot_optr_off", nullptr, 161, false, false },
     { OPTVAL_REVIVE_PARTNERS_ON, "tot_optr_on", nullptr, 162, false, false },
@@ -467,6 +469,12 @@ void DispMainWindow(WinMgrEntry* entry) {
                 } else {
                     row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
                 }
+                // If no partner mode, grey out partner-related options.
+                if (g_Mod->state_.CheckOptionValue(OPTVAL_NO_PARTNERS) &&
+                    (option == OPT_PARTNER || option == OPT_REVIVE_PARTNERS ||
+                     option == OPT_PARTNER_HP)) {
+                    row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
+                }
             }
 
             uint32_t* text_color;
@@ -584,7 +592,6 @@ void DispMainWindow(WinMgrEntry* entry) {
             }
             case MenuType::TOT_CHET_RIPPO_TRADE: {
                 // Draw current and destination stat level.
-                // TODO: Re-position stuff as needed, maybe use stat values?
 
                 char buf[8] = { 0 };
                 int current_level = 0;
@@ -1329,8 +1336,9 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             // Add BP unless it's set to infinite.
             if (!state.CheckOptionValue(OPTVAL_INFINITE_BP))
                 ids[num_options++] = 4;
-            // TODO: Add Partner HP only if partners are enabled.
-            ids[num_options++] = 2;
+            // Add Partner HP only if partners are enabled.
+            if (!state.CheckOptionValue(OPTVAL_NO_PARTNERS))
+                ids[num_options++] = 2;
 
             sel_entry->num_rows = num_options;
             sel_entry->row_data =

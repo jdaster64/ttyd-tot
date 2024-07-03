@@ -252,6 +252,7 @@ void StateManager::InitDefaultOptions() {
     SetOption(OPT_INVENTORY_SACK_SIZE, 2);
     SetOption(OPTNUM_ENEMY_HP, 100);
     SetOption(OPTNUM_ENEMY_ATK, 100);
+    SetOption(OPT_MAX_PARTNERS, 4);
     
     g_HasBackupSave = false;
 }
@@ -286,6 +287,7 @@ void StateManager::ApplyPresetOptions() {
             SetOption(OPT_INVENTORY_SACK_SIZE, 2);
             SetOption(OPTNUM_ENEMY_HP, 100);
             SetOption(OPTNUM_ENEMY_ATK, 100);
+            SetOption(OPT_MAX_PARTNERS, 4);
 
             break;
         }
@@ -515,6 +517,7 @@ const char* StateManager::GetEncodedOptions() const {
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_BATTLE_DROPS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_STARTER_ITEMS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MAX_PARTNERS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_REVIVE_PARTNERS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_HP);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_FP);
