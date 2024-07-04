@@ -1032,6 +1032,7 @@ void BuildBattle(
             break;
         default:
             battle->battle_setup_flags &= ~0x10'0000;
+            break;
     }
     
     // TODO: Additional setup (different stage props, etc.) for boss floors?
