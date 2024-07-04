@@ -140,11 +140,11 @@ StatusVulnerability unitHooktail_status  = {
 };
 StatusVulnerability unitGloomtail_status  = {
     30,  30,  30, 100,  30, 100, 100,   0,
-     0,   0, 100,   0, 100,  70,  30,   0,
+     0,   0, 100,   0, 100,  70,  55,   0,
      0, 100,  30,   0,   0,   0,
 };
 StatusVulnerability unitBonetail_status  = {
-     0,   0,   0, 100,   0, 100, 100,   0, 
+     0,   0,   0, 100,   0, 100, 100,   0,
      0,   0, 100,   0, 100,   0,   0,   0,
      0, 100,   0,   0,   0,   0,
 };
