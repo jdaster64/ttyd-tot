@@ -1030,6 +1030,8 @@ void BuildBattle(
         case BattleUnitType::BONETAIL:
             battle->battle_setup_flags |= 0x10'0000;
             break;
+        default:
+            battle->battle_setup_flags &= ~0x10'0000;
     }
     
     // TODO: Additional setup (different stage props, etc.) for boss floors?
