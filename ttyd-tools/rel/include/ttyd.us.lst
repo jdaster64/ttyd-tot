@@ -1714,6 +1714,24 @@
 80115b30:DrawOperationWin
 80115dac:DrawWeaponWin
 
+// battle_pad.o
+80119f48:BattlePadMultiCheckRepeat
+80119f60:BattlePadCheckRepeat
+80119f88:BattlePadMultiCheckUp
+80119fa0:BattlePadCheckUp
+80119fc8:BattlePadMultiCheckNow
+80119fe0:BattlePadCheckNow
+8011a008:BattlePadMultiCheckRecordTrigger
+8011a028:BattlePadCheckRecordTrigger
+8011a054:BattlePadMultiCheckTrigger
+8011a06c:BattlePadCheckTrigger
+8011a094:BattlePadGetNow
+8011a0a0:BattlePadGetTrigger
+8011a0ac:BtlPad_WorkUpdate
+8011a38c:BtlPad_WorkInit
+8011a43c:BattlePadManager
+8011a48c:BattlePadInit
+
 // battle_seq.o
 8011aa34:BattleCheckConcluded
 8011c350:_rule_disp

@@ -67,6 +67,13 @@ int32_t GetCurrentEnemyAtk(
 int32_t GetCurrentEnemyDef(
     ttyd::battle_unit::BattleWorkUnit* unit);
 
+// For "select a side" type attacks.
+// Handles user input to swap which side they are currently targeting.
+void HandleSideSelection();
+// Checks whether the currently selected actor is on the currently targeted
+// side (for displaying cursors before selecting the move).
+bool CheckOnSelectedSide(int32_t target_idx);
+
 // Applies a custom status effect to the target.
 // Params: unit, part, status_flag, color1 & color2 (rgb), sfx, announce_msg
 EVT_DECLARE_USER_FUNC(evtTot_ApplyCustomStatus, 7)

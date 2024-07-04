@@ -23,6 +23,7 @@
 #include <ttyd/battle_disp.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_message.h>
+#include <ttyd/battle_pad.h>
 #include <ttyd/battle_seq_command.h>
 #include <ttyd/battle_status_effect.h>
 #include <ttyd/battle_sub.h>
@@ -74,6 +75,12 @@ extern "C" {
     void BranchBackCalculateCounterDamage();
     void StartToggleScopedAndCheckFreezeBreak();
     void BranchBackToggleScopedAndCheckFreezeBreak();
+    // target_selection_patches.s
+    void StartCommandHandleSideSelection();
+    void BranchBackCommandHandleSideSelection();
+    void StartCommandDisplaySideSelection();
+    void BranchBackCommandDisplaySideSelection();
+    void ConditionalBranchCommandDisplaySideSelection();
     
     int32_t getActionCommandDifficulty() {
         return mod::g_Mod->state_.GetOption(mod::tot::OPT_AC_DIFFICULTY);
@@ -101,6 +108,12 @@ extern "C" {
         ttyd::battle_database_common::BattleWeapon* weapon) {
         mod::infinite_pit::battle::ToggleScopedStatus(attacker, target, weapon);
     }
+    void commandHandleSideSelection() {
+        mod::infinite_pit::battle::HandleSideSelection();
+    }
+    bool checkOnSelectedSide(int32_t target_idx) {
+        return mod::infinite_pit::battle::CheckOnSelectedSide(target_idx);
+    }
 }
 
 namespace mod::infinite_pit {
@@ -118,12 +131,14 @@ using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 
+namespace AttackTargetClass_Flags = 
+    ::ttyd::battle_database_common::AttackTargetClass_Flags;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 using WeaponDamageFn = uint32_t (*) (
     BattleWorkUnit*, BattleWeapon*, BattleWorkUnit*, BattleWorkUnitPart*);
 
-}
+}  // namespace
 
 // Function hooks.
 extern void (*g_BattleStoreExp_trampoline)(BattleWork*, int32_t);
@@ -147,6 +162,7 @@ extern int32_t (*g_BattleCalculateFpDamage_trampoline)(
 extern void (*g_BattleDamageDirect_trampoline)(
     int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
     uint32_t, uint32_t, uint32_t);
+extern int32_t (*g_btlevtcmd_GetSelectEnemy_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool);
 extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
@@ -163,6 +179,10 @@ extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH;
 extern const int32_t g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows;
 extern const int32_t g_btlSeqAct_SetConfuseProcRate_BH;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
+extern const int32_t g_BattleCommandDisplay_HandleSelectSide_BH;
+extern const int32_t g_BattleCommandDisplay_HandleSelectSide_EH;
+extern const int32_t g_BattleCommandDisplay_HandleSelectSide_CH1;
+extern const int32_t g_BattleCommandInput_HandleSelectSide_BH;
 extern const int32_t g__btlcmd_MakeOperationTable_Patch_NoSuperCharge;
 extern const int32_t g_BattleAudience_SetTargetAmount_BH;
 extern const int32_t g_battleAcMain_ButtonDown_ChooseButtons_BH;
@@ -1120,6 +1140,47 @@ void SpendAndIncrementPartySwitchCost() {
     }
 }
 
+void ReorderAndFilterWeaponTargets() {
+    auto& twork = ttyd::battle::g_BattleWork->weapon_targets_work;
+
+    // If weapon is 'select side', filter targets that don't match side.
+    if (twork.num_targets > 1 &&
+        twork.weapon_target_class_flags & AttackTargetClass_Flags::SELECT_SIDE) {
+        int8_t new_indices[74] = { 0 };
+        int32_t new_num_targets = 0;
+
+        for (int32_t i = 0; i < twork.num_targets; ++i) {
+            if (battle::CheckOnSelectedSide(twork.target_indices[i])) {
+                new_indices[new_num_targets] = twork.target_indices[i];
+                ++new_num_targets;
+            }
+        }
+
+        for (int32_t i = 0; i < new_num_targets; ++i) {
+            twork.target_indices[i] = new_indices[i];
+        }
+        twork.num_targets = new_num_targets;
+        twork.current_target = 0;
+    }
+
+    // For any multitarget weapon, reorder targets so the attacker (if present) 
+    // is targeted last, to make sure the attack doesn't end prematurely.
+    if (twork.num_targets > 1) {
+        for (int32_t i = 0; i < twork.num_targets - 1; ++i) {
+            int32_t target_unit_idx = 
+                twork.targets[twork.target_indices[i]].unit_idx;
+            if (target_unit_idx == twork.attacker_idx) {
+                // Swap with last target.
+                int32_t tmp = twork.target_indices[i];
+                twork.target_indices[i] = 
+                    twork.target_indices[twork.num_targets - 1];
+                twork.target_indices[twork.num_targets - 1] = tmp;
+                break;
+            }
+        }
+    }
+}
+
 void ApplyFixedPatches() {
     // Override Action Command difficulty with fixed option.
     g_BattleActionCommandSetDifficulty_trampoline = patch::hookFunction(
@@ -1490,6 +1551,34 @@ void ApplyFixedPatches() {
             }
             return result;
         });
+
+    // Handle target selection for moves that can select between sides.
+    // Player input to switch sides:
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_BattleCommandInput_HandleSelectSide_BH),
+        reinterpret_cast<void*>(StartCommandHandleSideSelection),
+        reinterpret_cast<void*>(BranchBackCommandHandleSideSelection));
+    // Drawing cursors only over selected side:
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(
+            g_BattleCommandDisplay_HandleSelectSide_BH),
+        reinterpret_cast<void*>(StartCommandDisplaySideSelection));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(BranchBackCommandDisplaySideSelection),
+        reinterpret_cast<void*>(
+            g_BattleCommandDisplay_HandleSelectSide_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ConditionalBranchCommandDisplaySideSelection),
+        reinterpret_cast<void*>(
+            g_BattleCommandDisplay_HandleSelectSide_CH1));
+    // Filters targets w.r.t. side selecting attacks, and changes targeting
+    // order for multitargets so the user hits themselves after other targets.
+    g_btlevtcmd_GetSelectEnemy_trampoline = patch::hookFunction(
+        ttyd::battle_event_cmd::btlevtcmd_GetSelectEnemy,
+        [](EvtEntry* evt, bool isFirstCall) {
+            ReorderAndFilterWeaponTargets();
+            return g_btlevtcmd_GetSelectEnemy_trampoline(evt, isFirstCall);
+        });
 }
 
 void SetTargetAudienceAmount() {
@@ -1582,6 +1671,55 @@ int32_t GetCurrentEnemyDef(BattleWorkUnit* unit) {
     int32_t part_id = BtlUnit_GetBodyPartsId(unit);
     auto* part = BtlUnit_GetPartsPtr(unit, part_id);
     return CalculateDefImpl(unit, part, /* element */ 0);
+}
+
+void HandleSideSelection() {
+    auto& twork = ttyd::battle::g_BattleWork->weapon_targets_work;
+
+    if (twork.num_targets > 1 &&
+        twork.weapon_target_class_flags & AttackTargetClass_Flags::SELECT_SIDE) {
+        int32_t change = 0;
+        if (ttyd::battle_pad::BattlePadCheckRepeat(0x80000)) ++change;
+        if (ttyd::battle_pad::BattlePadCheckRepeat(0x40000)) --change;
+        if (change) {
+            // Iterate between targets until finding one on the opposite side.
+            int32_t new_target = twork.current_target;
+            do {
+                new_target += change;
+                if (new_target >= twork.num_targets) new_target = 0;
+                if (new_target < 0) new_target = twork.num_targets - 1;
+
+                if (!CheckOnSelectedSide(new_target)) break;
+            } while (twork.current_target != new_target);
+
+            if (twork.current_target != new_target) {
+                ttyd::pmario_sound::psndSFXOn("SFX_BTL_CURSOR_MOVE2");
+                twork.current_target = new_target;
+            }
+        }
+    }
+}
+
+bool CheckOnSelectedSide(int32_t target_idx) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto& twork = battleWork->weapon_targets_work;
+    if (twork.weapon_target_class_flags & AttackTargetClass_Flags::SELECT_SIDE) {
+        BattleWorkUnit* primary_selection_unit =
+            battleWork->battle_units[
+                twork.targets[twork.target_indices[twork.current_target]].unit_idx];
+
+        BattleWorkUnit* target_unit =
+            battleWork->battle_units[
+                twork.targets[twork.target_indices[target_idx]].unit_idx];
+
+        // If target unit is on opposite side of field from primary selection.
+        // TODO: Arbitrary choice for "left" / "right" division.
+        if ((primary_selection_unit->home_position.x < -30.0f) !=
+            (target_unit->home_position.x < -30.0f))
+            return false;
+    }
+    // If not select-side, don't filter anything out.
+    return true;
 }
 
 // Applies a custom status effect to the target.

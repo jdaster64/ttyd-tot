@@ -6,6 +6,7 @@
 #include "mod.h"
 #include "mod_state.h"
 #include "patch.h"
+#include "patches_battle.h"
 #include "tot_custom_rel.h"
 
 #include <ttyd/battle.h>
@@ -89,7 +90,6 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 }
 
 // Function hooks.
-extern int32_t (*g_btlevtcmd_GetSelectEnemy_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_CheckSpace_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_BattleCheckConcluded_trampoline)(BattleWork*);
 // Patch addresses.
@@ -163,31 +163,6 @@ EVT_DEFINE_USER_FUNC(GetPercentOfMaxHP) {
     return 2;
 }
 
-// Changes the order that certain attacks select their targets in
-// (selecting the user last, if the user is included).
-void ReorderWeaponTargets() {
-    auto& twork = ttyd::battle::g_BattleWork->weapon_targets_work;
-    
-    // If Trade Off, reorder targets so attacker (if present) is targeted last.
-    // Apply this change for any other weapons with similar issues in the future.
-    if (twork.weapon == &ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka) {
-        if (twork.num_targets > 1) {
-            for (int32_t i = 0; i < twork.num_targets - 1; ++i) {
-                int32_t target_unit_idx = 
-                    twork.targets[twork.target_indices[i]].unit_idx;
-                if (target_unit_idx == twork.attacker_idx) {
-                    // Swap with last target.
-                    int32_t tmp = twork.target_indices[i];
-                    twork.target_indices[i] = 
-                        twork.target_indices[twork.num_targets - 1];
-                    twork.target_indices[twork.num_targets - 1] = tmp;
-                    return;
-                }
-            }
-        }
-    }
-}
-
 // Checks if all player characters are defeated (excluding enemies).
 bool CheckIfPlayerDefeated() {
     for (int32_t ai = 0; ai < 3; ++ai) {
@@ -218,16 +193,7 @@ bool CheckIfPlayerDefeated() {
 
 }
 
-void ApplyFixedPatches() {        
-    // Changes targeting order for certain attacks so the user hits themselves
-    // after all other targets.
-    g_btlevtcmd_GetSelectEnemy_trampoline = patch::hookFunction(
-        ttyd::battle_event_cmd::btlevtcmd_GetSelectEnemy,
-        [](EvtEntry* evt, bool isFirstCall) {
-            ReorderWeaponTargets();
-            return g_btlevtcmd_GetSelectEnemy_trampoline(evt, isFirstCall);
-        });
-
+void ApplyFixedPatches() {
     // Disallows audience from throwing items at Infatuated enemies.
     mod::patch::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudienceDetectTargetPlayer_CheckPlayer_BH),

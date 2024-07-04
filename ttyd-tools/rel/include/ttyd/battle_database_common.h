@@ -315,6 +315,11 @@ namespace AttackTargetClass_Flags {
         ONLY_TARGET_SELECT_PARTS        = 0x20'0000U,
         SINGLE_TARGET                   = 0x100'0000U,
         MULTIPLE_TARGET                 = 0x200'0000U,
+
+        // Custom for ToT; multitarget moves that select all actors on the
+        // left or right side of the battle.
+        SELECT_SIDE                     = 0x400'0000U,
+
         NO_TARGETS                      = 0x8000'0000U,
     };
 }
