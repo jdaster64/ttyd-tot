@@ -22,6 +22,7 @@
 #include <ttyd/battle_damage.h>
 #include <ttyd/battle_disp.h>
 #include <ttyd/battle_event_cmd.h>
+#include <ttyd/battle_item_data.h>
 #include <ttyd/battle_message.h>
 #include <ttyd/battle_pad.h>
 #include <ttyd/battle_seq_command.h>
@@ -1163,10 +1164,9 @@ void ReorderAndFilterWeaponTargets() {
         twork.current_target = 0;
     }
 
-    // For any multitarget weapon, reorder targets so the attacker (if present) 
+    // For certain multitarget weapons, reorder targets so the attacker
     // is targeted last, to make sure the attack doesn't end prematurely.
-    if (twork.num_targets > 1 &&
-        twork.weapon_target_class_flags & AttackTargetClass_Flags::MULTIPLE_TARGET) {
+    if (twork.weapon == &ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka) {
         for (int32_t i = 0; i < twork.num_targets - 1; ++i) {
             int32_t target_unit_idx = 
                 twork.targets[twork.target_indices[i]].unit_idx;

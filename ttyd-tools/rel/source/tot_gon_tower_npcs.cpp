@@ -435,7 +435,10 @@ EVT_BEGIN(TowerNpc_DazzleTalk)
 
 LBL(10)
     USER_FUNC(evt_msg_continue)
-    USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_SP_PURCHASED, 1)
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::DAZZLE)
+    IF_NOT_EQUAL(LW(5), 0)
+        USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_SP_PURCHASED, 1)
+    END_IF()
     USER_FUNC(evtTot_GetUniqueItemName, LW(0))
     USER_FUNC(evt_item_entry, LW(0), ItemType::STAR_PIECE, FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
     USER_FUNC(evt_item_get_item, LW(0))
@@ -743,8 +746,15 @@ EVT_DEFINE_USER_FUNC(evtTot_GetChetCost) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_GetDazzleCost) {
-    int32_t num_sp_bought = g_Mod->state_.GetOption(STAT_RUN_NPC_SP_PURCHASED);
-    evtSetValue(evt, evt->evtArguments[0], num_sp_bought * 10);
+    auto& state = g_Mod->state_;
+    int32_t last_floor_taken = state.GetOption(STAT_RUN_NPC_DAZZLE_FLOOR);
+    if (last_floor_taken != state.floor_) {
+        // First one's on the house
+        evtSetValue(evt, evt->evtArguments[0], 0);
+    } else {
+        int32_t num_sp_bought = state.GetOption(STAT_RUN_NPC_SP_PURCHASED);
+        evtSetValue(evt, evt->evtArguments[0], (num_sp_bought + 1) * 10);
+    }
     return 2;
 }
 
@@ -794,6 +804,10 @@ EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
         }
         case SecondaryNpcType::DOOPLISS: {
             g_Mod->state_.SetOption(STAT_RUN_NPC_DOOPLISS_FLOOR, floor);
+            break;
+        }
+        case SecondaryNpcType::DAZZLE: {
+            g_Mod->state_.SetOption(STAT_RUN_NPC_DAZZLE_FLOOR, floor);
             break;
         }
         case SecondaryNpcType::LUMPY: {

@@ -1101,6 +1101,11 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
             battle_info->wHeldItems[i] = item;
         }
     }
+
+    // Always have Pity Flower equipped on Gold Fuzzy?
+    // if (g_Enemies[0] == BattleUnitType::GOLD_FUZZY) {
+    //     battle_info->wHeldItems[0] = ItemType::PITY_FLOWER;
+    // }
     
     // Occasionally, set a battle condition for an optional bonus reward.
     SetBattleCondition(&npc->battleInfo);

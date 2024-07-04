@@ -224,8 +224,9 @@ enum RngSequence {
     RNG_AUDIENCE_ITEM           = 30,
     RNG_ITEM_OBFUSCATION        = 31,
     RNG_SECONDARY_NPC           = 32,
+    RNG_STAR_PIECE_CHEST        = 33,
     
-    RNG_SEQUENCE_MAX            = 33,
+    RNG_SEQUENCE_MAX            = 34,
 };
 
 // Different types of option values (see below for descriptions of each).
@@ -423,21 +424,22 @@ enum Options : uint32_t {
     STAT_RUN_SUPERGUARDS        = 0x022'3'01'06,
     STAT_RUN_NPCS_SELECTED      = 0x025'1'00'08,
     STAT_RUN_NPC_SP_PURCHASED   = 0x02d'1'01'03,
-    STAT_RUN_NPC_GRUBBA_FLOOR   = 0x02e'1'01'03,
-    STAT_RUN_NPC_DOOPLISS_FLOOR = 0x02f'1'01'03,
-    STAT_RUN_NPC_LUMPY_FLOOR    = 0x030'1'01'03,
-    STAT_RUN_NPC_RESERVED_FLOOR = 0x031'1'01'03,
-    STAT_RUN_NPC_LUMPY_COINS    = 0x032'2'01'03,
-    STAT_RUN_NPC_ITEMS_SOLD     = 0x034'2'01'04,
-    STAT_RUN_NPC_BADGES_SOLD    = 0x036'2'01'04,
-    STAT_RUN_NPC_LEVELS_SOLD    = 0x038'2'01'04,
-    STAT_RUN_CONDITIONS_MET     = 0x03a'1'00'00,
-    STAT_RUN_CONDITIONS_TOTAL   = 0x03b'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_FLAGS = 0x03c'1'00'0a,
-    STAT_RUN_MIDBOSSES_USED     = 0x046'1'00'07,
-    STAT_RUN_CONTINUES          = 0x04d'2'01'03,
+    STAT_RUN_NPC_DAZZLE_FLOOR   = 0x02e'1'01'03,
+    STAT_RUN_NPC_GRUBBA_FLOOR   = 0x02f'1'01'03,
+    STAT_RUN_NPC_DOOPLISS_FLOOR = 0x030'1'01'03,
+    STAT_RUN_NPC_LUMPY_FLOOR    = 0x031'1'01'03,
+    STAT_RUN_NPC_RESERVED_FLOOR = 0x032'1'01'03,
+    STAT_RUN_NPC_LUMPY_COINS    = 0x033'2'01'03,
+    STAT_RUN_NPC_ITEMS_SOLD     = 0x035'2'01'04,
+    STAT_RUN_NPC_BADGES_SOLD    = 0x037'2'01'04,
+    STAT_RUN_NPC_LEVELS_SOLD    = 0x039'2'01'04,
+    STAT_RUN_CONDITIONS_MET     = 0x03b'1'00'00,
+    STAT_RUN_CONDITIONS_TOTAL   = 0x03c'1'00'00,
+    STAT_RUN_UNIQUE_BADGE_FLAGS = 0x03d'1'00'0a,
+    STAT_RUN_MIDBOSSES_USED     = 0x047'1'00'07,
+    STAT_RUN_CONTINUES          = 0x04e'2'01'03,
 
-    // Next: 0x04f
+    // Next: 0x050
     // TODO: Add versions of most stats that persist across runs.
 };
 

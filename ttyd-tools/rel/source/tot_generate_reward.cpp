@@ -447,6 +447,7 @@ EVT_DECLARE_USER_FUNC(evtTot_InitializePartyMember, 2)
 EVT_DECLARE_USER_FUNC(evtTot_PartyJumpOutOfChest, 7)
 EVT_DECLARE_USER_FUNC(evtTot_PartyVictoryPose, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SelectMoves, 5)
+EVT_DECLARE_USER_FUNC(evtTot_GetStarPieceRolls, 1)
 
 // Script for health.
 EVT_BEGIN(Reward_FullHealEvt)
@@ -489,9 +490,12 @@ EVT_BEGIN(Reward_ShineSpriteBaseEvt)
     RETURN()
 EVT_END()
 
-// Pickup script for Star Pieces from chest.
+// Pickup script for Star Pieces from chest (does 1-3 rolls, at random).
 EVT_BEGIN(Reward_StarPieceChestEvt)
-    RUN_CHILD_EVT(Reward_StarPieceBaseEvt)
+    USER_FUNC(evtTot_GetStarPieceRolls, LW(3))
+    DO(LW(3))
+        RUN_CHILD_EVT(Reward_StarPieceBaseEvt)
+    WHILE()
     USER_FUNC(evtTot_ToggleIGT, 1)
     USER_FUNC(evt_mario_key_onoff, 1)
     SET((int32_t)GSW_Tower_ChestClaimed, 1)
@@ -717,12 +721,12 @@ void SelectChestContents() {
     auto& state = g_Mod->state_;
     
     // Weights for different types of moves (Jump, Hammer, Special, partner).
-    int32_t kMoveWeights[] = { 16, 16, 12, 55 };
+    int32_t kMoveWeights[] = { 17, 17, 12, 52 };
     // Weights for different types of stat upgrades (HP, FP, BP, HP P, inv.).
     int32_t kStatWeights[] = { 20, 20, 20, 15, 10 };
     // Weights for different types of other rewards
     // (coins, Star Piece, Shine Sprite, unique badge, stackable badge).
-    int32_t kOtherWeights[] = { 20, 20, 30, 20, 10 };
+    int32_t kOtherWeights[] = { 20, 20, 20, 20, 10 };
     
     // Top-level weight for choosing a move, stat-up, or other reward.
     // The former two categories cannot be chosen more than once per floor.
@@ -892,16 +896,10 @@ void SelectChestContents() {
                     case 1:
                         reward = REWARD_STAR_PIECE;
                         pickup_script = Reward_StarPieceChestEvt;
-                        // Don't offer Star Piece and Shine Sprite together.
-                        others_picked[1] = true;
-                        others_picked[2] = true;
                         break;
                     case 2:
                         reward = REWARD_SHINE_SPRITE;
                         pickup_script = Reward_ShineSpriteChestEvt;
-                        // Don't offer Star Piece and Shine Sprite together.
-                        others_picked[1] = true;
-                        others_picked[2] = true;
                         break;
                     case 3:
                         reward = SelectUniqueBadge();
@@ -1127,6 +1125,12 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectMoves) {
                 MoveManager::GetMoveData(g_MoveSelections[0])->name_msg)));
     }
     
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetStarPieceRolls) {
+    int32_t rolls = g_Mod->state_.Rand(3, RNG_STAR_PIECE_CHEST) + 1;
+    evtSetValue(evt, evt->evtArguments[0], rolls);
     return 2;
 }
 

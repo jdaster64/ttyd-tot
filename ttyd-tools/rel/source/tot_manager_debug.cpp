@@ -262,6 +262,9 @@ void DebugManager::Update() {
             }
         }
         if (dir == 0) return;
+
+        // Don't allow changing enemies after a blank spot.
+        if (g_CursorPos > 0 && g_DebugEnemies[g_CursorPos-1] == -1) return;
         
         const int32_t max_enemy = BattleUnitType::BONETAIL;
         const int32_t first_move = (buttons & ButtonId::L) ? 0x10 : 1;

@@ -92,7 +92,8 @@ EVT_DECLARE_USER_FUNC(evtTot_SetNeutralizeTurnCount, 2)
 EVT_DEFINE_USER_FUNC(evtTot_SetNeutralizeTurnCount) {
     int32_t buttons_pressed = evtGetValue(evt, evt->evtArguments[0]);
     int32_t level = evtGetValue(evt, evt->evtArguments[1]);
-    customWeapon_VivianNeutralize.allergic_time = buttons_pressed / level;
+    customWeapon_VivianNeutralize.allergic_time =
+        buttons_pressed == 1 ? 1 : buttons_pressed / level;
     return 2;
 }
 
