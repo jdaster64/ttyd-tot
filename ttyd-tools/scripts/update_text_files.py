@@ -599,8 +599,8 @@ g_StringMap = {
             b"slow their movements.",
             
         b"tot_ptr5_neutralize_desc":
-            b"Make the enemy unable to\n"
-            b"change their status.",
+            b"Makes the target immune to all\n"
+            b"status effects for a while.",
             
         b"msg_ptr_meromero_kiss":
             b"Blow a kiss to an enemy to try\n"
@@ -712,8 +712,8 @@ g_StringMap = {
             b"increase the shield's max HP.",
             
         b"tot_upg_multi":
-            b"Upgrading this move will\n"
-            b"allow you to target all foes.",
+            b"Upgrading this move allows\n"
+            b"it to hit multiple targets.",
             
         b"tot_upg_bombs":
             b"Upgrading this move will\n"

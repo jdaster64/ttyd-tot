@@ -55,8 +55,8 @@ namespace MoveType {
         
         KOOPS_BASE,
         KOOPS_POWER_SHELL,
-        KOOPS_SHELL_SHIELD,
         KOOPS_WITHDRAW,
+        KOOPS_SHELL_SHIELD,
         KOOPS_BULK_UP,
         KOOPS_SHELL_SLAM,
         

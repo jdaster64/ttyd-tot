@@ -1165,7 +1165,8 @@ void ReorderAndFilterWeaponTargets() {
 
     // For any multitarget weapon, reorder targets so the attacker (if present) 
     // is targeted last, to make sure the attack doesn't end prematurely.
-    if (twork.num_targets > 1) {
+    if (twork.num_targets > 1 &&
+        twork.weapon_target_class_flags & AttackTargetClass_Flags::MULTIPLE_TARGET) {
         for (int32_t i = 0; i < twork.num_targets - 1; ++i) {
             int32_t target_unit_idx = 
                 twork.targets[twork.target_indices[i]].unit_idx;

@@ -295,11 +295,19 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                             ~AttackTargetClass_Flags::MULTIPLE_TARGET;
                         weapons[i].weapon->target_class_flags |=
                             AttackTargetClass_Flags::SINGLE_TARGET;
+                        if (move_type == tot::MoveType::VIVIAN_NEUTRALIZE) {
+                            weapons[i].weapon->target_class_flags &=
+                                ~AttackTargetClass_Flags::SELECT_SIDE;
+                        }
                     } else {
                         weapons[i].weapon->target_class_flags &=
                             ~AttackTargetClass_Flags::SINGLE_TARGET;
                         weapons[i].weapon->target_class_flags |=
                             AttackTargetClass_Flags::MULTIPLE_TARGET;
+                        if (move_type == tot::MoveType::VIVIAN_NEUTRALIZE) {
+                            weapons[i].weapon->target_class_flags |=
+                                AttackTargetClass_Flags::SELECT_SIDE;
+                        }
                     }
                 }
                 

@@ -87,6 +87,15 @@ void MakeSelectWeaponTable(
     }
 }
 
+// Sets turn count of Neutralize based on number of successful presses.
+EVT_DECLARE_USER_FUNC(evtTot_SetNeutralizeTurnCount, 2)
+EVT_DEFINE_USER_FUNC(evtTot_SetNeutralizeTurnCount) {
+    int32_t buttons_pressed = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t level = evtGetValue(evt, evt->evtArguments[1]);
+    customWeapon_VivianNeutralize.allergic_time = buttons_pressed / level;
+    return 2;
+}
+
 // If Infatuate lands successfully, changes the target's alliance permanently.
 EVT_DECLARE_USER_FUNC(evtTot_InfatuateChangeAlliance, 2)
 EVT_DEFINE_USER_FUNC(evtTot_InfatuateChangeAlliance) {
@@ -432,12 +441,24 @@ EVT_BEGIN(partyVivianAttack_MagicalPowder)
         CASE_ETC()
             SET(LW(0), 24)
     END_SWITCH()
-    USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_FIERY_JINX, LW(1))
-    // Number of buttons (3, 5, 7 at level 1, 2, 3).
-    MUL(LW(1), 2)
-    ADD(LW(1), 1)
-    MUL(LW(0), LW(1))
-    USER_FUNC(btlevtcmd_AcSetParamAll, LW(0), 1, LW(1), -3, 1, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+
+    IF_EQUAL(LW(12), PTR(&customWeapon_VivianFieryJinx))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_FIERY_JINX, LW(1))
+        // Number of buttons (3, 5, 7 at level 1, 2, 3).
+        MUL(LW(1), 2)
+        ADD(LW(1), 1)
+        MUL(LW(0), LW(1))
+        // Random ABXY command.
+        USER_FUNC(btlevtcmd_AcSetParamAll, LW(0), 1, LW(1), -3, 1, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    ELSE()
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_NEUTRALIZE, LW(1))
+        // Number of buttons (3, 6 at level 1, 2).
+        MUL(LW(1), 3)
+        MUL(LW(0), LW(1))
+        // Shuffle ABXYLRZ command.
+        USER_FUNC(btlevtcmd_AcSetParamAll, LW(0), 1, LW(1), -5, 1, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    END_IF()
+
     USER_FUNC(btlevtcmd_AcSetFlag, 7)
     USER_FUNC(btlevtcmd_SetupAC, -2, 10, 1, 0)
     WAIT_FRM(22)
@@ -475,9 +496,11 @@ EVT_BEGIN(partyVivianAttack_MagicalPowder)
     USER_FUNC(evt_btl_camera_set_posoffset, 0, 0, 0, 0)
     WAIT_FRM(40)
     SET(LW(10), 0)
-    LBL(10)
-    USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    USER_FUNC(evt_eff, 0, PTR("kemuri_test"), 6, LW(0), LW(1), LW(2), FLOAT(1.0), 0, 0, 0, 0, 0, 0, 0)
+LBL(10)
+    IF_EQUAL(LW(12), PTR(&customWeapon_VivianFieryJinx))
+        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        USER_FUNC(evt_eff, 0, PTR("kemuri_test"), 6, LW(0), LW(1), LW(2), FLOAT(1.0), 0, 0, 0, 0, 0, 0, 0)
+    END_IF()
     USER_FUNC(btlevtcmd_CommandPreCheckDamage, -2, LW(3), LW(4), 256, LW(6))
     IF_NOT_EQUAL(LW(6), 1)
         IF_EQUAL(LW(6), 3)
@@ -492,6 +515,11 @@ EVT_BEGIN(partyVivianAttack_MagicalPowder)
         GOTO(50)
     END_IF()
     USER_FUNC(btlevtcmd_AcGetOutputParam, 0, LW(0))
+
+    IF_EQUAL(LW(12), PTR(&customWeapon_VivianNeutralize))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_NEUTRALIZE, LW(1))
+        USER_FUNC(evtTot_SetNeutralizeTurnCount, LW(0), LW(1))
+    END_IF()
 
     // Delay self-targeting by a couple frames to make sure it happens after
     // hitting all other targets, SP regeneration, etc.
@@ -541,22 +569,31 @@ EVT_BEGIN(partyVivianAttack_MagicalPowder)
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
         END_IF()
     END_IF()
-    LBL(50)
+LBL(50)
+
+    // If level 1 Neutralize, skip all other targets.
+    IF_EQUAL(LW(12), PTR(&customWeapon_VivianNeutralize))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_NEUTRALIZE, LW(0))
+        IF_EQUAL(LW(0), 1)
+            GOTO(80)
+        END_IF()
+    END_IF()
+
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_NOT_EQUAL(LW(3), -1)
         ADD(LW(10), 1)
         GOTO(10)
     END_IF()
-    LBL(80)
+LBL(80)
     USER_FUNC(evt_audience_ap_recovery)
     USER_FUNC(btlevtcmd_InviteApInfoReport)
-    LBL(90)
+LBL(90)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
     USER_FUNC(evt_btl_camera_set_posoffset, 0, 0, 0, 0)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PTR_A1_1"))
     WAIT_MSEC(800)
-    LBL(99)
+LBL(99)
     USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
     RUN_CHILD_EVT(PTR(&btldefaultevt_SuitoruBadgeEffect))
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
@@ -703,10 +740,8 @@ EVT_BEGIN(partyVivianAttack_CharmKissAttack)
             SET(LW(0), 1)
         CASE_EQUAL(PTR(&customWeapon_VivianCurse))
             USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_CURSE, LW(0))
-        CASE_EQUAL(PTR(&customWeapon_VivianNeutralize))
-            USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::VIVIAN_NEUTRALIZE, LW(0))
     END_SWITCH()
-    // If Infatuate, or level 1 version of Curse / Neutralize, don't check next.
+    // If Infatuate, or level 1 version of Curse, don't check next.
     IF_LARGE(LW(0), 1)
         USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         IF_NOT_EQUAL(LW(3), -1)
@@ -869,7 +904,7 @@ BattleWeapon customWeapon_VivianShadeFist = {
 
 BattleWeapon customWeapon_VivianVeil = {
     .name = "btl_wn_ptr_lv1",
-    .icon = IconType::PARTNER_MOVE_1,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_ptr_kagegakure",
     .base_accuracy = 100,
@@ -1113,11 +1148,10 @@ BattleWeapon customWeapon_VivianNeutralize = {
     .fp_damage_function = nullptr,
     .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .target_class_flags =
-        // Single-target or multiple depending on level.
+        // Single-target or multiple (selectable side) depending on level.
+        // In any case, can target enemy _or_ player actors, including herself.
         AttackTargetClass_Flags::SINGLE_TARGET |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
-        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
-        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
@@ -1126,7 +1160,7 @@ BattleWeapon customWeapon_VivianNeutralize = {
     .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
-    .ac_help_msg = "msg_ac_meromero_kiss",
+    .ac_help_msg = "msg_ac_mahou_no_kona",
     .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
@@ -1138,7 +1172,7 @@ BattleWeapon customWeapon_VivianNeutralize = {
     .allergic_chance = 127,
     .allergic_time = 3,
     
-    .attack_evt_code = (void*)partyVivianAttack_CharmKissAttack,
+    .attack_evt_code = (void*)partyVivianAttack_MagicalPowder,
     .bg_a1_a2_fall_weight = 0,
     .bg_a1_fall_weight = 0,
     .bg_a2_fall_weight = 0,

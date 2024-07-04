@@ -56,7 +56,7 @@ extern BattleWeapon customWeapon_KoopsWithdraw;
 
 BattleWeapon* g_WeaponTable[] = {
     &customWeapon_KoopsShellToss, &customWeapon_KoopsPowerShell, 
-    &customWeapon_KoopsShellShield, &customWeapon_KoopsWithdraw,
+    &customWeapon_KoopsWithdraw, &customWeapon_KoopsShellShield,
     &customWeapon_KoopsBulkUp, &customWeapon_KoopsShellSlam
 };
 
@@ -1668,7 +1668,7 @@ BattleWeapon customWeapon_KoopsPowerShell = {
 
 BattleWeapon customWeapon_KoopsShellShield = {
     .name = "btl_wn_pnk_lv2",
-    .icon = IconType::PARTNER_MOVE_1,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "msg_pnk_koura_no_mamori",
     .base_accuracy = 100,
@@ -1841,7 +1841,7 @@ BattleWeapon customWeapon_KoopsBulkUp = {
 
 BattleWeapon customWeapon_KoopsWithdraw = {
     .name = "tot_ptr2_withdraw",
-    .icon = IconType::PARTNER_MOVE_2,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "tot_ptr2_withdraw_desc",
     .base_accuracy = 100,
