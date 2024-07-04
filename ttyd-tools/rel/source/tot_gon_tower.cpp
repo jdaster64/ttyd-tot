@@ -360,9 +360,9 @@ EVT_BEGIN(Tower_SpawnPipe)
     END_IF()
     
     // Delete chest objects.
-    SET(LW(10), 3)
+    SET(LW(10), 4)
     DO(LW(10))
-        SET(LW(11), 3)
+        SET(LW(11), 4)
         SUB(LW(11), LW(10))
         USER_FUNC(evtTot_GetChestData, LW(11), LW(0), LW(1), LW(2), LW(3), EVT_NULLPTR)
         IF_EQUAL(LW(3), 0)
