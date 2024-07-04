@@ -352,6 +352,7 @@ EVT_BEGIN(TowerNpc_ChetRippoTalk)
 
     USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_whichstat"))
 LBL(0)
+    SET(LW(1), 0)
     USER_FUNC(evt_win_other_select, window_select::MenuType::TOT_CHET_RIPPO_TRADE)
     IF_EQUAL(LW(1), 0)
         USER_FUNC(evt_msg_print, 0, PTR("tot_chet_decline"), 0, PTR("me"))

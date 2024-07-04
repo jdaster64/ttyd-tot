@@ -141,6 +141,14 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
                 if (!g_Mod->state_.GetOption(OPT_MARIO_FP) || state.floor_ < 9)
                     condition.weight = 0;
                 break;
+            case TOTAL_DAMAGE_MORE:
+                // Take damage conditions shouldn't appear if both characters'
+                // max HP is locked to 1.
+                if (!g_Mod->state_.GetOption(OPT_MARIO_HP) &&
+                    (!g_Mod->state_.GetOption(OPT_PARTNER_HP) ||
+                     g_Mod->state_.CheckOptionValue(OPTVAL_NO_PARTNERS)))
+                    condition.weight = 0;
+                break;
         }
     }
     

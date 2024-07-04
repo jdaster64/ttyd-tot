@@ -325,7 +325,7 @@ BattleWeapon unitGoldFuzzy_weaponTackle = {
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::PREFER_FRONT |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -381,7 +381,7 @@ BattleWeapon unitGoldFuzzy_weaponDrainFp = {
     .special_property_flags = 
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::PREFER_FRONT |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -552,7 +552,7 @@ EVT_BEGIN(unitFuzzyHorde_damage_event)
         GOTO(99)
     END_IF()
 
-    // See how many Fuzzies should escape, out of 100.
+    // See how many Fuzzies should escape, out of 1000.
     USER_FUNC(btlevtcmd_GetMaxHp, -2, LW(2))
     USER_FUNC(btlevtcmd_GetHp, -2, LW(1))
     MUL(LW(1), 1000)
