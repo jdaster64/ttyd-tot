@@ -876,7 +876,7 @@ int32_t CalculateBaseDamage(
     // phase, queue pity Star Power restoration based on enemy's ATK.
     if (attacker->current_kind <= BattleUnitType::BONETAIL &&
         (target->current_kind == BattleUnitType::MARIO ||
-         target->current_kind > BattleUnitType::GOOMBELLA)) {
+         target->current_kind >= BattleUnitType::GOOMBELLA)) {
         if (atk > 0 && ttyd::battle::BattleGetSeq(battleWork, 4) != 0x400'0002) {
             auto& audience_work = battleWork->audience_work;
             int32_t current_audience = audience_work.current_audience_count_int;
