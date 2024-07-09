@@ -1,3 +1,4 @@
+// Old version of logic for tot_gon_tower.cpp, using Pit skin.
 #include "tot_gon_tower.h"
 
 #include "evt_cmd.h"
@@ -111,50 +112,14 @@ EVT_DECLARE_USER_FUNC(evtTot_WaitForDragonLanding, 1)
 
 // Other declarations.
 extern BeroEntry normal_room_entry_data[3];
-extern BeroEntry boss_room_entry_data[3];
-
-// Scripts for left / right door animations.
-EVT_BEGIN(Tower_LeftExit_Close)
-    MULF(LW(0), FLOAT(0.44))
-    USER_FUNC(evt_mapobj_rotate, 1, PTR("door01"), 0, 0, LW(0))
-    RETURN()
-EVT_END()
-EVT_BEGIN(Tower_LeftExit_Open)
-    MULF(LW(0), FLOAT(-0.44))
-    USER_FUNC(evt_mapobj_rotate, 1, PTR("door01"), 0, 0, LW(0))
-    RETURN()
-EVT_END()
-EVT_BEGIN(Tower_RightExit_Close)
-    MULF(LW(0), FLOAT(-0.44))
-    USER_FUNC(evt_mapobj_rotate, 1, PTR("door02"), 0, 0, LW(0))
-    RETURN()
-EVT_END()
-EVT_BEGIN(Tower_RightExit_Open)
-    MULF(LW(0), FLOAT(0.44))
-    USER_FUNC(evt_mapobj_rotate, 1, PTR("door02"), 0, 0, LW(0))
-    RETURN()
-EVT_END()
-
-// Scripts for lock on doors.
-EVT_BEGIN(Tower_Lock_Check)
-    RETURN()
-EVT_END()
-
-EVT_BEGIN(Tower_Lock_Unlock)
-    SET(LW(0), PTR("e_bero"))
-    RUN_CHILD_EVT(bero_case_switch_on)
-    RETURN()
-EVT_END()
 
 // Script for changing room destinations dynamically.
 EVT_BEGIN(Tower_UpdateDestinationEvt)
-    SET(LW(0), PTR("e_bero"))
+    SET(LW(0), PTR("dokan_1"))
     RUN_CHILD_EVT(bero_case_switch_off)
     USER_FUNC(evtTot_UpdateDestinationMap)
-    IF_EQUAL((int32_t)GSW_Tower_DisplayChestIcons, 2)
-        SET(LW(0), PTR("e_bero"))
-        RUN_CHILD_EVT(bero_case_switch_on)
-    END_IF()
+    SET(LW(0), PTR("dokan_1"))
+    RUN_CHILD_EVT(bero_case_switch_on)
     RETURN()
 EVT_END()
 
@@ -169,7 +134,7 @@ EVT_BEGIN(Tower_SignEvt)
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_npc_start_for_event)
     RETURN()
-EVT_END() 
+EVT_END()
 
 // Script that runs when opening a chest.
 EVT_BEGIN(Tower_ChestEvt_Core)
@@ -263,6 +228,14 @@ EVT_BEGIN(Tower_ChestEvt_3)
     RETURN()
 EVT_END()
 
+// Setting up loading zones, etc. for regular room.
+EVT_BEGIN(Tower_BeroSetupNormal)
+    SET(LW(0), PTR(&normal_room_entry_data))
+    USER_FUNC(evt_bero_get_info)
+    RUN_CHILD_EVT(PTR(&evt_bero_info_run))
+    RETURN()
+EVT_END()
+
 // Increment floor number.
 EVT_BEGIN(Tower_IncrementFloor)
     USER_FUNC(evtTot_ToggleIGT, 0)
@@ -298,50 +271,14 @@ EVT_BEGIN(Tower_SpawnHeartBlock)
     RETURN()
 EVT_END()
 
-// Open the grate blocking off access to the chest area.
-// LW(15) = Whether to open the grate statically on load.
-EVT_BEGIN(Tower_OpenGrate)
+// Spawn chests. LW(15) = Whether to spawn them statically on load.
+EVT_BEGIN(Tower_SpawnChests)
     IF_EQUAL(LW(15), 0)
         USER_FUNC(evt_mario_key_onoff, 0)
-        WAIT_MSEC(1750)
+        WAIT_MSEC(2000)
     END_IF()
-
-    SET(LW(0), 0)
-    IF_EQUAL(LW(15), 0)
-        SET(LW(1), 3)
-    ELSE()
-        SET(LW(1), 111)
-    END_IF()
-    USER_FUNC(evt_hit_bind_mapobj, PTR("a_kabeoku_01"), PTR("s_grate"))
-    USER_FUNC(evt_hit_bind_mapobj, PTR("a_kabeoku_02"), PTR("s_grate"))
-    USER_FUNC(evt_mapobj_get_position, PTR("s_grate"), LW(10), LW(11), LW(12))
-    IF_EQUAL(LW(15), 0)
-        USER_FUNC(
-            evt_snd_sfxon_3d, PTR("SFX_STG1_DOOR_GRID_OPEN1"), LW(10), LW(11), LW(12), 0)
-    END_IF()
-    DO(0)
-        ADD(LW(0), LW(1))
-        USER_FUNC(evt_mapobj_trans, 1, PTR("s_grate"), 0, 0, LW(0))
-        USER_FUNC(evt_hit_bind_update, PTR("a_kabeoku_01"))
-        USER_FUNC(evt_hit_bind_update, PTR("a_kabeoku_02"))
-        IF_LARGE_EQUAL(LW(0), 111)
-            DO_BREAK()
-        END_IF()
-        WAIT_FRM(1)
-    WHILE()
-
-    IF_EQUAL(LW(15), 0)
-        WAIT_MSEC(500)
-        USER_FUNC(evt_mario_key_onoff, 1)
-    END_IF()
-    SET((int32_t)GSW_Tower_DisplayChestIcons, 1)
-    RETURN()
-EVT_END()
-
-// Spawn chests.
-EVT_BEGIN(Tower_SpawnChests)
     USER_FUNC(evtTot_GenerateChestContents)
-
+    
     SET(LW(10), 4)
     DO(LW(10))
         // Get contents of next chest, and break from loop if empty.
@@ -350,6 +287,17 @@ EVT_BEGIN(Tower_SpawnChests)
         USER_FUNC(evtTot_GetChestData, LW(11), LW(0), LW(1), LW(2), LW(3), EVT_NULLPTR)
         IF_EQUAL(LW(3), 0)
             DO_BREAK()
+        END_IF()
+            
+        IF_EQUAL(LW(15), 0)
+            ADD(LW(1), 50)
+            USER_FUNC(
+                evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
+                0, 0, 0, 0, 0, 0, 0)
+            USER_FUNC(
+                evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
+                LW(0), LW(1), LW(2), 0)
+            SUB(LW(1), 25)
         END_IF()
         
         SWITCH(LW(11))
@@ -371,17 +319,37 @@ EVT_BEGIN(Tower_SpawnChests)
                     PTR(&Tower_ChestEvt_3), (int32_t)GSWF_Chest_3)
         END_SWITCH()
     WHILE()
+
+    IF_EQUAL(LW(15), 0)
+        WAIT_MSEC(1000)
+        USER_FUNC(evt_mario_key_onoff, 1)
+    END_IF()
+    SET((int32_t)GSW_Tower_DisplayChestIcons, 1)
     RETURN()
 EVT_END()
 
 // Spawn the exit to the floor.
-EVT_BEGIN(Tower_OpenExit)
+EVT_BEGIN(Tower_SpawnPipe)
     USER_FUNC(evt_mario_key_onoff, 0)
     
     // Spawn pipe.
-    WAIT_MSEC(300)
-    USER_FUNC(evt_mobj_lock_unlock, PTR("mobj_lock_00"))
     WAIT_MSEC(500)
+    SET(LW(2), PTR("a_dokan_1"))
+    SET(LW(3), PTR("dokan_1_s"))
+    USER_FUNC(evt_mapobj_get_position, LW(3), LW(7), LW(8), LW(9))
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_DOKAN_APPEAR1"), LW(7), LW(8), LW(9), 0)
+    USER_FUNC(evt_hit_bind_mapobj, LW(2), LW(3))
+    USER_FUNC(evt_sub_intpl_msec_init, 11, 0, 300, 500)
+    LBL(0)
+    USER_FUNC(evt_sub_intpl_msec_get_value)
+    DIVF(LW(0), FLOAT(10.0))
+    USER_FUNC(evt_mapobj_trans, 1, LW(3), 0, LW(0), 0)
+    USER_FUNC(evt_hit_bind_update, LW(2))
+    WAIT_FRM(1)
+    IF_EQUAL(LW(1), 1)
+        GOTO(0)
+    END_IF()
+    USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
 
     // Spawn Heart Block on boss floors.
     USER_FUNC(evtTot_GetFloor, LW(10))
@@ -451,13 +419,10 @@ EVT_BEGIN(Tower_RunGameOverScript)
         USER_FUNC(evtTot_LoadBackupSaveData)
         // Resets floor-based stats without making saves, etc.
         USER_FUNC(evtTot_IncrementFloor, 0)
-        // Set flag to spawn player in room ready to go to the next floor.
-        // Setting the "chest claimed" flag to 0 prevents lock in the current
-        // room from opening when the old floor is trying to be loaded.
+        // Set flag to spawn player in room with pipe already spawned.
         SET((int32_t)GSW_Tower_ContinuingFromGameOver, 1)
-        SET((int32_t)GSW_Tower_ChestClaimed, 0)
         USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-        USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("w_bero"))
+        USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("dokan_2"))
     ELSE()
         // Reload into lobby.
         USER_FUNC(evtTot_SetPreviousPartner, 0)
@@ -718,9 +683,9 @@ EVT_END()
 EVT_BEGIN(Tower_NpcSetup)
     USER_FUNC(evtTot_IsRestFloor, LW(0))
     IF_EQUAL(LW(0), 1)
-        // Rest floor; open grate immediately.
+        // Rest floor; spawn chest immediately.
         SET(LW(15), 1)
-        RUN_EVT(Tower_OpenGrate)
+        RUN_EVT(Tower_SpawnChests)
         
         USER_FUNC(evtTot_ClearEnemyInfo)
         
@@ -776,7 +741,7 @@ EVT_BEGIN(Tower_NpcSetup)
                 GOTO(1)
             END_IF()
             SET(LW(15), 0)
-            RUN_EVT(Tower_OpenGrate)
+            RUN_EVT(Tower_SpawnChests)
         END_INLINE()
     END_IF()
     
@@ -790,51 +755,9 @@ EVT_BEGIN(Tower_NpcSetup)
             END_IF()
             GOTO(2)
         END_IF()
-        // TODO: Is it a problem that this gets hit when continuing?
-        RUN_EVT(Tower_OpenExit)
+        RUN_EVT(Tower_SpawnPipe)
     END_INLINE()
 
-    RETURN()
-EVT_END()
-
-// Prompts if the player wants to give up if they check the left door.
-EVT_BEGIN(Tower_LeaveEarly)
-    USER_FUNC(evt_mario_key_onoff, 0)
-    USER_FUNC(evt_msg_print, 0, PTR("tot_quitearly"), 0, PTR("me"))
-    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
-    USER_FUNC(evt_msg_continue)
-    // Chose "continue" option.
-    IF_NOT_EQUAL(LW(0), 0)
-        USER_FUNC(evt_mario_key_onoff, 1)
-    ELSE()
-        // Despawn partner.
-        USER_FUNC(evt_mario_goodbye_party, 0)
-        // Reload into lobby.
-        USER_FUNC(evtTot_SetPreviousPartner, 0)
-        USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-        USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("dokan_3"))
-    END_IF()
-    RETURN()
-EVT_END()
-
-// Setting up loading zones, etc.
-EVT_BEGIN(Tower_BeroSetup)
-    USER_FUNC(evtTot_IsFinalFloor, LW(0))
-    IF_EQUAL(LW(0), 0)
-        SET(LW(0), PTR(&normal_room_entry_data))
-    ELSE()
-        SET(LW(0), PTR(&boss_room_entry_data))
-    END_IF()
-    USER_FUNC(evt_bero_get_info)
-    RUN_CHILD_EVT(PTR(&evt_bero_info_run))
-    // Disable left loading zone on normal floors, and have prompt to quit early.
-    USER_FUNC(evtTot_IsFinalFloor, LW(0))
-    IF_EQUAL(LW(0), 0)
-        SET(LW(0), PTR("w_bero"))
-        RUN_CHILD_EVT(bero_case_switch_off)
-        USER_FUNC(
-            evt_run_case_evt, 9, 1, PTR("w_bero"), 0, PTR(&Tower_LeaveEarly), 0)
-    END_IF()
     RETURN()
 EVT_END()
 
@@ -843,12 +766,12 @@ EVT_BEGIN(gon_01_InitEvt)
     // Random unused bytes, used to track chest collection and icon display.
     SET((int32_t)GSW_Tower_ChestClaimed, 0)
     SET((int32_t)GSW_Tower_DisplayChestIcons, 0)
-    // Flags to track chest / lock opening.
+    // Flags to track chest opening.
     SET((int32_t)GSWF_Chest_0, 0)
     SET((int32_t)GSWF_Chest_1, 0)
     SET((int32_t)GSWF_Chest_2, 0)
-    SET((int32_t)GSWF_Chest_3, 0)
-    SET((int32_t)GSWF_Lock, 0)
+
+    USER_FUNC(evt_run_case_evt, 9, 1, PTR("a_kanban"), 0, PTR(Tower_SignEvt), 0)
     
     // Is the player continuing from a Game Over?
     IF_EQUAL((int32_t)GSW_Tower_ContinuingFromGameOver, 0)
@@ -857,37 +780,25 @@ EVT_BEGIN(gon_01_InitEvt)
         IF_EQUAL(LW(0), 1)
             RUN_CHILD_EVT(PTR(&Tower_FinalBossSetup))
         ELSE()
-            // Set up chests and regular NPCs.
-            RUN_CHILD_EVT(PTR(&Tower_SpawnChests))
             RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
         END_IF()
         // Set up loading zones.
-        RUN_CHILD_EVT(PTR(&Tower_BeroSetup))
-
-        // Put lock on right door until enemies beaten + chests claimed.
-        USER_FUNC(evtTot_IsFinalFloor, LW(0))
-        IF_EQUAL(LW(0), 0)
-            USER_FUNC(evt_mobj_lock, PTR("mobj_lock_00"), 12, /* key item */
-                190, 10, 0, 270,  /* position + rotation */
-                PTR(&Tower_Lock_Check), PTR(&Tower_Lock_Unlock),
-                (int32_t)GSWF_Lock)
-        END_IF()
+        RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
     ELSE()
-        // Set up loading zones.
-        RUN_CHILD_EVT(PTR(&Tower_BeroSetup))
+        RUN_CHILD_EVT(PTR(&Tower_BeroSetupNormal))
         // Spawn Heart Block statically.
         USER_FUNC(evtTot_GetFloor, LW(15))
         IF_LARGE(LW(15), 0)
             SET(LW(15), 1)
             RUN_EVT(Tower_SpawnHeartBlock)
         END_IF()
-        // Open grate statically.
-        SET(LW(15), 1)
-        RUN_EVT(Tower_OpenGrate)
-
+        // Enable exit pipe immediately.
+        USER_FUNC(evt_hit_bind_mapobj, PTR("a_dokan_1"), PTR("dokan_1_s"))
+        USER_FUNC(evt_mapobj_trans, 1, PTR("dokan_1_s"), 0, 30, 0)
+        USER_FUNC(evt_hit_bind_update, PTR("a_dokan_1"))
+        USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("dokan_1_k"), 1)
+        
         SET((int32_t)GSW_Tower_ContinuingFromGameOver, 0)
-        SET((int32_t)GSW_Tower_ChestClaimed, 1)
-        SET((int32_t)GSW_Tower_DisplayChestIcons, 2)
     END_IF()
         
     // Dynamically update the destination of the exit loading zone.
@@ -896,14 +807,9 @@ EVT_BEGIN(gon_01_InitEvt)
     USER_FUNC(evtTot_IsFinalFloor, LW(0))
     IF_EQUAL(LW(0), 0)
         // Non-boss room music / env sound:
-        USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STG1_GON1"))
+        USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STG0_100DN1"))
         USER_FUNC(evt_snd_envoff, 512)
         USER_FUNC(evt_snd_set_rev_mode, 1)
-
-        // Spawn signboard with floor number as reminder.
-        USER_FUNC(
-            evt_mobj_signboard, PTR("board"), 100, 0, -130, 
-            PTR(&Tower_SignEvt), LSWF(0))
     ELSE()
         // Boss room music / env sound:
         USER_FUNC(evt_snd_bgmoff, 512)
@@ -917,42 +823,6 @@ EVT_BEGIN(gon_01_InitEvt)
 EVT_END()
 
 BeroEntry normal_room_entry_data[3] = {
-    {
-        .name = "w_bero",
-        .type = BeroType::DOOR,
-        .sfx_id = 0xC,
-        .direction = BeroDirection::AUTO,
-        .center_position = { 100000, 0, 0 },
-        .length = -1,
-        .entry_evt_code = nullptr,
-        .case_type = -1,
-        .out_evt_code = nullptr,
-        .target_map = nullptr,
-        .target_bero = nullptr,
-        .entry_anim_type = BeroAnimType::REPEATED_EVT,
-        .out_anim_type = BeroAnimType::REPEATED_EVT,
-        .entry_anim_args = (void*)Tower_LeftExit_Close,
-        .out_anim_args = (void*)Tower_LeftExit_Open,
-    }, {
-        .name = "e_bero",
-        .type = BeroType::DOOR,
-        .sfx_id = 0xC,
-        .direction = BeroDirection::AUTO,
-        .center_position = { 100000, 0, 0 },
-        .length = -1,
-        .entry_evt_code = nullptr,
-        .case_type = -1,
-        .out_evt_code = (void*)Tower_IncrementFloor,
-        .target_map = "gon_01",
-        .target_bero = "w_bero",
-        .entry_anim_type = BeroAnimType::REPEATED_EVT,
-        .out_anim_type = BeroAnimType::REPEATED_EVT,
-        .entry_anim_args = (void*)Tower_RightExit_Close,
-        .out_anim_args = (void*)Tower_RightExit_Open,
-    }, { /* null-terminator */ },
-};
-
-BeroEntry boss_room_entry_data[3] = {
     {
         .name = "dokan_2",
         .type = BeroType::PIPE,
@@ -988,6 +858,7 @@ BeroEntry boss_room_entry_data[3] = {
     }, { /* null-terminator */ },
 };
 
+/*
 const int32_t* GetTowerInitEvt() {
     return gon_01_InitEvt;
 }
@@ -995,6 +866,7 @@ const int32_t* GetTowerInitEvt() {
 void UpdateDestinationMap() {
     ttyd::evtmgr::evtEntry(const_cast<int32_t*>(Tower_UpdateDestinationEvt), 0, 0);
 }
+*/
 
 EVT_DEFINE_USER_FUNC(evtTot_HasBackupSave) {
     evtSetValue(evt, evt->evtArguments[0], g_Mod->state_.HasBackupSave());
@@ -1050,19 +922,18 @@ EVT_DEFINE_USER_FUNC(evtTot_WaitForDragonLanding) {
 // Note: This is probably overkill; I wasn't running the entry event in testing.
 // It's probably sufficient to update normal_room_entry_data on leaving a floor.
 EVT_DEFINE_USER_FUNC(evtTot_UpdateDestinationMap) {
-    const char* exit_bero = "e_bero";
+    const char* exit_bero = "dokan_1";
     
     int32_t floor = g_Mod->state_.floor_;
     bool is_penultimate_floor = g_Mod->state_.IsFinalBossFloor(floor + 1);
     const char* next_map = is_penultimate_floor ? "gon_05" : "gon_01";
-    const char* next_bero = is_penultimate_floor ? "dokan_2" : "w_bero";
     
     // Update the destination of the exit loading zone to match the floor.
     BeroEntry** entries = ttyd::evt_bero::BeroINFOARR;
     for (int32_t i = 0; i < 16; ++i) {
         if (entries[i] && !strcmp(entries[i]->name, exit_bero)) {
             entries[i]->target_map = next_map;
-            entries[i]->target_bero = next_bero;
+            entries[i]->target_bero = "dokan_2";
             break;
         }
     }

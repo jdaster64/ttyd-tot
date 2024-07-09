@@ -541,7 +541,7 @@ EVT_END()
 
 EVT_BEGIN(Reward_PartnerRestoreBgmEvt)
     WAIT_MSEC(100)
-    USER_FUNC(evt_snd_bgmon_f, 0x300, PTR("BGM_STG0_100DN1"), 1500)
+    USER_FUNC(evt_snd_bgmon_f, 0x300, PTR("BGM_STG1_GON1"), 1500)
     RETURN()
 EVT_END()
 
@@ -921,31 +921,18 @@ void SelectChestContents() {
 
 // Selects the contents of the chests.
 EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
-    // Could set positions based on Mario's current position, but final maps
-    // will probably have them behind a gate, so they wouldn't be in the way.
     const gc::vec3 positions[] = {
-        // 1 and 3 start
-        { 0.0, 0.0, -100.0 },
-        { -80.0, 0.0, -100.0 },
-        { 80.0, 0.0, -100.0 },
-        // 4 start
-        { -120.0, 0.0, -100.0 },
-        // 2 start
-        { -40.0, 0.0, -100.0 },
-        { 40.0, 0.0, -100.0 },
-        { 120.0, 0.0, -100.0 },
+        { -50.0, 0.0, -200.0 },
+        { 50.0, 0.0, -200.0 },
+        { -150.0, 0.0, -200.0 },
+        { 150.0, 0.0, -200.0 },
     };
     memset(g_Chests, 0, sizeof(g_Chests));
     
     int32_t num_chests = GetBattleRewardTier();
 
-    int32_t start_position = 0;
-    switch (num_chests) {
-        case 2: start_position = 4; break;
-        case 4: start_position = 3; break;
-    }
     for (int32_t i = 0; i < num_chests; ++i) {
-        g_Chests[i].home_pos = positions[start_position + i];
+        g_Chests[i].home_pos = positions[i];
         g_Chests[i].item = REWARD_PLACEHOLDER;
     }
     SelectChestContents();

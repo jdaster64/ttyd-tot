@@ -538,7 +538,10 @@
 800670e4:evt_mobj_recovery_blk
 80067878:evt_mobj_signboard
 80067a4c:evt_mobj_itembox
+800682ac:evt_mobj_lock
+800688b4:evt_mobj_lock_unlock
 8006b948:evt_mobj_wait_animation_end
+8006bb08:evt_mobj_exec_cancel
 8006c03c:evt_mobj_get_position
 8006c308:evt_mobj_delete
 // .data

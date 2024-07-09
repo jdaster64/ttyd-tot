@@ -1049,8 +1049,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     SelectEnemies();
     BuildBattle(battle_db, npc_setup, &npc_tribe_description, &lead_enemy_type);
     
-    int32_t x_pos = ttyd::system::irand(50) + 80;
-    x_pos *= (ttyd::system::irand(2) ? 1 : -1);
+    int32_t x_pos = ttyd::system::irand(100) + 20;
     int32_t z_pos = ttyd::system::irand(200) - 100;
     int32_t y_pos = kEnemyInfo[lead_enemy_type].field_y_pos;
     

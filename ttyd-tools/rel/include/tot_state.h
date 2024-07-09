@@ -455,6 +455,7 @@ enum GlobalWorkVars {
     GSWF_Chest_1,
     GSWF_Chest_2,
     GSWF_Chest_3,
+    GSWF_Lock,
 };
 
 }  // namespace mod::tot

@@ -61,9 +61,9 @@ EVT_DECLARE_USER_FUNC(evt_mobj_signboard, 6)
 // mobj_signboard
 EVT_DECLARE_USER_FUNC(evt_mobj_itembox, 8)
 // mobj_itembox
-// evt_mobj_lock
+EVT_DECLARE_USER_FUNC(evt_mobj_lock, 9)
 // mobj_lock
-// evt_mobj_lock_unlock
+EVT_DECLARE_USER_FUNC(evt_mobj_lock_unlock, 1)
 // evt_mobj_switch_float_blk
 // mobj_switch_float_blk
 // evt_mobj_float_blk
@@ -91,7 +91,7 @@ EVT_DECLARE_USER_FUNC(evt_mobj_itembox, 8)
 EVT_DECLARE_USER_FUNC(evt_mobj_wait_animation_end, 1)
 // evt_mobj_set_anim
 // evt_mobj_set_gravity_bound
-// evt_mobj_exec_cancel
+EVT_DECLARE_USER_FUNC(evt_mobj_exec_cancel, 1)
 // evt_mobj_set_z_position
 // evt_mobj_set_y_position
 // evt_mobj_set_x_position

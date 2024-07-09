@@ -751,6 +751,12 @@ g_StringMap = {
             
         # Generic Map text.
         
+        b"tot_quitearly":
+            b"<system>\n<p>\n"
+            b"Do you really want to end this\n"
+            b"run early and restart from\n"
+            b"the lobby?\n<o>",
+        
         b"tot_gameover":
             b"<system>\n<p>\n"
             b"Do you want to continue from\n"
