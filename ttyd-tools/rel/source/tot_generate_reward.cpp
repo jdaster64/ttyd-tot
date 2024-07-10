@@ -922,10 +922,10 @@ void SelectChestContents() {
 // Selects the contents of the chests.
 EVT_DEFINE_USER_FUNC(evtTot_GenerateChestContents) {
     const gc::vec3 positions[] = {
-        { -50.0, 0.0, -200.0 },
         { 50.0, 0.0, -200.0 },
-        { -150.0, 0.0, -200.0 },
+        { -50.0, 0.0, -200.0 },
         { 150.0, 0.0, -200.0 },
+        { -150.0, 0.0, -200.0 },
     };
     memset(g_Chests, 0, sizeof(g_Chests));
     

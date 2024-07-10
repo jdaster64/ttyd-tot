@@ -751,6 +751,16 @@ g_StringMap = {
             
         # Generic Map text.
         
+        b"tot_lock_claimchest":
+            b"<system>\n<p>\n"
+            b"Claim a reward from one of the\n"
+            b"chests to proceed!\n<k>",
+        
+        b"tot_lock_defeatenemies":
+            b"<system>\n<p>\n"
+            b"Defeat the enemy and claim\n"
+            b"the rewards to proceed!\n<k>",
+        
         b"tot_quitearly":
             b"<system>\n<p>\n"
             b"Do you really want to end this\n"

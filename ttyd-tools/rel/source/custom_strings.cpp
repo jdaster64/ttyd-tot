@@ -5,6 +5,9 @@
 #include "mod_state.h"
 #include "tot_generate_enemy.h"
 
+#include <ttyd/msgdrv.h>
+#include <ttyd/swdrv.h>
+
 #include <cstring>
 
 namespace mod::infinite_pit {
@@ -14,6 +17,7 @@ namespace MsgKey {
     enum e {
         CUSTOM_TATTLE_BATTLE = 0,
         CUSTOM_TATTLE_MENU,
+        SYS_NO_KEY,
     };
 }
     
@@ -24,6 +28,7 @@ namespace {
 constexpr const char* kKeyLookups[] = {
     "custom_tattle_battle",
     "custom_tattle_menu",
+    "sys_no_key",
 };
 
 }
@@ -63,6 +68,14 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::CUSTOM_TATTLE_BATTLE:
         case MsgKey::CUSTOM_TATTLE_MENU:
             return tot::GetCustomTattle();
+        case MsgKey::SYS_NO_KEY:
+            // Swap out "it's locked" message with more descriptive strings.
+            if (ttyd::swdrv::swByteGet(
+                tot::GSW_Tower_DisplayChestIcons - EVT_HELPER_GSW_BASE)) {
+                return ttyd::msgdrv::msgSearch("tot_lock_claimchest");
+            } else {
+                return ttyd::msgdrv::msgSearch("tot_lock_defeatenemies");
+            }
     }
     // Should not be reached.
     return nullptr;

@@ -902,7 +902,7 @@ EVT_BEGIN(gon_01_InitEvt)
 
         // Spawn signboard with floor number as reminder.
         USER_FUNC(
-            evt_mobj_signboard, PTR("board"), 100, 0, -130, 
+            evt_mobj_signboard, PTR("board"), -100, 0, -140, 
             PTR(&Tower_SignEvt), LSWF(0))
     ELSE()
         // Boss room music / env sound:
