@@ -17,6 +17,7 @@
 #include <ttyd/evt_npc.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_window.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/mapdata.h>
 
 namespace mod::tot::gon {
@@ -34,6 +35,8 @@ using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_window;
 
 using ::ttyd::evt_bero::BeroEntry;
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
@@ -41,10 +44,11 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 
 }  // namespace
 
-extern const BeroEntry gon_00_entry_data[5];
+extern const BeroEntry gon_00_entry_data[4];
 
 EVT_DECLARE_USER_FUNC(evtTot_TowerInitLobby, 0)
 EVT_DECLARE_USER_FUNC(evtTot_TowerInitFromOptions, 0)
+EVT_DECLARE_USER_FUNC(evtTot_InConfirmTriggerVolume, 4)
 
 EVT_BEGIN(Lobby_EnterTowerEvt)
     // Initialize stats, etc. based on selected options.
@@ -57,20 +61,6 @@ EVT_END()
 EVT_BEGIN(Lobby_ExitTowerEvt)
     // Re-init everything from scratch.
     USER_FUNC(evtTot_TowerInitLobby)
-    RETURN()
-EVT_END()
-
-EVT_BEGIN(Lobby_ExitReentryRejectEvt)
-    INLINE_EVT()
-        USER_FUNC(evt_cam_ctrl_onoff, 4, 0)
-        USER_FUNC(evt_mario_key_onoff, 0)
-        USER_FUNC(evt_bero_exec_wait, 65536)
-        WAIT_MSEC(750)
-        USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_reentry"), 0, 0)
-        USER_FUNC(evt_mario_key_onoff, 1)
-        USER_FUNC(evt_cam_ctrl_onoff, 4, 1)
-    END_INLINE()
-    SET(LW(0), 0)
     RETURN()
 EVT_END()
 
@@ -97,9 +87,52 @@ EVT_BEGIN(Lobby_BackSignEvt)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Lobby_ConfirmStart)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mario_set_mov_spd, FLOAT(0.00))
+    USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_confirmstart"), 0, 0)
+    USER_FUNC(evt_msg_select, 0, PTR("tot_lobby_optyesno"))
+    USER_FUNC(evt_msg_continue)
+    SET(LW(3), LW(0))
+    USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    IF_NOT_EQUAL(LW(3), 0)
+        // Chose "cancel" option.
+        USER_FUNC(evt_mario_mov_pos2, 140, 0, 60)
+        SET((int32_t)GSWF_Lobby_InConfirm, 0)
+        USER_FUNC(evt_mario_key_onoff, 1)
+    ELSE()
+        SET((int32_t)GSWF_Lobby_Confirmed, 1)
+        USER_FUNC(evt_mario_mov_pos2, 180, 0, 120)
+        INLINE_EVT()
+            USER_FUNC(evt_mario_mov_pos2, 250, 0, 120)
+        END_INLINE()
+        RUN_CHILD_EVT(Lobby_EnterTowerEvt)
+        USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("w_bero"))
+    END_IF()
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Lobby_ConfirmationTrigger)
+    DO(0)
+        IF_EQUAL((int32_t)GSWF_Lobby_InConfirm, 0)
+            USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            USER_FUNC(evtTot_InConfirmTriggerVolume, LW(0), LW(1), LW(2), LW(3))
+            IF_EQUAL(LW(3), 1)
+                RUN_EVT(Lobby_ConfirmStart)
+                SET((int32_t)GSWF_Lobby_InConfirm, 1)
+            END_IF()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(gon_00_InitEvt)
+    SET((int32_t)GSWF_Lobby_InConfirm, 0)
+    SET((int32_t)GSWF_Lobby_Confirmed, 0)
+
     USER_FUNC(evt_snd_bgmoff, 512)
-    USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG0_TIK1"))
+    USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG1_GON1"))
     USER_FUNC(evt_snd_set_rev_mode, 2)
     
     SET(LW(0), PTR(&gon_00_entry_data))
@@ -108,66 +141,36 @@ EVT_BEGIN(gon_00_InitEvt)
     
     // Spawn signs.
     USER_FUNC(
-        evt_mobj_signboard, PTR("board"), -50, 0, 50, 
+        evt_mobj_signboard, PTR("board"), -95, 0, -40,
         PTR(&Lobby_FrontSignEvt), LSWF(0))
     USER_FUNC(
-        evt_mobj_signboard, PTR("board2"), 50, 0, -250, 
+        evt_mobj_signboard, PTR("board2"), 95, 0, -40, 
         PTR(&Lobby_BackSignEvt), LSWF(0))
+
+    RUN_EVT(Lobby_ConfirmationTrigger)
         
     RETURN()
 EVT_END()
 
-const BeroEntry gon_00_entry_data[5] = {
+const BeroEntry gon_00_entry_data[4] = {
     {
-        .name = "dokan_1",
-        .type = BeroType::PIPE,
+        .name = "w_bero",
+        .type = BeroType::ROAD,
         .sfx_id = 0,
-        .direction = BeroDirection::DOWN,
+        .direction = BeroDirection::AUTO,
         .center_position = { 100000, 0, 0 },
         .length = -1,
-        .entry_evt_code = nullptr,
-        .case_type = 6,
-        .out_evt_code = (void*)Lobby_EnterTowerEvt,
-        .target_map = "gon_01",
+        .entry_evt_code = (void*)Lobby_ExitTowerEvt,
+        .case_type = -1,
+        .out_evt_code = nullptr,
+        .target_map = "gon_00",
         .target_bero = "w_bero",
         .entry_anim_type = BeroAnimType::ANIMATION,
         .out_anim_type = BeroAnimType::ANIMATION,
         .entry_anim_args = nullptr,
         .out_anim_args = nullptr,
     },{
-        .name = "dokan_2",
-        .type = BeroType::PIPE,
-        .sfx_id = 0,
-        .direction = BeroDirection::UP,
-        .center_position = { 100000, 0, 0 },
-        .length = -1,
-        .entry_evt_code = nullptr,
-        .case_type = 6,
-        .out_evt_code = nullptr,
-        .target_map = "tik_18",
-        .target_bero = "dokan_1",
-        .entry_anim_type = BeroAnimType::ANIMATION,
-        .out_anim_type = BeroAnimType::ANIMATION,
-        .entry_anim_args = nullptr,
-        .out_anim_args = nullptr,
-    },{
-        .name = "dokan_3",
-        .type = BeroType::PIPE,
-        .sfx_id = 0,
-        .direction = BeroDirection::DOWN,
-        .center_position = { 100000, 0, 0 },
-        .length = -1,
-        .entry_evt_code = (void*)Lobby_ExitTowerEvt,
-        .case_type = 6,
-        .out_evt_code = (void*)Lobby_ExitReentryRejectEvt,
-        .target_map = nullptr,
-        .target_bero = "dokan_3",
-        .entry_anim_type = BeroAnimType::ANIMATION,
-        .out_anim_type = BeroAnimType::ANIMATION,
-        .entry_anim_args = nullptr,
-        .out_anim_args = nullptr,
-    },{
-        .name = "e_bero",
+        .name = "e_bero_1",
         .type = BeroType::ROAD,
         .sfx_id = 0,
         .direction = BeroDirection::AUTO,
@@ -177,12 +180,29 @@ const BeroEntry gon_00_entry_data[5] = {
         .case_type = -1,
         .out_evt_code = nullptr,
         .target_map = "gon_00",
-        .target_bero = "e_bero",
+        .target_bero = "w_bero",
         .entry_anim_type = BeroAnimType::ANIMATION,
         .out_anim_type = BeroAnimType::ANIMATION,
         .entry_anim_args = nullptr,
         .out_anim_args = nullptr,
-    }, { /* null-terminator */ },
+    },{
+        .name = "e_bero_3",
+        .type = BeroType::ROAD,
+        .sfx_id = 0,
+        .direction = BeroDirection::AUTO,
+        .center_position = { 100000, 0, 0 },
+        .length = -1,
+        .entry_evt_code = nullptr,
+        .case_type = -1,
+        .out_evt_code = nullptr,
+        .target_map = "gon_00",
+        .target_bero = "w_bero",
+        .entry_anim_type = BeroAnimType::ANIMATION,
+        .out_anim_type = BeroAnimType::ANIMATION,
+        .entry_anim_args = nullptr,
+        .out_anim_args = nullptr,
+    },
+    { /* null-terminator */ },
 };
 
 const int32_t* GetLobbyInitEvt() {
@@ -196,6 +216,19 @@ EVT_DEFINE_USER_FUNC(evtTot_TowerInitLobby) {
 
 EVT_DEFINE_USER_FUNC(evtTot_TowerInitFromOptions) {
     OptionsManager::InitFromSelectedOptions();
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_InConfirmTriggerVolume) {
+    int32_t x = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t z = evtGetValue(evt, evt->evtArguments[2]);
+    bool in_volume = false;
+    if (150 <= x && x <= 200) {
+        if (-50 <= z && z <= 50) {
+            in_volume = true;
+        }
+    }
+    evtSetValue(evt, evt->evtArguments[3], in_volume);
     return 2;
 }
 

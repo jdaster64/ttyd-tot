@@ -967,6 +967,7 @@
 800e6840:evt_mario_set_pose
 800e6c28:evt_mario_set_dir_npc
 800e6de8:evt_mario_set_dir
+800e7098:evt_mario_set_mov_spd
 800e7180:evt_mario_set_pos
 800e71f8:evt_mario_get_pos
 800e7474:evt_mario_key_onoff

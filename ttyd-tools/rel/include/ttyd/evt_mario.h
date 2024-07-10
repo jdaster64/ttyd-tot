@@ -77,7 +77,7 @@ EVT_DECLARE_USER_FUNC(evt_mario_set_dir_npc, 1)
 EVT_DECLARE_USER_FUNC(evt_mario_set_dir, 3)
 // evt_mario_get_dir
 // evt_mario_get_mov_spd
-// evt_mario_set_mov_spd
+EVT_DECLARE_USER_FUNC(evt_mario_set_mov_spd, 1)
 // evt_mario_set_hosei_xyz
 EVT_DECLARE_USER_FUNC(evt_mario_set_pos, 3)
 EVT_DECLARE_USER_FUNC(evt_mario_get_pos, 4)

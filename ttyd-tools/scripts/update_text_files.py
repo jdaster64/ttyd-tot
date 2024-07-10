@@ -830,12 +830,22 @@ g_StringMap = {
         
     },
     
-    # Tower lobby placeholder
+    # Tower lobby.
     'gon_00': {
         # Area tattle. (TODO: Write final script)
         
         b"msg_kuri_map":
             b"Placeholder area tattle \xd0\n<k>",
+            
+        # General lobby text.
+        
+        b"tot_lobby_confirmstart":
+            b"<system>\n<p>\n"
+            b"Are you prepared to start with\n"
+            b"the options selected?\n<o>",
+            
+        b"tot_lobby_optyesno":
+            b"<select 0 1 0 40>\nYes\nNo",
             
         # Run options menu.
             

@@ -456,6 +456,8 @@ enum GlobalWorkVars {
     GSWF_Chest_2,
     GSWF_Chest_3,
     GSWF_Lock,
+    GSWF_Lobby_InConfirm,
+    GSWF_Lobby_Confirmed,
 };
 
 }  // namespace mod::tot

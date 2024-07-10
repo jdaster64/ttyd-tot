@@ -183,9 +183,9 @@ void ApplyFixedPatches() {
             } else if (
                 seq == SeqIndex::kMapChange && !strcmp(mapName, "aaa_00") && 
                 !strcmp(beroName, "prologue")) {
-                // If loading a new file, load the player into the pre-Pit room.
+                // If loading a new file, load the player into the tower lobby.
                 mapName = "gon_00";
-                beroName = "e_bero";
+                beroName = "w_bero";
             }
             g_seqSetSeq_trampoline(seq, mapName, beroName);
         });
