@@ -500,6 +500,7 @@ BattleUnitSetup g_CustomUnits[6];
 BattleUnitSetup g_MidbossMinionUnits[2];
 BattleGroupSetup g_CustomBattleParty;
 int8_t g_CustomAudienceWeights[12];
+NpcTribeDescription* g_LastMidbossTribe = nullptr;
 
 // Base enemy weights at level 2 ~ 10, per difficulty level.
 const int8_t kBaseWeights[21][9] = {
@@ -1043,6 +1044,13 @@ void BuildBattle(
 EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     auto* battle_db = (BattleSetupData*)evtGetValue(evt, evt->evtArguments[0]);
     auto* npc_setup = (NpcSetupInfo*)evtGetValue(evt, evt->evtArguments[1]);
+
+    // Clear double-height multiplier from previous midboss NPC, if any.
+    if (g_LastMidbossTribe) {
+        g_LastMidbossTribe->height /= 2.0f;
+        g_LastMidbossTribe = nullptr;
+    }
+
     ttyd::npcdrv::NpcTribeDescription* npc_tribe_description;
     int32_t lead_enemy_type;
     
@@ -1070,6 +1078,12 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     evtSetValue(evt, evt->evtArguments[4], x_pos);
     evtSetValue(evt, evt->evtArguments[5], y_pos);
     evtSetValue(evt, evt->evtArguments[6], z_pos);
+
+    // Double effective height of midboss field NPCs (for "!" indicator, mostly).
+    if (IsMidbossFloor(g_Mod->state_.floor_)) {
+        g_LastMidbossTribe = npc_tribe_description;
+        npc_tribe_description->height *= 2.0f;
+    }
     
     return 2;
 }

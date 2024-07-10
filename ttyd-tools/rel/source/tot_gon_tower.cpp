@@ -79,6 +79,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::item_data::itemDataTable;
 using ::ttyd::npc_data::npcTribe;
 using ::ttyd::npcdrv::NpcSetupInfo;
+using ::ttyd::npcdrv::NpcTribeDescription;
 
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
@@ -104,6 +105,7 @@ EVT_DECLARE_USER_FUNC(evtTot_ClearBattleResult, 0)
 EVT_DECLARE_USER_FUNC(evtTot_HasBackupSave, 1)
 EVT_DECLARE_USER_FUNC(evtTot_LoadBackupSaveData, 0)
 EVT_DECLARE_USER_FUNC(evtTot_IsFinalFloor, 1)
+EVT_DECLARE_USER_FUNC(evtTot_IsMidbossFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
 EVT_DECLARE_USER_FUNC(evtTot_UpdateDestinationMap, 0)
@@ -273,12 +275,18 @@ EVT_END()
 
 // Spawn heart block. LW(15) = Whether to spawn it statically on load.
 EVT_BEGIN(Tower_SpawnHeartBlock)
-    SET(LW(0), 40)
+    // Spawn on left side for rest floors, right side for boss floors.
+    USER_FUNC(evtTot_IsRestFloor, LW(4))
+    IF_EQUAL(LW(4), 1)
+        SET(LW(0), -150)
+    ELSE()
+        SET(LW(0), 150)
+    END_IF()
     SET(LW(1), 60)
-    SET(LW(2), -100)
+    SET(LW(2), -200)
     IF_EQUAL(LW(15), 0)
         // Wait and play bomb effect if spawning dynamically.
-        WAIT_MSEC(2000)
+        WAIT_MSEC(100)
         USER_FUNC(
             evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
             0, 0, 0, 0, 0, 0, 0)
@@ -289,9 +297,14 @@ EVT_BEGIN(Tower_SpawnHeartBlock)
     
     // Coin price = 10 + 5 for each boss floor after the first.
     USER_FUNC(evtTot_GetFloor, LW(3))
+    SUB(LW(3), 1)
     DIV(LW(3), 8)
-    ADD(LW(3), 1)
     MUL(LW(3), 5)
+    ADD(LW(3), 10)
+    // Double cost before the boss.
+    IF_EQUAL(LW(4), 1)
+        MUL(LW(3), 2)
+    END_IF()
     // Spawn heart block.
     USER_FUNC(evt_mobj_recovery_blk, PTR("hbox"), LW(3), LW(0), LW(1), LW(2), 0, 0)
 
@@ -687,8 +700,7 @@ EVT_BEGIN(Tower_FinalBossSetup)
     // Get battle / NPC info.
     USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
     SET(LW(1), PTR(g_EnemyNpcSetup))
-    USER_FUNC(evtTot_GetEnemyNpcInfo, 
-        LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
+    USER_FUNC(evtTot_GetEnemyNpcInfo, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
     
     // Set up main NPC, and Bonetail NPC to swap to for EX difficulty.
     USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
@@ -740,19 +752,30 @@ EVT_BEGIN(Tower_NpcSetup)
             USER_FUNC(evt_npc_setup, LW(6))
             USER_FUNC(evt_npc_set_position, LW(0), 100, 0, 0)
             IF_NOT_EQUAL(LW(3), 0)
-                USER_FUNC(evt_npc_set_position, LW(3), -110, 0, 0)
+                USER_FUNC(evt_npc_set_position, LW(3), 150, 0, -200)
             END_IF()
+
+            // Also spawn a Heart Block, statically.
+            SET(LW(15), 1)
+            RUN_EVT(Tower_SpawnHeartBlock)
         END_IF()
     ELSE()
         // Regular enemy floor; spawn enemies.
         USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
         SET(LW(1), PTR(g_EnemyNpcSetup))
-        USER_FUNC(evtTot_GetEnemyNpcInfo, 
+        USER_FUNC(evtTot_GetEnemyNpcInfo,
             LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
         
         USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
         USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
         USER_FUNC(evt_npc_setup, LW(1))
+
+        // Set scale to 1x for normal enemies, 2x for midbosses (not Atomic Boo).
+        // TODO: Change '!' height.
+        USER_FUNC(evtTot_IsMidbossFloor, LW(8))
+        ADD(LW(8), 1)
+        USER_FUNC(evt_npc_set_scale, PTR(kPitNpcName), LW(8), LW(8), LW(8))
+
         USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
         
         IF_STR_EQUAL(LW(3), PTR(kPiderName))
@@ -858,8 +881,8 @@ EVT_BEGIN(gon_01_InitEvt)
             RUN_CHILD_EVT(PTR(&Tower_FinalBossSetup))
         ELSE()
             // Set up chests and regular NPCs.
-            RUN_CHILD_EVT(PTR(&Tower_SpawnChests))
             RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
+            RUN_CHILD_EVT(PTR(&Tower_SpawnChests))
         END_IF()
         // Set up loading zones.
         RUN_CHILD_EVT(PTR(&Tower_BeroSetup))
@@ -1027,6 +1050,15 @@ EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
 EVT_DEFINE_USER_FUNC(evtTot_IsFinalFloor) {
     bool is_final_floor = g_Mod->state_.IsFinalBossFloor();
     evtSetValue(evt, evt->evtArguments[0], is_final_floor);
+    return 2;
+}
+
+// Returns whether the floor has a midboss.
+EVT_DEFINE_USER_FUNC(evtTot_IsMidbossFloor) {
+    bool is_midboss_floor = 
+        (g_Mod->state_.floor_ % 8 == 0) && 
+        (g_Mod->state_.floor_ % 32 != 0);
+    evtSetValue(evt, evt->evtArguments[0], is_midboss_floor);
     return 2;
 }
 

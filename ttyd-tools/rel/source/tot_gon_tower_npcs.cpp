@@ -606,7 +606,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .name = "npc_wonky",
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
-        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .regularEvtCode = nullptr,
         .talkEvtCode = (void*)TowerNpc_WonkyTalk,
         .battleInfoId = -1,
     },

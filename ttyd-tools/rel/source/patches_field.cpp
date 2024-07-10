@@ -10,6 +10,12 @@
 
 namespace mod::infinite_pit {
 
+// Declarations of patches.
+extern const int32_t g_chorobon_move_event_Patch_SetScale;
+extern const int32_t g_chorobon_find_event_Patch_SetScale;
+extern const int32_t g_chorobon_lost_event_Patch_SetScale;
+extern const int32_t g_chorobon_return_event_Patch_SetScale;
+
 namespace field {
 
 namespace {
@@ -43,6 +49,12 @@ void ApplyFixedPatches() {
     tribe_descs[238].modelName = "c_bomhey_h";
     tribe_descs[288].nameJp = "cosmic_boo";
     tribe_descs[288].modelName = "c_atmic_trs_p";
+
+    // Null out set scale events for Fuzzies on overworld.
+    memset((void*)g_chorobon_move_event_Patch_SetScale, 0, 0x18);
+    memset((void*)g_chorobon_find_event_Patch_SetScale, 0, 0x18);
+    memset((void*)g_chorobon_lost_event_Patch_SetScale, 0, 0x18);
+    memset((void*)g_chorobon_return_event_Patch_SetScale, 0, 0x18);
     
     // TODO: Move to patches_ui.h?
     // Fix captures / location information in Tattle menu.
@@ -53,6 +65,7 @@ void ApplyFixedPatches() {
     tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].model_name = "c_bomhey_h";
     tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].pose_name = "BOM_Z_1";
     tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].location_name = "menu_monosiri_shiga";
+    
 }
 
 }  // namespace field

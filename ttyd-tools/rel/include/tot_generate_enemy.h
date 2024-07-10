@@ -20,6 +20,7 @@ namespace mod::tot {
 // arg2 = npc_tribe_description->modelName
 // arg3 = npc_tribe_description->nameJp
 // arg4~6 = Starting spawn position (x, y, z).
+// arg7 = npc_tribe_description pointer
 EVT_DECLARE_USER_FUNC(evtTot_GetEnemyNpcInfo, 7)
 
 // Sets finalized battle info on the NPC, as well as any setting up any
