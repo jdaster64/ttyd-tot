@@ -710,7 +710,7 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evt_npc_setup, LW(1))
 
     USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 0, 0)
-    USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 0)
+    USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 1)
     USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_3"))
     USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 33554496)
     USER_FUNC(evt_npc_pera_onoff, PTR(kPitNpcName), 0)

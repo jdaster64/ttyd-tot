@@ -937,7 +937,7 @@ void BuildBattle(
         npc.searchAngle       = 300.0f;
         npc.homingRange       = 1000.0f;
         npc.homingAngle       = 360.0f;
-        npc.battleInfoId      = 1;
+        npc.battleInfoId      = 2;      /* Initialize to invalid battle */
     }
     
     // Set output variables.
@@ -1035,8 +1035,6 @@ void BuildBattle(
             battle->battle_setup_flags &= ~0x10'0000;
             break;
     }
-    
-    // TODO: Additional setup (different stage props, etc.) for boss floors?
 }
 
 }  // namespace
@@ -1055,7 +1053,11 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     int32_t lead_enemy_type;
     
     SelectEnemies();
-    BuildBattle(battle_db, npc_setup, &npc_tribe_description, &lead_enemy_type);
+
+    // Use different battle setup for final boss.
+    if (g_Mod->state_.IsFinalBossFloor()) battle_db += 1;
+    BuildBattle(
+        battle_db, npc_setup, &npc_tribe_description, &lead_enemy_type);
     
     int32_t x_pos = ttyd::system::irand(100) + 20;
     int32_t z_pos = ttyd::system::irand(200) - 100;

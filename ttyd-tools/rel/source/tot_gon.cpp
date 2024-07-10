@@ -61,8 +61,9 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 }
 
 BattleStageObjectData g_StageObjectData[] = {
+    // Props for normal battle stage.
     {
-        .name = "B_0",
+        .name = "haikei_B_a",
         .type = 2,
         .layer = 2,  // B
         .position = { 0.0f, 0.0f, 0.0f },
@@ -70,7 +71,24 @@ BattleStageObjectData g_StageObjectData[] = {
         .num_frames_to_fall = 60,
     },
     {
-        .name = "jon_0",
+        .name = "haikei_C_a",
+        .type = 2,
+        .layer = 3,  // C
+        .position = { 0.0f, 0.0f, 0.0f },
+        .num_frames_before_falling = 0,
+        .num_frames_to_fall = 60,
+    },
+    // Props for boss battle stage.
+    {
+        .name = "B",
+        .type = 2,
+        .layer = 2,  // B
+        .position = { 0.0f, 0.0f, 0.0f },
+        .num_frames_before_falling = 0,
+        .num_frames_to_fall = 60,
+    },
+    {
+        .name = "C",
         .type = 2,
         .layer = 3,  // C
         .position = { 0.0f, 0.0f, 0.0f },
@@ -82,22 +100,39 @@ BattleStageObjectData g_StageObjectData[] = {
 BattleStageData g_StageData[] = {
     {
         .global_stage_data_dir = "bti_01",
-        .current_stage_data_dir = "stg_00_3",
+        .current_stage_data_dir = "stg_01_3",
         .num_props = 2,
         .props = &g_StageObjectData[0],
+        .bg_a_weapon = DEFAULT_WALL_WEAPON_NO_DAMAGE,
+        .bg_b_weapon = DEFAULT_WALL_WEAPON,
+    },
+    {
+        .global_stage_data_dir = "bti_01",
+        .current_stage_data_dir = "stg_01_6",
+        .num_props = 2,
+        .props = &g_StageObjectData[2],
         .bg_a_weapon = DEFAULT_WALL_WEAPON_NO_DAMAGE,
         .bg_b_weapon = DEFAULT_WALL_WEAPON,
     },
 };
 
 // Will be filled dynamically by tot_generate_enemy.h.
-BattleGroupSetup g_NormalBattlePartyData;
+BattleGroupSetup g_BattlePartyData;
 
 BattleSetupWeightedLoadout g_NormalBattleLoadouts[] = {
     {
         .weight = 10,
-        .group_data = &g_NormalBattlePartyData,
+        .group_data = &g_BattlePartyData,
         .stage_data = &g_StageData[0],
+    },
+    {},
+};
+
+BattleSetupWeightedLoadout g_BossBattleLoadouts[] = {
+    {
+        .weight = 10,
+        .group_data = &g_BattlePartyData,
+        .stage_data = &g_StageData[1],
     },
     {},
 };
@@ -112,12 +147,22 @@ BattleSetupData g_SetupDataTbl[] = {
                                     // First Attack allowed (unavailable anyway)
         .audience_setting_mode = 0, // no special audience
     },
+    {
+        .battle_name = "boss_battle",
+        .different_loadouts_flag = -1,
+        .flag_on_loadouts = nullptr,
+        .flag_off_loadouts = g_BossBattleLoadouts,
+        .battle_setup_flags = 0x40, // Respawn on overworld after loss,
+                                    // First Attack allowed (unavailable anyway)
+        .audience_setting_mode = 0, // no special audience
+    },
     {},
 };
 
 // Not sure that this does anything?
 ttyd::database::DatabaseDefinition g_SetupNoTbl[] = {
     { .name = "normal_battle", .id = 0, },
+    { .name = "boss_battle", .id = 1, },
     {},
 };
 
