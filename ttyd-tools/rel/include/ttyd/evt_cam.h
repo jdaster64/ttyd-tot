@@ -21,7 +21,7 @@ extern "C" {
 // evt_cam3d_evt_xyz_off
 // evt_cam3d_evt_set_xyz
 // evt_cam3d_road_shift_onoff
-// evt_cam3d_evt_off
+EVT_DECLARE_USER_FUNC(evt_cam3d_evt_off, 2)
 // evt_cam3d_evt_set_rel_dir
 // evt_cam3d_evt_set_npc_rel
 // evt_cam3d_evt_set_rel

@@ -56,7 +56,7 @@ EVT_DECLARE_USER_FUNC(evt_mario_get_party, 1)
 // evt_mario_party_bero_move
 // evt_mario_party_door_move
 // N_evt_mario_party_door_halve_hitbox
-// evt_mario_mov_pos2
+EVT_DECLARE_USER_FUNC(evt_mario_mov_pos2, 3)
 // evt_mario_mov_pos
 // evt_mario_set_force_dir
 // evt_mario_get_pose

@@ -1516,6 +1516,17 @@ g_StringMap = {
         b"tot_optr_superguards":        b"Superguards",
         b"tot_optr_conditionsmet":      b"Conditions Met",
         
+        # Dragon field dialogue.
+        
+        b"tot_field_dragon00_00":
+            b"[Placeholder] Encounter<k>",
+        
+        b"tot_field_dragon01_00":
+            b"[Placeholder] Encounter<k>",
+        
+        b"tot_field_dragon02_00":
+            b"[Placeholder] Encounter<k>",
+        
         # Dragon fight dialogue.
         
         # Hooktail battle entry.

@@ -113,7 +113,7 @@ EVT_DECLARE_USER_FUNC(evtTot_WaitForDragonLanding, 1)
 
 // Other declarations.
 extern BeroEntry normal_room_entry_data[3];
-extern BeroEntry boss_room_entry_data[3];
+extern BeroEntry boss_room_entry_data[2];
 
 // Scripts for left / right door animations.
 EVT_BEGIN(Tower_LeftExit_Close)
@@ -134,6 +134,21 @@ EVT_END()
 EVT_BEGIN(Tower_RightExit_Open)
     MULF(LW(0), FLOAT(0.44))
     USER_FUNC(evt_mapobj_rotate, 1, PTR("door02"), 0, 0, LW(0))
+    RETURN()
+EVT_END()
+// Boss room
+EVT_BEGIN(Tower_BossDoor_Close)
+    MULF(LW(0), FLOAT(0.39))
+    USER_FUNC(evt_mapobj_rotate, 1, PTR("door03"), 0, LW(0), 0)
+    MULF(LW(0), FLOAT(-1.00))
+    USER_FUNC(evt_mapobj_rotate, 1, PTR("door04"), 0, LW(0), 0)
+    RETURN()
+EVT_END()
+EVT_BEGIN(Tower_BossDoor_Open)
+    MULF(LW(0), FLOAT(-0.39))
+    USER_FUNC(evt_mapobj_rotate, 1, PTR("door03"), 0, LW(0), 0)
+    MULF(LW(0), FLOAT(-1.00))
+    USER_FUNC(evt_mapobj_rotate, 1, PTR("door04"), 0, LW(0), 0)
     RETURN()
 EVT_END()
 
@@ -570,44 +585,79 @@ EVT_END()
 // Runs event for encountering final boss.
 EVT_BEGIN(Tower_FinalBossEvent)
     // Entry animation.
+    USER_FUNC(evt_hitobj_onoff, PTR("baba"), 1, 0)
     USER_FUNC(evt_map_set_fog, 2, 400, 1000, 0, 10, 40)
     USER_FUNC(evt_map_fog_onoff, 1)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_normalize)
-    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 175, 0, 0)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 60, 10, 45)
     USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_S_1"))
-    USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("oFF_jon_06"), 1)
+    USER_FUNC(evt_cam3d_evt_set, -480, 150, 459, -480, 67, -13, 0, 11)
+    USER_FUNC(evt_mario_set_pos, -560, 10, 0)
+    USER_FUNC(evt_party_set_pos, 0, -600, 10, 0)
     USER_FUNC(evt_seq_wait, 2)
-    WAIT_MSEC(3500)
+
+    INLINE_EVT()
+        SET(LW(1), 0)
+        RUN_EVT(bero_close_door_play_se)
+        USER_FUNC(evt_sub_intpl_msec_init, 11, 180, 0, 500)
+        DO(0)
+            USER_FUNC(evt_sub_intpl_msec_get_value)
+            RUN_CHILD_EVT(Tower_BossDoor_Close)
+            IF_EQUAL(LW(1), 0)
+                DO_BREAK()
+            END_IF()
+        WHILE()
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.00), 200)
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.00), 100)
+    END_INLINE()
+    INLINE_EVT()
+        USER_FUNC(evt_party_move_pos2, 0, -490, 0, FLOAT(120.0))
+    END_INLINE()
+    USER_FUNC(evt_mario_mov_pos2, -450, 0, FLOAT(120.0))
+    RUN_EVT(bero_case_entry)
+    WAIT_MSEC(1300)
+
+    // Encounter message.
+    USER_FUNC(evtTot_GetDifficulty, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_HALF)
+            USER_FUNC(evt_msg_print, 0, PTR("tot_field_dragon00_00"), 0, 0)
+        CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_FULL)
+            USER_FUNC(evt_msg_print, 0, PTR("tot_field_dragon01_00"), 0, 0)
+        CASE_ETC()
+            USER_FUNC(evt_msg_print, 0, PTR("tot_field_dragon02_00"), 0, 0)
+    END_SWITCH()
+
     USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
     USER_FUNC(evt_eff_fukidashi, 0, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
     USER_FUNC(evt_eff_fukidashi, 3, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
     USER_FUNC(evt_mario_set_pose, PTR("M_N_5B"))
-    INLINE_EVT()
-        SET(LW(3), LW(0))
-        ADD(LW(3), -40)
-        USER_FUNC(evt_party_move_pos, 0, LW(3), LW(2), 250)
-    END_INLINE()
     WAIT_MSEC(2000)
     USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
     USER_FUNC(evt_mario_set_dir_npc, PTR(kPitNpcName))
     USER_FUNC(evt_party_set_dir_npc, 0, PTR(kPitNpcName))
     USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_EVT_GONBABA_FLY2"))
     INLINE_EVT()
-        USER_FUNC(evt_snd_sfxon_3d_ex, PTR("SFX_STG1_GNB_ROAR2"), 0, 0, 0, 255, 255, 4300, 16, 0)
+        USER_FUNC(evt_snd_sfxon_3d_ex, PTR("SFX_STG1_GNB_ROAR2"), -900, 30, 490, 255, 255, 4300, 16, 0)
         USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_U_1"))
         USER_FUNC(evt_npc_wait_anim, PTR(kPitNpcName), FLOAT(1.0))
         USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_S_1"))
     END_INLINE()
     RUN_EVT(PTR(&Tower_DragonStandupShake))
     RUN_EVT(PTR(&Tower_DragonFogChange))
-    USER_FUNC(evt_cam3d_evt_set, -755, 24, 376, -84, 114, -22, 4500, 11)
+    USER_FUNC(evt_cam3d_evt_set, -900, 31, 490, -205, 175, 20, 4500, 11)
+    INLINE_EVT()
+        WAIT_MSEC(1800)
+        USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("door10"), 1)
+        USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("kesu"), 1)
+    END_INLINE()
     WAIT_MSEC(4000)
     DO(30)
-        USER_FUNC(evt_cam3d_evt_set, -755, 24, 376, -84, 114, -22, 15, 11)
+        USER_FUNC(evt_cam3d_evt_set, -890, 33, 483, -205, 175, 20, 15, 11)
         WAIT_MSEC(15)
-        USER_FUNC(evt_cam3d_evt_set, -745, 23, 366, -84, 114, -22, 15, 11)
+        USER_FUNC(evt_cam3d_evt_set, -900, 31, 490, -205, 175, 20, 15, 11)
         WAIT_MSEC(15)
     WHILE()
     WAIT_MSEC(3000)
@@ -617,6 +667,12 @@ EVT_BEGIN(Tower_FinalBossEvent)
     USER_FUNC(evt_npc_wait_battle_end)
     USER_FUNC(evt_npc_get_battle_result, LW(0))
     IF_EQUAL(LW(0), 3)
+        // Turn on red fog, turn door model back on and point at player.
+        USER_FUNC(evt_map_set_fog, 2, 400, 1000, 40, 0, 20)
+        USER_FUNC(evt_map_fog_onoff, 1)
+        USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("door10"), 1)
+        USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("kesu"), 1)
+        USER_FUNC(evt_cam3d_evt_off, 0, 11)
         RUN_CHILD_EVT(&Tower_RunGameOverScript)
         RETURN()
     END_IF()
@@ -631,10 +687,10 @@ EVT_BEGIN(Tower_FinalBossEvent)
         SET(LW(13), PTR(kBonetailNpcName))
     END_IF()
 
-    USER_FUNC(evt_cam3d_evt_set, -769, 50, 527, -22, 114, 7, 1, 11)
+    USER_FUNC(evt_cam3d_evt_set, 0, 30, 842, 0, 135, 150, 0, 11)
     USER_FUNC(evt_npc_set_anim, LW(13), PTR("GNB_H_1"))
     USER_FUNC(evt_map_fog_onoff, 0)
-    USER_FUNC(evt_npc_set_position, LW(13), 0, 60, 0)
+    USER_FUNC(evt_npc_set_position, LW(13), 0, 70, -100)
     USER_FUNC(evt_mario_set_pos, 25, 10, 150)
     USER_FUNC(evt_mario_set_dir, 270, 0, 0)
     USER_FUNC(evt_party_set_pos, 0, -25, 10, 150)
@@ -715,12 +771,14 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 33554496)
     USER_FUNC(evt_npc_pera_onoff, PTR(kPitNpcName), 0)
     USER_FUNC(evt_npc_set_ry, PTR(kPitNpcName), 0)
+    USER_FUNC(evt_npc_set_scale, PTR(kPitNpcName), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
 
     USER_FUNC(evt_npc_set_position, PTR(kBonetailNpcName), 0, -1000, 0)
     USER_FUNC(evt_npc_set_anim, PTR(kBonetailNpcName), PTR("GNB_H_3"))
     USER_FUNC(evt_npc_flag_onoff, 1, PTR(kBonetailNpcName), 33554496)
     USER_FUNC(evt_npc_pera_onoff, PTR(kBonetailNpcName), 0)
     USER_FUNC(evt_npc_set_ry, PTR(kBonetailNpcName), 0)
+    USER_FUNC(evt_npc_set_scale, PTR(kBonetailNpcName), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
     
     RUN_EVT(&Tower_FinalBossEvent)
     RETURN()
@@ -842,22 +900,22 @@ EVT_END()
 
 // Setting up loading zones, etc.
 EVT_BEGIN(Tower_BeroSetup)
+    // Only run partial logic on final floor.
     USER_FUNC(evtTot_IsFinalFloor, LW(0))
-    IF_EQUAL(LW(0), 0)
-        SET(LW(0), PTR(&normal_room_entry_data))
-    ELSE()
+    IF_EQUAL(LW(0), 1)
         SET(LW(0), PTR(&boss_room_entry_data))
+        USER_FUNC(evt_bero_get_info)
+        RETURN()
     END_IF()
+
+    SET(LW(0), PTR(&normal_room_entry_data))
     USER_FUNC(evt_bero_get_info)
     RUN_CHILD_EVT(PTR(&evt_bero_info_run))
-    // Disable left loading zone on normal floors, and have prompt to quit early.
-    USER_FUNC(evtTot_IsFinalFloor, LW(0))
-    IF_EQUAL(LW(0), 0)
-        SET(LW(0), PTR("w_bero"))
-        RUN_CHILD_EVT(bero_case_switch_off)
-        USER_FUNC(
-            evt_run_case_evt, 9, 1, PTR("w_bero"), 0, PTR(&Tower_LeaveEarly), 0)
-    END_IF()
+
+    // Disable left loading zone, and have prompt to quit early.
+    SET(LW(0), PTR("w_bero"))
+    RUN_CHILD_EVT(bero_case_switch_off)
+    USER_FUNC(evt_run_case_evt, 9, 1, PTR("w_bero"), 0, PTR(&Tower_LeaveEarly), 0)
     RETURN()
 EVT_END()
 
@@ -873,9 +931,9 @@ EVT_BEGIN(gon_01_InitEvt)
     SET((int32_t)GSWF_Chest_3, 0)
     SET((int32_t)GSWF_Lock, 0)
     
-    // Is the player continuing from a Game Over?
+    // For normal play (not continuing from a Game Over)...
     IF_EQUAL((int32_t)GSW_Tower_ContinuingFromGameOver, 0)
-        // If not, set up NPCs, enemies, etc.
+        // Set up NPCs, enemies, etc. ...
         USER_FUNC(evtTot_IsFinalFloor, LW(0))
         IF_EQUAL(LW(0), 1)
             RUN_CHILD_EVT(PTR(&Tower_FinalBossSetup))
@@ -884,6 +942,7 @@ EVT_BEGIN(gon_01_InitEvt)
             RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
             RUN_CHILD_EVT(PTR(&Tower_SpawnChests))
         END_IF()
+        
         // Set up loading zones.
         RUN_CHILD_EVT(PTR(&Tower_BeroSetup))
 
@@ -896,6 +955,7 @@ EVT_BEGIN(gon_01_InitEvt)
                 (int32_t)GSWF_Lock)
         END_IF()
     ELSE()
+        // Continuing from a Game Over...
         // Set up loading zones.
         RUN_CHILD_EVT(PTR(&Tower_BeroSetup))
         // Spawn Heart Block statically.
@@ -975,39 +1035,23 @@ BeroEntry normal_room_entry_data[3] = {
     }, { /* null-terminator */ },
 };
 
-BeroEntry boss_room_entry_data[3] = {
+BeroEntry boss_room_entry_data[2] = {
     {
-        .name = "dokan_2",
-        .type = BeroType::PIPE,
-        .sfx_id = 0,
-        .direction = BeroDirection::UP,
+        .name = "w_bero",
+        .type = BeroType::DOOR,
+        .sfx_id = 0xD,
+        .direction = BeroDirection::AUTO,
         .center_position = { 100000, 0, 0 },
         .length = -1,
         .entry_evt_code = nullptr,
-        .case_type = 6,
+        .case_type = -1,
         .out_evt_code = nullptr,
         .target_map = nullptr,
         .target_bero = nullptr,
-        .entry_anim_type = BeroAnimType::ANIMATION,
-        .out_anim_type = BeroAnimType::ANIMATION,
-        .entry_anim_args = nullptr,
-        .out_anim_args = nullptr,
-    }, {
-        .name = "dokan_1",
-        .type = BeroType::PIPE,
-        .sfx_id = 0,
-        .direction = BeroDirection::DOWN,
-        .center_position = { 100000, 0, 0 },
-        .length = -1,
-        .entry_evt_code = nullptr,
-        .case_type = 6,
-        .out_evt_code = (void*)Tower_IncrementFloor,
-        .target_map = "gon_01",
-        .target_bero = "dokan_2",
-        .entry_anim_type = BeroAnimType::ANIMATION,
-        .out_anim_type = BeroAnimType::ANIMATION,
-        .entry_anim_args = nullptr,
-        .out_anim_args = nullptr,
+        .entry_anim_type = BeroAnimType::REPEATED_EVT,
+        .out_anim_type = BeroAnimType::REPEATED_EVT,
+        .entry_anim_args = (void*)Tower_BossDoor_Close,
+        .out_anim_args = (void*)Tower_BossDoor_Open,
     }, { /* null-terminator */ },
 };
 
@@ -1087,7 +1131,7 @@ EVT_DEFINE_USER_FUNC(evtTot_UpdateDestinationMap) {
     int32_t floor = g_Mod->state_.floor_;
     bool is_penultimate_floor = g_Mod->state_.IsFinalBossFloor(floor + 1);
     const char* next_map = is_penultimate_floor ? "gon_05" : "gon_01";
-    const char* next_bero = is_penultimate_floor ? "dokan_2" : "w_bero";
+    const char* next_bero = "w_bero";
     
     // Update the destination of the exit loading zone to match the floor.
     BeroEntry** entries = ttyd::evt_bero::BeroINFOARR;

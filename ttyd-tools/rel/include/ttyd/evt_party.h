@@ -33,7 +33,7 @@ EVT_DECLARE_USER_FUNC(evt_party_set_pose, 2)
 // evt_party_move_behind_mario
 EVT_DECLARE_USER_FUNC(evt_party_jump_pos, 7)
 // evt_party_wait_landon
-// evt_party_move_pos2
+EVT_DECLARE_USER_FUNC(evt_party_move_pos2, 4)
 EVT_DECLARE_USER_FUNC(evt_party_move_pos, 4)
 EVT_DECLARE_USER_FUNC(evt_party_run, 1)
 // evt_party_stop
