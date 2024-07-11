@@ -1,6 +1,9 @@
 #pragma once
 
+#include "evt_cmd.h"
+
 #include <gc/types.h>
+#include <ttyd/evtmgr.h>
 
 #include <cstdint>
 
@@ -157,6 +160,10 @@ extern int32_t evt_XNaut_NormalAttackReturnLbl_PatchLoc[1];
 extern int32_t evt_XNaut_JumpAttackReturnLbl_PatchLoc[1];
 extern int32_t evt_EliteXNaut_NormalAttackReturnLbl_PatchLoc[1];
 extern int32_t evt_EliteXNaut_JumpAttackReturnLbl_PatchLoc[1];
+
+// Evt support for opening cutscene (from original hei_00 scripts).
+EVT_DECLARE_USER_FUNC(evt_hei_00_cam_test, 0)
+extern int32_t evt_hei_00_gonbaba_shadow_evt[1];
 
 }
 

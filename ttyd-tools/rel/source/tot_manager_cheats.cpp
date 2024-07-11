@@ -8,9 +8,11 @@
 #include "tot_state.h"
 
 #include <ttyd/item_data.h>
+#include <ttyd/mario.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/pmario_sound.h>
 #include <ttyd/sound.h>
+#include <ttyd/seqdrv.h>
 #include <ttyd/swdrv.h>
 #include <ttyd/system.h>
 
@@ -27,6 +29,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Constants for secret codes.
 uint32_t secretCode_BumpAttack      = 043652131;
 uint32_t secretCode_BgmOnOff        = 031313141;
+uint32_t secretCode_OpeningCutscene = 034345566;
 uint32_t secretCode_ShowAtkDef      = 023122312;
 uint32_t secretCode_UnlockFxBadges  = 026122146;
 uint32_t secretCode_ObfuscateItems  = 046362123;
@@ -61,6 +64,14 @@ void CheatsManager::Update() {
         bool toggle = !g_Mod->state_.GetOption(OPT_SHOW_ATK_DEF);
         g_Mod->state_.SetOption(OPT_SHOW_ATK_DEF, toggle);
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
+    }
+    if ((code_history & 0xFFFFFF) == secretCode_OpeningCutscene &&
+        !g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
+        code_history = 0;
+        // Bring Goombella out and warp to opening cutscene-land.
+        ttyd::mario::marioGetPtr()->prevFollowerId[0] = 1;
+        ttyd::seqdrv::seqSetSeq(
+            ttyd::seqdrv::SeqIndex::kMapChange, "gon_12", "dokan_2");
     }
     if ((code_history & 0xFFFFFF) == secretCode_UnlockFxBadges) {
         code_history = 0;

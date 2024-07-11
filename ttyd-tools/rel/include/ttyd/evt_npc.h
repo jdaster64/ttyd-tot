@@ -358,6 +358,10 @@ EVT_DECLARE_USER_FUNC(evt_npc_sound_data_set, 5)
 // evt_npc_release_filednpc(int on)
 EVT_DECLARE_USER_FUNC(evt_npc_release_filednpc, 1)
 
+
+// .data
+extern int32_t npc_init_evt[1];
+
 }
 
 }

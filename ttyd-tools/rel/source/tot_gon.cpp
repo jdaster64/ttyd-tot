@@ -1,7 +1,9 @@
 #include "tot_gon.h"
 
 #include "evt_cmd.h"
+#include "tot_custom_rel.h"
 #include "tot_gon_lobby.h"
+#include "tot_gon_opening.h"
 #include "tot_gon_tower.h"
 
 #include <ttyd/battle_database_common.h>
@@ -117,7 +119,14 @@ BattleStageData g_StageData[] = {
 };
 
 // Will be filled dynamically by tot_generate_enemy.h.
-BattleGroupSetup g_BattlePartyData;
+// Start with a dummy enemy assigned so invalid battles still work.
+BattleUnitSetup g_DummyEnemyData = {
+    .unit_kind_params = &tot::custom::unit_Goomba,
+};
+BattleGroupSetup g_BattlePartyData = {
+    .num_enemies = 1,
+    .enemy_data = &g_DummyEnemyData,
+};
 
 BattleSetupWeightedLoadout g_NormalBattleLoadouts[] = {
     {
@@ -170,6 +179,7 @@ void Prolog() {
     ttyd::mapdata::relSetEvtAddr("gon_00", GetLobbyInitEvt());
     ttyd::mapdata::relSetEvtAddr("gon_01", GetTowerInitEvt());
     ttyd::mapdata::relSetEvtAddr("gon_05", GetTowerInitEvt());
+    ttyd::mapdata::relSetEvtAddr("gon_12", GetOpeningInitEvt());
     ttyd::mapdata::relSetBtlAddr("gon", g_SetupDataTbl, g_SetupNoTbl);
 }
 
