@@ -1704,7 +1704,50 @@ g_StringMap = {
         # Bonetail fake death (unused).
         b"tot_dragon02_90":
             b"[Placeholder] Dead?",
-    }
+    },
+    
+    # Opening cutscene in Petal Meadows.
+    'gon_12': {
+    
+        # Area tattle.
+        
+        b"msg_kuri_map":
+            b"<keyxon>\n"
+            b"Ah, the Petal Meadows.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"A plateau surrounded by hills\n"
+            b"far to the east of Rogueport.\n<k>\n<p>\n"
+            b"It's mild and pleasant here\n"
+            b"all year round.<wait 250> I love it!\n"
+            b"<wait 300>\n"
+            b"Doesn't it feel nice?\n<k>",
+    
+        # Opening cutscene text.
+            
+        b"stg1_hei_00":
+            b"It's great that you could come\n"
+            b"and visit, Mario! <wait 250>I know that\n"
+            b"hero work can be a handful!\n<k>\n<p>\n"
+            b"I wonder what all the folks in\n"
+            b"Petalburg are up to these days.\n"
+            b"Ooh, I can't wait!\n<k>",
+            
+        b"stg1_hei_01":
+            b"Mario, <wait 150>that scary sound and\n"
+            b"ominous shadow couldn't mean\n"
+            b"what I think it does, <wait 250>could it?<wait 250> \n<k>\n<p>\n"
+            b"Oh, no! <wait 100>It IS her!\n"
+            b"<wait 250>Mario! Look!!!\n<k>",
+            
+        b"stg1_hei_02":
+            b"I thought we taught Hooktail\n"
+            b"a lesson last time! <wait 150>What's she\n"
+            b"she doing back here now?\n<k>\n<p>\n"
+            b"I've got a bad feeling about\n"
+            b"this, Mario. <wait 250>Let's investigate and\n"
+            b"make sure everything's OK! \n<k>",
+
+    },
 }
 
 class UpdateTextFilesError(Exception):

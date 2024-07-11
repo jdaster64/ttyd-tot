@@ -26,6 +26,7 @@
 #include <ttyd/evt_sub.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/mapdata.h>
+#include <ttyd/mario.h>
 #include <ttyd/npcdrv.h>
 
 namespace mod::tot::gon {
@@ -65,6 +66,8 @@ const char kHooktailNpcName[] = "\x83\x6f\x83\x6f";
 const char kHooktailNpcLongName[] = "\x83\x53\x83\x93\x83\x6f\x83\x6f\x89\x65";
 const char kMiniHooktailNpcName[] = "\x81\x69\x81\x45\x82\x98\x81\x45\x81\x6a";
 
+EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartnerToNone, 0)
+
 EVT_BEGIN(Opening_CutsceneFirstEvt)
     USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STG1_HEI1"))
     USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG1_HEI1"))
@@ -79,15 +82,6 @@ EVT_BEGIN(Opening_CutsceneFirstEvt)
     USER_FUNC(evt_mario_cont_onoff, 0)
     USER_FUNC(evt_cam3d_evt_set, 250, 350, 1041, 250, 130, -36, 0, 11)
     USER_FUNC(evt_seq_wait, 2)
-
-// TODO: Probably removable?
-/*
-    INLINE_EVT()
-        WAIT_MSEC(1000)
-        USER_FUNC(evt_telop_entry, 1)
-    END_INLINE()
-*/
-
     USER_FUNC(evt_cam3d_evt_set, -250, 350, 1041, -250, 130, -36, 6000, 11)
     WAIT_MSEC(6000)
     USER_FUNC(evt_mario_cont_onoff, 1)
@@ -111,12 +105,15 @@ EVT_BEGIN(Opening_CutsceneFirstEvt)
     ADD(LW(2), 1)
     USER_FUNC(evt_mario_mov_pos, LW(0), LW(2), 30)
     USER_FUNC(evt_mario_dispflag_onoff, 0, 2)
-    DO(2)
-        USER_FUNC(evt_party_set_dir, 0, 270, 300)
-        WAIT_MSEC(600)
-        USER_FUNC(evt_party_set_dir, 0, 90, 300)
-        WAIT_MSEC(600)
-    WHILE()
+
+    // DO(2)
+    //     USER_FUNC(evt_party_set_dir, 0, 270, 300)
+    //     WAIT_MSEC(600)
+    //     USER_FUNC(evt_party_set_dir, 0, 90, 300)
+    //     WAIT_MSEC(600)
+    // WHILE()
+
+    WAIT_MSEC(500)
     USER_FUNC(evt_msg_print, 0, PTR("stg1_hei_00"), 0, PTR("party"))
     USER_FUNC(evt_mario_set_dir, 90, 300, 0)
     USER_FUNC(evt_cam3d_evt_off, 500, 11)
@@ -249,15 +246,35 @@ EVT_BEGIN(Opening_TriggerHooktailEvt)
     USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
     USER_FUNC(evt_mario_set_dir, 270, 300, 0)
     USER_FUNC(evt_msg_print, 0, PTR("stg1_hei_02"), 0, PTR("party"))
-    USER_FUNC(evt_cam_shift_reset)
-    USER_FUNC(evt_cam3d_evt_off, 500, 11)
-    SET(GSW(0), 23)
+    USER_FUNC(evt_mario_set_dir, 270, 300, 0)
+
+    // Add Mario nodding animation.
+    WAIT_MSEC(500)
+    USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_NOD1_4"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_mario_set_pose, PTR("M_N_2"))
+    WAIT_MSEC(1000)
+
+    INLINE_EVT()
+        USER_FUNC(evt_mario_cont_onoff, 1)
+        USER_FUNC(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
+        ADD(LW(3), 120)
+        USER_FUNC(evt_mario_mov_pos2, LW(3), LW(5), FLOAT(120.0))
+    END_INLINE()
+    INLINE_EVT()
+        USER_FUNC(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
+        ADD(LW(0), 96)
+        USER_FUNC(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(120.0))
+        // Remove partner from overworld when loading the next screen.
+        USER_FUNC(evt_mario_goodbye_party, 0)
+        USER_FUNC(evtTot_SetPreviousPartnerToNone)
+    END_INLINE()
+
+    WAIT_FRM(15)
     USER_FUNC(evt_snd_bgmoff, 513)
-    USER_FUNC(evt_snd_bgmon, 288, 0)
-    SET(GSW(0), 24)
-    USER_FUNC(evt_mario_cont_onoff, 1)
-    USER_FUNC(evt_party_run, 0)
-    USER_FUNC(evt_mario_key_onoff, 1)
+    USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("w_bero"))
+    
     RETURN()
 EVT_END()
 
@@ -277,30 +294,38 @@ EVT_BEGIN(gon_12_InitEvt)
     RUN_EVT(Opening_CutsceneFirstEvt)
     RUN_EVT(Opening_TriggerHooktailEvt)
 
+    USER_FUNC(evt_map_playanim, PTR("anu_mugi_1"), 1, 0)
+    USER_FUNC(evt_npc_pera_onoff, PTR(kHooktailNpcLongName), 0)
+
+    // Enable interactable trees (set the flags for their items as collected).
+    SET(LW(0), tot::custom::hei_00_ki_data)
+    RUN_CHILD_EVT(evt_sub_tree_access_entry)
+    SET(GSWF(1778), 1)
+    SET(GSWF(5598), 1)
+
     // Enable pipe to Hooktail Castle for visual continuity with TTYD's story.
     USER_FUNC(evt_mapobj_flag_onoff, 0, 1, PTR("isi_0"), 1)
     USER_FUNC(evt_hitobj_onoff, PTR("a_isi_0"), 0, 0)
     USER_FUNC(evt_mapobj_trans, 0, PTR("h_dokan"), 0, 0, 0)
     USER_FUNC(evt_mapobj_flag_onoff, 0, 0, PTR("h_dokan"), 1)
-    SET(GSWF(1774), 1)
-    SET(GSWF(1775), 1)
-    SET(GSWF(1776), 1)
-    SET(GSWF(1777), 1)
+
+    USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("s_moji"), 1)
+    USER_FUNC(evt_hitobj_onoff, PTR("a_moji"), 1, 0)
 
     // Turn on Sun and Moon stones for similar purpose.
-    USER_FUNC(evt_hitobj_onoff, PTR("a_moji"), 1, 0)
-    USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("s_moji"), 1)
-    USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("tayou_ana"), 1)
+    USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("taiyou_ana"), 1)
     USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("taiyounoisi"), 1)
     USER_FUNC(evt_mapobj_trans, 1, PTR("isi_4"), -80, 0, 0)
     USER_FUNC(evt_mapobj_trans, 1, PTR("taiyounoisi"), -80, 0, 0)
+    USER_FUNC(evt_hit_bind_mapobj, PTR("a_isi_4"), PTR("isi_4"))
+    USER_FUNC(evt_hit_bind_update, PTR("a_isi_4"))
+
     USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("tuki_ana"), 1)
     USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("tukinoisi"), 1)
     USER_FUNC(evt_mapobj_trans, 1, PTR("isi_3"), 80, 0, 0)
     USER_FUNC(evt_mapobj_trans, 1, PTR("tukinoisi"), 80, 0, 0)
-
-    USER_FUNC(evt_map_playanim, PTR("anu_mugi_1"), 1, 0)
-    USER_FUNC(evt_npc_pera_onoff, PTR(kHooktailNpcLongName), 0)
+    USER_FUNC(evt_hit_bind_mapobj, PTR("a_isi_3"), PTR("isi_3"))
+    USER_FUNC(evt_hit_bind_update, PTR("a_isi_3"))
 
     USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STG1_HEI1"))
     USER_FUNC(evt_snd_envon, 512, PTR("ENV_STG1_HEI1"))
@@ -339,6 +364,12 @@ const NpcSetupInfo gon_12_npc_data[2] = {
 
 const int32_t* GetOpeningInitEvt() {
     return gon_12_InitEvt;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_SetPreviousPartnerToNone) {
+    auto* player = ttyd::mario::marioGetPtr();
+    player->prevFollowerId[0] = 0;
+    return 2;
 }
 
 }  // namespace mod::tot::gon

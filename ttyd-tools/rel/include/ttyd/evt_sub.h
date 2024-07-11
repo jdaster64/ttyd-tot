@@ -61,6 +61,9 @@ EVT_DECLARE_USER_FUNC(evt_sub_intpl_get_value_para, 2)
 EVT_DECLARE_USER_FUNC(evt_sub_intpl_get_value, 0)
 EVT_DECLARE_USER_FUNC(evt_sub_intpl_init, 4)
 
+// .data
+extern int32_t evt_sub_tree_access_entry[1];
+
 }
 
 }

@@ -66,9 +66,9 @@ void CheatsManager::Update() {
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
     }
     if ((code_history & 0xFFFFFF) == secretCode_OpeningCutscene &&
+        !strcmp(GetCurrentMap(), "gon_00") &&
         !g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
         code_history = 0;
-        // Bring Goombella out and warp to opening cutscene-land.
         ttyd::mario::marioGetPtr()->prevFollowerId[0] = 1;
         ttyd::seqdrv::seqSetSeq(
             ttyd::seqdrv::SeqIndex::kMapChange, "gon_12", "dokan_2");

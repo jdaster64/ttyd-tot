@@ -416,6 +416,7 @@
 80415e18:npc_init_evt
 
 // evt_sub.o
+// .text
 80053764:mail_evt_gor_04_keyoff_check
 800537c4:irai_mail_check
 80053c4c:evt_sub_check_intersect
@@ -468,6 +469,8 @@
 80055f90:evt_sub_intpl_get_value_para
 80056064:evt_sub_intpl_get_value
 80056120:evt_sub_intpl_init
+// .data
+80306f78:evt_sub_tree_access_entry
 
 // mario.o
 800561b8:toFrontPose
@@ -3442,3 +3445,4 @@
 // Scripts / functions for opening cutscene in Petal Meadows
 40,1,00008750:evt_hei_00_cam_test
 40,5,0001f310:evt_hei_00_gonbaba_shadow_evt
+40,5,00021504:hei_00_ki_data
