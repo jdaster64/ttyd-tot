@@ -1487,81 +1487,58 @@ EVT_DEFINE_USER_FUNC(evtTot_GetTowerNpcParams) {
 EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
     auto& state = g_Mod->state_;
 
-    int32_t active_npc_types = 0;
-    int32_t base_weights[SecondaryNpcType::NUM_NPC_TYPES] = { 0 };
+    int32_t active_npc_types = SecondaryNpcType::NUM_NPC_TYPES;
+    // Base weights for each NPC, and how much to reduce them per appearance.
+    int32_t weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = {
+        15, 10, 10, 10, 12, 12, 10, 10, 0
+    };
+    int32_t sub_weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = {
+        5, 2, 2, 2, 3, 3, 2, 2, 0 
+    };
+    
     for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
+        uint32_t option_value = 0;
         switch (i) {
-            case SecondaryNpcType::LUMPY: {
-                if (state.CheckOptionValue(OPTVAL_NPC_LUMPY_ON)) {
-                    base_weights[i] = 10;
-                    ++active_npc_types;
-                }
+            case SecondaryNpcType::LUMPY:
+                option_value = OPTVAL_NPC_LUMPY_OFF;
                 break;
-            }
-            case SecondaryNpcType::DOOPLISS: {
-                if (state.CheckOptionValue(OPTVAL_NPC_DOOPLISS_ON)) {
-                    base_weights[i] = 10;
-                    ++active_npc_types;
-                }
+            case SecondaryNpcType::DOOPLISS:
+                option_value = OPTVAL_NPC_DOOPLISS_OFF;
                 break;
-            }
-            case SecondaryNpcType::GRUBBA: {
-                if (state.CheckOptionValue(OPTVAL_NPC_GRUBBA_ON)) {
-                    base_weights[i] = 10;
-                    ++active_npc_types;
-                }
+            case SecondaryNpcType::GRUBBA:
+                option_value = OPTVAL_NPC_GRUBBA_OFF;
                 break;
-            }
-            case SecondaryNpcType::CHET_RIPPO: {
-                if (state.CheckOptionValue(OPTVAL_NPC_CHET_RIPPO_ON)) {
-                    base_weights[i] = 10;
-                    ++active_npc_types;
-                }
+            case SecondaryNpcType::CHET_RIPPO:
+                option_value = OPTVAL_NPC_CHET_RIPPO_OFF;
                 break;
-            }
-            case SecondaryNpcType::WONKY: {
-                if (state.CheckOptionValue(OPTVAL_NPC_WONKY_ON)) {
-                    base_weights[i] = 10;
-                    ++active_npc_types;
-                }
+            case SecondaryNpcType::WONKY:
+                option_value = OPTVAL_NPC_WONKY_OFF;
                 break;
-            }
-            case SecondaryNpcType::DAZZLE: {
-                if (state.CheckOptionValue(OPTVAL_NPC_DAZZLE_ON)) {
-                    base_weights[i] = 10;
-                    ++active_npc_types;
-                }
+            case SecondaryNpcType::DAZZLE:
+                option_value = OPTVAL_NPC_DAZZLE_OFF;
                 break;
-            }
-            case SecondaryNpcType::MOVER: {
-                if (state.CheckOptionValue(OPTVAL_NPC_MOVER_ON)) {
-                    base_weights[i] = 10;
-                    ++active_npc_types;
-                }
+            case SecondaryNpcType::MOVER:
+                option_value = OPTVAL_NPC_MOVER_OFF;
                 break;
-            }
-            case SecondaryNpcType::ZESS_T: {
-                if (state.CheckOptionValue(OPTVAL_NPC_ZESS_T_ON)) {
-                    base_weights[i] = 10;
-                    ++active_npc_types;
-                }
-                break;
-            }
-            default:
+            case SecondaryNpcType::ZESS_T:
+                option_value = OPTVAL_NPC_ZESS_T_OFF;
                 break;
         }
+        if (option_value && state.CheckOptionValue(option_value)) {
+            weights[i] = 0;
+            --active_npc_types;
+        }
     }
-    bool selected_lumpy = false;
 
-    // Select at most four types of NPC to spawn.
+    // Limit the number of NPC types that can appear in a single run to 4.
     while (active_npc_types > 4) {
         int32_t active_type_to_disable = 
             g_Mod->state_.Rand(active_npc_types, RNG_SECONDARY_NPC);
         int32_t active_type_idx = 0;
         for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
-            if (base_weights[i] > 0) {
+            if (weights[i] > 0) {
                 if (active_type_to_disable == active_type_idx) {
-                    base_weights[i] = 0;
+                    weights[i] = 0;
                     --active_npc_types;
                     break;
                 }
@@ -1569,55 +1546,71 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
             }
         }
     }
+    // If there are fewer than 4 enabled, add some chance of no NPC appearing.
+    if (active_npc_types < 4) {
+        weights[SecondaryNpcType::NUM_NPC_TYPES] += 7 * (4 - active_npc_types);
+    }
 
-    // Select NPCs for every floor.
-    const int32_t num_rest_floors = g_Mod->state_.GetNumFloors() / 8;
-    for (int32_t floor = 0; floor < num_rest_floors; ++floor) {
-        // Make Lumpy slightly likelier to show up at the beginning.
-        if (base_weights[SecondaryNpcType::LUMPY]) {
-            if (floor < num_rest_floors / 4) {
-                base_weights[SecondaryNpcType::LUMPY] = 15;
-            } else {
-                base_weights[SecondaryNpcType::LUMPY] = 10;
-            }
-        }
+    // Make a pool of 9 NPCs starting with 1 each of the enabled types, and
+    // the rest initialized to type NONE.
+    int32_t kPoolMax = 9;
+    int32_t npc_pool[kPoolMax];
+    for (int32_t i = 0; i < kPoolMax; ++i) {
+        npc_pool[i] = SecondaryNpcType::NONE;
+    }
+    int32_t pool_index = 0;
+    for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
+        if (weights[i]) npc_pool[pool_index++] = i;
+    }
 
-        // Disable Doopliss and Grubba on last floor, as well as Lumpy if he's
-        // never showed up before (as it's impossible for him to show up later).
-        if (floor == num_rest_floors - 1) {
-            if (base_weights[SecondaryNpcType::GRUBBA]) {
-                base_weights[SecondaryNpcType::GRUBBA] = 0;
-                --active_npc_types;
-            }
-            if (base_weights[SecondaryNpcType::DOOPLISS]) {
-                base_weights[SecondaryNpcType::DOOPLISS] = 0;
-                --active_npc_types;
-            }
-            if (base_weights[SecondaryNpcType::LUMPY] && !selected_lumpy) {
-                base_weights[SecondaryNpcType::LUMPY] = 0;
-                --active_npc_types;
-            }
-        }
-
-        // Pick an NPC at random (if there are fewer than 4 options, add some
-        // chance that no NPC shows up so you aren't guaranteed one every floor).
+    // Select random NPCs for pool entries 4+.
+    for (pool_index = 4; pool_index < kPoolMax; ++pool_index) {
         int32_t weight = 0;
-        for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
-            weight += base_weights[i];
+        for (int32_t i = 0; i <= SecondaryNpcType::NUM_NPC_TYPES; ++i) {
+            weight += weights[i];
         }
-        if (active_npc_types < 4) weight += (4 - active_npc_types) * 8;
         weight = g_Mod->state_.Rand(weight, RNG_SECONDARY_NPC);
-
-        g_Mod->state_.SetOption(
-            STAT_RUN_NPCS_SELECTED, SecondaryNpcType::NONE, floor);
         for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
-            weight -= base_weights[i];
+            weight -= weights[i];
             if (weight < 0) {
-                g_Mod->state_.SetOption(STAT_RUN_NPCS_SELECTED, i, floor);
-                if (i == SecondaryNpcType::LUMPY) selected_lumpy = true;
+                npc_pool[pool_index] = i;
+                weights[i] -= sub_weights[i];
                 break;
             }
         }
+    }
+
+    // Shuffle pool order with random swaps.
+    for (int32_t i = 0; i < 100; ++i) {
+        int32_t x = g_Mod->state_.Rand(kPoolMax, RNG_SECONDARY_NPC);
+        int32_t y = g_Mod->state_.Rand(kPoolMax, RNG_SECONDARY_NPC);
+        int32_t temp = npc_pool[x];
+        npc_pool[x] = npc_pool[y];
+        npc_pool[y] = temp;
+    }
+
+    // Disable certain NPCs for last floor, as they can't have any effect.
+    int32_t kNumRestFloors = g_Mod->state_.GetNumFloors() / 8;
+    int32_t lumpy_appearances = 0;
+    for (int32_t i = 0; i < kNumRestFloors; ++i) {
+        if (npc_pool[i] == SecondaryNpcType::LUMPY) ++lumpy_appearances;
+    }
+    switch (npc_pool[kNumRestFloors - 1]) {
+        case SecondaryNpcType::DOOPLISS:
+        case SecondaryNpcType::GRUBBA:
+        case SecondaryNpcType::MOVER:
+            npc_pool[kNumRestFloors - 1] = SecondaryNpcType::NONE;
+            break;
+        case SecondaryNpcType::LUMPY:
+            if (lumpy_appearances == 1) {
+                npc_pool[kNumRestFloors - 1] = SecondaryNpcType::NONE;
+            }
+            break;
+    }
+
+    // Assign NPCs.
+    for (int32_t i = 0; i < kNumRestFloors; ++i) {
+        g_Mod->state_.SetOption(STAT_RUN_NPCS_SELECTED, npc_pool[i], i);
     }
 
     return 2;

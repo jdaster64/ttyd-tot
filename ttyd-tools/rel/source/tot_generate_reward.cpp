@@ -128,9 +128,13 @@ int32_t SelectUniqueBadge() {
     uint8_t eligible[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     int32_t total_weight = 115;
     
+    // Disable partner badges that can't be of use.
     if (GetNumActivePartners() == 0) {
         eligible[2] = 0;
         eligible[4] = 0;
+        eligible[6] = 0;
+    }
+    if (state.GetOption(OPT_MAX_PARTNERS) < 2) {
         eligible[6] = 0;
     }
     
