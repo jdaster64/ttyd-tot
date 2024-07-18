@@ -167,6 +167,9 @@ OptionMenuData g_OptionMenuData[] = {
     { OPT_ENABLE_NPC_MOVER, "tot_optr_npc_mover", "tot_opth_npc_mover", 232, true, false },
     { OPTVAL_NPC_MOVER_OFF, "tot_optr_off", nullptr, 233, false, false },
     { OPTVAL_NPC_MOVER_ON, "tot_optr_on", nullptr, 234, false, false },
+    { OPT_ENABLE_NPC_ZESS_T, "tot_optr_npc_zess", "tot_opth_npc_zess", 235, true, false },
+    { OPTVAL_NPC_ZESS_T_OFF, "tot_optr_off", nullptr, 236, false, false },
+    { OPTVAL_NPC_ZESS_T_ON, "tot_optr_on", nullptr, 237, false, false },
 };
 
 uint32_t OptionLookup(uint16_t lookup_key) {

@@ -163,7 +163,7 @@ g_StringMap = {
             b'A hearty mushroom dish that\n'
             b'replenishes 15 HP and 5 FP.\n'
             b'Made by cooking a Super\n'
-            b'Shroom.',
+            b'Shroom or Volt Shroom.',
 
         b'msg_kinoko_foil_yaki':
             b'A hearty mushroom dish that\n'
@@ -1826,6 +1826,67 @@ g_StringMap = {
             b"Hey! <wait 100>You're looking loaded up\n"
             b'on gear already.<wait 250> You still sure\n'
             b"ya got room for this?\n<o>",
+            
+        b"tot_zess_intro":
+            b"[Placeholder] I'm Zess T.<wait 250> \n"
+            b"I love to cook! You provide the\n"
+            b"items, I work my magic.\n<k>\n<p>\n"
+            b"What can I do for you today?\n<o>",
+            
+        b"tot_zess_intronoitems":
+            b"[Placeholder] I'm Zess T.<wait 250> \n"
+            b"I love to cook! You provide the\n"
+            b"items, I work my magic.\n<k>\n<p>\n"
+            b"It seems you don't have any\n"
+            b"I can work with at the moment,\n"
+            b"though. Next time, then!\n<k>",
+            
+        b"tot_zess_decline":
+            b"<p>\nOh, that's too bad!\n<k>",
+            
+        b"tot_zess_nochooserecipe":
+            b"Indecisive, are we? <wait 250>Oh well,\n"
+            b"I'll be here if you make up\n"
+            b"your mind later...\n<k>",
+            
+        b"tot_zess_which1st":
+            b"<p>\nWhich would you like to use?\n<k>",
+            
+        b"tot_zess_which2nd":
+            b"Mm-hmm, got it. <wait 250>What else?\n<k>",
+            
+        b"tot_zess_whichrecipe":
+            b"[Placeholder] I've got a\n"
+            b"couple of dishes that use that.\n"
+            b"<wait 250>Which one do you want?\n<k>",
+        
+        b"tot_zess_giveup":
+            b"[Placeholder] What's wrong?\n"
+            b"Still want me to cook?\n<o>",
+            
+        b"tot_zess_confirmcost":
+            b"[Placeholder] All right, I'll\n"
+            b"cook that right up for you\n"
+            b"for %d coins.<wait 250> OK?\n<o>",
+            
+        b"tot_zess_declinecost":
+            b"<p>\n[Placeholder] Hmph, my art\n"
+            b"isn't free. <wait 250>Come back if you\n"
+            b"want anything else.\n<k>",
+            
+        b"tot_zess_confirmswap":
+            b"[Placeholder] All right, I'll\n"
+            b"swap that %s\n"
+            b"for you, free of charge. OK?\n<o>",
+            
+        b"tot_zess_cookagain":
+            b"Want me to cook anything\n"
+            b"else?\n<o>",
+            
+        b"tot_zess_nomoretocook":
+            b"[Placeholder] Well, I've done\n"
+            b"all I can do. <wait 200>Enjoy the fruit\n"
+            b"of my culinary magic!\n<k>",
             
         # NPC-related menu / help text.
         

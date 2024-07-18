@@ -23,6 +23,7 @@
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
+#include <ttyd/msgdrv.h>
 #include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/system.h>
@@ -48,6 +49,7 @@ using namespace ::ttyd::evt_window;
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
+using ::ttyd::item_data::itemDataTable;
 using ::ttyd::npc_data::npcTribe;
 using ::ttyd::npcdrv::NpcSetupInfo;
 using ::ttyd::system::qqsort;
@@ -73,6 +75,161 @@ namespace SecondaryNpcType {
     };
 }
 
+namespace RecipeItemRarity {
+    enum e {
+        INVALID = 0,
+        COMMON,
+        RARE,
+        SPECIALTY,
+    };
+}
+
+namespace RecipeItemType {
+    enum e {
+        INVALID = 0,
+        HEALING,
+        DAMAGE,
+        SUPPORT,
+        STATUS,
+        MISC,
+    };
+}
+
+namespace RecipeMode {
+    enum e {
+        INVALID = 0,
+        SINGLE_ITEM,
+        DOUBLE_ITEM,
+        POINT_SWAP,
+    };
+}
+
+// Holds information relevant to Zess T. cooking items.
+struct RecipeInfo {
+    int16_t recipe_1;
+    int16_t recipe_2;
+    int16_t swap_recipe;
+    uint8_t item_rarity;
+    uint8_t item_type;
+};
+// Recipe info (for items GOLD_BAR through FRESH_JUICE).
+RecipeInfo g_RecipeInfo[] = {
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::ELECTRO_POP, ItemType::THUNDER_RAGE, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::DAMAGE, },
+    { ItemType::ELECTRO_POP, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::DAMAGE, },
+    { ItemType::METEOR_MEAL, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::DAMAGE, },
+    { ItemType::SNOW_BUNNY, ItemType::FRUIT_PARFAIT, ItemType::FIRE_FLOWER, RecipeItemRarity::COMMON, RecipeItemType::DAMAGE, },
+    { ItemType::FIRE_POP, ItemType::HOT_SAUCE, ItemType::ICE_STORM, RecipeItemRarity::COMMON, RecipeItemType::DAMAGE, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::DAMAGE, },
+    { ItemType::LOVE_PUDDING, ItemType::INVALID_ITEM, ItemType::REPEL_CAPE, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::ELECTRO_POP, ItemType::SHROOM_ROAST, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::LOVE_PUDDING, ItemType::INVALID_ITEM, ItemType::BOOS_SHEET, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::PEACH_TART, ItemType::INVALID_ITEM, ItemType::SPITE_POUCH, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::PEACH_TART, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::EARTH_QUAKE, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::DAMAGE, },
+    { ItemType::PEACH_TART, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::PEACH_TART, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::LOVE_PUDDING, ItemType::INVALID_ITEM, ItemType::MINI_MR_MINI, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::LOVE_PUDDING, ItemType::COURAGE_MEAL, ItemType::MR_SOFTENER, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::POISON_SHROOM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::DAMAGE, },
+    { ItemType::PEACH_TART, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::PEACH_TART, ItemType::SHROOM_BROTH, ItemType::POWER_PUNCH, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::PEACH_TART, ItemType::SHROOM_BROTH, ItemType::COURAGE_SHELL, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::HONEY_SHROOM, ItemType::SHROOM_FRY, ItemType::HONEY_SYRUP, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::MAPLE_SUPER, ItemType::SHROOM_ROAST, ItemType::MAPLE_SYRUP, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::JELLY_ULTRA, ItemType::SHROOM_STEAK, ItemType::JAMMIN_JELLY, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::POISON_SHROOM, ItemType::INVALID_ITEM, ItemType::DRIED_SHROOM, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::SPACE_FOOD, ItemType::INVALID_ITEM, ItemType::LIFE_SHROOM, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::SPACE_FOOD, ItemType::HEALTHY_SALAD, ItemType::SPACE_FOOD, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::HONEY_SHROOM, ItemType::HONEY_CANDY, ItemType::MUSHROOM, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::MAPLE_SUPER, ItemType::ZESS_TEA, ItemType::SUPER_SHROOM, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::JELLY_ULTRA, ItemType::JELLY_CANDY, ItemType::ULTRA_SHROOM, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::METEOR_MEAL, ItemType::INVALID_ITEM, ItemType::GRADUAL_SYRUP, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::METEOR_MEAL, ItemType::INVALID_ITEM, ItemType::SLOW_SHROOM, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::SPICY_PASTA, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::SHROOM_CAKE, ItemType::MOUSSE_CAKE, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::MISC, },
+    { ItemType::PEACH_TART, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::MYSTERY, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::MISC, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::COCONUT_BOMB, ItemType::COCO_CANDY, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::DAMAGE, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::EGG_BOMB, ItemType::METEOR_MEAL, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::SPICY_PASTA, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::LOVE_PUDDING, ItemType::INVALID_ITEM, ItemType::RUIN_POWDER, RecipeItemRarity::COMMON, RecipeItemType::SUPPORT, },
+    { ItemType::PEACH_TART, ItemType::POISON_SHROOM, ItemType::INVALID_ITEM, RecipeItemRarity::COMMON, RecipeItemType::STATUS, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::HONEY_CANDY, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::ZESS_TEA, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::JELLY_CANDY, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::SPECIALTY, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::SPECIALTY, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::SPECIALTY, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::SPECIALTY, RecipeItemType::DAMAGE, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::SHROOM_ROAST, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::TASTY_TONIC, RecipeItemRarity::RARE, RecipeItemType::SUPPORT, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::FIRE_POP, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::DAMAGE, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::DAMAGE, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::MOUSSE_CAKE, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::SHROOM_CAKE, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::SUPPORT, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::DAMAGE, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::SUPPORT, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::PEACH_TART, RecipeItemRarity::RARE, RecipeItemType::SUPPORT, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::SUPPORT, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::SPECIALTY, RecipeItemType::SUPPORT, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::LOVE_PUDDING, RecipeItemRarity::RARE, RecipeItemType::STATUS, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::SNOW_BUNNY, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::SHROOM_FRY, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::SHROOM_STEAK, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
+};
+
+// Global variables.
+int32_t g_CurrentIngredients[2] = { 0, 0 };
+int32_t g_RecipeModes[3];
+
 // Declarations for USER_FUNCs.
 EVT_DECLARE_USER_FUNC(evtTot_SelectCharlietonItems, 0)
 EVT_DECLARE_USER_FUNC(evtTot_CheckCharlietonSoldOut, 1)
@@ -84,6 +241,13 @@ EVT_DECLARE_USER_FUNC(evtTot_GetDazzleCost, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetMoverCost, 2)
 EVT_DECLARE_USER_FUNC(evtTot_GetLumpyInfo, 2)
 EVT_DECLARE_USER_FUNC(evtTot_ReturnLumpy, 0)
+EVT_DECLARE_USER_FUNC(evtTot_GetRecipeOptionsString, 2)
+EVT_DECLARE_USER_FUNC(evtTot_GetSelectedRecipeMode, 3)
+EVT_DECLARE_USER_FUNC(evtTot_AddIngredient, 1)
+EVT_DECLARE_USER_FUNC(evtTot_MakeIngredientList, 3)
+EVT_DECLARE_USER_FUNC(evtTot_ResetIngredients, 0)
+EVT_DECLARE_USER_FUNC(evtTot_GetRecipeResults, 3)
+EVT_DECLARE_USER_FUNC(evtTot_GetItemName, 2)
 EVT_DECLARE_USER_FUNC(evtTot_CheckNpcEffectEnabled, 2)
 EVT_DECLARE_USER_FUNC(evtTot_EnableNpcEffect, 1)
 
@@ -638,6 +802,145 @@ LBL(99)
     RETURN()
 EVT_END()
 
+// Talk script for Zess T.
+EVT_BEGIN(TowerNpc_ZessTalk)
+    USER_FUNC(evtTot_GetRecipeOptionsString, LW(15), LW(0))
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_zess_intronoitems"), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+    
+    USER_FUNC(evt_msg_print, 0, PTR("tot_zess_intro"), 0, PTR("me"))
+LBL(10)
+    USER_FUNC(evtTot_ResetIngredients)
+    SET(LW(8), 0)
+    SET(LW(9), 0)
+    USER_FUNC(evt_msg_select, 1, LW(15))
+    IF_EQUAL(LW(0), 3)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_decline"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evtTot_GetSelectedRecipeMode, LW(0), LW(14), LW(5))
+    SWITCH(LW(14))
+        CASE_EQUAL((int32_t)RecipeMode::SINGLE_ITEM)
+            GOTO(40)
+        CASE_EQUAL((int32_t)RecipeMode::DOUBLE_ITEM)
+            GOTO(20)
+        CASE_EQUAL((int32_t)RecipeMode::POINT_SWAP)
+            USER_FUNC(evtTot_AddIngredient, (int32_t)ItemType::POINT_SWAP)
+            GOTO(40)
+        CASE_ETC()
+            // Should not be possible to reach; bail out.
+            USER_FUNC(evt_msg_continue)
+            GOTO(99)
+    END_SWITCH()
+
+LBL(20)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_which1st"))
+    USER_FUNC(evtTot_MakeIngredientList, LW(14), LW(13), LW(1))
+    USER_FUNC(evt_win_item_select, 0, LW(13), LW(0), 0)
+    IF_EQUAL(LW(0), -1)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_zess_giveup"), 0, PTR("me"))
+        USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+        IF_EQUAL(LW(0), 1)
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_decline"))
+            GOTO(99)
+        END_IF()
+        GOTO(20)
+    END_IF()
+    USER_FUNC(evtTot_AddIngredient, LW(0))
+    SET(LW(9), LW(0))
+    USER_FUNC(evtTot_GetItemName, LW(9), LW(7))
+
+LBL(30)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_zess_which2nd"), 0, PTR("me"))
+    GOTO(50)
+
+LBL(40)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_which1st"))
+
+LBL(50)
+    USER_FUNC(evtTot_MakeIngredientList, LW(14), LW(13), LW(1))
+    USER_FUNC(evt_win_item_select, 0, LW(13), LW(0), 0)
+    IF_EQUAL(LW(0), -1)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_zess_giveup"), 0, PTR("me"))
+        USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+        IF_EQUAL(LW(0), 1)
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_decline"))
+            GOTO(99)
+        END_IF()
+        GOTO(40)
+    END_IF()
+    USER_FUNC(evtTot_AddIngredient, LW(0))
+    SET(LW(8), LW(0))
+    USER_FUNC(evtTot_GetItemName, LW(8), LW(6))
+
+    USER_FUNC(evtTot_GetRecipeResults, LW(10), LW(11), LW(12))
+    IF_LARGE(LW(10), 1)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_zess_whichrecipe"), 0, PTR("me"))
+        USER_FUNC(evtTot_MakeIngredientList, LW(14), LW(13), LW(1))
+        USER_FUNC(evt_win_item_select, 0, LW(13), LW(0), 0)
+        IF_EQUAL(LW(0), -1)
+            USER_FUNC(evt_msg_print, 0, PTR("tot_zess_nochooserecipe"), 0, PTR("me"))
+            GOTO(99)
+        END_IF()
+        SET(LW(11), LW(0))
+    END_IF()
+
+    IF_LARGE(LW(5), 0)
+        // Prompt with coin cost.
+        USER_FUNC(evt_win_coin_on, 0, LW(12))
+        USER_FUNC(evt_msg_print_insert, 0, PTR("tot_zess_confirmcost"), 0, PTR("me"), LW(5))
+        USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+        IF_EQUAL(LW(0), 1)
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_declinecost"))
+            USER_FUNC(evt_win_coin_off, LW(12))
+            GOTO(99)
+        END_IF()
+        USER_FUNC(evt_pouch_get_coin, LW(0))
+        IF_SMALL(LW(0), LW(5))
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_declinecost"))
+            USER_FUNC(evt_win_coin_off, LW(12))
+            GOTO(99)
+        END_IF()
+        
+        MUL(LW(5), -1)
+        USER_FUNC(evt_pouch_add_coin, LW(5))
+        USER_FUNC(evt_win_coin_wait, LW(12))
+        WAIT_MSEC(200)
+        USER_FUNC(evt_win_coin_off, LW(12))
+    ELSE()
+        // Prompt without coin cost.
+        USER_FUNC(evt_msg_print_insert, 0, PTR("tot_zess_confirmswap"), 0, PTR("me"), LW(6))
+        USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+        IF_EQUAL(LW(0), 1)
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_decline"))
+            GOTO(99)
+        END_IF()
+    END_IF()
+
+    USER_FUNC(evt_msg_continue)
+
+    // Remove items LW(8) and LW(9) if set, give item LW(11).
+    USER_FUNC(evt_pouch_remove_item, LW(8), LW(0))
+    USER_FUNC(evt_pouch_remove_item, LW(9), LW(0))
+    USER_FUNC(evtTot_GetUniqueItemName, LW(0))
+    USER_FUNC(evt_item_entry, LW(0), LW(11), FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+    USER_FUNC(evt_item_get_item, LW(0))
+    
+    // Check whether to prompt to cook something else.    
+    USER_FUNC(evtTot_GetRecipeOptionsString, LW(15), LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_zess_cookagain"), 0, PTR("me"))
+        GOTO(10)
+    END_IF()
+    USER_FUNC(evt_msg_print, 0, PTR("tot_zess_nomoretocook"), 0, PTR("me"))
+
+LBL(99)
+    RETURN()
+EVT_END()
+
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::LUMPY,
     NpcTribeType::DOOPLISS,
@@ -711,7 +1014,7 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .flags = 0x1000'0600,
         .initEvtCode = nullptr,
         .regularEvtCode = nullptr,
-        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .talkEvtCode = (void*)TowerNpc_ZessTalk,
         .battleInfoId = -1,
     },
 };
@@ -882,6 +1185,223 @@ EVT_DEFINE_USER_FUNC(evtTot_ReturnLumpy) {
     int32_t num_coins = g_Mod->state_.GetOption(STAT_RUN_NPC_LUMPY_COINS);
     ttyd::mario_pouch::pouchAddCoin(num_coins * 2);
     g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_COINS, 0);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetRecipeOptionsString) {
+    static char buf[128];
+    char* p_buf = buf;
+    p_buf += sprintf(p_buf, "<select 0 3 0 40>");
+    int32_t num_options = 0;
+
+    const auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+
+    // Regular recipe - require one item that has a single-item result.
+    for (int32_t i = 0; i < 20; ++i) {
+        if (g_RecipeInfo[pouch.items[i] - ItemType::GOLD_BAR].recipe_1) {
+            g_RecipeModes[num_options++] = RecipeMode::SINGLE_ITEM;
+            p_buf += sprintf(
+                p_buf, "\nRegular recipe (%" PRId32 " coins)",
+                25 * GetBuyPriceScale() / 100);
+            break;
+        }
+    }
+
+    // Specialty recipe - require two distinct Rare-tier items.
+    int32_t rare_item = 0;
+    for (int32_t i = 0; i < 20; ++i) {
+        int32_t item = pouch.items[i];
+        if (g_RecipeInfo[item - ItemType::GOLD_BAR].item_rarity 
+            == RecipeItemRarity::RARE) {
+            if (rare_item == 0 || rare_item == item) {
+                rare_item = item;
+                continue;
+            }
+            g_RecipeModes[num_options++] = RecipeMode::DOUBLE_ITEM;
+            p_buf += sprintf(
+                p_buf, "\nSpecialty recipe (%" PRId32 " coins)",
+                50 * GetBuyPriceScale() / 100);
+            break;
+        }
+    }
+
+    // Point Swap recipe - require a Point Swap in the inventory.
+    for (int32_t i = 0; i < 20; ++i) {
+        if (pouch.items[i] == ItemType::POINT_SWAP) {
+            g_RecipeModes[num_options++] = RecipeMode::POINT_SWAP;
+            p_buf += sprintf(p_buf, "\nPoint Swap recipe (free)");
+            break;
+        }
+    }
+
+    evtSetValue(evt, evt->evtArguments[0], PTR(buf));
+    evtSetValue(evt, evt->evtArguments[1], num_options);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetSelectedRecipeMode) {
+    int32_t index = evtGetValue(evt, evt->evtArguments[0]);
+    evtSetValue(evt, evt->evtArguments[1], g_RecipeModes[index]);
+    switch(g_RecipeModes[index]) {
+        case RecipeMode::SINGLE_ITEM:
+            evtSetValue(evt, evt->evtArguments[2], 25 * GetBuyPriceScale() / 100);
+            break;
+        case RecipeMode::DOUBLE_ITEM:
+            evtSetValue(evt, evt->evtArguments[2], 50 * GetBuyPriceScale() / 100);
+            break;
+        default:
+            evtSetValue(evt, evt->evtArguments[2], 0);
+            break;
+    }
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_AddIngredient) {
+    int32_t item = evtGetValue(evt, evt->evtArguments[0]);
+    if (g_CurrentIngredients[0] == 0) {
+        g_CurrentIngredients[0] = item;
+    } else {
+        g_CurrentIngredients[1] = item;
+    }
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_MakeIngredientList) {
+    static int32_t g_IngredientList[21];
+    int32_t mode = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t index = 0;
+
+    // Actually asking for list of recipe options.
+    if (mode == RecipeMode::SINGLE_ITEM && g_CurrentIngredients[0]) {
+        g_IngredientList[0] =
+            g_RecipeInfo[g_CurrentIngredients[0] - ItemType::GOLD_BAR].recipe_1;
+        g_IngredientList[1] =
+            g_RecipeInfo[g_CurrentIngredients[0] - ItemType::GOLD_BAR].recipe_2;
+        g_IngredientList[2] = -1;
+        evtSetValue(evt, evt->evtArguments[1], PTR(&g_IngredientList[0]));
+        evtSetValue(evt, evt->evtArguments[2], 2);
+        return 2;
+    }
+
+    const auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    for (int32_t i = 0; i < 20; ++i) {
+        int32_t item = pouch.items[i];
+
+        // Determine whether the item is eligible to be cooked.
+        bool add_item = false;
+        switch (mode) {
+            case RecipeMode::SINGLE_ITEM:
+                add_item = g_RecipeInfo[item - ItemType::GOLD_BAR].recipe_1;
+                break;
+            case RecipeMode::DOUBLE_ITEM:
+                add_item =
+                    g_RecipeInfo[item - ItemType::GOLD_BAR].item_rarity 
+                        == RecipeItemRarity::RARE &&
+                    (g_CurrentIngredients[0] == 0 || g_CurrentIngredients[0] != item);
+                break;
+            case RecipeMode::POINT_SWAP:
+                add_item = g_RecipeInfo[item - ItemType::GOLD_BAR].swap_recipe;
+                break;
+        }
+
+        // Add the item to the list, if not already present.
+        if (add_item) {
+            for (int32_t i = 0; i < index; ++i) {
+                if (g_IngredientList[i] == item) {
+                    add_item = false;
+                    break;
+                }
+            }
+            if (add_item) g_IngredientList[index++] = item;
+        }
+    }
+    g_IngredientList[index] = -1;
+    evtSetValue(evt, evt->evtArguments[1], PTR(&g_IngredientList[0]));
+    evtSetValue(evt, evt->evtArguments[2], index);
+
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_ResetIngredients) {
+    g_CurrentIngredients[0] = 0;
+    g_CurrentIngredients[1] = 0;
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetRecipeResults) {
+    if (g_CurrentIngredients[0] == ItemType::MYSTERY) {
+        // Return a random rare / specialty item.
+        int32_t item = ItemType::SHROOM_FRY;
+        int32_t val = g_Mod->state_.Rand(33, RNG_MYSTERY_COOK_RESULT);
+        int32_t index = 0;
+        for (int32_t i = ItemType::GOLD_BAR; i <= ItemType::FRESH_JUICE; ++i) {
+            if (g_RecipeInfo[i - ItemType::GOLD_BAR].item_rarity > 
+                RecipeItemRarity::COMMON) {
+                if (index++ == val) {
+                    item = i;
+                    break;
+                }
+            }
+        }
+        evtSetValue(evt, evt->evtArguments[0], 1);
+        evtSetValue(evt, evt->evtArguments[1], item);
+    } else if (g_CurrentIngredients[0] == ItemType::POINT_SWAP) {
+        // Return the item's opposite.
+        int32_t item =
+            g_RecipeInfo[g_CurrentIngredients[1] - ItemType::GOLD_BAR].swap_recipe;
+        evtSetValue(evt, evt->evtArguments[0], 1);
+        evtSetValue(evt, evt->evtArguments[1], item);
+    } else if (g_CurrentIngredients[1]) {
+        // Return the correct specialty item.
+        int32_t type_1 =
+            g_RecipeInfo[g_CurrentIngredients[0] - ItemType::GOLD_BAR].item_type;
+        int32_t type_2 =
+            g_RecipeInfo[g_CurrentIngredients[1] - ItemType::GOLD_BAR].item_type;
+        evtSetValue(evt, evt->evtArguments[0], 1);
+        if (type_1 == RecipeItemType::DAMAGE && type_2 == RecipeItemType::DAMAGE) {
+            evtSetValue(evt, evt->evtArguments[1], ItemType::ZESS_DYNAMITE);
+        } else if (
+            type_1 == RecipeItemType::DAMAGE || type_1 == RecipeItemType::STATUS ||
+            type_2 == RecipeItemType::DAMAGE || type_2 == RecipeItemType::STATUS) {
+            evtSetValue(evt, evt->evtArguments[1], ItemType::TRIAL_STEW);
+        } else {
+            // Returns Zess T. food item based on total stat worth.
+            int32_t total_stats = 0;
+
+            auto& item_1 = itemDataTable[g_CurrentIngredients[0]];
+            int32_t item_1_stats = item_1.hp_restored + item_1.fp_restored;
+            total_stats += item_1_stats > 5 ? item_1_stats : 5;
+
+            auto& item_2 = itemDataTable[g_CurrentIngredients[1]];
+            int32_t item_2_stats = item_2.hp_restored + item_2.fp_restored;
+            total_stats += item_2_stats > 5 ? item_2_stats : 5;
+
+            if (total_stats < 25) {
+                evtSetValue(evt, evt->evtArguments[1], ItemType::ZESS_DINNER);
+            } else if (total_stats < 45) {
+                evtSetValue(evt, evt->evtArguments[1], ItemType::ZESS_SPECIAL);
+            } else {
+                evtSetValue(evt, evt->evtArguments[1], ItemType::ZESS_DELUXE);
+            }
+        }
+    } else {
+        // Return the possible recipe(s).
+        int32_t item_1 =
+            g_RecipeInfo[g_CurrentIngredients[0] - ItemType::GOLD_BAR].recipe_1;
+        int32_t item_2 =
+            g_RecipeInfo[g_CurrentIngredients[0] - ItemType::GOLD_BAR].recipe_2;
+        evtSetValue(evt, evt->evtArguments[0], item_2 ? 2 : 1);
+        evtSetValue(evt, evt->evtArguments[1], item_1);
+        evtSetValue(evt, evt->evtArguments[2], item_2);
+    }
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetItemName) {
+    int32_t item = evtGetValue(evt, evt->evtArguments[0]);
+    evtSetValue(
+        evt, evt->evtArguments[1],
+        PTR(ttyd::msgdrv::msgSearch(itemDataTable[item].name)));
     return 2;
 }
 
