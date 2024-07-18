@@ -23,6 +23,7 @@ namespace NpcTribeType {
         CHARLIETON      = 0x17,
         HOWZ_SELLER     = 0x1a,
         LUMPY           = 0x35,
+        ZESS_T          = 0x51,
         DOOGAN_YELLOW   = 0x5f,
         MOVER           = 0x6b,
         GRUBBA          = 0x74,

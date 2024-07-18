@@ -103,7 +103,7 @@ EVT_DECLARE_USER_FUNC(evt_mobj_get_position, 4)
 // evt_mobj_set_scale
 // evt_mobj_get_kindname
 // evt_mobj_flag_onoff
-// evt_mobj_check
+EVT_DECLARE_USER_FUNC(evt_mobj_check, 2)
 EVT_DECLARE_USER_FUNC(evt_mobj_delete, 1)
 // evt_mobj_entry
 

@@ -539,6 +539,29 @@
 8005e0b0:marioGetColor
 8005e0c0:marioGetPtr
 
+// mobjdrv.o
+8005eff0:mobjNearDistCheck2
+8005f290:mobjCheckItemboxOpen
+8005f334:mobjCheckExec
+8005f3a4:mobjGetHint
+8005f3c0:mobjCalcMtx2
+8005f4d8:mobjCalcMtx
+8005f744:mobjRunEvent
+8005f7c4:mobjHitObjPtrToPtr
+8005f7e0:mobjNameToPtrNoAssert
+8005f8ac:mobjNameToPtr
+8005f968:mobjMain
+8006098c:mobjSetPosition
+80060a94:mobjDelete
+80060b9c:mobjEntry
+80060d78:mobjHitEntry
+800612f0:mobjReset
+8006133c:mobjInit
+800613cc:mobjDisp_OffscreenXLU
+80061524:mobjDisp
+80061670:mobjDispXLU
+80061790:mobjKoopaOn
+
 // evt_mobj.o
 // .text
 800670e4:evt_mobj_recovery_blk
@@ -549,6 +572,7 @@
 8006b948:evt_mobj_wait_animation_end
 8006bb08:evt_mobj_exec_cancel
 8006c03c:evt_mobj_get_position
+8006c2b4:evt_mobj_check
 8006c308:evt_mobj_delete
 // .data
 8030b4ec:mobj_save_blk_sysevt
@@ -1137,7 +1161,9 @@
 800f07d0:evt_pouch_get_yoshiname
 800f0928:evt_pouch_get_havebadgecnt
 800f0a8c:evt_pouch_party_join
+800f0bb4:evt_pouch_check_item
 800f0d0c:N_evt_pouch_remove_item_index
+800f0da8:evt_pouch_remove_item
 800f0e20:evt_pouch_add_item
 800f0fe8:evt_pouch_add_coin
 800f1018:evt_pouch_get_coin

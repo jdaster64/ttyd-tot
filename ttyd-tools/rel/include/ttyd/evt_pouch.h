@@ -24,11 +24,11 @@ EVT_DECLARE_USER_FUNC(evt_pouch_party_join, 1)
 // evt_pouch_get_max_ap
 // L_evt_pouch_set_hp
 // L_evt_pouch_get_hp
-// evt_pouch_check_item
+EVT_DECLARE_USER_FUNC(evt_pouch_check_item, 2)
 // evt_pouch_remove_keepitem
 // evt_pouch_add_keepitem
 EVT_DECLARE_USER_FUNC(N_evt_pouch_remove_item_index, 3)
-// evt_pouch_remove_item
+EVT_DECLARE_USER_FUNC(evt_pouch_remove_item, 2)
 EVT_DECLARE_USER_FUNC(evt_pouch_add_item, 2)
 // evt_pouch_get_starstone
 // evt_pouch_add_starpiece

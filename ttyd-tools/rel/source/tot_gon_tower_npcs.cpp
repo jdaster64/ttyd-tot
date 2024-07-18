@@ -66,6 +66,8 @@ namespace SecondaryNpcType {
         CHET_RIPPO,
         WONKY,
         DAZZLE,
+        MOVER,
+        ZESS_T,
         
         NUM_NPC_TYPES
     };
@@ -79,6 +81,7 @@ EVT_DECLARE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable, 1)
 EVT_DECLARE_USER_FUNC(evtTot_DowngradeStat, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetChetCost, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetDazzleCost, 1)
+EVT_DECLARE_USER_FUNC(evtTot_GetMoverCost, 2)
 EVT_DECLARE_USER_FUNC(evtTot_GetLumpyInfo, 2)
 EVT_DECLARE_USER_FUNC(evtTot_ReturnLumpy, 0)
 EVT_DECLARE_USER_FUNC(evtTot_CheckNpcEffectEnabled, 2)
@@ -560,6 +563,81 @@ LBL(99)
     RETURN()
 EVT_END()
 
+// Talk script for Mover.
+EVT_BEGIN(TowerNpc_MoverTalk)
+    USER_FUNC(evtTot_CheckNpcEffectEnabled, (int32_t)SecondaryNpcType::MOVER, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_mover_active"), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evt_msg_print, 0, PTR("tot_mover_intro"), 0, PTR("me"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_mover_menu"))
+    IF_EQUAL(LW(0), 2)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_mover_decline"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evtTot_GetMoverCost, LW(0), LW(5))
+    USER_FUNC(evt_win_coin_on, 0, LW(8))
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(evt_msg_print_add_insert, 0, PTR("tot_mover_offer0"), LW(5))
+        SET(LW(1), (int32_t)ItemType::TOT_TOWER_KEY)
+    ELSE()
+        USER_FUNC(evt_msg_print_add_insert, 0, PTR("tot_mover_offer1"), LW(5))
+        SET(LW(1), (int32_t)ItemType::TOT_MASTER_KEY)
+    END_IF()
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_mover_decline"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+    USER_FUNC(evt_pouch_get_coin, LW(0))
+    IF_SMALL(LW(0), LW(5))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_mover_nocoins"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evt_pouch_add_item, LW(1), LW(0))
+    IF_EQUAL(LW(0), -1)
+        // Inventory full; prompt if the player wants to buy the item anyway.
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_mover_full_inv"))
+        USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+        IF_EQUAL(LW(0), 1)  // Declined.
+            USER_FUNC(evt_win_coin_off, LW(8))
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_mover_decline"))
+            GOTO(99)
+        END_IF()
+        SET(LW(6), 0)
+    ELSE()
+        // If inventory wasn't full, remove item so it can be given back.
+        USER_FUNC(evt_pouch_remove_item, LW(1), LW(0))
+        SET(LW(6), 1)
+    END_IF()
+    
+    MUL(LW(5), -1)
+    USER_FUNC(evt_pouch_add_coin, LW(5))
+    USER_FUNC(evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_coin_off, LW(8))
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::MOVER)
+
+    USER_FUNC(evt_msg_continue)
+    USER_FUNC(evtTot_GetUniqueItemName, LW(0))
+    USER_FUNC(evt_item_entry, LW(0), LW(1), FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+    USER_FUNC(evt_item_get_item, LW(0))
+    
+    IF_EQUAL(LW(6), 1)
+        // Skip success text if player has to throw an item away.
+        USER_FUNC(evt_msg_print, 0, PTR("tot_mover_success"), 0, PTR("me"))
+    END_IF()
+
+LBL(99)
+    RETURN()
+EVT_END()
+
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::LUMPY,
     NpcTribeType::DOOPLISS,
@@ -567,6 +645,8 @@ int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::CHET_RIPPO,
     NpcTribeType::WONKY,
     NpcTribeType::DAZZLE,
+    NpcTribeType::MOVER,
+    NpcTribeType::ZESS_T,
 };
 
 NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
@@ -618,6 +698,22 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .talkEvtCode = (void*)TowerNpc_DazzleTalk,
         .battleInfoId = -1,
     },
+    {
+        .name = "npc_mover",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = nullptr,
+        .talkEvtCode = (void*)TowerNpc_MoverTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_zess",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = nullptr,
+        .talkEvtCode = (void*)TowerNpc_GenericTalk,
+        .battleInfoId = -1,
+    },
 };
 
 NpcSetupInfo g_NpcSetup[3] = {
@@ -625,7 +721,7 @@ NpcSetupInfo g_NpcSetup[3] = {
         .name = "npc_shop",
         .flags = 0x1000'0600,
         .initEvtCode = (void*)TowerNpc_CharlietonInit,
-        .regularEvtCode = (void*)TowerNpc_GenericMove,
+        .regularEvtCode = nullptr,
         .talkEvtCode = (void*)TowerNpc_CharlietonTalk,
         .battleInfoId = -1,
     },
@@ -758,6 +854,15 @@ EVT_DEFINE_USER_FUNC(evtTot_GetDazzleCost) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_GetMoverCost) {
+    if (evtGetValue(evt, evt->evtArguments[0]) == 0) {
+        evtSetValue(evt, evt->evtArguments[1], 125 * GetBuyPriceScale() / 100);
+    } else {
+        evtSetValue(evt, evt->evtArguments[1], 250 * GetBuyPriceScale() / 100);
+    }
+    return 2;
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_GetLumpyInfo) {
     int32_t invested_coins = g_Mod->state_.GetOption(STAT_RUN_NPC_LUMPY_COINS);
 
@@ -790,6 +895,9 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckNpcEffectEnabled) {
         case SecondaryNpcType::DOOPLISS:
             effect = g_Mod->state_.GetOption(STAT_RUN_NPC_DOOPLISS_FLOOR) == floor;
             break;
+        case SecondaryNpcType::MOVER:
+            effect = g_Mod->state_.GetOption(STAT_RUN_NPC_MOVER_FLOOR) == floor;
+            break;
     }
     evtSetValue(evt, evt->evtArguments[1], effect);
     return 2;
@@ -815,6 +923,10 @@ EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
             g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_COINS, coins);
             g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_FLOOR, floor);
             coins = 0;
+            break;
+        }
+        case SecondaryNpcType::MOVER: {
+            g_Mod->state_.SetOption(STAT_RUN_NPC_MOVER_FLOOR, floor);
             break;
         }
     }
@@ -896,6 +1008,20 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
             }
             case SecondaryNpcType::DAZZLE: {
                 if (state.CheckOptionValue(OPTVAL_NPC_DAZZLE_ON)) {
+                    base_weights[i] = 10;
+                    ++active_npc_types;
+                }
+                break;
+            }
+            case SecondaryNpcType::MOVER: {
+                if (state.CheckOptionValue(OPTVAL_NPC_MOVER_ON)) {
+                    base_weights[i] = 10;
+                    ++active_npc_types;
+                }
+                break;
+            }
+            case SecondaryNpcType::ZESS_T: {
+                if (state.CheckOptionValue(OPTVAL_NPC_ZESS_T_ON)) {
                     base_weights[i] = 10;
                     ++active_npc_types;
                 }

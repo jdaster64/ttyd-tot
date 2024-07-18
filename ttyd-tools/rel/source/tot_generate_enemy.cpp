@@ -1163,12 +1163,12 @@ bool GetEnemyStats(
     // Change this if adding back a boss scaling option.
     int32_t boss_scale_factor = 4;
 
-    // Buff regular enemies' HP and ATK by 25% if Doopliss's effect is active.
-    int32_t doopliss_scale_factor = 4;
+    // Buff regular enemies' HP and ATK by 20% if Doopliss's effect is active.
+    int32_t doopliss_scale_factor = 5;
     int32_t doopliss_floor = state.GetOption(STAT_RUN_NPC_DOOPLISS_FLOOR);
     if (doopliss_floor && state.floor_ - doopliss_floor < 8) {
         if (state.floor_ % 8 != 0) {
-            doopliss_scale_factor = 5;
+            doopliss_scale_factor = 6;
         }
     }
             
@@ -1176,7 +1176,7 @@ bool GetEnemyStats(
         int32_t hp = Min(ei.base_hp * base_hp_pct, 1000000);
         hp *= state.GetOption(OPTNUM_ENEMY_HP);
         hp = hp * boss_scale_factor / 4;
-        hp = hp * doopliss_scale_factor / 4;
+        hp = hp * doopliss_scale_factor / 5;
         *out_hp = Clamp((hp + 5000) / 10000, 1, 9999);
     }
     if (out_atk) {
@@ -1184,7 +1184,7 @@ bool GetEnemyStats(
         atk += (base_attack_power - ei.atk_reference) * 100;
         atk *= state.GetOption(OPTNUM_ENEMY_ATK);
         atk = atk * boss_scale_factor / 4;
-        atk = atk * doopliss_scale_factor / 4;
+        atk = atk * doopliss_scale_factor / 5;
         *out_atk = Clamp((atk + 5000) / 10000, 1, 99);
     }
     if (out_def) {

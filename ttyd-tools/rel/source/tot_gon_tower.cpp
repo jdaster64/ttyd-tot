@@ -40,6 +40,7 @@
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
 #include <ttyd/mario.h>
+#include <ttyd/mobjdrv.h>
 #include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/swdrv.h>
@@ -107,6 +108,8 @@ EVT_DECLARE_USER_FUNC(evtTot_LoadBackupSaveData, 0)
 EVT_DECLARE_USER_FUNC(evtTot_IsFinalFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_IsMidbossFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
+EVT_DECLARE_USER_FUNC(evtTot_MakeKeyTable, 3)
+EVT_DECLARE_USER_FUNC(evtTot_OverrideLockKey, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
 EVT_DECLARE_USER_FUNC(evtTot_UpdateDestinationMap, 0)
 EVT_DECLARE_USER_FUNC(evtTot_WaitForDragonLanding, 1)
@@ -152,8 +155,26 @@ EVT_BEGIN(Tower_BossDoor_Open)
     RETURN()
 EVT_END()
 
-// Scripts for lock on doors.
+// Checks whether the player has a Tower / Master key to open the lock early.
 EVT_BEGIN(Tower_Lock_Check)
+    USER_FUNC(evt_pouch_check_item, (int32_t)ItemType::TOT_MASTER_KEY, LW(2))
+    SET(LW(0), LW(2))
+    SET(LW(1), 0)
+    USER_FUNC(evtTot_IsMidbossFloor, LW(8))
+    IF_EQUAL(LW(8), 0)
+        USER_FUNC(evt_pouch_check_item, (int32_t)ItemType::TOT_TOWER_KEY, LW(1))
+        ADD(LW(0), LW(1))
+    END_IF()
+    IF_LARGE(LW(0), 0)
+        USER_FUNC(evtTot_MakeKeyTable, LW(1), LW(2), LW(3))
+        USER_FUNC(evt_win_item_select, 0, LW(3), LW(0), 0)
+        IF_NOT_EQUAL(LW(0), -1)
+            // Change the key type to match the item selected.
+            USER_FUNC(evtTot_OverrideLockKey, LW(0))
+        ELSE()
+            USER_FUNC(evt_mobj_exec_cancel, PTR("me"))
+        END_IF()
+    END_IF()
     RETURN()
 EVT_END()
 
@@ -406,10 +427,13 @@ EVT_END()
 EVT_BEGIN(Tower_OpenExit)
     USER_FUNC(evt_mario_key_onoff, 0)
     
-    // Spawn pipe.
+    // Open locked door.
     WAIT_MSEC(300)
-    USER_FUNC(evt_mobj_lock_unlock, PTR("mobj_lock_00"))
-    WAIT_MSEC(500)
+    USER_FUNC(evt_mobj_check, PTR("mobj_lock_00"), LW(10))
+    IF_NOT_EQUAL(LW(10), 0)
+        USER_FUNC(evt_mobj_lock_unlock, PTR("mobj_lock_00"))
+        WAIT_MSEC(500)
+    END_IF()
 
     // Spawn Heart Block on boss floors.
     USER_FUNC(evtTot_GetFloor, LW(10))
@@ -808,9 +832,11 @@ EVT_BEGIN(Tower_NpcSetup)
                 USER_FUNC(evt_npc_set_tribe, LW(3), LW(4))
             END_IF()
             USER_FUNC(evt_npc_setup, LW(6))
-            USER_FUNC(evt_npc_set_position, LW(0), 100, 0, 0)
+            USER_FUNC(evt_npc_set_position, LW(0), 160, 0, -70)
+            USER_FUNC(evt_npc_set_ry_lr, LW(0), 0)
             IF_NOT_EQUAL(LW(3), 0)
-                USER_FUNC(evt_npc_set_position, LW(3), 150, 0, -200)
+                USER_FUNC(evt_npc_set_position, LW(3), 160, 0, 70)
+                USER_FUNC(evt_npc_set_ry_lr, LW(3), 0)
             END_IF()
 
             // Also spawn a Heart Block, statically.
@@ -949,7 +975,7 @@ EVT_BEGIN(gon_01_InitEvt)
         // Put lock on right door until enemies beaten + chests claimed.
         USER_FUNC(evtTot_IsFinalFloor, LW(0))
         IF_EQUAL(LW(0), 0)
-            USER_FUNC(evt_mobj_lock, PTR("mobj_lock_00"), 12, /* key item */
+            USER_FUNC(evt_mobj_lock, PTR("mobj_lock_00"), 12, /* dummy key */
                 190, 10, 0, 270,  /* position + rotation */
                 PTR(&Tower_Lock_Check), PTR(&Tower_Lock_Unlock),
                 (int32_t)GSWF_Lock)
@@ -1103,6 +1129,29 @@ EVT_DEFINE_USER_FUNC(evtTot_IsMidbossFloor) {
         (g_Mod->state_.floor_ % 8 == 0) && 
         (g_Mod->state_.floor_ % 32 != 0);
     evtSetValue(evt, evt->evtArguments[0], is_midboss_floor);
+    return 2;
+}
+
+// Returns a table with the preferred key type to open a given lock.
+EVT_DEFINE_USER_FUNC(evtTot_MakeKeyTable) {
+    static int32_t keys[] = { -1, -1, -1 };
+    int32_t index = 0;
+    if (evtGetValue(evt, evt->evtArguments[0]))
+        keys[index++] = ItemType::TOT_TOWER_KEY;
+    if (!index && evtGetValue(evt, evt->evtArguments[1]))
+        keys[index++] = ItemType::TOT_MASTER_KEY;
+    for (; index < 3; ++index)
+        keys[index] = -1;
+    evtSetValue(evt, evt->evtArguments[2], PTR(&keys[0]));
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_OverrideLockKey) {
+    void* lock = ttyd::mobjdrv::mobjNameToPtrNoAssert("mobj_lock_00");
+    if (lock) {
+        int32_t key_type = evtGetValue(evt, evt->evtArguments[0]);
+        *(int32_t*)((uintptr_t)lock + 0x1a0) = key_type;
+    }
     return 2;
 }
 

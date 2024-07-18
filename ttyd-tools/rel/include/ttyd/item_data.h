@@ -368,6 +368,8 @@ namespace ItemType {
         MAX_ITEM_TYPE,
         
         // Custom item types for TOT.
+        TOT_TOWER_KEY = GOLD_BAR,
+        TOT_MASTER_KEY = GOLD_BAR_X3,
         TOT_PERFECT_POWER = MEGA_JUMP,
         TOT_PERFECT_POWER_P = MEGA_SMASH,
         TOT_SUPER_START = MEGA_QUAKE,

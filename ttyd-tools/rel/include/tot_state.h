@@ -370,20 +370,26 @@ enum Options : uint32_t {
     OPT_ENABLE_NPC_DAZZLE       = 0x433'1'00'01,
     OPTVAL_NPC_DAZZLE_OFF       = 0x533'1'00'00,
     OPTVAL_NPC_DAZZLE_ON        = 0x533'1'00'01,
+    OPT_ENABLE_NPC_MOVER        = 0x434'1'00'01,
+    OPTVAL_NPC_MOVER_OFF        = 0x534'1'00'00,
+    OPTVAL_NPC_MOVER_ON         = 0x534'1'00'01,
+    OPT_ENABLE_NPC_ZESS_T       = 0x435'1'00'01,
+    OPTVAL_NPC_ZESS_T_OFF       = 0x535'1'00'00,
+    OPTVAL_NPC_ZESS_T_ON        = 0x535'1'00'01,
     // Determines the maximum number of partners Mario can have in a run,
-    // from 1-7 (default of 4).  TODO: Implement "0 partner" mode.
-    OPT_MAX_PARTNERS            = 0x434'3'00'07,
-    OPTVAL_NO_PARTNERS          = 0x534'3'00'00,
+    // from 1-7 (default of 4).
+    OPT_MAX_PARTNERS            = 0x436'3'00'07,
+    OPTVAL_NO_PARTNERS          = 0x536'3'00'00,
     // Determines the difficulty of Action Commands.
-    OPT_AC_DIFFICULTY           = 0x437'3'00'06,
-    OPTVAL_AC_3_SIMP            = 0x537'3'00'00,
-    OPTVAL_AC_2_SIMP            = 0x537'3'00'01,
-    OPTVAL_AC_1_SIMP            = 0x537'3'00'02,
-    OPTVAL_AC_DEFAULT           = 0x537'3'00'03,
-    OPTVAL_AC_1_UNSIMP          = 0x537'3'00'04,
-    OPTVAL_AC_2_UNSIMP          = 0x537'3'00'05,
-    OPTVAL_AC_3_UNSIMP          = 0x537'3'00'06,
-    // Next: 0x43a
+    OPT_AC_DIFFICULTY           = 0x439'3'00'06,
+    OPTVAL_AC_3_SIMP            = 0x539'3'00'00,
+    OPTVAL_AC_2_SIMP            = 0x539'3'00'01,
+    OPTVAL_AC_1_SIMP            = 0x539'3'00'02,
+    OPTVAL_AC_DEFAULT           = 0x539'3'00'03,
+    OPTVAL_AC_1_UNSIMP          = 0x539'3'00'04,
+    OPTVAL_AC_2_UNSIMP          = 0x539'3'00'05,
+    OPTVAL_AC_3_UNSIMP          = 0x539'3'00'06,
+    // Next: 0x43c
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,
@@ -428,7 +434,7 @@ enum Options : uint32_t {
     STAT_RUN_NPC_GRUBBA_FLOOR   = 0x02f'1'01'03,
     STAT_RUN_NPC_DOOPLISS_FLOOR = 0x030'1'01'03,
     STAT_RUN_NPC_LUMPY_FLOOR    = 0x031'1'01'03,
-    STAT_RUN_NPC_RESERVED_FLOOR = 0x032'1'01'03,
+    STAT_RUN_NPC_MOVER_FLOOR    = 0x032'1'01'03,
     STAT_RUN_NPC_LUMPY_COINS    = 0x033'2'01'03,
     STAT_RUN_NPC_ITEMS_SOLD     = 0x035'2'01'04,
     STAT_RUN_NPC_BADGES_SOLD    = 0x037'2'01'04,

@@ -344,24 +344,25 @@ EVT_DEFINE_USER_FUNC(evtTot_PickRandomStatus) {
                         (void*)ttyd::battle_weapon_power::weaponGetPowerDefault;
                     weapon->damage_function_params[0] = 5;
                     weapon->poison_chance = 100;
+                    weapon->poison_strength = 1;
                     weapon->poison_time = 5;
                     break;
                 case 1:
                     weapon->sleep_chance = 100;
-                    weapon->sleep_time = 5;
+                    weapon->sleep_time = 3;
                     break;
                 case 2:
                     weapon->confuse_chance = 100;
-                    weapon->confuse_time = 5;
+                    weapon->confuse_time = 3;
                     break;
                 case 3:
                     weapon->freeze_chance = 100;
-                    weapon->freeze_time = 5;
+                    weapon->freeze_time = 3;
                     break;
                 case 4:
                     weapon->size_change_strength = -2;
                     weapon->size_change_chance = 100;
-                    weapon->size_change_time = 5;
+                    weapon->size_change_time = 3;
                     break;
             }
             break;
@@ -520,15 +521,19 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::SUPER_HAMMER].description = "msg_custom_super_hammer";
     itemDataTable[ItemType::ULTRA_HAMMER].description = "msg_custom_ultra_hammer";
     
-    // Turn Gold Bars x3 into "Shine Sprites" that can be used from the menu.
-    // TODO: Replace this code with code for door unlocking items.
-    memcpy(&itemDataTable[ItemType::GOLD_BAR_X3], 
-           &itemDataTable[ItemType::SHINE_SPRITE], sizeof(ItemData));
-    itemDataTable[ItemType::GOLD_BAR_X3].usable_locations 
-        |= ItemUseLocation::kField;
-    // Set Shine Sprite sell price.
-    itemDataTable[ItemType::GOLD_BAR_X3].sell_price = 25;
-
+    // Changed messages, appearance and sort order for Tower Key items.
+    itemDataTable[ItemType::TOT_TOWER_KEY].name = "tot_key_name";
+    itemDataTable[ItemType::TOT_TOWER_KEY].description = "tot_key_desc";
+    itemDataTable[ItemType::TOT_TOWER_KEY].menu_description = "tot_key_desc";
+    itemDataTable[ItemType::TOT_TOWER_KEY].type_sort_order = 98;
+    itemDataTable[ItemType::TOT_TOWER_KEY].sell_price = 25;
+    itemDataTable[ItemType::TOT_TOWER_KEY].icon_id = IconType::STORAGE_KEY;
+    itemDataTable[ItemType::TOT_MASTER_KEY].name = "tot_mkey_name";
+    itemDataTable[ItemType::TOT_MASTER_KEY].description = "tot_mkey_desc";
+    itemDataTable[ItemType::TOT_MASTER_KEY].menu_description = "tot_mkey_desc";
+    itemDataTable[ItemType::TOT_MASTER_KEY].type_sort_order = 99;
+    itemDataTable[ItemType::TOT_MASTER_KEY].sell_price = 50;
+    itemDataTable[ItemType::TOT_MASTER_KEY].icon_id = IconType::STATION_KEY;
 
     // Balance changes for individual items...
 

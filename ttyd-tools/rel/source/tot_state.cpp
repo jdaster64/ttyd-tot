@@ -251,6 +251,7 @@ void StateManager::InitDefaultOptions() {
     SetOption(OPTVAL_NPC_CHET_RIPPO_ON);
     SetOption(OPTVAL_NPC_WONKY_ON);
     SetOption(OPTVAL_NPC_DAZZLE_ON);
+    SetOption(OPTVAL_NPC_MOVER_ON);
     SetOption(OPT_MARIO_HP, 5);
     SetOption(OPT_MARIO_FP, 5);
     SetOption(OPT_MARIO_BP, 5);
@@ -287,6 +288,7 @@ void StateManager::ApplyPresetOptions() {
             SetOption(OPTVAL_NPC_CHET_RIPPO_ON);
             SetOption(OPTVAL_NPC_WONKY_ON);
             SetOption(OPTVAL_NPC_DAZZLE_ON);
+            SetOption(OPTVAL_NPC_MOVER_ON);
             SetOption(OPT_MARIO_HP, 5);
             SetOption(OPT_MARIO_FP, 5);
             SetOption(OPT_MARIO_BP, 5);
@@ -543,6 +545,7 @@ const char* StateManager::GetEncodedOptions() const {
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_LUMPY);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_DOOPLISS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_GRUBBA);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_MOVER);
 
     const int32_t kEncodedByteCount = (encoded_bit_count + 5) / 6;
     for (int32_t i = 0; i < kEncodedByteCount; ++i) {

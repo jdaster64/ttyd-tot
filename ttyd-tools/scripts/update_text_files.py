@@ -35,6 +35,8 @@ g_StringMap = {
         b"in_perfect_power_p":      b"Perfect Power P",
         b"in_pity_star":            b"Pity Star",
         b"in_pity_star_p":          b"Pity Star P",
+        b"tot_key_name":            b"Tower Key",
+        b"tot_mkey_name":           b"Master Key",
         
         # Special item descriptions.
         
@@ -57,6 +59,14 @@ g_StringMap = {
             
         b"msg_custom_ultra_hammer":
             b"An even more powerful hammer.",
+            
+        b"tot_key_desc":
+            b"Opens a single locked door.\n"
+            b"Works on non-midboss rooms.",
+            
+        b"tot_mkey_desc":
+            b"Opens a single locked door.\n"
+            b"Works on any room.",
             
         # Normal item descriptions.
         
@@ -1289,6 +1299,8 @@ g_StringMap = {
         b"tot_optr_npc_lumpy":          b"NPCs: Lumpy",
         b"tot_optr_npc_doopliss":       b"NPCs: Doopliss",
         b"tot_optr_npc_grubba":         b"NPCs: Grubba",
+        b"tot_optr_npc_mover":          b"NPCs: Mover",
+        b"tot_optr_npc_zess":           b"NPCs: Zess T.",
         
         b"tot_optr_off":                b"Off",
         b"tot_optr_on":                 b"On",
@@ -1397,6 +1409,14 @@ g_StringMap = {
             b"He'll give you extra conditions\n"
             b"for double-or-nothing winnings.",
             
+        b"tot_opth_npc_mover":
+            b"He can sell you special keys\n"
+            b"that let you skip encounters.",
+            
+        b"tot_opth_npc_zess":
+            b"She'll use her cooking skills to\n"
+            b"turn your items into rarer ones.",
+            
         # Map text.
         
         b"tot_lobby_frontsign":
@@ -1485,6 +1505,18 @@ g_StringMap = {
             b"<dkey><wait 300></dkey>\n"
             b"He'll sell us extra Star Pieces\n"
             b"to help rank up our moves.\n<k>",
+            
+        b"npc_mover":
+            b"<keyxon>\n[Placeholder] That's a Mover.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"Word has it, he can help us get\n"
+            b"through the tower faster.\n<k>",
+            
+        b"npc_zess":
+            b"<keyxon>\n[Placeholder] That's Zess T.\n"
+            b"<dkey><wait 300></dkey>\n"
+            b"She's a wonderful cook that can\n"
+            b"turn our items into rarer ones.\n<k>",
             
         b"\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae":
             b"<keyxon>\nThat's Chet Rippo, the\n"
@@ -1742,6 +1774,58 @@ g_StringMap = {
             b"<p>\nIf you'd care to lend me your\n"
             b"cash again, I can offer you the\n"
             b"same deal. What do you say?\n<o>",
+            
+        b"tot_mover_intro":
+            b"Hey.<wait 250> Wassup?<wait 250> I'm a Mover.\n"
+            b'<wait 250>\n'
+            b'I know a few things about\n'
+            b'getting through this tower.\n<k>\n<p>\n'
+            b'For a few coins, I can get you\n'
+            b'the key to where you wanna go.\n'
+            b'<wait 250>\n'
+            b"Whaddya thinkin'?\n<o>",
+            
+        b"tot_mover_menu":
+            b"<select 0 2 0 40>\n"
+            b"Tower Key (skips 1 non-midboss)\n"
+            b"Master Key (skips any 1 floor)\n"
+            b"I'm good, thanks!",
+            
+        b"tot_mover_decline":
+            b"<p>\n[Placeholder] That's too bad.\n<k>",
+            
+        b"tot_mover_offer0":
+            b"<p>\n[Placeholder] A Tower Key\n"
+            b"is gonna run you %d coins.\n"
+            b"<wait 250>Deal?\n<o>",
+            
+        b"tot_mover_offer1":
+            b"<p>\n[Placeholder] A Master Key\n"
+            b"is gonna run you %d coins.\n"
+            b"<wait 250>Deal?\n<o>",
+            
+        b"tot_mover_nocoins":
+            b'<p>\n'
+            b'Hey! <wait 100>You need more coins.\n'
+            b'<wait 250>\n'
+            b"Sorry, but a guy's gotta make\n"
+            b'a living, know what I mean?\n'
+            b'<k>',
+
+        b'tot_mover_success':
+            b'[Placeholder] Awright! \n'
+            b'<wait 150>My secret paths are...secret!<wait 250> \n'
+            b"We never spoke, <wait 150> got it?\n<k>",
+            
+        b"tot_mover_active":
+            b"[Placeholder] We never spoke,\n"
+            b"<wait 150>got it?\n<k>",
+            
+        b"tot_mover_full_inv":
+            b'<p>\n'
+            b"Hey! <wait 100>You're looking loaded up\n"
+            b'on gear already.<wait 250> You still sure\n'
+            b"ya got room for this?\n<o>",
             
         # NPC-related menu / help text.
         
