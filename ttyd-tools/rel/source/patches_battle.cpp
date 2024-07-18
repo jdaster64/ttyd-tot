@@ -1166,19 +1166,23 @@ void ReorderAndFilterWeaponTargets() {
 
     // For certain multitarget weapons, reorder targets so the attacker
     // is targeted last, to make sure the attack doesn't end prematurely.
-    if (twork.weapon == &ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka) {
-        for (int32_t i = 0; i < twork.num_targets - 1; ++i) {
-            int32_t target_unit_idx = 
-                twork.targets[twork.target_indices[i]].unit_idx;
-            if (target_unit_idx == twork.attacker_idx) {
-                // Swap with last target.
-                int32_t tmp = twork.target_indices[i];
-                twork.target_indices[i] = 
-                    twork.target_indices[twork.num_targets - 1];
-                twork.target_indices[twork.num_targets - 1] = tmp;
-                break;
+    switch (twork.weapon->item_id) {
+        case ItemType::TRADE_OFF:
+        case ItemType::LOVE_PUDDING:
+        case ItemType::PEACH_TART:
+            for (int32_t i = 0; i < twork.num_targets - 1; ++i) {
+                int32_t target_unit_idx = 
+                    twork.targets[twork.target_indices[i]].unit_idx;
+                if (target_unit_idx == twork.attacker_idx) {
+                    // Swap with last target.
+                    int32_t tmp = twork.target_indices[i];
+                    twork.target_indices[i] = 
+                        twork.target_indices[twork.num_targets - 1];
+                    twork.target_indices[twork.num_targets - 1] = tmp;
+                    break;
+                }
             }
-        }
+            break;
     }
 }
 

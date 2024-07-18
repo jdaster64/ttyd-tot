@@ -16,11 +16,13 @@
 #include <ttyd/battle.h>
 #include <ttyd/battle_actrecord.h>
 #include <ttyd/battle_database_common.h>
+#include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_information.h>
 #include <ttyd/battle_monosiri.h>
 #include <ttyd/battle_seq.h>
 #include <ttyd/battle_seq_command.h>
 #include <ttyd/battle_unit.h>
+#include <ttyd/evt_eff.h>
 #include <ttyd/evt_item.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mariost.h>
@@ -48,6 +50,9 @@ extern "C" {
     // currency_patches.s
     void StartCheckDeleteFieldItem();
     void BranchBackCheckDeleteFieldItem();
+    // turn_seq_patches.s
+    void StartCheckGradualSpRecovery();
+    void BranchBackCheckGradualSpRecovery();
     
     void checkMarioSingleJumpHammer() {
         auto* battleWork = ttyd::battle::g_BattleWork;
@@ -72,6 +77,10 @@ extern "C" {
                 break;
             }
         }
+    }
+
+    void checkGradualSpRecovery() {
+        mod::infinite_pit::battle_seq::CheckGradualSpRegenEffect();
     }
     
     int32_t calculateCoinDrops(
@@ -101,6 +110,8 @@ using ::ttyd::npcdrv::NpcEntry;
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
+int32_t g_GradualSpRecoveryTurns = 0;
+
 }
 
 // Function hooks.
@@ -127,6 +138,7 @@ extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_BH;
 extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_EH;
 extern const int32_t g_btlseqTurn_Patch_RuleDispShowLonger;
 extern const int32_t g_btlseqTurn_Patch_RuleDispDismissOnlyWithB;
+extern const int32_t g_btlseqTurn_SpGradualRecoveryProc_BH;
 extern const int32_t g_btlseqEnd_JudgeRuleEarly_BH;
 extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule;
 extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH;
@@ -334,6 +346,8 @@ void ApplyFixedPatches() {
             partner::RefreshExtraTattleStats();
             // Reset cost of Quick Change switches.
             battle::ResetPartySwitchCost();
+            // Reset SP regen status from prior fights.
+            g_GradualSpRecoveryTurns = 0;
             // Reset current Star Power to 0 + 50 per copy of Super Start.
             const int32_t sp = Min(
                 ttyd::mario_pouch::pouchEquipCheckBadge(
@@ -467,6 +481,12 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_itemseq_Bound_Patch_BounceRange),
         0x2c00007b /* cmpwi r0,0x7b (heart, not Pianta) */);
+    
+    // Handle per-turn SP recovery.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_btlseqTurn_SpGradualRecoveryProc_BH),
+        reinterpret_cast<void*>(StartCheckGradualSpRecovery),
+        reinterpret_cast<void*>(BranchBackCheckGradualSpRecovery));
 }
 
 int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
@@ -497,6 +517,30 @@ int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
         }
     }
     return result < 100 ? result : 100;
+}
+
+void StoreGradualSpRegenEffect() {
+    g_GradualSpRecoveryTurns = 3;
+}
+
+EVT_BEGIN(ApplyStardustEffectToMario)
+    USER_FUNC(
+        ttyd::battle_event_cmd::btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
+    USER_FUNC(
+        ttyd::evt_eff::evt_eff, PTR(""), PTR("stardust"), 2,
+        LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+    RETURN()
+EVT_END()
+
+void CheckGradualSpRegenEffect() {
+    if (g_GradualSpRecoveryTurns > 0) {
+        --g_GradualSpRecoveryTurns;
+        auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+        pouch.current_sp += pouch.max_sp / 3;
+        if (pouch.current_sp > pouch.max_sp) pouch.current_sp = pouch.max_sp;
+        ttyd::evtmgr::evtEntry(
+            const_cast<int32_t*>(ApplyStardustEffectToMario), 0, 0);
+    }
 }
 
 }  // namespace battle_seq

@@ -249,6 +249,7 @@ extern const int32_t g_btlseqTurn_HappyHeartProc_BH = 0x8011ded4;
 extern const int32_t g_btlseqTurn_HappyHeartProc_EH = 0x8011defc;
 extern const int32_t g_btlseqTurn_HappyFlowerProc_BH = 0x8011e08c;
 extern const int32_t g_btlseqTurn_HappyFlowerProc_EH = 0x8011e0b4;
+extern const int32_t g_btlseqTurn_SpGradualRecoveryProc_BH = 0x8011e36c;
 extern const int32_t g_BattleDrawEnemyHP_DrawEnemyHPText_BH = 0x8011ffcc;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH = 0x801204c8;
 extern const int32_t g_BattleCommandDisplay_HandleSelectSide_BH = 0x80120cf4;

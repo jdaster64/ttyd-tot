@@ -161,9 +161,9 @@ EVT_DEFINE_USER_FUNC(evtTot_GetKissThiefResult) {
     
     int32_t item = unit->held_item;
     // No held item; pick a random item to steal;
-    // 30% chance of item (20% normal, 10% recipe), 10% badge, 60% coin.
+    // 30% chance of item (20% common, 10% rare), 10% badge, 60% coin.
     if (!item) {
-        item = PickRandomItem(RNG_STOLEN_ITEM, 20, 10, 10, 60);
+        item = PickRandomItem(RNG_STOLEN_ITEM, 25, 5, 10, 60);
         if (!item) item = ItemType::COIN;
     }
     if ((ac_result & 2) == 0 || !ttyd::mario_pouch::pouchGetItem(item)) {

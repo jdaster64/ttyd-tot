@@ -1107,11 +1107,12 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
             battle_info->wHeldItems[i] = 0;
         }
     } else {
-        int32_t sp_rate = state.floor_ / 10;
+        // Base weight of Star Pieces; goes from 0 ~ 14 for non-midboss floors.
+        int32_t sp_rate = state.floor_ % 8 ? (state.floor_ / 8) * 2 : 0;
         // Make Star Pieces more likely if they can't be given by conditions.
         if (reward_mode == OPTVAL_DROP_HELD_FROM_BONUS) sp_rate += 10;
         for (int32_t i = 0; i < battle_info->pConfiguration->num_enemies; ++i) {
-            int32_t item = PickRandomItem(RNG_ENEMY_ITEM, 40, 20, 40, sp_rate);            
+            int32_t item = PickRandomItem(RNG_ENEMY_ITEM, 50, 10, 30, sp_rate);            
             if (!item) item = ItemType::STAR_PIECE;
             battle_info->wHeldItems[i] = item;
         }

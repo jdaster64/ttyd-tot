@@ -634,21 +634,23 @@ NpcSetupInfo g_NpcSetup[3] = {
 EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     int16_t* inventory = GetCharlietonInventoryPtr();
     
-    // Pick N normal items, special items, and badges.
-    // Normal stock = 5 of each, smaller / limited = 3 of each.
-    int32_t kNumItemsPerType = 3;
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_CHARLIETON_NORMAL)) {
-        kNumItemsPerType = 5;
+    // Normal / limited stock = 5 common, 2 rare, 5 (+1 unique) badges;
+    // Smaller stock = 3 common, 1 rare, 3 (+1 unique) badges.
+    int32_t kNumItemsPerType = 5;
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_CHARLIETON_SMALLER)) {
+        kNumItemsPerType = 3;
     }
-    for (int32_t i = 0; i < kNumItemsPerType * 3; ++i) {
+    int32_t kTotalItems = kNumItemsPerType * 5 / 2;
+    
+    for (int32_t i = 0; i < kTotalItems; ++i) {
         bool found = true;
         while (found) {
             found = false;
             int32_t item = PickRandomItem(
                 RNG_NPC_OPTIONS,
-                i / kNumItemsPerType == 0,
-                i / kNumItemsPerType == 1, 
-                i / kNumItemsPerType == 2, 
+                i < kNumItemsPerType,
+                i >= kNumItemsPerType && i < kNumItemsPerType * 3 / 2,
+                i >= kNumItemsPerType * 3 / 2,
                 0);
             // Make sure no duplicate items exist.
             for (int32_t j = 0; j < i; ++j) {
@@ -665,13 +667,11 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     int32_t num_badges = kNumItemsPerType;
     int32_t special_badge = RewardManager::GetUniqueBadgeForShop();
     if (special_badge) {
-        inventory[kNumItemsPerType * 3 + 0] = special_badge;
-        // inventory[kNumItemsPerType * 3 + 1] = ItemType::STAR_PIECE;
-        inventory[kNumItemsPerType * 3 + 1] = -1;
+        inventory[kTotalItems + 0] = special_badge;
+        inventory[kTotalItems + 1] = -1;
         ++num_badges;
     } else {
-        // inventory[kNumItemsPerType * 3 + 0] = ItemType::STAR_PIECE;
-        inventory[kNumItemsPerType * 3 + 0] = -1;
+        inventory[kTotalItems + 0] = -1;
     }
     
     // Sort each category by ascending price.
@@ -679,10 +679,10 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
         &inventory[kNumItemsPerType * 0], kNumItemsPerType, sizeof(int16_t),
         (void*)BuyPriceComparator);
     qqsort(
-        &inventory[kNumItemsPerType * 1], kNumItemsPerType, sizeof(int16_t),
+        &inventory[kNumItemsPerType * 1], kNumItemsPerType / 2, sizeof(int16_t),
         (void*)BuyPriceComparator);
     qqsort(
-        &inventory[kNumItemsPerType * 2], num_badges, sizeof(int16_t),
+        &inventory[kNumItemsPerType * 3 / 2], num_badges, sizeof(int16_t),
         (void*)BuyPriceComparator);
     
     return 2;

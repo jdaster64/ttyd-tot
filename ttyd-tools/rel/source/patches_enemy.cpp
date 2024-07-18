@@ -160,6 +160,7 @@ bool GetEnemyConsumeItem(ttyd::evtmgr::EvtEntry* evt) {
 void* EnemyUseAdditionalItemsCheck(BattleWorkUnit* unit) {
     switch (unit->held_item) {
         // Items that aren't normally usable but work with no problems:
+        case ItemType::COCONUT:
         case ItemType::COURAGE_MEAL:
         case ItemType::EGG_BOMB:
         case ItemType::COCONUT_BOMB:
@@ -167,20 +168,24 @@ void* EnemyUseAdditionalItemsCheck(BattleWorkUnit* unit) {
         case ItemType::HOT_SAUCE:
         case ItemType::SPITE_POUCH:
         case ItemType::KOOPA_CURSE:
-        case ItemType::SHROOM_BROTH:
+        case ItemType::ELECTRO_POP:
         case ItemType::LOVE_PUDDING:
         case ItemType::PEACH_TART:
-        case ItemType::ELECTRO_POP:
+        case ItemType::SPACE_FOOD:
+        // Try to use for status effects even if not needed for healing:
+        case ItemType::SPICY_PASTA:
+        case ItemType::FRUIT_PARFAIT:
         // Additional items (would not have the desired effect without patches):
         case ItemType::POISON_SHROOM:
         case ItemType::POINT_SWAP:
         case ItemType::TRIAL_STEW:
         case ItemType::TRADE_OFF:
             return ttyd::battle_enemy_item::_check_attack_item(unit);
-        case ItemType::FRESH_JUICE:
         case ItemType::HEALTHY_SALAD:
             return ttyd::battle_enemy_item::_check_status_recover_item(unit);
         // Explicitly not allowed:
+        case ItemType::MYSTIC_EGG:
+        case ItemType::METEOR_MEAL:
         case ItemType::FRIGHT_MASK:
         case ItemType::MYSTERY:
         default:

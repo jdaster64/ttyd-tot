@@ -326,7 +326,7 @@ void SetPinchThreshold(BattleUnitKind* kind, int32_t max_hp, bool peril) {
 
 int32_t GetRandomAudienceItem(int32_t item_type) {
     if (g_Mod->state_.GetOption(tot::OPT_AUDIENCE_RANDOM_THROWS)) {
-        item_type = PickRandomItem(tot::RNG_AUDIENCE_ITEM, 20, 10, 5, 15);
+        item_type = PickRandomItem(tot::RNG_AUDIENCE_ITEM, 25, 5, 5, 15);
         if (item_type <= 0) {
             // Pick a coin, heart, flower, or random bad item if "none" selected.
             switch (g_Mod->state_.Rand(10, tot::RNG_AUDIENCE_ITEM)) {

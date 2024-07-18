@@ -47,6 +47,8 @@ g_NewIconDefs = [
     [(623, 0)],
     # Pity Star P badge
     [(624, 0)],
+    # Hottest Dog item
+    [(625, 0)],
 ]
 g_IconDefs = []
 

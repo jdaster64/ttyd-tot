@@ -176,7 +176,7 @@ void OptionsManager::InitFromSelectedOptions() {
             // Give 4 to 6 random items, based on the seed.
             int32_t num_items = state.Rand(3, RNG_STARTER_ITEM) + 4;
             for (int32_t i = 0; i < num_items; ++i) {
-                int32_t item_type = PickRandomItem(RNG_STARTER_ITEM, 10, 5, 0, 0);
+                int32_t item_type = PickRandomItem(RNG_STARTER_ITEM, 15, 5, 0, 0);
                 ttyd::mario_pouch::pouchGetItem(item_type);
             }
             break;

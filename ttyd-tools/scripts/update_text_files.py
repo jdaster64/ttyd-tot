@@ -20,26 +20,31 @@ g_StringMap = {
         # Generic placeholder string.
         b"tot_msg_dummy":       b"Placeholder",
         
-        # Item names.
-        b"in_cake":             b"Strawberry Cake",
-        b"in_suitoru":          b"HP-Sucker",
-        b"in_2bai_damage":      b"No Pain, No Gain",
-        b"in_toughen_up":       b"Toughen Up",
-        b"in_toughen_up_p":     b"Toughen Up P",
-        b"in_super_start":      b"Super Start",
-        b"in_perfect_power":    b"Perfect Power",
-        b"in_perfect_power_p":  b"Perfect Power P",
-        b"in_pity_star":        b"Pity Star",
-        b"in_pity_star_p":      b"Pity Star P",
+        # Item & badge names.
+        b"in_cake":                 b"Strawberry Cake",
+        b"in_suitoru":              b"HP-Sucker",
+        b"in_nancy_tea":            b"Maple Tea",
+        b"in_first_love_pudding":   b"Sweet Pudding",
+        b"in_peach_talt":           b"Sour Tart",
+        b"in_kararina_pasta":       b"Hottest Dog",
+        b"in_2bai_damage":          b"No Pain, No Gain",
+        b"in_toughen_up":           b"Toughen Up",
+        b"in_toughen_up_p":         b"Toughen Up P",
+        b"in_super_start":          b"Super Start",
+        b"in_perfect_power":        b"Perfect Power",
+        b"in_perfect_power_p":      b"Perfect Power P",
+        b"in_pity_star":            b"Pity Star",
+        b"in_pity_star_p":          b"Pity Star P",
         
-        # Item descriptions.
+        # Special item descriptions.
+        
         b"msg_super_coin":
             b"A powerful object that ranks\n"
             b"up a move of your choice.",
 
         b'msg_star_piece':
             b'A capricious object that ranks\n'
-            b'up a random move.',
+            b'up your moves at random.',
             
         b"msg_custom_super_boots":
             b"A stronger pair of boots.",
@@ -52,10 +57,80 @@ g_StringMap = {
             
         b"msg_custom_ultra_hammer":
             b"An even more powerful hammer.",
+            
+        # Normal item descriptions.
+        
+        b"msg_kaminari_gorogoro":
+            b"Strikes a single enemy with\n"
+            b"lightning, dealing 5 damage.",
+        
+        b"msg_kaminari_dokkan":
+            b"Strikes all enemies with\n"
+            b"lightning, dealing 5 damage.",
+        
+        b"msg_kirakira_otoshi":
+            b"Drops a shower of stars\n"
+            b"on enemies for 6 damage.",
+        
+        b"msg_koori_no_ibuki":
+            b"Deals 3 ice damage to all foes,\n"
+            b"and might freeze them.",
+        
+        b"msg_fire_flower":
+            b"Deals 3 fire damage to all foes,\n"
+            b"and might burn them.",
+        
+        b"msg_yurayura_jishin":
+            b"Hits all ground-bound foes for\n"
+            b"6 damage, and can flip them.",
+
+        b'msg_pow_block':
+            b'Hits all foes for 2 damage,\n'
+            b'and can flip certain enemies.',
+
+        b'msg_dekadeka_drink':
+            b"Makes you Huge, temporarily\n"
+            b'increasing power by 50%.',
+
+        b'msg_kachikachi_koura':
+            b'Boosts your Defense power\n'
+            b'by 3 for a short while.',
+            
+        b"msg_teki_kyouka":
+            b"Enemies drop extra coins, but\n"
+            b"temporarily gain +3 ATK.",
+
+        b'msg_minimini_kun':
+            b'Briefly shrinks enemies,\n'
+            b'reducing damage by 50%.',
+
+        b'msg_ultra_kinoko':
+            b'A feel-great mushroom.\n'
+            b'Replenishes 30 HP.',
+
+        b'msg_royal_jelly':
+            b'A highly nutritious snack.\n'
+            b'Restores 30 FP.',
+
+        b'msg_hotdog':
+            b"A tasty hot dog that restores\n"
+            b'5 HP and 5 FP.',
         
         b"msg_cake":
             b"Scrumptious strawberry cake.\n"
             b"Heals 5 to 30 HP and FP.",
+
+        b'msg_coconuts':
+            b"Hard fruit that's probably\n"
+            b"better tossed than eaten.",
+
+        b'msg_wonder_egg':
+            b'A mystical egg that restores\n'
+            b'a third of your Star Power.',
+
+        b'msg_red_kararin':
+            b'A red-hot sauce that charges\n'
+            b"your next attack's power by 3.",
             
         b"msg_shikaeshi_no_kona":
             b"Direct attackers take back\n"
@@ -64,30 +139,320 @@ g_StringMap = {
         b"msg_kame_no_noroi":
             b"Has a chance of inducing Slow \n"
             b"status on all foes.",
+
+        b'list_kinoko_itame':
+            b'A tasty mushroom dish that\n'
+            b'replenishes 8 HP and 2 FP.\n'
+            b'Made by cooking a Mushroom.',
+
+        b'msg_kinoko_itame':
+            b'A tasty mushroom dish that\n'
+            b'replenishes 8 HP and 2 FP.',
+
+        b'list_kinoko_foil_yaki':
+            b'A hearty mushroom dish that\n'
+            b'replenishes 15 HP and 5 FP.\n'
+            b'Made by cooking a Super\n'
+            b'Shroom.',
+
+        b'msg_kinoko_foil_yaki':
+            b'A hearty mushroom dish that\n'
+            b'replenishes 15 HP and 5 FP.',
+
+        b'list_kinoko_steak':
+            b'A supreme mushroom dish that\n'
+            b'replenishes 45 HP and 10 FP.\n'
+            b'Made by cooking an Ultra\n'
+            b'Shroom.',
+
+        b'msg_kinoko_steak':
+            b'A supreme mushroom dish that\n'
+            b'replenishes 45 HP and 10 FP.',
+
+        b'list_honey_kinoko':
+            b'A sweet-topped mushroom that\n'
+            b'replenishes 5 HP and 5 FP.\n'
+            b'Made by cooking a Mushroom\n'
+            b'or Honey Syrup.',
+
+        b'msg_honey_kinoko':
+            b'A sweet-topped mushroom that\n'
+            b'replenishes 5 HP and 5 FP.',
+
+        b'list_maple_kinokoS':
+            b'A sweet-topped mushroom that\n'
+            b'replenishes 10 HP and 10 FP.\n'
+            b'Made by cooking a Super\n'
+            b'Shroom or Maple Syrup.',
+
+        b'msg_maple_kinokoS':
+            b'A sweet-topped mushroom that\n'
+            b'replenishes 10 HP and 10 FP.',
+
+        b'list_royal_kinokoZ':
+            b'A sweet-topped mushroom that\n'
+            b'replenishes 30 HP and 30 FP.\n'
+            b'Made by cooking an Ultra\n'
+            b"Shroom or Jammin' Jelly.",
+
+        b'msg_royal_kinokoZ':
+            b'A sweet-topped mushroom that\n'
+            b'replenishes 30 HP and 30 FP.',
+
+        b'list_nancy_dinner':
+            b'A nice meal made by Zess T.\n'
+            b'Replenishes 15 HP and 15 FP.\n'
+            b'Made by mixing two healing\n'
+            b'items with small recovery.',
+
+        b'msg_nancy_dinner':
+            b'A nice meal made by Zess T.\n'
+            b'Replenishes 15 HP and 15 FP.',
+
+        b'list_nancy_special':
+            b'A tasty meal made by Zess T.\n'
+            b'Replenishes 25 HP and 25 FP.\n'
+            b'Made by mixing two healing\n'
+            b'items with moderate recovery.',
+
+        b'msg_nancy_special':
+            b'A tasty meal made by Zess T.\n'
+            b'Replenishes 25 HP and 25 FP.',
+
+        b'list_nancy_delux':
+            b"A feast made by Zess T.\n"
+            b'Replenishes 50 HP and 50 FP.\n'
+            b'Made by mixing two healing\n'
+            b'items with strong recovery.',
+
+        b'msg_nancy_delux':
+            b"A feast made by Zess T.\n"
+            b'Replenishes 50 HP and 50 FP.',
+
+        b'list_nancy_dynamite':
+            b'Explosives made by Zess T.\n'
+            b'Deals 10 damage to all foes.\n'
+            b'Made by mixing two rare\n'
+            b'attacking items.',
+
+        b'msg_nancy_dynamite':
+            b'Explosives made by Zess T.\n'
+            b'Deals 10 damage to all foes.',
+
+        b'list_nancy_tea':
+            b'A maple-sweetened tea that\n'
+            b'replenishes 20 FP.\n'
+            b'Made by cooking Maple Syrup.',
+
+        b'msg_nancy_tea':
+            b'A maple-sweetened tea that\n'
+            b'replenishes 20 FP.',
+
+        b'list_space_food':
+            b'Dry food that makes your\n'
+            b'status unable to change.\n'
+            b'Made by cooking a Dried\n'
+            b'Shroom or Tasty Tonic.',
+
+        b'msg_space_food':
+            b'Dry food that makes your\n'
+            b'status unable to change.',
+
+        b'list_snow_rabbit':
+            b'A captivating dessert that\n'
+            b'heals 30 HP but freezes you.\n'
+            b'Made by cooking an Ice Storm.',
+
+        b'msg_snow_rabbit':
+            b'A captivating dessert that\n'
+            b'heals 30 HP but freezes you.',
+
+        b'list_coconuts_bomb':
+            b'An explosive Coconut that\n'
+            b'deals 7 damage to one enemy.\n'
+            b'Made by cooking a Coconut.',
+
+        b'msg_coconuts_bomb':
+            b'An explosive Coconut that\n'
+            b'deals 7 damage to one enemy.',
+
+        b'list_kachikachi_dish':
+            b'Hard food that damages and\n'
+            b'may soften an enemy.\n'
+            b'Made by cooking a Courage\n'
+            b'Shell.',
+
+        b'msg_kachikachi_dish':
+            b'Hard food that damages and\n'
+            b'may soften an enemy.',
+
+        b'list_kinoko_cake':
+            b'A hearty mushroom cake.\n'
+            b'Replenishes 30 HP and 10 FP.\n'
+            b'Made by redecorating a\n'
+            b'Strawberry Cake.',
+
+        b'msg_kinoko_cake':
+            b'A hearty mushroom cake.\n'
+            b'Replenishes 30 HP and 10 FP.',
+
+        b'list_mousse_cake':
+            b'A moist, fluffy cake.\n'
+            b'Replenishes 10 HP and 30 FP.\n'
+            b'Made by redecorating a\n'
+            b'Strawberry Cake.',
+
+        b'msg_mousse_cake':
+            b'A moist, fluffy cake.\n'
+            b'Replenishes 10 HP and 30 FP.',
+
+        b'list_fruit_parfait':
+            b'Dessert made to last! Heals 5\n'
+            b'HP and FP, and more over time.\n'
+            b'Made by cooking an Ice Storm.',
+
+        b'msg_fruit_parfait':
+            b'Dessert made to last! Heals 5\n'
+            b'HP and FP, and more over time.',
+
+        b'list_bomb_egg':
+            b'An explosive egg that deals\n'
+            b'6 damage to one enemy.\n'
+            b'Made by cooking a Mystic Egg.',
+
+        b'msg_bomb_egg':
+            b'An explosive egg that deals\n'
+            b'6 damage to one enemy.',
+
+        b'list_tea_kinoko':
+            b'Mellow soup that heals 20 HP\n'
+            b'and FP, but drops ATK and DEF.\n'
+            b'Made by cooking a Mini Mr.\n'
+            b'Mini or Mr. Softener.',
+
+        b'msg_tea_kinoko':
+            b'Mellow soup that heals 20 HP\n'
+            b'and FP, but drops ATK and DEF.',
+
+        b'list_poisoned_kinoko':
+            b'A dubious mushroom. It might\n'
+            b"poison you, or heal you to full!\n"
+            b'Made by cooking an HP-Sucker\n'
+            b'or a Life Shroom.',
+
+        b'msg_poisoned_kinoko':
+            b'A dubious mushroom. It might\n'
+            b"poison you, or heal to full!",
+
+        b'list_first_love_pudding':
+            b'Amazing pudding brimming\n'
+            b'with positive energy.\n'
+            b'Made by cooking an item\n'
+            b'that gives a helpful status.',
+
+        b'msg_first_love_pudding':
+            b'Amazing pudding brimming\n'
+            b'with positive energy.',
+
+        b'list_peach_talt':
+            b'A tart-tasting pastry that\n'
+            b'spreads negative energy.\n'
+            b'Made by cooking an item\n'
+            b'that gives a harmful status.',
+
+        b'msg_peach_talt':
+            b'A tart-tasting pastry that\n'
+            b'spreads negative energy.',
+
+        b'list_starry_dinner':
+            b'An out-of-this-world dish that\n'
+            b'slowly recovers HP, FP and SP!\n'
+            b'Made by cooking a Shooting\n'
+            b'Star or slow-healing item.',
+
+        b'msg_starry_dinner':
+            b'An out-of-this-world dish that\n'
+            b'slowly recovers HP, FP and SP!',
+
+        b'list_last_dinner':
+            b'A pitch-black stew that\n'
+            b'yields incredible results.\n'
+            b"Made by mixing a dangerous\n"
+            b'and a helpful item.',
+
+        b'msg_last_dinner':
+            b'A pitch-black stew that\n'
+            b'yields incredible results.',
+
+        b'list_kararina_pasta':
+            b'A spicy coney that heals 7 HP\n'
+            b'and 7 FP, and gives +3 Charge.\n'
+            b'Made by cooking a Hot Dog\n'
+            b'or Hot Sauce.',
+
+        b'msg_kararina_pasta':
+            b'A spicy coney that heals 7 HP\n'
+            b'and 7 FP, and gives +3 Charge.',
+
+        b'list_biribiri_candy':
+            b'Candy that restores 15 FP\n'
+            b'and applies Electric status.\n'
+            b'Made by cooking an item\n'
+            b'with ties to electricity.',
+
+        b'msg_biribiri_candy':
+            b'Candy that restores 15 FP\n'
+            b'and applies Electric status.',
             
-        b"msg_teki_kyouka":
-            b"Enemies drop extra coins, but\n"
-            b"temporarily gain +3 ATK.",
+        b'list_fire_candy':
+            b'A treat that heals 30 FP,\n'
+            b'but has a burning aftertaste.\n'
+            b'Made by cooking a Fire\n'
+            b'Flower.',
+
+        b'msg_fire_candy':
+            b'A treat that heals 30 FP,\n'
+            b'but has a burning aftertaste.',
+
+        b'list_honey_candy':
+            b'Sweet candy that\n'
+            b'replenishes 15 FP.\n'
+            b'Made by cooking a Honey\n'
+            b'Syrup.',
+
+        b'msg_honey_candy':
+            b'Sweet candy that\n'
+            b'replenishes 15 FP.',
+
+        b'list_coconut_candy':
+            b'Hard candy that heals\n'
+            b'3 HP and 15 FP.\n'
+            b'Made by cooking a Coconut.',
+
+        b'msg_coconut_candy':
+            b'Hard candy that heals\n'
+            b'3 HP and 15 FP.',
+
+        b'list_royal_candy':
+            b'Fruit-flavored candy that\n'
+            b'restores 50 FP.\n'
+            b"Made by cooking a Jammin'\n"
+            b"Jelly.",
+
+        b'msg_royal_candy':
+            b'Fruit-flavored candy that\n'
+            b'restores 50 FP.',
+
+        b'list_healthy_salad':
+            b'Healthy food that heals 10\n'
+            b'HP and FP, and cures ailments.\n'
+            b'Made by cooking Tasty Tonic.',
+
+        b'msg_healthy_salad':
+            b'Healthy food that heals 10\n'
+            b'HP and FP, and cures ailments.',
             
-        b"msg_ice_candy":
-            b"A dessert made by Zess T.\n"
-            b"Gives 15 FP, but might freeze!",
-            
-        b"list_ice_candy":
-            b"A dessert made by Zess T.\n"
-            b"Gives 15 FP, but might freeze!\n"
-            b"Made by mixing Honey Syrup \n"
-            b"with an Ice Storm.",
-            
-        b"msg_nancy_frappe":
-            b"A dessert made by Zess T.\n"
-            b"Gives 20 FP, but might freeze!",
-            
-        b"list_nancy_frappe":
-            b"A dessert made by Zess T.\n"
-            b"Gives 20 FP, but might freeze!\n"
-            b"Made by mixing Maple Syrup \n"
-            b"with an Ice Storm.",
+        # Badge descriptions.
 
         b'menu_power_plus':
             b"Boosts Mario's attack power\n"
@@ -470,6 +835,10 @@ g_StringMap = {
             b'Immobilizes enemies and slows\n'
             b'bosses for a few turns.',
             
+        b"tot_sp_regen_effect":
+            b"Star Power will regenerate\n"
+            b"over a few turns.",
+            
         b"tot_ptr1_scope_out_effect_msg1":
             b"Scoped! The next attack is\n"
             b"guaranteed to land!",
@@ -493,6 +862,10 @@ g_StringMap = {
         b"msg_st_chg_allergy":
             b"Allergic! Status effects\n"
             b"cannot be changed!",
+
+        b'msg_st_chg_freeze':
+            b"Frozen! Breaking hits will\n"
+            b'deal double damage!',
 
         b'msg_st_chg_big':
             b'Huge! Attack power is\n'

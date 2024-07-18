@@ -25,11 +25,11 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Bitfields of whether each item is included in its respective pool or not;
 // item X is enabled if kItemPool[X / 16 - offset] & (1 << (X % 16)) != 0.
-static constexpr const uint16_t kNormalItems[] = {
-    0xffff, 0xffff, 0x000f, 0x0006
+static constexpr const uint16_t kCommonItems[] = {
+    0xffdf, 0xffff, 0x214f, 0x0006, 0x0000, 0x0000, 0x0000
 };
-static constexpr const uint16_t kRecipeItems[] = {
-    0x2020, 0xffb8, 0x3edf, 0x97ef, 0x0bff
+static constexpr const uint16_t kRareItems[] = {
+    0x0020, 0x0000, 0x0000, 0x88b8, 0x5e60, 0x0333, 0x02fd
 };
 static constexpr const uint16_t kStackableBadges[] = {
     0x0000, 0xffff, 0x0e3f, 0xfff7, 0x018f, 0xf000, 0x0007
@@ -93,15 +93,15 @@ int32_t PickRandomItem(
     
     int32_t current_weight = normal_item_weight;
     if (result < current_weight) {
-        bitfield = kNormalItems;
-        len_bitfield = sizeof(kNormalItems) / sizeof(uint16_t);
+        bitfield = kCommonItems;
+        len_bitfield = sizeof(kCommonItems) / sizeof(uint16_t);
         offset = 0x80;
     } else {
         current_weight += recipe_item_weight;
         if (result < current_weight) {
-            bitfield = kRecipeItems;
-            len_bitfield = sizeof(kRecipeItems) / sizeof(uint16_t);
-            offset = 0xa0;
+            bitfield = kRareItems;
+            len_bitfield = sizeof(kRareItems) / sizeof(uint16_t);
+            offset = 0x80;
         } else {
             current_weight += badge_weight;
             if (result < current_weight) {
@@ -165,9 +165,9 @@ void ObfuscateItems(bool enable) {
     
     uint16_t* ptr = ids;
     ptr = PopulateFromBitfield(
-        ptr, kNormalItems, sizeof(kNormalItems) / sizeof(uint16_t), 0x80);
+        ptr, kCommonItems, sizeof(kCommonItems) / sizeof(uint16_t), 0x80);
     ptr = PopulateFromBitfield(
-        ptr, kRecipeItems, sizeof(kRecipeItems) / sizeof(uint16_t), 0xa0);
+        ptr, kRareItems, sizeof(kRareItems) / sizeof(uint16_t), 0x80);
     const int32_t num_items = (ptr - ids);
         
     ptr = PopulateFromBitfield(

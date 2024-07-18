@@ -591,6 +591,7 @@ namespace IconType {
         TOT_BLANK,
         PITY_STAR,
         PITY_STAR_P,
+        HOTTEST_DOG,
     };
 }
 

@@ -104,9 +104,9 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEggLayItem) {
     
     int32_t item = unit->held_item;
     // No held item; pick a random item to get;
-    // 30% chance of item (20% normal, 10% recipe), 10% badge, 60% coin.
+    // 30% chance of item (25% common, 5% rare), 10% badge, 60% coin.
     if (!item) {
-        item = PickRandomItem(RNG_STOLEN_ITEM, 20, 10, 10, 60);
+        item = PickRandomItem(RNG_STOLEN_ITEM, 25, 5, 10, 60);
         if (!item) item = ItemType::COIN;
     }
     if (!ttyd::mario_pouch::pouchGetItem(item)) {

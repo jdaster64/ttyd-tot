@@ -100,7 +100,7 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
     
     // Use the unused "random_item_weight" field to store the item reward.
     int32_t* item_reward = &npc_info->pConfiguration->random_item_weight;
-    *item_reward = PickRandomItem(RNG_ENEMY_CONDITION_ITEM, 10, 10, 40, sp_rate);
+    *item_reward = PickRandomItem(RNG_ENEMY_CONDITION_ITEM, 13, 7, 40, sp_rate);
     // If the "none" case was picked, make it a Star Piece.
     if (*item_reward <= 0) *item_reward = ItemType::STAR_PIECE;
     
