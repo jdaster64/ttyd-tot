@@ -139,7 +139,9 @@ struct BattleWorkCommand {
     BattleWorkCommandCursor     cursor_table[14];
     int8_t          unk_540[0x1c];
     void*           window_work;
-    int8_t          unk_560[0x14];
+    int8_t          unk_560[0x4];
+    int32_t         selection_error_msg;
+    int8_t          unk_568[0xc];
 } ;
 
 static_assert(sizeof(BattleWorkCommand) == 0x574);

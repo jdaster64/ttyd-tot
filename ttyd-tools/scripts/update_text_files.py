@@ -888,6 +888,12 @@ g_StringMap = {
         b"tot_status_withdraw":
             b"Invulnerable to all\n"
             b"attacks this turn!",
+
+        b'tot_selerr_infatuate':
+            b"Already Infatuated an enemy!",
+
+        b'tot_selerr_megaton_bomb':
+            b"Megaton Bomb already deployed!",
             
         b"msg_gatsun_jump":
             b"Attack an enemy with a single\n"

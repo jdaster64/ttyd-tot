@@ -24,6 +24,8 @@
 #include <ttyd/battle_unit.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_item.h>
+#include <ttyd/evtmgr.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mariost.h>
 #include <ttyd/npcdrv.h>
@@ -103,6 +105,9 @@ using ::ttyd::battle_database_common::BattleGroupSetup;
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::battle_database_common::PointDropData;
 using ::ttyd::battle_unit::BattleWorkUnit;
+using ::ttyd::evtmgr::EvtEntry;
+using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::npcdrv::FbatBattleInformation;
 using ::ttyd::npcdrv::NpcBattleInfo;
 using ::ttyd::npcdrv::NpcEntry;
@@ -120,6 +125,9 @@ extern void (*g_fbatBattleMode_trampoline)(void);
 extern void (*g_BtlActRec_JudgeRuleKeep_trampoline)(void);
 extern void (*g__rule_disp_trampoline)(void);
 extern BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t);
+extern int32_t (*g_BattleSeqCmd_get_msg_trampoline)(EvtEntry*, bool);
+extern void (*g__btlcmd_UpdateSelectWeaponTable_trampoline)(
+    BattleWork*, int32_t);
 extern int32_t (*g__btlcmd_MakeSelectWeaponTable_trampoline)(
     BattleWork*, int32_t);
 extern void (*g_BattleCommandInit_trampoline)(BattleWork*);
@@ -390,6 +398,81 @@ void ApplyFixedPatches() {
             // Replaces the original logic completely.
             return tot::party_mario::MakeSelectWeaponTable(
                 battleWork, table_type);
+        });
+        
+    // Hook to disable moves under special circumstances.
+    g__btlcmd_UpdateSelectWeaponTable_trampoline = patch::hookFunction(
+        ttyd::battle_seq_command::_btlcmd_UpdateSelectWeaponTable, [](
+            BattleWork* battleWork, int32_t table_type) {
+            // Run original logic.
+            g__btlcmd_UpdateSelectWeaponTable_trampoline(battleWork, table_type);
+            
+            ttyd::battle::BattleWorkCommandCursor* cursor;
+            ttyd::battle_seq_command::_btlcmd_GetCursorPtr(
+                &battleWork->command_work, table_type, &cursor);
+            if (!cursor) return;
+            // Run extra logic to disable moves under special circumstances.
+            for (int32_t i = 0; i < cursor->num_options; ++i) {
+                auto& weapon = battleWork->command_work.weapon_table[i];
+                if (!weapon.weapon || weapon.item_id) continue;
+                switch (weapon.index) {
+                    case tot::MoveType::VIVIAN_INFATUATE: {
+                        // Disable if there is already an Infatuated enemy.
+                        bool disable = false;
+                        for (int32_t i = 0; i < 64; ++i) {
+                            auto* unit = battleWork->battle_units[i];
+                            if (unit && unit->alliance == 0 &&
+                                unit->current_kind <= BattleUnitType::BONETAIL) {
+                                disable = true;
+                                break;
+                            }
+                        }
+                        if (disable) {
+                            weapon.unk_04 = 0;
+                            weapon.unk_18 = 10;
+                        }
+                        break;
+                    }
+                    case tot::MoveType::BOBBERY_MEGATON_BOMB: {
+                        // Disable if there is already an active Megaton Bomb.
+                        bool disable = false;
+                        for (int32_t i = 0; i < 64; ++i) {
+                            auto* unit = battleWork->battle_units[i];
+                            if (unit &&
+                                unit->current_kind == BattleUnitType::BOMB_SQUAD_BOMB &&
+                                unit->unit_work[2] == 2) {
+                                disable = true;
+                                break;
+                            }
+                        }
+                        if (disable) {
+                            weapon.unk_04 = 0;
+                            weapon.unk_18 = 11;
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+        
+    // Handle additional "can't select move" message types.
+    g_BattleSeqCmd_get_msg_trampoline = patch::hookFunction(
+        ttyd::battle_seq_command::BattleSeqCmd_get_msg,
+        [](EvtEntry* evt, bool isFirstCall) {
+            // Check for new message types.
+            auto* battleWork = ttyd::battle::g_BattleWork;
+            switch (battleWork->command_work.selection_error_msg) {
+                case 10:
+                    evtSetValue(
+                        evt, evt->evtArguments[0], PTR("tot_selerr_infatuate"));
+                    return 2;
+                case 11:
+                    evtSetValue(
+                        evt, evt->evtArguments[0], PTR("tot_selerr_megaton_bomb"));
+                    return 2;
+            }
+            // Run vanilla logic.
+            return g_BattleSeqCmd_get_msg_trampoline(evt, isFirstCall);
         });
     
     g_BattleCommandInit_trampoline = patch::hookFunction(

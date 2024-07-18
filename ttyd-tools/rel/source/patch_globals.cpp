@@ -118,8 +118,12 @@ uint32_t (*g_BattleCheckConcluded_trampoline)(BattleWork*) = nullptr;
 void (*g__rule_disp_trampoline)(void) = nullptr;
 // battle_seq.o  8011edb8
 BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t) = nullptr;
+// battle_seq_command.o  8011f488
+int32_t (*g_BattleSeqCmd_get_msg_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_seq_command.o  8011f62c
 void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*) = nullptr;
+// battle_seq_command.o  80123db0
+void (*g__btlcmd_UpdateSelectWeaponTable_trampoline)(BattleWork*, int32_t) = nullptr;
 // battle_seq_command.o  80123ec0
 int32_t (*g__btlcmd_MakeSelectWeaponTable_trampoline)(BattleWork*, int32_t) = nullptr;
 // battle_seq_command.o  80125380

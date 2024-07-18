@@ -745,12 +745,14 @@ void SelectChestContents() {
     if (partner_pool_size > 4) {
         // Slightly increase partner weight.
         kMoveWeights[3] += (partner_pool_size - 4) * 8;
+        // Slightly increase overall move weight.
+        top_level_weights[0] += (partner_pool_size - 4);
     } else if (partner_pool_size < 4) {
-        // Decrease partner weight, and increase jump/hammer accordingly.
-        const int32_t diff = kMoveWeights[3] * (4 - partner_pool_size) / 4;
-        kMoveWeights[3] -= diff;
-        kMoveWeights[0] += diff / 2;
-        kMoveWeights[1] += diff / 2;
+        // Decrease partner weight, slightly decrease Star Power weight.
+        kMoveWeights[3] *= partner_pool_size / 4;
+        kMoveWeights[2] -= 2 * (4 - partner_pool_size);
+        // Slightly decrease overall move weight.
+        top_level_weights[0] -= 1.75 * (4 - partner_pool_size);
     }
 
     // Filter out stat-ups that are forced to 0 / have reached their maximum.

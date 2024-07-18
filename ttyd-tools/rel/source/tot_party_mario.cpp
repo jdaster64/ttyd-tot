@@ -276,19 +276,19 @@ int32_t MakeSelectWeaponTable(BattleWork* battleWork, int32_t table_type) {
     
     // Update cursor bounds / position.
     if (num_options < 1) {
-      num_options = 0;
+        num_options = 0;
     }
     else {
-      cursor->num_options = num_options;
-      if (cursor->num_options <= cursor->abs_position) {
-        cursor->abs_position = cursor->num_options - 1;
-      }
-      while (cursor->num_options < cursor->rel_position + 6 &&
-             0 < cursor->rel_position) {
-        --cursor->rel_position;
-      }
-      ttyd::battle_seq_command::_btlcmd_UpdateSelectWeaponTable(
-        battleWork, table_type);
+        cursor->num_options = num_options;
+        if (cursor->num_options <= cursor->abs_position) {
+            cursor->abs_position = cursor->num_options - 1;
+        }
+        while (cursor->num_options < cursor->rel_position + 6 &&
+               0 < cursor->rel_position) {
+            --cursor->rel_position;
+        }
+        ttyd::battle_seq_command::_btlcmd_UpdateSelectWeaponTable(
+            battleWork, table_type);
     }
     
     return num_options;

@@ -18,7 +18,7 @@ namespace ttyd::battle_seq_command {
 extern "C" {
 
 // _check_weapon_type_attack
-// _get_msg
+EVT_DECLARE_USER_FUNC(BattleSeqCmd_get_msg, 1)
 // BattleCommandAttackAudienceCheck
 // _commandRestoreRec
 void* BattleSetConfuseAct(

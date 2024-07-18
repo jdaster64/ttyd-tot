@@ -1912,7 +1912,7 @@
 // battle_seq_command.o
 // .text
 8011f29c:_check_weapon_type_attack
-8011f488:_get_msg
+8011f488:BattleSeqCmd_get_msg
 8011f524:BattleCommandAttackAudienceCheck
 8011f5f0:_commandRestoreRec
 8011f62c:BattleSetConfuseAct

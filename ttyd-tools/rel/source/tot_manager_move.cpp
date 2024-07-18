@@ -101,7 +101,7 @@ const MoveData g_MoveData[] = {
     { { 0, 2, 4 }, 3, 0, 7, IconType::PARTNER_MOVE_0, "btl_wn_pcr_normal", nullptr, "msg_pch_binta", "msg_ac_binta", "tot_upg_hits", },
     { { 5, 5, 5 }, 1, 1, 7, IconType::PARTNER_MOVE_1, "btl_wn_pcr_steal", nullptr, "msg_pch_heart_catch", "msg_ac_heart_catch", "tot_upg_none", },
     { { 2, 4, 7 }, 3, 1, 7, IconType::PARTNER_MOVE_1, "btl_wn_pcr_madowase", nullptr, "msg_pch_madowaseru", "msg_ac_madowaseru", "tot_upg_tease", },
-    { { 5, 5, 5 }, 1, 1, 7, IconType::PARTNER_MOVE_1, "tot_ptr7_embargo", nullptr, "tot_ptr7_embargo_desc", "msg_ac_madowaseru", "tot_upg_none", },
+    { { 2, 2, 2 }, 1, 1, 7, IconType::PARTNER_MOVE_1, "tot_ptr7_embargo", nullptr, "tot_ptr7_embargo_desc", "msg_ac_madowaseru", "tot_upg_none", },
     { { 4, 5, 6 }, 3, 2, 7, IconType::PARTNER_MOVE_2, "tot_ptr7_smokebomb", "tot_ptr7_smokeb_abb", "tot_ptr7_smokebomb_desc", "msg_ac_madowaseru", "tot_upg_damage", },
     { { 4, 7, 10 }, 3, 3, 7, IconType::PARTNER_MOVE_3, "btl_wn_pcr_kiss", nullptr, "msg_pch_kiss", "msg_ac_chuchurina_kiss", "tot_upg_smooch", },
     { { 1, 1, 1 }, 1, 1, -1, IconType::CHARGE, "in_charge", nullptr, "tot_msg_dummy", "tot_msg_dummy", "tot_msg_dummy", },
