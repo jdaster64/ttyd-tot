@@ -169,7 +169,7 @@ PoseTableEntry unitDragon_pose_table_weak[] = {
     28, "GNB_S_4",
     65, "GNB_T_4",
     31, "GNB_S_4",
-    39, "GNB_V_1",
+    39, "GNB_D_1",  // Only Hooktail has GNB_V_1
     69, "GNB_S_4",
 };
 
@@ -1140,10 +1140,10 @@ EVT_BEGIN(unitDragon_phase_event)
         END_IF()
         USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_LowHealthMsg, LW(2))
         IF_NOT_EQUAL(LW(2), 1)
+            USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitDragon_pose_table_weak))
             SET(LW(0), (int32_t)ConversationType::LOW_HEALTH)
             RUN_CHILD_EVT(unitDragon_conversation_event)
             USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_LowHealthMsg, 1)
-            USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitDragon_pose_table_weak))
         END_IF()
     END_IF()
     
