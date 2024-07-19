@@ -428,11 +428,11 @@ EVT_BEGIN(Tower_OpenExit)
     USER_FUNC(evt_mario_key_onoff, 0)
     
     // Open locked door.
-    WAIT_MSEC(300)
+    WAIT_MSEC(100)
     USER_FUNC(evt_mobj_check, PTR("mobj_lock_00"), LW(10))
     IF_NOT_EQUAL(LW(10), 0)
         USER_FUNC(evt_mobj_lock_unlock, PTR("mobj_lock_00"))
-        WAIT_MSEC(500)
+        WAIT_FRM(2)
     END_IF()
 
     // Spawn Heart Block on boss floors.
@@ -887,7 +887,7 @@ EVT_BEGIN(Tower_NpcSetup)
         END_INLINE()
     END_IF()
     
-    // Wait for a chest to be opened, then spawn pipe.
+    // Wait for a chest to be opened, then unlock the exit (if necessary).
     INLINE_EVT()
         LBL(2)
         WAIT_FRM(1)
@@ -897,7 +897,6 @@ EVT_BEGIN(Tower_NpcSetup)
             END_IF()
             GOTO(2)
         END_IF()
-        // TODO: Is it a problem that this gets hit when continuing?
         RUN_EVT(Tower_OpenExit)
     END_INLINE()
 
