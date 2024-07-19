@@ -979,6 +979,9 @@ EVT_BEGIN(gon_01_InitEvt)
                 190, 10, 0, 270,  /* position + rotation */
                 PTR(&Tower_Lock_Check), PTR(&Tower_Lock_Unlock),
                 (int32_t)GSWF_Lock)
+            
+            SET(LW(0), PTR("e_bero"))
+            RUN_CHILD_EVT(bero_case_switch_off)
         END_IF()
     ELSE()
         // Continuing from a Game Over...
