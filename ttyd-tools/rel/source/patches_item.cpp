@@ -665,6 +665,8 @@ void ApplyFixedPatches() {
     // Space Food no longer restores HP, but guarantees Allergic status.
     SetItemRestoration(ItemType::SPACE_FOOD, 0, 0);
     ttyd::battle_item_data::ItemWeaponData_SpaceFood.allergic_chance = 100;
+    ttyd::battle_item_data::ItemWeaponData_SpaceFood.special_property_flags
+        |= AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE;
     // Can only be used in battle.
     itemDataTable[ItemType::SPACE_FOOD].usable_locations
         &= ~ItemUseLocation::kField;

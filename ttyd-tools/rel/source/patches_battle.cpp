@@ -454,33 +454,40 @@ uint32_t GetStatusDamageFromWeapon(
                     break;
             }
 
-            // Make midbosses less susceptible to most negative statuses.
+            // Make midbosses less susceptible to most negative statuses,
+            // unless the move is meant to guarantee that they go through.
             if ((turns != 0 || strength != 0) &&
                 (target->status_flags & BattleUnitStatus_Flags::MIDBOSS)) {
-                switch (type) {
-                    case StatusEffectType::SLEEP:
-                    case StatusEffectType::STOP:
-                    case StatusEffectType::DIZZY:
-                    case StatusEffectType::CONFUSE:
-                    case StatusEffectType::FREEZE:
-                    case StatusEffectType::ATTACK_DOWN:
-                    case StatusEffectType::DEFENSE_DOWN:
-                    case StatusEffectType::SLOW:
-                        chance = chance * 75 / 100;
-                        break;
-                    case StatusEffectType::TINY:
-                    case StatusEffectType::FRIGHT:
-                    case StatusEffectType::OHKO:
-                        chance /= 2;
-                        break;
-                    case StatusEffectType::GALE_FORCE:
-                        // Effectively 50% if shrunk, 0% otherwise.
-                        chance /= 3;
-                        break;
-                    case StatusEffectType::HUGE:
-                        // Immune to non-permanent Huge status.
-                        chance = 0;
-                        break;
+
+                if (type == StatusEffectType::HUGE) {
+                    // Always immune to non-permanent Huge status.
+                    chance = 0;
+                }
+
+                // Only reduce other vulnerabilities for non-guaranteed status.
+                if (!(weapon->special_property_flags 
+                    & AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE)) {
+                    switch (type) {
+                        case StatusEffectType::SLEEP:
+                        case StatusEffectType::STOP:
+                        case StatusEffectType::DIZZY:
+                        case StatusEffectType::CONFUSE:
+                        case StatusEffectType::FREEZE:
+                        case StatusEffectType::ATTACK_DOWN:
+                        case StatusEffectType::DEFENSE_DOWN:
+                        case StatusEffectType::SLOW:
+                            chance = chance * 75 / 100;
+                            break;
+                        case StatusEffectType::TINY:
+                        case StatusEffectType::FRIGHT:
+                        case StatusEffectType::OHKO:
+                            chance /= 2;
+                            break;
+                        case StatusEffectType::GALE_FORCE:
+                            // Effectively 50% if shrunk, 0% otherwise.
+                            chance /= 3;
+                            break;
+                    }
                 }
             }
             
