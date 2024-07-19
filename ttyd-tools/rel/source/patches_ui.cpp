@@ -671,8 +671,16 @@ void PartyMenuSetMoveDescAndCursorPos(void* pWin) {
 }
 
 void PartyMenuDispStats(void* pWin) {
-    float win_x = *(float*)((uintptr_t)pWin + 0xc4);
-    float win_y = *(float*)((uintptr_t)pWin + 0xc8);
+    int32_t tab = 0;
+    for (int32_t i = 0; i < 5; ++i) {
+        // Check for which tab is the Party tab.
+        if (*(int32_t*)((uintptr_t)pWin + 0xc0 + 0x14 * i) == 1) {
+            tab = i;
+            break;
+        }
+    }
+    float win_x = *(float*)((uintptr_t)pWin + 0xc4 + 0x14 * tab);
+    float win_y = *(float*)((uintptr_t)pWin + 0xc8 + 0x14 * tab);
     void* texInit_param = **(void***)(*(uintptr_t*)((uintptr_t)pWin + 0x28) + 0xa0);
     
     int32_t selected_partner_idx = *(int32_t*)((uintptr_t)pWin + 0x1d8);
@@ -854,9 +862,17 @@ void ItemMenuDispInventory(void* pWin) {
     if (!g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) return;
     // Only display if on the regular item inventory screen.
     if (*(int32_t*)((uintptr_t)pWin + 0x210) != 0) return;
-    
-    float win_x = *(float*)((uintptr_t)pWin + 0xc4);
-    float win_y = *(float*)((uintptr_t)pWin + 0xc8);
+
+    int32_t tab = 0;
+    for (int32_t i = 0; i < 5; ++i) {
+        // Check for which tab is the Items tab.
+        if (*(int32_t*)((uintptr_t)pWin + 0xc0 + 0x14 * i) == 2) {
+            tab = i;
+            break;
+        }
+    }
+    float win_x = *(float*)((uintptr_t)pWin + 0xc4 + 0x14 * tab);
+    float win_y = *(float*)((uintptr_t)pWin + 0xc8 + 0x14 * tab);
     
     // void* texInit_param = **(void***)(*(uintptr_t*)((uintptr_t)pWin + 0x28) + 0xa0);
     
