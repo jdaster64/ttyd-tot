@@ -124,6 +124,8 @@ extern const int32_t g_partyVivian_makeTechMenuFuncPtr;
 extern const int32_t g_partyNokotarou_makeTechMenuFuncPtr;
 extern const int32_t g_partyChristine_makeTechMenuFuncPtr;
 extern const int32_t g_partyNokotarou_Patch_InitWaitPhase;
+extern const int32_t g_ac_power_gauge_lv2_LipLockPower;
+extern const int32_t g_ac_air_gauge_FlurrieGaleForceResistance;
 
 namespace partner {
     
@@ -231,6 +233,23 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_koura_damage_core_Patch_HeavyDmg), 1);
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_koura_damage_core_Patch_LightDmg), 2);
+
+    // Change the strength of Gale Force / Blizzard's resistance to be
+    // more manageable at higher difficulties.
+    float kGaleForceResistanceArr[] = {
+        0.30f, 0.34f, 0.37f, 0.40f, 0.42f, 0.435f, 0.45f
+    };
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_ac_air_gauge_FlurrieGaleForceResistance),
+        kGaleForceResistanceArr, sizeof(kGaleForceResistanceArr));
+
+    // Change the strength of Lip Lock's power to scale down less harshly at
+    // higher difficulties and up less hilariously at lower ones.
+    int32_t kLipLockPowerArr[] = { 124, 116, 108, 100, 92, 84, 76 };
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_ac_power_gauge_lv2_LipLockPower),
+        kLipLockPowerArr, sizeof(kLipLockPowerArr));
+    
     
     // Disable getting coins and experience from a successful Gale Force.
     mod::patch::writePatch(
