@@ -2,9 +2,274 @@
 
 #include <cstdint>
 
+// Forward declarations.
+namespace ttyd::effdrv { struct EffEntry; }
+namespace ttyd::evtmgr { struct EvtEntry; }
+namespace ttyd::filemgr { struct File; }
+
 namespace ttyd::win_root {
 
 extern "C" {
+
+struct WinTabHeaderInfo {
+    int32_t     id;
+    float       x;
+    float       y;
+    int32_t     state;
+    int32_t     timer;
+};
+static_assert(sizeof(WinTabHeaderInfo) == 0x14);
+
+struct WinTabBodyInfo {
+    int32_t     id;
+    float       x;
+    float       y;
+    int32_t     state;
+    int32_t     timer;
+};
+static_assert(sizeof(WinTabBodyInfo) == 0x14);
+
+struct WinEmailInfo {
+    uint8_t     order;
+    uint8_t     id;
+};
+static_assert(sizeof(WinEmailInfo) == 2);
+
+struct WinEquippedBadgeInfo {
+    int32_t     is_equipped;
+    int32_t     badge_menu_idx;
+    int32_t     badge_id;
+};
+static_assert(sizeof(WinEquippedBadgeInfo) == 0xc);
+
+struct WinLogSubmenuInfo {
+    int32_t     id;
+    float       x;
+    float       y;
+    float       target_x;
+    float       target_y;
+    int32_t     state;
+    int32_t     timer;
+    const char* help_msg;
+};
+static_assert(sizeof(WinLogSubmenuInfo) == 0x20);
+
+struct WinLogTattleInfo {
+    uint8_t     order;
+    uint8_t     id;
+};
+static_assert(sizeof(WinLogTattleInfo) == 2);
+
+struct WinLogTattleMenuWork {
+    int32_t     state;
+    int32_t     enemy_id;
+    filemgr::File* win_tpl;
+    filemgr::File* mono_dat;
+    float       x;
+    float       y;
+    float       target_x;
+    float       target_y;
+    int32_t     anim_pose;
+    int32_t     anim_pose_2;
+    void*       texture_obj;
+    int32_t     alpha;
+};
+static_assert(sizeof(WinLogTattleMenuWork) == 0x30);
+
+struct WinPauseMenu {
+    uint16_t    flags;                                      // 0x0000
+    int8_t      unk_0x0002[2];                              // 0x0002
+    uint32_t    buttons_pressed;                            // 0x0004
+    uint32_t    buttons_repeated;                           // 0x0008
+    uint32_t    dirs_pressed;                               // 0x000c
+    uint32_t    dirs_repeated;                              // 0x0010
+    int32_t     lecture_state;                              // 0x0014
+    evtmgr::EvtEntry* lecture_evt;                          // 0x0018
+    int32_t     initial_root_menu_id;                       // 0x001c
+    int32_t     menu_state;                                 // 0x0020
+    int32_t     root_menu_state;                            // 0x0024
+    filemgr::File* win_tpl;                                 // 0x0028
+    filemgr::File* mail_tpl;                                // 0x002c
+    filemgr::File* map_tpl;                                 // 0x0030
+    void*       framebuffer_work;                           // 0x0034
+    int32_t     framebuffer_finished;                       // 0x0038
+    evtmgr::EvtEntry* use_item_evt;                         // 0x003c
+    int32_t     root_cursor_idx;                            // 0x0040
+    int32_t     root_cursor_max;                            // 0x0044
+    WinTabHeaderInfo tab_header_info[6];                    // 0x0048
+    WinTabBodyInfo   tab_body_info[5];                      // 0x00c0
+    int32_t     parent_menu_state;                          // 0x0124
+    float       msg_menu_x;                                 // 0x0128
+    float       msg_menu_y;                                 // 0x012c
+    int32_t     msg_menu_state;                             // 0x0130
+    int32_t     msg_menu_timer;                             // 0x0134
+    int32_t     msg_entry_param_2;                          // 0x0138
+    char*       msg_menu_msg;                               // 0x013c
+    int32_t     msg_entry_param_4;                          // 0x0140
+    char*       msg_menu_msg_copy;                          // 0x0144
+    int32_t     msg_line_current;                           // 0x0148
+    int32_t     msg_line_count;                             // 0x014c
+    float       main_cursor_x;                              // 0x0150
+    float       main_cursor_y;                              // 0x0154
+    float       main_cursor_target_x;                       // 0x0158
+    float       main_cursor_target_y;                       // 0x015c
+
+    // "Mario" menu + sort menu.
+    int32_t     mario_menu_state;                           // 0x0160
+    float       sort_menu_x;                                // 0x0164
+    float       sort_menu_y;                                // 0x0168
+    float       sort_menu_target_x;                         // 0x016c
+    float       sort_menu_target_y;                         // 0x0170
+    int32_t     sort_cursor_idx;                            // 0x0174
+    int32_t     sort_cursor_max;                            // 0x0178
+    int32_t     sort_menu_state;                            // 0x017c
+    int32_t     has_sorted;                                 // 0x0180
+    int32_t     sort_menu_type;                             // 0x0184
+    int32_t     mario_anim_pose_id;                         // 0x0188
+    int32_t     mario_anim_timer;                           // 0x018c
+    int32_t     special_move_menu_opened;                   // 0x0190
+    int32_t     special_move_cursor_idx;                    // 0x0194
+    int32_t     special_move_count;                         // 0x0198
+
+    // "Party" menu.
+    int32_t     is_swapping_party;                          // 0x019c
+    int32_t     party_anim_pose_ids[7];                     // 0x01a0
+    int32_t     party_member_ids[7];                        // 0x01bc
+    int32_t     active_party_winPartyDt_idx;                // 0x01d8
+    int32_t     party_cursor_idx;                           // 0x01dc
+    int32_t     party_count;                                // 0x01e0
+    float       party_circle_rotation;                      // 0x01e4
+    float       party_circle_target_rotation;               // 0x01e8
+    int8_t      unk_0x01ec[16];                             // 0x01ec
+    int32_t     current_field_party_idx;                    // 0x01fc
+    int32_t     party_moves_menu_opened;                    // 0x0200
+    int32_t     party_moves_count;                          // 0x0204
+    int32_t     party_moves_cursor_idx;                     // 0x0208
+
+    // "Item" menu.
+    int32_t     item_menu_state;                            // 0x020c
+    int32_t     item_submenu_id;                            // 0x0210
+    // Indexed by item_submenu_id.
+    int32_t     items_cursor_idx[2];                        // 0x0214
+    int32_t     items_page_num[2];                          // 0x021c
+    float       items_offset_y[2];                          // 0x0224
+    float       items_target_y[2];                          // 0x022c
+    float       super_luigi_win_offset_x;                   // 0x0234
+    float       super_luigi_win_target_x;                   // 0x0238
+    float       super_luigi_win_offset_y;                   // 0x023c
+    float       super_luigi_win_target_y;                   // 0x0240
+    float       mail_win_offset_x;                          // 0x0244
+    float       mail_win_target_x;                          // 0x0248
+    float       mail_win_offset_y;                          // 0x024c
+    float       mail_win_target_y;                          // 0x0250
+    int32_t     emails_count;                               // 0x0254
+    int32_t     emails_cursor_idx;                          // 0x0258
+    int32_t     emails_page_num;                            // 0x025c
+    float       email_scroll_y;                             // 0x0260
+    float       email_target_y;                             // 0x0264
+    int32_t     email_line_current;                         // 0x0268
+    int16_t     email_line_count;                           // 0x026c
+    WinEmailInfo email_ids[45];                             // 0x026e
+    int32_t     super_luigi_book_id;                        // 0x02c8
+    int32_t     super_luigi_page_count;                     // 0x02cc
+    int32_t     super_luigi_page;                           // 0x02d0
+    int32_t     use_item_type;                              // 0x02d4
+    int32_t     use_item_idx;                               // 0x02d8
+    int32_t     use_item_menu_cursor_idx;                   // 0x02dc
+    int32_t     use_item_timer;                             // 0x02e0
+    int8_t      unk_0x02e4[4];                              // 0x02e4
+    int16_t     key_items[121];                             // 0x02e8
+    int16_t     key_items_count;                            // 0x03da
+
+    // "Badges" menu.
+    int32_t     badge_menu_state;                           // 0x03dc
+    int32_t     badge_submenu_id;                           // 0x03e0
+    // Indexed by badge_submenu_id.
+    int32_t     badges_cursor_idx[2];                       // 0x03e4
+    int32_t     badges_page_num[2];                         // 0x03ec
+    float       badges_offset_y[2];                         // 0x03f4
+    float       badges_target_y[2];                         // 0x03fc
+    WinEquippedBadgeInfo equipped_badge_ids[200];           // 0x0404
+    int32_t     equipped_badges_count;                      // 0x0d64
+
+    // "Log" menu + submenus.
+    int32_t     log_menu_state;                             // 0x0d68
+    int32_t     log_submenu_cursor_idx;                     // 0x0d6c
+    int32_t     log_submenu_count;                          // 0x0d70
+    WinLogSubmenuInfo log_submenu_info[5];                  // 0x0d74
+    // "Map"
+    int32_t     map_cursor_area_idx;                        // 0x0e14
+    int32_t     map_current_area_idx;                       // 0x0e18
+    int32_t     map_animpose_idx;                           // 0x0e1c
+    float       map_cursor_x;                               // 0x0e20
+    float       map_cursor_y;                               // 0x0e24
+    float       map_win_target_x;                           // 0x0e28
+    float       map_win_offset_x;                           // 0x0e2c
+    float       map_win_target_y;                           // 0x0e30
+    float       map_win_offset_y;                           // 0x0e34
+    float       map_scroll_offset_x;                        // 0x0e38
+    float       map_scroll_offset_y;                        // 0x0e3c
+    // "Crystal Stars"
+    int32_t     crystal_star_count;                         // 0x0e40
+    effdrv::EffEntry* crystal_star_effs[7];                 // 0x0e44
+    int32_t     crystal_star_selected;                      // 0x0e60
+    float       unk_0x0e64;                                 // 0x0e64
+    float       unk_0x0e68;                                 // 0x0e68
+    float       crystal_stars_win_target_x;                 // 0x0e6c
+    float       crystal_stars_win_offset_x;                 // 0x0e70
+    float       crystal_stars_win_target_y;                 // 0x0e74
+    float       crystal_stars_win_offset_y;                 // 0x0e78
+    float       crystal_stars_target_rotation;              // 0x0e7c
+    float       crystal_stars_rotation;                     // 0x0e80
+    // "Badge Log"
+    float       badge_log_win_offset_x;                     // 0x0e84
+    float       badge_log_win_target_x;                     // 0x0e88
+    float       badge_log_win_offset_y;                     // 0x0e8c
+    float       badge_log_win_target_y;                     // 0x0e90
+    int32_t     badge_log_total_count;                      // 0x0e94
+    int32_t     badge_log_obtained_count;                   // 0x0e98
+    int32_t     badge_log_cursor_idx;                       // 0x0e9c
+    int32_t     badge_log_page_num;                         // 0x0ea0
+    float       badge_log_scroll_y;                         // 0x0ea4
+    float       badge_log_scroll_target_y;                  // 0x0ea8
+    float       badge_log_showcased_x;                      // 0x0eac
+    float       badge_log_showcased_target_x;               // 0x0eb0
+    float       badge_log_showcased_y;                      // 0x0eb4
+    float       badge_log_showcased_target_y;               // 0x0eb8
+    int16_t     badge_log_ids[100];                         // 0x0ebc
+    // "Recipe Log"
+    float       recipe_log_win_offset_x;                    // 0x0f84
+    float       recipe_log_win_target_x;                    // 0x0f88
+    float       recipe_log_win_offset_y;                    // 0x0f8c
+    float       recipe_log_win_target_y;                    // 0x0f90
+    int32_t     recipe_log_total_count;                     // 0x0f94
+    int32_t     recipe_log_obtained_count;                  // 0x0f98
+    int32_t     recipe_log_cursor_idx;                      // 0x0f9c
+    int32_t     recipe_log_page_num;                        // 0x0fa0
+    int32_t     recipe_log_scroll_y;                        // 0x0fa4
+    int32_t     recipe_log_scroll_target_y;                 // 0x0fa8
+    float       recipe_log_showcased_x;                     // 0x0fac
+    float       recipe_log_showcased_target_x;              // 0x0fb0
+    float       recipe_log_showcased_y;                     // 0x0fb4
+    float       recipe_log_showcased_target_y;              // 0x0fb8
+    int16_t     recipe_log_ids[57];                         // 0x0fbc
+    // "Tattle Log"
+    int8_t      unk_0x1030[16];                             // 0x1030
+    int32_t     tattle_log_total_count;                     // 0x1040
+    int32_t     tattle_log_obtained_count;                  // 0x1044
+    int32_t     tattle_log_cursor_idx;                      // 0x1048
+    int32_t     tattle_log_page_num;                        // 0x104c
+    int8_t      unk_0x1050[8];                              // 0x1050
+    WinLogTattleInfo tattle_logs[0xd8];                     // 0x1058
+    WinLogTattleMenuWork* tattle_log_menu_work;             // 0x1208
+    int8_t      unk_0x120c[4];                              // 0x120c
+
+    // WinMgrEntry indices for additional window dialogs
+    // (used when choosing an item to use in the "Items" menu).
+    int32_t     winmgr_entry_1;                             // 0x1210
+    int32_t     winmgr_entry_2;                             // 0x1214
+};
+static_assert(sizeof(WinPauseMenu) == 0x1218);
 
 // .text
 // winMailDisp
