@@ -98,17 +98,18 @@ struct WinPauseMenu {
     int32_t     root_cursor_max;                            // 0x0044
     WinTabHeaderInfo tab_header_info[6];                    // 0x0048
     WinTabBodyInfo   tab_body_info[5];                      // 0x00c0
+    // Used by sort menu, possibly description window as well?
     int32_t     parent_menu_state;                          // 0x0124
-    float       msg_menu_x;                                 // 0x0128
-    float       msg_menu_y;                                 // 0x012c
-    int32_t     msg_menu_state;                             // 0x0130
-    int32_t     msg_menu_timer;                             // 0x0134
-    int32_t     msg_entry_param_2;                          // 0x0138
-    char*       msg_menu_msg;                               // 0x013c
-    int32_t     msg_entry_param_4;                          // 0x0140
-    char*       msg_menu_msg_copy;                          // 0x0144
-    int32_t     msg_line_current;                           // 0x0148
-    int32_t     msg_line_count;                             // 0x014c
+    float       msg_win_x;                                  // 0x0128
+    float       msg_win_y;                                  // 0x012c
+    int32_t     msg_win_state;                              // 0x0130
+    int32_t     msg_win_timer;                              // 0x0134
+    int32_t     msg_win_item_id;                            // 0x0138
+    char*       msg_win_body;                               // 0x013c
+    char*       msg_win_header;                             // 0x0140
+    char*       msg_win_body_copy;                          // 0x0144
+    int32_t     msg_win_line_current;                       // 0x0148
+    int32_t     msg_win_line_count;                         // 0x014c
     float       main_cursor_x;                              // 0x0150
     float       main_cursor_y;                              // 0x0154
     float       main_cursor_target_x;                       // 0x0158
