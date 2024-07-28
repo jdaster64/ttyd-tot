@@ -199,14 +199,14 @@ WinMgrSelectEntry* winMgrSelectEntry(
 void winMgrHelpDraw(WinMgrEntry* winMgrEntry);
 // winMgrHelpMain
 // winMgrHelpInit
-// winMgrGetPtr
+WinMgrEntry* winMgrGetPtr(int32_t entry_idx);
 // winMgrSetPriority
-// winMgrSetSize
-// winMgrAction
+void winMgrSetSize(int32_t entry_idx, int32_t x, int32_t y, int32_t w, int32_t h);
+uint32_t winMgrAction(int32_t entry_idx);
 // winMgrDelete
 // winMgrCloseAutoDelete
-// winMgrClose
-// winMgrOpen
+void winMgrClose(int32_t entry_idx);
+void winMgrOpen(int32_t entry_idx);
 // winMgrSetParam
 // winMgrEntry
 // winMgrSeq

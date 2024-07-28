@@ -275,9 +275,10 @@ static_assert(sizeof(WinPauseMenu) == 0x1218);
 // .text
 // winMailDisp
 // winZClear
-void winKageGX(float x, float y, float z, float scale, void* pWin, uint32_t* color);
-// winSortWait
-// winSortEntry
+void winKageGX(
+    float x, float y, float z, float scale, WinPauseMenu* menu, uint32_t* color);
+uint32_t winSortWait(WinPauseMenu* menu);
+void winSortEntry(double x, double y, WinPauseMenu* menu, int sortType);
 // winSortGX
 // winSortMain
 // sort_8_2_func
@@ -322,17 +323,22 @@ void winKageGX(float x, float y, float z, float scale, void* pWin, uint32_t* col
 // sort_2_1_func
 // sort_1_2_func
 // sort_1_1_func
-void winWazaGX(float x, float y, float w, float h, void* pWin, int32_t type);
-void winHakoGX(float x, float y, void* pWin, int32_t type);
+void winWazaGX(
+    float x, float y, float w, float h, WinPauseMenu* menu, int32_t type);
+void winHakoGX(
+    float x, float y, WinPauseMenu* menu, int32_t type);
 // winMailGX
 // winHalfBookGX
 // winBookGX
-void winNameGX(float x, float y, float w, float h, void* pWin, int32_t type);
-void winKirinukiGX(float x, float y, float w, float h, void* pWin, int32_t type);
-void winMsgEntry(void* pWin, int32_t unk0, const char* msg, int32_t unk1);
+void winNameGX(
+    float x, float y, float w, float h, WinPauseMenu* menu, int32_t type);
+void winKirinukiGX(
+    float x, float y, float w, float h, WinPauseMenu* menu, int32_t type);
+void winMsgEntry(
+    WinPauseMenu* menu, int32_t item_id, const char* msg, const char* name);
 // winMsgDisp
 // winMsgMain
-// winBgGX
+void winBgGX(double x, double y, WinPauseMenu* menu, int32_t type);
 // winBgMain
 // winRootDisp
 // winRootMain

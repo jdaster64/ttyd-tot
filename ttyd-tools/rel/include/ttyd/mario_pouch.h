@@ -63,7 +63,7 @@ struct PouchData {
 
 static_assert(sizeof(PouchData) == 0x5d4);
 
-// pouchGetYoshiName
+const char* pouchGetYoshiName();
 // pouchSetYoshiName
 void pouchSetPartyColor(int32_t party_member, int32_t color);  // 4 = Yoshi
 int32_t pouchGetPartyColor(int32_t party_member);
@@ -122,7 +122,7 @@ int32_t pouchAddCoin(int16_t coins);
 int32_t comp_kind(int16_t* lhs, int16_t* rhs);
 // comp_aiueo
 // unk051[US|JP] zz_800d48b0_
-// pouchRemoveItemIndex
+int32_t pouchRemoveItemIndex(int32_t item_type, int32_t index);
 int32_t pouchRemoveItem(int32_t item_type);
 int32_t pouchCheckItem(int32_t item_type);
 uint32_t pouchGetItem(int32_t item_type);
@@ -135,7 +135,7 @@ int32_t pouchGetHaveItemCnt();
 // ?pouchEquipBadge
 // pouchHaveBadge
 // pouchKeepItem
-// pouchHaveItem
+int32_t pouchHaveItem(int32_t index);
 // pouchKeyItem
 void pouchInit();
 PouchData* pouchGetPtr();

@@ -14,18 +14,6 @@
 .global BranchBackPartyDispHook1
 .global StartPartyDispHook2
 .global BranchBackPartyDispHook2
-# win_item
-.global StartItemDispInventorySize
-.global BranchBackItemDispInventorySize
-.global StartFixItemWinPartyDispOrder
-.global BranchBackFixItemWinPartyDispOrder
-.global StartFixItemWinPartySelectOrder
-.global BranchBackFixItemWinPartySelectOrder
-.global StartCheckForUnusableItemInMenu
-.global ConditionalBranchCheckForUnusableItemInMenu
-.global BranchBackCheckForUnusableItemInMenu
-.global StartUseSpecialItems
-.global BranchBackUseSpecialItems
 # win_log
 .global StartInitTattleLog
 .global BranchBackInitTattleLog
@@ -79,50 +67,6 @@ mr %r3, %r30
 bl partyMenuDispStats
 
 BranchBackPartyDispHook2:
-b 0
-
-StartItemDispInventorySize:
-mr %r3, %r29
-bl itemDispInventorySize
-# Original opcode.
-fmr %f1, %f28
-
-BranchBackItemDispInventorySize:
-b 0
-
-StartFixItemWinPartyDispOrder:
-mr %r3, %r5
-bl getPartyMemberMenuOrder
-
-BranchBackFixItemWinPartyDispOrder:
-b 0
-
-StartFixItemWinPartySelectOrder:
-mr %r3, %r5
-bl getPartyMemberMenuOrder
-
-BranchBackFixItemWinPartySelectOrder:
-b 0
-
-StartCheckForUnusableItemInMenu:
-# Check to see if the player is allowed to use the item on a target.
-bl checkForUnusableItemInMenu
-cmpwi %r3, 0
-# If so, branch past code responsible for processing the item use.
-bne- 0xc
-lwz %r3, 0x4 (%r28)
-BranchBackCheckForUnusableItemInMenu:
-b 0
-ConditionalBranchCheckForUnusableItemInMenu:
-b 0
-
-StartUseSpecialItems:
-# Call C function to check whether the item being used has special logic.
-addi %r3, %r1, 0x8
-bl useSpecialItems
-# Restore existing opcode.
-lwz %r0, 0x2dc(%r28)
-BranchBackUseSpecialItems:
 b 0
 
 StartInitTattleLog:

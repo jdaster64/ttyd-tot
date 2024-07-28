@@ -650,11 +650,15 @@ g_StringMap = {
             b"on their turn, for a cost\n"
             b"of 4 or 8 FP.",
             
+        b"msg_subayaku_kawaru":
+            b"Swapping partners costs FP,\n"
+            b"but doesn't consume a turn.",
+            
         b"menu_subayaku_kawaru":
-            b"Allow your ally to attack\n"
-            b"even after changing partners.\n"
+            b"Swapping partners costs FP,\n"
+            b"but doesn't consume a turn.\n"
             b"Switching costs 1 FP initially,\n"
-            b"and increases on every use.",
+            b"and increases per use up to 5.",
         
         b"msg_toughen_up":
             b"Increases the defense given by\n"
@@ -2266,7 +2270,7 @@ g_StringMap = {
         b"stg1_hei_02":
             b"I thought we taught Hooktail\n"
             b"a lesson last time! <wait 150>What's she\n"
-            b"she doing back here now?\n<k>\n<p>\n"
+            b"doing back here now?\n<k>\n<p>\n"
             b"I've got a bad feeling about\n"
             b"this, Mario. <wait 250>Let's investigate and\n"
             b"make sure everything's OK! \n<k>",

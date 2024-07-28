@@ -155,7 +155,7 @@ extern "C" {
 // marioChkSts
 // marioBgmodeOff
 // marioBgmodeOn
-// marioBgmodeChk
+uint32_t marioBgmodeChk();
 uint16_t marioSetMutekiTime(int32_t msec);
 // marioKeyOn
 // marioKeyOff

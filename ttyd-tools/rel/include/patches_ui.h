@@ -5,6 +5,8 @@
 
 #include <cstdint>
 
+namespace ttyd::win_root { struct WinPauseMenu; }
+
 namespace mod::infinite_pit::ui {
 
 // Apply patches to the HUD, pause menu, etc.
@@ -16,32 +18,20 @@ void DisplayUpDownNumberIcons(
     uint32_t unk0);
 
 // Checks whether to open the moves submenu in the "Mario" tab.
-bool CheckOpenMarioMoveMenu(void* win_ptr);
+bool CheckOpenMarioMoveMenu(ttyd::win_root::WinPauseMenu* menu);
 // Prints the maximum level of each available move in the Mario tab.
-void MarioMoveMenuDisp(void* win_ptr);
+void MarioMoveMenuDisp(ttyd::win_root::WinPauseMenu* menu);
 // Prints the description for the currently hovered move in the Mario tab.
-void MarioMoveMenuMsgEntry(void* win_ptr);
+void MarioMoveMenuMsgEntry(ttyd::win_root::WinPauseMenu* menu);
 
 // Prints the partner's description and sets their move count in the Party menu.
-void PartyMenuSetupPartnerDescAndMoveCount(void* win_ptr);
+void PartyMenuSetupPartnerDescAndMoveCount(ttyd::win_root::WinPauseMenu* menu);
 // Sets the move description and updates the move cursor XY pos for Party menu.
-void PartyMenuSetMoveDescAndCursorPos(void* win_ptr);
+void PartyMenuSetMoveDescAndCursorPos(ttyd::win_root::WinPauseMenu* menu);
 // Prints all of the information on the right side of the Party tab.
-void PartyMenuDispStats(void* win_ptr);
+void PartyMenuDispStats(ttyd::win_root::WinPauseMenu* menu);
 
-// Prints the current inventory fullness / size in the Item tab.
-void ItemMenuDispInventory(void* win_ptr);
-
-// Stores pointers to WinPartyData entries in the correct order based
-// on the currently active partner and partners currently obtained.
-void GetPartyMemberMenuOrder(ttyd::win_party::WinPartyData** out_party_data);
-// If the player attempts to use the currently selected item in the pause
-// menu on an invalid target, prevents it and returns true.
-bool CheckForUnusableItemInMenu();
-// Ranks up and fully heals the selected party member when using a Shine Sprite,
-// or restores random HP/FP if using a Strawberry Cake.
-void UseSpecialItemsInMenu(ttyd::win_party::WinPartyData** party_data);
-// Initializes the Tattle log Journal page with only Infinite Pit's enemies.
-void InitializeTattleLog(void* win_log_ptr);
+// Initializes the Tattle log Journal page with only enemies used in ToT.
+void InitializeTattleLog(ttyd::win_root::WinPauseMenu* menu);
 
 }

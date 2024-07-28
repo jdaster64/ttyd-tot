@@ -4,9 +4,11 @@
 #include <ttyd/battle.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_unit.h>
+#include <ttyd/dispdrv.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/seqdrv.h>
+#include <ttyd/win_root.h>
 #include <ttyd/winmgr.h>
 
 #include <cstdint>
@@ -22,9 +24,12 @@ using ::ttyd::battle::BattleWork;
 using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::battle_unit::BattleWorkUnitPart;
+using ::ttyd::dispdrv::CameraId;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::npcdrv::FbatBattleInformation;
 using ::ttyd::seqdrv::SeqIndex;
+using ::ttyd::win_root::WinPauseMenu;
+using ::ttyd::winmgr::WinMgrEntry;
 using ::ttyd::winmgr::WinMgrSelectEntry;
 
 }
@@ -146,6 +151,16 @@ int32_t (*g_BattleItemData_rank_up_trampoline)(EvtEntry*, bool) = nullptr;
 void (*g_statusWinDisp_trampoline)(void) = nullptr;
 // statuswindow.o  8013d440
 void (*g_gaugeDisp_trampoline)(double, double, int32_t) = nullptr;
+// win_item.o  80169cf0
+void (*g_itemUseDisp2_trampoline)(WinMgrEntry*) = nullptr;
+// win_item.o  80169ec0
+void (*g_itemUseDisp_trampoline)(WinMgrEntry*) = nullptr;
+// win_item.o  8016bbec
+void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
+// win_item.o  8016bf10
+void (*g_winItemMain2_trampoline)(WinPauseMenu*) = nullptr;
+// win_item.o  8016c030
+int32_t (*g_winItemMain_trampoline)(WinPauseMenu*) = nullptr;
 // unit_party_chuchurina.o  80181bdc
 int32_t (*g__make_madowase_weapon_trampoline)(EvtEntry*, bool) = nullptr;
 // unit_party_christine.o  801895b0
@@ -277,16 +292,6 @@ extern const int32_t g_winPartyMain_RotatePartnersHook_BH = 0x801675ac;
 extern const int32_t g_winPartyMain_RotatePartnersHook_EH = 0x801675ec;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_BH = 0x801676b8;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_EH = 0x80167718;
-extern const int32_t g_itemUseDisp_FixPartyOrder_BH = 0x80169f40;
-extern const int32_t g_itemUseDisp_FixPartyOrder_EH = 0x8016a088;
-extern const int32_t g_winItemDisp_DispInventorySize_BH = 0x8016bec4;
-extern const int32_t g_winItemMain_CheckInvalidTarget_BH = 0x8016cd74;
-extern const int32_t g_winItemMain_CheckInvalidTarget_EH = 0x8016cd78;
-extern const int32_t g_winItemMain_Patch_AlwaysUseItemsInMenu = 0x8016ce40;
-extern const int32_t g_winItemMain_FixPartyOrder_BH = 0x8016ce88;
-extern const int32_t g_winItemMain_FixPartyOrder_EH = 0x8016cfd0;
-extern const int32_t g_winItemMain_UseSpecialItems_BH = 0x8016cfd0;
-extern const int32_t g_winItemMain_CheckInvalidTarget_CH1 = 0x8016d1a4;
 extern const int32_t g_winMarioDisp_MoveMenuDisp_BH = 0x8016f584;
 extern const int32_t g_winMarioDisp_MoveMenuDisp_EH = 0x8016f7f8;
 extern const int32_t g_winMarioMain_MoveDescription_BH = 0x80170c38;

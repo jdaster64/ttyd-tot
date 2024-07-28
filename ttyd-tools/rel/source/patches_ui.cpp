@@ -8,6 +8,7 @@
 #include "tot_generate_enemy.h"
 #include "tot_manager_move.h"
 #include "tot_state.h"
+#include "tot_window_item.h"
 #include "tot_window_select.h"
 
 #include <gc/mtx.h>
@@ -20,8 +21,10 @@
 #include <ttyd/battle_mario.h>
 #include <ttyd/battle_monosiri.h>
 #include <ttyd/battle_seq_end.h>
+#include <ttyd/dispdrv.h>
 #include <ttyd/eff_updown.h>
 #include <ttyd/evtmgr.h>
+#include <ttyd/filemgr.h>
 #include <ttyd/fontmgr.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
@@ -30,6 +33,7 @@
 #include <ttyd/msgdrv.h>
 #include <ttyd/sound.h>
 #include <ttyd/statuswindow.h>
+#include <ttyd/win_item.h>
 #include <ttyd/win_main.h>
 #include <ttyd/win_mario.h>
 #include <ttyd/win_party.h>
@@ -62,18 +66,6 @@ extern "C" {
     void StartPartyDispHook2();
     void BranchBackPartyDispHook2();
     
-    void StartItemDispInventorySize();
-    void BranchBackItemDispInventorySize();
-    void StartFixItemWinPartyDispOrder();
-    void BranchBackFixItemWinPartyDispOrder();
-    void StartFixItemWinPartySelectOrder();
-    void BranchBackFixItemWinPartySelectOrder();
-    void StartCheckForUnusableItemInMenu();
-    void ConditionalBranchCheckForUnusableItemInMenu();
-    void BranchBackCheckForUnusableItemInMenu();
-    void StartUseSpecialItems();
-    void BranchBackUseSpecialItems();
-    
     void StartInitTattleLog();
     void BranchBackInitTattleLog();
     // status_window_patches.s
@@ -91,39 +83,27 @@ extern "C" {
     }
     bool checkOutsidePit() {
         return strcmp("jon", mod::GetCurrentArea()) != 0;
-    } 
-    void getPartyMemberMenuOrder(ttyd::win_party::WinPartyData** party_data) {
-        mod::infinite_pit::ui::GetPartyMemberMenuOrder(party_data);
     }
-    bool checkForUnusableItemInMenu() {
-        return mod::infinite_pit::ui::CheckForUnusableItemInMenu();
+    bool checkOpenMarioMoveMenu(ttyd::win_root::WinPauseMenu* menu) {
+        return mod::infinite_pit::ui::CheckOpenMarioMoveMenu(menu);
     }
-    void useSpecialItems(ttyd::win_party::WinPartyData** party_data) {
-        mod::infinite_pit::ui::UseSpecialItemsInMenu(party_data);
+    void marioMoveMenuDisp(ttyd::win_root::WinPauseMenu* menu) {
+        mod::infinite_pit::ui::MarioMoveMenuDisp(menu);
     }
-    bool checkOpenMarioMoveMenu(void* pWin) {
-        return mod::infinite_pit::ui::CheckOpenMarioMoveMenu(pWin);
+    void marioMoveMenuMsgEntry(ttyd::win_root::WinPauseMenu* menu) {
+        mod::infinite_pit::ui::MarioMoveMenuMsgEntry(menu);
     }
-    void marioMoveMenuDisp(void* pWin) {
-        mod::infinite_pit::ui::MarioMoveMenuDisp(pWin);
+    void partyMenuSetupPartnerDescAndMoveCount(ttyd::win_root::WinPauseMenu* menu) {
+        mod::infinite_pit::ui::PartyMenuSetupPartnerDescAndMoveCount(menu);
     }
-    void marioMoveMenuMsgEntry(void* pWin) {
-        mod::infinite_pit::ui::MarioMoveMenuMsgEntry(pWin);
+    void partyMenuSetMoveDescAndCursorPos(ttyd::win_root::WinPauseMenu* menu) {
+        mod::infinite_pit::ui::PartyMenuSetMoveDescAndCursorPos(menu);
     }
-    void partyMenuSetupPartnerDescAndMoveCount(void* pWin) {
-        mod::infinite_pit::ui::PartyMenuSetupPartnerDescAndMoveCount(pWin);
+    void partyMenuDispStats(ttyd::win_root::WinPauseMenu* menu) {
+        mod::infinite_pit::ui::PartyMenuDispStats(menu);
     }
-    void partyMenuSetMoveDescAndCursorPos(void* pWin) {
-        mod::infinite_pit::ui::PartyMenuSetMoveDescAndCursorPos(pWin);
-    }
-    void partyMenuDispStats(void* pWin) {
-        mod::infinite_pit::ui::PartyMenuDispStats(pWin);
-    }
-    void itemDispInventorySize(void* pWin) {
-        mod::infinite_pit::ui::ItemMenuDispInventory(pWin);
-    }
-    void initTattleLog(void* win_log_ptr) {
-        mod::infinite_pit::ui::InitializeTattleLog(win_log_ptr);
+    void initTattleLog(ttyd::win_root::WinPauseMenu* menu) {
+        mod::infinite_pit::ui::InitializeTattleLog(menu);
     }
 
     bool checkHideTopBarInWindow(ttyd::winmgr::WinMgrSelectEntry* sel_entry) {
@@ -146,10 +126,13 @@ namespace {
 using namespace ::ttyd::gx::GXTev;
     
 using ::ttyd::battle_database_common::BattleWeapon;
+using ::ttyd::dispdrv::CameraId;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::mario_pouch::PouchData;
 using ::ttyd::msgdrv::msgSearch;
 using ::ttyd::win_party::WinPartyData;
+using ::ttyd::win_root::WinPauseMenu;
+using ::ttyd::winmgr::WinMgrEntry;
 using ::ttyd::winmgr::WinMgrSelectEntry;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
@@ -161,6 +144,11 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Function hooks.
 extern void (*g_statusWinDisp_trampoline)(void);
 extern void (*g_gaugeDisp_trampoline)(double, double, int32_t);
+extern void (*g_itemUseDisp2_trampoline)(WinMgrEntry*);
+extern void (*g_itemUseDisp_trampoline)(WinMgrEntry*);
+extern void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
+extern void (*g_winItemMain2_trampoline)(WinPauseMenu*);
+extern int32_t (*g_winItemMain_trampoline)(WinPauseMenu*);
 extern const char* (*g_BattleGetRankNameLabel_trampoline)(int32_t);
 extern int32_t (*g_winMgrSelectOther_trampoline)(WinMgrSelectEntry*, EvtEntry*);
 extern WinMgrSelectEntry* (*g_winMgrSelectEntry_trampoline)(int32_t, int32_t, int32_t);
@@ -183,11 +171,6 @@ extern const int32_t g_itemUseDisp_FixPartyOrder_EH;
 extern const int32_t g_winItemDisp_DispInventorySize_BH;
 extern const int32_t g_winItemMain_FixPartyOrder_BH;
 extern const int32_t g_winItemMain_FixPartyOrder_EH;
-extern const int32_t g_winItemMain_CheckInvalidTarget_BH;
-extern const int32_t g_winItemMain_CheckInvalidTarget_EH;
-extern const int32_t g_winItemMain_CheckInvalidTarget_CH1;
-extern const int32_t g_winItemMain_UseSpecialItems_BH;
-extern const int32_t g_winItemMain_Patch_AlwaysUseItemsInMenu;
 extern const int32_t g_winMarioDisp_MoveMenuDisp_BH;
 extern const int32_t g_winMarioDisp_MoveMenuDisp_EH;
 extern const int32_t g_winMarioMain_MoveDescription_BH;
@@ -300,42 +283,6 @@ void ApplyFixedPatches() {
     mod::patch::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchPreventDpadShortcutsOutsidePit),
         reinterpret_cast<void*>(g_statusWinDisp_HideDpadMenuOutsidePit_CH1));
-    
-    // Apply patches to item menu code to display the correct available partners
-    // (both functions use identical code).
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_itemUseDisp_FixPartyOrder_BH),
-        reinterpret_cast<void*>(g_itemUseDisp_FixPartyOrder_EH),
-        reinterpret_cast<void*>(StartFixItemWinPartyDispOrder),
-        reinterpret_cast<void*>(BranchBackFixItemWinPartyDispOrder));
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winItemMain_FixPartyOrder_BH),
-        reinterpret_cast<void*>(g_winItemMain_FixPartyOrder_EH),
-        reinterpret_cast<void*>(StartFixItemWinPartySelectOrder),
-        reinterpret_cast<void*>(BranchBackFixItemWinPartySelectOrder));
-        
-    // Apply patch to item menu code to check for invalid item targets
-    // (e.g. using Shine Sprites on fully-upgraded partners or Mario).
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(g_winItemMain_CheckInvalidTarget_BH),
-        reinterpret_cast<void*>(StartCheckForUnusableItemInMenu));
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(BranchBackCheckForUnusableItemInMenu),
-        reinterpret_cast<void*>(g_winItemMain_CheckInvalidTarget_EH));
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(ConditionalBranchCheckForUnusableItemInMenu),
-        reinterpret_cast<void*>(g_winItemMain_CheckInvalidTarget_CH1));
-        
-    // Apply patch to item menu code to properly use Shine Sprite items.
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winItemMain_UseSpecialItems_BH),
-        reinterpret_cast<void*>(StartUseSpecialItems),
-        reinterpret_cast<void*>(BranchBackUseSpecialItems));
-
-    // Prevents the menu from closing if you use an item on the active party.
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_winItemMain_Patch_AlwaysUseItemsInMenu),
-        0x4800001cU /* b 0x1c */);
         
     // Make item name in battle menu based on item data rather than weapon data.
     mod::patch::writePatch(
@@ -393,12 +340,32 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_winPartyDisp_StatsHook2_EH),
         reinterpret_cast<void*>(StartPartyDispHook2),
         reinterpret_cast<void*>(BranchBackPartyDispHook2));
-        
-    // Display current number of items / max inventory size in Item menu.
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winItemDisp_DispInventorySize_BH),
-        reinterpret_cast<void*>(StartItemDispInventorySize),
-        reinterpret_cast<void*>(BranchBackItemDispInventorySize));
+
+    // Replace most win_item functions with custom logic.
+    g_winItemMain_trampoline = patch::hookFunction(
+        ttyd::win_item::winItemMain, [](WinPauseMenu* menu) {
+            return tot::win::ItemMenuMain(menu);
+        });
+    g_winItemMain2_trampoline = patch::hookFunction(
+        ttyd::win_item::winItemMain2, [](WinPauseMenu* menu) {
+            tot::win::ItemMenuMain2(menu);
+        });
+    g_winItemDisp_trampoline = patch::hookFunction(
+        ttyd::win_item::winItemDisp, [](
+            CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
+            tot::win::ItemMenuDisp(camera, menu, tab_number);
+        });
+    g_itemUseDisp_trampoline = patch::hookFunction(
+        ttyd::win_item::itemUseDisp, [](WinMgrEntry* menu) {
+            tot::win::ItemSubdialogMain1(menu);
+        });
+    g_itemUseDisp2_trampoline = patch::hookFunction(
+        ttyd::win_item::itemUseDisp2, [](WinMgrEntry* menu) {
+            tot::win::ItemSubdialogMain2(menu);
+        });
+
+    // Add Mailbox SP to Key Items menu skip list (in place of Boat curse).
+    ttyd::win_item::menu_skip_list[6] = ItemType::MAILBOX_SP;
         
     // Apply patch to only include Infinite Pit enemies in the Tattle Log.
     mod::patch::writeBranchPair(
@@ -512,9 +479,9 @@ void DisplayUpDownNumberIcons(
         -8.0, 16.0, 16.0, 16.0, 1.0, 1.0, 0, unk0);
 }
 
-bool CheckOpenMarioMoveMenu(void* pWin) {
+bool CheckOpenMarioMoveMenu(WinPauseMenu* menu) {
     int32_t starting_move = -1;
-    switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
+    switch (menu->mario_menu_state) {
         case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
         case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
         case 12:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
@@ -528,12 +495,12 @@ bool CheckOpenMarioMoveMenu(void* pWin) {
             ++num_selections;
         }
     }
-    *(int32_t*)((uintptr_t)pWin + 0x198) = num_selections;
+    menu->special_move_count = num_selections;
     
     return true;
 }
 
-void MarioMoveMenuDisp(void* pWin) {
+void MarioMoveMenuDisp(WinPauseMenu* menu) {
     // Constants for menu code.
     gc::vec3    header_position         = { -50.0, 155.0, 0.0 };
     gc::vec3    header_scale            = { 0.8, 0.8, 0.8 };
@@ -552,7 +519,7 @@ void MarioMoveMenuDisp(void* pWin) {
         &header_position, &header_scale, &header_color, "Lvl.");
         
     int32_t starting_move;
-    switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
+    switch (menu->mario_menu_state) {
         case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
         case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
         default:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
@@ -588,11 +555,9 @@ void MarioMoveMenuDisp(void* pWin) {
     }
 }
 
-void MarioMoveMenuMsgEntry(void* pWin) {
-    int32_t cursor_pos = *(int32_t*)((uintptr_t)pWin + 0x194);
-    
+void MarioMoveMenuMsgEntry(WinPauseMenu* menu) {
     int32_t starting_move;
-    switch (*(uint32_t*)((uintptr_t)pWin + 0x160)) {
+    switch (menu->mario_menu_state) {
         case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
         case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
         default:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
@@ -601,16 +566,16 @@ void MarioMoveMenuMsgEntry(void* pWin) {
     for (int32_t i = 0; i < 8; ++i) {
         int32_t move = starting_move + i;
         if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
-        if (current_pos == cursor_pos) {
+        if (current_pos == menu->special_move_cursor_idx) {
             ttyd::win_root::winMsgEntry(
-                pWin, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
+                menu, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
             return;
         }
     }
 }
 
-void PartyMenuSetupPartnerDescAndMoveCount(void* pWin) {
-    int32_t selected_partner_idx = *(int32_t*)((uintptr_t)pWin + 0x1d8);
+void PartyMenuSetupPartnerDescAndMoveCount(WinPauseMenu* menu) {
+    int32_t selected_partner_idx = menu->active_party_winPartyDt_idx;
     auto* winpartydt = ttyd::win_party::g_winPartyDt;
     int32_t party_id = winpartydt[selected_partner_idx].partner_id;
         
@@ -630,20 +595,20 @@ void PartyMenuSetupPartnerDescAndMoveCount(void* pWin) {
         int32_t move = starting_move + i;
         if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++num_moves;
     }
-    *(int32_t*)((uintptr_t)pWin + 0x204) = num_moves;
+    menu->party_moves_count = num_moves;
     
     ttyd::win_root::winMsgEntry(
-        pWin, 0, winpartydt[selected_partner_idx].msg_menu, 0);
+        menu, 0, winpartydt[selected_partner_idx].msg_menu, 0);
 }
 
-void PartyMenuSetMoveDescAndCursorPos(void* pWin) {
-    int32_t cursor_pos = *(int32_t*)((uintptr_t)pWin + 0x208);
+void PartyMenuSetMoveDescAndCursorPos(WinPauseMenu* menu) {
+    int32_t cursor_pos = menu->party_moves_cursor_idx;
     
     // Override cursor XY position.
-    *(float*)((uintptr_t)pWin + 0x158) = -13.0f;
-    *(float*)((uintptr_t)pWin + 0x15c) = 38.0f - 23.4f * cursor_pos;
+    menu->main_cursor_target_x = -13.0f;
+    menu->main_cursor_target_y = 38.0f - 23.4f * cursor_pos;
     
-    int32_t selected_partner_idx = *(int32_t*)((uintptr_t)pWin + 0x1d8);
+    int32_t selected_partner_idx = menu->active_party_winPartyDt_idx;
     int32_t party_id =
         ttyd::win_party::g_winPartyDt[selected_partner_idx].partner_id;
     
@@ -664,26 +629,25 @@ void PartyMenuSetMoveDescAndCursorPos(void* pWin) {
         if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
         if (current_pos == cursor_pos) {
             ttyd::win_root::winMsgEntry(
-                pWin, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
+                menu, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
             return;
         }
     }
 }
 
-void PartyMenuDispStats(void* pWin) {
+void PartyMenuDispStats(WinPauseMenu* menu) {
     int32_t tab = 0;
     for (int32_t i = 0; i < 5; ++i) {
         // Check for which tab is the Party tab.
-        if (*(int32_t*)((uintptr_t)pWin + 0xc0 + 0x14 * i) == 1) {
+        if (menu->tab_body_info[i].id == 1) {
             tab = i;
             break;
         }
     }
-    float win_x = *(float*)((uintptr_t)pWin + 0xc4 + 0x14 * tab);
-    float win_y = *(float*)((uintptr_t)pWin + 0xc8 + 0x14 * tab);
-    void* texInit_param = **(void***)(*(uintptr_t*)((uintptr_t)pWin + 0x28) + 0xa0);
+    float win_x = menu->tab_body_info[tab].x;
+    float win_y = menu->tab_body_info[tab].y;
     
-    int32_t selected_partner_idx = *(int32_t*)((uintptr_t)pWin + 0x1d8);
+    int32_t selected_partner_idx = menu->active_party_winPartyDt_idx;
     int32_t party_id =
         ttyd::win_party::g_winPartyDt[selected_partner_idx].partner_id;
 
@@ -705,12 +669,12 @@ void PartyMenuDispStats(void* pWin) {
     gc::vec3 tbl_win = { win_x - 5.0f, win_y + 80.0f, 0.0f };
 
     // Draw recessed window for HP.
-    ttyd::win_root::winKirinukiGX(hp_win.x, hp_win.y, 240.0f, 46.0f, pWin, 0);
+    ttyd::win_root::winKirinukiGX(hp_win.x, hp_win.y, 240.0f, 46.0f, menu, 0);
     // Draw move table background.
-    ttyd::win_root::winWazaGX(tbl_win.x, tbl_win.y, 260.0f, 176.0f, pWin, 0);
+    ttyd::win_root::winWazaGX(tbl_win.x, tbl_win.y, 260.0f, 176.0f, menu, 0);
 
     // Draw pink blob behind "HP" text.
-    ttyd::win_main::winTexInit(texInit_param);
+    ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     pos.x = hp_win.x + 45.0f - 2.0f;
@@ -721,7 +685,7 @@ void PartyMenuDispStats(void* pWin) {
     ttyd::win_main::winTexSet(0xaf, &pos, &scale, &kPinkBlobColor);
     
     // Draw slash between current and maximum HP.
-    ttyd::win_main::winTexInit(texInit_param);
+    ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
     pos.x = hp_win.x + 8.0f + 170.f;
     pos.y = hp_win.y - 26.0f + 4.0f;
     ttyd::win_main::winTexSet(0x10, &pos, &scale, &kWhite);
@@ -857,189 +821,21 @@ void PartyMenuDispStats(void* pWin) {
     }
 }
 
-void ItemMenuDispInventory(void* pWin) {
-    // Don't display if not in the middle of a run.
-    if (!g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) return;
-    // Only display if on the regular item inventory screen.
-    if (*(int32_t*)((uintptr_t)pWin + 0x210) != 0) return;
-
-    int32_t tab = 0;
-    for (int32_t i = 0; i < 5; ++i) {
-        // Check for which tab is the Items tab.
-        if (*(int32_t*)((uintptr_t)pWin + 0xc0 + 0x14 * i) == 2) {
-            tab = i;
-            break;
-        }
-    }
-    float win_x = *(float*)((uintptr_t)pWin + 0xc4 + 0x14 * tab);
-    float win_y = *(float*)((uintptr_t)pWin + 0xc8 + 0x14 * tab);
-    
-    // void* texInit_param = **(void***)(*(uintptr_t*)((uintptr_t)pWin + 0x28) + 0xa0);
-    
-    // "Constant" colors.
-    static uint32_t kBlack = 0x000000FFU;
-    // static uint32_t kWhite = 0xFFFFFFFFU;
-    static uint32_t kRed   = 0xA00000FFU;
-    
-    // Temporary variables, used across draw calls.
-    gc::vec3 pos = { 0.0f, 0.0f, 0.0f };
-    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-    int32_t width;
-    
-    // Top-left corner of the window, for reference.
-    gc::vec3 win_pos = { win_x - 268.0f, win_y + 20.0f, 0.0f };
-    gc::vec3 win_dim = { 100.0f, 40.0f, 0.0f };
-
-    // Draw recessed window for item count.
-    ttyd::win_root::winKirinukiGX(
-        win_pos.x, win_pos.y, win_dim.x, win_dim.y, pWin, 0);
-
-    ttyd::win_main::winFontInit();
-    
-    // Draw slash between current and maximum item count.
-    width = ttyd::fontmgr::FontGetMessageWidth("/");
-    pos.x = win_pos.x + 50.0f - 0.5f * width;
-    pos.y = win_pos.y - 9.0f;
-    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "/");
-    
-    // Draw slash between current and maximum item count.
-    // ttyd::win_main::winTexInit(texInit_param);
-    // ttyd::win_main::winTexSet(0x10, &pos, &scale, &kWhite);
-    
-    int32_t current_items = ttyd::mario_pouch::pouchGetHaveItemCnt();
-    int32_t max_items = mod::infinite_pit::item::GetItemInventorySize();
-    
-    // Draw current and max inventory numbers.
-    const char* temp_current_items = ttyd::win_mario::winZenkakuStr(current_items);
-    width = ttyd::fontmgr::FontGetMessageWidth(temp_current_items);
-    pos.x = win_pos.x + 30.0f - 0.5f * width;
-    uint32_t* color = current_items < max_items ? &kBlack : &kRed;
-    ttyd::win_main::winFontSet(&pos, &scale, color, "%s", temp_current_items);
-
-    const char* temp_max_items = ttyd::win_mario::winZenkakuStr(max_items);
-    width = ttyd::fontmgr::FontGetMessageWidth(temp_max_items);
-    pos.x = win_pos.x + 70.0f - 0.5f * width;
-    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "%s", temp_max_items);
-    
-    // Draw "Space used" string.
-    const char* space_used = msgSearch("tot_menu_spaceused");
-    width = ttyd::fontmgr::FontGetMessageWidth(space_used);
-    scale.x = 0.6f;
-    scale.y = 0.6f;
-    scale.z = 0.6f;
-    pos.x = win_pos.x + (win_dim.x - scale.x * width) * 0.5f ;
-    pos.y = win_pos.y + scale.y * 26.0f + 2.0f;
-    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, space_used);
-}
-
-void GetPartyMemberMenuOrder(WinPartyData** out_party_data) {
-    WinPartyData* party_data = ttyd::win_party::g_winPartyDt;
-    // Get the currently active party member.
-    const int32_t party_id = ttyd::mario_party::marioGetParty();
-    
-    // Put the currently active party member in the first slot.
-    WinPartyData** current_order = out_party_data;
-    for (int32_t i = 0; i < 7; ++i) {
-        if (party_data[i].partner_id == party_id) {
-            *current_order = party_data + i;
-            ++current_order;
-        }
-    }
-    // Put the remaining party members in the remaining slots, ordered by
-    // the order they appear in g_winPartyDt.
-    ttyd::mario_pouch::PouchPartyData* pouch_data = 
-        ttyd::mario_pouch::pouchGetPtr()->party_data;
-    for (int32_t i = 0; i < 7; ++i) {
-        int32_t id = party_data[i].partner_id;
-        if ((pouch_data[id].flags & 1) && id != party_id) {
-            *current_order = party_data + i;
-            ++current_order;
-        }
-    }
-}
-
-bool CheckForUnusableItemInMenu() {
-    void* winPtr = ttyd::win_main::winGetPtr();
-    const int32_t item = reinterpret_cast<int32_t*>(winPtr)[0x2d4 / 4];
-    
-    // If not a Shine Sprite, item is not unusable; can return.
-    if (item != ItemType::GOLD_BAR_X3) return false;
-    
-    // If the player isn't actively making a selection, can return safely.
-    uint32_t& buttons = reinterpret_cast<uint32_t*>(winPtr)[0x4 / 4];
-    if (!(buttons & ButtonId::A) || (buttons & ButtonId::B)) return false;
-    
-    WinPartyData* party_data[7];
-    GetPartyMemberMenuOrder(party_data);
-    int32_t& party_member_target = reinterpret_cast<int32_t*>(winPtr)[0x2dc / 4];
-    
-    // Mario is selected.
-    if (party_member_target == 0) {
-        // Can only use Shine Sprites if max SP > 0.
-        if (ttyd::mario_pouch::pouchGetMaxAP() > 0) return false;
-    } else {
-        // Shine Sprites can always be used on partners.
-        return false;
-    }
-    
-    // The item cannot be used; play a sound effect and return true.
-    ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
-    return true;
-}
-
-void UseSpecialItemsInMenu(WinPartyData** party_data) {
-    void* winPtr = ttyd::win_main::winGetPtr();
-    const int32_t item = reinterpret_cast<int32_t*>(winPtr)[0x2d4 / 4];
-    
-    // If the item is a special item (currently just Strawberry Cake)...
-    if (item == ItemType::CAKE) {
-        int32_t& party_member_target =
-            reinterpret_cast<int32_t*>(winPtr)[0x2dc / 4];
-        int32_t selected_party_id = 0;
-        if (party_member_target > 0) {
-            // Convert the selected menu index into the PouchPartyData index.
-            selected_party_id = party_data[party_member_target - 1]->partner_id;
-        }
-        
-        if (item == ItemType::CAKE) {
-            // Add just bonus HP / FP (the base is added after this function).
-            if (selected_party_id == 0) {
-                ttyd::mario_pouch::pouchSetHP(
-                    ttyd::mario_pouch::pouchGetHP() +
-                    item::GetBonusCakeRestoration());
-            } else {
-                ttyd::mario_pouch::pouchSetPartyHP(
-                    selected_party_id,
-                    ttyd::mario_pouch::pouchGetPartyHP(selected_party_id) + 
-                    item::GetBonusCakeRestoration());
-            }
-            ttyd::mario_pouch::pouchSetFP(
-                ttyd::mario_pouch::pouchGetFP() +
-                item::GetBonusCakeRestoration());
-        }
-    }
-    
-    // Track items used in the menu.
-    g_Mod->state_.ChangeOption(tot::STAT_RUN_ITEMS_USED);
-    
-    // Run normal logic to add HP, FP, and SP afterwards...
-}
-
-void InitializeTattleLog(void* win_log_ptr) {
-    uintptr_t win_log_base = reinterpret_cast<uintptr_t>(win_log_ptr);
-    uint16_t* enemy_info = reinterpret_cast<uint16_t*>(win_log_base + 0x1058);
+void InitializeTattleLog(WinPauseMenu* menu) {
     int32_t num_enemies = 0;
     // Fill in only the enemy info for enemies appearing in Infinite Pit.
     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
         const int32_t tattle_idx = tot::GetCustomTattleIndex(i);
         if (tattle_idx < 0) continue;
-        enemy_info[num_enemies] =
-            (static_cast<uint8_t>(tattle_idx) << 8) | static_cast<uint8_t>(i);
+
+        menu->tattle_logs[num_enemies].order = tattle_idx;
+        menu->tattle_logs[num_enemies].id = i;
         ++num_enemies;
     }
     // Initialize the number of enemies.
-    *reinterpret_cast<int32_t*>(win_log_base + 0x1040) = num_enemies;
+    menu->tattle_log_total_count = num_enemies;
     // Sort initially by type sort index.
+    uint16_t* enemy_info = reinterpret_cast<uint16_t*>(menu->tattle_logs);
     for (int32_t i = 1; i < num_enemies; ++i) {
         const int16_t x = enemy_info[i];
         int32_t j = i - 1;

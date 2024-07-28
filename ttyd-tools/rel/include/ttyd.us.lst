@@ -941,12 +941,39 @@
 
 // mario_pouch.o
 // .text
+800d2db4:pouchGetYoshiName
+800d2dfc:pouchSetYoshiName
 800d2e28:pouchSetPartyColor
 800d2e44:pouchGetPartyColor
+800d2e58:pouchCheckMail
+800d2eb4:pouchOpenMail
+800d2ef4:pouchReceiveMail
+800d300c:pouchReceiveMailCount
+800d30e0:pouchGetStarStone
+800d3154:pouchAddKpaScore
+800d3184:pouchGetKpaScore
+800d3190:pouchAddKpaCoin
+800d31c8:pouchGetKpaCoin
+800d31d4:pouchMajinaiInit
+800d3204:pouchArriveBadge
+800d3234:N_pouchUnEquipBadgeID
 800d328c:pouchEquipBadgeID
+800d32e0:pouchEquipCheckBadgeIndex
 800d3300:pouchEquipCheckBadge
+800d33c8:pouchUnEquipBadgeIndex
+800d33f8:pouchEquipBadgeIndex
+800d3424:pouchGetStarPoint
+800d3430:pouchRevisePartyParam
 800d35a8:pouchReviseMarioParam
+800d3830:pouchRemoveKeepItem
+800d3964:pouchAddKeepItem
+800d3a8c:pouchGetPartyAttackLv
+800d3aa0:pouchGetHammerLv
+800d3b20:pouchGetJumpLv
+800d3ba0:pouchSetAudienceNum
+800d3bac:pouchGetAudienceNum
 800d3bb8:pouchGetMaxAP
+800d3bc4:pouchSetAP
 800d3c00:pouchAddAP
 800d3c44:pouchGetAP
 800d3c50:pouchSetMaxFP
@@ -959,14 +986,35 @@
 800d3d00:pouchSetHP
 800d3d24:pouchGetMaxHP
 800d3d30:pouchGetHP
+800d3d3c:pouchAddHP
+800d3d8c:pouchAddStarPiece
+800d3da8:pouchGetStarPiece
+800d3db4:pouchSetSuperCoin
+800d3dc8:pouchGetSuperCoin
 800d3dd4:pouchSetCoin
 800d3e18:pouchAddCoin
+800d3e64:pouchGetCoin
+800d3e70:pouchSortItem
+800d44f8:comp_kind_r
+800d4540:comp_aiueo_r
 800d46d4:comp_kind
+800d471c:comp_aiueo
+800d48b0:unk_800d48b0
+800d4974:pouchRemoveItemIndex
 800d4c38:pouchRemoveItem
 800d4ed4:pouchCheckItem
 800d50cc:pouchGetItem
+800d5570:pouchGetEmptyKeepItemCnt
+800d5614:pouchGetEmptyHaveItemCnt
+800d5674:pouchGetEquipBadgeCnt
 800d5738:pouchGetHaveBadgeCnt
+800d57fc:pouchGetKeepItemCnt
 800d58a0:pouchGetHaveItemCnt
+800d5964:L_pouchEquipBadge
+800d5978:pouchHaveBadge
+800d598c:pouchKeepItem
+800d59a0:pouchHaveItem
+800d59b4:pouchKeyItem
 800d59c8:pouchInit
 800d5eb0:pouchGetPtr
 // .data
@@ -2357,6 +2405,21 @@
 // 80167848:winPartyInit
 // .data
 803773d8:g_winPartyDt
+
+// win_item.o
+// .text
+80169cf0:itemUseDisp2
+80169ec0:itemUseDisp
+8016b41c:item_disp
+8016bbec:winItemDisp
+8016bf10:winItemMain2
+8016c030:winItemMain
+8016d2d8:winItemExit
+8016d310:winItemInit2
+8016d43c:winItemInit
+8016d6a0:winMakeSkipList
+// .data
+80417fb4:menu_skip_list
 
 // win_mario.o
 8016d7c4:winMarioDisp

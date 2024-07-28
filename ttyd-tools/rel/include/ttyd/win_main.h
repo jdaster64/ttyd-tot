@@ -18,11 +18,11 @@ void winIconGrayInit();
 void winIconInit();
 void winTexSet_x2(
     uint32_t unk1, uint32_t unk2, gc::vec3* pos, gc::vec3* scale, uint32_t* color);
-// winTexInit_x2
+void winTexInit_x2(void* tpl_file_data);
 // winTexSetRot
 // unk_JP_US_EU_50_8017c9bc
 void winTexSet(uint32_t unk, gc::vec3* pos, gc::vec3* scale, uint32_t* color);
-void winTexInit(void* unk);
+void winTexInit(void* tpl_file_data);
 // winFontSetLabel
 void winFontSetEdgeWidth(
     gc::vec3* pos, gc::vec3* scale, uint32_t* color, double width,
