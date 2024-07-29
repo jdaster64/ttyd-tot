@@ -52,6 +52,15 @@ extern "C" {
     void StartDispUpdownNumberIcons();
     void BranchBackDispUpdownNumberIcons();
     // menu_patches.s
+    void StartHakoGxInitializeFields();
+    void BranchBackHakoGxInitializeFields();
+    void StartHakoGxCheckDrawNoItemBox();
+    void ReturnHakoGxCheckDrawNoItemBoxNoItemCase();
+    void ReturnHakoGxCheckDrawNoItemBoxItemCase();
+    void StartHakoGxCheckDrawItemIcon();
+    void ReturnHakoGxCheckDrawItemIconNoItemCase();
+    void ReturnHakoGxCheckDrawItemIconItemCase();
+
     void StartCheckOpenMarioMoveMenu();
     void BranchBackCheckOpenMarioMoveMenu();
     void StartMarioMoveMenuDisp();
@@ -100,6 +109,11 @@ extern "C" {
     }
     void partyMenuDispStats(ttyd::win_root::WinPauseMenu* menu) {
         mod::infinite_pit::ui::PartyMenuDispStats(menu);
+    }
+    int32_t getIconForBadgeOrItemLogEntry(
+        ttyd::win_root::WinPauseMenu* menu, bool item_log, int32_t index) {
+        return mod::infinite_pit::ui::GetIconForBadgeOrItemLogEntry(
+            menu, item_log, index);
     }
 
     bool checkHideTopBarInWindow(ttyd::winmgr::WinMgrSelectEntry* sel_entry) {
@@ -160,6 +174,15 @@ extern const int32_t g_effUpdownDisp_TwoDigitSupport_EH;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_BH;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_EH;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_CH1;
+extern const int32_t g_winHakoGX_SetInitialFields_BH;
+extern const int32_t g_winHakoGX_SetInitialFields_EH;
+extern const int32_t g_winHakoGX_Patch_SkipSingleBox;
+extern const int32_t g_winHakoGX_CheckDrawNoItemBox_BH;
+extern const int32_t g_winHakoGX_CheckDrawNoItemBox_EH;
+extern const int32_t g_winHakoGX_CheckDrawNoItemBox_CH1;
+extern const int32_t g_winHakoGX_CheckDrawItemIcon_BH;
+extern const int32_t g_winHakoGX_CheckDrawItemIcon_EH;
+extern const int32_t g_winHakoGX_CheckDrawItemIcon_CH1;
 extern const int32_t g_winPartyDisp_StatsHook1_BH;
 extern const int32_t g_winPartyDisp_StatsHook1_EH;
 extern const int32_t g_winPartyDisp_StatsHook2_BH;
@@ -393,6 +416,9 @@ void ApplyFixedPatches() {
             CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
             tot::win::LogMenuDisp(camera, menu, tab_number);
         });
+
+    // Update sorting functions used by certain win_log menus.
+    tot::win::ReplaceLogSortMethods();
         
     // Override the default "Type" order used for the Tattle log.
     int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
@@ -404,6 +430,38 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         ttyd::win_root::enemy_monoshiri_sort_table,
         custom_tattle_order, sizeof(custom_tattle_order));
+
+    // winHakoGX (Item / Badge log box drawing function) patches:
+    // References new WinPauseMenu field locations in initialization. 
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_winHakoGX_SetInitialFields_BH),
+        reinterpret_cast<void*>(g_winHakoGX_SetInitialFields_EH),
+        reinterpret_cast<void*>(StartHakoGxInitializeFields),
+        reinterpret_cast<void*>(BranchBackHakoGxInitializeFields));
+    // Handles checking whether to draw a "not obtained" box.
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(g_winHakoGX_CheckDrawNoItemBox_BH),
+        reinterpret_cast<void*>(StartHakoGxCheckDrawNoItemBox));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ReturnHakoGxCheckDrawNoItemBoxNoItemCase),
+        reinterpret_cast<void*>(g_winHakoGX_CheckDrawNoItemBox_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ReturnHakoGxCheckDrawNoItemBoxItemCase),
+        reinterpret_cast<void*>(g_winHakoGX_CheckDrawNoItemBox_CH1));
+    // Handles checking whether to draw an item icon (opposite of above).
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(g_winHakoGX_CheckDrawItemIcon_BH),
+        reinterpret_cast<void*>(StartHakoGxCheckDrawItemIcon));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ReturnHakoGxCheckDrawItemIconNoItemCase),
+        reinterpret_cast<void*>(g_winHakoGX_CheckDrawItemIcon_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ReturnHakoGxCheckDrawItemIconItemCase),
+        reinterpret_cast<void*>(g_winHakoGX_CheckDrawItemIcon_CH1));
+    // Patch out the logic to draw a single background box on the last page.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_winHakoGX_Patch_SkipSingleBox),
+        0x48000a1cU  /* unconditional branch to 0x80159144 */);
         
     // Update winmgr::select_desc_tbl with a larger one to handle custom menus.
     uintptr_t new_select_desc_tbl = reinterpret_cast<uintptr_t>(
@@ -834,6 +892,14 @@ void PartyMenuDispStats(WinPauseMenu* menu) {
         
         y_offset -= 23.4f;
     }
+}
+
+int32_t GetIconForBadgeOrItemLogEntry(
+    WinPauseMenu* menu, bool item_log, int32_t index) {
+    const int32_t item_type = item_log
+        ? menu->recipe_log_ids[index] : menu->badge_log_ids[index];
+    return g_Mod->state_.GetOption(tot::FLAGS_ITEM_ENCOUNTERED, item_type)
+        ? ttyd::item_data::itemDataTable[item_type + 0x80].icon_id : -1;
 }
 
 }  // namespace ui

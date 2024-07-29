@@ -10,6 +10,10 @@ namespace ttyd::winmgr { struct WinMgrEntry; }
 
 namespace mod::tot::win {
 
+// Replaces the sorting function logic for certain Journal menus.
+
+void ReplaceLogSortMethods();
+
 // Replacement functions for the Journal ("Log") tab in the pause menu.
 
 void LogMenuInit(ttyd::win_root::WinPauseMenu* menu);

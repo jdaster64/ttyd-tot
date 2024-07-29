@@ -406,7 +406,8 @@ enum Options : uint32_t {
     OPTNUM_SUPERGUARD_SP_COST   = 0x602'0'01'64,
     // Next: 0x603
     
-    // Tracking flags (need to add on the flag to set / check manually).
+    // Different types of boolean tracking flags.
+    // Can only be set to true; bitwise OR the value or just use 'value' param.
     FLAGS_ACHIEVEMENT           = 0x700'0'00'00,
     FLAGS_MOVE_ENCOUNTERED      = 0x800'0'00'00U,
     FLAGS_ITEM_ENCOUNTERED      = 0x900'0'00'00U,

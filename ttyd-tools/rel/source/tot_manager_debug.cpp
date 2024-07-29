@@ -37,7 +37,7 @@ enum DebugManagerMode {
     DEBUG_UNLOCK_ALL_MOVES,     // Tower only
     DEBUG_UNLOCK_ALL_PARTNERS,  // Tower only
     DEBUG_UNLOCK_ALL_BADGES,
-    DEBUG_UNLOCK_TATTLE_LOG,
+    DEBUG_COMPLETE_LOGS,
     DEBUG_DIFFICULTY,
     DEBUG_MAX_STATS,
     DEBUG_EXIT,
@@ -206,12 +206,16 @@ void DebugManager::Update() {
                         (void*)ttyd::mario_pouch::comp_kind);
                     break;
                 }
-                case DEBUG_UNLOCK_TATTLE_LOG: {
+                case DEBUG_COMPLETE_LOGS: {
                     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
                         // Set Tattle flags for only enemies in Infinite Pit.
                         if (tot::GetCustomTattleIndex(i) > 0) {
                             ttyd::swdrv::swSet(0x117a + i);
                         }
+                    }
+                    for (int32_t i = 0; i < 256; ++i) {
+                        // Set all "item obtained" flags in state manager.
+                        g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, i);
                     }
                     break;
                 }
@@ -423,8 +427,8 @@ void DebugManager::Draw() {
             case DEBUG_UNLOCK_ALL_BADGES: {
                 strcpy(buf, "Unlock 1 of Each Badge");      break;
             }
-            case DEBUG_UNLOCK_TATTLE_LOG: {
-                strcpy(buf, "Unlock All Tattle Logs");      break;
+            case DEBUG_COMPLETE_LOGS: {
+                strcpy(buf, "Unlock All Journal Logs");     break;
             }
             case DEBUG_EXIT: {
                 strcpy(buf, "Exit Debug Mode");             break;

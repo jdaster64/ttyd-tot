@@ -1168,6 +1168,12 @@ g_StringMap = {
             
         b"tot_gameover_opt":
             b"<select 0 1 0 40>\nContinue\nGive Up",
+            
+        # Pause menu stuff.
+        
+        b"msg_menu_kiroku_ryori":
+            b'Inspect the items Mario has\n'
+            b'collected here.',
         
         # Enemy names + Tattle info (TODO)
         

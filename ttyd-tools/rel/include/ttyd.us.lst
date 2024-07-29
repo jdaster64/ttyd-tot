@@ -2474,6 +2474,14 @@
 801648e8:winRootMain
 // .data
 80377218:enemy_monoshiri_sort_table
+80417e2c:sort_1
+80417e44:sort_2
+80417e5c:sort_3
+80417e7c:sort_4
+80417e9c:sort_5
+80417ebc:sort_6
+80417ed4:sort_7
+80417ef4:sort_8
 
 // win_party.o
 // .text

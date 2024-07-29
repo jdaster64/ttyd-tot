@@ -428,6 +428,7 @@ int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
     // FLAGS can use value or | with the base flag type.
     if (t >= TYPE_FLAGS_ACHIEVEMENT) {
         x = index == 0 ? b : index;
+        y = 1;  // Always requesting a single bit.
     }
     
     const uint32_t* flag_ptr = nullptr;

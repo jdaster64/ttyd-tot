@@ -31,4 +31,8 @@ void PartyMenuSetMoveDescAndCursorPos(ttyd::win_root::WinPauseMenu* menu);
 // Prints all of the information on the right side of the Party tab.
 void PartyMenuDispStats(ttyd::win_root::WinPauseMenu* menu);
 
+// Returns the icon for the Nth item in the badge/items collected log.
+int32_t GetIconForBadgeOrItemLogEntry(
+    ttyd::win_root::WinPauseMenu* menu, bool item_log, int32_t index);
+
 }

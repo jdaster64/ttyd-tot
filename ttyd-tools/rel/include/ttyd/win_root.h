@@ -11,6 +11,12 @@ namespace ttyd::win_root {
 
 extern "C" {
 
+struct SortMethodInfo {
+    const char* type;
+    void*       func;
+};
+static_assert(sizeof(SortMethodInfo) == 8);
+
 struct WinTabHeaderInfo {
     int32_t     id;
     float       x;
@@ -194,66 +200,45 @@ struct WinPauseMenu {
     int32_t     equipped_badges_count;                      // 0x0d64
 
     // "Log" menu + submenus.
+    // Note that fields from 0xe14 ~ 0x1030 were changed from vanilla!
     int32_t     log_menu_state;                             // 0x0d68
     int32_t     log_submenu_cursor_idx;                     // 0x0d6c
     int32_t     log_submenu_count;                          // 0x0d70
-    WinLogSubmenuInfo log_submenu_info[5];                  // 0x0d74
-    // "Map"
-    int32_t     map_cursor_area_idx;                        // 0x0e14
-    int32_t     map_current_area_idx;                       // 0x0e18
-    int32_t     map_animpose_idx;                           // 0x0e1c
-    float       map_cursor_x;                               // 0x0e20
-    float       map_cursor_y;                               // 0x0e24
-    float       map_win_target_x;                           // 0x0e28
-    float       map_win_offset_x;                           // 0x0e2c
-    float       map_win_target_y;                           // 0x0e30
-    float       map_win_offset_y;                           // 0x0e34
-    float       map_scroll_offset_x;                        // 0x0e38
-    float       map_scroll_offset_y;                        // 0x0e3c
-    // "Crystal Stars"
-    int32_t     crystal_star_count;                         // 0x0e40
-    effdrv::EffEntry* crystal_star_effs[7];                 // 0x0e44
-    int32_t     crystal_star_selected;                      // 0x0e60
-    float       unk_0x0e64;                                 // 0x0e64
-    float       unk_0x0e68;                                 // 0x0e68
-    float       crystal_stars_win_target_x;                 // 0x0e6c
-    float       crystal_stars_win_offset_x;                 // 0x0e70
-    float       crystal_stars_win_target_y;                 // 0x0e74
-    float       crystal_stars_win_offset_y;                 // 0x0e78
-    float       crystal_stars_target_rotation;              // 0x0e7c
-    float       crystal_stars_rotation;                     // 0x0e80
+    WinLogSubmenuInfo log_submenu_info[6];                  // 0x0d74
     // "Badge Log"
-    float       badge_log_win_offset_x;                     // 0x0e84
-    float       badge_log_win_target_x;                     // 0x0e88
-    float       badge_log_win_offset_y;                     // 0x0e8c
-    float       badge_log_win_target_y;                     // 0x0e90
-    int32_t     badge_log_total_count;                      // 0x0e94
-    int32_t     badge_log_obtained_count;                   // 0x0e98
-    int32_t     badge_log_cursor_idx;                       // 0x0e9c
-    int32_t     badge_log_page_num;                         // 0x0ea0
-    float       badge_log_scroll_y;                         // 0x0ea4
-    float       badge_log_scroll_target_y;                  // 0x0ea8
-    float       badge_log_showcased_x;                      // 0x0eac
-    float       badge_log_showcased_target_x;               // 0x0eb0
-    float       badge_log_showcased_y;                      // 0x0eb4
-    float       badge_log_showcased_target_y;               // 0x0eb8
-    int16_t     badge_log_ids[100];                         // 0x0ebc
+    float       badge_log_win_offset_x;                     // 0x0e34
+    float       badge_log_win_target_x;                     // 0x0e38
+    float       badge_log_win_offset_y;                     // 0x0e3c
+    float       badge_log_win_target_y;                     // 0x0e40
+    int32_t     badge_log_total_count;                      // 0x0e44
+    int32_t     badge_log_obtained_count;                   // 0x0e48
+    int32_t     badge_log_cursor_idx;                       // 0x0e4c
+    int32_t     badge_log_page_num;                         // 0x0e50
+    float       badge_log_scroll_y;                         // 0x0e54
+    float       badge_log_scroll_target_y;                  // 0x0e58
+    float       badge_log_showcased_x;                      // 0x0e5c
+    float       badge_log_showcased_target_x;               // 0x0e60
+    float       badge_log_showcased_y;                      // 0x0e64
+    float       badge_log_showcased_target_y;               // 0x0e68
+    int16_t     badge_log_ids[84];                          // 0x0e6c
     // "Recipe Log"
-    float       recipe_log_win_offset_x;                    // 0x0f84
-    float       recipe_log_win_target_x;                    // 0x0f88
-    float       recipe_log_win_offset_y;                    // 0x0f8c
-    float       recipe_log_win_target_y;                    // 0x0f90
-    int32_t     recipe_log_total_count;                     // 0x0f94
-    int32_t     recipe_log_obtained_count;                  // 0x0f98
-    int32_t     recipe_log_cursor_idx;                      // 0x0f9c
-    int32_t     recipe_log_page_num;                        // 0x0fa0
-    float       recipe_log_scroll_y;                        // 0x0fa4
-    float       recipe_log_scroll_target_y;                 // 0x0fa8
-    float       recipe_log_showcased_x;                     // 0x0fac
-    float       recipe_log_showcased_target_x;              // 0x0fb0
-    float       recipe_log_showcased_y;                     // 0x0fb4
-    float       recipe_log_showcased_target_y;              // 0x0fb8
-    int16_t     recipe_log_ids[57];                         // 0x0fbc
+    float       recipe_log_win_offset_x;                    // 0x0f14
+    float       recipe_log_win_target_x;                    // 0x0f18
+    float       recipe_log_win_offset_y;                    // 0x0f1c
+    float       recipe_log_win_target_y;                    // 0x0f20
+    int32_t     recipe_log_total_count;                     // 0x0f24
+    int32_t     recipe_log_obtained_count;                  // 0x0f28
+    int32_t     recipe_log_cursor_idx;                      // 0x0f2c
+    int32_t     recipe_log_page_num;                        // 0x0f30
+    float       recipe_log_scroll_y;                        // 0x0f34
+    float       recipe_log_scroll_target_y;                 // 0x0f38
+    float       recipe_log_showcased_x;                     // 0x0f3c
+    float       recipe_log_showcased_target_x;              // 0x0f40
+    float       recipe_log_showcased_y;                     // 0x0f44
+    float       recipe_log_showcased_target_y;              // 0x0f48
+    int16_t     recipe_log_ids[84];                         // 0x0f4c
+    // Reserved space for other menus.
+    int8_t      unused_0x0ff4[60];                          // 0x0ff4
     // "Tattle Log"
     int8_t      unk_0x1030[16];                             // 0x1030
     int32_t     tattle_log_total_count;                     // 0x1040
@@ -287,7 +272,7 @@ void winSortEntry(double x, double y, WinPauseMenu* menu, int sortType);
 // sort_8_1_func
 // compare_func4_r
 // compare_func4
-// sort_7_3_func
+void sort_7_3_func(WinPauseMenu* menu);
 // compare_func3_r
 // compare_func3
 // sort_7_2_func
@@ -345,6 +330,14 @@ void winBgGX(double x, double y, WinPauseMenu* menu, int32_t type);
 
 // .data
 extern uint8_t enemy_monoshiri_sort_table[0xe7];
+extern SortMethodInfo sort_1[3];
+extern SortMethodInfo sort_2[3];
+extern SortMethodInfo sort_3[4];
+extern SortMethodInfo sort_4[4];
+extern SortMethodInfo sort_5[4];
+extern SortMethodInfo sort_6[3];
+extern SortMethodInfo sort_7[4];
+extern SortMethodInfo sort_8[3];
 
 }
 

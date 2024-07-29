@@ -1006,6 +1006,11 @@ void ApplyFixedPatches() {
             if (return_value) {
                 tot::RewardManager::MarkUniqueItemCollected(item_type);
             }
+
+            // Mark regular items / badges as being encountered.
+            if (return_value && item_type >= ItemType::THUNDER_BOLT) {
+                g_Mod->state_.SetOption(tot::FLAGS_ITEM_ENCOUNTERED, item_type - 0x80);
+            }
             
             return return_value;
         });

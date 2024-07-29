@@ -31,6 +31,9 @@ static constexpr const uint16_t kCommonItems[] = {
 static constexpr const uint16_t kRareItems[] = {
     0x0020, 0x0000, 0x0000, 0x88b8, 0x5e60, 0x0333, 0x02fd
 };
+static constexpr const uint16_t kSignatureItems[] = {
+    0x0000, 0x0000, 0x0000, 0x0000, 0x001e, 0x0400, 0x0000
+};
 static constexpr const uint16_t kStackableBadges[] = {
     0x0000, 0xffff, 0x0e3f, 0xfff7, 0x018f, 0xf000, 0x0007
 };
@@ -168,6 +171,8 @@ void ObfuscateItems(bool enable) {
         ptr, kCommonItems, sizeof(kCommonItems) / sizeof(uint16_t), 0x80);
     ptr = PopulateFromBitfield(
         ptr, kRareItems, sizeof(kRareItems) / sizeof(uint16_t), 0x80);
+    ptr = PopulateFromBitfield(
+        ptr, kSignatureItems, sizeof(kSignatureItems) / sizeof(uint16_t), 0x80);
     const int32_t num_items = (ptr - ids);
         
     ptr = PopulateFromBitfield(

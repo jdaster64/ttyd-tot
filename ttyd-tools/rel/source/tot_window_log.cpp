@@ -49,7 +49,142 @@ namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
 
+int32_t CompBadgeItemABC(int16_t* lhs, int16_t* rhs) {
+    return strcmp(
+        msgSearch(itemDataTable[*lhs + 0x80].name),
+        msgSearch(itemDataTable[*rhs + 0x80].name));
+}
+
+int32_t CompBadgeItemABC_R(int16_t* lhs, int16_t* rhs) {
+    return !strcmp(
+        msgSearch(itemDataTable[*lhs + 0x80].name),
+        msgSearch(itemDataTable[*rhs + 0x80].name));
+}
+
+int32_t CompBadgeItemId(int16_t* lhs, int16_t* rhs) {
+    return itemDataTable[*lhs + 0x80].type_sort_order
+         - itemDataTable[*rhs + 0x80].type_sort_order;
+}
+
+int32_t CompBadgeItemId_R(int16_t* lhs, int16_t* rhs) {
+    return itemDataTable[*rhs + 0x80].type_sort_order
+         - itemDataTable[*lhs + 0x80].type_sort_order;
+}
+
+int32_t CompBadgeBP(int16_t* lhs, int16_t* rhs) {
+    // Sort by cost ascending, then type ascending.
+    const int32_t lhs_sort =
+        (itemDataTable[*lhs + 0x80].bp_cost << 16)
+        - itemDataTable[*lhs + 0x80].type_sort_order;
+    const int32_t rhs_sort =
+        (itemDataTable[*rhs + 0x80].bp_cost << 16)
+        - itemDataTable[*rhs + 0x80].type_sort_order;
+    return lhs_sort - rhs_sort;
+}
+
+int32_t CompBadgeBP_R(int16_t* lhs, int16_t* rhs) {
+    // Sort by cost descending, then type ascending.
+    const int32_t lhs_sort =
+        ((10 - itemDataTable[*lhs + 0x80].bp_cost) << 16)
+        - itemDataTable[*lhs + 0x80].type_sort_order;
+    const int32_t rhs_sort =
+        ((10 - itemDataTable[*rhs + 0x80].bp_cost) << 16)
+        - itemDataTable[*rhs + 0x80].type_sort_order;
+    return lhs_sort - rhs_sort;
+}
+
+void SortBadgeLogABC(WinPauseMenu* menu) {
+    if (menu->has_sorted == 0) {
+        ttyd::system::qqsort(
+            menu->badge_log_ids, menu->badge_log_total_count, 2,
+            (void*)CompBadgeItemABC);
+    } else {
+        ttyd::system::qqsort(
+            menu->badge_log_ids, menu->badge_log_total_count, 2,
+            (void*)CompBadgeItemABC_R);
+    }
+    menu->has_sorted = !menu->has_sorted;
+    menu->badge_log_cursor_idx = 0;
+    menu->badge_log_page_num = 0;
+}
+
+void SortBadgeLogType(WinPauseMenu* menu) {
+    if (menu->has_sorted == 0) {
+        ttyd::system::qqsort(
+            menu->badge_log_ids, menu->badge_log_total_count, 2,
+            (void*)CompBadgeItemId);
+    } else {
+        ttyd::system::qqsort(
+            menu->badge_log_ids, menu->badge_log_total_count, 2,
+            (void*)CompBadgeItemId_R);
+    }
+    menu->has_sorted = !menu->has_sorted;
+    menu->badge_log_cursor_idx = 0;
+    menu->badge_log_page_num = 0;
+}
+
+void SortBadgeLogBP(WinPauseMenu* menu) {
+    if (menu->has_sorted == 0) {
+        ttyd::system::qqsort(
+            menu->badge_log_ids, menu->badge_log_total_count, 2,
+            (void*)CompBadgeBP);
+    } else {
+        ttyd::system::qqsort(
+            menu->badge_log_ids, menu->badge_log_total_count, 2,
+            (void*)CompBadgeBP_R);
+    }
+    menu->has_sorted = !menu->has_sorted;
+    menu->badge_log_cursor_idx = 0;
+    menu->badge_log_page_num = 0;
+}
+
+void SortItemLogABC(WinPauseMenu* menu) {
+    if (menu->has_sorted == 0) {
+        ttyd::system::qqsort(
+            menu->recipe_log_ids, menu->recipe_log_total_count, 2,
+            (void*)CompBadgeItemABC);
+    } else {
+        ttyd::system::qqsort(
+            menu->recipe_log_ids, menu->recipe_log_total_count, 2,
+            (void*)CompBadgeItemABC_R);
+    }
+    menu->has_sorted = !menu->has_sorted;
+    menu->recipe_log_cursor_idx = 0;
+    menu->recipe_log_page_num = 0;
+}
+
+void SortItemLogType(WinPauseMenu* menu) {
+    if (menu->has_sorted == 0) {
+        ttyd::system::qqsort(
+            menu->recipe_log_ids, menu->recipe_log_total_count, 2,
+            (void*)CompBadgeItemId);
+    } else {
+        ttyd::system::qqsort(
+            menu->recipe_log_ids, menu->recipe_log_total_count, 2,
+            (void*)CompBadgeItemId_R);
+    }
+    menu->has_sorted = !menu->has_sorted;
+    menu->recipe_log_cursor_idx = 0;
+    menu->recipe_log_page_num = 0;
+}
+
 }  // namespace
+
+void ReplaceLogSortMethods() {
+    // Replace sort functions for item/recipe logs to cover entire item range.
+    ttyd::win_root::sort_5[0].func = (void*)SortBadgeLogABC;
+    ttyd::win_root::sort_5[1].func = (void*)SortBadgeLogType;
+    ttyd::win_root::sort_5[2].func = (void*)SortBadgeLogBP;
+    ttyd::win_root::sort_6[0].func = (void*)SortItemLogABC;
+    ttyd::win_root::sort_6[1].func = (void*)SortItemLogType;
+
+    // Remove "by location" sort for Tattle log.
+    // Could eventually replace with "# defeated" if that's implemented?
+    ttyd::win_root::sort_7[1].type = "msg_menu_sort_aiueo";
+    ttyd::win_root::sort_7[1].func = (void*)ttyd::win_root::sort_7_3_func;
+    ttyd::win_root::sort_7[2].type = nullptr;
+    ttyd::win_root::sort_7[2].func = nullptr;
+}
 
 void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     // Hardcode Journal menu to have three submenus: Tattles, Items, Badges.
@@ -73,19 +208,17 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     menu->log_submenu_info[2].id = 2;
     menu->log_submenu_info[2].help_msg = "msg_menu_kiroku_badge";
   
-    // TODO: Use ToT's flags for 'encountered'.
     menu->badge_log_total_count = 0;
     menu->badge_log_obtained_count = 0;
     for (int32_t i = ItemType::POWER_JUMP; i < ItemType::MAX_ITEM_TYPE; ++i) {
         if (itemDataTable[i].type_sort_order != -1) {
-            menu->badge_log_ids[menu->badge_log_total_count++] = i - 0xf0;
-            if (ttyd::swdrv::swGet(i - 0x70)) ++menu->badge_log_obtained_count;
+            menu->badge_log_ids[menu->badge_log_total_count++] = i - 0x80;
+            if (g_Mod->state_.GetOption(FLAGS_ITEM_ENCOUNTERED, (i - 0x80)))
+                ++menu->badge_log_obtained_count;
         }
     }
-    // TODO: Update to use new sort.
     ttyd::system::qqsort(
-        menu->badge_log_ids, menu->badge_log_total_count, 2,
-        (void*)ttyd::win_root::compare_func5_2);
+        menu->badge_log_ids, menu->badge_log_total_count, 2, (void*)CompBadgeItemId);
     menu->badge_log_cursor_idx = 0;
     menu->badge_log_page_num = 0;
     menu->badge_log_win_offset_x = 320.0f;
@@ -99,19 +232,17 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     menu->badge_log_showcased_y = -300.0f;
     menu->badge_log_showcased_target_y = -300.0f;
 
-    // TODO: Use ToT's flags for 'encountered' + full item range.
     menu->recipe_log_total_count = 0;
     menu->recipe_log_obtained_count = 0;
-    for (int32_t i = ItemType::SHROOM_FRY; i <= ItemType::FRESH_JUICE; ++i) {
+    for (int32_t i = ItemType::THUNDER_BOLT; i <= ItemType::FRESH_JUICE; ++i) {
         if (itemDataTable[i].type_sort_order != -1) {
-            menu->recipe_log_ids[menu->recipe_log_total_count++] = i - 0xb3;
-            if (ttyd::swdrv::swGet(i - 0x72)) ++menu->recipe_log_obtained_count;
+            menu->recipe_log_ids[menu->recipe_log_total_count++] = i - 0x80;
+            if (g_Mod->state_.GetOption(FLAGS_ITEM_ENCOUNTERED, (i - 0x80)))
+                ++menu->recipe_log_obtained_count;
         }
     }
-    // TODO: Update to use new sort.
     ttyd::system::qqsort(
-        menu->recipe_log_ids, menu->recipe_log_total_count, 2, 
-        (void*)ttyd::win_root::compare_func6_2);
+        menu->recipe_log_ids, menu->recipe_log_total_count, 2, (void*)CompBadgeItemId);
     menu->recipe_log_cursor_idx = 0;
     menu->recipe_log_page_num = 0;
     menu->recipe_log_win_offset_x = 320.0f;
@@ -314,15 +445,17 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             menu->main_cursor_target_x = -140 + (menu->badge_log_cursor_idx % 7) * 56;
             menu->main_cursor_target_y = 90 - ((menu->badge_log_cursor_idx % 28) / 7) * 56;
       
-            if (!ttyd::swdrv::swGet(menu->badge_log_ids[menu->badge_log_cursor_idx] + 0x80)) {
+            if (!g_Mod->state_.GetOption(
+                    FLAGS_ITEM_ENCOUNTERED,
+                    menu->badge_log_ids[menu->badge_log_cursor_idx])) {
                 ttyd::win_root::winMsgEntry(
                     menu, -2, 
                     "msg_menu_stone_none_help", "msg_menu_stone_none_name");
             } else {
                 ttyd::win_root::winMsgEntry(
                     menu,-2,
-                    itemDataTable[menu->badge_log_ids[menu->badge_log_cursor_idx] + 0xf0].menu_description,
-                    itemDataTable[menu->badge_log_ids[menu->badge_log_cursor_idx] + 0xf0].name);
+                    itemDataTable[menu->badge_log_ids[menu->badge_log_cursor_idx] + 0x80].menu_description,
+                    itemDataTable[menu->badge_log_ids[menu->badge_log_cursor_idx] + 0x80].name);
             }
             
             break;
@@ -388,15 +521,17 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             menu->main_cursor_target_x = -140 + (menu->recipe_log_cursor_idx % 7) * 56;
             menu->main_cursor_target_y = 90 - ((menu->recipe_log_cursor_idx % 28) / 7) * 56;
       
-            if (!ttyd::swdrv::swGet(menu->recipe_log_ids[menu->recipe_log_cursor_idx] + 0x41)) {
+            if (!g_Mod->state_.GetOption(
+                    FLAGS_ITEM_ENCOUNTERED,
+                    menu->recipe_log_ids[menu->recipe_log_cursor_idx])) {
                 ttyd::win_root::winMsgEntry(
                     menu, -2, 
                     "msg_menu_stone_none_help", "msg_menu_stone_none_name");
             } else {
                 ttyd::win_root::winMsgEntry(
                     menu,-2,
-                    itemDataTable[menu->recipe_log_ids[menu->recipe_log_cursor_idx] + 0xb3].menu_description,
-                    itemDataTable[menu->recipe_log_ids[menu->recipe_log_cursor_idx] + 0xb3].name);
+                    itemDataTable[menu->recipe_log_ids[menu->recipe_log_cursor_idx] + 0x80].menu_description,
+                    itemDataTable[menu->recipe_log_ids[menu->recipe_log_cursor_idx] + 0x80].name);
             }
             
             break;
@@ -720,8 +855,9 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
             ttyd::win_main::winTexSet(0x95, &position, &scale, &color);
         }
         // Draw badge icon only if currently unlocked.
-        // TODO: Use new set of flags for this.
-        if (ttyd::swdrv::swGet(menu->badge_log_ids[menu->badge_log_cursor_idx] + 0x80)) {
+        if (g_Mod->state_.GetOption(
+                FLAGS_ITEM_ENCOUNTERED, 
+                menu->badge_log_ids[menu->badge_log_cursor_idx])) {
             ttyd::win_main::winIconInit();
             gc::vec3 position = {
                 win_x + menu->badge_log_showcased_x,
@@ -730,7 +866,7 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
             gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
             uint32_t color = 0xFFFFFFFFU;
             ttyd::win_main::winIconSet(
-                itemDataTable[menu->badge_log_ids[menu->badge_log_cursor_idx] + 0xf0].icon_id,
+                itemDataTable[menu->badge_log_ids[menu->badge_log_cursor_idx] + 0x80].icon_id,
                 &position, &scale, &color);
         }
     }
@@ -766,11 +902,13 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
                 0.0f };
             gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
             uint32_t color = 0xFFFFFFFFU;
-            ttyd::win_main::winTexSet(0x96, &position, &scale, &color);
+            // Change background to the pedestal one from the badge menu.
+            ttyd::win_main::winTexSet(0x95, &position, &scale, &color);
         }
         // Draw recipe icon only if currently unlocked.
-        // TODO: Use new set of flags for this.
-        if (ttyd::swdrv::swGet(menu->recipe_log_ids[menu->recipe_log_cursor_idx] + 0x41)) {
+        if (g_Mod->state_.GetOption(
+                FLAGS_ITEM_ENCOUNTERED,
+                menu->recipe_log_ids[menu->recipe_log_cursor_idx])) {
             ttyd::win_main::winIconInit();
             gc::vec3 position = {
                 win_x + menu->recipe_log_showcased_x,
@@ -779,7 +917,7 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
             gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
             uint32_t color = 0xFFFFFFFFU;
             ttyd::win_main::winIconSet(
-                itemDataTable[menu->recipe_log_ids[menu->recipe_log_cursor_idx] + 0xb3].icon_id,
+                itemDataTable[menu->recipe_log_ids[menu->recipe_log_cursor_idx] + 0x80].icon_id,
                 &position, &scale, &color);
         }
     }
