@@ -16,7 +16,7 @@ void _mapFree(void* heap, void* ptr);
 // smartInit
 // smartReInit
 // smartAutoFree
-// smartFree
+void smartFree(void* handle);
 // smartAlloc
 // smartGarbage
 // smartTexObj

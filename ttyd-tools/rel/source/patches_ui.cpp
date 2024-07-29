@@ -9,6 +9,7 @@
 #include "tot_manager_move.h"
 #include "tot_state.h"
 #include "tot_window_item.h"
+#include "tot_window_log.h"
 #include "tot_window_select.h"
 
 #include <gc/mtx.h>
@@ -34,6 +35,7 @@
 #include <ttyd/sound.h>
 #include <ttyd/statuswindow.h>
 #include <ttyd/win_item.h>
+#include <ttyd/win_log.h>
 #include <ttyd/win_main.h>
 #include <ttyd/win_mario.h>
 #include <ttyd/win_party.h>
@@ -65,9 +67,6 @@ extern "C" {
     void BranchBackPartyDispHook1();
     void StartPartyDispHook2();
     void BranchBackPartyDispHook2();
-    
-    void StartInitTattleLog();
-    void BranchBackInitTattleLog();
     // status_window_patches.s
     void StartPreventDpadShortcutsOutsidePit();
     void ConditionalBranchPreventDpadShortcutsOutsidePit();
@@ -101,9 +100,6 @@ extern "C" {
     }
     void partyMenuDispStats(ttyd::win_root::WinPauseMenu* menu) {
         mod::infinite_pit::ui::PartyMenuDispStats(menu);
-    }
-    void initTattleLog(ttyd::win_root::WinPauseMenu* menu) {
-        mod::infinite_pit::ui::InitializeTattleLog(menu);
     }
 
     bool checkHideTopBarInWindow(ttyd::winmgr::WinMgrSelectEntry* sel_entry) {
@@ -149,6 +145,12 @@ extern void (*g_itemUseDisp_trampoline)(WinMgrEntry*);
 extern void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
 extern void (*g_winItemMain2_trampoline)(WinPauseMenu*);
 extern int32_t (*g_winItemMain_trampoline)(WinPauseMenu*);
+extern void (*g_winLogDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
+extern void (*g_winLogMain2_trampoline)(WinPauseMenu*);
+extern int32_t (*g_winLogMain_trampoline)(WinPauseMenu*);
+extern void (*g_winLogExit_trampoline)(WinPauseMenu*);
+extern void (*g_winLogInit2_trampoline)(WinPauseMenu*);
+extern void (*g_winLogInit_trampoline)(WinPauseMenu*);
 extern const char* (*g_BattleGetRankNameLabel_trampoline)(int32_t);
 extern int32_t (*g_winMgrSelectOther_trampoline)(WinMgrSelectEntry*, EvtEntry*);
 extern WinMgrSelectEntry* (*g_winMgrSelectEntry_trampoline)(int32_t, int32_t, int32_t);
@@ -176,8 +178,6 @@ extern const int32_t g_winMarioDisp_MoveMenuDisp_EH;
 extern const int32_t g_winMarioMain_MoveDescription_BH;
 extern const int32_t g_winMarioMain_MoveDescription_EH;
 extern const int32_t g_winMarioMain_CheckOpenMoveMenu_BH;
-extern const int32_t g_winLogInit_Patch_DisableCrystalStarLog;
-extern const int32_t g_winLogInit_InitTattleLog_BH;
 extern const int32_t g_select_main_CheckHideTopBar_BH;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblHi16;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblLo16;
@@ -366,18 +366,33 @@ void ApplyFixedPatches() {
 
     // Add Mailbox SP to Key Items menu skip list (in place of Boat curse).
     ttyd::win_item::menu_skip_list[6] = ItemType::MAILBOX_SP;
-        
-    // Apply patch to only include Infinite Pit enemies in the Tattle Log.
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winLogInit_InitTattleLog_BH),
-        reinterpret_cast<void*>(StartInitTattleLog),
-        reinterpret_cast<void*>(BranchBackInitTattleLog));
-        
-    // Disable the "Crystal Stars" page of the Journal (Special Moves are
-    // already listed on the "Mario" page).
-    mod::patch::writePatch(
-        reinterpret_cast<void*>(g_winLogInit_Patch_DisableCrystalStarLog),
-        0x2c0303e7U /* cmpwi r3, (sequence position) 999 */);
+
+    // Replace all basic win_log functions with custom logic.
+    g_winLogInit_trampoline = patch::hookFunction(
+        ttyd::win_log::winLogInit, [](WinPauseMenu* menu) {
+            tot::win::LogMenuInit(menu);
+        });
+    g_winLogInit2_trampoline = patch::hookFunction(
+        ttyd::win_log::winLogInit2, [](WinPauseMenu* menu) {
+            tot::win::LogMenuInit2(menu);
+        });
+    g_winLogExit_trampoline = patch::hookFunction(
+        ttyd::win_log::winLogExit, [](WinPauseMenu* menu) {
+            tot::win::LogMenuExit(menu);
+        });
+    g_winLogMain_trampoline = patch::hookFunction(
+        ttyd::win_log::winLogMain, [](WinPauseMenu* menu) {
+            return tot::win::LogMenuMain(menu);
+        });
+    g_winLogMain2_trampoline = patch::hookFunction(
+        ttyd::win_log::winLogMain2, [](WinPauseMenu* menu) {
+            tot::win::LogMenuMain2(menu);
+        });
+    g_winLogDisp_trampoline = patch::hookFunction(
+        ttyd::win_log::winLogDisp, [](
+            CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
+            tot::win::LogMenuDisp(camera, menu, tab_number);
+        });
         
     // Override the default "Type" order used for the Tattle log.
     int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
@@ -818,31 +833,6 @@ void PartyMenuDispStats(WinPauseMenu* menu) {
         }
         
         y_offset -= 23.4f;
-    }
-}
-
-void InitializeTattleLog(WinPauseMenu* menu) {
-    int32_t num_enemies = 0;
-    // Fill in only the enemy info for enemies appearing in Infinite Pit.
-    for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
-        const int32_t tattle_idx = tot::GetCustomTattleIndex(i);
-        if (tattle_idx < 0) continue;
-
-        menu->tattle_logs[num_enemies].order = tattle_idx;
-        menu->tattle_logs[num_enemies].id = i;
-        ++num_enemies;
-    }
-    // Initialize the number of enemies.
-    menu->tattle_log_total_count = num_enemies;
-    // Sort initially by type sort index.
-    uint16_t* enemy_info = reinterpret_cast<uint16_t*>(menu->tattle_logs);
-    for (int32_t i = 1; i < num_enemies; ++i) {
-        const int16_t x = enemy_info[i];
-        int32_t j = i - 1;
-        for (; j >= 0 && enemy_info[j] > x; --j) {
-            enemy_info[j + 1] = enemy_info[j];
-        }
-        enemy_info[j + 1] = x;
     }
 }
 

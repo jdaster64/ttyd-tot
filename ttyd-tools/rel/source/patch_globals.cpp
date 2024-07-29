@@ -161,6 +161,18 @@ void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
 void (*g_winItemMain2_trampoline)(WinPauseMenu*) = nullptr;
 // win_item.o  8016c030
 int32_t (*g_winItemMain_trampoline)(WinPauseMenu*) = nullptr;
+// win_log.o  80173c70
+void (*g_winLogDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
+// win_log.o  80174758
+void (*g_winLogMain2_trampoline)(WinPauseMenu*) = nullptr;
+// win_log.o  80174df4
+int32_t (*g_winLogMain_trampoline)(WinPauseMenu*) = nullptr;
+// win_log.o  80176b7c
+void (*g_winLogExit_trampoline)(WinPauseMenu*) = nullptr;
+// win_log.o  80176bf8
+void (*g_winLogInit2_trampoline)(WinPauseMenu*) = nullptr;
+// win_log.o  80176d30
+void (*g_winLogInit_trampoline)(WinPauseMenu*) = nullptr;
 // unit_party_chuchurina.o  80181bdc
 int32_t (*g__make_madowase_weapon_trampoline)(EvtEntry*, bool) = nullptr;
 // unit_party_christine.o  801895b0
@@ -297,8 +309,6 @@ extern const int32_t g_winMarioDisp_MoveMenuDisp_EH = 0x8016f7f8;
 extern const int32_t g_winMarioMain_MoveDescription_BH = 0x80170c38;
 extern const int32_t g_winMarioMain_MoveDescription_EH = 0x80170c48;
 extern const int32_t g_winMarioMain_CheckOpenMoveMenu_BH = 0x801704d4;
-extern const int32_t g_winLogInit_Patch_DisableCrystalStarLog = 0x80176e0c;
-extern const int32_t g_winLogInit_InitTattleLog_BH = 0x80177940;
 extern const int32_t g_acShot_dispAfterimage_Patch_numBombs = 0x80197ffb;
 extern const int32_t g_acShot_dispAfterimage_Patch_targetVar2_1 = 0x80197f6f;
 extern const int32_t g_acShot_dispAfterimage_Patch_targetVar2_2 = 0x80197fcf;

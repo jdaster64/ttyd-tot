@@ -14,9 +14,6 @@
 .global BranchBackPartyDispHook1
 .global StartPartyDispHook2
 .global BranchBackPartyDispHook2
-# win_log
-.global StartInitTattleLog
-.global BranchBackInitTattleLog
 
 StartCheckOpenMarioMoveMenu:
 # Check for opening the menu for jumps and hammers as well.
@@ -67,13 +64,4 @@ mr %r3, %r30
 bl partyMenuDispStats
 
 BranchBackPartyDispHook2:
-b 0
-
-StartInitTattleLog:
-# Move win_log struct pointer into first parameter slot.
-mr %r3, %r28
-bl initTattleLog
-# Restore existing opcode.
-lmw	%r27, 0x4c (%sp)
-BranchBackInitTattleLog:
 b 0

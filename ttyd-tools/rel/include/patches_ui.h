@@ -31,7 +31,4 @@ void PartyMenuSetMoveDescAndCursorPos(ttyd::win_root::WinPauseMenu* menu);
 // Prints all of the information on the right side of the Party tab.
 void PartyMenuDispStats(ttyd::win_root::WinPauseMenu* menu);
 
-// Initializes the Tattle log Journal page with only enemies used in ToT.
-void InitializeTattleLog(ttyd::win_root::WinPauseMenu* menu);
-
 }

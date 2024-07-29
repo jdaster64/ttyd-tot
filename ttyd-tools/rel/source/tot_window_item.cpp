@@ -216,8 +216,6 @@ void DrawItemGrid(WinPauseMenu* menu, float win_x, float win_y) {
     }
 }
 
-
-
 void DrawItemInventorySize(WinPauseMenu* menu, float win_x, float win_y) {    
     // "Constant" colors.
     static uint32_t kBlack = 0x000000FFU;

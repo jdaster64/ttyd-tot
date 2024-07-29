@@ -247,8 +247,8 @@ struct WinPauseMenu {
     int32_t     recipe_log_obtained_count;                  // 0x0f98
     int32_t     recipe_log_cursor_idx;                      // 0x0f9c
     int32_t     recipe_log_page_num;                        // 0x0fa0
-    int32_t     recipe_log_scroll_y;                        // 0x0fa4
-    int32_t     recipe_log_scroll_target_y;                 // 0x0fa8
+    float       recipe_log_scroll_y;                        // 0x0fa4
+    float       recipe_log_scroll_target_y;                 // 0x0fa8
     float       recipe_log_showcased_x;                     // 0x0fac
     float       recipe_log_showcased_target_x;              // 0x0fb0
     float       recipe_log_showcased_y;                     // 0x0fb4
@@ -298,17 +298,17 @@ void winSortEntry(double x, double y, WinPauseMenu* menu, int sortType);
 // compare_func1
 // sort_6_2_func
 // sort_6_1_func
-// compare_func6_2_r
-// compare_func6_2
-// compare_func6_1_r
-// compare_func6_1
+int32_t compare_func6_2_r(int16_t* param_1,int16_t* param_2);
+int32_t compare_func6_2(int16_t* param_1,int16_t* param_2);
+int32_t compare_func6_1_r(int16_t* param_1,int16_t* param_2);
+int32_t compare_func6_1(int16_t* param_1,int16_t* param_2);
 // sort_5_3_func
 // sort_5_2_func
 // sort_5_1_func
-// compare_func5_2_r
-// compare_func5_2
-// compare_func5_1_r
-// compare_func5_1
+int32_t compare_func5_2_r(int16_t* param_1,int16_t* param_2);
+int32_t compare_func5_2(int16_t* param_1,int16_t* param_2);
+int32_t compare_func5_1_r(int16_t* param_1,int16_t* param_2);
+int32_t compare_func5_1(int16_t* param_1,int16_t* param_2);
 // sort_4_3_func
 // sort_4_2_func
 // sort_4_1_func
