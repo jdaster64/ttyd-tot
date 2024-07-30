@@ -191,6 +191,8 @@ extern const int32_t g_winPartyMain_RotatePartnersHook_BH;
 extern const int32_t g_winPartyMain_RotatePartnersHook_EH;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_BH;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_EH;
+extern const int32_t g_winBadge_mario_change_Patch_SkipMapAnim1;
+extern const int32_t g_winBadge_mario_change_Patch_SkipMapAnim2;
 extern const int32_t g_itemUseDisp_FixPartyOrder_BH;
 extern const int32_t g_itemUseDisp_FixPartyOrder_EH;
 extern const int32_t g_winItemDisp_DispInventorySize_BH;
@@ -462,6 +464,14 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_winHakoGX_Patch_SkipSingleBox),
         0x48000a1cU  /* unconditional branch to 0x80159144 */);
+
+    // Disable check for unloading Mario animPose on map.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_winBadge_mario_change_Patch_SkipMapAnim1),
+        0x3860ffffU  /* li r3, -1 */);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_winBadge_mario_change_Patch_SkipMapAnim2),
+        0x3860ffffU  /* li r3, -1 */);
         
     // Update winmgr::select_desc_tbl with a larger one to handle custom menus.
     uintptr_t new_select_desc_tbl = reinterpret_cast<uintptr_t>(
