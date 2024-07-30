@@ -94,6 +94,12 @@ g_StringMap = {
             b"Hits all ground-bound foes for\n"
             b"6 damage, and can flip them.",
 
+        b'list_yurayura_jishin':
+            b"Hits all ground-bound foes for\n"
+            b"6 damage, and can flip them.\n"
+            b'Crafted from the raw material\n'
+            b'found in a POW Block.',
+
         b'msg_pow_block':
             b'Hits all foes for 2 damage,\n'
             b'and can flip certain enemies.',

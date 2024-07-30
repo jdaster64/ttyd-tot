@@ -56,9 +56,9 @@ int32_t CompBadgeItemABC(int16_t* lhs, int16_t* rhs) {
 }
 
 int32_t CompBadgeItemABC_R(int16_t* lhs, int16_t* rhs) {
-    return !strcmp(
-        msgSearch(itemDataTable[*lhs + 0x80].name),
-        msgSearch(itemDataTable[*rhs + 0x80].name));
+    return strcmp(
+        msgSearch(itemDataTable[*rhs + 0x80].name),
+        msgSearch(itemDataTable[*lhs + 0x80].name));
 }
 
 int32_t CompBadgeItemId(int16_t* lhs, int16_t* rhs) {

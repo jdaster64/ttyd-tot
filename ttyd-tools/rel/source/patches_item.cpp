@@ -568,6 +568,8 @@ void ApplyFixedPatches() {
         special_property_flags |= AttackSpecialProperty_Flags::FLIPS_SHELLED;
     ttyd::battle_item_data::ItemWeaponData_Yurayura_Jishin.
         special_property_flags |= AttackSpecialProperty_Flags::FLIPS_BOMB;
+    // Reference new list description.
+    itemDataTable[ItemType::EARTH_QUAKE].menu_description = "list_yurayura_jishin";
         
     // Make Trade Off usable only on the enemy party.
     ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka.target_class_flags =
