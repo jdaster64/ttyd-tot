@@ -371,7 +371,7 @@ namespace ItemType {
         TOT_KEY_PEEKABOO = 0x10,
         TOT_KEY_SUPER_PEEKABOO,
         TOT_KEY_TIMING_TUTOR,
-        TOT_KEY_BGM_MUTE,
+        TOT_KEY_BGM_TOGGLE,
         TOT_KEY_ATTACK_FX,
         TOT_TOWER_KEY = GOLD_BAR,
         TOT_MASTER_KEY = GOLD_BAR_X3,

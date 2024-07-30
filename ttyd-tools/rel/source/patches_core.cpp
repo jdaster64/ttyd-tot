@@ -202,7 +202,9 @@ void ApplyFixedPatches() {
         ttyd::pmario_sound::psndBGMOn_f_d, [](
             uint32_t unk0, const char* name, uint32_t fadein_time,
             uint16_t unk1) {
-            if (g_Mod->state_.GetOption(tot::OPT_BGM_DISABLED)) {
+            // Only disable background music after loading a save file.
+            if (!strcmp(GetCurrentArea(), "gon") &&
+                !tot::GetSWF(tot::GSWF_BgmEnabled)) {
                 return 0U;
             }
             return g_psndBGMOn_f_d_trampoline(unk0, name, fadein_time, unk1);

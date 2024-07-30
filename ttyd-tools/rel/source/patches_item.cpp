@@ -542,7 +542,7 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_KEY_PEEKABOO].menu_description = "msg_HP_mieru";
     itemDataTable[ItemType::TOT_KEY_PEEKABOO].icon_id = IconType::PEEKABOO;
     itemDataTable[ItemType::TOT_KEY_PEEKABOO].type_sort_order = 1;
-    
+
     itemDataTable[ItemType::TOT_KEY_SUPER_PEEKABOO].name = "in_super_peekaboo";
     itemDataTable[ItemType::TOT_KEY_SUPER_PEEKABOO].description = "msg_super_peekaboo";
     itemDataTable[ItemType::TOT_KEY_SUPER_PEEKABOO].menu_description = "msg_super_peekaboo";
@@ -554,6 +554,12 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR].menu_description = "msg_timing_oshieru";
     itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR].icon_id = IconType::TIMING_TUTOR;
     itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR].type_sort_order = 3;
+
+    itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].name = "in_bgm";
+    itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].description = "msg_bgm";
+    itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].menu_description = "msg_bgm";
+    itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].icon_id = IconType::ATTACK_FX_B;
+    itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].type_sort_order = 4;
 
     // Balance changes for individual items...
 

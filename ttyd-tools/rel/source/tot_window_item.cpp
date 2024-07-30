@@ -98,6 +98,8 @@ void DrawItemGrid(WinPauseMenu* menu, float win_x, float win_y) {
                 case ItemType::TOT_KEY_TIMING_TUTOR:
                     item_active = GetSWF(GSWF_TimingTutorEnabled);
                     break;
+                case ItemType::TOT_KEY_BGM_TOGGLE:
+                    item_active = GetSWF(GSWF_BgmEnabled);
             }
         }
         
@@ -366,6 +368,8 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                         case ItemType::TOT_KEY_TIMING_TUTOR:
                             effect_flag = GSWF_TimingTutorEnabled;
                             break;
+                        case ItemType::TOT_KEY_BGM_TOGGLE:
+                            effect_flag = GSWF_BgmEnabled;
                     }
                     if (effect_flag) {
                         if (ToggleSWF(effect_flag)) {
@@ -374,6 +378,10 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                             // Also disable Super Peekaboo if regular disabled. 
                             if (effect_flag == GSWF_PeekabooEnabled) {
                                 SetSWF(GSWF_SuperPeekabooEnabled, 0);
+                            }
+                            // Fade out current BGM if disabling music.
+                            if (effect_flag == GSWF_BgmEnabled) {
+                                ttyd::pmario_sound::psndStopAllFadeOut();
                             }
                             ttyd::pmario_sound::psndSFXOn((char *)0x20039);
                         }

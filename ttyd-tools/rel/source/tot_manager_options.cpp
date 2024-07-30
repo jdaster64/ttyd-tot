@@ -120,12 +120,14 @@ void OptionsManager::InitLobby() {
 
     // Testing: Give all currently implemented QoL / cosmetic key items.
     // (These items should not be deleted in the final version, ideally)
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BGM_TOGGLE);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_SUPER_PEEKABOO);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_PEEKABOO);
     SetSWF(GSWF_PeekabooEnabled);
     SetSWF(GSWF_SuperPeekabooEnabled);
     SetSWF(GSWF_TimingTutorEnabled);
+    SetSWF(GSWF_BgmEnabled);
     
     // Assign Yoshi a totally random color.
     ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));

@@ -395,7 +395,6 @@ enum Options : uint32_t {
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,
     OPT_DEBUG_MODE_USED         = 0x461'1'00'01,
-    OPT_BGM_DISABLED            = 0x462'1'00'01,
     
     // Numeric options.
     // Global enemy HP and ATK scaling (0.05x ~ 10.00x in increments of 0.05).

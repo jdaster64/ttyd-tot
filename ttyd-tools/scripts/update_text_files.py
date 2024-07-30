@@ -35,9 +35,10 @@ g_StringMap = {
         b"in_perfect_power_p":      b"Perfect Power P",
         b"in_pity_star":            b"Pity Star",
         b"in_pity_star_p":          b"Pity Star P",
-        b"in_super_peekaboo":       b"Super Peekaboo",
         b"tot_key_name":            b"Tower Key",
         b"tot_mkey_name":           b"Master Key",
+        b"in_super_peekaboo":       b"Stat Master",
+        b"in_bgm":                  b"Music Toggle",
         
         # Special item descriptions.
         
@@ -68,6 +69,21 @@ g_StringMap = {
         b"tot_mkey_desc":
             b"Opens a single locked door.\n"
             b"Works on any room.",
+
+        b'msg_HP_mieru':
+            b"Shows enemies' HP bar.",
+
+        b'msg_super_peekaboo':
+            b"Shows enemies' current ATK and\n"
+            b"DEF stats under their HP.",
+
+        b'msg_timing_oshieru':
+            b'Shows an indicator for when\n'
+            b'to perform Stylish commands.',
+
+        b'msg_bgm':
+            b"Toggle the background music\n"
+            b"on or off.",
             
         # Normal item descriptions.
         
@@ -630,17 +646,6 @@ g_StringMap = {
             b"by 1 but regain 1 FP per attack.\n"
             b"Wearing multiple copies raises\n"
             b"FP more, for no extra ATK loss.",
-
-        b'msg_HP_mieru':
-            b"Shows enemies' HP bar.",
-
-        b'msg_super_peekaboo':
-            b"Shows enemies' current ATK and\n"
-            b"DEF stats under their HP.",
-
-        b'msg_timing_oshieru':
-            b'Shows an indicator for when\n'
-            b'to perform Stylish commands.',
 
         b'menu_itsumo_genki':
             b'Makes Mario immune to all\n'

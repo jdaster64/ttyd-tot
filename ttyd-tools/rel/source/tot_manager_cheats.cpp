@@ -27,12 +27,11 @@ namespace {
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Constants for secret codes.
-uint32_t secretCode_BumpAttack      = 043652131;
-uint32_t secretCode_BgmOnOff        = 031313141;
 uint32_t secretCode_OpeningCutscene = 034345566;
-uint32_t secretCode_UnlockFxBadges  = 026122146;
 uint32_t secretCode_ObfuscateItems  = 046362123;
 uint32_t secretCode_DebugMode       = 036363636;
+uint32_t secretCode_UnlockFxBadges  = 026122146;
+uint32_t secretCode_BumpAttack      = 043652131;
 
 }
 
@@ -48,16 +47,6 @@ void CheatsManager::Update() {
     if (ttyd::system::keyGetButtonTrg(0) & ButtonId::Y) code = 6;
     if (code) code_history = (code_history << 3) | code;
     
-    if ((code_history & 0xFFFFFF) == secretCode_BgmOnOff) {
-        code_history = 0;
-        // Toggle on/off background music from playing or starting.
-        bool toggle = !g_Mod->state_.GetOption(OPT_BGM_DISABLED);
-        g_Mod->state_.SetOption(OPT_BGM_DISABLED, toggle);
-        if (toggle) {
-            ttyd::pmario_sound::psndStopAllFadeOut();
-        }
-        ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
-    }
     if ((code_history & 0xFFFFFF) == secretCode_OpeningCutscene &&
         !strcmp(GetCurrentMap(), "gon_00") &&
         !g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
