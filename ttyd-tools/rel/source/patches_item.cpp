@@ -537,13 +537,23 @@ void ApplyFixedPatches() {
 
     // Key items...
 
-    // Peekaboo, Timing Tutor - Copy data to key item version.
-    memcpy(
-        &itemDataTable[ItemType::TOT_KEY_PEEKABOO],
-        &itemDataTable[ItemType::PEEKABOO], sizeof(ItemData));
-    memcpy(
-        &itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR],
-        &itemDataTable[ItemType::TIMING_TUTOR], sizeof(ItemData));
+    itemDataTable[ItemType::TOT_KEY_PEEKABOO].name = "in_HP_mieru";
+    itemDataTable[ItemType::TOT_KEY_PEEKABOO].description = "msg_HP_mieru";
+    itemDataTable[ItemType::TOT_KEY_PEEKABOO].menu_description = "msg_HP_mieru";
+    itemDataTable[ItemType::TOT_KEY_PEEKABOO].icon_id = IconType::PEEKABOO;
+    itemDataTable[ItemType::TOT_KEY_PEEKABOO].type_sort_order = 1;
+    
+    itemDataTable[ItemType::TOT_KEY_SUPER_PEEKABOO].name = "in_super_peekaboo";
+    itemDataTable[ItemType::TOT_KEY_SUPER_PEEKABOO].description = "msg_super_peekaboo";
+    itemDataTable[ItemType::TOT_KEY_SUPER_PEEKABOO].menu_description = "msg_super_peekaboo";
+    itemDataTable[ItemType::TOT_KEY_SUPER_PEEKABOO].icon_id = IconType::SUPER_PEEKABOO;
+    itemDataTable[ItemType::TOT_KEY_SUPER_PEEKABOO].type_sort_order = 2;
+
+    itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR].name = "in_timing_oshieru";
+    itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR].description = "msg_timing_oshieru";
+    itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR].menu_description = "msg_timing_oshieru";
+    itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR].icon_id = IconType::TIMING_TUTOR;
+    itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR].type_sort_order = 3;
 
     // Balance changes for individual items...
 

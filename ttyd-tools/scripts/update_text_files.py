@@ -35,6 +35,7 @@ g_StringMap = {
         b"in_perfect_power_p":      b"Perfect Power P",
         b"in_pity_star":            b"Pity Star",
         b"in_pity_star_p":          b"Pity Star P",
+        b"in_super_peekaboo":       b"Super Peekaboo",
         b"tot_key_name":            b"Tower Key",
         b"tot_mkey_name":           b"Master Key",
         
@@ -630,15 +631,12 @@ g_StringMap = {
             b"Wearing multiple copies raises\n"
             b"FP more, for no extra ATK loss.",
 
-        b'menu_HP_mieru':
-            b"Shows enemies' HP bar.",
-
         b'msg_HP_mieru':
             b"Shows enemies' HP bar.",
 
-        b'menu_timing_oshieru':
-            b'Shows an indicator for when\n'
-            b'to perform Stylish commands.',
+        b'msg_super_peekaboo':
+            b"Shows enemies' current ATK and\n"
+            b"DEF stats under their HP.",
 
         b'msg_timing_oshieru':
             b'Shows an indicator for when\n'

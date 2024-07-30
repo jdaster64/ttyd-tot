@@ -974,6 +974,21 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
     // Draw banners for submenus.
     for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
         const auto& submenu = menu->log_submenu_info[i];
+        int32_t banner_id;
+        switch (submenu.id) {
+            default:
+                banner_id = 0x20;
+                break;
+            case 2:
+                banner_id = 0x21;
+                break;
+            case 3:
+                banner_id = 0xc2;
+                break;
+            case 4:
+                banner_id = 0x23;
+                break;
+        }
         if (i == menu->log_submenu_cursor_idx) {
             {    
                 ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
@@ -987,14 +1002,14 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
                 gc::vec3 position = { win_x + submenu.x - 8.0f, win_y + submenu.y + 8.0f, 0.0f };
                 gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
                 uint32_t color = 0xFFFFFFFFU;
-                ttyd::win_main::winTexSet_x2(submenu.id + 0x1f, 0xb5, &position, &scale, &color);
+                ttyd::win_main::winTexSet_x2(banner_id, 0xb5, &position, &scale, &color);
             }
         } else {
             ttyd::win_main::winTexInit_x2(*menu->win_tpl->mpFileData);
             gc::vec3 position = { win_x + submenu.x, win_y + submenu.y, 0.0f };
             gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
             uint32_t color = 0x808080FFU;
-            ttyd::win_main::winTexSet_x2(submenu.id + 0x1f, 0xb5, &position, &scale, &color);
+            ttyd::win_main::winTexSet_x2(banner_id, 0xb5, &position, &scale, &color);
         }
     }
 }

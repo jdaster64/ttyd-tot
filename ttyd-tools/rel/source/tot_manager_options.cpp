@@ -118,11 +118,13 @@ void OptionsManager::InitLobby() {
     ttyd::mario_pouch::pouchGetItem(ItemType::W_EMBLEM);
     ttyd::mario_pouch::pouchGetItem(ItemType::L_EMBLEM);
 
-    // Testing: Give key item versions of Peekaboo and Timing Tutor.
-    // (Key items should not be deleted in the final version, ideally)
+    // Testing: Give all currently implemented QoL / cosmetic key items.
+    // (These items should not be deleted in the final version, ideally)
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_SUPER_PEEKABOO);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_PEEKABOO);
     SetSWF(GSWF_PeekabooEnabled);
+    SetSWF(GSWF_SuperPeekabooEnabled);
     SetSWF(GSWF_TimingTutorEnabled);
     
     // Assign Yoshi a totally random color.

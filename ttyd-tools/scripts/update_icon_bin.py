@@ -49,6 +49,8 @@ g_NewIconDefs = [
     [(624, 0)],
     # Hottest Dog item
     [(625, 0)],
+    # Super Peekaboo key item
+    [(626, 0)],
 ]
 g_IconDefs = []
 

@@ -592,6 +592,7 @@ namespace IconType {
         PITY_STAR,
         PITY_STAR_P,
         HOTTEST_DOG,
+        SUPER_PEEKABOO,
     };
 }
 

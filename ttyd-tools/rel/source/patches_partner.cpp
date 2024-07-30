@@ -7,6 +7,7 @@
 #include "patch.h"
 #include "patches_battle.h"
 #include "tot_generate_enemy.h"
+#include "tot_gsw.h"
 #include "tot_party_bobbery.h"
 #include "tot_party_flurrie.h"
 #include "tot_party_goombella.h"
@@ -389,7 +390,7 @@ void DisplayTattleStats(
         (ttyd::swdrv::swGet(0x117a + unit->true_kind) ||
         ttyd::swdrv::swGet(0x117a + unit->current_kind));
     // If option is enabled, default to it being on (can toggle with Z).
-    if (g_Mod->state_.GetOption(tot::OPT_SHOW_ATK_DEF)) {
+    if (tot::GetSWF(tot::GSWF_SuperPeekabooEnabled)) {
         show_atk_def = true;
     }
     // Hide ATK / DEF outside player action phase (or if hidden for this floor).

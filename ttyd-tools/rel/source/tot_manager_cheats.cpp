@@ -30,7 +30,6 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 uint32_t secretCode_BumpAttack      = 043652131;
 uint32_t secretCode_BgmOnOff        = 031313141;
 uint32_t secretCode_OpeningCutscene = 034345566;
-uint32_t secretCode_ShowAtkDef      = 023122312;
 uint32_t secretCode_UnlockFxBadges  = 026122146;
 uint32_t secretCode_ObfuscateItems  = 046362123;
 uint32_t secretCode_DebugMode       = 036363636;
@@ -57,12 +56,6 @@ void CheatsManager::Update() {
         if (toggle) {
             ttyd::pmario_sound::psndStopAllFadeOut();
         }
-        ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
-    }
-    if ((code_history & 0xFFFFFF) == secretCode_ShowAtkDef) {
-        code_history = 0;
-        bool toggle = !g_Mod->state_.GetOption(OPT_SHOW_ATK_DEF);
-        g_Mod->state_.SetOption(OPT_SHOW_ATK_DEF, toggle);
         ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
     }
     if ((code_history & 0xFFFFFF) == secretCode_OpeningCutscene &&

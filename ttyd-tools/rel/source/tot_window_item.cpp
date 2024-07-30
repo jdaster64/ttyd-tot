@@ -92,6 +92,9 @@ void DrawItemGrid(WinPauseMenu* menu, float win_x, float win_y) {
                 case ItemType::TOT_KEY_PEEKABOO:
                     item_active = GetSWF(GSWF_PeekabooEnabled);
                     break;
+                case ItemType::TOT_KEY_SUPER_PEEKABOO:
+                    item_active = GetSWF(GSWF_SuperPeekabooEnabled);
+                    break;
                 case ItemType::TOT_KEY_TIMING_TUTOR:
                     item_active = GetSWF(GSWF_TimingTutorEnabled);
                     break;
@@ -352,10 +355,13 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                     }
                 } else {
                     // Toggle on key items with boolean effects.
-                    uint32_t effect_flag = 0;
+                    int32_t effect_flag = 0;
                     switch (item) {
                         case ItemType::TOT_KEY_PEEKABOO:
                             effect_flag = GSWF_PeekabooEnabled;
+                            break;
+                        case ItemType::TOT_KEY_SUPER_PEEKABOO:
+                            effect_flag = GSWF_SuperPeekabooEnabled;
                             break;
                         case ItemType::TOT_KEY_TIMING_TUTOR:
                             effect_flag = GSWF_TimingTutorEnabled;
@@ -365,6 +371,10 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                         if (ToggleSWF(effect_flag)) {
                             ttyd::pmario_sound::psndSFXOn((char *)0x20038);
                         } else {
+                            // Also disable Super Peekaboo if regular disabled. 
+                            if (effect_flag == GSWF_PeekabooEnabled) {
+                                SetSWF(GSWF_SuperPeekabooEnabled, 0);
+                            }
                             ttyd::pmario_sound::psndSFXOn((char *)0x20039);
                         }
                     }
