@@ -7,6 +7,7 @@
 #include "tot_generate_reward.h"
 #include "tot_gon.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_gsw.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
 #include "tot_window_select.h"

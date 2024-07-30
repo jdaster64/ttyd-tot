@@ -10,6 +10,7 @@
 #include "patches_partner.h"
 #include "tot_generate_condition.h"
 #include "tot_generate_reward.h"
+#include "tot_gsw.h"
 #include "tot_manager_move.h"
 #include "tot_party_mario.h"
 
@@ -30,6 +31,7 @@
 #include <ttyd/mariost.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/seq_battle.h>
+#include <ttyd/swdrv.h>
 #include <ttyd/system.h>
 
 #include <cstdint>
@@ -122,6 +124,7 @@ int32_t g_GradualSpRecoveryTurns = 0;
 // Function hooks.
 extern void (*g_seq_battleInit_trampoline)(void);
 extern void (*g_fbatBattleMode_trampoline)(void);
+extern void (*g_Btl_UnitSetup_trampoline)(BattleWork*);
 extern void (*g_BtlActRec_JudgeRuleKeep_trampoline)(void);
 extern void (*g__rule_disp_trampoline)(void);
 extern BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t);
@@ -371,6 +374,19 @@ void ApplyFixedPatches() {
             g_fbatBattleMode_trampoline();
             // Copy information back to parent npc after battle, if applicable.
             if (post_battle_state) CopyChildBattleInfo(/* to_child = */ false);
+        });
+
+    g_Btl_UnitSetup_trampoline = patch::hookFunction(
+        ttyd::battle::Btl_UnitSetup, [](BattleWork* battleWork) {
+            // Run original logic.
+            g_Btl_UnitSetup_trampoline(battleWork);
+            // Set "badge equipped" flags based on new key item flags.
+            if (tot::GetSWF(tot::GSWF_PeekabooEnabled)) {
+                battleWork->badge_equipped_flags |= 2;
+            }
+            if (tot::GetSWF(tot::GSWF_TimingTutorEnabled)) {
+                battleWork->badge_equipped_flags |= 4;
+            }
         });
         
     g_BtlActRec_JudgeRuleKeep_trampoline = patch::hookFunction(

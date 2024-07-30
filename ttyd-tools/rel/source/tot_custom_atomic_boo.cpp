@@ -1,6 +1,7 @@
 #include "tot_custom_rel.h"     // For externed unit definitions.
 
 #include "evt_cmd.h"
+#include "tot_gsw.h"
 #include "tot_state.h"
 
 #include <gc/mtx.h>

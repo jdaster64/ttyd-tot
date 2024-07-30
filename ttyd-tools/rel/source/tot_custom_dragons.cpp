@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_gsw.h"
 #include "tot_state.h"
 
 #include <gc/types.h>

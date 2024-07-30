@@ -10,6 +10,7 @@
 #include "patches_mario_move.h"
 #include "patches_options.h"
 #include "tot_manager_options.h"
+#include "tot_gsw.h"
 #include "tot_state.h"
 
 #include <gc/OSLink.h>
@@ -123,12 +124,11 @@ void OnFileLoad(bool new_file = true) {
         
         // Set story progress / some tutorial flags.
         ttyd::swdrv::swInit();
-        ttyd::swdrv::swByteSet(0, 405);     // post-game story progress
+        ttyd::swdrv::swByteSet(0, 405);     // post-game vanilla story progress
         ttyd::swdrv::swSet(0xe9);           // Save Block tutorial
         ttyd::swdrv::swSet(0xea);           // Heart Block tutorial
         ttyd::swdrv::swSet(0xeb);           // Item tutorial
         ttyd::swdrv::swSet(0xec);           // Save Block tutorial-related
-        ttyd::swdrv::swSet(0x15d9);         // Star piece in Pit room collected
         
         // Initializes the mod's InfPit state and copies it to the pouch.
         g_Mod->inf_state_.Load(/* new_save = */ true);

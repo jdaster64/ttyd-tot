@@ -1517,17 +1517,53 @@
 
 // battle.o
 // .text
+800f74b4:BattleConsumeReserveItem
+800f7514:BattleStatusWindowCheck
+800f75cc:BattleStatusWindowSystemOff
+800f75f8:BattleStatusWindowEventOff
+800f7624:BattleStatusWindowSystemOn
+800f7650:BattleStatusWindowEventOn
+800f767c:BattleStatusWindowAPRecoveryOff
+800f76a8:BattleStatusWindowAPRecoveryOn
+800f76d4:BattleMajinaiEndCheck
+800f7718:BattleMajinaiDone
+800f7774:BattleMajinaiCheck
+800f78c4:battleDisableHResetCheck
+800f78fc:BattleAfterReactionMain
+800f79e4:BattleAfterReactionRelease
+800f7a78:BattleAfterReactionEntry
+800f7af0:BattleAfterReactionQueueInit
+800f7b28:BattleCheckUnitBroken
+800f7b84:BattleGetFloorHeight
+800f7bd4:BattleGetStockExp
 800f7bfc:BattleStoreExp
 800f7c0c:BattleStoreCoin
+800f7c20:BattlePartyInfoWorkInit
 800f7ca4:_EquipItem
 800f831c:BtlUnit_EquipItem
+800f83e4:BattleTransPartyIdToUnitKind
+800f8444:BattleTransPartyId
+800f8538:BattleChangeParty
+800f86b4:BattlePartyAnimeLoad
+800f86f4:BattleGetPartnerPtr
 800f8728:BattleGetPartyPtr
 800f87a8:BattleGetMarioPtr
+800f8814:BattleGetSystemPtr
 800f8874:BattleGetUnitPartsPtr
+800f88b4:BattleSetUnitPtr
 800f88cc:BattleGetUnitPtr
+800f8908:BattleFree
 800f8934:BattleAlloc
+800f895c:BattleIncSeq
 800f89a0:BattleGetSeq
+800f8a08:BattleSetSeq
+800f8a68:BattleSetMarioParamToFieldBattle
+800f8aac:Btl_UnitSetup
+800f8da4:BattleEnd
+800f8e28:BattleMain
 800f8f04:BattleInit
+800f903c:battleSeqEndCheck
+800f904c:battleMain
 // .data
 8041eb90:g_BattleWork
 

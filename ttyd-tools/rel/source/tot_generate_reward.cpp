@@ -7,6 +7,7 @@
 #include "patches_item.h"
 #include "tot_generate_enemy.h"
 #include "tot_generate_item.h"
+#include "tot_gsw.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
 #include "tot_manager_timer.h"
@@ -428,7 +429,7 @@ int32_t GetIcon(ChestData* chest) {
 
 void DisplayIcons(CameraId camera, void* user_data) {
     // Ideally this would fade, but alpha doesn't seem supported for this cam.
-    int32_t value = ttyd::swdrv::swByteGet(1001);
+    int32_t value = GetSWByte(tot::GSW_Tower_DisplayChestIcons);
     if (g_ChestDrawAlpha < 0xff && value == 1) g_ChestDrawAlpha = 0xff;
     if (g_ChestDrawAlpha > 0 && value != 1) g_ChestDrawAlpha = 0;
     

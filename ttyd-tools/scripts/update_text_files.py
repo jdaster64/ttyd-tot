@@ -620,6 +620,20 @@ g_StringMap = {
             b"Wearing multiple copies raises\n"
             b"FP more, for no extra ATK loss.",
 
+        b'menu_HP_mieru':
+            b"Shows enemies' HP bar.",
+
+        b'msg_HP_mieru':
+            b"Shows enemies' HP bar.",
+
+        b'menu_timing_oshieru':
+            b'Shows an indicator for when\n'
+            b'to perform Stylish commands.',
+
+        b'msg_timing_oshieru':
+            b'Shows an indicator for when\n'
+            b'to perform Stylish commands.',
+
         b'menu_itsumo_genki':
             b'Makes Mario immune to all\n'
             b'negative status effects.',

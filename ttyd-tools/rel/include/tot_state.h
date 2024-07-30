@@ -451,21 +451,4 @@ enum Options : uint32_t {
     // TODO: Add versions of most stats that persist across runs.
 };
 
-// GSW variables used for Tower of Trials-specific purposes.
-enum GlobalWorkVars {
-    GSW_Tower_ChestClaimed                  = GSW(1000),
-    GSW_Tower_DisplayChestIcons,
-    GSW_Tower_ContinuingFromGameOver,
-    GSW_Battle_AtomicBoo_BreathGuardCount,
-    GSW_Battle_Hooktail_BiteReactionSeen,
-
-    GSWF_Chest_0                            = GSWF(5075),
-    GSWF_Chest_1,
-    GSWF_Chest_2,
-    GSWF_Chest_3,
-    GSWF_Lock,
-    GSWF_Lobby_InConfirm,
-    GSWF_Lobby_Confirmed,
-};
-
 }  // namespace mod::tot

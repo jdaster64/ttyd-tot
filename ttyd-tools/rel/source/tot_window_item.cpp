@@ -3,6 +3,7 @@
 #include "common_types.h"
 #include "mod.h"
 #include "patches_item.h"
+#include "tot_gsw.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -81,9 +82,21 @@ void DrawItemGrid(WinPauseMenu* menu, float win_x, float win_y) {
         
         float items_base_y = menu->items_offset_y[menu->item_submenu_id];
          
-        bool item_active =
-            menu->item_submenu_id != 0 ||
-            (itemDataTable[item_type].usable_locations & ItemUseLocation::kField);
+        bool item_active = true;
+        if (menu->item_submenu_id == 0) {
+            if (!(itemDataTable[item_type].usable_locations 
+                & ItemUseLocation::kField))
+                item_active = false;
+        } else {
+            switch (item_type) {
+                case ItemType::TOT_KEY_PEEKABOO:
+                    item_active = GetSWF(GSWF_PeekabooEnabled);
+                    break;
+                case ItemType::TOT_KEY_TIMING_TUTOR:
+                    item_active = GetSWF(GSWF_TimingTutorEnabled);
+                    break;
+            }
+        }
         
         float item_y = 
             items_base_y + 20.0f + 100.0f + win_y - (i / 2) * 38 - 10.0f;
@@ -338,7 +351,23 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
                     }
                 } else {
-                    // TODO: Handle selecting key items.
+                    // Toggle on key items with boolean effects.
+                    uint32_t effect_flag = 0;
+                    switch (item) {
+                        case ItemType::TOT_KEY_PEEKABOO:
+                            effect_flag = GSWF_PeekabooEnabled;
+                            break;
+                        case ItemType::TOT_KEY_TIMING_TUTOR:
+                            effect_flag = GSWF_TimingTutorEnabled;
+                            break;
+                    }
+                    if (effect_flag) {
+                        if (ToggleSWF(effect_flag)) {
+                            ttyd::pmario_sound::psndSFXOn((char *)0x20038);
+                        } else {
+                            ttyd::pmario_sound::psndSFXOn((char *)0x20039);
+                        }
+                    }
                 }
             } else if (menu->buttons_pressed & ButtonId::L) {
                 if (--page_num < 0) page_num = 0;

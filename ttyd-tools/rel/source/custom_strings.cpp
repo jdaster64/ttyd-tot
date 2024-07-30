@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "mod_state.h"
 #include "tot_generate_enemy.h"
+#include "tot_gsw.h"
 
 #include <ttyd/msgdrv.h>
 #include <ttyd/swdrv.h>
@@ -70,8 +71,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
             return tot::GetCustomTattle();
         case MsgKey::SYS_NO_KEY:
             // Swap out "it's locked" message with more descriptive strings.
-            if (ttyd::swdrv::swByteGet(
-                tot::GSW_Tower_DisplayChestIcons - EVT_HELPER_GSW_BASE)) {
+            if (GetSWByte(tot::GSW_Tower_DisplayChestIcons)) {
                 return ttyd::msgdrv::msgSearch("tot_lock_claimchest");
             } else {
                 return ttyd::msgdrv::msgSearch("tot_lock_defeatenemies");

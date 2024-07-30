@@ -618,7 +618,7 @@ void* BattleAlloc(int32_t size);
 int32_t BattleGetSeq(BattleWork* battleWork, int32_t level);
 // BattleSetSeq
 // BattleSetMarioParamToFieldBattle
-// Btl_UnitSetup
+void Btl_UnitSetup(BattleWork* battleWork);
 // BattleEnd
 // BattleMain
 // BattleInit

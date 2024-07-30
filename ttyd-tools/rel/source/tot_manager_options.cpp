@@ -3,6 +3,7 @@
 #include "common_functions.h"
 #include "mod.h"
 #include "tot_generate_item.h"
+#include "tot_gsw.h"
 #include "tot_state.h"
 
 #include <ttyd/item_data.h>
@@ -116,15 +117,16 @@ void OptionsManager::InitLobby() {
     ttyd::mario_pouch::pouchGetItem(ItemType::HAMMER);
     ttyd::mario_pouch::pouchGetItem(ItemType::W_EMBLEM);
     ttyd::mario_pouch::pouchGetItem(ItemType::L_EMBLEM);
+
+    // Testing: Give key item versions of Peekaboo and Timing Tutor.
+    // (Key items should not be deleted in the final version, ideally)
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_PEEKABOO);
+    SetSWF(GSWF_PeekabooEnabled);
+    SetSWF(GSWF_TimingTutorEnabled);
     
     // Assign Yoshi a totally random color.
     ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));
-    
-    // Assign Peekaboo and Timing Tutor (for testing; might make optional).
-    ttyd::mario_pouch::pouchGetItem(ItemType::TIMING_TUTOR);
-    ttyd::mario_pouch::pouchEquipBadgeID(ItemType::TIMING_TUTOR);
-    ttyd::mario_pouch::pouchGetItem(ItemType::PEEKABOO);
-    ttyd::mario_pouch::pouchEquipBadgeID(ItemType::PEEKABOO);
     
     // Set starting HP, FP, BP.
     SetBaseStats();

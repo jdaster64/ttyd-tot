@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_gsw.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
 #include "tot_window_select.h"

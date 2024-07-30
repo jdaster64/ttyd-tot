@@ -427,7 +427,7 @@ void ApplyFixedPatches() {
         // Items / recipes.
         0x5a866873, 0x5a335335, 0xb7423343, 0x44474215, 0x03001676,
         0x00800006, 0x40864330, 0xa0005000, 0x036bba80, 0x08086650,
-        0x00760057, 0x00000b96, 0x85455609, 0x00000060,
+        0x00760057, 0x00000bb6, 0x85455809, 0x00000060,
         // Badges.
         0xb8a88dbb, 0xdd9d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,
         0xbbbebeeb, 0xaaaacdfc, 0xcaacccca, 0xd00edd7c, 0x0000000d,
@@ -439,7 +439,7 @@ void ApplyFixedPatches() {
     };
     static const constexpr uint32_t kBpCost[] = {
         0x11111111, 0x44111111, 0x22662211, 0x22111144, 0x11224411,
-        0x33331441, 0x12226220, 0x62211111, 0x40042216, 0x00000004,
+        0x33331441, 0x12226220, 0x62211111, 0x40032216, 0x00000004,
         0x03110001, 0x24220100, 0x00000112,
     };
     static const constexpr int8_t kSortOrders[] = {
@@ -456,7 +456,7 @@ void ApplyFixedPatches() {
         29, 30, 27, 28,  1,  2,  9, 10,  3,  4, 20, 21, 18, 19, 11, 12,
         22, 23, 13, 14, 15, 16, -1, -1, -1, 43, 44, 57, 58, 61, 62, 59,
         17,  7,  8, 60, 40, 41, 42, 50, 51, 52, 53, 24, 25, 35, 36, 37,
-        38, 56, 45, 46, 26, 98, 99, 54, 55, -1, -1, 80, 81, 82, 83, 84,
+        38, 56, 45, 46, 26, -1, -1, 54, 55, -1, -1, 80, 81, 82, 83, 84,
         63, -1, -1, -1, -1, -1, 39, 85, 86, -1, -1, -1,  5,  6, 49, 47,
         48, 31, 32,
     };
@@ -534,6 +534,16 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_MASTER_KEY].type_sort_order = 99;
     itemDataTable[ItemType::TOT_MASTER_KEY].sell_price = 50;
     itemDataTable[ItemType::TOT_MASTER_KEY].icon_id = IconType::STATION_KEY;
+
+    // Key items...
+
+    // Peekaboo, Timing Tutor - Copy data to key item version.
+    memcpy(
+        &itemDataTable[ItemType::TOT_KEY_PEEKABOO],
+        &itemDataTable[ItemType::PEEKABOO], sizeof(ItemData));
+    memcpy(
+        &itemDataTable[ItemType::TOT_KEY_TIMING_TUTOR],
+        &itemDataTable[ItemType::TIMING_TUTOR], sizeof(ItemData));
 
     // Balance changes for individual items...
 

@@ -64,6 +64,8 @@ void (*g_stg0_00_init_trampoline)(void) = nullptr;
 void (*g_BattleStoreExp_trampoline)(BattleWork*, int32_t) = nullptr;
 // battle.o  800f7ca4
 void (*g__EquipItem_trampoline)(BattleWorkUnit*, uint32_t, int32_t) = nullptr;
+// battle.o  800f8aac
+void (*g_Btl_UnitSetup_trampoline)(BattleWork*) = nullptr;
 // battle_ac.o  800fa12c
 void (*g_BattleActionCommandSetDifficulty_trampoline)(
     BattleWork*, BattleWorkUnit*, int32_t) = nullptr;
