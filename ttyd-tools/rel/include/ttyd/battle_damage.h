@@ -65,7 +65,8 @@ int32_t BattleCalculateDamage(
     battle_unit::BattleWorkUnit* attacker, battle_unit::BattleWorkUnit* target,
     battle_unit::BattleWorkUnitPart* target_part,
     battle_database_common::BattleWeapon* weapon, uint32_t* unk0, uint32_t unk1);
-// BattleCheckPikkyoro
+void BattleCheckPikkyoro(
+    battle_database_common::BattleWeapon* weapon, uint32_t* unk_flags);
 void BattleDamageDirect(
     int32_t unit_idx, battle_unit::BattleWorkUnit* target,
     battle_unit::BattleWorkUnitPart* part, int32_t damage,

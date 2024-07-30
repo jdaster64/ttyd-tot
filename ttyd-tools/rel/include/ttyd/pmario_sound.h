@@ -20,7 +20,7 @@ extern "C" {
 // psndSFXOff
 // psndSFX_dist
 // psndSFX_pos
-// psndSFX_pit
+void psndSFX_pit(uint32_t sfxIndex, int16_t pitch);
 // psndSFX_vol
 // psndSFXOnEx_3D
 uint32_t psndSFXOn_3D(const char* id, gc::vec3* position);

@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 
+#include <gc/types.h>
 #include <ttyd/evtmgr.h>
 
 #include <cstdint>
@@ -73,6 +74,9 @@ void HandleSideSelection();
 // Checks whether the currently selected actor is on the currently targeted
 // side (for displaying cursors before selecting the move).
 bool CheckOnSelectedSide(int32_t target_idx);
+
+// Plays the selected Attack FX sound, if one exists.
+bool CheckPlayAttackFx(uint32_t flags, gc::vec3* position);
 
 // Applies a custom status effect to the target.
 // Params: unit, part, status_flag, color1 & color2 (rgb), sfx, announce_msg

@@ -1122,6 +1122,7 @@
 800d7394:evt_ext_entry
 
 // pmario_sound.o
+800d9744:psndSFX_pit
 800d9848:psndSFXOn_3D
 800d98bc:psndSFXOn
 800daf24:psndBGMOn_f_d
@@ -1555,7 +1556,7 @@
 // 800fd490:_getSickStatusRate
 800fd680:BattleCalculateFpDamage
 800fd790:BattleCalculateDamage
-// 800fde2c:BattleCheckPikkyoro
+800fde2c:BattleCheckPikkyoro
 800fdfd4:BattleDamageDirect
 
 // battle_disp.o

@@ -61,6 +61,10 @@ extern "C" {
     // action_seq_patches.s
     void StartSetConfuseProcRate();
     void BranchBackSetConfuseProcRate();
+    // attack_fx_patches.s
+    void StartCheckPlayAttackFX();
+    void BranchBackCheckPlayAttackFX();
+    void ConditionalBranchCheckPlayAttackFX();
     // audience_level_patches.s
     void StartSetTargetAudienceCount();
     void BranchBackSetTargetAudienceCount();
@@ -115,6 +119,9 @@ extern "C" {
     bool checkOnSelectedSide(int32_t target_idx) {
         return mod::infinite_pit::battle::CheckOnSelectedSide(target_idx);
     }
+    bool checkPlayAttackFx(uint32_t flags, gc::vec3* position) {
+        return mod::infinite_pit::battle::CheckPlayAttackFx(flags, position);
+    }
 }
 
 namespace mod::infinite_pit {
@@ -160,6 +167,7 @@ extern int32_t (*g_BattleCalculateDamage_trampoline)(
 extern int32_t (*g_BattleCalculateFpDamage_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,
     uint32_t*, uint32_t);
+extern void (*g_BattleCheckPikkyoro_trampoline)(BattleWeapon*, uint32_t*);
 extern void (*g_BattleDamageDirect_trampoline)(
     int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
     uint32_t, uint32_t, uint32_t);
@@ -180,6 +188,9 @@ extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH;
 extern const int32_t g_BattleSetStatusDamage_Patch_FeelingFineYesCase;
 extern const int32_t g_BattleSetStatusDamage_Patch_FeelingFineNoCase;
 extern const int32_t g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows;
+extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_BH;
+extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_EH;
+extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_CH1;
 extern const int32_t g_btlSeqAct_SetConfuseProcRate_BH;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
 extern const int32_t g_BattleCommandDisplay_HandleSelectSide_BH;
@@ -1196,6 +1207,36 @@ void ReorderAndFilterWeaponTargets() {
     }
 }
 
+void PickAttackFX(BattleWeapon* weapon, uint32_t* flags) {
+    if (!(weapon->special_property_flags & 
+        AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND)) return;
+    
+    int32_t sounds[5] = { 0 };
+    int32_t num_sounds = 0;
+    
+    // TODO: Move to GSWF bits, set by a dialog from a new key item.
+    uint32_t badge_flags = ttyd::battle::g_BattleWork->badge_equipped_flags;
+    if (badge_flags & 0x100) {
+        sounds[num_sounds++] = 1;
+    }
+    if (badge_flags & 0x200) {
+        sounds[num_sounds++] = 2;
+    }
+    if (badge_flags & 0x400) {
+        sounds[num_sounds++] = 3;
+    }
+    if (badge_flags & 0x800) {
+        sounds[num_sounds++] = 4;
+    }
+    if (badge_flags & 0x1000) {
+        sounds[num_sounds++] = 5;
+    }
+    if (num_sounds) {
+        int32_t selected_sound = sounds[ttyd::system::irand(num_sounds)];
+        *flags |= selected_sound * 0x1000000;
+    }
+}
+
 void ApplyFixedPatches() {
     // Override Action Command difficulty with fixed option.
     g_BattleActionCommandSetDifficulty_trampoline = patch::hookFunction(
@@ -1361,6 +1402,24 @@ void ApplyFixedPatches() {
                 unit_idx, target, part, original_damage, fp_damage, 
                 unk0, damage_pattern, unk1);
         });
+
+    // Attack FX changes.
+    g_BattleCheckPikkyoro_trampoline = mod::patch::hookFunction(
+        ttyd::battle_damage::BattleCheckPikkyoro, [](
+            BattleWeapon* weapon, uint32_t* flags) {
+            // Completely replace existing logic.
+            PickAttackFX(weapon, flags);
+        });
+    // Replace BattleDamageDirect logic that reads flags for picked sound.
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(g_BattleDamageDirect_CheckPlayAttackFX_BH),
+        reinterpret_cast<void*>(StartCheckPlayAttackFX));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(BranchBackCheckPlayAttackFX),
+        reinterpret_cast<void*>(g_BattleDamageDirect_CheckPlayAttackFX_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ConditionalBranchCheckPlayAttackFX),
+        reinterpret_cast<void*>(g_BattleDamageDirect_CheckPlayAttackFX_CH1));
 
     // Add support for Snow Whirled-like variant of button pressing AC.
     // Override choosing buttons:
@@ -1758,6 +1817,25 @@ bool CheckOnSelectedSide(int32_t target_idx) {
             return false;
     }
     // If not select-side, don't filter anything out.
+    return true;
+}
+
+bool CheckPlayAttackFx(uint32_t flags, gc::vec3* position) {
+    const char* kAttackFxNames[] = {
+        nullptr,
+        "SFX_MARIO_HAMMER_PIKKYO_R1",
+        "SFX_MARIO_HAMMER_PIKKYO_Y1",
+        "SFX_MARIO_HAMMER_PIKKYO_B1",
+        "SFX_MARIO_HAMMER_PIKKYO_G1",
+        "SFX_MARIO_HAMMER_PIKKYO_P1",
+    };
+    const char* fx_name = kAttackFxNames[(flags & 0x1f00'0000) / 0x100'0000];
+    if (!fx_name) return false;
+
+    int32_t id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);
+    int16_t pitch = 0x400 * (ttyd::system::irand(3) - 1);
+    // TODO: Testing, to see what FX sounds sound like at different pitches.
+    ttyd::pmario_sound::psndSFX_pit(id, pitch);
     return true;
 }
 

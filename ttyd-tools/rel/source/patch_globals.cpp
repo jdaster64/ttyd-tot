@@ -86,7 +86,9 @@ int32_t (*g_BattleCalculateFpDamage_trampoline)(
 int32_t (*g_BattleCalculateDamage_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*, BattleWeapon*,
     uint32_t*, uint32_t) = nullptr;
-// battle_damage.o 800fdfd4
+// battle_damage.o  800fde2c
+void (*g_BattleCheckPikkyoro_trampoline)(BattleWeapon*, uint32_t*) = nullptr;
+// battle_damage.o  800fdfd4
 void (*g_BattleDamageDirect_trampoline)(
     int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
     uint32_t, uint32_t, uint32_t) = nullptr;
@@ -259,6 +261,9 @@ extern const int32_t g_BattleSetStatusDamage_Patch_GaleLevelFactor = 0x800fc0a8;
 extern const int32_t g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows = 0x800fcb2c;
 extern const int32_t g_BattleDamageDirect_Patch_AddTotalDamage = 0x800fe058;
 extern const int32_t g_BattleDamageDirect_Patch_PityFlowerChance = 0x800fe500;
+extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_BH = 0x800fe5a4;
+extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_EH = 0x800fe61c;
+extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_CH1 = 0x800fe71c;
 extern const int32_t g_BattleChoiceSamplingEnemy_SumRandWeights_BH = 0x800ff528;
 extern const int32_t g_BattleChoiceSamplingEnemy_SumRandWeights_EH = 0x800ff544;
 extern const int32_t g_btlDispMain_DrawNormalHeldItem_BH = 0x80102ff4;
