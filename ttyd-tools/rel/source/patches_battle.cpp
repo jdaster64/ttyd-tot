@@ -177,6 +177,8 @@ extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_EH;
 extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH;
+extern const int32_t g_BattleSetStatusDamage_Patch_FeelingFineYesCase;
+extern const int32_t g_BattleSetStatusDamage_Patch_FeelingFineNoCase;
 extern const int32_t g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows;
 extern const int32_t g_btlSeqAct_SetConfuseProcRate_BH;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
@@ -199,6 +201,7 @@ extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_EH;
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_CH1;
 extern const int32_t g_btlseqEnd_Patch_CheckDisableExpLevel;
 extern const int32_t g_effStarPointDisp_Patch_SetIconId;
+extern const int32_t g_BattleSetStatusDamage_FeelingFine_SwitchTable;
 
 int32_t g_PartySwitchNextFpCost = 1;
 int32_t g_PartySwitchPlayerInitiated = false;
@@ -1426,6 +1429,30 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows),
         0x2c19000cU /* cmpwi r25, 12 */);
+
+    // Make Feeling Fine work on all negative statuses and not Electric.
+    auto* ff_table = (int32_t*)g_BattleSetStatusDamage_FeelingFine_SwitchTable;
+    for (int32_t i = 0; i < StatusEffectType::STATUS_MAX; ++i) {
+        switch (i) {
+            case StatusEffectType::SLEEP:
+            case StatusEffectType::STOP:
+            case StatusEffectType::DIZZY:
+            case StatusEffectType::CONFUSE:
+            case StatusEffectType::POISON:
+            case StatusEffectType::BURN:
+            case StatusEffectType::FREEZE:
+            case StatusEffectType::TINY:
+            case StatusEffectType::ATTACK_DOWN:
+            case StatusEffectType::DEFENSE_DOWN:
+            case StatusEffectType::SLOW:
+            case StatusEffectType::OHKO:
+                ff_table[i] = g_BattleSetStatusDamage_Patch_FeelingFineYesCase;
+                break;
+            default:
+                ff_table[i] = g_BattleSetStatusDamage_Patch_FeelingFineNoCase;
+                break;
+        }
+    }
         
     // Change frame windows for guarding / Superguarding at different levels
     // of Simplifiers / Unsimplifiers to be more symmetric.

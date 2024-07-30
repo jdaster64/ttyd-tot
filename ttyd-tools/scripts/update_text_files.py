@@ -621,20 +621,20 @@ g_StringMap = {
             b"FP more, for no extra ATK loss.",
 
         b'menu_itsumo_genki':
-            b'Makes Mario immune to many\n'
-            b'kinds of status effects.',
+            b'Makes Mario immune to all\n'
+            b'negative status effects.',
 
         b'msg_itsumo_genki':
-            b'Makes Mario immune to many\n'
-            b'kinds of status effects.',
+            b'Makes Mario immune to all\n'
+            b'negative status effects.',
 
         b'menu_itsumo_genki_p':
-            b'Makes allies immune to many\n'
-            b'kinds of status effects.',
+            b'Makes allies immune to all\n'
+            b'negative status effects.',
 
         b'msg_itsumo_genki_p':
-            b'Make allies immune to many\n'
-            b'kinds of status effects.',
+            b'Make allies immune to all\n'
+            b'negative status effects.',
 
         b"msg_2kai_item":
             b"During battle, Mario can use\n"
