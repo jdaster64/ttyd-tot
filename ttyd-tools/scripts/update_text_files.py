@@ -486,11 +486,21 @@ g_StringMap = {
             b"Boosts allies' attack power\n"
             b'by 1.',
 
+        b'msg_jump_only':
+            b"+1 Jump ATK, but can't use\n"
+            b"Hammer abilities.",
+
+        b'menu_jump_only':
+            b"+1 Jump ATK, but can't use\n"
+            b"Hammer abilities.",
+
+        b'msg_hammer_only':
+            b"+1 Hammer ATK and single hits\n"
+            b"become throws, but can't Jump.",
+
         b'menu_hammer_only':
-            b'Increase hammer power by 1,\n'
-            b'but lose the ability to jump.\n'
-            b'Mario will throw his hammer\n'
-            b'for single-target attacks.',
+            b"+1 Hammer ATK and single hits\n"
+            b"become throws, but can't Jump.",
 
         b'menu_nice_de_bougyo':
             b"Successful guards reduce\n"

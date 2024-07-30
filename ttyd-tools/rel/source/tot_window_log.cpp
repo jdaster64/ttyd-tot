@@ -387,6 +387,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
         case 12: {
             // Badges menu.
             int32_t total = menu->badge_log_total_count;
+            int32_t last_row_start = total / 7 * 7;
             int32_t pages = (total + 28 - 1) / 28;
             
             if (menu->buttons_pressed & ButtonId::B) {
@@ -411,13 +412,31 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 menu->badge_log_cursor_idx = menu->badge_log_page_num * 28;
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) {
-                if (menu->badge_log_cursor_idx % 7 < 6 &&
-                    menu->badge_log_cursor_idx + 1 < total)
-                    ++menu->badge_log_cursor_idx;
+                if (menu->badge_log_cursor_idx >= last_row_start) {
+                    if (menu->badge_log_cursor_idx + 1 == total) {
+                        menu->badge_log_cursor_idx = last_row_start;
+                    } else {
+                        ++menu->badge_log_cursor_idx;
+                    }
+                } else {
+                    if (++menu->badge_log_cursor_idx % 7 == 0)
+                        menu->badge_log_cursor_idx -= 7;
+                }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) {
-                if (menu->badge_log_cursor_idx % 7 > 0)
-                    --menu->badge_log_cursor_idx;
+                if (menu->badge_log_cursor_idx >= last_row_start) {
+                    if (menu->badge_log_cursor_idx == last_row_start) {
+                        menu->badge_log_cursor_idx = total - 1;
+                    } else {
+                        --menu->badge_log_cursor_idx;
+                    }
+                } else {
+                    if (menu->badge_log_cursor_idx % 7 == 0) {
+                        menu->badge_log_cursor_idx += 6;
+                    } else {
+                        --menu->badge_log_cursor_idx;
+                    }
+                }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
                 if (menu->badge_log_cursor_idx >= 7)
@@ -463,6 +482,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
         case 13: {
             // Recipes menu.
             int32_t total = menu->recipe_log_total_count;
+            int32_t last_row_start = total / 7 * 7;
             int32_t pages = (total + 28 - 1) / 28;
             
             if (menu->buttons_pressed & ButtonId::B) {
@@ -487,13 +507,31 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 menu->recipe_log_cursor_idx = menu->recipe_log_page_num * 28;
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) {
-                if (menu->recipe_log_cursor_idx % 7 < 6 &&
-                    menu->recipe_log_cursor_idx + 1 < total)
-                    ++menu->recipe_log_cursor_idx;
+                if (menu->recipe_log_cursor_idx >= last_row_start) {
+                    if (menu->recipe_log_cursor_idx + 1 == total) {
+                        menu->recipe_log_cursor_idx = last_row_start;
+                    } else {
+                        ++menu->recipe_log_cursor_idx;
+                    }
+                } else {
+                    if (++menu->recipe_log_cursor_idx % 7 == 0)
+                        menu->recipe_log_cursor_idx -= 7;
+                }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) {
-                if (menu->recipe_log_cursor_idx % 7 > 0)
-                    --menu->recipe_log_cursor_idx;
+                if (menu->recipe_log_cursor_idx >= last_row_start) {
+                    if (menu->recipe_log_cursor_idx == last_row_start) {
+                        menu->recipe_log_cursor_idx = total - 1;
+                    } else {
+                        --menu->recipe_log_cursor_idx;
+                    }
+                } else {
+                    if (menu->recipe_log_cursor_idx % 7 == 0) {
+                        menu->recipe_log_cursor_idx += 6;
+                    } else {
+                        --menu->recipe_log_cursor_idx;
+                    }
+                }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
                 if (menu->recipe_log_cursor_idx >= 7)
