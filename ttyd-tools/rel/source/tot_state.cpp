@@ -298,7 +298,11 @@ void StateManager::ApplyPresetOptions() {
             SetOption(OPT_INVENTORY_SACK_SIZE, 2);
             SetOption(OPTNUM_ENEMY_HP, 100);
             SetOption(OPTNUM_ENEMY_ATK, 100);
-            SetOption(OPT_MAX_PARTNERS, 4);
+            if (CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
+                SetOption(OPT_MAX_PARTNERS, 3);
+            } else {
+                SetOption(OPT_MAX_PARTNERS, 4);
+            }
 
             break;
         }

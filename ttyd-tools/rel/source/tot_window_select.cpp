@@ -373,8 +373,8 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                 state.NextOption(option, change);
                 // Play selection sound.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
-                // If the option was presets, apply that preset's settings.
-                if (option == OPT_PRESET) {
+                // Re-enforce current preset's settings, if not custom.
+                if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM)) {
                     state.ApplyPresetOptions();
                 }
             }
