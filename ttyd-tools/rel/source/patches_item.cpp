@@ -456,7 +456,7 @@ void ApplyFixedPatches() {
         29, 30, 27, 28,  1,  2,  9, 10,  3,  4, 20, 21, 18, 19, 11, 12,
         22, 23, 13, 14, 15, 16, -1, -1, -1, 43, 44, 57, 58, 61, 62, 59,
         17,  7,  8, 60, 40, 41, 42, 50, 51, 52, 53, 24, 25, 35, 36, 37,
-        38, 56, 45, 46, 26, -1, -1, 54, 55, -1, -1, 80, 81, 82, 83, 84,
+        38, 56, 45, 46, 26, -1, -1, 54, 55, -1, -1, -1, -1, -1, -1, -1,
         63, -1, -1, -1, -1, -1, 39, 85, 86, -1, -1, -1,  5,  6, 49, 47,
         48, 31, 32,
     };
@@ -560,6 +560,12 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].menu_description = "msg_bgm";
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].icon_id = IconType::ATTACK_FX_B;
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].type_sort_order = 4;
+
+    itemDataTable[ItemType::TOT_KEY_ATTACK_FX].name = "in_attack_fx";
+    itemDataTable[ItemType::TOT_KEY_ATTACK_FX].description = "msg_attack_fx";
+    itemDataTable[ItemType::TOT_KEY_ATTACK_FX].menu_description = "msg_attack_fx";
+    itemDataTable[ItemType::TOT_KEY_ATTACK_FX].icon_id = IconType::ATTACK_FX_R;
+    itemDataTable[ItemType::TOT_KEY_ATTACK_FX].type_sort_order = 5;
 
     // Balance changes for individual items...
 

@@ -183,6 +183,7 @@ extern const int32_t g_winHakoGX_CheckDrawNoItemBox_CH1;
 extern const int32_t g_winHakoGX_CheckDrawItemIcon_BH;
 extern const int32_t g_winHakoGX_CheckDrawItemIcon_EH;
 extern const int32_t g_winHakoGX_CheckDrawItemIcon_CH1;
+extern const int32_t g_winRootDisp_Patch_SkipMailGx;
 extern const int32_t g_winPartyDisp_StatsHook1_BH;
 extern const int32_t g_winPartyDisp_StatsHook1_EH;
 extern const int32_t g_winPartyDisp_StatsHook2_BH;
@@ -391,6 +392,11 @@ void ApplyFixedPatches() {
 
     // Add Mailbox SP to Key Items menu skip list (in place of Boat curse).
     ttyd::win_item::menu_skip_list[6] = ItemType::MAILBOX_SP;
+
+    // Patch out call to winMailGx.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_winRootDisp_Patch_SkipMailGx),
+        0x60000000U  /* nop */);
 
     // Replace all basic win_log functions with custom logic.
     g_winLogInit_trampoline = patch::hookFunction(

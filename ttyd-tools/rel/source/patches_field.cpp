@@ -20,7 +20,7 @@ extern "C" {
     void BranchBackPlayFieldHammerFX();
     
     void playFieldHammerFX(gc::vec3* position) {
-        int32_t id = mod::tot::CosmeticsManager::PickActiveFX(false);
+        int32_t id = mod::tot::CosmeticsManager::PickActiveFX();
         if (id) {
             const char* fx_name = mod::tot::CosmeticsManager::GetFXName(id);
             int32_t id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);

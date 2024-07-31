@@ -1,9 +1,11 @@
 #include "tot_window_item.h"
 
+#include "common_functions.h"
 #include "common_types.h"
 #include "mod.h"
 #include "patches_item.h"
 #include "tot_gsw.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -287,6 +289,380 @@ void DrawItemInventorySize(WinPauseMenu* menu, float win_x, float win_y) {
     ttyd::win_main::winFontSet(&pos, &scale, &kBlack, space_used);
 }
 
+void DrawUseItemDialog(WinMgrEntry* winmgr_entry) {
+    auto* menu = (WinPauseMenu*)ttyd::win_main::winGetPtr();
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+
+    // Sort party members: Mario, current member, remaining members.
+    WinPartyData* party_members[8] = { nullptr };
+    GetPartyMemberMenuOrder(party_members + 1);
+    
+    for (int32_t i = 0; i < menu->party_count + 1; ++i) {
+        float y_offset = 0.0f;
+        if (i == 1) {
+            y_offset = -16.0f;
+        } else if (i != 0) {
+            y_offset = -28.0f;
+        }
+        
+        bool item_disabled = false;
+        uint32_t text_color = 0x000000FFU;
+        if (menu->use_item_timer != 0 && i != menu->use_item_menu_cursor_idx) {
+            item_disabled = true;
+            text_color = 0x808080FFU;
+        }
+        
+        // If Mario...
+        if (i == 0) {            
+            if (menu->use_item_timer % 20 < 16 || i != menu->use_item_menu_cursor_idx) {
+            
+                // Draw Mario head icon.
+                
+                if (item_disabled) {
+                    ttyd::win_main::winIconGrayInit();
+                } else {
+                    ttyd::win_main::winIconInit();
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 30.0f,
+                        winmgr_entry->y - 20.0f - (i * 22),
+                        0.0f
+                    };              
+                    gc::vec3 scale = { 0.65f, 0.65f, 0.65f };
+                    uint32_t color = 0xFFFFFFFFU;
+                    ttyd::win_main::winIconSet(
+                        IconType::MARIO_HEAD, &position, &scale, &color);
+                }
+                
+                // Color spots behind "HP" and "FP".
+                
+                ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+                ttyd::gx::GXTev::GXSetTevColorIn(
+                    GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+                ttyd::gx::GXTev::GXSetTevAlphaIn(
+                    GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+                {
+                    int32_t width = ttyd::fontmgr::FontGetMessageWidth("HP");
+                    gc::vec3 position = {
+                        0.9f * width * 0.5f + winmgr_entry->x + 220,
+                        winmgr_entry->y - 19.0f - (i * 22),
+                        0.0f
+                    };
+                    gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                    uint32_t color = 0xCB8CA2FEU;
+                    ttyd::win_main::winTexSet(0xaf, &position, &scale, &color);
+                }
+                {
+                    int32_t width = ttyd::fontmgr::FontGetMessageWidth("FP");
+                    gc::vec3 position = {
+                        0.9f * width * 0.5f + winmgr_entry->x + 220,
+                        winmgr_entry->y - 41.0f,
+                        0.0f
+                    };
+                    gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                    uint32_t color = 0xCBBE89FEU;
+                    ttyd::win_main::winTexSet(0xaf, &position, &scale, &color);
+                }
+                
+                // Text for Mario's HP and FP.
+                
+                ttyd::win_main::winFontInit();
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 50.0f,
+                        winmgr_entry->y - 8.0f - (i * 22),
+                        0.0f
+                    };
+                    gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                    uint32_t color = text_color;
+                    const char* msg = msgSearch("name_mario");
+                    ttyd::win_main::winFontSet(&position, &scale, &color, msg);
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 220.0f,
+                        winmgr_entry->y - 8.0f - (i * 22),
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSet(&position, &scale, &color, "HP");
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 245.0f,
+                        winmgr_entry->y - 8.0f - (i * 22),
+                        0.0f
+                    };    
+                    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSetR(
+                        &position, &scale, &color, "%d", 
+                        ttyd::mario_pouch::pouchGetHP());
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 267.0f,
+                        winmgr_entry->y - 8.0f - (i * 22),
+                        0.0f
+                    };    
+                    gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSetR(&position, &scale, &color, "/");
+                }
+                { 
+                    gc::vec3 position = {
+                        winmgr_entry->x + 310.0f,
+                        winmgr_entry->y - 10.0f - (i * 22),
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSet(
+                        &position, &scale, &color, "%d", 
+                        ttyd::mario_pouch::pouchGetMaxHP());
+                }
+
+                // Skip drawing FP if item was just used on party member
+                // and the text should be flashing.
+                if (itemDataTable[menu->use_item_type].fp_restored != 0) {
+                    if (menu->use_item_timer % 20 >= 16)
+                        continue;
+                    text_color = 0x000000FFU;
+                }
+
+                ttyd::win_main::winFontInit();
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 220.0f,
+                        winmgr_entry->y - 30.0f,
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSet(&position, &scale, &color, "FP");
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 245.0f,
+                        winmgr_entry->y - 30.0f,
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSetR(
+                        &position, &scale, &color, "%d", 
+                        ttyd::mario_pouch::pouchGetFP()); 
+                }             
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 267.0f,
+                        winmgr_entry->y - 30.0f,
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSetR(&position, &scale, &color, "/");
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 310.0f,
+                        winmgr_entry->y - 30.0f,
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSet(
+                        &position, &scale, &color, "%d", 
+                        ttyd::mario_pouch::pouchGetMaxFP());
+                }
+            }
+        } else {
+            // Otherwise, partner...
+            int32_t partner_id = party_members[i]->partner_id;
+            const char* party_name;
+            if (partner_id == 4) {
+                party_name = ttyd::mario_pouch::pouchGetYoshiName();
+            } else {
+                party_name = msgSearch(party_members[i]->name);
+            }
+        
+            if (menu->use_item_timer % 20 < 16 || i != menu->use_item_menu_cursor_idx) {
+                // Color spots behind "HP" and "FP".
+                ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+                ttyd::gx::GXTev::GXSetTevColorIn(
+                    GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+                ttyd::gx::GXTev::GXSetTevAlphaIn(
+                    GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+                {
+                    int32_t width = ttyd::fontmgr::FontGetMessageWidth("HP");
+                    gc::vec3 position = {
+                        0.9f * width * 0.5f + winmgr_entry->x + 220,
+                        y_offset + winmgr_entry->y - 8 - (i * 28) - 14.0f,
+                        0.0f
+                    };
+                    gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                    uint32_t color = 0xCB8CA2FEU;
+                    ttyd::win_main::winTexSet(0xaf, &position, &scale, &color);
+                }
+
+                // Partner icon.
+                if (item_disabled) {
+                    ttyd::win_main::winIconGrayInit();
+                }
+                else {
+                    ttyd::win_main::winIconInit();
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 30.0f,
+                        y_offset + winmgr_entry->y - 20.0f - (i * 28),
+                        0.0f
+                    };              
+                    gc::vec3 scale = { 0.65f, 0.65f, 0.65f };
+                    uint32_t color = 0xFFFFFFFFU;
+                    ttyd::win_main::winIconSet(
+                        party_members[i]->icon_id, &position, &scale, &color);
+                }
+
+                // Text for partner's HP.
+                
+                ttyd::win_main::winFontInit();
+                {
+                    int32_t width = ttyd::fontmgr::FontGetMessageWidth(party_name);
+                    float x_scale = 1.0f;
+                    if (160.0f <= width) {
+                        x_scale = 160.0f / width;
+                    }
+                    gc::vec3 position = {
+                        winmgr_entry->x + 50.0f,
+                        y_offset + winmgr_entry->y - 8 - (i * 28),
+                        0.0f
+                    };
+                    gc::vec3 scale = { x_scale, 1.0f, 1.0f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSet(&position, &scale, &color, party_name);
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 220.0f,
+                        y_offset + winmgr_entry->y - 8 - (i * 28),
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSet(&position, &scale, &color, "HP");
+                }
+                {    
+                    gc::vec3 position = {
+                        winmgr_entry->x + 245.0f,
+                        y_offset + winmgr_entry->y - 8 - (i * 28),
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSetR(
+                        &position, &scale, &color, "%d",
+                        pouch.party_data[partner_id].current_hp);              
+                }
+                {   
+                    gc::vec3 position = {
+                        winmgr_entry->x + 267.0f,
+                        y_offset + winmgr_entry->y - 8 - (i * 28),
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSetR(&position, &scale, &color, "/");
+                }
+                {
+                    gc::vec3 position = {
+                        winmgr_entry->x + 310.0f,
+                        y_offset + winmgr_entry->y - 8 - (i * 28),
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+                    uint32_t color = text_color;
+                    ttyd::win_main::winFontSet(
+                        &position, &scale, &color, "%d",
+                        pouch.party_data[partner_id].max_hp);
+                }
+            }
+        }
+    }
+    
+    if (menu->party_count > 1) {
+        // Draw dotted line under first partner.
+        ttyd::win_main::winIconInit();
+        for (int32_t i = 2; i < 30; ++i) {            
+            gc::vec3 position = {
+                winmgr_entry->x + (float)(winmgr_entry->width * i / 31),
+                winmgr_entry->y - 84.0f,
+                0.0f
+            };
+            gc::vec3 scale = { 0.15f, 0.15f, 0.15f };
+            uint32_t color = 0x000000FFU;
+            ttyd::win_main::winIconSet(
+                IconType::SP_ORB_YELLOW, &position, &scale, &color);
+        }
+    }
+}
+
+void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
+    auto* menu = (WinPauseMenu*)ttyd::win_main::winGetPtr();
+
+    // Limit drawing space to within the dialog.
+    ttyd::gx::GXTransform::GXSetScissor(
+        winmgr_entry->x + 304, -winmgr_entry->y + 16 + 240,
+        winmgr_entry->width, winmgr_entry->height - 32);
+
+    for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
+        int32_t type = menu->cosmetic_options[i];
+        const auto* data = CosmeticsManager::GetData(CosmeticType::ATTACK_FX, type);
+
+        float y_trans = 
+            winmgr_entry->y + menu->cosmetic_menu_scroll_y - i * 24.0f - 28.0f;
+
+        // Skip entry if out of visible window.
+        if (y_trans - 32.0f > winmgr_entry->y ||
+            y_trans + 32.0f < winmgr_entry->y - winmgr_entry->height)
+            continue;
+        
+        // Placeholders.
+        const char* text = msgSearch(data->name_msg);
+        ttyd::win_main::winFontInit();
+        gc::vec3 text_pos = { winmgr_entry->x + 55.0f, y_trans + 12.0f, 0.0f };
+        gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
+        uint32_t text_color = 0x000000FFU;
+        ttyd::win_main::winFontSet(&text_pos, &text_scale, &text_color, text);
+        
+        ttyd::win_main::winIconInit();
+        {
+            int32_t icon = data->icon;
+            gc::vec3 pos = { winmgr_entry->x + 30.0f, y_trans, 0.0f };
+            gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
+            uint32_t icon_color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(icon, &pos, &scale, &icon_color);
+        }
+        {
+            // "Equipped" indicator.
+            int32_t equipped = GetSWF(GSWF_AttackFxFlags + type)
+                ? IconType::AC_LIGHT_GREEN : IconType::SP_ORB_EMPTY;
+            gc::vec3 pos = { 
+                winmgr_entry->x + winmgr_entry->width - 24.0f,
+                y_trans, 
+                0.0f
+            };
+            gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+            uint32_t icon_color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(equipped, &pos, &scale, &icon_color);
+        }
+    }
+
+    ttyd::gx::GXTransform::GXSetScissor(0, 0, 608, 480);
+}
+
 }  // namespace
 
 int32_t ItemMenuMain(WinPauseMenu* menu) {
@@ -357,33 +733,54 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                     }
                 } else {
                     // Toggle on key items with boolean effects.
-                    int32_t effect_flag = 0;
-                    switch (item) {
-                        case ItemType::TOT_KEY_PEEKABOO:
-                            effect_flag = GSWF_PeekabooEnabled;
-                            break;
-                        case ItemType::TOT_KEY_SUPER_PEEKABOO:
-                            effect_flag = GSWF_SuperPeekabooEnabled;
-                            break;
-                        case ItemType::TOT_KEY_TIMING_TUTOR:
-                            effect_flag = GSWF_TimingTutorEnabled;
-                            break;
-                        case ItemType::TOT_KEY_BGM_TOGGLE:
-                            effect_flag = GSWF_BgmEnabled;
-                    }
-                    if (effect_flag) {
-                        if (ToggleSWF(effect_flag)) {
-                            ttyd::pmario_sound::psndSFXOn((char *)0x20038);
-                        } else {
-                            // Also disable Super Peekaboo if regular disabled. 
-                            if (effect_flag == GSWF_PeekabooEnabled) {
-                                SetSWF(GSWF_SuperPeekabooEnabled, 0);
+                    if (item == ItemType::TOT_KEY_ATTACK_FX) {
+                        for (int32_t i = 0; i < 30; ++i) {
+                            // TODO: Fill with unlocked options.
+                            menu->cosmetic_options[i] = i + 1;
+                        }
+                        menu->cosmetic_cursor_idx = 0;
+                        menu->cosmetic_num_options = 5;
+                        menu->item_menu_state = 400;
+                        ttyd::pmario_sound::psndSFXOn((char *)0x20012);
+
+                        int32_t height =
+                            Min(menu->cosmetic_num_options, 8) * 24 + 32;
+                        
+                        auto* win = ttyd::winmgr::winMgrGetPtr(menu->winmgr_entry_1);
+                        ttyd::winmgr::winMgrSetSize(
+                            menu->winmgr_entry_1, win->x, win->y,
+                            win->width, height);
+                        ttyd::winmgr::winMgrOpen(menu->winmgr_entry_1);
+                        ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
+                    } else {
+                        int32_t effect_flag = 0;
+                        switch (item) {
+                            case ItemType::TOT_KEY_PEEKABOO:
+                                effect_flag = GSWF_PeekabooEnabled;
+                                break;
+                            case ItemType::TOT_KEY_SUPER_PEEKABOO:
+                                effect_flag = GSWF_SuperPeekabooEnabled;
+                                break;
+                            case ItemType::TOT_KEY_TIMING_TUTOR:
+                                effect_flag = GSWF_TimingTutorEnabled;
+                                break;
+                            case ItemType::TOT_KEY_BGM_TOGGLE:
+                                effect_flag = GSWF_BgmEnabled;
+                        }
+                        if (effect_flag) {
+                            if (ToggleSWF(effect_flag)) {
+                                ttyd::pmario_sound::psndSFXOn((char *)0x20038);
+                            } else {
+                                // Also disable Stat Master if Peekaboo disabled. 
+                                if (effect_flag == GSWF_PeekabooEnabled) {
+                                    SetSWF(GSWF_SuperPeekabooEnabled, 0);
+                                }
+                                // Fade out current BGM if disabling music.
+                                if (effect_flag == GSWF_BgmEnabled) {
+                                    ttyd::pmario_sound::psndStopAllFadeOut();
+                                }
+                                ttyd::pmario_sound::psndSFXOn((char *)0x20039);
                             }
-                            // Fade out current BGM if disabling music.
-                            if (effect_flag == GSWF_BgmEnabled) {
-                                ttyd::pmario_sound::psndStopAllFadeOut();
-                            }
-                            ttyd::pmario_sound::psndSFXOn((char *)0x20039);
                         }
                     }
                 }
@@ -433,6 +830,7 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                 menu->use_item_type = 0;
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
+                return -2;
             } else if (menu->buttons_pressed & ButtonId::B) {
                 ttyd::pmario_sound::psndSFXOn((char *)0x20013);
                 menu->item_menu_state = 10;
@@ -524,6 +922,63 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
             }
             break;
         }
+        case 400: {
+            int32_t type = menu->cosmetic_options[menu->cosmetic_cursor_idx];
+
+            if (menu->buttons_pressed & ButtonId::START) {
+                menu->use_item_type = 0;
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
+                return -2;
+            } else if (menu->buttons_pressed & ButtonId::B) {
+                ttyd::pmario_sound::psndSFXOn((char *)0x20013);
+                menu->item_menu_state = 10;
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
+            } else if (menu->buttons_pressed & ButtonId::A) {
+                if (ToggleSWF(GSWF_AttackFxFlags + type)) {
+                    ttyd::pmario_sound::psndSFXOn((char *)0x20038);
+                } else {
+                    ttyd::pmario_sound::psndSFXOn((char *)0x20039);
+                }
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
+                if (--menu->cosmetic_cursor_idx < 0) {
+                    menu->cosmetic_cursor_idx = menu->cosmetic_num_options - 1;
+                    if (menu->cosmetic_num_options > 8) {
+                        menu->cosmetic_menu_offset =
+                            menu->cosmetic_num_options - 8;
+                    }
+                } else {
+                    if (menu->cosmetic_menu_offset > 0 &&
+                        menu->cosmetic_menu_offset == menu->cosmetic_cursor_idx)
+                        --menu->cosmetic_menu_offset;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
+                if (++menu->cosmetic_cursor_idx >= menu->cosmetic_num_options) {
+                    menu->cosmetic_cursor_idx = 0;
+                    menu->cosmetic_menu_offset = 0;
+                } else {
+                    if (menu->cosmetic_menu_offset + 8 < menu->cosmetic_num_options &&
+                        menu->cosmetic_menu_offset + 7 == menu->cosmetic_cursor_idx)
+                        ++menu->cosmetic_menu_offset;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            }
+
+            // Update help text.
+            const auto* data = CosmeticsManager::GetData(CosmeticType::ATTACK_FX, type);
+            ttyd::win_root::winMsgEntry(menu, 0, data->help_msg, 0);
+            
+            // Set cursor position.
+            menu->main_cursor_target_x = -80.0f;
+            menu->main_cursor_target_y = 124.0f - 24.0f * 
+                (menu->cosmetic_cursor_idx - menu->cosmetic_menu_offset);
+            // Set window scroll offset.
+            menu->cosmetic_menu_scroll_target_y = menu->cosmetic_menu_offset * 24.0f;
+            
+            break;
+        }
         case 1000: {
             if (ttyd::win_root::winSortWait(menu) == 0) {
                 menu->item_menu_state = menu->parent_menu_state;
@@ -546,6 +1001,9 @@ void ItemMenuMain2(ttyd::win_root::WinPauseMenu* menu) {
     menu->items_target_y[1] = menu->items_page_num[1] * 190.0f;
     menu->items_offset_y[1] +=
         (menu->items_target_y[1] - menu->items_offset_y[1]) / 4.0f;
+
+    menu->cosmetic_menu_scroll_y +=
+        (menu->cosmetic_menu_scroll_target_y - menu->cosmetic_menu_scroll_y) / 8.0f;
 }
 
 void ItemMenuDisp(
@@ -603,325 +1061,13 @@ void ItemMenuDisp(
 }
 
 void ItemSubdialogMain1(WinMgrEntry* winmgr_entry) {
-    
     auto* menu = (WinPauseMenu*)ttyd::win_main::winGetPtr();
-    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
   
     if (ttyd::winmgr::winMgrAction(menu->winmgr_entry_1) == 0) {
-
-        // Sort party members: Mario, current member, remaining members.
-        WinPartyData* party_members[8] = { nullptr };
-        GetPartyMemberMenuOrder(party_members + 1);
-        
-        for (int32_t i = 0; i < menu->party_count + 1; ++i) {
-            float y_offset = 0.0f;
-            if (i == 1) {
-                y_offset = -16.0f;
-            } else if (i != 0) {
-                y_offset = -28.0f;
-            }
-          
-            bool item_disabled = false;
-            uint32_t text_color = 0x000000FFU;
-            if (menu->use_item_timer != 0 && i != menu->use_item_menu_cursor_idx) {
-                item_disabled = true;
-                text_color = 0x808080FFU;
-            }
-          
-            // If Mario...
-            if (i == 0) {            
-                if (menu->use_item_timer % 20 < 16 || i != menu->use_item_menu_cursor_idx) {
-              
-                    // Draw Mario head icon.
-                  
-                    if (item_disabled) {
-                        ttyd::win_main::winIconGrayInit();
-                    } else {
-                        ttyd::win_main::winIconInit();
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 30.0f,
-                            winmgr_entry->y - 20.0f - (i * 22),
-                            0.0f
-                        };              
-                        gc::vec3 scale = { 0.65f, 0.65f, 0.65f };
-                        uint32_t color = 0xFFFFFFFFU;
-                        ttyd::win_main::winIconSet(
-                            IconType::MARIO_HEAD, &position, &scale, &color);
-                    }
-                  
-                    // Color spots behind "HP" and "FP".
-                  
-                    ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
-                    ttyd::gx::GXTev::GXSetTevColorIn(
-                        GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
-                    ttyd::gx::GXTev::GXSetTevAlphaIn(
-                        GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
-                    {
-                        int32_t width = ttyd::fontmgr::FontGetMessageWidth("HP");
-                        gc::vec3 position = {
-                            0.9f * width * 0.5f + winmgr_entry->x + 220,
-                            winmgr_entry->y - 19.0f - (i * 22),
-                            0.0f
-                        };
-                        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
-                        uint32_t color = 0xCB8CA2FEU;
-                        ttyd::win_main::winTexSet(0xaf, &position, &scale, &color);
-                    }
-                    {
-                        int32_t width = ttyd::fontmgr::FontGetMessageWidth("FP");
-                        gc::vec3 position = {
-                            0.9f * width * 0.5f + winmgr_entry->x + 220,
-                            winmgr_entry->y - 41.0f,
-                            0.0f
-                        };
-                        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
-                        uint32_t color = 0xCBBE89FEU;
-                        ttyd::win_main::winTexSet(0xaf, &position, &scale, &color);
-                    }
-                  
-                    // Text for Mario's HP and FP.
-                  
-                    ttyd::win_main::winFontInit();
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 50.0f,
-                            winmgr_entry->y - 8.0f - (i * 22),
-                            0.0f
-                        };
-                        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
-                        uint32_t color = text_color;
-                        const char* msg = msgSearch("name_mario");
-                        ttyd::win_main::winFontSet(&position, &scale, &color, msg);
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 220.0f,
-                            winmgr_entry->y - 8.0f - (i * 22),
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSet(&position, &scale, &color, "HP");
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 245.0f,
-                            winmgr_entry->y - 8.0f - (i * 22),
-                            0.0f
-                        };    
-                        gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSetR(
-                            &position, &scale, &color, "%d", 
-                            ttyd::mario_pouch::pouchGetHP());
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 267.0f,
-                            winmgr_entry->y - 8.0f - (i * 22),
-                            0.0f
-                        };    
-                        gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSetR(&position, &scale, &color, "/");
-                    }
-                    { 
-                        gc::vec3 position = {
-                            winmgr_entry->x + 310.0f,
-                            winmgr_entry->y - 10.0f - (i * 22),
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSet(
-                            &position, &scale, &color, "%d", 
-                            ttyd::mario_pouch::pouchGetMaxHP());
-                    }
-
-                    // Skip drawing FP if item was just used on party member
-                    // and the text should be flashing.
-                    if (itemDataTable[menu->use_item_type].fp_restored != 0) {
-                        if (menu->use_item_timer % 20 >= 16)
-                            continue;
-                        text_color = 0x000000FFU;
-                    }
-
-                    ttyd::win_main::winFontInit();
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 220.0f,
-                            winmgr_entry->y - 30.0f,
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSet(&position, &scale, &color, "FP");
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 245.0f,
-                            winmgr_entry->y - 30.0f,
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSetR(
-                            &position, &scale, &color, "%d", 
-                            ttyd::mario_pouch::pouchGetFP()); 
-                    }             
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 267.0f,
-                            winmgr_entry->y - 30.0f,
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSetR(&position, &scale, &color, "/");
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 310.0f,
-                            winmgr_entry->y - 30.0f,
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSet(
-                            &position, &scale, &color, "%d", 
-                            ttyd::mario_pouch::pouchGetMaxFP());
-                    }
-                }
-            } else {
-                // Otherwise, partner...
-                int32_t partner_id = party_members[i]->partner_id;
-                const char* party_name;
-                if (partner_id == 4) {
-                    party_name = ttyd::mario_pouch::pouchGetYoshiName();
-                } else {
-                    party_name = msgSearch(party_members[i]->name);
-                }
-            
-                if (menu->use_item_timer % 20 < 16 || i != menu->use_item_menu_cursor_idx) {
-                    // Color spots behind "HP" and "FP".
-                    ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
-                    ttyd::gx::GXTev::GXSetTevColorIn(
-                        GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
-                    ttyd::gx::GXTev::GXSetTevAlphaIn(
-                        GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
-                    {
-                        int32_t width = ttyd::fontmgr::FontGetMessageWidth("HP");
-                        gc::vec3 position = {
-                            0.9f * width * 0.5f + winmgr_entry->x + 220,
-                            y_offset + winmgr_entry->y - 8 - (i * 28) - 14.0f,
-                            0.0f
-                        };
-                        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
-                        uint32_t color = 0xCB8CA2FEU;
-                        ttyd::win_main::winTexSet(0xaf, &position, &scale, &color);
-                    }
-
-                    // Partner icon.
-                    if (item_disabled) {
-                        ttyd::win_main::winIconGrayInit();
-                    }
-                    else {
-                        ttyd::win_main::winIconInit();
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 30.0f,
-                            y_offset + winmgr_entry->y - 20.0f - (i * 28),
-                            0.0f
-                        };              
-                        gc::vec3 scale = { 0.65f, 0.65f, 0.65f };
-                        uint32_t color = 0xFFFFFFFFU;
-                        ttyd::win_main::winIconSet(
-                            party_members[i]->icon_id, &position, &scale, &color);
-                    }
-
-                    // Text for partner's HP.
-                  
-                    ttyd::win_main::winFontInit();
-                    {
-                        int32_t width = ttyd::fontmgr::FontGetMessageWidth(party_name);
-                        float x_scale = 1.0f;
-                        if (160.0f <= width) {
-                            x_scale = 160.0f / width;
-                        }
-                        gc::vec3 position = {
-                            winmgr_entry->x + 50.0f,
-                            y_offset + winmgr_entry->y - 8 - (i * 28),
-                            0.0f
-                        };
-                        gc::vec3 scale = { x_scale, 1.0f, 1.0f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSet(&position, &scale, &color, party_name);
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 220.0f,
-                            y_offset + winmgr_entry->y - 8 - (i * 28),
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSet(&position, &scale, &color, "HP");
-                    }
-                    {    
-                        gc::vec3 position = {
-                            winmgr_entry->x + 245.0f,
-                            y_offset + winmgr_entry->y - 8 - (i * 28),
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSetR(
-                            &position, &scale, &color, "%d",
-                            pouch.party_data[partner_id].current_hp);              
-                    }
-                    {   
-                        gc::vec3 position = {
-                            winmgr_entry->x + 267.0f,
-                            y_offset + winmgr_entry->y - 8 - (i * 28),
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSetR(&position, &scale, &color, "/");
-                    }
-                    {
-                        gc::vec3 position = {
-                            winmgr_entry->x + 310.0f,
-                            y_offset + winmgr_entry->y - 8 - (i * 28),
-                            0.0f
-                        };
-                        gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
-                        uint32_t color = text_color;
-                        ttyd::win_main::winFontSet(
-                            &position, &scale, &color, "%d",
-                            pouch.party_data[partner_id].max_hp);
-                    }
-                }
-            }
-        }
-        
-        if (menu->party_count > 1) {
-            // Draw dotted line under first partner.
-            ttyd::win_main::winIconInit();
-            for (int32_t i = 2; i < 30; ++i) {            
-                gc::vec3 position = {
-                    winmgr_entry->x + (float)(winmgr_entry->width * i / 31),
-                    winmgr_entry->y - 84.0f,
-                    0.0f
-                };
-                gc::vec3 scale = { 0.15f, 0.15f, 0.15f };
-                uint32_t color = 0x000000FFU;
-                ttyd::win_main::winIconSet(
-                    IconType::SP_ORB_YELLOW, &position, &scale, &color);
-            }
+        if (menu->item_menu_state == 300 || menu->item_menu_state == 301) {
+            DrawUseItemDialog(winmgr_entry);
+        } else if (menu->item_menu_state == 400) {
+            DrawCosmeticSelectionDialog(winmgr_entry);
         }
     }
   
@@ -952,8 +1098,14 @@ void ItemSubdialogMain1(WinMgrEntry* winmgr_entry) {
 void ItemSubdialogMain2(WinMgrEntry* winmgr_entry) {
     auto* menu = (WinPauseMenu*)ttyd::win_main::winGetPtr();
     if (ttyd::winmgr::winMgrAction(menu->winmgr_entry_2) == 0) {
-        // "Use it on whom?"
-        const char* msg = msgSearch("msg_window_select_5");
+        const char* msg = "";
+        if (menu->item_menu_state == 300 || menu->item_menu_state == 301) {
+            // "Use it on whom?"
+            msg = msgSearch("msg_window_select_5");
+        } else if (menu->item_menu_state == 400) {
+            msg = msgSearch("tot_winsel_whichones");
+        }
+
         uint16_t lines;
         int32_t text_length = ttyd::fontmgr::FontGetMessageWidthLine(msg, &lines);
         if (winmgr_entry->width - 20 < text_length) {

@@ -39,6 +39,7 @@ g_StringMap = {
         b"tot_mkey_name":           b"Master Key",
         b"in_super_peekaboo":       b"Stat Master",
         b"in_bgm":                  b"Music Toggle",
+        b"in_attack_fx":            b"Attack FX",
         
         # Special item descriptions.
         
@@ -84,6 +85,10 @@ g_StringMap = {
         b'msg_bgm':
             b"Toggle the background music\n"
             b"on or off.",
+
+        b'msg_attack_fx':
+            b"Select which sound effects\n"
+            b"play when Mario attacks.",
             
         # Normal item descriptions.
         
@@ -1165,6 +1170,7 @@ g_StringMap = {
         b"tot_winsel_whichunlock":    b"Which move?",
         b"tot_winsel_titlestat":      b"Stat Lvl.",
         b"tot_winsel_tradewhichstat": b"Trade which?",
+        b"tot_winsel_whichones":      b"Which ones?",
         
         # TODO: Move this and other Gold Fuzzy dialogue to the final boss area.
         
@@ -1241,6 +1247,34 @@ g_StringMap = {
             b'any hit only leaves a scratch!\n<k>\n<p>\n',
         
         # TODO: Menu Tattles for all enemies. - b"menu_enemy_001", etc.
+        
+        # Cosmetic names and descriptions.
+        
+        b'tot_cos0_01':     b'Ding FX',
+        b'tot_cos0_02':     b'Froggy FX',
+        b'tot_cos0_03':     b'Squeaky FX',
+        b'tot_cos0_04':     b'Peach FX',
+        b'tot_cos0_05':     b'Bowser FX',
+        
+        b'tot_cos0_01_h':
+            b"Gives Mario's attacks a tinny,\n"
+            b"dinging sound.",
+            
+        b'tot_cos0_02_h':
+            b"Gives Mario's attacks a\n"
+            b"croaking sound.",
+            
+        b'tot_cos0_03_h':
+            b"Gives Mario's attacks a\n"
+            b"mouse-like squeaking sound.",
+            
+        b'tot_cos0_04_h':
+            b"Gives Mario's attacks a\n"
+            b"cheerful laughing sound.",
+            
+        b'tot_cos0_05_h':
+            b"Gives Mario's attacks a\n"
+            b"dreadful roaring sound.",
             
         # Achievements (TODO)
         

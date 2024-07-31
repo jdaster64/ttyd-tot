@@ -30,7 +30,6 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 uint32_t secretCode_OpeningCutscene = 034345566;
 uint32_t secretCode_ObfuscateItems  = 046362123;
 uint32_t secretCode_DebugMode       = 036363636;
-uint32_t secretCode_UnlockFxBadges  = 026122146;
 uint32_t secretCode_BumpAttack      = 043652131;
 
 }
@@ -54,20 +53,6 @@ void CheatsManager::Update() {
         ttyd::mario::marioGetPtr()->prevFollowerId[0] = 1;
         ttyd::seqdrv::seqSetSeq(
             ttyd::seqdrv::SeqIndex::kMapChange, "gon_12", "dokan_2");
-    }
-    if ((code_history & 0xFFFFFF) == secretCode_UnlockFxBadges) {
-        code_history = 0;
-        // Check Journal for whether the FX badges were already unlocked.
-        bool has_fx_badges = ttyd::swdrv::swGet(
-            ItemType::ATTACK_FX_R - ItemType::POWER_JUMP + 0x80);
-        if (!has_fx_badges && ttyd::mario_pouch::pouchGetHaveBadgeCnt() < 196) {
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_P);
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_G);
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_B);
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_Y);
-            ttyd::mario_pouch::pouchGetItem(ItemType::ATTACK_FX_R);
-            ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
-        }
     }
     if ((code_history & 0xFFFFFF) == secretCode_BumpAttack) {
         code_history = 0;

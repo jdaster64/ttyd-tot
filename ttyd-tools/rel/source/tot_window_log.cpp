@@ -75,10 +75,10 @@ int32_t CompBadgeBP(int16_t* lhs, int16_t* rhs) {
     // Sort by cost ascending, then type ascending.
     const int32_t lhs_sort =
         (itemDataTable[*lhs + 0x80].bp_cost << 16)
-        - itemDataTable[*lhs + 0x80].type_sort_order;
+        + itemDataTable[*lhs + 0x80].type_sort_order;
     const int32_t rhs_sort =
         (itemDataTable[*rhs + 0x80].bp_cost << 16)
-        - itemDataTable[*rhs + 0x80].type_sort_order;
+        + itemDataTable[*rhs + 0x80].type_sort_order;
     return lhs_sort - rhs_sort;
 }
 
@@ -86,10 +86,10 @@ int32_t CompBadgeBP_R(int16_t* lhs, int16_t* rhs) {
     // Sort by cost descending, then type ascending.
     const int32_t lhs_sort =
         ((10 - itemDataTable[*lhs + 0x80].bp_cost) << 16)
-        - itemDataTable[*lhs + 0x80].type_sort_order;
+        + itemDataTable[*lhs + 0x80].type_sort_order;
     const int32_t rhs_sort =
         ((10 - itemDataTable[*rhs + 0x80].bp_cost) << 16)
-        - itemDataTable[*rhs + 0x80].type_sort_order;
+        + itemDataTable[*rhs + 0x80].type_sort_order;
     return lhs_sort - rhs_sort;
 }
 

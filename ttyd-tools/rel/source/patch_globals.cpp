@@ -316,6 +316,7 @@ extern const int32_t g_winHakoGX_CheckDrawNoItemBox_CH1 = 0x80159dcc;
 extern const int32_t g_winHakoGX_CheckDrawItemIcon_BH = 0x80159e8c;
 extern const int32_t g_winHakoGX_CheckDrawItemIcon_EH = 0x80159f8c;
 extern const int32_t g_winHakoGX_CheckDrawItemIcon_CH1 = 0x80159ef8;
+extern const int32_t g_winRootDisp_Patch_SkipMailGx = 0x801647b0;
 extern const int32_t g_winPartyDisp_StatsHook1_BH = 0x80165c4c;
 extern const int32_t g_winPartyDisp_StatsHook1_EH = 0x80166290;
 extern const int32_t g_winPartyDisp_StatsHook2_BH = 0x80166cb8;

@@ -176,7 +176,16 @@ struct WinPauseMenu {
     float       email_target_y;                             // 0x0264
     int32_t     email_line_current;                         // 0x0268
     int16_t     email_line_count;                           // 0x026c
-    WinEmailInfo email_ids[45];                             // 0x026e
+    // Fields from 0x026e ~ 0x02c8 are altered from vanilla.
+    int8_t      cosmetic_options[30];                       // 0x026e
+    int32_t     cosmetic_num_options;                       // 0x028c
+    int32_t     cosmetic_cursor_idx;                        // 0x0290
+    float       cosmetic_menu_scroll_y;                     // 0x0294
+    float       cosmetic_menu_scroll_target_y;              // 0x0298
+    int32_t     cosmetic_menu_offset;                       // 0x029c
+    int32_t     cosmetic_menu_type;                         // 0x02a0
+    // Reserved space for other menus.
+    int8_t      unused_0x02a0[0x24];                        // 0x02a4
     int32_t     super_luigi_book_id;                        // 0x02c8
     int32_t     super_luigi_page_count;                     // 0x02cc
     int32_t     super_luigi_page;                           // 0x02d0
@@ -200,7 +209,7 @@ struct WinPauseMenu {
     int32_t     equipped_badges_count;                      // 0x0d64
 
     // "Log" menu + submenus.
-    // Note that fields from 0xe14 ~ 0x1030 were changed from vanilla!
+    // Fields from 0xe14 ~ 0x1030 are altered from vanilla.
     int32_t     log_menu_state;                             // 0x0d68
     int32_t     log_submenu_cursor_idx;                     // 0x0d6c
     int32_t     log_submenu_count;                          // 0x0d70
@@ -238,7 +247,7 @@ struct WinPauseMenu {
     float       recipe_log_showcased_target_y;              // 0x0f48
     int16_t     recipe_log_ids[84];                         // 0x0f4c
     // Reserved space for other menus.
-    int8_t      unused_0x0ff4[60];                          // 0x0ff4
+    int8_t      unused_0x0ff4[0x3c];                        // 0x0ff4
     // "Tattle Log"
     int8_t      unk_0x1030[16];                             // 0x1030
     int32_t     tattle_log_total_count;                     // 0x1040

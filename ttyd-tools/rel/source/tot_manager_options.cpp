@@ -120,6 +120,7 @@ void OptionsManager::InitLobby() {
 
     // Testing: Give all currently implemented QoL / cosmetic key items.
     // (These items should not be deleted in the final version, ideally)
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ATTACK_FX);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BGM_TOGGLE);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_SUPER_PEEKABOO);

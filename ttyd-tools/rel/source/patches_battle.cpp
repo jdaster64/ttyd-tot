@@ -1382,7 +1382,7 @@ void ApplyFixedPatches() {
             if (!(weapon->special_property_flags & 
                 AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND)) return;
             
-            if (int32_t id = tot::CosmeticsManager::PickActiveFX(true); id > 0) {
+            if (int32_t id = tot::CosmeticsManager::PickActiveFX(); id > 0) {
                 *flags |= id * 0x100'0000;
             }
         });
