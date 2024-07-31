@@ -619,7 +619,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 menu->tattle_log_page_num = menu->tattle_log_cursor_idx / 16;
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
-                if (++menu->tattle_log_cursor_idx > total)
+                if (++menu->tattle_log_cursor_idx >= total)
                     menu->tattle_log_cursor_idx = total - 1;
                 menu->tattle_log_page_num = menu->tattle_log_cursor_idx / 16;
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);

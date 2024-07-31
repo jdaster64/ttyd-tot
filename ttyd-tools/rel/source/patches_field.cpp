@@ -1,16 +1,44 @@
 #include "patches_field.h"
 
 #include "mod.h"
+#include "patch.h"
+#include "tot_manager_cosmetics.h"
 
+#include <gc/types.h>
 #include <ttyd/battle_monosiri.h>
 #include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
+#include <ttyd/pmario_sound.h>
+#include <ttyd/system.h>
 
 #include <cstring>
+
+// Assembly patch functions.
+extern "C" {
+    // attack_fx_patches.s
+    void StartPlayFieldHammerFX();
+    void BranchBackPlayFieldHammerFX();
+    
+    void playFieldHammerFX(gc::vec3* position) {
+        int32_t id = mod::tot::CosmeticsManager::PickActiveFX(false);
+        if (id) {
+            const char* fx_name = mod::tot::CosmeticsManager::GetFXName(id);
+            int32_t id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);
+            // Play at one of a few random pitches.
+            int16_t pitch = 0x400 * (ttyd::system::irand(3) - 1);
+            ttyd::pmario_sound::psndSFX_pit(id, pitch);
+        } else {
+            // Play standard hammer impact sound.
+            ttyd::pmario_sound::psndSFXOn_3D("SFX_MARIO_HAMMER_WOOD_DON1", position);
+        }
+    }
+}
 
 namespace mod::infinite_pit {
 
 // Declarations of patches.
+extern const int32_t g_mot_hammer_PickHammerFieldSfx_BH;
+extern const int32_t g_mot_hammer_PickHammerFieldSfx_EH;
 extern const int32_t g_chorobon_move_event_Patch_SetScale;
 extern const int32_t g_chorobon_find_event_Patch_SetScale;
 extern const int32_t g_chorobon_lost_event_Patch_SetScale;
@@ -26,7 +54,14 @@ namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 
 }
 
-void ApplyFixedPatches() {        
+void ApplyFixedPatches() {
+    // Replaces logic for picking a FX to play on hammering in the field.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_mot_hammer_PickHammerFieldSfx_BH),
+        reinterpret_cast<void*>(g_mot_hammer_PickHammerFieldSfx_EH),
+        reinterpret_cast<void*>(StartPlayFieldHammerFX),
+        reinterpret_cast<void*>(BranchBackPlayFieldHammerFX));
+
     // Correcting heights in NPC tribe description data.
     NpcTribeDescription* tribe_descs = ttyd::npc_data::npcTribe;
     // Shady Paratroopa

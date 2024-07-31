@@ -8,6 +8,7 @@
 #include "patches_mario_move.h"
 #include "tot_custom_rel.h"
 #include "tot_generate_enemy.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
 
 #include <ttyd/_core_language_libs.h>
@@ -1207,36 +1208,6 @@ void ReorderAndFilterWeaponTargets() {
     }
 }
 
-void PickAttackFX(BattleWeapon* weapon, uint32_t* flags) {
-    if (!(weapon->special_property_flags & 
-        AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND)) return;
-    
-    int32_t sounds[5] = { 0 };
-    int32_t num_sounds = 0;
-    
-    // TODO: Move to GSWF bits, set by a dialog from a new key item.
-    uint32_t badge_flags = ttyd::battle::g_BattleWork->badge_equipped_flags;
-    if (badge_flags & 0x100) {
-        sounds[num_sounds++] = 1;
-    }
-    if (badge_flags & 0x200) {
-        sounds[num_sounds++] = 2;
-    }
-    if (badge_flags & 0x400) {
-        sounds[num_sounds++] = 3;
-    }
-    if (badge_flags & 0x800) {
-        sounds[num_sounds++] = 4;
-    }
-    if (badge_flags & 0x1000) {
-        sounds[num_sounds++] = 5;
-    }
-    if (num_sounds) {
-        int32_t selected_sound = sounds[ttyd::system::irand(num_sounds)];
-        *flags |= selected_sound * 0x1000000;
-    }
-}
-
 void ApplyFixedPatches() {
     // Override Action Command difficulty with fixed option.
     g_BattleActionCommandSetDifficulty_trampoline = patch::hookFunction(
@@ -1407,8 +1378,13 @@ void ApplyFixedPatches() {
     g_BattleCheckPikkyoro_trampoline = mod::patch::hookFunction(
         ttyd::battle_damage::BattleCheckPikkyoro, [](
             BattleWeapon* weapon, uint32_t* flags) {
-            // Completely replace existing logic.
-            PickAttackFX(weapon, flags);
+            // Completely replace existing logic to pick a sound.
+            if (!(weapon->special_property_flags & 
+                AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND)) return;
+            
+            if (int32_t id = tot::CosmeticsManager::PickActiveFX(true); id > 0) {
+                *flags |= id * 0x100'0000;
+            }
         });
     // Replace BattleDamageDirect logic that reads flags for picked sound.
     mod::patch::writeBranch(
@@ -1821,21 +1797,14 @@ bool CheckOnSelectedSide(int32_t target_idx) {
 }
 
 bool CheckPlayAttackFx(uint32_t flags, gc::vec3* position) {
-    const char* kAttackFxNames[] = {
-        nullptr,
-        "SFX_MARIO_HAMMER_PIKKYO_R1",
-        "SFX_MARIO_HAMMER_PIKKYO_Y1",
-        "SFX_MARIO_HAMMER_PIKKYO_B1",
-        "SFX_MARIO_HAMMER_PIKKYO_G1",
-        "SFX_MARIO_HAMMER_PIKKYO_P1",
-    };
-    const char* fx_name = kAttackFxNames[(flags & 0x1f00'0000) / 0x100'0000];
+    const int32_t id = (flags & 0x1f00'0000) / 0x100'0000;
+    const char* fx_name = tot::CosmeticsManager::GetFXName(id);
     if (!fx_name) return false;
 
-    int32_t id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);
+    int32_t sfx_id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);
+    // Play at one of a few random pitches.
     int16_t pitch = 0x400 * (ttyd::system::irand(3) - 1);
-    // TODO: Testing, to see what FX sounds sound like at different pitches.
-    ttyd::pmario_sound::psndSFX_pit(id, pitch);
+    ttyd::pmario_sound::psndSFX_pit(sfx_id, pitch);
     return true;
 }
 

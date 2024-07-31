@@ -1,6 +1,8 @@
 .global StartCheckPlayAttackFX
 .global BranchBackCheckPlayAttackFX
 .global ConditionalBranchCheckPlayAttackFX
+.global StartPlayFieldHammerFX
+.global BranchBackPlayFieldHammerFX
 
 StartCheckPlayAttackFX:
 # Pointer to sound effect 3d location.
@@ -13,4 +15,12 @@ ConditionalBranchCheckPlayAttackFX:
 b 0
 
 BranchBackCheckPlayAttackFX:
+b 0
+
+
+StartPlayFieldHammerFX:
+addi %r3, %r31, 0x8c
+bl playFieldHammerFX
+
+BranchBackPlayFieldHammerFX:
 b 0
