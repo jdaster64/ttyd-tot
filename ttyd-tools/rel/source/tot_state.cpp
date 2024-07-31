@@ -4,6 +4,7 @@
 #include "common_types.h"
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_gon_tower_npcs.h"
 
 #include <gc/OSLink.h>
 #include <gc/OSTime.h>
@@ -245,14 +246,10 @@ void StateManager::InitDefaultOptions() {
     SetOption(OPTVAL_STARTER_ITEMS_BASIC);
     SetOption(OPTVAL_REVIVE_PARTNERS_ON);
     SetOption(OPTVAL_AC_DEFAULT);
-    SetOption(OPTVAL_NPC_LUMPY_ON);
-    SetOption(OPTVAL_NPC_DOOPLISS_ON);
-    SetOption(OPTVAL_NPC_GRUBBA_ON);
-    SetOption(OPTVAL_NPC_CHET_RIPPO_ON);
-    SetOption(OPTVAL_NPC_WONKY_ON);
-    SetOption(OPTVAL_NPC_DAZZLE_ON);
-    SetOption(OPTVAL_NPC_MOVER_ON);
-    SetOption(OPTVAL_NPC_ZESS_T_ON);
+    SetOption(OPT_NPC_CHOICE_1, gon::GetNumSecondaryNpcTypes());
+    SetOption(OPT_NPC_CHOICE_2, gon::GetNumSecondaryNpcTypes());
+    SetOption(OPT_NPC_CHOICE_3, gon::GetNumSecondaryNpcTypes());
+    SetOption(OPT_NPC_CHOICE_4, gon::GetNumSecondaryNpcTypes());
     SetOption(OPT_MARIO_HP, 5);
     SetOption(OPT_MARIO_FP, 5);
     SetOption(OPT_MARIO_BP, 5);
@@ -283,14 +280,10 @@ void StateManager::ApplyPresetOptions() {
             SetOption(OPTVAL_STARTER_ITEMS_BASIC);
             SetOption(OPTVAL_REVIVE_PARTNERS_ON);
             SetOption(OPTVAL_AC_DEFAULT);
-            SetOption(OPTVAL_NPC_LUMPY_ON);
-            SetOption(OPTVAL_NPC_DOOPLISS_ON);
-            SetOption(OPTVAL_NPC_GRUBBA_ON);
-            SetOption(OPTVAL_NPC_CHET_RIPPO_ON);
-            SetOption(OPTVAL_NPC_WONKY_ON);
-            SetOption(OPTVAL_NPC_DAZZLE_ON);
-            SetOption(OPTVAL_NPC_MOVER_ON);
-            SetOption(OPTVAL_NPC_ZESS_T_ON);
+            SetOption(OPT_NPC_CHOICE_1, gon::GetNumSecondaryNpcTypes());
+            SetOption(OPT_NPC_CHOICE_2, gon::GetNumSecondaryNpcTypes());
+            SetOption(OPT_NPC_CHOICE_3, gon::GetNumSecondaryNpcTypes());
+            SetOption(OPT_NPC_CHOICE_4, gon::GetNumSecondaryNpcTypes());
             SetOption(OPT_MARIO_HP, 5);
             SetOption(OPT_MARIO_FP, 5);
             SetOption(OPT_MARIO_BP, 5);
@@ -546,14 +539,10 @@ const char* StateManager::GetEncodedOptions() const {
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_AC_DIFFICULTY);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_BANDIT_ESCAPE);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_CHARLIETON_STOCK);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_WONKY);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_DAZZLE);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_CHET_RIPPO);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_LUMPY);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_DOOPLISS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_GRUBBA);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_MOVER);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_ENABLE_NPC_ZESS_T);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_1);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_2);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_3);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_4);
 
     const int32_t kEncodedByteCount = (encoded_bit_count + 5) / 6;
     for (int32_t i = 0; i < kEncodedByteCount; ++i) {

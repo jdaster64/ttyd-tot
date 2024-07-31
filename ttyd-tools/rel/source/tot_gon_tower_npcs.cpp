@@ -62,16 +62,19 @@ namespace NpcTribeType = ::ttyd::npc_data::NpcTribeType;
 namespace SecondaryNpcType {
     enum e {
         NONE = -1,
-        LUMPY = 0,
+        WONKY = 0,
+        DAZZLE,
+        CHET_RIPPO,
+        LUMPY,
         DOOPLISS,
         GRUBBA,
-        CHET_RIPPO,
-        WONKY,
-        DAZZLE,
         MOVER,
         ZESS_T,
         
-        NUM_NPC_TYPES
+        NUM_NPC_TYPES,
+        // Used for interpreting run options.
+        CHOICE_RANDOM   = NUM_NPC_TYPES,
+        CHOICE_NONE     = NUM_NPC_TYPES + 1,
     };
 }
 
@@ -942,17 +945,41 @@ LBL(99)
 EVT_END()
 
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
+    NpcTribeType::WONKY,
+    NpcTribeType::DAZZLE,
+    NpcTribeType::CHET_RIPPO,
     NpcTribeType::LUMPY,
     NpcTribeType::DOOPLISS,
     NpcTribeType::GRUBBA,
-    NpcTribeType::CHET_RIPPO,
-    NpcTribeType::WONKY,
-    NpcTribeType::DAZZLE,
     NpcTribeType::MOVER,
     NpcTribeType::ZESS_T,
 };
 
 NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
+    {
+        .name = "npc_wonky",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = nullptr,
+        .talkEvtCode = (void*)TowerNpc_WonkyTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_dazzle",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = nullptr,
+        .talkEvtCode = (void*)TowerNpc_DazzleTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_chet",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = nullptr,
+        .talkEvtCode = (void*)TowerNpc_ChetRippoTalk,
+        .battleInfoId = -1,
+    },
     {
         .name = "npc_lumpy",
         .flags = 0x1000'0600,
@@ -975,30 +1002,6 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .initEvtCode = nullptr,
         .regularEvtCode = nullptr,
         .talkEvtCode = (void*)TowerNpc_GrubbaTalk,
-        .battleInfoId = -1,
-    },
-    {
-        .name = "npc_chet",
-        .flags = 0x1000'0600,
-        .initEvtCode = nullptr,
-        .regularEvtCode = nullptr,
-        .talkEvtCode = (void*)TowerNpc_ChetRippoTalk,
-        .battleInfoId = -1,
-    },
-    {
-        .name = "npc_wonky",
-        .flags = 0x1000'0600,
-        .initEvtCode = nullptr,
-        .regularEvtCode = nullptr,
-        .talkEvtCode = (void*)TowerNpc_WonkyTalk,
-        .battleInfoId = -1,
-    },
-    {
-        .name = "npc_dazzle",
-        .flags = 0x1000'0600,
-        .initEvtCode = nullptr,
-        .regularEvtCode = nullptr,
-        .talkEvtCode = (void*)TowerNpc_DazzleTalk,
         .battleInfoId = -1,
     },
     {
@@ -1487,74 +1490,77 @@ EVT_DEFINE_USER_FUNC(evtTot_GetTowerNpcParams) {
 EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
     auto& state = g_Mod->state_;
 
-    int32_t active_npc_types = SecondaryNpcType::NUM_NPC_TYPES;
+    const int32_t kPoolDistinct =
+        state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) ? 3 : 4;
+    const int32_t kPoolMax =
+        state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) ? 5 : 9;
+
     // Base weights for each NPC, and how much to reduce them per appearance.
-    int32_t weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = {
-        15, 10, 10, 10, 12, 12, 10, 10, 0
+    int32_t base_weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = {
+        12, 12, 10, 15, 10, 10, 10, 10, 0
     };
     int32_t sub_weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = {
-        5, 2, 2, 2, 3, 3, 2, 2, 0 
+        3, 3, 2, 5, 2, 2, 2, 2, 0 
     };
+    // Active weights for each NPC.
+    int32_t weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = { 0 };
     
+    // Determine which 3-4 NPCs have a chance to appear.
+    // Start by shuffling an array of the different types.
+    int32_t npcs_selected[SecondaryNpcType::NUM_NPC_TYPES];
     for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
-        uint32_t option_value = 0;
-        switch (i) {
-            case SecondaryNpcType::LUMPY:
-                option_value = OPTVAL_NPC_LUMPY_OFF;
-                break;
-            case SecondaryNpcType::DOOPLISS:
-                option_value = OPTVAL_NPC_DOOPLISS_OFF;
-                break;
-            case SecondaryNpcType::GRUBBA:
-                option_value = OPTVAL_NPC_GRUBBA_OFF;
-                break;
-            case SecondaryNpcType::CHET_RIPPO:
-                option_value = OPTVAL_NPC_CHET_RIPPO_OFF;
-                break;
-            case SecondaryNpcType::WONKY:
-                option_value = OPTVAL_NPC_WONKY_OFF;
-                break;
-            case SecondaryNpcType::DAZZLE:
-                option_value = OPTVAL_NPC_DAZZLE_OFF;
-                break;
-            case SecondaryNpcType::MOVER:
-                option_value = OPTVAL_NPC_MOVER_OFF;
-                break;
-            case SecondaryNpcType::ZESS_T:
-                option_value = OPTVAL_NPC_ZESS_T_OFF;
-                break;
-        }
-        if (option_value && state.CheckOptionValue(option_value)) {
-            weights[i] = 0;
-            --active_npc_types;
-        }
+        npcs_selected[i] = i;
     }
-
-    // Limit the number of NPC types that can appear in a single run to 4.
-    while (active_npc_types > 4) {
-        int32_t active_type_to_disable = 
-            g_Mod->state_.Rand(active_npc_types, RNG_SECONDARY_NPC);
-        int32_t active_type_idx = 0;
-        for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
-            if (weights[i] > 0) {
-                if (active_type_to_disable == active_type_idx) {
-                    weights[i] = 0;
-                    --active_npc_types;
-                    break;
-                }
-                ++active_type_idx;
+    for (int32_t i = 0; i < 100; ++i) {
+        int32_t x = g_Mod->state_.Rand(
+            SecondaryNpcType::NUM_NPC_TYPES, RNG_SECONDARY_NPC);
+        int32_t y = g_Mod->state_.Rand(
+            SecondaryNpcType::NUM_NPC_TYPES, RNG_SECONDARY_NPC);
+        int32_t tmp = npcs_selected[x];
+        npcs_selected[x] = npcs_selected[y];
+        npcs_selected[y] = tmp;
+    }
+    // Incorporate player's choices.
+    int32_t npc_player_choices[] = {
+        state.GetOption(OPT_NPC_CHOICE_1), state.GetOption(OPT_NPC_CHOICE_2),
+        state.GetOption(OPT_NPC_CHOICE_3), state.GetOption(OPT_NPC_CHOICE_4),
+    };
+    for (int32_t i = 0; i < kPoolDistinct; ++i) {
+        // Bubble sort to order by NPC type, then random, then none.
+        for (int32_t j = i+1; j < kPoolDistinct; ++j) {
+            if (npc_player_choices[i] > npc_player_choices[j]) {
+                int32_t tmp = npc_player_choices[i];
+                npc_player_choices[i] = npc_player_choices[j];
+                npc_player_choices[j] = tmp;
             }
         }
+
+        // If type is a valid NPC, bring that to the front of active types.
+        if (npc_player_choices[i] < SecondaryNpcType::NUM_NPC_TYPES) {
+            for (int32_t j = i; j < SecondaryNpcType::NUM_NPC_TYPES; ++j) {
+                if (npc_player_choices[i] == npcs_selected[j]) {
+                    int32_t tmp = npcs_selected[j];
+                    npcs_selected[j] = npcs_selected[i];
+                    npcs_selected[i] = tmp;
+                }
+            }
+        } else if (npc_player_choices[i] == SecondaryNpcType::CHOICE_NONE) {
+            npcs_selected[i] = SecondaryNpcType::NONE;
+        }
     }
-    // If there are fewer than 4 enabled, add some chance of no NPC appearing.
-    if (active_npc_types < 4) {
-        weights[SecondaryNpcType::NUM_NPC_TYPES] += 7 * (4 - active_npc_types);
+    // Set up weights array based on selected types.
+    for (int32_t i = 0; i < kPoolDistinct; ++i) {
+        if (npcs_selected[i] == SecondaryNpcType::NONE) {
+            // Slight weight for no NPC.
+            weights[SecondaryNpcType::NUM_NPC_TYPES] += 6;
+        } else {
+            weights[npcs_selected[i]] = base_weights[npcs_selected[i]];
+        }
     }
 
-    // Make a pool of 9 NPCs starting with 1 each of the enabled types, and
+    // Make a pool of NPCs starting with 1 each of the enabled types, and
     // the rest initialized to type NONE.
-    int32_t kPoolMax = 9;
-    int32_t npc_pool[kPoolMax];
+    int32_t npc_pool[9];
     for (int32_t i = 0; i < kPoolMax; ++i) {
         npc_pool[i] = SecondaryNpcType::NONE;
     }
@@ -1562,9 +1568,8 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
     for (int32_t i = 0; i < SecondaryNpcType::NUM_NPC_TYPES; ++i) {
         if (weights[i]) npc_pool[pool_index++] = i;
     }
-
-    // Select random NPCs for pool entries 4+.
-    for (pool_index = 4; pool_index < kPoolMax; ++pool_index) {
+    // Select random NPCs for remaining entries.
+    for (pool_index = kPoolDistinct; pool_index < kPoolMax; ++pool_index) {
         int32_t weight = 0;
         for (int32_t i = 0; i <= SecondaryNpcType::NUM_NPC_TYPES; ++i) {
             weight += weights[i];
@@ -1579,7 +1584,6 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
             }
         }
     }
-
     // Shuffle pool order with random swaps.
     for (int32_t i = 0; i < 100; ++i) {
         int32_t x = g_Mod->state_.Rand(kPoolMax, RNG_SECONDARY_NPC);
@@ -1614,6 +1618,60 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
     }
 
     return 2;
+}
+
+int32_t GetNumSecondaryNpcTypes() {
+    return SecondaryNpcType::NUM_NPC_TYPES;
+}
+
+void GetNpcMsgs(int32_t type, const char** out_name, const char** out_help) {
+    switch (type) {
+        case SecondaryNpcType::WONKY:
+            if (out_name) *out_name = "tot_optr_npc_wonky";
+            if (out_help) *out_help = "tot_opth_npc_wonky";
+            break;
+        case SecondaryNpcType::DAZZLE:
+            if (out_name) *out_name = "tot_optr_npc_dazzle";
+            if (out_help) *out_help = "tot_opth_npc_dazzle";
+            break;
+        case SecondaryNpcType::CHET_RIPPO:
+            if (out_name) *out_name = "tot_optr_npc_chet";
+            if (out_help) *out_help = "tot_opth_npc_chet";
+            break;
+        case SecondaryNpcType::LUMPY:
+            if (out_name) *out_name = "tot_optr_npc_lumpy";
+            if (out_help) *out_help = "tot_opth_npc_lumpy";
+            break;
+        case SecondaryNpcType::DOOPLISS:
+            if (out_name) *out_name = "tot_optr_npc_doopliss";
+            if (out_help) *out_help = "tot_opth_npc_doopliss";
+            break;
+        case SecondaryNpcType::GRUBBA:
+            if (out_name) *out_name = "tot_optr_npc_grubba";
+            if (out_help) *out_help = "tot_opth_npc_grubba";
+            break;
+        case SecondaryNpcType::MOVER:
+            if (out_name) *out_name = "tot_optr_npc_mover";
+            if (out_help) *out_help = "tot_opth_npc_mover";
+            break;
+        case SecondaryNpcType::ZESS_T:
+            if (out_name) *out_name = "tot_optr_npc_zess";
+            if (out_help) *out_help = "tot_opth_npc_zess";
+            break;
+        case SecondaryNpcType::CHOICE_RANDOM:
+            if (out_name) *out_name = "tot_optr_npc_random";
+            if (out_help) *out_help = "tot_opth_npc_generic";
+            break;
+        case SecondaryNpcType::CHOICE_NONE:
+            if (out_name) *out_name = "tot_optr_npc_none";
+            if (out_help) *out_help = "tot_opth_npc_generic";
+            break;
+        default:
+            // Should not be reachable.
+            if (out_name) *out_name = "tot_optr_npc_none";
+            if (out_help) *out_help = "tot_optr_npc_none";
+            break;
+    }
 }
 
 }  // namespace mod::tot::gon

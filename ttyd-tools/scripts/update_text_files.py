@@ -1342,14 +1342,20 @@ g_StringMap = {
         b"tot_optr_bandit":             b"Bandit Behavior",
         b"tot_optr_bandit_flee":        b"No Refight",
         b"tot_optr_bandit_fight":       b"Forced Refight",
-        b"tot_optr_npc_wonky":          b"NPCs: Wonky",
-        b"tot_optr_npc_dazzle":         b"NPCs: Dazzle",
-        b"tot_optr_npc_chet":           b"NPCs: Chet Rippo",
-        b"tot_optr_npc_lumpy":          b"NPCs: Lumpy",
-        b"tot_optr_npc_doopliss":       b"NPCs: Doopliss",
-        b"tot_optr_npc_grubba":         b"NPCs: Grubba",
-        b"tot_optr_npc_mover":          b"NPCs: Mover",
-        b"tot_optr_npc_zess":           b"NPCs: Zess T.",
+        b"tot_optr_npc_1":              b"NPC Option 1",
+        b"tot_optr_npc_2":              b"NPC Option 2",
+        b"tot_optr_npc_3":              b"NPC Option 3",
+        b"tot_optr_npc_4":              b"NPC Option 4",
+        b"tot_optr_npc_wonky":          b"Wonky",
+        b"tot_optr_npc_dazzle":         b"Dazzle",
+        b"tot_optr_npc_chet":           b"Chet Rippo",
+        b"tot_optr_npc_lumpy":          b"Lumpy",
+        b"tot_optr_npc_doopliss":       b"Doopliss",
+        b"tot_optr_npc_grubba":         b"Grubba",
+        b"tot_optr_npc_mover":          b"Mover",
+        b"tot_optr_npc_zess":           b"Zess T.",
+        b"tot_optr_npc_random":         b"Random",
+        b"tot_optr_npc_none":           b"None",
         
         b"tot_optr_off":                b"Off",
         b"tot_optr_on":                 b"On",
@@ -1433,6 +1439,10 @@ g_StringMap = {
         b"tot_opth_bandit":
             b"What happens after finishing a\n"
             b"fight where a Bandit ran away.",
+            
+        b"tot_opth_npc_generic":
+            b"Choose which NPCs can appear\n"
+            b"on rest floors.",
             
         b"tot_opth_npc_wonky":
             b"He'll buy unwanted items or\n"

@@ -8,6 +8,9 @@
 
 namespace mod::tot::gon {
 
+int32_t GetNumSecondaryNpcTypes();
+void GetNpcMsgs(int32_t type, const char** out_name, const char** out_help);
+
 // Returns setup info for NPCs.
 // out arg0 - NPC name, arg1 - tribe name, arg2 - model (Charlieton),
 // out arg3 - NPC name, arg4 - tribe name, arg5 - model (secondary),

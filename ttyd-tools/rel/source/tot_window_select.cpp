@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
+#include "tot_gon_tower_npcs.h"
 #include "tot_manager_move.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
@@ -146,30 +147,10 @@ OptionMenuData g_OptionMenuData[] = {
     { OPTVAL_CHARLIETON_NORMAL, "tot_optr_charlie_5", nullptr, 211, false, false },
     { OPTVAL_CHARLIETON_SMALLER, "tot_optr_charlie_3", nullptr, 212, false, false },
     { OPTVAL_CHARLIETON_LIMITED, "tot_optr_charlie_lim", nullptr, 213, false, false },
-    { OPT_ENABLE_NPC_WONKY, "tot_optr_npc_wonky", "tot_opth_npc_wonky", 214, true, false },
-    { OPTVAL_NPC_WONKY_OFF, "tot_optr_off", nullptr, 215, false, false },
-    { OPTVAL_NPC_WONKY_ON, "tot_optr_on", nullptr, 216, false, false },
-    { OPT_ENABLE_NPC_DAZZLE, "tot_optr_npc_dazzle", "tot_opth_npc_dazzle", 217, true, false },
-    { OPTVAL_NPC_DAZZLE_OFF, "tot_optr_off", nullptr, 218, false, false },
-    { OPTVAL_NPC_DAZZLE_ON, "tot_optr_on", nullptr, 219, false, false },
-    { OPT_ENABLE_NPC_CHET_RIPPO, "tot_optr_npc_chet", "tot_opth_npc_chet", 220, true, false },
-    { OPTVAL_NPC_CHET_RIPPO_OFF, "tot_optr_off", nullptr, 221, false, false },
-    { OPTVAL_NPC_CHET_RIPPO_ON, "tot_optr_on", nullptr, 222, false, false },
-    { OPT_ENABLE_NPC_LUMPY, "tot_optr_npc_lumpy", "tot_opth_npc_lumpy", 223, true, false },
-    { OPTVAL_NPC_LUMPY_OFF, "tot_optr_off", nullptr, 224, false, false },
-    { OPTVAL_NPC_LUMPY_ON, "tot_optr_on", nullptr, 225, false, false },
-    { OPT_ENABLE_NPC_DOOPLISS, "tot_optr_npc_doopliss", "tot_opth_npc_doopliss", 226, true, false },
-    { OPTVAL_NPC_DOOPLISS_OFF, "tot_optr_off", nullptr, 227, false, false },
-    { OPTVAL_NPC_DOOPLISS_ON, "tot_optr_on", nullptr, 228, false, false },
-    { OPT_ENABLE_NPC_GRUBBA, "tot_optr_npc_grubba", "tot_opth_npc_grubba", 229, true, false },
-    { OPTVAL_NPC_GRUBBA_OFF, "tot_optr_off", nullptr, 230, false, false },
-    { OPTVAL_NPC_GRUBBA_ON, "tot_optr_on", nullptr, 231, false, false },
-    { OPT_ENABLE_NPC_MOVER, "tot_optr_npc_mover", "tot_opth_npc_mover", 232, true, false },
-    { OPTVAL_NPC_MOVER_OFF, "tot_optr_off", nullptr, 233, false, false },
-    { OPTVAL_NPC_MOVER_ON, "tot_optr_on", nullptr, 234, false, false },
-    { OPT_ENABLE_NPC_ZESS_T, "tot_optr_npc_zess", "tot_opth_npc_zess", 235, true, false },
-    { OPTVAL_NPC_ZESS_T_OFF, "tot_optr_off", nullptr, 236, false, false },
-    { OPTVAL_NPC_ZESS_T_ON, "tot_optr_on", nullptr, 237, false, false },
+    { OPT_NPC_CHOICE_1, "tot_optr_npc_1", nullptr, 220, true, false },
+    { OPT_NPC_CHOICE_2, "tot_optr_npc_2", nullptr, 221, true, false },
+    { OPT_NPC_CHOICE_3, "tot_optr_npc_3", nullptr, 222, true, false },
+    { OPT_NPC_CHOICE_4, "tot_optr_npc_4", nullptr, 223, true, false },
 };
 
 uint32_t OptionLookup(uint16_t lookup_key) {
@@ -296,6 +277,14 @@ const char* OptionValue(uint16_t lookup_key) {
             sprintf(buf, "%" PRId32 " / %" PRId32, met, total);
             break;
         }
+        case OPT_NPC_CHOICE_1:
+        case OPT_NPC_CHOICE_2:
+        case OPT_NPC_CHOICE_3:
+        case OPT_NPC_CHOICE_4: {
+            const char* name;
+            tot::gon::GetNpcMsgs(state.GetOption(option), &name, nullptr);
+            return msgSearch(name);
+        }
         case OPTNUM_SUPERGUARD_SP_COST: {
             int32_t value = state.GetOption(OPTNUM_SUPERGUARD_SP_COST);
             sprintf(buf, "%.02f", value * 0.01f);
@@ -371,6 +360,38 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
             } else {
                 // Change the option, wrapping around if necessary.
                 state.NextOption(option, change);
+                // Special handling for NPC options.
+                switch (option) {
+                    case OPT_NPC_CHOICE_1:
+                    case OPT_NPC_CHOICE_2:
+                    case OPT_NPC_CHOICE_3:
+                    case OPT_NPC_CHOICE_4: {
+                        // If in Half difficulty, force choice 4 to None.
+                        if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
+                            state.SetOption(
+                                OPT_NPC_CHOICE_4,
+                                tot::gon::GetNumSecondaryNpcTypes() + 1);
+                        }
+                        // Skip past duplicate NPCs.
+                        int32_t matches;
+                        do {
+                            matches = 0;
+                            int32_t cur = state.GetOption(option);
+                            if (cur < tot::gon::GetNumSecondaryNpcTypes()) {
+                                matches += 
+                                    state.GetOption(OPT_NPC_CHOICE_1) == cur ? 1 : 0;
+                                matches += 
+                                    state.GetOption(OPT_NPC_CHOICE_2) == cur ? 1 : 0;
+                                matches += 
+                                    state.GetOption(OPT_NPC_CHOICE_3) == cur ? 1 : 0;
+                                matches += 
+                                    state.GetOption(OPT_NPC_CHOICE_4) == cur ? 1 : 0;
+                                if (matches > 1)
+                                    state.NextOption(option, change);
+                            }
+                        } while (matches > 1);
+                    }
+                }
                 // Play selection sound.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
                 // Re-enforce current preset's settings, if not custom.
@@ -528,6 +549,11 @@ void DispMainWindow(WinMgrEntry* entry) {
                 if (g_Mod->state_.CheckOptionValue(OPTVAL_NO_PARTNERS) &&
                     (option == OPT_PARTNER || option == OPT_REVIVE_PARTNERS ||
                      option == OPT_PARTNER_HP)) {
+                    row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
+                }
+                // If half difficulty, grey out NPC option 4.
+                if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
+                    option == OPT_NPC_CHOICE_4) {
                     row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
                 }
             }
@@ -985,7 +1011,22 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                 help_msg = "No option selected.";
                 for (const auto& data : g_OptionMenuData) {
                     if (data.lookup_key == value) {
-                        help_msg = msgSearch(data.help_msg);
+                        switch (data.option) {
+                            case OPT_NPC_CHOICE_1:
+                            case OPT_NPC_CHOICE_2:
+                            case OPT_NPC_CHOICE_3:
+                            case OPT_NPC_CHOICE_4: {
+                                const char* help;
+                                tot::gon::GetNpcMsgs(
+                                    g_Mod->state_.GetOption(data.option),
+                                    nullptr, &help);
+                                help_msg = msgSearch(help);
+                                break;
+                            }
+                            default:
+                                help_msg = msgSearch(data.help_msg);
+                                break;
+                        }
                         break;
                     }
                 }
