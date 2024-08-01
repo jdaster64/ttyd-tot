@@ -743,17 +743,19 @@ void SelectChestContents() {
 
     // Change weights for moves based on how many partners are in the pool.
     const int32_t partner_pool_size = state.GetOption(OPT_MAX_PARTNERS);
-    if (partner_pool_size > 4) {
+    const int32_t default_pool_size =
+        state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) ? 3 : 4;
+    if (partner_pool_size > default_pool_size) {
         // Slightly increase partner weight.
-        kMoveWeights[3] += (partner_pool_size - 4) * 8;
+        kMoveWeights[3] += (partner_pool_size - default_pool_size) * 8;
         // Slightly increase overall move weight.
-        top_level_weights[0] += (partner_pool_size - 4);
-    } else if (partner_pool_size < 4) {
+        top_level_weights[0] += (partner_pool_size - default_pool_size);
+    } else if (partner_pool_size < default_pool_size) {
         // Decrease partner weight, slightly decrease Star Power weight.
-        kMoveWeights[3] *= partner_pool_size / 4;
-        kMoveWeights[2] -= 2 * (4 - partner_pool_size);
+        kMoveWeights[3] *= partner_pool_size / default_pool_size;
+        kMoveWeights[2] -= 2 * (default_pool_size - partner_pool_size);
         // Slightly decrease overall move weight.
-        top_level_weights[0] -= 1.75 * (4 - partner_pool_size);
+        top_level_weights[0] -= 1.75 * (default_pool_size - partner_pool_size);
     }
 
     // Filter out stat-ups that are forced to 0 / have reached their maximum.
