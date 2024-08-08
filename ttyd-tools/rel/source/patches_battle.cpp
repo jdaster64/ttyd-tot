@@ -1175,7 +1175,7 @@ void ReorderAndFilterWeaponTargets() {
         int32_t new_num_targets = 0;
 
         for (int32_t i = 0; i < twork.num_targets; ++i) {
-            if (battle::CheckOnSelectedSide(twork.target_indices[i])) {
+            if (battle::CheckOnSelectedSide(i)) {
                 new_indices[new_num_targets] = twork.target_indices[i];
                 ++new_num_targets;
             }
