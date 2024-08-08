@@ -878,6 +878,10 @@ g_StringMap = {
         b"tot_ptr6_megatonbomb":    b"Megaton Bomb",
         b"tot_ptr7_embargo":        b"Embargo",
         b"tot_ptr7_smokebomb":      b"Smoke Bomb",
+
+        b'msg_genkigenki':
+            b"Restores Mario and his ally's\n"
+            b'HP and FP, and cures ailments.',
             
         b"msg_super_genki":
             b"Restores Mario and his ally's\n"
@@ -949,16 +953,23 @@ g_StringMap = {
             b"Hit all enemies with a gust of\n"
             b"wind, dizzying aerial foes.",
             
+        b"msg_jyabara_jump":
+            b"Attack an enemy with a\n"
+            b"three-hit Spring Jump combo.",
+            
+        b"msg_normal_hammer":
+            b"Hit an enemy with the Hammer.",
+            
         b"msg_kaiten_hammer":
             b"Strike an enemy, knocking it\n"
             b"into the enemies behind it.",
             
         b"msg_ultra_hammer":
-            b"Strike an enemy, knocking it\n"
+            b"Hit an enemy twice, knocking it\n"
             b"into the enemies behind it.",
             
         b"msg_gatsun_naguri":
-            b"Pound an enemy with a powerful,\n"
+            b"Pound an enemy with a strong\n"
             b"defense-piercing strike.",
             
         b"msg_konran_hammer":
@@ -1225,6 +1236,499 @@ g_StringMap = {
         b"tot_movelog_used":        b"Used",
         b"tot_movelog_stylish":     b"Styl.",
         b"tot_movelog_movecount":   b"Moves",
+        
+        # Level descriptions for moves in Moves log.
+        
+        # Placeholders.
+        b"tot_movelog_d001": b"\nLv. 1: ???\n",
+        b"tot_movelog_d002": b"\nLv. 2: ???\n",
+        b"tot_movelog_d003": b"\nLv. 3: ???",
+        
+        # Jump moves.
+        b"tot_movelog_d011":
+            b"\nLv. 1: Deals 2+2 damage\n"
+            b"for no cost.",
+        b"tot_movelog_d012":
+            b"\nLv. 2: Deals 3+3 damage\n"
+            b"for 2 FP.",
+        b"tot_movelog_d013":
+            b"\nLv. 3: Deals 4+4 damage\n"
+            b"for 4 FP.",
+        b"tot_movelog_d021":
+            b"\nLv. 1: Deals 2+4 damage\n"
+            b"for 2 FP.",
+        b"tot_movelog_d022":
+            b"\nLv. 2: Deals 3+6 damage\n"
+            b"for 4 FP.",
+        b"tot_movelog_d023":
+            b"\nLv. 3: Deals 4+8 damage\n"
+            b"for 7 FP.",
+        b"tot_movelog_d031":
+            b"\nLv. 1: Deals 2+2+4 damage\n"
+            b"for 4 FP.",
+        b"tot_movelog_d032":
+            b"\nLv. 2: Deals 3+3+6 damage\n"
+            b"for 6 FP.",
+        b"tot_movelog_d033":
+            b"\nLv. 3: Deals 4+4+8 damage\n"
+            b"for 9 FP.",
+        b"tot_movelog_d041":
+            b"\nLv. 1: Deals 6 damage and\n"
+            b"3-turn -3 DEF for 2 FP.",
+        b"tot_movelog_d042":
+            b"\nLv. 2: Deals 9 damage and\n"
+            b"3-turn -3 DEF for 4 FP.",
+        b"tot_movelog_d043":
+            b"\nLv. 3: Deals 12 damage and\n"
+            b"3-turn -3 DEF for 6 FP.",
+        b"tot_movelog_d051":
+            b"\nLv. 1: Deals 2 damage to\n"
+            b"each enemy for 3 FP.",
+        b"tot_movelog_d052":
+            b"\nLv. 2: Deals 3 damage to\n"
+            b"each enemy for 4 FP.",
+        b"tot_movelog_d053":
+            b"\nLv. 3: Deals 4 damage to\n"
+            b"each enemy for 6 FP.",
+        b"tot_movelog_d061":
+            b"\nLv. 1: Deals 1 damage per\n"
+            b"hit, diminishing, for 3 FP.",
+        b"tot_movelog_d062":
+            b"\nLv. 2: Deals 2 damage per\n"
+            b"hit, diminishing, for 5 FP.",
+        b"tot_movelog_d063":
+            b"\nLv. 3: Deals 3 damage per\n"
+            b"hit, diminishing, for 7 FP.",
+        b"tot_movelog_d071":
+            b"\nLv. 1: Deals 2+2 damage and\n"
+            b"3-turn Sleep for 2 FP.",
+        b"tot_movelog_d072":
+            b"\nLv. 1: Deals 2+2 damage and\n"
+            b"5-turn Sleep for 4 FP.",
+        b"tot_movelog_d073":
+            b"\nLv. 1: Deals 2+2 damage and\n"
+            b"7-turn Sleep for 6 FP.",
+        b"tot_movelog_d081":
+            b"\nLv. 1: Deals 4 damage, and\n"
+            b"2 to all others for 3 FP.",
+        b"tot_movelog_d082":
+            b"\nLv. 2: Deals 6 damage, and\n"
+            b"3 to all others for 5 FP.",
+        b"tot_movelog_d083":
+            b"\nLv. 3: Deals 8 damage, and\n"
+            b"4 to all others for 7 FP.",
+        # Hammer moves.
+        b"tot_movelog_d111":
+            b"\n\nLv. 1: Deals 4 damage\n"
+            b"for no cost.",
+        b"tot_movelog_d112":
+            b"\nLv. 2: Deals 6 damage\n"
+            b"for 2 FP.",
+        b"tot_movelog_d113":
+            b"\nLv. 3: Deals 8 damage\n"
+            b"for 4 FP.",
+        b"tot_movelog_d121":
+            b"\nLv. 1: Deals 4 damage, and\n"
+            b"2 to foes behind for 2 FP.",
+        b"tot_movelog_d122":
+            b"\nLv. 2: Deals 6 damage, and\n"
+            b"3 to foes behind for 4 FP.",
+        b"tot_movelog_d123":
+            b"\nLv. 3: Deals 8 damage, and\n"
+            b"4 to foes behind for 6 FP.",
+        b"tot_movelog_d131":
+            b"\nLv. 1: Deals 4+4 damage, and\n"
+            b"2 to foes behind for 4 FP.",
+        b"tot_movelog_d132":
+            b"\nLv. 2: Deals 6+6 damage, and\n"
+            b"3 to foes behind for 6 FP.",
+        b"tot_movelog_d133":
+            b"\nLv. 3: Deals 8+8 damage, and\n"
+            b"4 to foes behind for 9 FP.",
+        b"tot_movelog_d141":
+            b"\nLv. 1: Deals 6 DEF-piercing\n"
+            b"damage for 2 FP.",
+        b"tot_movelog_d142":
+            b"\nLv. 2: Deals 9 DEF-piercing\n"
+            b"damage for 4 FP.",
+        b"tot_movelog_d143":
+            b"\nLv. 3: Deals 12 DEF-piercing\n"
+            b"damage for 6 FP.",
+        b"tot_movelog_d151":
+            b"\nLv. 1: Deals 4 damage and\n"
+            b"2-turn Shrink for 2 FP.",
+        b"tot_movelog_d152":
+            b"\nLv. 2: Deals 4 damage and\n"
+            b"3-turn Shrink for 4 FP.",
+        b"tot_movelog_d153":
+            b"\nLv. 3: Deals 4 damage and\n"
+            b"4-turn Shrink for 6 FP.",
+        b"tot_movelog_d161":
+            b"\nLv. 1: Deals 4 damage and\n"
+            b"2-turn Freeze for 3 FP.",
+        b"tot_movelog_d162":
+            b"\nLv. 2: Deals 4 damage and\n"
+            b"3-turn Freeze for 5 FP.",
+        b"tot_movelog_d163":
+            b"\nLv. 3: Deals 4 damage and\n"
+            b"4-turn Freeze for 7 FP.",
+        b"tot_movelog_d171":
+            b"\nLv. 1: Deals 2 damage to\n"
+            b"grounded enemies for 3 FP.",
+        b"tot_movelog_d172":
+            b"\nLv. 2: Deals 4 damage to\n"
+            b"grounded enemies for 5 FP.",
+        b"tot_movelog_d173":
+            b"\nLv. 3: Deals 6 damage to\n"
+            b"grounded enemies for 7 FP.",
+        b"tot_movelog_d181":
+            b"\nLv. 1: Hits for 3 (diminishing)\n"
+            b"and 3-turn Burn for 3 FP.",
+        b"tot_movelog_d182":
+            b"\nLv. 2: Hits for 5 (diminishing)\n"
+            b"and 3-turn Burn for 5 FP.",
+        b"tot_movelog_d183":
+            b"\nLv. 3: Hits for 7 (diminishing)\n"
+            b"and 3-turn Burn for 7 FP.",
+        # Special moves.
+        b"tot_movelog_d211":
+            b"\nLv. 1: Heal up to 7 HP apiece\n"
+            b"and 8 FP, for 1 SP.",
+        b"tot_movelog_d212":
+            b"\nLv. 2: Heal up to 15 HP apiece\n"
+            b"and 14 FP, for 2 SP.",
+        b"tot_movelog_d213":
+            b"\nLv. 3: Heal up to 24 HP apiece\n"
+            b"and 21 FP, for 3 SP.",
+        b"tot_movelog_d221":
+            b"\nLv. 1: Deals 1 damage + 1 / bar,\n"
+            b"up to a total of 4, for 1 SP.",
+        b"tot_movelog_d222":
+            b"\nLv. 2: Deals 2 damage + 1 / bar,\n"
+            b"up to a total of 6, for 2 SP.",
+        b"tot_movelog_d223":
+            b"\nLv. 3: Deals 3 damage + 1 / bar,\n"
+            b"up to a total of 8, for 3 SP.",
+        b"tot_movelog_d231":
+            b"\nLv. 1: Stops enemies and slows\n"
+            b"bosses for 2 turns, for 2 SP.",
+        b"tot_movelog_d232":
+            b"\nLv. 2: Stops enemies and slows\n"
+            b"bosses for 3 turns, for 3 SP.",
+        b"tot_movelog_d233":
+            b"\nLv. 3: Stops enemies and slows\n"
+            b"bosses for 4 turns, for 4 SP.",
+        b"tot_movelog_d241":
+            b"\nLv. 1: Earn +1 ATK or DEF per\n"
+            b"6 arrows shot, for 2 SP.",
+        b"tot_movelog_d242":
+            b"\nLv. 2: Earn +1 ATK or DEF per\n"
+            b"5 arrows shot, for 3 SP.",
+        b"tot_movelog_d243":
+            b"\nLv. 3: Earn +1 ATK or DEF per\n"
+            b"4 arrows shot, for 4 SP.",
+        b"tot_movelog_d251":
+            b"\nLv. 1: Deal up to 2 damage per\n"
+            b"enemy encircled, for 3 SP.",
+        b"tot_movelog_d252":
+            b"\nLv. 2: Deal up to 3 damage per\n"
+            b"enemy encircled, for 5 SP.",
+        b"tot_movelog_d253":
+            b"\nLv. 3: Deal up to 4 damage per\n"
+            b"enemy encircled, for 6 SP.",
+        b"tot_movelog_d261":
+            b"\nLv. 1: Heal about 3-4 HP and\n"
+            b"FP for 5 turns, for 2 SP.",
+        b"tot_movelog_d262":
+            b"\nLv. 2: Heal about 4-6 HP and\n"
+            b"FP for 5 turns, for 3 SP.",
+        b"tot_movelog_d263":
+            b"\nLv. 3: Heal about 5-7 HP and\n"
+            b"FP for 5 turns, for 5 SP.",
+        b"tot_movelog_d271":
+            b"\nLv. 1: Instantly defeat foes\n"
+            b"with a 65% base rate for 2 SP.",
+        b"tot_movelog_d272":
+            b"\nLv. 2: Instantly defeat foes\n"
+            b"with a 90% base rate for 4 SP.",
+        b"tot_movelog_d273":
+            b"\nLv. 3: Instantly defeat foes\n"
+            b"with a 115% base rate for 5 SP.",
+        b"tot_movelog_d281":
+            b"\nLv. 1: Deal up to 10 damage\n"
+            b"to all foes for 4 SP.",
+        b"tot_movelog_d282":
+            b"\nLv. 2: Deal up to 20 damage\n"
+            b"to all foes for 6 SP.",
+        b"tot_movelog_d283":
+            b"\nLv. 3: Deal up to 30 damage\n"
+            b"to all foes for 7 SP.",
+        # Goombella moves.
+        b"tot_movelog_d311":
+            b"\nLv. 1: Deals 2+2 damage\n"
+            b"for no cost.",
+        b"tot_movelog_d312":
+            b"\nLv. 2: Deals 3+3 damage\n"
+            b"for 2 FP.",
+        b"tot_movelog_d313":
+            b"\nLv. 3: Deals 4+4 damage\n"
+            b"for 4 FP.",
+        b"tot_movelog_d331":
+            b"\nLv. 1: Deals 2+2 DEF-piercing\n"
+            b"damage for 2 FP.",
+        b"tot_movelog_d332":
+            b"\nLv. 2: Deals 3+3 DEF-piercing\n"
+            b"damage for 4 FP.",
+        b"tot_movelog_d333":
+            b"\nLv. 3: Deals 4+4 DEF-piercing\n"
+            b"damage for 6 FP.",
+        b"tot_movelog_d341":
+            b"\nLv. 1: Ensures the next attack\n"
+            b"against the target will land.",
+        b"tot_movelog_d342":
+            b"\nLv. 2: Ensures the next attack\n"
+            b"will land and inflict its status.",
+        b"tot_movelog_d351":
+            b"\nLv. 1: Deals 1 damage per\n"
+            b"hit, diminishing, for 3 FP.",
+        b"tot_movelog_d352":
+            b"\nLv. 2: Deals 2 damage per\n"
+            b"hit, diminishing, for 5 FP.",
+        b"tot_movelog_d353":
+            b"\nLv. 3: Deals 3 damage per\n"
+            b"hit, diminishing, for 7 FP.",
+        # Koops moves.
+        b"tot_movelog_d411":
+            b"\nLv. 1: Deals 3 damage\n"
+            b"for no cost.",
+        b"tot_movelog_d412":
+            b"\nLv. 2: Deals 5 damage\n"
+            b"for 2 FP.",
+        b"tot_movelog_d413":
+            b"\nLv. 3: Deals 8 damage\n"
+            b"for 4 FP.",
+        b"tot_movelog_d421":
+            b"\nLv. 1: Deals 2 damage to\n"
+            b"grounded foes for 3 FP.",
+        b"tot_movelog_d422":
+            b"\nLv. 2: Deals 3 damage to\n"
+            b"grounded foes for 4 FP.",
+        b"tot_movelog_d423":
+            b"\nLv. 3: Deals 5 damage to\n"
+            b"grounded foes for 6 FP.",
+        b"tot_movelog_d441":
+            b"\nLv. 1: Shields Mario for\n"
+            b"up to two hits for 4 FP.",
+        b"tot_movelog_d442":
+            b"\nLv. 2: Shields Mario for\n"
+            b"up to three hits for 6 FP.",
+        b"tot_movelog_d443":
+            b"\nLv. 3: Shields Mario for\n"
+            b"up to four hits for 8 FP.",
+        b"tot_movelog_d451":
+            b"\nLv. 1: Gives +2 ATK and DEF\n"
+            b"for up to four turns for 3 FP.",
+        b"tot_movelog_d452":
+            b"\nLv. 2: Gives +3 ATK and DEF\n"
+            b"for up to four turns for 6 FP.",
+        b"tot_movelog_d453":
+            b"\nLv. 3: Gives +4 ATK and DEF\n"
+            b"for up to four turns for 9 FP.",
+        b"tot_movelog_d461":
+            b"\nLv. 1: Deals 4 piercing damage\n"
+            b"to grounded foes for 5 FP.",
+        b"tot_movelog_d462":
+            b"\nLv. 2: Deals 6 piercing damage\n"
+            b"to grounded foes for 7 FP.",
+        b"tot_movelog_d463":
+            b"\nLv. 3: Deals 8 piercing damage\n"
+            b"to grounded foes for 9 FP.",
+        # Flurrie moves.
+        b"tot_movelog_d511":
+            b"\nLv. 1: Deals 3 damage\n"
+            b"for no cost.",
+        b"tot_movelog_d512":
+            b"\nLv. 2: Deals 5 damage\n"
+            b"for 2 FP.",
+        b"tot_movelog_d513":
+            b"\nLv. 3: Deals 8 damage\n"
+            b"for 4 FP.",
+        b"tot_movelog_d531":
+            b"\nLv. 1: Drains 4 HP from an\n"
+            b"enemy for 3 FP.",
+        b"tot_movelog_d532":
+            b"\nLv. 2: Drains 6 HP from an\n"
+            b"enemy for 5 FP.",
+        b"tot_movelog_d533":
+            b"\nLv. 3: Drains 8 HP from an\n"
+            b"enemy for 7 FP.",
+        b"tot_movelog_d551":
+            b"\nLv. 1: Deals 3 piercing damage\n"
+            b"and 1-turn Freeze for 5 FP.",
+        b"tot_movelog_d552":
+            b"\nLv. 2: Deals 4 piercing damage\n"
+            b"and 2-turn Freeze for 7 FP.",
+        b"tot_movelog_d553":
+            b"\nLv. 3: Deals 5 piercing damage\n"
+            b"and 3-turn Freeze for 9 FP.",
+        # Yoshi moves.
+        b"tot_movelog_d611":
+            b"\nLv. 1: Hits up to 4 times for\n"
+            b"diminishing damage for no cost.",
+        b"tot_movelog_d612":
+            b"\nLv. 2: Hits up to 5 times for\n"
+            b"diminishing damage for 2 FP.",
+        b"tot_movelog_d613":
+            b"\nLv. 3: Hits up to 6 times for\n"
+            b"diminishing damage for 4 FP.",
+        b"tot_movelog_d621":
+            b"\nLv. 1: Deals 4 damage, and\n"
+            b"2 to foes behind for 2 FP.",
+        b"tot_movelog_d622":
+            b"\nLv. 2: Deals 6 damage, and\n"
+            b"3 to foes behind for 4 FP.",
+        b"tot_movelog_d623":
+            b"\nLv. 3: Deals 8 damage, and\n"
+            b"4 to foes behind for 6 FP.",
+        b"tot_movelog_d631":
+            b"\nLv. 1: Toss up to 3 eggs\n"
+            b"for 2 damage for 3 FP.",
+        b"tot_movelog_d632":
+            b"\nLv. 2: Toss up to 4 eggs\n"
+            b"for 2 damage for 5 FP.",
+        b"tot_movelog_d633":
+            b"\nLv. 3: Toss up to 5 eggs\n"
+            b"for 2 damage for 7 FP.",
+        b"tot_movelog_d651":
+            b"\nLv. 1: Toss up to 2 eggs\n"
+            b"for 3-turn Shrink for 3 FP.",
+        b"tot_movelog_d652":
+            b"\nLv. 2: Toss up to 3 eggs\n"
+            b"for 3-turn Shrink for 4 FP.",
+        b"tot_movelog_d653":
+            b"\nLv. 3: Toss up to 4 eggs\n"
+            b"for 3-turn Shrink for 5 FP.",
+        b"tot_movelog_d661":
+            b"\nLv. 1: Hits up to 4 times for\n"
+            b"diminishing damage for 4 FP.",
+        b"tot_movelog_d662":
+            b"\nLv. 2: Hits up to 5 times for\n"
+            b"diminishing damage for 6 FP.",
+        b"tot_movelog_d663":
+            b"\nLv. 3: Hits up to 6 times for\n"
+            b"diminishing damage for 8 FP.",
+        # Vivian moves.
+        b"tot_movelog_d711":
+            b"\nLv. 1: Deals 3 damage and\n"
+            b"2-turn Burn for no cost.",
+        b"tot_movelog_d712":
+            b"\nLv. 2: Deals 5 damage and\n"
+            b"2-turn Burn for 2 FP.",
+        b"tot_movelog_d713":
+            b"\nLv. 3: Deals 7 damage and\n"
+            b"2-turn Burn for 4 FP.",
+        b"tot_movelog_d721":
+            b"\nLv. 1: Inflicts 3-turn Slow\n"
+            b"on a single enemy for 2 FP.",
+        b"tot_movelog_d722":
+            b"\nLv. 2: Inflicts 3-turn Slow\n"
+            b"on all enemies for 5 FP.",
+        b"tot_movelog_d731":
+            b"\nLv. 1: Inflicts 3-turn Allergic\n"
+            b"on any single target for 2 FP.",
+        b"tot_movelog_d732":
+            b"\nLv. 2: Inflicts 3-turn Allergic\n"
+            b"on either side for 5 FP.",
+        b"tot_movelog_d741":
+            b"\nLv. 1: Hide for a turn, and skip\n"
+            b"the next turn, for 1 FP.",
+        b"tot_movelog_d742":
+            b"\nLv. 2: Hide for a turn, and grant\n"
+            b"Mario an extra move, for 6 FP.",
+        b"tot_movelog_d751":
+            b"\nLv. 1: Deals 3 piercing damage\n"
+            b"and 3-turn Burn for 4 FP.",
+        b"tot_movelog_d752":
+            b"\nLv. 2: Deals 5 piercing damage\n"
+            b"and 3-turn Burn for 6 FP.",
+        b"tot_movelog_d753":
+            b"\nLv. 3: Deals 7 piercing damage\n"
+            b"and 3-turn Burn for 8 FP.",
+        # Bobbery moves.
+        b"tot_movelog_d811":
+            b"\nLv. 1: Deals 3 damage\n"
+            b"for no cost.",
+        b"tot_movelog_d812":
+            b"\nLv. 2: Deals 5 damage\n"
+            b"for 2 FP.",
+        b"tot_movelog_d813":
+            b"\nLv. 3: Deals 8 damage\n"
+            b"for 4 FP.",
+        b"tot_movelog_d821":
+            b"\nLv. 1: Throw two bombs for\n"
+            b"3 piercing damage, for 2 FP.",
+        b"tot_movelog_d822":
+            b"\nLv. 2: Throw three bombs for\n"
+            b"3 piercing damage, for 4 FP.",
+        b"tot_movelog_d823":
+            b"\nLv. 3: Throw four bombs for\n"
+            b"3 piercing damage, for 6 FP.",
+        b"tot_movelog_d841":
+            b"\nLv. 1: Throw two bombs, which\n"
+            b"inflict 5-Turn Poison, for 3 FP.",
+        b"tot_movelog_d842":
+            b"\nLv. 2: Throw three bombs, which\n"
+            b"inflict 5-Turn Poison, for 5 FP.",
+        b"tot_movelog_d843":
+            b"\nLv. 3: Throw four bombs, which\n"
+            b"inflict 5-Turn Poison, for 7 FP.",
+        b"tot_movelog_d851":
+            b"\nLv. 1: Deals 5 damage to all\n"
+            b"enemies for 6 FP.",
+        b"tot_movelog_d852":
+            b"\nLv. 2: Deals 7 damage to all\n"
+            b"enemies for 8 FP.",
+        b"tot_movelog_d853":
+            b"\nLv. 3: Deals 9 damage to all\n"
+            b"enemies for 10 FP.",
+        # Ms. Mowz moves.
+        b"tot_movelog_d911":
+            b"\nLv. 1: Deals 3 piercing hits for\n"
+            b"diminishing damage for no cost.",
+        b"tot_movelog_d912":
+            b"\nLv. 2: Deals 4 piercing hits for\n"
+            b"diminishing damage for 2 FP.",
+        b"tot_movelog_d913":
+            b"\nLv. 3: Deals 5 piercing hits for\n"
+            b"diminishing damage for 4 FP.",
+        b"tot_movelog_d931":
+            b"\nLv. 1: 2-turn Confuse, with a\n"
+            b"failed act rate of 50% for 2 FP.",
+        b"tot_movelog_d932":
+            b"\nLv. 2: 2-turn Confuse, with a\n"
+            b"failed act rate of 70% for 4 FP.",
+        b"tot_movelog_d933":
+            b"\nLv. 3: 2-turn Confuse, with a\n"
+            b"failed act rate of 90% for 7 FP.",
+        b"tot_movelog_d951":
+            b"\nLv. 1: Deals 3 piercing damage\n"
+            b"and 50% 1-turn Dizzy for 4 FP.",
+        b"tot_movelog_d952":
+            b"\nLv. 2: Deals 4 piercing damage\n"
+            b"and 50% 1-turn Dizzy for 5 FP.",
+        b"tot_movelog_d953":
+            b"\nLv. 3: Deals 5 piercing damage\n"
+            b"and 50% 1-turn Dizzy for 6 FP.",
+        b"tot_movelog_d961":
+            b"\nLv. 1: Heal up to 5 HP for\n"
+            b"both Mario and Mowz for 4 FP.",
+        b"tot_movelog_d962":
+            b"\nLv. 2: Heal up to 10 HP for\n"
+            b"both Mario and Mowz for 7 FP.",
+        b"tot_movelog_d963":
+            b"\nLv. 3: Heal up to 15 HP for\n"
+            b"both Mario and Mowz for 10 FP.",
+        
         
         # Enemy names + Tattle info (TODO)
         

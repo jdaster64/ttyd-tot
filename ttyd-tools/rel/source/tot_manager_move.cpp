@@ -28,6 +28,7 @@ using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::battle_unit::BattleWorkUnitPart;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
+using ::ttyd::msgdrv::msgSearch;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
@@ -110,6 +111,31 @@ const MoveData g_MoveData[] = {
     { { 1, 1, 1 }, 1, 1, -1, IconType::DEFEND_BADGE, "in_toughen_up", "tot_toughen_up_abb", "tot_msg_dummy", "tot_msg_dummy", "tot_msg_dummy", },
     { { 1, 1, 1 }, 1, 1, -1, IconType::DEFEND_BADGE, "in_toughen_up", "tot_toughen_up_abb", "tot_msg_dummy", "tot_msg_dummy", "tot_msg_dummy", },
 }; 
+
+const char* GetLogMoveLevelDesc(int32_t move_type, int32_t level) {
+    char buf[20];
+    int32_t move_class = move_type < MoveType::GOOMBELLA_BASE
+        ? move_type / 8 : move_type / 6 - 1;
+    int32_t move_class_idx = move_type < MoveType::GOOMBELLA_BASE
+        ? move_type + 1 - move_class * 8 : move_type + 1 - (move_class + 1) * 6;
+    if (level > g_MoveData[move_type].max_level || g_MoveData[move_type].max_level == 1) {
+        // Level does not exist or no distinguishing needed; return empty string.
+        return "";
+    } else if (
+        // Never unlocked; return 00X placeholder that always says "Lv. X: ???".
+        (level == 2 && !(g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG) 
+            & MoveLogFlags::UNLOCKED_LV_2)) ||
+        (level == 3 && !(g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG)
+            & MoveLogFlags::UNLOCKED_LV_3))) {
+        move_class = 0;
+        move_class_idx = 0;
+    }
+
+    sprintf(
+        buf, "tot_movelog_d%" PRId32 "%" PRId32 "%" PRId32, 
+        move_class, move_class_idx, level);
+    return msgSearch(buf);
+}
 
 void MoveManager::Init() {
     // Set unlocked levels of moves.
@@ -290,8 +316,8 @@ bool MoveManager::GetCurrentSelectionString(int32_t move_type, char* out_buf) {
     // Shorten move's name, if there's a short name available.
     const char* move_name =
         g_MoveData[move_type].abbrev_msg
-            ? ttyd::msgdrv::msgSearch(g_MoveData[move_type].abbrev_msg)
-            : ttyd::msgdrv::msgSearch(g_MoveData[move_type].name_msg);
+            ? msgSearch(g_MoveData[move_type].abbrev_msg)
+            : msgSearch(g_MoveData[move_type].name_msg);
     sprintf(
         out_buf, "%s Lv. %" PRId8, move_name, GetSelectedLevel(move_type));
     return true;
@@ -329,6 +355,17 @@ void MoveManager::LogMoveStylish(int32_t move_type, uint32_t stylish_flags) {
     uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move_type);
     value |= stylish_flags ? stylish_flags : MoveLogFlags::STYLISH_ALL;
     g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, value, move_type);
+}
+
+const char* MoveManager::GetLogDescription(int32_t move_type) {
+    static char buf[1024];
+    sprintf(
+        buf, "%s%s%s%s",
+        msgSearch(g_MoveData[move_type].desc_msg),
+        GetLogMoveLevelDesc(move_type, 1),
+        GetLogMoveLevelDesc(move_type, 2),
+        GetLogMoveLevelDesc(move_type, 3));
+    return buf;
 }
 
 uint32_t GetWeaponPowerFromSelectedLevel(

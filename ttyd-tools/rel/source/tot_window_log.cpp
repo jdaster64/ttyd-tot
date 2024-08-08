@@ -976,6 +976,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 page_number < 3 ? page_number * 8 : (page_number + 1) * 6;
             int32_t page_cur_entry =
                 menu->move_log_cursor_idx - page_first_entry;
+            int32_t last_pos = menu->move_log_cursor_idx;
 
             if (menu->buttons_pressed & ButtonId::START) {
                 return -2;
@@ -989,10 +990,18 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
                 if (--menu->move_log_cursor_idx < 0)
                     menu->move_log_cursor_idx = 0;
+                if (last_pos != menu->move_log_cursor_idx) {
+                    // Force an update.
+                    ttyd::win_root::winMsgEntry(menu, 0, "", 0);
+                }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
                 if (++menu->move_log_cursor_idx >= num_moves)
                     menu->move_log_cursor_idx = num_moves - 1;
+                if (last_pos != menu->move_log_cursor_idx) {
+                    // Force an update.
+                    ttyd::win_root::winMsgEntry(menu, 0, "", 0);
+                }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if ((menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) ||
                        (menu->buttons_repeated & ButtonId::L)) {
@@ -1001,6 +1010,10 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     page_number < 3 ? page_number * 8 : (page_number + 1) * 6;
                 menu->move_log_cursor_idx = page_first_entry;
                 page_cur_entry = 0;
+                if (last_pos != menu->move_log_cursor_idx) {
+                    // Force an update.
+                    ttyd::win_root::winMsgEntry(menu, 0, "", 0);
+                }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if ((menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) ||
                        (menu->buttons_repeated & ButtonId::R)) {
@@ -1009,24 +1022,26 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     page_number < 3 ? page_number * 8 : (page_number + 1) * 6;
                 menu->move_log_cursor_idx = page_first_entry;
                 page_cur_entry = 0;
+                if (last_pos != menu->move_log_cursor_idx) {
+                    // Force an update.
+                    ttyd::win_root::winMsgEntry(menu, 0, "", 0);
+                }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             }
 
             // Set window description based on hovered move.
-            ttyd::win_root::winMsgEntry(menu, 0, "msg_menu_stone_none_help", 0);
-
             uint32_t partner_flags =
                 g_Mod->state_.GetOption(STAT_PERM_PARTNERS_OBTAINED);
             uint32_t move_flags =
                 g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, menu->move_log_cursor_idx);
-            // Skip non-unlocked moves or moves for non-unlocked partners.
             if ((move_flags & MoveLogFlags::UNLOCKED_LV_1) &&
                 (page_number < 3 || (partner_flags & (1 << (page_number - 2))))) {
-                // TODO: Full description, with levels.
-                ttyd::win_root::winMsgEntry(
-                    menu, 0,
-                    MoveManager::GetMoveData(menu->move_log_cursor_idx)->desc_msg,
-                    0);
+                // Create dynamic lookup key, so move description can
+                // change to include move level information as levels unlock.
+                ttyd::win_root::winMsgEntry(menu, 0, "tot_movelog_desc_dyn", 0);
+            } else {
+                // Skip non-unlocked moves or moves for non-unlocked partners.
+                ttyd::win_root::winMsgEntry(menu, 0, "msg_menu_stone_none_help", 0);
             }
 
             // Set cursor position based on selected entry.

@@ -25,6 +25,7 @@ namespace MsgKey {
         CUSTOM_TATTLE_MENU,
         MENU_MONOSIRI_DERUTOKORO,
         SYS_NO_KEY,
+        TOT_MOVELOG_DESC_DYN,
     };
 }
     
@@ -38,6 +39,7 @@ constexpr const char* kKeyLookups[] = {
     "custom_tattle_menu",
     "menu_monosiri_derutokoro",
     "sys_no_key",
+    "tot_movelog_desc_dyn",
 };
 
 }
@@ -74,8 +76,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
     
     if (!found) return nullptr;
     
-    // Order of case statements shouldn't matter, but consider either
-    // ordering them alphabetically or putting logically similar ones together?
+    // Order of case statements doesn't matter.
     switch (idx) {
         case MsgKey::CUSTOM_TATTLE_BATTLE:
         case MsgKey::CUSTOM_TATTLE_MENU:
@@ -91,10 +92,17 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                     g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, idx), ptr);
                 return buf;
             }
+            break;
         }
         case MsgKey::MENU_MONOSIRI_DERUTOKORO:
             // Get rid of extra spacing before location in Tattle log.
             return "";
+        case MsgKey::TOT_MOVELOG_DESC_DYN:
+            if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
+                int32_t move = menu->move_log_cursor_idx;
+                return tot::MoveManager::GetLogDescription(move);
+            }
+            break;
         case MsgKey::SYS_NO_KEY:
             // Swap out "it's locked" message with more descriptive strings.
             if (GetSWByte(tot::GSW_Tower_DisplayChestIcons)) {

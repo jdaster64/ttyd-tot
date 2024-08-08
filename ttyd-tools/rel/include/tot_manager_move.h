@@ -179,6 +179,8 @@ public:
     static void LogMoveUnlock(int32_t move_type, int32_t level);
     static void LogMoveUse(int32_t move_type);
     static void LogMoveStylish(int32_t move_type, uint32_t stylish_flags = 0);
+    // Returns the description of a move in the Move Log, including level info.
+    static const char* GetLogDescription(int32_t move_type);
 };
 
 // battle_weapon_power-like interface for scaling ATK based on a move.
