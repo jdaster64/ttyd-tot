@@ -43,6 +43,7 @@ namespace PartsAttribute_Flags = ::ttyd::battle_unit::PartsAttribute_Flags;
 }
 
 // Function hooks.
+extern int32_t (*g_BtlUnit_Delete_trampoline)(BattleWorkUnit* unit);
 extern BattleWorkUnit* (*g_BtlUnit_Entry_trampoline)(BattleUnitSetup*);
 extern bool (*g_BattleCheckEndUnitInitEvent_trampoline)(BattleWork*);
 extern int32_t (*g_btlevtcmd_SetEventAttack_trampoline)(EvtEntry*, bool);
@@ -204,6 +205,18 @@ void ApplyFixedPatches() {
             BattleWorkUnit* unit = g_BtlUnit_Entry_trampoline(unit_setup);
             ApplyMidbossStats(unit);
             return unit;
+        });
+
+    // Track enemy kills on deletion.
+    g_BtlUnit_Delete_trampoline = patch::hookFunction(
+        ttyd::battle_unit::BtlUnit_Delete, [](BattleWorkUnit* unit) {
+            int32_t tattle_idx = tot::GetCustomTattleIndex(unit->true_kind);
+            if (tattle_idx >= 0 &&
+                g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, tattle_idx) < 9999) {
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_KILLS, 1, tattle_idx);
+            }
+            // Run original logic.
+            return g_BtlUnit_Delete_trampoline(unit);
         });
         
     g_btlevtcmd_ConsumeItem_trampoline = patch::hookFunction(

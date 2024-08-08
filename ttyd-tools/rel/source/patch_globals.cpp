@@ -148,6 +148,8 @@ int32_t (*g_BtlUnit_GetWeaponCost_trampoline)(BattleWorkUnit*, BattleWeapon*) = 
 int32_t (*g_BtlUnit_GetCoin_trampoline)(BattleWorkUnit*) = nullptr;
 // battle_unit.o  80127890
 uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(BattleWorkUnit*, int8_t) = nullptr;
+// battle_unit.o  80128e08
+int32_t (*g_BtlUnit_Delete_trampoline)(BattleWorkUnit* unit) = nullptr;
 // battle_unit.o  80128fe0
 BattleWorkUnit* (*g_BtlUnit_Entry_trampoline)(BattleUnitSetup*) = nullptr;
 // battle_unit_event.o  80129994

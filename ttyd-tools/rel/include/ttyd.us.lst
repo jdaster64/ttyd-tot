@@ -2158,6 +2158,7 @@
 80128c7c:BtlUnit_GetPos
 80128c98:BtlUnit_GetBodyPartsId
 80128cd8:BtlUnit_GetPartsPtr
+80128e08:BtlUnit_Delete
 80128fe0:BtlUnit_Entry
 
 // battle_unit_event.o

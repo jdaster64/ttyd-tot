@@ -575,7 +575,7 @@ int32_t BtlUnit_GetBodyPartsId(BattleWorkUnit* unit);
 BattleWorkUnitPart* BtlUnit_GetPartsPtr(BattleWorkUnit* unit, int part_idx);
 // BtlUnit_GetUnitId
 // BtlUnit_Spawn
-// BtlUnit_Delete
+int32_t BtlUnit_Delete(BattleWorkUnit* unit);
 BattleWorkUnit* BtlUnit_Entry(
     battle_database_common::BattleUnitSetup* unit_setup);
 // BtlUnit_Init
