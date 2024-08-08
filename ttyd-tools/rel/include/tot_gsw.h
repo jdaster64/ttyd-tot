@@ -17,10 +17,6 @@ enum GlobalWorkVars {
     GSW_Battle_AtomicBoo_BreathGuardCount,
     GSW_Battle_Hooktail_BiteReactionSeen,
 
-    // Used for tracking things that persist across runs.
-    GSW_Enemy_Defeated_Count                = GSW(1500),
-    GSW_Enemy_Defeated_Count_End            = GSW_Enemy_Defeated_Count + 110*2,
-
     // Flags used for tower progression.
     GSWF_Chest_0                            = GSWF(6000),
     GSWF_Chest_1,
@@ -40,7 +36,9 @@ enum GlobalWorkVars {
     GSWF_AttackFxFlags                      = GSWF(7500),
     GSWF_AttackFxFlags_End                  = GSWF_AttackFxFlags + 30,
     GSWF_YoshiColors                        = GSWF_AttackFxFlags_End,
-    GSWF_YoshiColors_End                    = GSWF_YoshiColors + 16,
+    GSWF_YoshiColors_End                    = GSWF_YoshiColors + 30,
+    GSWF_MarioColors                        = GSWF_YoshiColors_End,
+    GSWF_MarioColors_End                    = GSWF_MarioColors + 30,
 };
 
 // Wrappers to ttyd::swdrv functions that handle base conversion.

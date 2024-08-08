@@ -134,6 +134,7 @@ using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_unit;
 
 using ::ttyd::battle::BattleWork;
+using ::ttyd::battle::BattleWorkCommand;
 using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_damage::CounterattackWork;
 using ::ttyd::evtmgr::EvtEntry;
@@ -175,6 +176,7 @@ extern void (*g_BattleDamageDirect_trampoline)(
 extern int32_t (*g_btlevtcmd_GetSelectEnemy_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool);
 extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
+extern void (*g__btlcmd_SetAttackEvent_trampoline)(BattleWorkUnit*, BattleWorkCommand*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
 extern void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*);
@@ -1573,6 +1575,31 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g__btlcmd_MakeOperationTable_Patch_NoSuperCharge),
         0x480000b8U /* unconditional branch */);
+
+    // Track first use of moves at every level.
+    g__btlcmd_SetAttackEvent_trampoline = patch::hookFunction(
+        ttyd::battle_seq_command::_btlcmd_SetAttackEvent,
+        [](BattleWorkUnit* unit, BattleWorkCommand* command_work) {
+            // Run vanilla logic.
+            g__btlcmd_SetAttackEvent_trampoline(unit, command_work);
+
+            // Track the player having used jump/hammer, Special, partner moves.
+            switch (command_work->current_cursor_type) {
+                case 0:
+                case 1:
+                case 4:
+                case 6:
+                    break;
+                default:
+                    return;
+            }
+            ttyd::battle::BattleWorkCommandCursor* cursor;
+            ttyd::battle_seq_command::_btlcmd_GetCursorPtr(
+                command_work, command_work->current_cursor_type, &cursor);
+            const int32_t move_type = 
+                command_work->weapon_table[cursor->abs_position].index;
+            tot::MoveManager::LogMoveUse(move_type);
+        });
         
     // Quick Change FP cost:
     // Signal that party switch was initiated by the player.

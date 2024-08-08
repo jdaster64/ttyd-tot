@@ -59,10 +59,10 @@ public:
     
     // Permanent tracking data.
     uint32_t    achievement_flags_[4];
-    uint32_t    move_encountered_flags_[4];
+    uint32_t    option_unlocked_flags_[4];
     uint32_t    item_encountered_flags_[8];
     uint32_t    item_purchased_flags_[8];
-    uint32_t    option_unlocked_flags_[4];
+    uint32_t    reserved_flags_[4];
     
     // Saves various stats for current runs and all-time.
     uint8_t     play_stats_[1024];
@@ -236,10 +236,9 @@ enum OptionsType {
     TYPE_OPTVAL                 = 5,
     TYPE_OPTNUM                 = 6,
     TYPE_FLAGS_ACHIEVEMENT      = 7,
-    TYPE_FLAGS_MOVE_ENCOUNTERED = 8,
+    TYPE_FLAGS_OPT_UNLOCKED     = 8,
     TYPE_FLAGS_ITEM_ENCOUNTERED = 9,
     TYPE_FLAGS_ITEM_PURCHASED   = 10,
-    TYPE_FLAGS_OPT_UNLOCKED     = 11,
 };
 
 // An enumeration of all options (flags, option values, numeric values), 
@@ -387,12 +386,13 @@ enum Options : uint32_t {
     // Different types of boolean tracking flags.
     // Can only be set to true; bitwise OR the value or just use 'value' param.
     FLAGS_ACHIEVEMENT           = 0x700'0'00'00,
-    FLAGS_MOVE_ENCOUNTERED      = 0x800'0'00'00U,
+    FLAGS_OPTION_UNLOCKED       = 0x800'0'00'00U,
     FLAGS_ITEM_ENCOUNTERED      = 0x900'0'00'00U,
     FLAGS_ITEM_PURCHASED        = 0xa00'0'00'00U,
-    FLAGS_OPTION_UNLOCKED       = 0xb00'0'00'00U,
     
     // Play stats.
+
+    // Stats reset per run.
     STAT_RUN_TURNS_SPENT        = 0x000'3'01'06,
     STAT_RUN_MOST_TURNS_RECORD  = 0x003'2'01'04,
     STAT_RUN_MOST_TURNS_CURRENT = 0x005'2'01'04,
@@ -424,9 +424,14 @@ enum Options : uint32_t {
     STAT_RUN_UNIQUE_BADGE_FLAGS = 0x03d'1'00'0a,
     STAT_RUN_MIDBOSSES_USED     = 0x047'1'00'07,
     STAT_RUN_CONTINUES          = 0x04e'2'01'03,
-
     // Next: 0x050
-    // TODO: Add versions of most stats that persist across runs.
+
+    // Stats that persist across runs.
+    // TODO: Add analogs to above stats, etc.
+    STAT_PERM_ENEMY_KILLS       = 0x100'2'00'70,
+    STAT_PERM_MOVE_LOG          = 0x1e0'1'00'42,
+    STAT_PERM_PARTNERS_OBTAINED = 0x222'1'00'00,
+    // Next: 0x223
 };
 
 }  // namespace mod::tot

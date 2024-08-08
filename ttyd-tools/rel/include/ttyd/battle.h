@@ -137,7 +137,8 @@ struct BattleWorkCommand {
     BattleWorkCommandParty      party_table[8];
     BattleWorkCommandMultiItem  multi_item_table[3];
     BattleWorkCommandCursor     cursor_table[14];
-    int8_t          unk_540[0x1c];
+    int32_t         current_cursor_type;
+    int8_t          unk_544[0x18];
     void*           window_work;
     int8_t          unk_560[0x4];
     int32_t         selection_error_msg;

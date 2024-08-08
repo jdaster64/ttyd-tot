@@ -21,6 +21,7 @@ using ::gc::OSLink::OSModuleInfo;
 using ::ttyd::battle_database_common::BattleUnitSetup;
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::battle::BattleWork;
+using ::ttyd::battle::BattleWorkCommand;
 using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::battle_unit::BattleWorkUnitPart;
@@ -131,6 +132,8 @@ BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t) = nullptr;
 int32_t (*g_BattleSeqCmd_get_msg_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_seq_command.o  8011f62c
 void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*) = nullptr;
+// battle_seq_command.o  80120268
+void (*g__btlcmd_SetAttackEvent_trampoline)(BattleWorkUnit*, BattleWorkCommand*) = nullptr;
 // battle_seq_command.o  80123db0
 void (*g__btlcmd_UpdateSelectWeaponTable_trampoline)(BattleWork*, int32_t) = nullptr;
 // battle_seq_command.o  80123ec0

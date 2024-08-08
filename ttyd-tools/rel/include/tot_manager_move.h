@@ -108,6 +108,24 @@ namespace MoveType {
     };
 }
 
+namespace MoveLogFlags {
+    enum e {
+        UNLOCKED_LV_1   = 0x1,
+        UNLOCKED_LV_2   = 0x2,
+        UNLOCKED_LV_3   = 0x4,
+        UNLOCKED_ALL    = UNLOCKED_LV_1 | UNLOCKED_LV_2 | UNLOCKED_LV_3,
+
+        USED_LV_1       = 0x8,
+        USED_LV_2       = 0x10,
+        USED_LV_3       = 0x20,
+        USED_ALL        = USED_LV_1 | USED_LV_2 | USED_LV_3,
+
+        STYLISH_1       = 0x40,
+        STYLISH_2       = 0x80,
+        STYLISH_ALL     = STYLISH_1 | STYLISH_2,
+    };
+}
+
 // Metadata for every move.
 struct MoveData {
     int8_t      move_cost[3];
@@ -156,6 +174,11 @@ public:
 
     // For badge-based moves only, sets unlock levels based on badges equipped.
     static void InitBadgeMoveLevels();
+
+    // Tracks unlocking, using and performing Stylish commands for moves.
+    static void LogMoveUnlock(int32_t move_type, int32_t level);
+    static void LogMoveUse(int32_t move_type);
+    static void LogMoveStylish(int32_t move_type, uint32_t stylish_flags = 0);
 };
 
 // battle_weapon_power-like interface for scaling ATK based on a move.

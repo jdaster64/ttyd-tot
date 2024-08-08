@@ -1065,6 +1065,11 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
     party_data.hp_level = 0;
     party_data.attack_level = 0;
     party_data.tech_level = 0;
+
+    // Mark off permanent log flag for first obtaining this partner.
+    uint32_t option = g_Mod->state_.GetOption(STAT_PERM_PARTNERS_OBTAINED);
+    option |= 1 << (-reward_type);
+    g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, option);
     
     evtSetValue(evt, evt->evtArguments[1], idx);
     return 2;

@@ -459,10 +459,10 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             } else if (menu->buttons_pressed & ButtonId::START) {
                 return -2;
             }
-                         
+
             // Set cursor position based on selected badge.
-            menu->main_cursor_target_x = -140 + (menu->badge_log_cursor_idx % 7) * 56;
-            menu->main_cursor_target_y = 90 - ((menu->badge_log_cursor_idx % 28) / 7) * 56;
+            menu->main_cursor_target_x = -140.0f + (menu->badge_log_cursor_idx % 7) * 56;
+            menu->main_cursor_target_y = 90.0f - ((menu->badge_log_cursor_idx % 28) / 7) * 56;
       
             if (!g_Mod->state_.GetOption(
                     FLAGS_ITEM_ENCOUNTERED,
@@ -556,8 +556,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             }
                          
             // Set cursor position based on selected recipe.
-            menu->main_cursor_target_x = -140 + (menu->recipe_log_cursor_idx % 7) * 56;
-            menu->main_cursor_target_y = 90 - ((menu->recipe_log_cursor_idx % 28) / 7) * 56;
+            menu->main_cursor_target_x = -140.0f + (menu->recipe_log_cursor_idx % 7) * 56;
+            menu->main_cursor_target_y = 90.0f - ((menu->recipe_log_cursor_idx % 28) / 7) * 56;
       
             if (!g_Mod->state_.GetOption(
                     FLAGS_ITEM_ENCOUNTERED,

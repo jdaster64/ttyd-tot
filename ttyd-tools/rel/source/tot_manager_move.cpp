@@ -126,12 +126,15 @@ void MoveManager::Init() {
             case MoveType::MOWZ_BASE:
                 // Base attacks start with 2 levels unlocked.
                 default_level = 2;
+                LogMoveUnlock(i, 1);
+                LogMoveUnlock(i, 2);
                 break;
             case MoveType::GOOMBELLA_TATTLE:
             case MoveType::SP_SWEET_TREAT:
             case MoveType::SP_EARTH_TREMOR:
                 // Star Powers start with only first level unlocked.
                 default_level = 1;
+                LogMoveUnlock(i, 1);
                 break;
         }
         g_Mod->state_.level_unlocked_[i] = default_level;
@@ -211,13 +214,14 @@ bool MoveManager::UpgradeMove(int32_t move_type) {
             case MoveType::SP_SWEET_FEAST:
             case MoveType::SP_SHOWSTOPPER:
             case MoveType::SP_SUPERNOVA:
-                move_type -= MoveType::SP_SWEET_TREAT;
-                pouch.star_powers_obtained |= (1 << move_type);
+                pouch.star_powers_obtained |= 
+                    (1 << (move_type - MoveType::SP_SWEET_TREAT));
                 pouch.max_sp += 100;
                 break;
         }
         g_Mod->state_.level_selected_[move_type] = 1;
     }
+    LogMoveUnlock(move_type, level);
     return true;
 }
 
@@ -306,6 +310,24 @@ void MoveManager::InitBadgeMoveLevels() {
         g_MaxBadgeMoveLevels[i] = badge_count;
         g_CurBadgeMoveLevels[i] = 1;
     }
+}
+
+void MoveManager::LogMoveUnlock(int32_t move_type, int32_t level) {
+    uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move_type);
+    value |= (MoveLogFlags::UNLOCKED_LV_1 << (level - 1));
+    g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, value, move_type);
+}
+
+void MoveManager::LogMoveUse(int32_t move_type) {
+    uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move_type);
+    value |= (MoveLogFlags::USED_LV_1 << (GetSelectedLevel(move_type) - 1));
+    g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, value, move_type);
+}
+
+void MoveManager::LogMoveStylish(int32_t move_type, uint32_t stylish_flags) {
+    uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move_type);
+    value |= stylish_flags ? stylish_flags : MoveLogFlags::STYLISH_ALL;
+    g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, value, move_type);
 }
 
 uint32_t GetWeaponPowerFromSelectedLevel(

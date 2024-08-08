@@ -27,7 +27,8 @@ void* BattleSetConfuseAct(
 // BattleDrawEnemyHP
 // _check_present_item
 // BattleGetSelectWeapon
-// _btlcmd_SetAttackEvent
+void _btlcmd_SetAttackEvent(
+    battle_unit::BattleWorkUnit* unit, battle::BattleWorkCommand* command_work);
 // BattleCommandDisplay_AllEnd
 // BattleCommandDisplay_ProtectPartnerSelectMenuEnd
 // BattleCommandDisplay_ProtectPartnerSelectMenuDisp

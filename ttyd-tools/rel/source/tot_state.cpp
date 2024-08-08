@@ -237,8 +237,8 @@ void StateManager::InitDefaultOptions() {
     
     memset(option_flags_, 0, sizeof(option_flags_));
     memset(option_bytes_, 0, sizeof(option_bytes_));
-    // TODO: Only reset per-run play stats.
-    memset(play_stats_, 0, sizeof(play_stats_));
+    // Only reset per-run play stats.
+    memset(play_stats_, 0, 0x100);
 
     // Set non-zero default values to their default values.
     SetOption(OPTVAL_PRESET_DEFAULT);
@@ -329,7 +329,6 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
             return true;
         }
         case TYPE_FLAGS_ACHIEVEMENT:
-        case TYPE_FLAGS_MOVE_ENCOUNTERED:
         case TYPE_FLAGS_ITEM_ENCOUNTERED:
         case TYPE_FLAGS_ITEM_PURCHASED:
         case TYPE_FLAGS_OPT_UNLOCKED: {
@@ -344,10 +343,6 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
             switch (t) {
                 case TYPE_FLAGS_ACHIEVEMENT: {
                     ptr = achievement_flags_ + (value >> 5);
-                    break;
-                }
-                case TYPE_FLAGS_MOVE_ENCOUNTERED: {
-                    ptr = move_encountered_flags_ + (value >> 5);
                     break;
                 }
                 case TYPE_FLAGS_ITEM_ENCOUNTERED: {
@@ -437,10 +432,6 @@ int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
         }
         case TYPE_FLAGS_ACHIEVEMENT: {
             flag_ptr = achievement_flags_ + (x >> 5);
-            break;
-        }
-        case TYPE_FLAGS_MOVE_ENCOUNTERED: {
-            flag_ptr = move_encountered_flags_ + (x >> 5);
             break;
         }
         case TYPE_FLAGS_ITEM_ENCOUNTERED: {
