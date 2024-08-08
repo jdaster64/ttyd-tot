@@ -180,6 +180,7 @@ void DebugManager::Update() {
                         for (int32_t i = 1; i <= 7; ++i) {
                             pouch.party_data[i].flags |= 1;
                         }
+                        g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
                     }
                     break;
                 }
@@ -217,6 +218,12 @@ void DebugManager::Update() {
                         // Set all "item obtained" flags in state manager.
                         g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, i);
                     }
+                    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+                        // Set all "move unlocked / used / Stylish" flags.
+                        g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, 0xff, i);
+                    }
+                    // Set all partners as having been obtained once.
+                    g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
                     break;
                 }
             }

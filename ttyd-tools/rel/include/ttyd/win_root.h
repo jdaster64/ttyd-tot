@@ -246,8 +246,11 @@ struct WinPauseMenu {
     float       recipe_log_showcased_y;                     // 0x0f44
     float       recipe_log_showcased_target_y;              // 0x0f48
     int16_t     recipe_log_ids[84];                         // 0x0f4c
+    // Added menus.
+    int32_t     move_log_cursor_idx;                        // 0x0ff4
+    int32_t     move_log_obtained_count;                    // 0x0ff8
     // Reserved space for other menus.
-    int8_t      unused_0x0ff4[0x3c];                        // 0x0ff4
+    int8_t      unused_0x0ffc[0x34];                        // 0x0ffc
     // "Tattle Log"
     int8_t      unk_0x1030[16];                             // 0x1030
     int32_t     tattle_log_total_count;                     // 0x1040
@@ -319,11 +322,10 @@ int32_t compare_func5_1(int16_t* param_1,int16_t* param_2);
 // sort_1_1_func
 void winWazaGX(
     float x, float y, float w, float h, WinPauseMenu* menu, int32_t type);
-void winHakoGX(
-    float x, float y, WinPauseMenu* menu, int32_t type);
+void winHakoGX(float x, float y, WinPauseMenu* menu, int32_t type);
 // winMailGX
 // winHalfBookGX
-// winBookGX
+void winBookGX(float x, float y, WinPauseMenu* menu, int32_t type);
 void winNameGX(
     float x, float y, float w, float h, WinPauseMenu* menu, int32_t type);
 void winKirinukiGX(

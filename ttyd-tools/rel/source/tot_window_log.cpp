@@ -25,6 +25,7 @@
 #include <ttyd/system.h>
 #include <ttyd/win_log.h>
 #include <ttyd/win_main.h>
+#include <ttyd/win_party.h>
 #include <ttyd/win_root.h>
 #include <ttyd/winmgr.h>
 
@@ -168,6 +169,184 @@ void SortItemLogType(WinPauseMenu* menu) {
     menu->recipe_log_page_num = 0;
 }
 
+void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
+    const auto& state = g_Mod->state_;
+
+    // Draw book background.
+    ttyd::win_root::winBookGX(win_x, win_y, menu, 1);
+    
+    int32_t page_number = menu->move_log_cursor_idx < 24
+        ? menu->move_log_cursor_idx / 8 : (menu->move_log_cursor_idx) / 6 - 1;
+    int32_t page_first_entry =
+        page_number < 3 ? page_number * 8 : (page_number + 1) * 6;
+    int32_t page_last_entry = (page_number < 3 ? 8 : 6) + page_first_entry;
+
+    int32_t page_unlocked = true;
+    if (uint32_t partner_flags = state.GetOption(STAT_PERM_PARTNERS_OBTAINED);
+        page_number >= 3 && !(partner_flags & (1 << (page_number - 2)))) {
+        page_unlocked = false;
+    }
+
+    // Draw header for page.
+    {
+        const char* msg;
+        int32_t header_icon = IconType::MARIO_HEAD;
+        switch (page_number) {
+            case 0:
+                msg = "tot_movelog_jump";
+                break;
+            case 1:
+                msg = "tot_movelog_hammer";
+                break;
+            case 2:
+                msg = "tot_movelog_special";
+                break;
+            default: {
+                if (page_unlocked) {
+                    msg =
+                        ttyd::win_party::g_winPartyDt[page_number - 3].name;
+                    header_icon = 
+                        ttyd::win_party::g_winPartyDt[page_number - 3].icon_id;
+                } else {
+                    msg = "msg_menu_stone_none_help";
+                    header_icon = -1;
+                }
+                break;
+            }
+        }
+
+        {
+            if (page_unlocked) {
+                ttyd::win_main::winIconInit();
+                gc::vec3 position = { win_x + 25.0f, win_y - 24.0f, 0.0f };
+                gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+                uint32_t color = 0xFFFFFFFFU;
+                ttyd::win_main::winIconSet(header_icon, &position, &scale, &color);
+            }
+
+            ttyd::win_main::winFontInit();
+            {
+                gc::vec3 position = { win_x + 43.0f, win_y - 16.0f, 0.0f };
+                gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+                uint32_t color = 0x000000FFU;
+                ttyd::win_main::winFontSet(&position, &scale, &color, msgSearch(msg));
+            }
+            {
+                gc::vec3 position = { win_x + 245.0f, win_y - 16.0f, 0.0f };
+                gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+                uint32_t color = 0x000000FFU;
+                ttyd::win_main::winFontSet(
+                    &position, &scale, &color, msgSearch("tot_movelog_found"));
+            }
+            {
+                gc::vec3 position = { win_x + 310.0f, win_y - 16.0f, 0.0f };
+                gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+                uint32_t color = 0x000000FFU;
+                ttyd::win_main::winFontSet(
+                    &position, &scale, &color, msgSearch("tot_movelog_used"));
+            }
+            {
+                gc::vec3 position = { win_x + 370.0f, win_y - 16.0f, 0.0f };
+                gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+                uint32_t color = 0x000000FFU;
+                ttyd::win_main::winFontSet(
+                    &position, &scale, &color, msgSearch("tot_movelog_stylish"));
+            }
+        }
+    }
+
+    // Draw entries for each move.
+
+
+    for (int32_t move = page_first_entry; move < page_last_entry; ++move) {
+        float base_y = win_y - 16.0f - 24.0f * ((move - page_first_entry) + 1);
+        const auto* move_data = MoveManager::GetMoveData(move);
+        uint32_t move_flags = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move);
+        if (!page_unlocked) move_flags = 0;
+
+        // Print move name, and print icon if unlocked.
+        {
+            const char* name_msg = (move_flags & MoveLogFlags::UNLOCKED_LV_1) 
+                ? move_data->name_msg : "msg_menu_stone_none_help";
+            ttyd::win_main::winFontInit();
+            gc::vec3 position = { win_x + 43.0f, base_y, 0.0f };
+            gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+            uint32_t color = 0x000000FFU;
+            ttyd::win_main::winFontSet(
+                &position, &scale, &color, msgSearch(name_msg));
+        }
+        ttyd::win_main::winIconInit();
+        if (move_flags & MoveLogFlags::UNLOCKED_LV_1) {
+            gc::vec3 position = { win_x + 25.0f, base_y - 8.0f, 0.0f };
+            gc::vec3 scale = { 0.45f, 0.45f, 0.45f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(
+                move_data->icon_id, &position, &scale, &color);
+        }
+
+        bool move_completed = true;
+
+        // Print pips for levels unlocked, levels used, and Stylish.
+        for (int32_t i = 0; i < move_data->max_level; ++i) {
+            uint32_t flag = MoveLogFlags::UNLOCKED_LV_1;
+            switch (i) {
+                case 1: flag = MoveLogFlags::UNLOCKED_LV_2; break;
+                case 2: flag = MoveLogFlags::UNLOCKED_LV_3; break;
+            }
+            int32_t icon = IconType::SP_ORB_EMPTY;
+            if (move_flags & flag) {
+                icon = IconType::AC_LIGHT_GREEN + i;
+            } else {
+                move_completed = false;
+            }
+            gc::vec3 position = { win_x + 250.0f + 18.0f * i, base_y - 8.0f, 0.0f };
+            gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(icon, &position, &scale, &color);
+        }
+        for (int32_t i = 0; i < move_data->max_level; ++i) {
+            uint32_t flag = MoveLogFlags::USED_LV_1;
+            switch (i) {
+                case 1: flag = MoveLogFlags::USED_LV_2; break;
+                case 2: flag = MoveLogFlags::USED_LV_3; break;
+            }
+            int32_t icon = IconType::SP_ORB_EMPTY;
+            if (move_flags & flag) {
+                icon = IconType::AC_LIGHT_GREEN + i;
+            } else {
+                move_completed = false;
+            }
+            gc::vec3 position = { win_x + 315.0f + 18.0f * i, base_y - 8.0f, 0.0f };
+            gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(icon, &position, &scale, &color);
+        }
+        {
+            uint32_t flag = MoveLogFlags::STYLISH_ALL;
+            int32_t icon = IconType::SP_ORB_EMPTY;
+            if ((move_flags & flag) == flag) {
+                icon = IconType::AC_LIGHT_GREEN;
+            } else {
+                move_completed = false;
+            }
+            gc::vec3 position = { win_x + 385.0f, base_y - 8.0f, 0.0f };
+            gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(icon, &position, &scale, &color);
+        }
+
+        // Draw a ribbon if all flags for the move were completed.
+        if (move_completed) {
+            ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+            gc::vec3 position = { win_x + 420.0f, base_y - 8.0f, 0.0f };
+            gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+            uint32_t color = 0xFFFFFFFFU;
+            // Change background to the pedestal one from the badge menu.
+            ttyd::win_main::winTexSet(0xb0, &position, &scale, &color);
+        }
+    }
+}
+
 }  // namespace
 
 void ReplaceLogSortMethods() {
@@ -190,8 +369,8 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     // Hardcode Journal menu to have three submenus: Tattles, Items, Badges.
     menu->log_menu_state = 0;
     menu->log_submenu_cursor_idx = 0;
-    menu->log_submenu_count = 3;
-    for (int32_t i = 0; i < 3; ++i) {
+    menu->log_submenu_count = 4;
+    for (int32_t i = 0; i < 4; ++i) {
         auto& submenu = menu->log_submenu_info[i];
         submenu.x = 0.0f;
         submenu.target_x = 0.0f;
@@ -207,6 +386,8 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     menu->log_submenu_info[1].help_msg = "msg_menu_kiroku_ryori";
     menu->log_submenu_info[2].id = 2;
     menu->log_submenu_info[2].help_msg = "msg_menu_kiroku_badge";
+    menu->log_submenu_info[3].id = 5;
+    menu->log_submenu_info[3].help_msg = "msg_menu_move_log";
   
     menu->badge_log_total_count = 0;
     menu->badge_log_obtained_count = 0;
@@ -286,6 +467,14 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     }
     menu->tattle_log_cursor_idx = 0;
     menu->tattle_log_page_num = 0;
+
+    menu->move_log_cursor_idx = 0;
+    menu->move_log_obtained_count = 0;
+    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+        uint32_t move_flags = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, i);
+        if (move_flags & MoveLogFlags::UNLOCKED_LV_1)
+            ++menu->move_log_obtained_count;
+    }
 }
 
 void LogMenuInit2(ttyd::win_root::WinPauseMenu* menu) {
@@ -668,6 +857,76 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             
             break;
         }
+        case 15: {
+            // Move log.
+
+            const int32_t num_moves = MoveType::MOVE_TYPE_MAX;
+            int32_t page_number = menu->move_log_cursor_idx < 24
+                ? menu->move_log_cursor_idx / 8
+                : (menu->move_log_cursor_idx) / 6 - 1;
+            int32_t page_first_entry =
+                page_number < 3 ? page_number * 8 : (page_number + 1) * 6;
+            int32_t page_cur_entry =
+                menu->move_log_cursor_idx - page_first_entry;
+
+            if (menu->buttons_pressed & ButtonId::START) {
+                return -2;
+            } else if (menu->buttons_pressed & ButtonId::B) {
+                ttyd::pmario_sound::psndSFXOn((char *)0x20013);
+                for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
+                    menu->log_submenu_info[i].state = 40;
+                }
+                menu->log_submenu_info[menu->log_submenu_cursor_idx].state = 20;
+                menu->log_menu_state = 0;
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
+                if (--menu->move_log_cursor_idx < 0)
+                    menu->move_log_cursor_idx = 0;
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
+                if (++menu->move_log_cursor_idx >= num_moves)
+                    menu->move_log_cursor_idx = num_moves - 1;
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if ((menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) ||
+                       (menu->buttons_repeated & ButtonId::L)) {
+                if (--page_number < 0) page_number = 0;
+                page_first_entry = 
+                    page_number < 3 ? page_number * 8 : (page_number + 1) * 6;
+                menu->move_log_cursor_idx = page_first_entry;
+                page_cur_entry = 0;
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if ((menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) ||
+                       (menu->buttons_repeated & ButtonId::R)) {
+                if (++page_number > 9) page_number = 9;
+                page_first_entry = 
+                    page_number < 3 ? page_number * 8 : (page_number + 1) * 6;
+                menu->move_log_cursor_idx = page_first_entry;
+                page_cur_entry = 0;
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            }
+
+            // Set window description based on hovered move.
+            ttyd::win_root::winMsgEntry(menu, 0, "msg_menu_stone_none_help", 0);
+
+            uint32_t partner_flags =
+                g_Mod->state_.GetOption(STAT_PERM_PARTNERS_OBTAINED);
+            uint32_t move_flags =
+                g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, menu->move_log_cursor_idx);
+            // Skip non-unlocked moves or moves for non-unlocked partners.
+            if ((move_flags & MoveLogFlags::UNLOCKED_LV_1) &&
+                (page_number < 3 || (partner_flags & (1 << (page_number - 2))))) {
+                // TODO: Full description, with levels.
+                ttyd::win_root::winMsgEntry(
+                    menu, 0,
+                    MoveManager::GetMoveData(menu->move_log_cursor_idx)->desc_msg,
+                    0);
+            }
+
+            // Set cursor position based on selected entry.
+            menu->main_cursor_target_x = -180.0f;
+            menu->main_cursor_target_y = 82.0f - page_cur_entry * 24;
+
+            break;
+        }
         case 21: {
             // Loading Tattle scene.
             if (menu->buttons_pressed & ButtonId::B) {
@@ -970,23 +1229,39 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
              ttyd::win_log::monoshiriGX(win_x - 170.0f, win_y + 130.0f, menu);
              break;
     }
+
+    // Move log menu.
+    // TODO: Add text, progress markers, kirinuki window, move description.
+    if (menu->log_menu_state == 15) {
+        DrawMoveLog(menu, win_x - 170.0f, win_y + 130.0f);
+    }
   
     // Draw banners for submenus.
     for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
         const auto& submenu = menu->log_submenu_info[i];
         int32_t banner_id;
         switch (submenu.id) {
-            default:
-                banner_id = 0x20;
-                break;
             case 2:
-                banner_id = 0x21;
+                banner_id = 0x21;   // Badges
                 break;
             case 3:
-                banner_id = 0xc2;
+                banner_id = 0xc2;   // Items
                 break;
             case 4:
-                banner_id = 0x23;
+                banner_id = 0x23;   // Tattle Log
+                break;
+            case 5:
+                banner_id = 0xc4;   // Moves
+                break;
+            case 6:
+                banner_id = 0xc1;   // Achievements
+                break;
+            case 7:
+                banner_id = 0xc3;   // Records
+                break;
+            default:
+                // Should not be reached.
+                banner_id = 0x20;
                 break;
         }
         if (i == menu->log_submenu_cursor_idx) {

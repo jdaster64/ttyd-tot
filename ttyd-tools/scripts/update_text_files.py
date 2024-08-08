@@ -1214,11 +1214,22 @@ g_StringMap = {
             b'Inspect the items Mario has\n'
             b'collected here.',
         
+        b"msg_menu_move_log":
+            b'Information about the moves\n'
+            b'Mario and party can perform.',
+            
+        b"tot_movelog_jump":        b"Jump Moves",
+        b"tot_movelog_hammer":      b"Hammer Moves",
+        b"tot_movelog_special":     b"Special Moves",
+        b"tot_movelog_found":       b"Lvls.",
+        b"tot_movelog_used":        b"Used",
+        b"tot_movelog_stylish":     b"Styl.",
+        
         # Enemy names + Tattle info (TODO)
         
-        b"btl_un_monban":             b"Craw",
-        b"btl_un_sinnosuke":          b"H. Bob-omb",
-        b"btl_un_hyper_sinnosuke":    b"Cosmic Boo",
+        b"btl_un_monban":           b"Craw",
+        b"btl_un_sinnosuke":        b"H. Bob-omb",
+        b"btl_un_hyper_sinnosuke":  b"Cosmic Boo",
         
         # TODO: Shortened Tattles for all enemies - b"btl_hlp_monban", etc.
         
