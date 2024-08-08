@@ -5,6 +5,7 @@
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_database_common.h>
+#include <ttyd/battle_seq_command.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
@@ -382,6 +383,28 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMoveSelectedLevel) {
 EVT_DEFINE_USER_FUNC(evtTot_UpgradeMove) {
     int32_t move = evtGetValue(evt, evt->evtArguments[0]);
     MoveManager::UpgradeMove(move);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_LogActiveMoveStylish) {
+    // Get the move type for the currently selected command.
+    auto* command_work = &g_BattleWork->command_work;
+    ttyd::battle::BattleWorkCommandCursor* cursor;
+    ttyd::battle_seq_command::_btlcmd_GetCursorPtr(
+        command_work, command_work->current_cursor_type, &cursor);
+    const int32_t move_type = 
+        command_work->weapon_table[cursor->abs_position].index;
+
+    if (static_cast<int32_t>(evtGetValue(evt, evt->evtArguments[0])) == -1) {
+        // Special case, since this Stylish doesn't occur within the move.
+        MoveManager::LogMoveStylish(
+            MoveType::VIVIAN_VEIL, MoveLogFlags::STYLISH_ALL);
+    } else {
+        const uint32_t stylish_flags =
+            evtGetValue(evt, evt->evtArguments[0]) * MoveLogFlags::STYLISH_1;
+        MoveManager::LogMoveStylish(move_type, stylish_flags);
+    }
+
     return 2;
 }
 

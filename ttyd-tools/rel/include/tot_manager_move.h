@@ -208,4 +208,8 @@ EVT_DECLARE_USER_FUNC(evtTot_GetMoveSelectedLevel, 2)
 // Unlocks or upgrades the level of move arg0.
 EVT_DECLARE_USER_FUNC(evtTot_UpgradeMove, 1)
 
+// Logs a successful Stylish command for the currently executed move.
+// arg0 = 0 for all Stylishes, 1/2 for first or second of independent Stylishes.
+EVT_DECLARE_USER_FUNC(evtTot_LogActiveMoveStylish, 1)
+
 }
