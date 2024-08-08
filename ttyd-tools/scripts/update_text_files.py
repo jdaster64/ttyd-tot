@@ -1224,6 +1224,7 @@ g_StringMap = {
         b"tot_movelog_found":       b"Lvls.",
         b"tot_movelog_used":        b"Used",
         b"tot_movelog_stylish":     b"Styl.",
+        b"tot_movelog_movecount":   b"Moves",
         
         # Enemy names + Tattle info (TODO)
         

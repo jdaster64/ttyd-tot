@@ -249,8 +249,9 @@ struct WinPauseMenu {
     // Added menus.
     int32_t     move_log_cursor_idx;                        // 0x0ff4
     int32_t     move_log_obtained_count;                    // 0x0ff8
+    int32_t     move_log_completed_count;                   // 0x0ffc
     // Reserved space for other menus.
-    int8_t      unused_0x0ffc[0x34];                        // 0x0ffc
+    int8_t      unused_0x1000[0x30];                        // 0x1000
     // "Tattle Log"
     int8_t      unk_0x1030[16];                             // 0x1030
     int32_t     tattle_log_total_count;                     // 0x1040

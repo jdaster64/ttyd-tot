@@ -228,27 +228,27 @@ void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
             {
                 gc::vec3 position = { win_x + 43.0f, win_y - 16.0f, 0.0f };
                 gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
-                uint32_t color = 0x000000FFU;
+                uint32_t color = 0x403030FFU;
                 ttyd::win_main::winFontSet(&position, &scale, &color, msgSearch(msg));
             }
             {
                 gc::vec3 position = { win_x + 245.0f, win_y - 16.0f, 0.0f };
                 gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
-                uint32_t color = 0x000000FFU;
+                uint32_t color = 0x403030FFU;
                 ttyd::win_main::winFontSet(
                     &position, &scale, &color, msgSearch("tot_movelog_found"));
             }
             {
                 gc::vec3 position = { win_x + 310.0f, win_y - 16.0f, 0.0f };
                 gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
-                uint32_t color = 0x000000FFU;
+                uint32_t color = 0x403030FFU;
                 ttyd::win_main::winFontSet(
                     &position, &scale, &color, msgSearch("tot_movelog_used"));
             }
             {
                 gc::vec3 position = { win_x + 370.0f, win_y - 16.0f, 0.0f };
                 gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
-                uint32_t color = 0x000000FFU;
+                uint32_t color = 0x403030FFU;
                 ttyd::win_main::winFontSet(
                     &position, &scale, &color, msgSearch("tot_movelog_stylish"));
             }
@@ -256,8 +256,6 @@ void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
     }
 
     // Draw entries for each move.
-
-
     for (int32_t move = page_first_entry; move < page_last_entry; ++move) {
         float base_y = win_y - 16.0f - 24.0f * ((move - page_first_entry) + 1);
         const auto* move_data = MoveManager::GetMoveData(move);
@@ -321,7 +319,7 @@ void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
             uint32_t color = 0xFFFFFFFFU;
             ttyd::win_main::winIconSet(icon, &position, &scale, &color);
         }
-        {
+        if (page_number != 2 && move != MoveType::GOOMBELLA_RALLY_WINK) {
             uint32_t flag = MoveLogFlags::STYLISH_ALL;
             int32_t icon = IconType::SP_ORB_EMPTY;
             if ((move_flags & flag) == flag) {
@@ -341,8 +339,100 @@ void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
             gc::vec3 position = { win_x + 420.0f, base_y - 8.0f, 0.0f };
             gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
             uint32_t color = 0xFFFFFFFFU;
-            // Change background to the pedestal one from the badge menu.
             ttyd::win_main::winTexSet(0xb0, &position, &scale, &color);
+        }
+    }
+
+    // Draw window with move obtained / completed counts.
+    ttyd::win_root::winKirinukiGX(
+        win_x - 110.0f, win_y - 140.0f, 100.0f, 81.0f, menu, 0);
+    ttyd::win_main::winFontInit();
+    {
+        const char* msg = msgSearch("tot_movelog_movecount");
+        int32_t width = ttyd::fontmgr::FontGetMessageWidth(msg);
+        gc::vec3 position = {
+            win_x - 60.0f - 0.5f * 0.75f * width,
+            win_y - 148.0f,
+            0.0f
+        };
+        gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+        uint32_t color = 0x000000FFU;
+        ttyd::win_main::winFontSet(&position, &scale, &color, msg);
+    }
+    {
+        char buf[8];
+        sprintf(
+            buf, "%" PRId32 "/%" PRId32, 
+            menu->move_log_obtained_count, MoveType::MOVE_TYPE_MAX);
+        int32_t width = ttyd::fontmgr::FontGetMessageWidth(buf);
+        gc::vec3 position = {
+            win_x - 32.0f - 0.75f * width,
+            win_y - 166.0f,
+            0.0f
+        };
+        gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+        uint32_t color = 0x000000FFU;
+        ttyd::win_main::winFontSet(&position, &scale, &color, buf);
+    }
+    {
+        char buf[4];
+        sprintf(
+            buf, "x%s%" PRId32,
+            menu->move_log_completed_count < 10 ? " " : "",
+            menu->move_log_completed_count);
+        int32_t width = ttyd::fontmgr::FontGetMessageWidth(buf);
+        gc::vec3 position = {
+            win_x - 32.0f - 0.75f * width,
+            win_y - 190.0f,
+            0.0f
+        };
+        gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+        uint32_t color = 0x000000FFU;
+        ttyd::win_main::winFontSet(&position, &scale, &color, buf);
+    }
+    {
+        // Draw ribbon next to completed number.
+        ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+        gc::vec3 position = { win_x - 80.0f, win_y - 200.0f, 0.0f };
+        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+        uint32_t color = 0xFFFFFFFFU;
+        ttyd::win_main::winTexSet(0xb0, &position, &scale, &color);
+    }
+
+    // Draw L/R button icon / arrows.
+    if (page_number != 0) {
+        {
+            ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+            gc::vec3 position = { win_x + 440.0f, win_y + 18.0f, 0.0f };
+            gc::vec3 scale = { -1.0f, -1.0f, -1.0f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winTexSet(0x17, &position, &scale, &color);
+        }
+        {
+            ttyd::win_main::winIconInit();        
+            gc::vec3 position = { win_x + 440.0f, win_y, 0.0f };
+            gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(
+                IconType::L_BUTTON, &position, &scale, &color);
+        }
+    }
+    if (page_number != 9) {
+        {
+            ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+            gc::vec3 position = { win_x + 440.0f, win_y - 255.0f, 0.0f };
+            gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winTexSet(0x17, &position, &scale, &color);
+        }
+        
+        {
+            ttyd::win_main::winIconInit();
+            gc::vec3 position = { win_x + 440.0f, win_y - 240.0f, 0.0f };
+            gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(
+                IconType::R_BUTTON, &position, &scale, &color);
         }
     }
 }
@@ -470,10 +560,28 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
 
     menu->move_log_cursor_idx = 0;
     menu->move_log_obtained_count = 0;
-    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
-        uint32_t move_flags = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, i);
+    menu->move_log_completed_count = 0;
+    for (int32_t move = 0; move < MoveType::MOVE_TYPE_MAX; ++move) {
+        uint32_t move_flags = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move);
+        const auto* move_data = MoveManager::GetMoveData(move);
         if (move_flags & MoveLogFlags::UNLOCKED_LV_1)
             ++menu->move_log_obtained_count;
+
+        // Check for whether the move has been unlocked (implicitly) and used
+        // at every level, and had its Stylish commands performed, if any.
+        bool completed = true;
+        if (!(move_flags & MoveLogFlags::USED_LV_1))
+            completed = false;
+        if (move_data->max_level >= 2 && !(move_flags & MoveLogFlags::USED_LV_2))
+            completed = false;
+        if (move_data->max_level >= 3 && !(move_flags & MoveLogFlags::USED_LV_3))
+            completed = false;
+        if ((move < MoveType::SP_SWEET_TREAT || move > MoveType::SP_SUPERNOVA)
+            && move != MoveType::GOOMBELLA_RALLY_WINK
+            && (move_flags & MoveLogFlags::STYLISH_ALL) != MoveLogFlags::STYLISH_ALL)
+            completed = false;
+
+        if (completed) ++menu->move_log_completed_count;
     }
 }
 
@@ -1231,7 +1339,6 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
     }
 
     // Move log menu.
-    // TODO: Add text, progress markers, kirinuki window, move description.
     if (menu->log_menu_state == 15) {
         DrawMoveLog(menu, win_x - 170.0f, win_y + 130.0f);
     }
