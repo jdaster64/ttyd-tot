@@ -5,10 +5,14 @@
 #include "mod_state.h"
 #include "tot_generate_enemy.h"
 #include "tot_gsw.h"
+#include "tot_state.h"
 
 #include <ttyd/msgdrv.h>
 #include <ttyd/swdrv.h>
+#include <ttyd/win_main.h>
+#include <ttyd/win_root.h>
 
+#include <cstdio>
 #include <cstring>
 
 namespace mod::infinite_pit {
@@ -17,7 +21,9 @@ namespace mod::infinite_pit {
 namespace MsgKey {
     enum e {
         CUSTOM_TATTLE_BATTLE = 0,
+        CUSTOM_TATTLE_KILLCOUNT,
         CUSTOM_TATTLE_MENU,
+        MENU_MONOSIRI_DERUTOKORO,
         SYS_NO_KEY,
     };
 }
@@ -28,7 +34,9 @@ namespace {
 // in sync with the above enum, and always maintain alphabetical order.
 constexpr const char* kKeyLookups[] = {
     "custom_tattle_battle",
+    "custom_tattle_killcount",
     "custom_tattle_menu",
+    "menu_monosiri_derutokoro",
     "sys_no_key",
 };
 
@@ -37,7 +45,10 @@ constexpr const char* kKeyLookups[] = {
 const char* StringsManager::LookupReplacement(const char* msg_key) {
     // Handle journal Tattle entries.
     if (strstr(msg_key, "menu_enemy_")) {
-        msg_key = tot::SetCustomMenuTattle(msg_key);
+        if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
+            int32_t id = menu->tattle_logs[menu->tattle_log_cursor_idx].id;
+            msg_key = tot::SetCustomMenuTattle(id);
+        }
     }
     
     // Binary search on all possible message replacements.
@@ -69,6 +80,21 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::CUSTOM_TATTLE_BATTLE:
         case MsgKey::CUSTOM_TATTLE_MENU:
             return tot::GetCustomTattle();
+        case MsgKey::CUSTOM_TATTLE_KILLCOUNT: {
+            // Print the number of this enemy defeated.
+            static char buf[24];
+            if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
+                int32_t idx = menu->tattle_logs[menu->tattle_log_cursor_idx].order;
+                char* ptr = buf;
+                ptr += sprintf(buf, "Times Defeated: ");
+                ptr += IntegerToFmtString(
+                    g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, idx), ptr);
+                return buf;
+            }
+        }
+        case MsgKey::MENU_MONOSIRI_DERUTOKORO:
+            // Get rid of extra spacing before location in Tattle log.
+            return "";
         case MsgKey::SYS_NO_KEY:
             // Swap out "it's locked" message with more descriptive strings.
             if (GetSWByte(tot::GSW_Tower_DisplayChestIcons)) {

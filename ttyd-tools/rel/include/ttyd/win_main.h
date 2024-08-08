@@ -4,6 +4,8 @@
 
 #include <cstdint>
 
+namespace ttyd::win_root { struct WinPauseMenu; }
+
 namespace ttyd::win_main {
 
 extern "C" {
@@ -52,7 +54,7 @@ void winFontInit();
 // winCheck
 // winReInit
 // winInit
-void* winGetPtr();
+win_root::WinPauseMenu* winGetPtr();
 
 }
 

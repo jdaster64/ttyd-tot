@@ -57,7 +57,7 @@ void* GetMidbossAttackScript(void* original_script);
 const char* GetCustomTattle();
 const char* SetCustomTattle(
     ttyd::battle_unit::BattleWorkUnit* unit, const char* original_tattle_msg);
-const char* SetCustomMenuTattle(const char* original_tattle_msg);
+const char* SetCustomMenuTattle(int32_t unit_type);
 // Returns a custom ordering for Tattles that only considers enemies in the Pit.
 int8_t GetCustomTattleIndex(int32_t unit_type);
 // Returns the custom attack and defense "stat" for an enemy type, as used by

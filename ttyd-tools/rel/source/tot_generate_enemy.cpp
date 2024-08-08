@@ -1449,22 +1449,7 @@ const char* SetCustomTattle(
     return "custom_tattle_battle";
 }
 
-const char* SetCustomMenuTattle(const char* original_tattle_msg) {
-    const auto* kTattleInfo = 
-        ttyd::battle_monosiri::battleGetUnitMonosiriPtr(0);
-        
-    // Look for the enemy type with a matching message name.
-    bool found_match = false;
-    int32_t unit_type = 1;
-    for (; unit_type <= BattleUnitType::BONETAIL; ++unit_type) {
-        const char* tattle = kTattleInfo[unit_type].menu_tattle;
-        if (tattle && !strcmp(tattle, original_tattle_msg)) {
-            found_match = true;
-            break;
-        }
-    }
-    if (!found_match) return original_tattle_msg;
-    
+const char* SetCustomMenuTattle(int32_t unit_type) {
     // Print a simple base stat string to g_TattleTextBuf.
     if (unit_type > BattleUnitType::BONETAIL || unit_type < 0 ||
         kEnemyInfo[unit_type].base_hp < 0) {

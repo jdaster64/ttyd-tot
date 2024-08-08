@@ -439,6 +439,12 @@ void ApplyFixedPatches() {
         ttyd::win_root::enemy_monoshiri_sort_table,
         custom_tattle_order, sizeof(custom_tattle_order));
 
+    // Replace location string in Tattle log with defeated count.
+    for (int32_t i = 0; i <= kNumEnemyTypes; ++i) {
+        ttyd::battle_monosiri::battleGetUnitMonosiriPtr(i)->location_name =
+            "custom_tattle_killcount";
+    }
+
     // winHakoGX (Item / Badge log box drawing function) patches:
     // References new WinPauseMenu field locations in initialization. 
     mod::patch::writeBranchPair(
