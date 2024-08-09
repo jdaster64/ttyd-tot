@@ -1384,6 +1384,17 @@ void ApplyFixedPatches() {
                     tot::AchievementsManager::MarkCompleted(
                         tot::AchievementId::AGG_DAMAGE_50000);
                 }
+
+                // Track direct damage from Infatuated attackers.
+                auto* battleWork = ttyd::battle::g_BattleWork;
+                if (unit_idx >= 0 && 
+                    battleWork->battle_units[unit_idx]->alliance == 0 &&
+                    battleWork->battle_units[unit_idx]->true_kind 
+                        <= BattleUnitType::BONETAIL) {
+                    g_Mod->state_.ChangeOption(
+                        tot::STAT_RUN_INFATUATE_DAMAGE, damage);
+                }
+                    
             }
             // Run normal damage logic.
             g_BattleDamageDirect_trampoline(

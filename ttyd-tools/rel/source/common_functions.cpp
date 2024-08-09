@@ -59,6 +59,20 @@ int32_t GetNumActivePartners() {
     }
     return num_partners;
 }
+
+bool IsPartnerActive(int32_t idx) {
+    auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+    switch (idx) {
+        case 1: return pouch->party_data[1].flags & 1;
+        case 2: return pouch->party_data[2].flags & 1;
+        case 3: return pouch->party_data[5].flags & 1;
+        case 4: return pouch->party_data[4].flags & 1;
+        case 5: return pouch->party_data[6].flags & 1;
+        case 6: return pouch->party_data[3].flags & 1;
+        case 7: return pouch->party_data[7].flags & 1;
+    }
+    return false;
+}
     
 void LinkCustomEvt(ModuleId::e module_id, void* module_ptr, int32_t* evt) {
     int32_t op;

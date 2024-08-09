@@ -31,6 +31,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Function hooks.
 extern void (*g_BtlUnit_PayWeaponCost_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
+extern int32_t (*g_pouchEquipBadgeIndex_trampoline)(int32_t);
 extern int32_t (*g_pouchAddCoin_trampoline)(int16_t);
 extern void (*g_BtlActRec_AddCount_trampoline)(uint8_t*);
 
@@ -48,6 +49,14 @@ void ApplyFixedPatches() {
             g_Mod->state_.ChangeOption(tot::STAT_PERM_SP_SPENT, weapon->base_sp_cost);
             // Run normal pay-weapon-cost logic.
             g_BtlUnit_PayWeaponCost_trampoline(unit, weapon);
+        });
+
+    g_pouchEquipBadgeIndex_trampoline = mod::patch::hookFunction(
+        ttyd::mario_pouch::pouchEquipBadgeIndex, [](int32_t index) {
+            // Track number of badges equipped.
+            g_Mod->state_.ChangeOption(tot::STAT_RUN_BADGES_EQUIPPED, 1);
+            // Run normal badge equipping logic.
+            return g_pouchEquipBadgeIndex_trampoline(index);
         });
 
     g_pouchAddCoin_trampoline = mod::patch::hookFunction(

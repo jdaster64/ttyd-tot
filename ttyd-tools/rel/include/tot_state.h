@@ -79,6 +79,11 @@ public:
     void InitDefaultOptions();
     // Resets settings based on the currently selected preset.
     void ApplyPresetOptions();
+
+    // Verifies that settings are default except enemy stat scaling.
+    bool VerifyDefaultsExceptEnemyScaling();
+    // Verifies that settings are default except Mario's stat scaling.
+    bool VerifyDefaultsExceptMarioScaling();
     
     // Sets / adjusts options, play stats, achievements, etc.
     // If OPTVAL is provided for 'SetOption', value parameter is ignored.
@@ -432,7 +437,11 @@ enum Options : uint32_t {
     STAT_RUN_UNIQUE_BADGE_FLAGS = 0x045'1'00'0a,
     STAT_RUN_MIDBOSSES_USED     = 0x04f'1'00'07,
     STAT_RUN_CONTINUES          = 0x056'2'01'03,
-    // Next: 0x058
+    // Only used for achievement tracking.
+    STAT_RUN_JUMPS_HAMMERS_USED = 0x058'1'01'02,
+    STAT_RUN_BADGES_EQUIPPED    = 0x059'1'01'02,
+    STAT_RUN_INFATUATE_DAMAGE   = 0x05a'2'01'04,
+    // Next: 0x05c
 
     // Stats that persist across runs.
     STAT_PERM_ENEMY_KILLS       = 0x100'2'00'70,

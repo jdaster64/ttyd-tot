@@ -352,6 +352,10 @@ void MoveManager::LogMoveUse(int32_t move_type) {
     value |= (MoveLogFlags::USED_LV_1 << (level - 1));
     g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, value, move_type);
 
+    if (move_type < MoveType::SP_SWEET_TREAT) {
+        g_Mod->state_.ChangeOption(STAT_RUN_JUMPS_HAMMERS_USED);
+    }
+
     // Check for new completion of "Using 10 different Lvl. 3 moves".
     int32_t lv3_uses = 0;
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {

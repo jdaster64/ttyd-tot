@@ -22,6 +22,8 @@ const char* GetCurrentMap();
 const char* GetNextMap();
 // Returns the current number of unlocked partners.
 int32_t GetNumActivePartners();
+// Returns whether the partner (in expected order, not internal order) is unlocked.
+bool IsPartnerActive(int32_t idx);
 
 // For custom event support; allows calling subroutines / user_funcs in
 // relocatable modules.

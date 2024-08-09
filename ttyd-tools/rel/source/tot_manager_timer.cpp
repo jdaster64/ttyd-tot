@@ -3,6 +3,7 @@
 #include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_manager_achievements.h"
 #include "tot_state.h"
 
 #include <ttyd/evtmgr.h>
@@ -126,19 +127,160 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
             state.ChangeOption(STAT_PERM_HALF_FINISHES);
             if (igt_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME))
                 state.SetOption(STAT_PERM_HALF_BEST_TIME, igt_centis);
+            AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_FIRST);
+            if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
+                if (igt_centis < 60 * 360000) {
+                    AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_SPEED1);
+                }
+                if (igt_centis < 40 * 360000) {
+                    AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_SPEED2);
+                }
+            }
             break;
         case OPTVAL_DIFFICULTY_FULL:
             state.ChangeOption(STAT_PERM_FULL_FINISHES);
             if (igt_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME))
                 state.SetOption(STAT_PERM_FULL_BEST_TIME, igt_centis);
+            AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_FIRST);
+            if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
+                if (igt_centis < 120 * 360000) {
+                    AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_SPEED1);
+                }
+                if (igt_centis < 90 * 360000) {
+                    AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_SPEED2);
+                }
+            }
             break;
         case OPTVAL_DIFFICULTY_FULL_EX:
             state.ChangeOption(STAT_PERM_EX_FINISHES);
             if (igt_centis < state.GetOption(STAT_PERM_EX_BEST_TIME))
                 state.SetOption(STAT_PERM_EX_BEST_TIME, igt_centis);
+            if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
+                AchievementsManager::MarkCompleted(AchievementId::RUN_EX_FIRST);
+                if (igt_centis < 180 * 360000) {
+                    AchievementsManager::MarkCompleted(AchievementId::RUN_EX_SPEED1);
+                }
+                if (igt_centis < 135 * 360000) {
+                    AchievementsManager::MarkCompleted(AchievementId::RUN_EX_SPEED2);
+                }
+            }
             break;
         default:
             break;
+    }
+
+    // Check for other run completion achievements.
+    int32_t num_npc_deals = 0;
+    for (int32_t i = 0; i < 8; ++i) {
+        if (state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i)) ++num_npc_deals;
+    }
+    if (num_npc_deals >= 7) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_NPC_DEALS_7);
+    }
+
+    if (state.CheckOptionValue(OPTVAL_AC_3_UNSIMP)) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_MAX_AC_DIFFICULTY);
+    }
+
+    int32_t num_partners = GetNumActivePartners();
+    if (num_partners == 0) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_NO_PARTNERS);
+    }
+    if (num_partners == 7) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_ALL_PARTNERS);
+    }
+
+    int32_t conditions_met = state.GetOption(STAT_RUN_CONDITIONS_MET);
+    int32_t conditions_total = state.GetOption(STAT_RUN_CONDITIONS_TOTAL);
+    if (conditions_met > 0 && conditions_met == conditions_total) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_ALL_CONDITIONS_MET);
+    }
+
+    bool all_moves_maxed = true;
+    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+        // Skip moves for non-unlocked partners.
+        if (i == MoveType::GOOMBELLA_BASE && !IsPartnerActive(1))   continue;
+        if (i == MoveType::KOOPS_BASE && !IsPartnerActive(2))       continue;
+        if (i == MoveType::FLURRIE_BASE && !IsPartnerActive(3))     continue;
+        if (i == MoveType::YOSHI_BASE && !IsPartnerActive(4))       continue;
+        if (i == MoveType::VIVIAN_BASE && !IsPartnerActive(5))      continue;
+        if (i == MoveType::BOBBERY_BASE && !IsPartnerActive(6))     continue;
+        if (i == MoveType::MOWZ_BASE && !IsPartnerActive(7))        continue;
+
+        int32_t unlocked_level = MoveManager::GetUnlockedLevel(i);
+        if (unlocked_level && 
+            unlocked_level != MoveManager::GetMoveData(i)->max_level) {
+            all_moves_maxed = false;
+            break;
+        }
+    }
+    if (all_moves_maxed) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_ALL_MOVES_MAXED);
+    }
+
+    if (state.GetOption(STAT_RUN_COINS_SPENT) == 417) {
+        AchievementsManager::MarkCompleted(AchievementId::SECRET_COINS);
+    }
+
+    if (state.GetOption(STAT_RUN_PLAYER_DAMAGE) == 654) {
+        AchievementsManager::MarkCompleted(AchievementId::SECRET_DAMAGE);
+    }
+
+    if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
+        if (state.GetOption(STAT_RUN_ITEMS_USED) == 0) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_ITEMS);
+        }
+        if (state.GetOption(STAT_RUN_BADGES_EQUIPPED) == 0) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_BADGES);
+        }
+        if (state.GetOption(STAT_RUN_JUMPS_HAMMERS_USED) == 0) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_JUMP_HAMMER);
+        }
+        if (state.GetOption(STAT_RUN_PLAYER_DAMAGE) == 0) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_DAMAGE);
+        }
+        if (state.GetOption(STAT_RUN_MOST_TURNS_RECORD) <= 3) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_ALL_FLOORS_3_TURN);
+        }
+        if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 1000) {
+            AchievementsManager::MarkCompleted(AchievementId::SECRET_INFATUATE);
+        }
+    }
+
+    if (state.VerifyDefaultsExceptEnemyScaling() &&
+        state.GetOption(OPTNUM_ENEMY_HP) >= 200 &&
+        state.GetOption(OPTNUM_ENEMY_ATK) >= 200) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_DOUBLE_HP_ATK);
+    }
+
+    if (state.VerifyDefaultsExceptMarioScaling()) {
+        int32_t mario_hp_scale = state.GetOption(OPT_MARIO_HP);
+        int32_t mario_fp_scale = state.GetOption(OPT_MARIO_FP);
+        int32_t mario_bp_scale = state.GetOption(OPT_MARIO_BP);
+        int32_t mario_hp_level = state.hp_level_;
+        int32_t mario_fp_level = state.fp_level_;
+        int32_t mario_bp_level = state.bp_level_;
+
+        int32_t not_default_or_zero = 0;
+        int32_t zero = 0;
+        if (mario_hp_scale != 0 && mario_hp_scale != 5) ++not_default_or_zero;
+        if (mario_fp_scale != 0 && mario_fp_scale != 5) ++not_default_or_zero;
+        if (mario_bp_scale != 0 && mario_bp_scale != 5) ++not_default_or_zero;
+        if (mario_hp_scale == 0 || mario_hp_level == 0) ++zero;
+        if (mario_fp_scale == 0 || mario_fp_level == 0) ++zero;
+        if (mario_bp_scale == 0 || mario_bp_level == 0) ++zero;
+
+        if (not_default_or_zero == 0) {
+            if (zero >= 1) {
+                AchievementsManager::MarkCompleted(AchievementId::RUN_ZERO_STAT_1);
+            }
+            if (zero >= 2) {
+                AchievementsManager::MarkCompleted(AchievementId::RUN_ZERO_STAT_2);
+            }
+            if (zero >= 3) {
+                AchievementsManager::MarkCompleted(AchievementId::SECRET_ZERO_STATS_3);
+            }
+        }
     }
     
     return 2;

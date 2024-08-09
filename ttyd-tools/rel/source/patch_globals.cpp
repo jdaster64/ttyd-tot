@@ -50,6 +50,8 @@ void* (*g_itemEntry_trampoline)(
     const char*, int32_t, float, float, float, uint32_t, int32_t, void*) = nullptr;
 // cardmgr.o  800b2388
 void (*g_cardCopy2Main_trampoline)(int32_t) = nullptr;
+// mario_pouch.o  800d33f8
+int32_t (*g_pouchEquipBadgeIndex_trampoline)(int32_t) = nullptr;
 // mario_pouch.o  800d35a8
 void (*g_pouchReviseMarioParam_trampoline)() = nullptr;
 // mario_pouch.o 800d3e18
