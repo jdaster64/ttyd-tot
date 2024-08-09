@@ -7,6 +7,8 @@ namespace mod::tot {
 namespace CosmeticType {
     enum e {
         ATTACK_FX = 0,
+        MARIO_COSTUME,
+        YOSHI_COSTUME,
     };
 }
 

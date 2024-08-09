@@ -298,7 +298,7 @@ enum Options : uint32_t {
     OPTVAL_STARTER_ITEMS_BASIC  = 0x508'3'00'01,
     OPTVAL_STARTER_ITEMS_STRONG = 0x508'3'00'02,
     OPTVAL_STARTER_ITEMS_RANDOM = 0x508'3'00'03,
-    // Reserved: OPTVAL_STARTER_ITEMS_CUSTOM
+    OPTVAL_STARTER_ITEMS_CUSTOM = 0x508'3'00'04,    // Not used yet.
     // How enemies hold / drop items, and whether there are battle conditions.
     OPT_BATTLE_DROPS            = 0x40b'2'00'03,
     OPTVAL_DROP_STANDARD        = 0x50b'2'00'00,   // one drop + bonus chance
@@ -356,6 +356,11 @@ enum Options : uint32_t {
     OPT_NPC_CHOICE_2            = 0x432'4'00'09,
     OPT_NPC_CHOICE_3            = 0x436'4'00'09,
     OPT_NPC_CHOICE_4            = 0x43a'4'00'09,
+    // Determines whether the secret boss will appear.
+    OPT_SECRET_BOSS             = 0x43e'2'00'02,
+    OPTVAL_SECRET_BOSS_RANDOM   = 0x53e'2'00'00,
+    OPTVAL_SECRET_BOSS_OFF      = 0x53e'2'00'01,
+    OPTVAL_SECRET_BOSS_ON       = 0x53e'2'00'02,
     // Determines the maximum number of partners Mario can have in a run,
     // from 1-7 (default of 4).
     OPT_MAX_PARTNERS            = 0x440'3'00'07,
@@ -369,7 +374,7 @@ enum Options : uint32_t {
     OPTVAL_AC_1_UNSIMP          = 0x543'3'00'04,
     OPTVAL_AC_2_UNSIMP          = 0x543'3'00'05,
     OPTVAL_AC_3_UNSIMP          = 0x543'3'00'06,
-    // Next: 0x446 (3e and 3f are unused, as well.)
+    // Next: 0x446
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,
