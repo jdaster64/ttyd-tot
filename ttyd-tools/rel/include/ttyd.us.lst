@@ -1582,7 +1582,7 @@
 // 800fac58:BattleAttackDeclareAll
 // 800fad70:__declare
 // 800faecc:BattleAttackDeclare
-// 800fb01c:BattleCheckDamage
+800fb01c:BattleCheckDamage
 // 800fba1c:_checkDamageCode_EmergencyRevival
 800fbadc:BattlePreCheckDamage
 800fbd8c:BattleSetStatusDamageFromWeapon

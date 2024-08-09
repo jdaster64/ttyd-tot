@@ -47,7 +47,7 @@ namespace AchievementId {
         MISC_FAINTED_PARTNER,
         MISC_BANDIT_STEAL,
         MISC_BOMB_SQUAD_FIRE,
-        MISC_FROZEN_30,
+        MISC_FROZEN_20,
         MISC_POISON_50,
         MISC_SHRUNK_OHKO,
         MISC_THUNDER_STORM_GREAT,

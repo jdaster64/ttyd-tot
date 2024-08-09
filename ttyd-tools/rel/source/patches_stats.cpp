@@ -67,6 +67,10 @@ void ApplyFixedPatches() {
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_SPENT, -coins);
             } else {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED, coins);
+                if (g_Mod->state_.GetOption(tot::STAT_RUN_COINS_EARNED) >= 999) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::MISC_RUN_COINS_999);
+                }
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED, coins);
                 if (g_Mod->state_.GetOption(tot::STAT_PERM_COINS_EARNED) >= 10000) {
                     tot::AchievementsManager::MarkCompleted(

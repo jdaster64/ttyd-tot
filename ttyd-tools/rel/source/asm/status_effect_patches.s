@@ -2,6 +2,8 @@
 .global BranchBackCalculateCounterDamage
 .global StartToggleScopedAndCheckFreezeBreak
 .global BranchBackToggleScopedAndCheckFreezeBreak
+.global StartTrackPoisonDamage
+.global BranchBackTrackPoisonDamage
 
 StartCalculateCounterDamage:
 # Counterattack work (input to BattleCheckCounter).
@@ -17,6 +19,7 @@ bl calculateCounterDamage
 
 BranchBackCalculateCounterDamage:
 b 0
+
 
 StartToggleScopedAndCheckFreezeBreak:
 # If this is the final hit in the attack...
@@ -55,3 +58,11 @@ lwz %r0, 0x10 (%r1)
 BranchBackToggleScopedAndCheckFreezeBreak:
 b 0
 
+
+StartTrackPoisonDamage:
+lwz %r10, 0xb40 (%r4)
+add %r10, %r10, %r6
+stw %r10, 0xb40 (%r4)
+li %r10, 1  # Original opcode.
+BranchBackTrackPoisonDamage:
+b 0

@@ -375,6 +375,7 @@ LBL(10)
     USER_FUNC(evtTot_CheckCharlietonSoldOut, LW(0))
     IF_EQUAL(LW(0), 1)
         USER_FUNC(evt_msg_print_add, 0, PTR("tot_charlieton_success"))
+        USER_FUNC(evtTot_MarkCompletedAchievement, AchievementId::MISC_CHARLIETON_OUT_OF_STOCK)
         RETURN()
     END_IF()
     // Otherwise, offer to sell another.
@@ -556,6 +557,7 @@ LBL(0)
     USER_FUNC(evt_pouch_add_coin, LW(5))
     USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_LEVELS_SOLD, 1)
     USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::CHET_RIPPO)
+    USER_FUNC(evtTot_CheckCompletedAchievement, AchievementId::MISC_CHET_RIPPO_SELL_ALL)
     USER_FUNC(evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(evt_win_coin_off, LW(8))
@@ -601,6 +603,9 @@ EVT_BEGIN(TowerNpc_DazzleTalk)
         GOTO(99)
     END_IF()
     
+    IF_LARGE_EQUAL(LW(5), 100)
+        USER_FUNC(evtTot_MarkCompletedAchievement, AchievementId::MISC_DAZZLE_100_COINS)
+    END_IF()
     MUL(LW(5), -1)
     USER_FUNC(evt_pouch_add_coin, LW(5))
     USER_FUNC(evt_win_coin_wait, LW(8))
@@ -936,6 +941,13 @@ LBL(50)
     USER_FUNC(evt_item_entry, LW(0), LW(11), FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
     USER_FUNC(evt_item_get_item, LW(0))
     USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::ZESS_T)
+
+    SWITCH(LW(14))
+        CASE_EQUAL((int32_t)RecipeMode::DOUBLE_ITEM)
+            USER_FUNC(evtTot_MarkCompletedAchievement, AchievementId::MISC_ZESS_SIGNATURE)
+        CASE_EQUAL((int32_t)RecipeMode::POINT_SWAP)
+            USER_FUNC(evtTot_MarkCompletedAchievement, AchievementId::MISC_ZESS_POINT_SWAP)
+    END_SWITCH()
     
     // Check whether to prompt to cook something else.    
     USER_FUNC(evtTot_GetRecipeOptionsString, LW(15), LW(0))
@@ -1193,6 +1205,8 @@ EVT_DEFINE_USER_FUNC(evtTot_ReturnLumpy) {
     int32_t num_coins = g_Mod->state_.GetOption(STAT_RUN_NPC_LUMPY_COINS);
     ttyd::mario_pouch::pouchAddCoin(num_coins * 2);
     g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_COINS, 0);
+
+    AchievementsManager::CheckCompleted(AchievementId::MISC_LUMPY_DOUBLE_2);
     return 2;
 }
 

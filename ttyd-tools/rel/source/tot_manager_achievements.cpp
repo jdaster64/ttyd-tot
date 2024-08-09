@@ -1,5 +1,6 @@
 #include "tot_manager_achievements.h"
 
+#include "common_functions.h"
 #include "mod.h"
 #include "tot_state.h"
 
@@ -160,6 +161,24 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
 void AchievementsManager::CheckCompleted(int32_t ach) {
     const auto& state = g_Mod->state_;
     switch (ach) {
+        case AchievementId::MISC_CHET_RIPPO_SELL_ALL: {
+            if (state.hp_level_ > 0) return;
+            if (state.fp_level_ > 0) return;
+            if (state.bp_level_ > 0) return;
+            if (state.hp_p_level_ > 0 && GetNumActivePartners()) return;
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::MISC_LUMPY_DOUBLE_2: {
+            int32_t lumpy_deals = 0;
+            for (int32_t i = 0; i < 8; ++i) {
+                if (state.GetOption(STAT_RUN_NPCS_SELECTED, i) == 3 &&
+                    state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i))
+                    ++lumpy_deals;
+            }
+            if (lumpy_deals >= 2) MarkCompleted(ach);
+            break;
+        }
         case AchievementId::META_COSMETICS_5: {
             int32_t cosmetics = 0;
             for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {

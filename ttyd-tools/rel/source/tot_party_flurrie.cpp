@@ -1,6 +1,7 @@
 #include "tot_party_flurrie.h"
 
 #include "evt_cmd.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 
 #include <ttyd/battle.h>
@@ -30,6 +31,8 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_sub;
+using namespace ::ttyd::battle_unit;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_batstage;
@@ -79,11 +82,24 @@ void MakeSelectWeaponTable(
     }
 }
 
+// Check whether Gale KOed target was a midboss.
+EVT_DECLARE_USER_FUNC(evtTot_CheckGaleMidbossAchievement, 1)
+EVT_DEFINE_USER_FUNC(evtTot_CheckGaleMidbossAchievement) {
+    int32_t id = BattleTransID(evt, evtGetValue(evt, evt->evtArguments[0]));
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    
+    if (unit && unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
+        tot::AchievementsManager::MarkCompleted(
+            tot::AchievementId::MISC_SHRUNK_OHKO);
+    }
+    return 2;
+}
+
 // Check whether enemies should shake during wind attacks.
 EVT_DECLARE_USER_FUNC(evtTot_CheckEnemyShake, 3)
 EVT_DEFINE_USER_FUNC(evtTot_CheckEnemyShake) {
-    int32_t unit_idx = ttyd::battle_sub::BattleTransID(
-        evt, evtGetValue(evt, evt->evtArguments[0]));
+    int32_t unit_idx = BattleTransID(evt, evtGetValue(evt, evt->evtArguments[0]));
     auto* battleWork = ttyd::battle::g_BattleWork;
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
     auto* weapon = (BattleWeapon*)evtGetValue(evt, evt->evtArguments[1]);
@@ -514,6 +530,10 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
                     SET(LW(8), 4)
                 END_IF()
             END_IF()
+            IF_LARGE_EQUAL(LW(0), 8)
+                USER_FUNC(evtTot_MarkCompletedAchievement,
+                    AchievementId::MISC_THUNDER_STORM_GREAT)
+            END_IF()
     END_SWITCH()
     
     WAIT_FRM(60)
@@ -574,6 +594,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             USER_FUNC(btlevtcmd_GetDamageCode, LW(3), LW(0))
             IF_EQUAL(LW(0), 29)
                 SET(LW(0), 0)
+                USER_FUNC(evtTot_CheckGaleMidbossAchievement, LW(3))
             ELSE()
                 SET(LW(0), -1)
             END_IF()

@@ -1,6 +1,7 @@
 #include "tot_party_bobbery.h"
 
 #include "evt_cmd.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 
 #include <ttyd/battle.h>
@@ -8,12 +9,14 @@
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
+#include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_sanders.h>
@@ -27,6 +30,7 @@ using namespace ::ttyd::battle_camera;
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
+using namespace ::ttyd::battle_sub;
 using namespace ::ttyd::battle_unit;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
@@ -34,6 +38,8 @@ using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_sanders;
+
+using ::ttyd::evtmgr_cmd::evtGetValue;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 
@@ -83,6 +89,22 @@ uint32_t GetPoisonBombPower(
     BattleWorkUnit* target, BattleWorkUnitPart* part) {
     // Deals 1 damage to bombs so they can chain, but 0 to everything else.
     return target->current_kind == BattleUnitType::BOMB_SQUAD_BOMB;
+}
+
+EVT_DECLARE_USER_FUNC(evtTot_CheckPlayerMegatonHit, 1)
+EVT_DEFINE_USER_FUNC(evtTot_CheckPlayerMegatonHit) {
+    int32_t self_id = BattleTransID(evt, -2);
+    int32_t id = BattleTransID(evt, evtGetValue(evt, evt->evtArguments[0]));
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* self = ttyd::battle::BattleGetUnitPtr(battleWork, self_id);
+    auto* target = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    // Check for fully charged damage + a player character as target.
+    if (target && self && self->unit_work[3] == 20 &&
+        (target->true_kind == BattleUnitType::MARIO ||
+        target->true_kind >= BattleUnitType::GOOMBELLA)) {
+        AchievementsManager::MarkCompleted(AchievementId::MISC_MEGATON_BOMB);
+    }
+    return 2;
 }
 
 // Including definition of Bomb Squad bomb actor here, that way it's easier
@@ -322,6 +344,9 @@ EVT_BEGIN(unitBombzo_explosion_event)
     USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(8), 256, LW(5))
     IF_EQUAL(LW(5), 1)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(8), 256, LW(5))
+        IF_EQUAL(LW(8), PTR(&unitBombzo_weapon_Megaton))
+            USER_FUNC(evtTot_CheckPlayerMegatonHit, LW(3))
+        END_IF()
     END_IF()
     LBL(80)
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))

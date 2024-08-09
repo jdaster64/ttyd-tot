@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_state.h"
 
@@ -41,6 +42,7 @@ using namespace ::ttyd::battle_event_cmd;
 using namespace ::ttyd::battle_event_default;
 using namespace ::ttyd::battle_icon;
 using namespace ::ttyd::battle_message;
+using namespace ::ttyd::battle_unit;
 using namespace ::ttyd::battle_weapon_power;
 using namespace ::ttyd::evt_audience;
 using namespace ::ttyd::evt_eff;
@@ -95,6 +97,22 @@ void MakeSelectWeaponTable(
     }
 }
 
+// Check whether Gulp KOed target was a midboss.
+EVT_DECLARE_USER_FUNC(evtTot_CheckSwallowMidbossAchievement, 1)
+EVT_DEFINE_USER_FUNC(evtTot_CheckSwallowMidbossAchievement) {
+    int32_t id = ttyd::battle_sub::BattleTransID(
+        evt, evtGetValue(evt, evt->evtArguments[0]));
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    
+    if (unit && unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
+        tot::AchievementsManager::MarkCompleted(
+            tot::AchievementId::MISC_SHRUNK_OHKO);
+    }
+    return 2;
+}
+
+// Get the item the enemy was holding.
 EVT_DECLARE_USER_FUNC(evtTot_GetEggLayItem, 2)
 EVT_DEFINE_USER_FUNC(evtTot_GetEggLayItem) {
     auto* battleWork = ttyd::battle::g_BattleWork;
@@ -1462,6 +1480,8 @@ LBL(5)
         USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
         USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
     END_IF()
+
+    USER_FUNC(evtTot_CheckSwallowMidbossAchievement, LW(3))
         
     USER_FUNC(btlevtcmd_SetUnitWork, -2, 1, 1)
     BROTHER_EVT()

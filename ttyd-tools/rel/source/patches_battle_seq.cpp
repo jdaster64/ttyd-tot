@@ -11,6 +11,7 @@
 #include "tot_generate_condition.h"
 #include "tot_generate_reward.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_party_mario.h"
 
@@ -150,6 +151,8 @@ extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_EH;
 extern const int32_t g_btlseqTurn_Patch_RuleDispShowLonger;
 extern const int32_t g_btlseqTurn_Patch_RuleDispDismissOnlyWithB;
 extern const int32_t g_btlseqTurn_SpGradualRecoveryProc_BH;
+extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitAlloc;
+extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitMemset;
 extern const int32_t g_btlseqEnd_JudgeRuleEarly_BH;
 extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule;
 extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH;
@@ -235,12 +238,17 @@ void CheckBattleCondition() {
     
     // Did not win the fight (e.g. ran away).
     if (fbat_info->wResult != 1) return;
-    
-    // Did not win the fight (an enemy still has a stolen item);
-    // Skip this check if forced refights are disabled.
-    if (state.CheckOptionValue(tot::OPTVAL_BANDIT_FORCE_REFIGHT)) {
-        for (int32_t i = 0; i < 8; ++i) {
-            if (npc_info->wStolenItems[i] != 0) return;
+
+    for (int32_t i = 0; i < 8; ++i) {
+        if (npc_info->wStolenItems[i] != 0) {
+            if (state.CheckOptionValue(tot::OPTVAL_BANDIT_FORCE_REFIGHT)) {
+                // Did not win the fight (an enemy still has a stolen item).
+                return;
+            }
+            // If no forced refights, achievement for getting away.
+            tot::AchievementsManager::MarkCompleted(
+                tot::AchievementId::MISC_BANDIT_STEAL);
+            break;
         }
     }
     
@@ -379,6 +387,14 @@ void ApplyFixedPatches() {
             // Copy information back to parent npc after battle, if applicable.
             if (post_battle_state) CopyChildBattleInfo(/* to_child = */ false);
         });
+
+    // Enlarge size of BattleWorkUnit struct to add ToT-relevant fields.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_BtlUnit_Entry_Patch_BattleWorkUnitAlloc),
+        0x38600b50U /* li r3, 0xb34 -> 0xb50 */);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_BtlUnit_Entry_Patch_BattleWorkUnitMemset),
+        0x38a00b50U /* li r5, 0xb34 -> 0xb50 */);
 
     g_Btl_UnitSetup_trampoline = patch::hookFunction(
         ttyd::battle::Btl_UnitSetup, [](BattleWork* battleWork) {
@@ -619,6 +635,16 @@ int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
             }
         }
     }
+
+    // Check for dead partners, and give achievement if any exist.
+    for (int32_t i = 1; i <= 7; ++i) {
+        const auto& data = ttyd::mario_pouch::pouchGetPtr()->party_data[i];
+        if ((data.flags & 1) && data.current_hp == 0) {
+            tot::AchievementsManager::MarkCompleted(
+                tot::AchievementId::MISC_FAINTED_PARTNER);
+        }
+    }
+
     return result < 100 ? result : 100;
 }
 

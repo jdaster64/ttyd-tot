@@ -75,6 +75,10 @@ void (*g_BattleActionCommandSetDifficulty_trampoline)(
 // battle_ac.o  800fa1b8
 int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*) = nullptr;
+// battle_damage.o  800fb01c
+int32_t (*g_BattleCheckDamage_trampoline)(
+    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
+    BattleWeapon*, uint32_t) = nullptr;
 // battle_damage.o  800fbadc
 int32_t (*g_BattlePreCheckDamage_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
@@ -294,6 +298,7 @@ extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_BH = 0x8011c05c;
 extern const int32_t g_btlSeqMove_FixMarioSingleMoveCheck_EH = 0x8011c11c;
 extern const int32_t g_btlseqTurn_Patch_RuleDispShowLonger = 0x8011c5ec;
 extern const int32_t g_btlseqTurn_Patch_RuleDispDismissOnlyWithB = 0x8011c62c;
+extern const int32_t g_btlseqTurn_TrackPoisonDamage_BH = 0x8011d920;
 extern const int32_t g_btlseqTurn_HappyHeartProc_BH = 0x8011ded4;
 extern const int32_t g_btlseqTurn_HappyHeartProc_EH = 0x8011defc;
 extern const int32_t g_btlseqTurn_HappyFlowerProc_BH = 0x8011e08c;
@@ -311,6 +316,8 @@ extern const int32_t g__btlcmd_MakeSelectWeaponTable_Patch_GetNameFromItem = 0x8
 extern const int32_t g_BtlUnit_EnemyItemCanUseCheck_Patch_SkipCheck = 0x80125d54;
 extern const int32_t g_BtlUnit_CheckPinchStatus_PerilThreshold_BH = 0x80126e20;
 extern const int32_t g_BtlUnit_CheckPinchStatus_DangerThreshold_BH = 0x80126e84;
+extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitAlloc = 0x8012903c;
+extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitMemset = 0x80129058;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_BH = 0x8013d140;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_EH = 0x8013d144;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_CH1 = 0x8013d404;

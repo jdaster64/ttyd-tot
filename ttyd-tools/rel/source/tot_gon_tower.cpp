@@ -8,6 +8,7 @@
 #include "tot_gon.h"
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
@@ -302,8 +303,13 @@ EVT_BEGIN(Tower_ChestEvt_3)
     RETURN()
 EVT_END()
 
-// Increment floor number.
+// Runs when exiting a regular tower floor.
 EVT_BEGIN(Tower_IncrementFloor)
+    // If chest unclaimed but accessible, give achievement for skipping.
+    IF_EQUAL((int32_t)GSW_Tower_DisplayChestIcons, 1)
+        USER_FUNC(evtTot_MarkCompletedAchievement, AchievementId::MISC_KEY_SKIP_CHEST)
+    END_IF()
+    // Increment floor number and run end-of-floor logic.
     USER_FUNC(evtTot_ToggleIGT, 0)
     USER_FUNC(evtTot_IncrementFloor, 1)
     SET(LW(0), 0)

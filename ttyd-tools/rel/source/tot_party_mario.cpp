@@ -1,6 +1,7 @@
 #include "tot_party_mario.h"
 
 #include "evt_cmd.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_party_bobbery.h"
 #include "tot_party_koops.h"
@@ -328,6 +329,8 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckBombSquadHit) {
             unit->position.x < cur_position) {
             // Run explosion event.
             ttyd::battle_unit_event::BattleRunHitEvent(unit, 0x717);
+            // Mark off achievement.
+            AchievementsManager::MarkCompleted(AchievementId::MISC_BOMB_SQUAD_FIRE);
         }
     }
 

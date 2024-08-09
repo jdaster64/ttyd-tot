@@ -8,6 +8,7 @@
 #include "patches_mario_move.h"
 #include "tot_custom_rel.h"
 #include "tot_generate_enemy.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
@@ -82,6 +83,8 @@ extern "C" {
     void BranchBackCalculateCounterDamage();
     void StartToggleScopedAndCheckFreezeBreak();
     void BranchBackToggleScopedAndCheckFreezeBreak();
+    void StartTrackPoisonDamage();
+    void BranchBackTrackPoisonDamage();
     // target_selection_patches.s
     void StartCommandHandleSideSelection();
     void BranchBackCommandHandleSideSelection();
@@ -158,6 +161,9 @@ extern void (*g_BattleActionCommandSetDifficulty_trampoline)(
     BattleWork*, BattleWorkUnit*, int32_t);
 extern int32_t (*g_BattleActionCommandCheckDefence_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
+extern int32_t (*g_BattleCheckDamage_trampoline)(
+    BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
+    BattleWeapon*, uint32_t);
 extern int32_t (*g_BattlePreCheckDamage_trampoline)(
     BattleWorkUnit*, BattleWorkUnit*, BattleWorkUnitPart*,
     BattleWeapon*, uint32_t);
@@ -196,6 +202,7 @@ extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_BH;
 extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_EH;
 extern const int32_t g_BattleDamageDirect_CheckPlayAttackFX_CH1;
 extern const int32_t g_btlSeqAct_SetConfuseProcRate_BH;
+extern const int32_t g_btlseqTurn_TrackPoisonDamage_BH;
 extern const int32_t g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH;
 extern const int32_t g_BattleCommandDisplay_HandleSelectSide_BH;
 extern const int32_t g_BattleCommandDisplay_HandleSelectSide_EH;
@@ -461,7 +468,7 @@ uint32_t GetStatusDamageFromWeapon(
                     if (target->poison_turns > 0) {
                         strength = target->poison_strength + 1;
                     }
-                    if (strength > 5) strength = 5;
+                    if (strength > 99) strength = 99;
                     break;
                 case StatusEffectType::HUGE:
                 case StatusEffectType::ATTACK_UP:
@@ -604,7 +611,7 @@ uint32_t StatusEffectTick(BattleWorkUnit* unit, int8_t status_type) {
             strength = 1;
             turns = 100;
         }
-    } else if (status_type == StatusEffectType::POISON && strength < 5) {
+    } else if (status_type == StatusEffectType::POISON && strength < 99) {
         // Poison strengthens every turn it remains active.
         ++strength;
     }
@@ -976,10 +983,13 @@ int32_t CalculateBaseDamage(
         damage = (damage + last_stands) / (last_stands + 1);
     }
     
+    bool freeze_broken = false;
     // Double the damage of a hit if it will break Freeze status.
     if (BtlUnit_CheckStatus(target, StatusEffectType::FREEZE) &&
         element != AttackElement::ICE && weapon->freeze_time == 0) {
         damage *= 2;
+
+        freeze_broken = true;
     }
     
     switch (def_attr) {
@@ -1006,6 +1016,10 @@ int32_t CalculateBaseDamage(
         (sp & AttackSpecialProperty_Flags::UNKNOWN_0x8000 ||
          !(target->attribute_flags & BattleUnitAttribute_Flags::UNK_100))) {
         *unk0 |= 0x10000;
+    }
+
+    if (freeze_broken && damage >= 20) {
+        tot::AchievementsManager::MarkCompleted(tot::AchievementId::MISC_FROZEN_20);
     }
     
     return damage;
@@ -1275,6 +1289,28 @@ void ApplyFixedPatches() {
             }
             return defense_result;
         });
+
+    // Run additional logic at start of BattleCheckDamage.
+    g_BattleCheckDamage_trampoline = patch::hookFunction(
+        ttyd::battle_damage::BattleCheckDamage, [](
+            BattleWorkUnit* attacker, BattleWorkUnit* target, 
+            BattleWorkUnitPart* part, BattleWeapon* weapon, 
+            uint32_t extra_params) {
+                if (attacker) {
+                    attacker->last_attacker_weapon = weapon;
+                    attacker->last_target_weapon = nullptr;
+                    attacker->last_target_weapon_cr_flags = 0;
+                }
+                if (target) {
+                    target->last_attacker_weapon = nullptr;
+                    target->last_target_weapon = weapon;
+                    if (weapon)
+                        target->last_target_weapon_cr_flags = 
+                            weapon->counter_resistance_flags;
+                }
+                return g_BattleCheckDamage_trampoline(
+                    attacker, target, part, weapon, extra_params);
+            });
     
     // Replacing several core damage / status infliction functions.
     g_BattlePreCheckDamage_trampoline = patch::hookFunction(
@@ -1394,7 +1430,14 @@ void ApplyFixedPatches() {
                     g_Mod->state_.ChangeOption(
                         tot::STAT_RUN_INFATUATE_DAMAGE, damage);
                 }
-                    
+
+                // Check for Superguarded dragon bites.
+                if (unit_idx == -5 && unk0 == 0x137 &&
+                    target->last_attacker_weapon == &tot::custom::unitDragon_weaponBite) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::MISC_SUPERGUARD_BITE);
+                    tot::SetSWF(tot::GSWF_Battle_Hooktail_BiteReactionSeen);
+                }
             }
             // Run normal damage logic.
             g_BattleDamageDirect_trampoline(
@@ -1487,6 +1530,12 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleCheckDamage_AlwaysFreezeBreak_BH),
         reinterpret_cast<void*>(StartToggleScopedAndCheckFreezeBreak),
         reinterpret_cast<void*>(BranchBackToggleScopedAndCheckFreezeBreak));
+            
+    // Track the total damage dealt by Poison status.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_btlseqTurn_TrackPoisonDamage_BH),
+        reinterpret_cast<void*>(StartTrackPoisonDamage),
+        reinterpret_cast<void*>(BranchBackTrackPoisonDamage));
             
     // Skip drawing Huge / Tiny status arrows when inflicted.
     mod::patch::writePatch(
@@ -1614,17 +1663,31 @@ void ApplyFixedPatches() {
                 case 0:
                 case 1:
                 case 4:
-                case 6:
+                case 6: {
+                    ttyd::battle::BattleWorkCommandCursor* cursor;
+                    ttyd::battle_seq_command::_btlcmd_GetCursorPtr(
+                        command_work, command_work->current_cursor_type, &cursor);
+                    const int32_t move_type = 
+                        command_work->weapon_table[cursor->abs_position].index;
+                    tot::MoveManager::LogMoveUse(move_type);
                     break;
-                default:
-                    return;
+                }
+                case 2: {
+                    ttyd::battle::BattleWorkCommandCursor* cursor;
+                    ttyd::battle_seq_command::_btlcmd_GetCursorPtr(
+                        command_work, command_work->current_cursor_type, &cursor);
+                    const int32_t item_type = 
+                        command_work->weapon_table[cursor->abs_position].weapon->item_id;
+
+                    if (item_type == ItemType::TRADE_OFF &&
+                        ttyd::battle::g_BattleWork->turn_count <= 1 &&
+                        g_Mod->state_.IsFinalBossFloor()) {
+                        tot::AchievementsManager::MarkCompleted(
+                            tot::AchievementId::MISC_TRADE_OFF_BOSS);
+                    }
+                    break;
+                }
             }
-            ttyd::battle::BattleWorkCommandCursor* cursor;
-            ttyd::battle_seq_command::_btlcmd_GetCursorPtr(
-                command_work, command_work->current_cursor_type, &cursor);
-            const int32_t move_type = 
-                command_work->weapon_table[cursor->abs_position].index;
-            tot::MoveManager::LogMoveUse(move_type);
         });
         
     // Quick Change FP cost:

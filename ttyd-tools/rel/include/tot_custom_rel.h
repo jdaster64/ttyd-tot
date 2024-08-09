@@ -127,6 +127,7 @@ extern ttyd::battle_database_common::BattleUnitKind unit_FuzzyHorde;
 
 // Other structures referenced by patches, etc.
 extern ttyd::battle_database_common::BattleWeapon unitBobOmb_weaponBomb;
+extern ttyd::battle_database_common::BattleWeapon unitDragon_weaponBite;
 extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_ZYux_Main;

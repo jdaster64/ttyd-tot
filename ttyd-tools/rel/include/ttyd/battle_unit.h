@@ -445,10 +445,20 @@ struct BattleWorkUnit {
     int32_t         held_item;
     battle_database_common::ItemDropData* held_item_table;
     
-    int8_t          misc_310[0x824];
+    int8_t          misc_0x310[0x824];
+
+    // Added fields; only for ToT.
+
+    // Note that these weapon pointers are not guaranteed to be valid;
+    // only check for exact equality with a known valid weapon's address!
+    ttyd::battle_database_common::BattleWeapon* last_attacker_weapon;
+    ttyd::battle_database_common::BattleWeapon* last_target_weapon;
+    uint32_t        last_target_weapon_cr_flags;
+    int32_t         poison_damage;
+    int8_t          reserved_0xb44[0xc];
 } ;
 
-static_assert(sizeof(BattleWorkUnit) == 0xb34);
+static_assert(sizeof(BattleWorkUnit) == 0xb50);
 
 extern "C" {
 

@@ -15,9 +15,8 @@ enum GlobalWorkVars {
     GSW_Tower_DisplayChestIcons,
     GSW_Tower_ContinuingFromGameOver,
     GSW_Battle_AtomicBoo_BreathGuardCount,
-    GSW_Battle_Hooktail_BiteReactionSeen,
 
-    // Flags used for tower progression.
+    // Flags used for tower progression / one-time dialogue.
     GSWF_Chest_0                            = GSWF(6000),
     GSWF_Chest_1,
     GSWF_Chest_2,
@@ -25,6 +24,7 @@ enum GlobalWorkVars {
     GSWF_Lock,
     GSWF_Lobby_InConfirm,
     GSWF_Lobby_Confirmed,
+    GSWF_Battle_Hooktail_BiteReactionSeen,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

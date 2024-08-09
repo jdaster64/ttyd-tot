@@ -1023,6 +1023,10 @@ void ApplyFixedPatches() {
             // Track coins, Star Pieces, and Shine Sprites gained.
             if (item_type == ItemType::COIN) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED);
+                if (g_Mod->state_.GetOption(tot::STAT_RUN_COINS_EARNED) >= 999) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::MISC_RUN_COINS_999);
+                }
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED);
                 if (g_Mod->state_.GetOption(tot::STAT_PERM_COINS_EARNED) >= 10000) {
                     tot::AchievementsManager::MarkCompleted(
@@ -1036,6 +1040,10 @@ void ApplyFixedPatches() {
             if (item_type == ItemType::SHINE_SPRITE) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_SHINE_SPRITES);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_SHINE_SPRITES);
+                if (g_Mod->state_.GetOption(tot::STAT_PERM_SHINE_SPRITES) > 9) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::MISC_SHINES_10);
+                }
             }
             
             // Handle items with special effects in ToT.

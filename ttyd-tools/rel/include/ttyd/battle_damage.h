@@ -36,7 +36,10 @@ extern "C" {
 // BattleAttackDeclareAll
 // __declare
 // BattleAttackDeclare
-// BattleCheckDamage
+int32_t BattleCheckDamage(
+    battle_unit::BattleWorkUnit* attacker, battle_unit::BattleWorkUnit* target,
+    battle_unit::BattleWorkUnitPart* part,
+    battle_database_common::BattleWeapon* weapon, uint32_t extra_params);
 // _checkDamageCode_EmergencyRevival
 int32_t BattlePreCheckDamage(
     battle_unit::BattleWorkUnit* attacker, battle_unit::BattleWorkUnit* target,

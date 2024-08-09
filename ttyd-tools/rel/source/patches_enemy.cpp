@@ -232,6 +232,11 @@ void ApplyFixedPatches() {
                     }
                 }
 
+                if (unit->poison_damage >= 50) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::MISC_POISON_50);
+                }
+
                 if (unit->true_kind == BattleUnitType::GOLD_FUZZY) {
                     tot::AchievementsManager::MarkCompleted(
                         tot::AchievementId::META_SECRET_BOSS);
