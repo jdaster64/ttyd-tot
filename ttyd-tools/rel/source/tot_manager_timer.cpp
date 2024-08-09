@@ -117,4 +117,31 @@ EVT_DEFINE_USER_FUNC(evtTot_ToggleIGT) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
+    auto& state = g_Mod->state_;
+    int32_t igt_centis = DurationTicksToCentiseconds(state.current_total_igt_);
+
+    switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+        case OPTVAL_DIFFICULTY_HALF:
+            state.ChangeOption(STAT_PERM_HALF_FINISHES);
+            if (igt_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME))
+                state.SetOption(STAT_PERM_HALF_BEST_TIME, igt_centis);
+            break;
+        case OPTVAL_DIFFICULTY_FULL:
+            state.ChangeOption(STAT_PERM_FULL_FINISHES);
+            if (igt_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME))
+                state.SetOption(STAT_PERM_FULL_BEST_TIME, igt_centis);
+            break;
+        case OPTVAL_DIFFICULTY_FULL_EX:
+            state.ChangeOption(STAT_PERM_EX_FINISHES);
+            if (igt_centis < state.GetOption(STAT_PERM_EX_BEST_TIME))
+                state.SetOption(STAT_PERM_EX_BEST_TIME, igt_centis);
+            break;
+        default:
+            break;
+    }
+    
+    return 2;
+}
+
 }  // namespace mod::tot

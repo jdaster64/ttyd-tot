@@ -42,7 +42,9 @@ void ApplyFixedPatches() {
             // Track FP / SP spent.
             const int32_t fp_cost = BtlUnit_GetWeaponCost(unit, weapon);
             g_Mod->state_.ChangeOption(tot::STAT_RUN_FP_SPENT, fp_cost);
+            g_Mod->state_.ChangeOption(tot::STAT_PERM_FP_SPENT, fp_cost);
             g_Mod->state_.ChangeOption(tot::STAT_RUN_SP_SPENT, weapon->base_sp_cost);
+            g_Mod->state_.ChangeOption(tot::STAT_PERM_SP_SPENT, weapon->base_sp_cost);
             // Run normal pay-weapon-cost logic.
             g_BtlUnit_PayWeaponCost_trampoline(unit, weapon);
         });
@@ -52,8 +54,10 @@ void ApplyFixedPatches() {
             // Track coins gained / spent (stolen coins subtract from gained).
             if (coins < 0 && !ttyd::mariost::g_MarioSt->bInBattle) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_SPENT, -coins);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_SPENT, -coins);
             } else {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED, coins);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED, coins);
             }
             // Run coin increment logic.
             return g_pouchAddCoin_trampoline(coins);
@@ -68,6 +72,7 @@ void ApplyFixedPatches() {
                 counter == &actRecordWork.partner_num_times_attack_items_used ||
                 counter == &actRecordWork.partner_num_times_non_attack_items_used) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_ITEMS_USED);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_ITEMS_USED);
             }
             // Run act record counting logic.
             g_BtlActRec_AddCount_trampoline(counter); 

@@ -417,6 +417,7 @@ LBL(0)
     USER_FUNC(ttyd::evt_pouch::N_evt_pouch_remove_item_index, LW(1), LW(4), LW(0))
     USER_FUNC(ttyd::evt_pouch::evt_pouch_add_coin, LW(3))
     USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_ITEMS_SOLD, 1)
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::WONKY)
     USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
@@ -465,6 +466,7 @@ LBL(0)
     USER_FUNC(ttyd::evt_pouch::N_evt_pouch_remove_item_index, LW(1), LW(4), LW(0))
     USER_FUNC(ttyd::evt_pouch::evt_pouch_add_coin, LW(3))
     USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_BADGES_SOLD, 1)
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::WONKY)
     USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
@@ -552,6 +554,7 @@ LBL(0)
     // TODO: Play a sound effect or visual effect?
     USER_FUNC(evt_pouch_add_coin, LW(5))
     USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_LEVELS_SOLD, 1)
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::CHET_RIPPO)
     USER_FUNC(evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(evt_win_coin_off, LW(8))
@@ -931,6 +934,7 @@ LBL(50)
     USER_FUNC(evtTot_GetUniqueItemName, LW(0))
     USER_FUNC(evt_item_entry, LW(0), LW(11), FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
     USER_FUNC(evt_item_get_item, LW(0))
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::ZESS_T)
     
     // Check whether to prompt to cook something else.    
     USER_FUNC(evtTot_GetRecipeOptionsString, LW(15), LW(0))
@@ -1427,32 +1431,52 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckNpcEffectEnabled) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
-    const int32_t floor = g_Mod->state_.floor_;
+    auto& state = g_Mod->state_;
+    const int32_t floor = state.floor_;
     switch (evtGetValue(evt, evt->evtArguments[0])) {
-        case SecondaryNpcType::GRUBBA: {
-            g_Mod->state_.SetOption(STAT_RUN_NPC_GRUBBA_FLOOR, floor);
-            break;
-        }
-        case SecondaryNpcType::DOOPLISS: {
-            g_Mod->state_.SetOption(STAT_RUN_NPC_DOOPLISS_FLOOR, floor);
+        case SecondaryNpcType::WONKY: {
+            state.ChangeOption(STAT_PERM_NPC_WONKY_TRADES, 1);
             break;
         }
         case SecondaryNpcType::DAZZLE: {
-            g_Mod->state_.SetOption(STAT_RUN_NPC_DAZZLE_FLOOR, floor);
+            state.SetOption(STAT_RUN_NPC_DAZZLE_FLOOR, floor);
+            state.ChangeOption(STAT_PERM_NPC_DAZZLE_TRADES, 1);
+            break;
+        }
+        case SecondaryNpcType::CHET_RIPPO: {
+            state.ChangeOption(STAT_PERM_NPC_RIPPO_TRADES, 1);
             break;
         }
         case SecondaryNpcType::LUMPY: {
             auto& coins = ttyd::mario_pouch::pouchGetPtr()->coins;
-            g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_COINS, coins);
-            g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_FLOOR, floor);
+            state.SetOption(STAT_RUN_NPC_LUMPY_COINS, coins);
+            state.SetOption(STAT_RUN_NPC_LUMPY_FLOOR, floor);
+            state.ChangeOption(STAT_PERM_NPC_LUMPY_TRADES, 1);
             coins = 0;
             break;
         }
+        case SecondaryNpcType::GRUBBA: {
+            state.SetOption(STAT_RUN_NPC_GRUBBA_FLOOR, floor);
+            state.ChangeOption(STAT_PERM_NPC_GRUBBA_DEAL, 1);
+            break;
+        }
+        case SecondaryNpcType::DOOPLISS: {
+            state.SetOption(STAT_RUN_NPC_DOOPLISS_FLOOR, floor);
+            state.ChangeOption(STAT_PERM_NPC_DOOPLISS_DEAL, 1);
+            break;
+        }
         case SecondaryNpcType::MOVER: {
-            g_Mod->state_.SetOption(STAT_RUN_NPC_MOVER_FLOOR, floor);
+            state.SetOption(STAT_RUN_NPC_MOVER_FLOOR, floor);
+            state.ChangeOption(STAT_PERM_NPC_MOVER_TRADES, 1);
+            break;
+        }
+        case SecondaryNpcType::ZESS_T: {
+            state.ChangeOption(STAT_PERM_NPC_ZESS_COOKS, 1);
             break;
         }
     }
+    // Set flag for having dealt with an NPC on each floor.
+    state.SetOption(STAT_RUN_NPCS_DEALT_WITH, 1, floor / 8);
     return 2;
 }
 

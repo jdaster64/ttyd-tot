@@ -136,6 +136,11 @@ void OnFileLoad(bool new_file = true) {
         
         // Initialize Tower of Trials-specific state & pouch stuff.
         tot::OptionsManager::InitLobby();
+
+        // Initialize best times to maximum time.
+        g_Mod->state_.SetOption(tot::STAT_PERM_HALF_BEST_TIME, 100 * 60 * 60 * 100 - 1);
+        g_Mod->state_.SetOption(tot::STAT_PERM_FULL_BEST_TIME, 100 * 60 * 60 * 100 - 1);
+        g_Mod->state_.SetOption(tot::STAT_PERM_EX_BEST_TIME, 100 * 60 * 60 * 100 - 1);
     }
 }
 

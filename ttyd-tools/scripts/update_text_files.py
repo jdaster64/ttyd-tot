@@ -1228,6 +1228,10 @@ g_StringMap = {
         b"msg_menu_move_log":
             b'Information about the moves\n'
             b'Mario and party can perform.',
+        
+        b"msg_menu_move_records":
+            b"Records of past runs' stats and\n"
+            b'your overall completion progress.',
             
         b"tot_movelog_jump":        b"Jump Moves",
         b"tot_movelog_hammer":      b"Hammer Moves",
@@ -1728,6 +1732,76 @@ g_StringMap = {
         b"tot_movelog_d963":
             b"\nLv. 3: Heal up to 15 HP for\n"
             b"both Mario and Mowz for 10 FP.",
+            
+            
+        # Records log text.
+        
+        b"tot_recn_overall":            b"Completion",
+        b"tot_recn_playtime":           b"Total Play Time",
+        b"tot_recn_completion_pct":     b"Completion %",
+        b"tot_recn_item_pct":           b"Items Log",
+        b"tot_recn_badge_pct":          b"Badge Log",
+        b"tot_recn_move_pct":           b"Moves Log",
+        b"tot_recn_tattle_pct":         b"Tattle Log",
+        b"tot_recn_achievement_pct":    b"Achievement Log",
+        b"tot_recn_hub_pct":            b"Hub Progression",
+        b"tot_recn_hub":                b"Hub Progression",
+        b"tot_recn_hub_items":          b"Items Bought",
+        b"tot_recn_hub_badges":         b"Badges Bought",
+        b"tot_recn_hub_keyitems":       b"Key Items Bought",
+        b"tot_recn_hub_options":        b"Options Bought",
+        b"tot_recn_hub_marioskins":     b"???",
+        b"tot_recn_hub_yoshiskins":     b"???",
+        b"tot_recn_hub_attackfx":       b"???",
+        b"tot_recn_runs":               b"Run Completions",
+        b"tot_recn_half_wins":          b"Half Length",
+        b"tot_recn_full_wins":          b"Full Length",
+        b"tot_recn_ex_wins":            b"EX Difficulty",
+        b"tot_recn_continues":          b"Total Continues",
+        b"tot_recn_times":              b"Best Times (IGT)",
+        b"tot_recn_half_time":          b"Half Length",
+        b"tot_recn_full_time":          b"Full Length",
+        b"tot_recn_ex_time":            b"EX Difficulty",
+        b"tot_recn_runstats_1":         b"Run Stats (1/3)",
+        b"tot_recn_floors":             b"Floors Cleared",
+        b"tot_recn_turns":              b"Turns Spent",
+        b"tot_recn_runaway":            b"Times Ran Away",
+        b"tot_recn_kills":              b"Foes Defeated",
+        b"tot_recn_edamage":            b"Enemy Damage",
+        b"tot_recn_pdamage":            b"Player Damage",
+        b"tot_recn_coinsearned":        b"Coins Earned",
+        b"tot_recn_coinsspent":         b"Coins Spent",
+        b"tot_recn_runstats_2":         b"Run Stats (2/3)",
+        b"tot_recn_fpspent":            b"FP Spent",
+        b"tot_recn_spspent":            b"SP Spent",
+        b"tot_recn_superguards":        b"Superguards",
+        b"tot_recn_conditions":         b"Conditions Met",
+        b"tot_recn_starpieces":         b"Star Pieces",
+        b"tot_recn_shinesprites":       b"Shine Sprites",
+        b"tot_recn_itemsused":          b"Items Used",
+        b"tot_recn_itemsbought":        b"Items Bought",
+        b"tot_recn_runstats_3":         b"Run Stats (3/3)",
+        b"tot_recn_wonky":              b"Wonky Deals",
+        b"tot_recn_dazzle":             b"Dazzle Deals",
+        b"tot_recn_rippo":              b"Chet Rippo Deals",
+        b"tot_recn_lumpy":              b"Lumpy Deals",
+        b"tot_recn_grubba":             b"Grubba Deals",
+        b"tot_recn_doopliss":           b"Doopliss Deals",
+        b"tot_recn_mover":              b"Mover Deals",
+        b"tot_recn_zess":               b"Zess T. Deals",
+
+        b"tot_rech_progression":
+            b"Total playtime and Journal\n"
+            b"completion progress.",
+        b"tot_rech_hub_pct":
+            b"Unlockables purchased from\n"
+            b"various vendors in Petalburg.",
+        b"tot_rech_wins":
+            b"How many successful runs were\n"
+            b"completed, and best clear times.",
+        b"tot_rech_runstats":
+            b"Various stats aggregated across\n"
+            b"all of your past runs.",
         
         
         # Enemy names + Tattle info (TODO)

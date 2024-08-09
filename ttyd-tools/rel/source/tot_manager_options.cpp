@@ -201,6 +201,20 @@ void OptionsManager::InitFromSelectedOptions() {
     }
 
     ApplyOptionsOnLoad();
+
+    switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+        case OPTVAL_DIFFICULTY_HALF:
+            state.ChangeOption(STAT_PERM_HALF_ATTEMPTS, 1);
+            break;
+        case OPTVAL_DIFFICULTY_FULL:
+            state.ChangeOption(STAT_PERM_FULL_ATTEMPTS, 1);
+            break;
+        case OPTVAL_DIFFICULTY_FULL_EX:
+            state.ChangeOption(STAT_PERM_EX_ATTEMPTS, 1);
+            break;
+        default:
+            break;
+    }
     
     // Start timers and mark run as started.
     state.SetOption(OPT_RUN_STARTED, 1);

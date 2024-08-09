@@ -146,7 +146,10 @@ bool StateManager::Load(TotSaveSlot* save) {
     player->prevFollowerId[1] = mariost->saveParty1Id;
     
     // Add 1 to number of times the current run was continued.
-    if (GetOption(OPT_RUN_STARTED)) ChangeOption(STAT_RUN_CONTINUES);
+    if (GetOption(OPT_RUN_STARTED)) {
+        ChangeOption(STAT_RUN_CONTINUES);
+        ChangeOption(STAT_PERM_CONTINUES);
+    }
     
     return true;
 }
@@ -560,11 +563,6 @@ void StateManager::IncrementFloor(int32_t change) {
     // Update timer values for the current floor.
     TimerFloorUpdate();
     
-    // Make a backup save if advancing, and if the floor is divisible by 8.
-    if (floor_ % 8 == 0 && change > 0) {
-        Save(&g_BackupSave);
-    }
-    
     int32_t max_floor = 64;
     switch (GetOptionValue(tot::OPT_DIFFICULTY)) {
         case tot::OPTVAL_DIFFICULTY_TUTORIAL:
@@ -574,6 +572,16 @@ void StateManager::IncrementFloor(int32_t change) {
             max_floor = 32;
             break;
     }
+    if (floor_ < max_floor) {
+        // Update number of total floors cleared across all runs.
+        ChangeOption(STAT_PERM_FLOORS, change);
+    }
+    
+    // Make a backup save if advancing, and if the floor is divisible by 8.
+    if (floor_ % 8 == 0 && change > 0) {
+        Save(&g_BackupSave);
+    }
+
     floor_ = Clamp(floor_ + change, 0, max_floor);
     
     // Clear RNG state values that should reset every floor.
@@ -677,6 +685,7 @@ void StateManager::ClearRunStats() {
         splits_battle_igt_[i] = 0;
     }
     
+    // Only clear per-run play stats.
     for (int32_t i = 0; i < 0x100; ++i) {
         play_stats_[i] = 0;
     }

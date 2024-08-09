@@ -218,6 +218,8 @@ void CheckBattleCondition() {
     state.ChangeOption(
         tot::STAT_RUN_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
     state.ChangeOption(
+        tot::STAT_PERM_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
+    state.ChangeOption(
         tot::STAT_RUN_MOST_TURNS_CURRENT, ttyd::battle::g_BattleWork->turn_count);
     if (state.GetOption(tot::STAT_RUN_MOST_TURNS_CURRENT) >
         state.GetOption(tot::STAT_RUN_MOST_TURNS_RECORD)) {
@@ -228,6 +230,7 @@ void CheckBattleCondition() {
     }
     if (fbat_info->wResult != 1) {
         state.ChangeOption(tot::STAT_RUN_TIMES_RAN_AWAY);
+        state.ChangeOption(tot::STAT_PERM_TIMES_RAN_AWAY);
     }
     
     // Did not win the fight (e.g. ran away).
@@ -261,6 +264,7 @@ void CheckBattleCondition() {
         }
         // Increment the count of successful challenges.
         state.ChangeOption(tot::STAT_RUN_CONDITIONS_MET);
+        state.ChangeOption(tot::STAT_PERM_CONDITIONS_MET);
     }
     
     // If battle reward mode is "drop all held", award items other than the

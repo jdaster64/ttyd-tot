@@ -1,5 +1,6 @@
 #include "tot_window_log.h"
 
+#include "common_functions.h"
 #include "common_types.h"
 #include "mod.h"
 #include "tot_generate_enemy.h"
@@ -49,6 +50,89 @@ using ::ttyd::winmgr::WinMgrEntry;
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
+
+enum RecordLogOptions {
+    // All record-log specific options should have negative values.
+    REC_EMPTY = -100000,
+    REC_PLAY_TIME,
+    REC_COMPLETION_PCT,
+    REC_ITEM_PCT,
+    REC_BADGE_PCT,
+    REC_MOVE_PCT,
+    REC_TATTLE_PCT,
+    REC_ACHIEVEMENT_PCT,
+    REC_HUB_PROGRESS_PCT,
+    REC_HUB_ITEMS,
+    REC_HUB_BADGES,
+    REC_HUB_KEY_ITEMS,
+    REC_HUB_OPTIONS,
+    REC_HUB_MARIO_SKINS,
+    REC_HUB_YOSHI_SKINS,
+    REC_HUB_ATTACK_FX,
+};
+
+struct RecordLogEntry {
+    int32_t option;
+    const char* name_msg;
+    const char* desc_msg;
+};
+const RecordLogEntry kRecordLogEntries[] = {
+    { REC_EMPTY, "tot_recn_overall", "tot_rech_progression" },
+    { REC_PLAY_TIME, "tot_recn_playtime", "tot_rech_progression" },
+    { REC_COMPLETION_PCT, "tot_recn_completion_pct", "tot_rech_progression" },
+    { REC_ACHIEVEMENT_PCT, "tot_recn_achievement_pct", "tot_rech_progression" },
+    { REC_ITEM_PCT, "tot_recn_item_pct", "tot_rech_progression" },
+    { REC_BADGE_PCT, "tot_recn_badge_pct", "tot_rech_progression" },
+    { REC_MOVE_PCT, "tot_recn_move_pct", "tot_rech_progression" },
+    { REC_TATTLE_PCT, "tot_recn_tattle_pct", "tot_rech_progression" },
+    { REC_HUB_PROGRESS_PCT, "tot_recn_hub_pct", "tot_rech_hub_pct" },
+    { REC_EMPTY, "tot_recn_hub", "tot_rech_hub_pct" },
+    { REC_HUB_ITEMS, "tot_recn_hub_items", "tot_rech_hub_pct" },
+    { REC_HUB_BADGES, "tot_recn_hub_badges", "tot_rech_hub_pct" },
+    { REC_HUB_KEY_ITEMS, "tot_recn_hub_keyitems", "tot_rech_hub_pct" },
+    { REC_HUB_OPTIONS, "tot_recn_hub_options", "tot_rech_hub_pct" },
+    { REC_HUB_MARIO_SKINS, "tot_recn_hub_marioskins", "tot_rech_hub_pct" },
+    { REC_HUB_YOSHI_SKINS, "tot_recn_hub_yoshiskins", "tot_rech_hub_pct" },
+    { REC_HUB_ATTACK_FX, "tot_recn_hub_attackfx", "tot_rech_hub_pct" },
+    { REC_EMPTY, nullptr, "tot_rech_wins" },
+    { REC_EMPTY, "tot_recn_runs", "tot_rech_wins" },
+    { STAT_PERM_HALF_FINISHES, "tot_recn_half_wins", "tot_rech_wins" },
+    { STAT_PERM_FULL_FINISHES, "tot_recn_full_wins", "tot_rech_wins" },
+    { STAT_PERM_EX_FINISHES, "tot_recn_ex_wins", "tot_rech_wins" },
+    { STAT_PERM_CONTINUES, "tot_recn_continues", "tot_rech_wins" },
+    { REC_EMPTY, "tot_recn_times", "tot_rech_wins" },
+    { STAT_PERM_HALF_BEST_TIME, "tot_recn_half_time", "tot_rech_wins" },
+    { STAT_PERM_FULL_BEST_TIME, "tot_recn_full_time", "tot_rech_wins" },
+    { STAT_PERM_EX_BEST_TIME, "tot_recn_ex_time", "tot_rech_wins" },
+    { REC_EMPTY, "tot_recn_runstats_1", "tot_rech_runstats" },
+    { STAT_PERM_FLOORS, "tot_recn_floors", "tot_rech_runstats" },
+    { STAT_PERM_TURNS_SPENT, "tot_recn_turns", "tot_rech_runstats" },
+    { STAT_PERM_TIMES_RAN_AWAY, "tot_recn_runaway", "tot_rech_runstats" },
+    { STAT_PERM_ENEMIES_DEFEATED, "tot_recn_kills", "tot_rech_runstats" },
+    { STAT_PERM_ENEMY_DAMAGE, "tot_recn_edamage", "tot_rech_runstats" },
+    { STAT_PERM_PLAYER_DAMAGE, "tot_recn_pdamage", "tot_rech_runstats" },
+    { STAT_PERM_SUPERGUARDS, "tot_recn_superguards", "tot_rech_runstats" },
+    { STAT_PERM_CONDITIONS_MET, "tot_recn_conditions", "tot_rech_runstats" },
+    { REC_EMPTY, "tot_recn_runstats_2", "tot_rech_runstats" },
+    { STAT_PERM_FP_SPENT, "tot_recn_fpspent", "tot_rech_runstats" },
+    { STAT_PERM_SP_SPENT, "tot_recn_spspent", "tot_rech_runstats" },
+    { STAT_PERM_STAR_PIECES, "tot_recn_starpieces", "tot_rech_runstats" },
+    { STAT_PERM_SHINE_SPRITES, "tot_recn_shinesprites", "tot_rech_runstats" },
+    { STAT_PERM_COINS_EARNED, "tot_recn_coinsearned", "tot_rech_runstats" },
+    { STAT_PERM_COINS_SPENT, "tot_recn_coinsspent", "tot_rech_runstats" },
+    { STAT_PERM_ITEMS_USED, "tot_recn_itemsused", "tot_rech_runstats" },
+    { STAT_PERM_ITEMS_BOUGHT, "tot_recn_itemsbought", "tot_rech_runstats" },
+    { REC_EMPTY, "tot_recn_runstats_3", "tot_rech_runstats" },
+    { STAT_PERM_NPC_WONKY_TRADES, "tot_recn_wonky", "tot_rech_runstats" },
+    { STAT_PERM_NPC_DAZZLE_TRADES, "tot_recn_dazzle", "tot_rech_runstats" },
+    { STAT_PERM_NPC_RIPPO_TRADES, "tot_recn_rippo", "tot_rech_runstats" },
+    { STAT_PERM_NPC_LUMPY_TRADES, "tot_recn_lumpy", "tot_rech_runstats" },
+    { STAT_PERM_NPC_GRUBBA_DEAL, "tot_recn_grubba", "tot_rech_runstats" },
+    { STAT_PERM_NPC_DOOPLISS_DEAL, "tot_recn_doopliss", "tot_rech_runstats" },
+    { STAT_PERM_NPC_MOVER_TRADES, "tot_recn_mover", "tot_rech_runstats" },
+    { STAT_PERM_NPC_ZESS_COOKS, "tot_recn_zess", "tot_rech_runstats" },
+};
+const int32_t kNumRecordLogEntries = sizeof(kRecordLogEntries) / sizeof(RecordLogEntry);
 
 int32_t CompBadgeItemABC(int16_t* lhs, int16_t* rhs) {
     return strcmp(
@@ -437,6 +521,205 @@ void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
     }
 }
 
+void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
+    const auto& state = g_Mod->state_;
+
+    // Draw book background.
+    ttyd::win_root::winBookGX(win_x, win_y, menu, 1);
+    
+    int32_t page_first_entry = menu->records_log_cursor_idx / 9 * 9;
+    int32_t page_last_entry = page_first_entry + 9;
+
+    ttyd::win_main::winFontInit();
+    for (int32_t i = page_first_entry; i < page_last_entry; ++i) {
+        const auto& record = kRecordLogEntries[i];
+        const float pos_y = win_y - 16.0f - (i - page_first_entry) * 24.0f;
+
+        // Draw entry's name text.
+        {
+            gc::vec3 position = { win_x + 30.0f, pos_y, 0.0f };
+            gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+            uint32_t color = 
+                record.option == REC_EMPTY ? 0x403030FFU : 0x000000FFU;
+            const char* name =
+                record.name_msg ? msgSearch(record.name_msg) : "";
+            ttyd::win_main::winFontSet(&position, &scale, &color, name);
+        }
+
+        // Draw entry's value text.
+        if (record.option != REC_EMPTY) {
+            static char buf[64];
+            buf[0] = '\0';
+
+            char* ptr = buf;
+            switch (record.option) {
+                case REC_PLAY_TIME: {
+                    ptr += DurationTicksToFmtString(
+                        ttyd::mariost::g_MarioSt->lastFrameRetraceLocalTime, ptr);
+                    // Remove centiseconds from end of string.
+                    ptr[-3] = '\0';
+                    break;
+                }
+                case REC_COMPLETION_PCT: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_ACHIEVEMENT_PCT: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_ITEM_PCT: {
+                    sprintf(
+                        ptr, "%" PRId32 " / %" PRId32,
+                        menu->recipe_log_obtained_count,
+                        menu->recipe_log_total_count);
+                    break;
+                }
+                case REC_BADGE_PCT: {
+                    sprintf(
+                        ptr, "%" PRId32 " / %" PRId32,
+                        menu->badge_log_obtained_count,
+                        menu->badge_log_total_count);
+                    break;
+                }
+                case REC_MOVE_PCT: {
+                    sprintf(
+                        ptr, "%" PRId32 " / %" PRId32,
+                        menu->move_log_completed_count,
+                        MoveType::MOVE_TYPE_MAX);
+                    break;
+                }
+                case REC_TATTLE_PCT: {
+                    sprintf(
+                        ptr, "%" PRId32 " / %" PRId32,
+                        menu->tattle_log_obtained_count,
+                        menu->tattle_log_total_count);
+                    break;
+                }
+                case REC_HUB_PROGRESS_PCT: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_HUB_ITEMS: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_HUB_BADGES: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_HUB_KEY_ITEMS: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_HUB_OPTIONS: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_HUB_MARIO_SKINS: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_HUB_YOSHI_SKINS: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case REC_HUB_ATTACK_FX: {
+                    sprintf(ptr, "???");
+                    break;
+                }
+                case STAT_PERM_HALF_FINISHES: {
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_PERM_HALF_FINISHES), ptr);
+                    ptr += sprintf(ptr, " / ");
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_PERM_HALF_ATTEMPTS), ptr);
+                    break;
+                }
+                case STAT_PERM_FULL_FINISHES: {
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_PERM_FULL_FINISHES), ptr);
+                    ptr += sprintf(ptr, " / ");
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_PERM_FULL_ATTEMPTS), ptr);
+                    break;
+                }
+                case STAT_PERM_EX_FINISHES: {
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_PERM_EX_FINISHES), ptr);
+                    ptr += sprintf(ptr, " / ");
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_PERM_EX_ATTEMPTS), ptr);
+                    break;
+                }
+                case STAT_PERM_HALF_BEST_TIME:
+                case STAT_PERM_FULL_BEST_TIME:
+                case STAT_PERM_EX_BEST_TIME: {
+                    ptr += DurationCentisToFmtString(
+                        state.GetOption(record.option), ptr);
+                    break;
+                }
+                case STAT_PERM_CONDITIONS_MET: {
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_PERM_CONDITIONS_MET), ptr);
+                    ptr += sprintf(ptr, " / ");
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_PERM_CONDITIONS_TOTAL), ptr);
+                    break;
+                }
+                default: {
+                    ptr += IntegerToFmtString(
+                        state.GetOption(record.option), ptr);
+                    break;
+                }
+            }
+
+            gc::vec3 position = { win_x + 250.0f, pos_y, 0.0f };
+            gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+            uint32_t color = 0x000000FFU;
+            ttyd::win_main::winFontSet(&position, &scale, &color, buf);
+        }
+    }
+
+    // Draw L/R button icon / arrows.
+    if (page_first_entry != 0) {
+        {
+            ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+            gc::vec3 position = { win_x + 440.0f, win_y + 18.0f, 0.0f };
+            gc::vec3 scale = { -1.0f, -1.0f, -1.0f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winTexSet(0x17, &position, &scale, &color);
+        }
+        {
+            ttyd::win_main::winIconInit();        
+            gc::vec3 position = { win_x + 440.0f, win_y, 0.0f };
+            gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(
+                IconType::L_BUTTON, &position, &scale, &color);
+        }
+    }
+    if (page_last_entry < kNumRecordLogEntries) {
+        {
+            ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+            gc::vec3 position = { win_x + 440.0f, win_y - 255.0f, 0.0f };
+            gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winTexSet(0x17, &position, &scale, &color);
+        }
+        
+        {
+            ttyd::win_main::winIconInit();
+            gc::vec3 position = { win_x + 440.0f, win_y - 240.0f, 0.0f };
+            gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(
+                IconType::R_BUTTON, &position, &scale, &color);
+        }
+    }
+    
+}
+
 }  // namespace
 
 void ReplaceLogSortMethods() {
@@ -459,8 +742,8 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     // Hardcode Journal menu to have three submenus: Tattles, Items, Badges.
     menu->log_menu_state = 0;
     menu->log_submenu_cursor_idx = 0;
-    menu->log_submenu_count = 4;
-    for (int32_t i = 0; i < 4; ++i) {
+    menu->log_submenu_count = 5;
+    for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
         auto& submenu = menu->log_submenu_info[i];
         submenu.x = 0.0f;
         submenu.target_x = 0.0f;
@@ -478,6 +761,8 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     menu->log_submenu_info[2].help_msg = "msg_menu_kiroku_badge";
     menu->log_submenu_info[3].id = 5;
     menu->log_submenu_info[3].help_msg = "msg_menu_move_log";
+    menu->log_submenu_info[4].id = 7;
+    menu->log_submenu_info[4].help_msg = "msg_menu_move_records";
   
     menu->badge_log_total_count = 0;
     menu->badge_log_obtained_count = 0;
@@ -1050,6 +1335,70 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
 
             break;
         }
+        case 17: {
+            // Move log.
+
+            if (menu->buttons_pressed & ButtonId::START) {
+                return -2;
+            } else if (menu->buttons_pressed & ButtonId::B) {
+                ttyd::pmario_sound::psndSFXOn((char *)0x20013);
+                for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
+                    menu->log_submenu_info[i].state = 40;
+                }
+                menu->log_submenu_info[menu->log_submenu_cursor_idx].state = 20;
+                menu->log_menu_state = 0;
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
+                while (true) {
+                    if (--menu->records_log_cursor_idx < 0) {
+                        menu->records_log_cursor_idx = 1;
+                        break;
+                    }
+                    if (kRecordLogEntries[menu->records_log_cursor_idx].option 
+                        != REC_EMPTY)
+                        break;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
+                while (true) {
+                    if (++menu->records_log_cursor_idx >= kNumRecordLogEntries) {
+                        menu->records_log_cursor_idx = kNumRecordLogEntries - 1;
+                        break;
+                    }
+                    if (kRecordLogEntries[menu->records_log_cursor_idx].option 
+                        != REC_EMPTY)
+                        break;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if ((menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) ||
+                       (menu->buttons_repeated & ButtonId::L)) {
+                menu->records_log_cursor_idx = 
+                    menu->records_log_cursor_idx / 9 * 9 - 9;
+                if (menu->records_log_cursor_idx < 0) {
+                    menu->records_log_cursor_idx += 9;
+                }
+                ++menu->records_log_cursor_idx;
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if ((menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) ||
+                       (menu->buttons_repeated & ButtonId::R)) {
+                menu->records_log_cursor_idx = 
+                    menu->records_log_cursor_idx / 9 * 9 + 9;
+                if (menu->records_log_cursor_idx >= kNumRecordLogEntries) {
+                    menu->records_log_cursor_idx -= 9;
+                }
+                ++menu->records_log_cursor_idx;
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            }
+
+            // Set window description based on hovered option.
+            ttyd::win_root::winMsgEntry(
+                menu, 0, kRecordLogEntries[menu->records_log_cursor_idx].desc_msg, 0);
+
+            // Set cursor position based on selected entry.
+            menu->main_cursor_target_x = -180.0f;
+            menu->main_cursor_target_y = 106.0f - (menu->records_log_cursor_idx % 9) * 24;
+
+            break;
+        }
         case 21: {
             // Loading Tattle scene.
             if (menu->buttons_pressed & ButtonId::B) {
@@ -1353,9 +1702,12 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
              break;
     }
 
-    // Move log menu.
+    // New menus.
     if (menu->log_menu_state == 15) {
         DrawMoveLog(menu, win_x - 170.0f, win_y + 130.0f);
+    }
+    if (menu->log_menu_state == 17) {
+        DrawRecordsLog(menu, win_x - 170.0f, win_y + 130.0f);
     }
   
     // Draw banners for submenus.

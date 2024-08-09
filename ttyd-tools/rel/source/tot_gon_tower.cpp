@@ -747,6 +747,7 @@ EVT_BEGIN(Tower_FinalBossEvent)
     // Increment floor to lock timer.
     USER_FUNC(evtTot_ToggleIGT, 0)
     USER_FUNC(evtTot_IncrementFloor, 1)
+    USER_FUNC(evtTot_TrackCompletedRun)
     WAIT_MSEC(5000)
     
     // TODO: Flesh out victory animations, results, ...

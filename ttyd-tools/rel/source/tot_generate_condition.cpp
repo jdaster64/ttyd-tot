@@ -224,6 +224,7 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
     
     // Increment the counter of bonus challenges.
     state.ChangeOption(STAT_RUN_CONDITIONS_TOTAL);
+    state.ChangeOption(STAT_PERM_CONDITIONS_TOTAL);
 }
 
 void GetBattleConditionString(char* out_buf) {

@@ -1240,6 +1240,7 @@ void ApplyFixedPatches() {
                 if (defense_result == 5) {
                     // Successful Superguard, track in play stats.
                     g_Mod->state_.ChangeOption(tot::STAT_RUN_SUPERGUARDS);
+                    g_Mod->state_.ChangeOption(tot::STAT_PERM_SUPERGUARDS);
                 }
                 return defense_result;
             }
@@ -1260,6 +1261,7 @@ void ApplyFixedPatches() {
                 // Successful Superguard, subtract SP and track in play stats.
                 ttyd::mario_pouch::pouchAddAP(-sp_cost);
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_SUPERGUARDS);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_SUPERGUARDS);
             }
             if (restore_superguard_frames) {
                 memcpy(ttyd::battle_ac::superguard_frames, superguard_frames, 7);
@@ -1365,10 +1367,12 @@ void ApplyFixedPatches() {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_PLAYER_DAMAGE, damage);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_PLAYER_DAMAGE, damage);
             } else if (target->current_kind <= BattleUnitType::BONETAIL) {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_ENEMY_DAMAGE, damage);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_DAMAGE, damage);
             }
             // Run normal damage logic.
             g_BattleDamageDirect_trampoline(

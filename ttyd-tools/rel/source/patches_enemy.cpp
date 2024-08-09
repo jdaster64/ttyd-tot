@@ -210,10 +210,11 @@ void ApplyFixedPatches() {
     // Track enemy kills on deletion.
     g_BtlUnit_Delete_trampoline = patch::hookFunction(
         ttyd::battle_unit::BtlUnit_Delete, [](BattleWorkUnit* unit) {
-            int32_t tattle_idx = tot::GetCustomTattleIndex(unit->true_kind);
-            if (tattle_idx >= 0 &&
-                g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, tattle_idx) < 9999) {
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_KILLS, 1, tattle_idx);
+            int32_t idx = tot::GetCustomTattleIndex(unit->true_kind);
+            if (idx >= 0) {
+                if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, idx) < 9999)
+                    g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_KILLS, 1, idx);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMIES_DEFEATED, 1);
             }
             // Run original logic.
             return g_BtlUnit_Delete_trampoline(unit);

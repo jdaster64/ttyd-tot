@@ -1011,6 +1011,10 @@ EVT_DEFINE_USER_FUNC(evtTot_AfterItemBought) {
         }
         *last = -1;
     }
+
+    // Increase tracked items bought.
+    g_Mod->state_.ChangeOption(STAT_PERM_ITEMS_BOUGHT, 1);
+
     return 2;
 }
 

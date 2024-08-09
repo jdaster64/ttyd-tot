@@ -21,5 +21,7 @@ public:
 
 // Toggles the in-game timer on or off.
 EVT_DECLARE_USER_FUNC(evtTot_ToggleIGT, 1)
+// Tracks the completion.
+EVT_DECLARE_USER_FUNC(evtTot_TrackCompletedRun, 0)
 
 }

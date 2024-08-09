@@ -873,6 +873,7 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
 
                 // Track items used in the menu.
                 g_Mod->state_.ChangeOption(STAT_RUN_ITEMS_USED);
+                g_Mod->state_.ChangeOption(STAT_PERM_ITEMS_USED);
                 
                 menu->use_item_timer = 0;
                 menu->item_menu_state = 301;
