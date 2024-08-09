@@ -149,6 +149,8 @@ bool StateManager::Load(TotSaveSlot* save) {
     if (GetOption(OPT_RUN_STARTED)) {
         ChangeOption(STAT_RUN_CONTINUES);
         ChangeOption(STAT_PERM_CONTINUES);
+        // Decrement so exiting floor after a continue doesn't double-count.
+        if (floor_ > 0) ChangeOption(STAT_PERM_FLOORS, -1);
     }
     
     return true;
@@ -572,7 +574,7 @@ void StateManager::IncrementFloor(int32_t change) {
             max_floor = 32;
             break;
     }
-    if (floor_ < max_floor) {
+    if (floor_ != 0) {
         // Update number of total floors cleared across all runs.
         ChangeOption(STAT_PERM_FLOORS, change);
     }
