@@ -231,6 +231,11 @@ void ApplyFixedPatches() {
                             tot::AchievementId::AGG_MIDBOSS_TYPES_50);
                     }
                 }
+
+                if (unit->true_kind == BattleUnitType::GOLD_FUZZY) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::META_SECRET_BOSS);
+                }
             }
             // Run original logic.
             return g_BtlUnit_Delete_trampoline(unit);

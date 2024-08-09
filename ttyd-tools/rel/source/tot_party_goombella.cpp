@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "patch.h"
 #include "patches_battle.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 
 #include <gc/types.h>
@@ -486,7 +487,13 @@ EVT_BEGIN(partyChristineAttack_Monosiri)
     END_IF()
     USER_FUNC(btlevtcmd_get_monosiri_msg_no, LW(3), LW(4), LW(0))
     USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+
+    // Mark Tattle log flag.
     USER_FUNC(_monosiri_flag_on, LW(3))
+    // Check for completion of Tattle Log.
+    USER_FUNC(evtTot_CheckCompletedAchievement, AchievementId::META_TATTLE_LOG_BASIC)
+    USER_FUNC(evtTot_CheckCompletedAchievement, AchievementId::META_TATTLE_LOG_ALL)
+
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("PKR_T_1"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("PKR_S_1"))
     USER_FUNC(btlevtcmd_SetUnitWork, -2, 0, 4)

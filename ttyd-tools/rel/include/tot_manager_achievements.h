@@ -119,15 +119,19 @@ public:
     // Gets achievement data.
     static const AchievementData* GetData(int32_t ach);
 
-    // Checks whether an achievement is met.
-    static bool CheckCompleted(int32_t ach);
     // Checks whether an option is unlocked.
     static bool CheckOptionUnlocked(uint32_t option);
     // Marks off an achievement.
     static void MarkCompleted(int32_t ach);
+    // Checks whether an achievement should be newly met, and marks it if so.
+    static void CheckCompleted(int32_t ach);
+    // Gets the progress for an achievement.
+    static bool GetProgress(int32_t ach, int32_t* done, int32_t* total);
 };
 
 // Marks an achievement as complete.
-EVT_DECLARE_USER_FUNC(evtTot_MarkCompleted, 1)
+EVT_DECLARE_USER_FUNC(evtTot_MarkCompletedAchievement, 1)
+// Checks whether an achievement should be newly met, and marks it if so.
+EVT_DECLARE_USER_FUNC(evtTot_CheckCompletedAchievement, 1)
  
 }

@@ -373,6 +373,10 @@ namespace ItemType {
         TOT_KEY_TIMING_TUTOR,
         TOT_KEY_BGM_TOGGLE,
         TOT_KEY_ATTACK_FX,
+        TOT_KEY_MARIO_COSTUME,
+        TOT_KEY_YOSHI_COSTUME,
+        TOT_KEY_ITEM_MAX,
+
         TOT_TOWER_KEY = GOLD_BAR,
         TOT_MASTER_KEY = GOLD_BAR_X3,
         TOT_PERFECT_POWER = MEGA_JUMP,

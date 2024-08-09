@@ -1052,6 +1052,21 @@ void ApplyFixedPatches() {
             // Mark regular items / badges as being encountered.
             if (return_value && item_type >= ItemType::THUNDER_BOLT) {
                 g_Mod->state_.SetOption(tot::FLAGS_ITEM_ENCOUNTERED, item_type - 0x80);
+
+                // Check for Item / Badge log completion.
+                tot::AchievementsManager::CheckCompleted(
+                    tot::AchievementId::META_ITEM_LOG_BASIC);
+                tot::AchievementsManager::CheckCompleted(
+                    tot::AchievementId::META_ITEM_LOG_ALL);
+                tot::AchievementsManager::CheckCompleted(
+                    tot::AchievementId::META_BADGE_LOG_ALL);
+            }
+
+            // Check for having collected all Key Items.
+            if (item_type >= ItemType::TOT_KEY_PEEKABOO && 
+                item_type < ItemType::TOT_KEY_ITEM_MAX) {
+                tot::AchievementsManager::CheckCompleted(
+                    tot::AchievementId::META_ALL_KEY_ITEMS);
             }
             
             return return_value;

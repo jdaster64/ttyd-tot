@@ -170,6 +170,17 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     }
 
     // Check for other run completion achievements.
+    int32_t runs_completed = 0;
+    runs_completed += state.GetOption(STAT_PERM_HALF_FINISHES);
+    runs_completed += state.GetOption(STAT_PERM_FULL_FINISHES);
+    runs_completed += state.GetOption(STAT_PERM_EX_FINISHES);
+    if (runs_completed >= 10) {
+        AchievementsManager::MarkCompleted(AchievementId::META_RUNS_10);
+    }
+    if (runs_completed >= 25) {
+        AchievementsManager::MarkCompleted(AchievementId::META_RUNS_25);
+    }
+
     int32_t num_npc_deals = 0;
     for (int32_t i = 0; i < 8; ++i) {
         if (state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i)) ++num_npc_deals;
@@ -198,14 +209,14 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
 
     bool all_moves_maxed = true;
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
-        // Skip moves for non-unlocked partners.
-        if (i == MoveType::GOOMBELLA_BASE && !IsPartnerActive(1))   continue;
-        if (i == MoveType::KOOPS_BASE && !IsPartnerActive(2))       continue;
-        if (i == MoveType::FLURRIE_BASE && !IsPartnerActive(3))     continue;
-        if (i == MoveType::YOSHI_BASE && !IsPartnerActive(4))       continue;
-        if (i == MoveType::VIVIAN_BASE && !IsPartnerActive(5))      continue;
-        if (i == MoveType::BOBBERY_BASE && !IsPartnerActive(6))     continue;
-        if (i == MoveType::MOWZ_BASE && !IsPartnerActive(7))        continue;
+        // Skip base moves for non-unlocked partners.
+        if (i == MoveType::GOOMBELLA_BASE   && !IsPartnerActive(1)) continue;
+        if (i == MoveType::KOOPS_BASE       && !IsPartnerActive(2)) continue;
+        if (i == MoveType::FLURRIE_BASE     && !IsPartnerActive(3)) continue;
+        if (i == MoveType::YOSHI_BASE       && !IsPartnerActive(4)) continue;
+        if (i == MoveType::VIVIAN_BASE      && !IsPartnerActive(5)) continue;
+        if (i == MoveType::BOBBERY_BASE     && !IsPartnerActive(6)) continue;
+        if (i == MoveType::MOWZ_BASE        && !IsPartnerActive(7)) continue;
 
         int32_t unlocked_level = MoveManager::GetUnlockedLevel(i);
         if (unlocked_level && 
@@ -272,13 +283,16 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
 
         if (not_default_or_zero == 0) {
             if (zero >= 1) {
-                AchievementsManager::MarkCompleted(AchievementId::RUN_ZERO_STAT_1);
+                AchievementsManager::MarkCompleted(
+                    AchievementId::RUN_ZERO_STAT_1);
             }
             if (zero >= 2) {
-                AchievementsManager::MarkCompleted(AchievementId::RUN_ZERO_STAT_2);
+                AchievementsManager::MarkCompleted(
+                    AchievementId::RUN_ZERO_STAT_2);
             }
             if (zero >= 3) {
-                AchievementsManager::MarkCompleted(AchievementId::SECRET_ZERO_STATS_3);
+                AchievementsManager::MarkCompleted(
+                    AchievementId::SECRET_ZERO_STATS_3);
             }
         }
     }

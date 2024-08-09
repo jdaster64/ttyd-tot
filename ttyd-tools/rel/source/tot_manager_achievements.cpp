@@ -6,7 +6,9 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
+#include <ttyd/mario_pouch.h>
 #include <ttyd/pmario_sound.h>
+#include <ttyd/swdrv.h>
 
 namespace mod::tot {
 
@@ -111,10 +113,6 @@ const AchievementData* AchievementsManager::GetData(int32_t ach) {
     return &g_AchievementData[ach];
 }
 
-bool AchievementsManager::CheckCompleted(int32_t ach) {
-    return g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach);
-}
-
 bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         if (g_AchievementData[i].reward_type == AchievementRewardType::OPTION &&
@@ -126,13 +124,11 @@ bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
 }
 
 void AchievementsManager::MarkCompleted(int32_t ach) {
-    // TODO: Move this to the window popup.
+    // TODO: Move sound effect to the window popup.
     ttyd::pmario_sound::psndSFXOn("SFX_MOBJ_BLOCK_POWER_SHINE1");
 
-    if (!CheckCompleted(ach)) {
+    if (!g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach)) {
         g_Mod->state_.SetOption(FLAGS_ACHIEVEMENT, ach);
-        if (g_AchievementData[ach].reward_type == AchievementRewardType::OPTION)
-            g_Mod->state_.SetOption(FLAGS_OPTION_UNLOCKED, ach);
         
         for (int32_t i = 0; i <= AchievementId::MAX_ACHIEVEMENT; ++i) {
             if (g_WinQueue[i] == -1) {
@@ -146,13 +142,198 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
                 g_MarkQueue[i + 1] = -1;
             }
         }
+
+        // For options, automatically unlock their reward (no purchase needed).
+        if (g_AchievementData[ach].reward_type == AchievementRewardType::OPTION) {
+            g_Mod->state_.SetOption(FLAGS_OPTION_UNLOCKED, ach);
+            // Check to see if all extra options are unlocked.
+            CheckCompleted(AchievementId::META_ALL_OPTIONS);
+        }
+    }
+
+    if (!g_Mod->state_.GetOption(
+        FLAGS_ACHIEVEMENT, AchievementId::META_ALL_ACHIEVEMENTS)) {
+        CheckCompleted(AchievementId::META_ALL_ACHIEVEMENTS);
     }
 }
 
-// Marks an achievement as complete.
-EVT_DEFINE_USER_FUNC(evtTot_MarkCompleted) {
+void AchievementsManager::CheckCompleted(int32_t ach) {
+    const auto& state = g_Mod->state_;
+    switch (ach) {
+        case AchievementId::META_COSMETICS_5: {
+            int32_t cosmetics = 0;
+            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+                if (g_AchievementData[i].reward_type == 
+                    AchievementRewardType::MARIO_COSTUME) {
+                    if (state.GetOption(FLAGS_OPTION_UNLOCKED, i)) ++cosmetics;
+                }
+            }
+            if (cosmetics < 5) return;
+            cosmetics = 0;
+            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+                if (g_AchievementData[i].reward_type == 
+                    AchievementRewardType::YOSHI_COSTUME) {
+                    if (state.GetOption(FLAGS_OPTION_UNLOCKED, i)) ++cosmetics;
+                }
+            }
+            if (cosmetics < 5) return;
+            cosmetics = 0;
+            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+                if (g_AchievementData[i].reward_type == 
+                    AchievementRewardType::ATTACK_FX) {
+                    if (state.GetOption(FLAGS_OPTION_UNLOCKED, i)) ++cosmetics;
+                }
+            }
+            if (cosmetics < 5) return;
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_ALL_OPTIONS: {
+            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+                if (g_AchievementData[i].reward_type == 
+                    AchievementRewardType::OPTION) {
+                    if (!state.GetOption(FLAGS_OPTION_UNLOCKED, i)) return;
+                }
+            }
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_ALL_KEY_ITEMS: {
+            for (int32_t i = ItemType::TOT_KEY_PEEKABOO; 
+                i < ItemType::TOT_KEY_ITEM_MAX; ++i) {
+                if (!ttyd::mario_pouch::pouchCheckItem(i)) return;
+            }
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_ITEMS_BADGES_10: {
+            int32_t num_items = 0;
+            for (int32_t i = ItemType::THUNDER_BOLT; i < ItemType::POWER_JUMP; ++i) {
+                if (state.GetOption(FLAGS_ITEM_PURCHASED, i - ItemType::THUNDER_BOLT) &&
+                    ttyd::item_data::itemDataTable[i].type_sort_order >= 0)
+                    ++num_items;
+            }
+            if (num_items < 10) return;
+            int32_t num_badges = 0;
+            for (int32_t i = ItemType::POWER_JUMP; i < ItemType::MAX_ITEM_TYPE; ++i) {
+                if (state.GetOption(FLAGS_ITEM_PURCHASED, i - ItemType::THUNDER_BOLT) &&
+                    ttyd::item_data::itemDataTable[i].type_sort_order >= 0)
+                    ++num_badges;
+            }
+            if (num_badges < 10) return;
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_ITEMS_BADGES_ALL: {
+            int32_t num_items = 0;
+            for (int32_t i = ItemType::THUNDER_BOLT; i < ItemType::POWER_JUMP; ++i) {
+                if (state.GetOption(FLAGS_ITEM_PURCHASED, i - ItemType::THUNDER_BOLT) &&
+                    ttyd::item_data::itemDataTable[i].type_sort_order >= 0)
+                    ++num_items;
+            }
+            if (num_items < 73) return;
+            int32_t num_badges = 0;
+            for (int32_t i = ItemType::POWER_JUMP; i < ItemType::MAX_ITEM_TYPE; ++i) {
+                if (state.GetOption(FLAGS_ITEM_PURCHASED, i - ItemType::THUNDER_BOLT) &&
+                    ttyd::item_data::itemDataTable[i].type_sort_order >= 0)
+                    ++num_badges;
+            }
+            if (num_badges < 63) return;
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_ITEM_LOG_BASIC: {
+            int32_t num_items = 0;
+            for (int32_t i = ItemType::THUNDER_BOLT; i < ItemType::POWER_JUMP; ++i) {
+                if (state.GetOption(FLAGS_ITEM_ENCOUNTERED, i - ItemType::THUNDER_BOLT) &&
+                    ttyd::item_data::itemDataTable[i].type_sort_order >= 1 &&
+                    ttyd::item_data::itemDataTable[i].type_sort_order <= 68)
+                    ++num_items;
+            }
+            if (num_items < 68) return;
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_ITEM_LOG_ALL: {
+            int32_t num_items = 0;
+            for (int32_t i = ItemType::THUNDER_BOLT; i < ItemType::POWER_JUMP; ++i) {
+                if (state.GetOption(FLAGS_ITEM_ENCOUNTERED, i - ItemType::THUNDER_BOLT) &&
+                    ttyd::item_data::itemDataTable[i].type_sort_order >= 0)
+                    ++num_items;
+            }
+            if (num_items < 73) return;
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_BADGE_LOG_ALL: {
+            int32_t num_badges = 0;
+            for (int32_t i = ItemType::POWER_JUMP; i < ItemType::MAX_ITEM_TYPE; ++i) {
+                if (state.GetOption(FLAGS_ITEM_ENCOUNTERED, i - ItemType::THUNDER_BOLT) &&
+                    ttyd::item_data::itemDataTable[i].type_sort_order >= 0)
+                    ++num_badges;
+            }
+            if (num_badges < 63) return;
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_TATTLE_LOG_BASIC: {
+            for (int32_t i = 1; i <= 95; ++i) {
+                if (!ttyd::swdrv::swGet(i + 0x117a)) return;
+            }
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_TATTLE_LOG_ALL: {
+            for (int32_t i = 1; i <= 100; ++i) {
+                if (!ttyd::swdrv::swGet(i + 0x117a)) return;
+            }
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_MOVE_LOG_ALL: {
+            for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+                uint32_t flags = state.GetOption(STAT_PERM_MOVE_LOG, i);
+                const auto* data = MoveManager::GetMoveData(i);
+
+                // Check "used" (and implicitly, "obtained") flags.
+                if (!(flags & MoveLogFlags::USED_LV_1)) return;
+                if (data->max_level >= 2 && !(flags & MoveLogFlags::USED_LV_2)) return;
+                if (data->max_level >= 3 && !(flags & MoveLogFlags::USED_LV_3)) return;
+
+                // Check Stylish completion for moves that have one.
+                if (i == MoveType::GOOMBELLA_RALLY_WINK ||
+                    (i >= MoveType::SP_SWEET_TREAT && i <= MoveType::SP_SUPERNOVA))
+                    continue;
+                if ((flags & MoveLogFlags::STYLISH_ALL) != MoveLogFlags::STYLISH_ALL)
+                    return;
+            }
+            MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::META_ALL_ACHIEVEMENTS: {
+            for (int32_t i = 0; i < AchievementId::META_ALL_ACHIEVEMENTS; ++i) {
+                if (!state.GetOption(FLAGS_ACHIEVEMENT, i)) return;
+            }
+            MarkCompleted(ach);
+            break;
+        }
+    }
+}
+
+bool AchievementsManager::GetProgress(int32_t ach, int32_t* done, int32_t* total) {
+    // TODO: Implement.
+    return false;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_MarkCompletedAchievement) {
     int32_t ach = evtGetValue(evt, evt->evtArguments[0]);
     AchievementsManager::MarkCompleted(ach);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_CheckCompletedAchievement) {
+    int32_t ach = evtGetValue(evt, evt->evtArguments[0]);
+    AchievementsManager::CheckCompleted(ach);
     return 2;
 }
  

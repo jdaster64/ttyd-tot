@@ -365,6 +365,9 @@ void MoveManager::LogMoveUse(int32_t move_type) {
     if (lv3_uses >= 10) {
         AchievementsManager::MarkCompleted(AchievementId::AGG_USE_LV_3_MOVES_10);
     }
+
+    // Check for move log completion.
+    AchievementsManager::CheckCompleted(AchievementId::META_MOVE_LOG_ALL);
 }
 
 void MoveManager::LogMoveStylish(int32_t move_type, uint32_t stylish_flags) {
@@ -383,6 +386,9 @@ void MoveManager::LogMoveStylish(int32_t move_type, uint32_t stylish_flags) {
     if (stylish_count >= 20) {
         AchievementsManager::MarkCompleted(AchievementId::AGG_STYLISH_20);
     }
+
+    // Check for move log completion.
+    AchievementsManager::CheckCompleted(AchievementId::META_MOVE_LOG_ALL);
 }
 
 const char* MoveManager::GetLogDescription(int32_t move_type) {
