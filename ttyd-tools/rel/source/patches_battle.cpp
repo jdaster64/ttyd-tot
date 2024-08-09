@@ -8,6 +8,7 @@
 #include "patches_mario_move.h"
 #include "tot_custom_rel.h"
 #include "tot_generate_enemy.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
 
@@ -1241,6 +1242,9 @@ void ApplyFixedPatches() {
                     // Successful Superguard, track in play stats.
                     g_Mod->state_.ChangeOption(tot::STAT_RUN_SUPERGUARDS);
                     g_Mod->state_.ChangeOption(tot::STAT_PERM_SUPERGUARDS);
+                    if (g_Mod->state_.GetOption(tot::STAT_PERM_SUPERGUARDS) >= 100)
+                        tot::AchievementsManager::MarkCompleted(
+                            tot::AchievementId::AGG_SUPERGUARD_100);
                 }
                 return defense_result;
             }
@@ -1262,6 +1266,9 @@ void ApplyFixedPatches() {
                 ttyd::mario_pouch::pouchAddAP(-sp_cost);
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_SUPERGUARDS);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_SUPERGUARDS);
+                if (g_Mod->state_.GetOption(tot::STAT_PERM_SUPERGUARDS) >= 100)
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::AGG_SUPERGUARD_100);
             }
             if (restore_superguard_frames) {
                 memcpy(ttyd::battle_ac::superguard_frames, superguard_frames, 7);
@@ -1373,6 +1380,10 @@ void ApplyFixedPatches() {
                 if (damage > 99) damage = 99;
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_ENEMY_DAMAGE, damage);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_DAMAGE, damage);
+                if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_DAMAGE) >= 50000) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::AGG_DAMAGE_50000);
+                }
             }
             // Run normal damage logic.
             g_BattleDamageDirect_trampoline(

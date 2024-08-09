@@ -7,6 +7,7 @@
 #include "patches_battle.h"
 #include "patches_battle_seq.h"
 #include "tot_generate_reward.h"
+#include "tot_manager_achievements.h"
 #include "tot_state.h"
 
 #include <ttyd/battle.h>
@@ -1023,6 +1024,10 @@ void ApplyFixedPatches() {
             if (item_type == ItemType::COIN) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED);
+                if (g_Mod->state_.GetOption(tot::STAT_PERM_COINS_EARNED) >= 10000) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::AGG_COINS_10000);
+                }
             }
             if (item_type == ItemType::STAR_PIECE) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_STAR_PIECES);

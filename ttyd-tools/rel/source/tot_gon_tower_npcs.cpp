@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_options.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
@@ -1436,15 +1437,18 @@ EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
     switch (evtGetValue(evt, evt->evtArguments[0])) {
         case SecondaryNpcType::WONKY: {
             state.ChangeOption(STAT_PERM_NPC_WONKY_TRADES, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
         }
         case SecondaryNpcType::DAZZLE: {
             state.SetOption(STAT_RUN_NPC_DAZZLE_FLOOR, floor);
             state.ChangeOption(STAT_PERM_NPC_DAZZLE_TRADES, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
         }
         case SecondaryNpcType::CHET_RIPPO: {
             state.ChangeOption(STAT_PERM_NPC_RIPPO_TRADES, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
         }
         case SecondaryNpcType::LUMPY: {
@@ -1452,31 +1456,40 @@ EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
             state.SetOption(STAT_RUN_NPC_LUMPY_COINS, coins);
             state.SetOption(STAT_RUN_NPC_LUMPY_FLOOR, floor);
             state.ChangeOption(STAT_PERM_NPC_LUMPY_TRADES, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             coins = 0;
             break;
         }
         case SecondaryNpcType::GRUBBA: {
             state.SetOption(STAT_RUN_NPC_GRUBBA_FLOOR, floor);
             state.ChangeOption(STAT_PERM_NPC_GRUBBA_DEAL, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
         }
         case SecondaryNpcType::DOOPLISS: {
             state.SetOption(STAT_RUN_NPC_DOOPLISS_FLOOR, floor);
             state.ChangeOption(STAT_PERM_NPC_DOOPLISS_DEAL, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
         }
         case SecondaryNpcType::MOVER: {
             state.SetOption(STAT_RUN_NPC_MOVER_FLOOR, floor);
             state.ChangeOption(STAT_PERM_NPC_MOVER_TRADES, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
         }
         case SecondaryNpcType::ZESS_T: {
             state.ChangeOption(STAT_PERM_NPC_ZESS_COOKS, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
         }
     }
     // Set flag for having dealt with an NPC on each floor.
     state.SetOption(STAT_RUN_NPCS_DEALT_WITH, 1, floor / 8);
+    if (state.GetOption(STAT_PERM_NPC_DEALS_TOTAL) >= 10) {
+        AchievementsManager::MarkCompleted(AchievementId::AGG_NPC_DEALS_10);
+    }
+
     return 2;
 }
 

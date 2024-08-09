@@ -60,9 +60,9 @@ public:
     // Permanent tracking data.
     uint32_t    achievement_flags_[4];
     uint32_t    option_unlocked_flags_[4];
+    uint32_t    midboss_defeated_flags_[4];
     uint32_t    item_encountered_flags_[8];
     uint32_t    item_purchased_flags_[8];
-    uint32_t    reserved_flags_[4];
     
     // Saves various stats for current runs and all-time.
     uint8_t     play_stats_[1024];
@@ -239,6 +239,7 @@ enum OptionsType {
     TYPE_FLAGS_OPT_UNLOCKED     = 8,
     TYPE_FLAGS_ITEM_ENCOUNTERED = 9,
     TYPE_FLAGS_ITEM_PURCHASED   = 10,
+    TYPE_FLAGS_MIDBOSS_DEFEATED = 11,
 };
 
 // An enumeration of all options (flags, option values, numeric values), 
@@ -394,6 +395,7 @@ enum Options : uint32_t {
     FLAGS_OPTION_UNLOCKED       = 0x800'0'00'00U,
     FLAGS_ITEM_ENCOUNTERED      = 0x900'0'00'00U,
     FLAGS_ITEM_PURCHASED        = 0xa00'0'00'00U,
+    FLAGS_MIDBOSS_DEFEATED      = 0xb00'0'00'00U,
     
     // Play stats.
 
@@ -471,7 +473,8 @@ enum Options : uint32_t {
     STAT_PERM_NPC_DOOPLISS_DEAL = 0x287'3'01'07,
     STAT_PERM_NPC_MOVER_TRADES  = 0x28a'3'01'07,
     STAT_PERM_NPC_ZESS_COOKS    = 0x28d'3'01'07,
-    // Next: 0x290
+    STAT_PERM_NPC_DEALS_TOTAL   = 0x290'3'01'07,
+    // Next: 0x293
 };
 
 }  // namespace mod::tot

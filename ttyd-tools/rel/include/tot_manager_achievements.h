@@ -1,5 +1,9 @@
 #pragma once
 
+#include "evt_cmd.h"
+
+#include <ttyd/evtmgr.h>
+
 #include <cstdint>
 
 namespace mod::tot {
@@ -113,7 +117,17 @@ public:
     static void Draw();
 
     // Gets achievement data.
-    static const AchievementData* GetData(int32_t idx);
+    static const AchievementData* GetData(int32_t ach);
+
+    // Checks whether an achievement is met.
+    static bool CheckCompleted(int32_t ach);
+    // Checks whether an option is unlocked.
+    static bool CheckOptionUnlocked(uint32_t option);
+    // Marks off an achievement.
+    static void MarkCompleted(int32_t ach);
 };
+
+// Marks an achievement as complete.
+EVT_DECLARE_USER_FUNC(evtTot_MarkCompleted, 1)
  
 }

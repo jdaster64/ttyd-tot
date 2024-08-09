@@ -1,16 +1,22 @@
 #include "tot_manager_achievements.h"
 
+#include "mod.h"
 #include "tot_state.h"
 
+#include <ttyd/evtmgr.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
+#include <ttyd/pmario_sound.h>
 
 namespace mod::tot {
 
 namespace {
 
+using ::ttyd::evtmgr_cmd::evtGetValue;
+
 namespace ItemType = ttyd::item_data::ItemType;
 
-}  // namespace
+
 
 const AchievementData g_AchievementData[] = {
     { "tot_achd_00", nullptr, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_TIMING_TUTOR },
@@ -85,16 +91,69 @@ const AchievementData g_AchievementData[] = {
     { "tot_achd_69", nullptr, AchievementRewardType::YOSHI_COSTUME, 17 },
 };
 
+// Queues for popping up "Achievement unlocked" dialogs and marking off
+// completed achievements in the pause menu.
+int8_t g_WinQueue[AchievementId::MAX_ACHIEVEMENT + 1] = { -1 };
+int8_t g_MarkQueue[AchievementId::MAX_ACHIEVEMENT + 1] = { -1 };
+
+}  // namespace
+
 void AchievementsManager::Update() {
-    // TODO: Implement.
+    // TODO: Check for new completions every frame, if needed.
+    // TODO: Implement window dequeueing system.
 }
 
 void AchievementsManager::Draw() {
-    // TODO: Implement.
+    // TODO: Implement, if needed.
 }
 
-const AchievementData* AchievementsManager::GetData(int32_t idx) {
-    return &g_AchievementData[idx];
+const AchievementData* AchievementsManager::GetData(int32_t ach) {
+    return &g_AchievementData[ach];
+}
+
+bool AchievementsManager::CheckCompleted(int32_t ach) {
+    return g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach);
+}
+
+bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
+    for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+        if (g_AchievementData[i].reward_type == AchievementRewardType::OPTION &&
+            static_cast<uint32_t>(g_AchievementData[i].reward_type) == option) {
+            return g_Mod->state_.GetOption(FLAGS_OPTION_UNLOCKED, i);
+        }
+    }
+    return false;
+}
+
+void AchievementsManager::MarkCompleted(int32_t ach) {
+    // TODO: Move this to the window popup.
+    ttyd::pmario_sound::psndSFXOn("SFX_MOBJ_BLOCK_POWER_SHINE1");
+
+    if (!CheckCompleted(ach)) {
+        g_Mod->state_.SetOption(FLAGS_ACHIEVEMENT, ach);
+        if (g_AchievementData[ach].reward_type == AchievementRewardType::OPTION)
+            g_Mod->state_.SetOption(FLAGS_OPTION_UNLOCKED, ach);
+        
+        for (int32_t i = 0; i <= AchievementId::MAX_ACHIEVEMENT; ++i) {
+            if (g_WinQueue[i] == -1) {
+                g_WinQueue[i] = ach;
+                g_WinQueue[i + 1] = -1;
+            }
+        }
+        for (int32_t i = 0; i <= AchievementId::MAX_ACHIEVEMENT; ++i) {
+            if (g_MarkQueue[i] == -1) {
+                g_MarkQueue[i] = ach;
+                g_MarkQueue[i + 1] = -1;
+            }
+        }
+    }
+}
+
+// Marks an achievement as complete.
+EVT_DEFINE_USER_FUNC(evtTot_MarkCompleted) {
+    int32_t ach = evtGetValue(evt, evt->evtArguments[0]);
+    AchievementsManager::MarkCompleted(ach);
+    return 2;
 }
  
 }

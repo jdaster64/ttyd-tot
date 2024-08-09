@@ -7,6 +7,7 @@
 #include "patches_field.h"
 #include "tot_generate_enemy.h"
 #include "tot_gon_tower.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
@@ -181,6 +182,8 @@ void DebugManager::Update() {
                             pouch.party_data[i].flags |= 1;
                         }
                         g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
+                        AchievementsManager::MarkCompleted(
+                            AchievementId::AGG_ALL_PARTNERS);
                     }
                     break;
                 }
@@ -224,6 +227,8 @@ void DebugManager::Update() {
                     }
                     // Set all partners as having been obtained once.
                     g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::AGG_ALL_PARTNERS);
                     break;
                 }
             }

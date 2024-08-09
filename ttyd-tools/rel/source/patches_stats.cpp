@@ -1,8 +1,9 @@
 #include "patches_stats.h"
 
 #include "mod.h"
-#include "tot_state.h"
 #include "patch.h"
+#include "tot_manager_achievements.h"
+#include "tot_state.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_actrecord.h>
@@ -58,6 +59,10 @@ void ApplyFixedPatches() {
             } else {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED, coins);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED, coins);
+                if (g_Mod->state_.GetOption(tot::STAT_PERM_COINS_EARNED) >= 10000) {
+                    tot::AchievementsManager::MarkCompleted(
+                        tot::AchievementId::AGG_COINS_10000);
+                }
             }
             // Run coin increment logic.
             return g_pouchAddCoin_trampoline(coins);

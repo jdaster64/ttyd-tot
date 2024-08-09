@@ -336,7 +336,8 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
         case TYPE_FLAGS_ACHIEVEMENT:
         case TYPE_FLAGS_ITEM_ENCOUNTERED:
         case TYPE_FLAGS_ITEM_PURCHASED:
-        case TYPE_FLAGS_OPT_UNLOCKED: {
+        case TYPE_FLAGS_OPT_UNLOCKED:
+        case TYPE_FLAGS_MIDBOSS_DEFEATED: {
             // Can use either value or manually bit-or'd "b" for setting.
             if (value == 0) value = b;
             // Check for values outside valid range.
@@ -360,6 +361,10 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
                 }
                 case TYPE_FLAGS_OPT_UNLOCKED: {
                     ptr = option_unlocked_flags_ + (value >> 5);
+                    break;
+                }
+                case TYPE_FLAGS_MIDBOSS_DEFEATED: {
+                    ptr = midboss_defeated_flags_ + (value >> 5);
                     break;
                 }
             }
@@ -449,6 +454,10 @@ int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
         }
         case TYPE_FLAGS_OPT_UNLOCKED: {
             flag_ptr = option_unlocked_flags_ + (x >> 5);
+            break;
+        }
+        case TYPE_FLAGS_MIDBOSS_DEFEATED: {
+            flag_ptr = midboss_defeated_flags_ + (x >> 5);
             break;
         }
         case TYPE_OPTNUM: {

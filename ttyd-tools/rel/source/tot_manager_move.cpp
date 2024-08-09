@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_manager_achievements.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_database_common.h>
@@ -347,14 +348,37 @@ void MoveManager::LogMoveUnlock(int32_t move_type, int32_t level) {
 
 void MoveManager::LogMoveUse(int32_t move_type) {
     uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move_type);
-    value |= (MoveLogFlags::USED_LV_1 << (GetSelectedLevel(move_type) - 1));
+    int32_t level = GetSelectedLevel(move_type);
+    value |= (MoveLogFlags::USED_LV_1 << (level - 1));
     g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, value, move_type);
+
+    // Check for new completion of "Using 10 different Lvl. 3 moves".
+    int32_t lv3_uses = 0;
+    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+        uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, i);
+        if (value & MoveLogFlags::USED_LV_3) ++lv3_uses;
+    }
+    if (lv3_uses >= 10) {
+        AchievementsManager::MarkCompleted(AchievementId::AGG_USE_LV_3_MOVES_10);
+    }
 }
 
 void MoveManager::LogMoveStylish(int32_t move_type, uint32_t stylish_flags) {
     uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move_type);
     value |= stylish_flags ? stylish_flags : MoveLogFlags::STYLISH_ALL;
     g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, value, move_type);
+
+    // Check for new completion of "20 Stylishes".
+    int32_t stylish_count = 0;
+    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+        uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, i);
+        if ((value & MoveLogFlags::STYLISH_ALL) == MoveLogFlags::STYLISH_ALL) {
+            ++stylish_count;
+        }
+    }
+    if (stylish_count >= 20) {
+        AchievementsManager::MarkCompleted(AchievementId::AGG_STYLISH_20);
+    }
 }
 
 const char* MoveManager::GetLogDescription(int32_t move_type) {

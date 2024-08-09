@@ -6,6 +6,7 @@
 #include "patch.h"
 #include "patches_battle.h"
 #include "tot_generate_enemy.h"
+#include "tot_manager_achievements.h"
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_damage.h>
@@ -215,6 +216,21 @@ void ApplyFixedPatches() {
                 if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, idx) < 9999)
                     g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_KILLS, 1, idx);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMIES_DEFEATED, 1);
+
+                // If a midboss, check off its flag and check if 50 diff met.
+                if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
+                    g_Mod->state_.SetOption(tot::FLAGS_MIDBOSS_DEFEATED, idx);
+
+                    int32_t num_midbosses_defeated = 0;
+                    for (int32_t i = 0; i < 128; ++i) {
+                        num_midbosses_defeated += g_Mod->state_.GetOption(
+                            tot::FLAGS_MIDBOSS_DEFEATED, idx);
+                    }
+                    if (num_midbosses_defeated >= 50) {
+                        tot::AchievementsManager::MarkCompleted(
+                            tot::AchievementId::AGG_MIDBOSS_TYPES_50);
+                    }
+                }
             }
             // Run original logic.
             return g_BtlUnit_Delete_trampoline(unit);

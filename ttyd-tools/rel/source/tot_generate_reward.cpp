@@ -8,6 +8,7 @@
 #include "tot_generate_enemy.h"
 #include "tot_generate_item.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
 #include "tot_manager_timer.h"
@@ -1014,6 +1015,9 @@ EVT_DEFINE_USER_FUNC(evtTot_AfterItemBought) {
 
     // Increase tracked items bought.
     g_Mod->state_.ChangeOption(STAT_PERM_ITEMS_BOUGHT, 1);
+    if (g_Mod->state_.GetOption(STAT_PERM_ITEMS_BOUGHT) >= 50) {
+        AchievementsManager::MarkCompleted(AchievementId::AGG_BUY_ITEMS_50);
+    }
 
     return 2;
 }
@@ -1074,6 +1078,9 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
     uint32_t option = g_Mod->state_.GetOption(STAT_PERM_PARTNERS_OBTAINED);
     option |= 1 << (-reward_type);
     g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, option);
+    if (option == 0xfeU) {
+        AchievementsManager::MarkCompleted(AchievementId::AGG_ALL_PARTNERS);
+    }
     
     evtSetValue(evt, evt->evtArguments[1], idx);
     return 2;
