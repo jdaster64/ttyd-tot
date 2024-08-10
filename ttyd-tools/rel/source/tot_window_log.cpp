@@ -305,6 +305,13 @@ int32_t GetAchievementStates(int8_t* states) {
 
 void GetAchievementRewardDetails(
     int32_t cursor, int32_t* icon, const char** name_msg) {
+    // Special case for selecting one of the unlocking hammers.
+    if (cursor == -1) {
+        if (icon) *icon = IconType::HAMMER;
+        if (name_msg) *name_msg =
+            ttyd::item_data::itemDataTable[ItemType::HAMMER].name;
+        return;
+    }
     const auto* data =  AchievementsManager::GetData(g_AchievementGrid[cursor]);
     switch (data->reward_type) {
         case AchievementRewardType::OPTION:
@@ -403,9 +410,9 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
     // Draw large tile that shows current tile's reward.
     {
         int32_t cursor = menu->achievement_log_cursor_idx;
-        int32_t success_shade = states[cursor] == 2 ? 13 : 0;
+        int32_t cursor_state = cursor >= 0 ? states[cursor] : 2;
         uint32_t color = 0x505050FFU;
-        switch (states[cursor]) {
+        switch (cursor_state) {
             case 1:  color = 0xb0b0b0FFU;  break;
             case 2:  color = 0xFFFFFFFFU;  break;
         }
@@ -413,9 +420,9 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         gc::vec3 scale = { 1.5f, 1.5f, 1.5f };
         ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
         ttyd::win_main::winTexSet(
-            0x7b + success_shade, &position, &scale, &color);
+            0x7b + (cursor_state == 2 ? 13 : 0), &position, &scale, &color);
 
-        if (states[cursor]) {
+        if (cursor_state) {
             int32_t icon = 0;
             const char* name_msg = "";
             GetAchievementRewardDetails(cursor, &icon, &name_msg);
@@ -423,14 +430,14 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             // Draw icon.
             ttyd::win_main::winIconInit();
             gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
-            color = states[cursor] == 2 ? 0xFFFFFFFFU : 0x000000FFU;
+            color = cursor_state == 2 ? 0xFFFFFFFFU : 0x000000FFU;
             ttyd::win_main::winIconSet(icon, &position, &scale, &color);
 
             // Draw nameplate.
             ttyd::win_root::winNameGX(
                 position.x - 85.0f, position.y - 42.0f, 170.0f, 0.0f, menu, 1);
 
-            if (states[cursor] < 2) name_msg = "msg_menu_stone_none_help";
+            if (cursor_state < 2) name_msg = "msg_menu_stone_none_help";
             const char* name = msgSearch(name_msg);
             int32_t width = ttyd::fontmgr::FontGetMessageWidth(name);
             float x_scale = 1.0f;
@@ -453,6 +460,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         }
     }
 
+    // Draw hammers.
     for (int32_t i = 0; i < 5; ++i) {
         ttyd::win_main::winIconInit();
         gc::vec3 position = {
@@ -1625,45 +1633,63 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 menu->log_submenu_info[menu->log_submenu_cursor_idx].state = 20;
                 menu->log_menu_state = 0;
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
-                if (cursor > 9 && 
+                if (cursor != -1 && cursor > 9 && 
                     !((cursor == 10 || cursor == 19) && !states[cursor - 10])) {
                     menu->achievement_log_cursor_idx -= 10;
                     cursor = menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
-                if (cursor < 60 && 
+                if (cursor != -1 && cursor < 60 && 
                     !((cursor == 50 || cursor == 59) && !states[cursor + 10])) {
                     menu->achievement_log_cursor_idx += 10;
                     cursor = menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) {
-                if (cursor % 10 > 0 && 
+                if (cursor % 10 == 0 && menu->achievement_log_hammers > 0) {
+                    menu->achievement_log_cursor_idx = -1;
+                    cursor = -1;
+                } else if (cursor % 10 > 0 && 
                     !((cursor == 1 || cursor == 61) && !states[cursor - 1])) {
                     cursor = --menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) {
-                if (cursor % 10 < 9 && 
+                if (cursor == -1) {
+                    menu->achievement_log_cursor_idx = 30;
+                    cursor = 30;
+                } else if (cursor % 10 < 9 && 
                     !((cursor == 8 || cursor == 68) && !states[cursor + 1])) {
                     cursor = ++menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             }
 
-            if (states[cursor] > 0) {
+            if (cursor == -1) {
+                int32_t hammer_index = menu->achievement_log_hammers - 1;
+
+                ttyd::win_root::winMsgEntry(menu, 0, "tot_ach_usehammer", 0);
+
+                // Set cursor position based on selected hammer.
+                menu->main_cursor_target_x = -286.0f + 30.0f * hammer_index;
+                menu->main_cursor_target_y = -25.0f - 10.0f * (hammer_index & 1);
+            } else if (states[cursor] > 0) {
                 int32_t ach = g_AchievementGrid[cursor];
                 ttyd::win_root::winMsgEntry(
                     menu, 0, AchievementsManager::GetData(ach)->help_msg, 0);
+
+                // Set cursor position based on selected entry.
+                menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
+                menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
             } else {
                 ttyd::win_root::winMsgEntry(
                     menu, 0, "msg_menu_stone_none_help", 0);
-            }
 
-            // Set cursor position based on selected entry.
-            menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
-            menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
+                // Set cursor position based on selected entry.
+                menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
+                menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
+            }
 
             break;
         }
@@ -1839,6 +1865,12 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 shake_offset *= ttyd::_core_cos(shake_time * 8 * 3.14159265f);
                 shake_offset *= (1.0f - shake_time) * (1.0f - shake_time);
                 menu->achievement_log_cam_shake_offset = shake_offset;
+
+                // Allow speeding up animation if holding down the A or B button.
+                if ((ttyd::system::keyGetButton(0) & (ButtonId::A | ButtonId::B)) &&
+                    menu->achievement_log_unlock_timer < 30) {
+                    menu->achievement_log_unlock_timer = 0;
+                }
             }
 
             if (menu->achievement_log_unlock_timer == 0) {

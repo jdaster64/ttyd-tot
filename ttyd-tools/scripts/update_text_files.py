@@ -2037,6 +2037,10 @@ g_StringMap = {
         b"tot_acho_obfuscated":     b"Obfuscated Items",
         b"tot_acho_secretboss":     b"???",  # b"Gold Fuzzy Boss",
         
+        b"tot_ach_usehammer":
+            b"Use a Hammer to unlock an\n"
+            b"achivement's reward early.",
+        
         
         # Enemy names + Tattle info (TODO)
         
