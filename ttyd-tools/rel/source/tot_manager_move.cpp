@@ -124,9 +124,9 @@ const char* GetLogMoveLevelDesc(int32_t move_type, int32_t level) {
         return "";
     } else if (
         // Never unlocked; return 00X placeholder that always says "Lv. X: ???".
-        (level == 2 && !(g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG) 
+        (level == 2 && !(g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move_type) 
             & MoveLogFlags::UNLOCKED_LV_2)) ||
-        (level == 3 && !(g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG)
+        (level == 3 && !(g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move_type)
             & MoveLogFlags::UNLOCKED_LV_3))) {
         move_class = 0;
         move_class_idx = 0;
