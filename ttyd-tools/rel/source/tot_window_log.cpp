@@ -269,6 +269,12 @@ void SortItemLogType(WinPauseMenu* menu) {
     menu->recipe_log_page_num = 0;
 }
 
+bool IsUnbreakable(int32_t cursor) {
+    int32_t row = cursor / 10;
+    int32_t col = cursor % 10;
+    return (row <= 1 || row >= 5) && (col <= 1 || col >= 8);
+}
+
 // Gets the current display state of each cell in the achievement grid.
 // Returns the cell of the smallest achievement ready to unlock, or -1 if none.
 int32_t GetAchievementStates(int8_t* states) {
@@ -475,6 +481,11 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             position.x -= 2.0f;
             position.y += 2.0f;
             color = 0xFFFFFFFFU;
+            // Darken the last hammer if currently in use.
+            if (i == menu->achievement_log_hammers - 1 && 
+                menu->achievement_log_using_hammer) {
+                color = 0xB0B0B0FFU;
+            }
             ttyd::win_main::winIconSet(IconType::HAMMER, &position, &scale, &color);
         }
     }
@@ -1627,11 +1638,17 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 return -2;
             } else if (menu->buttons_pressed & ButtonId::B) {
                 ttyd::pmario_sound::psndSFXOn((char *)0x20013);
-                for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
-                    menu->log_submenu_info[i].state = 40;
+                if (menu->achievement_log_using_hammer) {
+                    // Exit "using hammer" mode.
+                    menu->achievement_log_using_hammer = 0;
+                    menu->achievement_log_cursor_idx = -1;
+                } else {
+                    for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
+                        menu->log_submenu_info[i].state = 40;
+                    }
+                    menu->log_submenu_info[menu->log_submenu_cursor_idx].state = 20;
+                    menu->log_menu_state = 0;
                 }
-                menu->log_submenu_info[menu->log_submenu_cursor_idx].state = 20;
-                menu->log_menu_state = 0;
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
                 if (cursor != -1 && cursor > 9 && 
                     !((cursor == 10 || cursor == 19) && !states[cursor - 10])) {
@@ -1647,7 +1664,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) {
-                if (cursor % 10 == 0 && menu->achievement_log_hammers > 0) {
+                if (cursor % 10 == 0 && !menu->achievement_log_using_hammer &&
+                    menu->achievement_log_hammers > 0) {
                     menu->achievement_log_cursor_idx = -1;
                     cursor = -1;
                 } else if (cursor % 10 > 0 && 
@@ -1664,28 +1682,52 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     cursor = ++menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if (menu->buttons_pressed & ButtonId::A) {
+                if (menu->achievement_log_using_hammer) {
+                    if (IsUnbreakable(cursor) || states[cursor] == 2) {
+                        ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                    } else {
+                        int32_t ach = g_AchievementGrid[cursor];
+                        AchievementsManager::MarkCompleted(ach);
+                        g_Mod->state_.ChangeOption(STAT_PERM_ACH_HAMMERS, -1);
+                        menu->log_menu_state = 60;
+                        menu->achievement_log_unlock_timer = -1;
+                        break;
+                    }
+                } else if (cursor == -1 &&
+                    menu->achievement_log_completed_count < 
+                    menu->achievement_log_total_count) {
+                    // Go into "hammer use" mode, only if there are
+                    // achievements left to unlock.
+                    menu->achievement_log_using_hammer = 1;
+                    menu->achievement_log_cursor_idx = 34;
+                    cursor = 34;
+                    ttyd::pmario_sound::psndSFXOn((char *)0x20012);
+                }
             }
 
             if (cursor == -1) {
-                int32_t hammer_index = menu->achievement_log_hammers - 1;
-
+                // Instructions on using the hammer.
                 ttyd::win_root::winMsgEntry(menu, 0, "tot_ach_usehammer", 0);
-
                 // Set cursor position based on selected hammer.
+                int32_t hammer_index = menu->achievement_log_hammers - 1;
                 menu->main_cursor_target_x = -286.0f + 30.0f * hammer_index;
                 menu->main_cursor_target_y = -25.0f - 10.0f * (hammer_index & 1);
+            } else if (
+                menu->achievement_log_using_hammer && IsUnbreakable(cursor) &&
+                states[cursor] < 2) {
+                // Let the player know they cannot use the hammer.
+                ttyd::win_root::winMsgEntry(menu, 0, "tot_ach_unbreakable", 0);
             } else if (states[cursor] > 0) {
                 int32_t ach = g_AchievementGrid[cursor];
                 ttyd::win_root::winMsgEntry(
                     menu, 0, AchievementsManager::GetData(ach)->help_msg, 0);
-
-                // Set cursor position based on selected entry.
-                menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
-                menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
             } else {
                 ttyd::win_root::winMsgEntry(
                     menu, 0, "msg_menu_stone_none_help", 0);
+            }
 
+            if (cursor != -1) {
                 // Set cursor position based on selected entry.
                 menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
                 menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
@@ -1873,6 +1915,14 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 }
             }
 
+            if (menu->achievement_log_unlock_timer == 60 - 7 &&
+                menu->achievement_log_using_hammer) {
+                // Play second half of hammer swinging sound.
+                ttyd::sound::SoundEfxPlayEx(0x37f, 0, 0x64, 0x40);
+                // Leave hammer-use mode.
+                menu->achievement_log_using_hammer = 0;
+            }
+
             if (menu->achievement_log_unlock_timer == 0) {
                 if (unlock_cell == -1) {
                     menu->log_menu_state = 16;
@@ -1901,12 +1951,16 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 if (AchievementsManager::GetData(ach)->reward_type ==
                     AchievementRewardType::HAMMER) {
                     g_Mod->state_.ChangeOption(STAT_PERM_ACH_HAMMERS, 1);
-                    menu->achievement_log_hammers =
-                        g_Mod->state_.GetOption(STAT_PERM_ACH_HAMMERS);
                 }
+                menu->achievement_log_hammers =
+                    g_Mod->state_.GetOption(STAT_PERM_ACH_HAMMERS);
                 
-                // Play explosion sound.
-                ttyd::sound::SoundEfxPlayEx(0x3f7, 0, 0x64, 0x40);
+                // Play explosion / hammer swinging sound.
+                if (menu->achievement_log_using_hammer) {
+                    ttyd::sound::SoundEfxPlayEx(0x384, 0, 0x64, 0x40);
+                } else {
+                    ttyd::sound::SoundEfxPlayEx(0x3f7, 0, 0x64, 0x40);
+                }
 
                 menu->achievement_log_unlock_timer = 60;
             }

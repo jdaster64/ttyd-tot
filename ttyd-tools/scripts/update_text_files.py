@@ -2039,8 +2039,10 @@ g_StringMap = {
         
         b"tot_ach_usehammer":
             b"Use a Hammer to unlock an\n"
-            b"achivement's reward early.",
-        
+            b"achievement's reward early.",
+        b"tot_ach_unbreakable":
+            b"This reward cannot be\n"
+            b"unlocked early.",
         
         # Enemy names + Tattle info (TODO)
         
