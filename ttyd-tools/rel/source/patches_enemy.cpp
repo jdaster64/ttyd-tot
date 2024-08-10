@@ -223,8 +223,10 @@ void ApplyFixedPatches() {
 
                     int32_t num_midbosses_defeated = 0;
                     for (int32_t i = 0; i < 128; ++i) {
-                        num_midbosses_defeated += g_Mod->state_.GetOption(
-                            tot::FLAGS_MIDBOSS_DEFEATED, idx);
+                        if (g_Mod->state_.GetOption(
+                            tot::FLAGS_MIDBOSS_DEFEATED, i)) {
+                            ++num_midbosses_defeated;
+                        }
                     }
                     if (num_midbosses_defeated >= 50) {
                         tot::AchievementsManager::MarkCompleted(

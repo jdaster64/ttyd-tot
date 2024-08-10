@@ -1207,14 +1207,14 @@ g_StringMap = {
         b"tot_quitearly":
             b"<system>\n<p>\n"
             b"Do you really want to end this\n"
-            b"run early and restart from\n"
-            b"the lobby?\n<o>",
+            b"run early and return to the\n"
+            b"lobby?\n<o>",
         
         b"tot_gameover":
             b"<system>\n<p>\n"
             b"Do you want to continue from\n"
             b"after the last boss, or give up\n"
-            b"and restart from the lobby?\n<o>",
+            b"and return to the lobby?\n<o>",
             
         b"tot_gameover_opt":
             b"<select 0 1 0 40>\nContinue\nGive Up",
@@ -2002,21 +2002,25 @@ g_StringMap = {
         b"tot_achd_65":
             b"Complete all other achievements.\n",
         b"tot_achd_66":
-            b"???", 
+            b"???",
+            # Placeholder;
             # b"Spend exactly 417 coins in a\n"
             # b"single tower run.",
         b"tot_achd_67":
             b"???", 
+            # Placeholder;
             # "Deal 1,000 or more damage with\n"
             # b"Infatuated foes in a default run.",
         b"tot_achd_68":
             b"???", 
+            # Placeholder;
             # b"Finish a run with all of Mario's\n"
             # b"stats at a maximum of 1.\n"
             # b"Settings must be default, aside\n"
             # b"from setting HP/FP/BP to 0.",
         b"tot_achd_69":
             b"???", 
+            # Placeholder;
             # b"Take exactly 654 total damage\n"
             # b"in a single tower run.",
         
@@ -2035,7 +2039,7 @@ g_StringMap = {
         b"tot_acho_invincrease":    b"S. Sack Size",
         b"tot_acho_customloadout":  b"Custom Items",
         b"tot_acho_obfuscated":     b"Obfuscated Items",
-        b"tot_acho_secretboss":     b"???",  # b"Gold Fuzzy Boss",
+        b"tot_acho_secretboss":     b"???",  # Placeholder; b"Gold Fuzzy Boss",
         
         b"tot_ach_usehammer":
             b"Use a Hammer to unlock an\n"
@@ -2044,7 +2048,7 @@ g_StringMap = {
             b"This reward cannot be\n"
             b"unlocked early.",
         
-        # Enemy names + Tattle info (TODO)
+        # Enemy names
         
         b"btl_un_monban":           b"Craw",
         b"btl_un_sinnosuke":        b"H. Bob-omb",
