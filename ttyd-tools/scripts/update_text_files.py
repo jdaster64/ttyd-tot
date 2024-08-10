@@ -1910,8 +1910,8 @@ g_StringMap = {
             b"Beat a floor with a fainted\n"
             b"partner.",
         b"tot_achd_33":
-            b"Lose an item or badge to a\n" 
-            b"Bandit.",
+            b"Finish a fight after a Bandit\n" 
+            b"flees with an item.",
         b"tot_achd_34":
             b"Detonate a Bomb Squad bomb\n"
             b"early with Fire Drive.",

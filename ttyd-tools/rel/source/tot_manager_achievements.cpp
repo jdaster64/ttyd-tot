@@ -121,15 +121,15 @@ bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
 }
 
 void AchievementsManager::MarkCompleted(int32_t ach) {
-    // TODO: Move sound effect to the window popup.
-    ttyd::pmario_sound::psndSFXOn("SFX_MOBJ_BLOCK_POWER_SHINE1");
-
     if (!g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach)) {
         g_Mod->state_.SetOption(FLAGS_ACHIEVEMENT, ach);
 
         // Queue animations for unlocking.
         SetSWF(GSWF_AchWinQueue + ach);
         SetSWF(GSWF_AchUnlockQueue + ach);
+
+        // TODO: Move sound effect to the window popup, if creating one.
+        ttyd::pmario_sound::psndSFXOn("SFX_MOBJ_BLOCK_POWER_SHINE1");
 
         // For options, automatically unlock their reward (no purchase needed).
         switch (g_AchievementData[ach].reward_type) {
