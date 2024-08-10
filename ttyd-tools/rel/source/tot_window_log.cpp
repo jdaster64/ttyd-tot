@@ -4,6 +4,7 @@
 #include "common_types.h"
 #include "mod.h"
 #include "tot_generate_enemy.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_state.h"
@@ -11,8 +12,9 @@
 #include <gc/types.h>
 #include <ttyd/gx/GXTev.h>
 #include <ttyd/gx/GXTransform.h>
-#include <ttyd/battle_monosiri.h>
+#include <ttyd/_core_language_libs.h>
 #include <ttyd/animdrv.h>
+#include <ttyd/battle_monosiri.h>
 #include <ttyd/dispdrv.h>
 #include <ttyd/filemgr.h>
 #include <ttyd/fontmgr.h>
@@ -24,6 +26,7 @@
 #include <ttyd/memory.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/pmario_sound.h>
+#include <ttyd/sound.h>
 #include <ttyd/swdrv.h>
 #include <ttyd/system.h>
 #include <ttyd/win_log.h>
@@ -266,11 +269,26 @@ void SortItemLogType(WinPauseMenu* menu) {
     menu->recipe_log_page_num = 0;
 }
 
-void GetAchievementStates(int8_t* states) {
+// Gets the current display state of each cell in the achievement grid.
+// Returns the cell of the smallest achievement ready to unlock, or -1 if none.
+int32_t GetAchievementStates(int8_t* states) {
     const auto& state = g_Mod->state_;
+    int32_t queued_unlock = -1;
+    int32_t queued_unlock_ach = -1;
     for (int32_t i = 0; i < 70; ++i) {
         int32_t ach = g_AchievementGrid[i];
         states[i] = state.GetOption(FLAGS_ACHIEVEMENT, ach) ? 2 : 0;
+    }
+    for (int32_t i = 0; i < 70; ++i) {
+        int32_t ach = g_AchievementGrid[i];
+        if (GetSWF(GSWF_AchUnlockQueue + ach)) {
+            // Suppress cell from being drawn as unlocked.
+            states[i] = 0;
+            if (queued_unlock < 0 || ach < queued_unlock_ach) {
+                queued_unlock = i;
+                queued_unlock_ach = ach;
+            }
+        }
     }
     for (int32_t i = 0; i < 70; ++i) {
         int32_t ach = g_AchievementGrid[i];
@@ -282,6 +300,7 @@ void GetAchievementStates(int8_t* states) {
             states[i] = 1;
         }
     }
+    return queued_unlock;
 }
 
 void GetAchievementRewardDetails(
@@ -370,13 +389,13 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         ttyd::win_main::winTexSet(
             0x7b + darker_shade + success_shade, &position, &scale, &color);
 
-        // Draw icon.
+        // Draw icon (or its shadow).
         if (states[i]) {
             int32_t icon = 0;
             GetAchievementRewardDetails(i, &icon, nullptr);
             ttyd::win_main::winIconInit();
             scale = { 0.45f, 0.45f, 0.45f };
-            color = states[i] == 2 ? 0xFFFFFFFFU : 0x000000FFU;
+            color = states[i] == 2 ? 0xFFFFFFFFU : 0x000000B0U;
             ttyd::win_main::winIconSet(icon, &position, &scale, &color);
         }
     }
@@ -1107,15 +1126,18 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     menu->achievement_log_completed_count = 0;
     menu->achievement_log_total_count = 0;
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
-        bool completed = g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i);
-        if (g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i)) {
-            ++menu->achievement_log_completed_count;
-        }
+        bool completed =
+            g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i) &&
+            !GetSWF(GSWF_AchUnlockQueue + i);
+        if (completed) ++menu->achievement_log_completed_count;
         if (i <= AchievementId::META_ALL_ACHIEVEMENTS || completed) {
             ++menu->achievement_log_total_count;
         }
     }
     menu->achievement_log_hammers = g_Mod->state_.GetOption(STAT_PERM_ACH_HAMMERS);
+    menu->achievement_log_using_hammer = 0;
+    menu->achievement_log_unlock_timer = 0;
+    menu->achievement_log_cam_shake_offset = 0.0f;
 }
 
 void LogMenuInit2(ttyd::win_root::WinPauseMenu* menu) {
@@ -1585,7 +1607,11 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             // Achievement log.
 
             int8_t states[70];
-            GetAchievementStates(states);
+            if (GetAchievementStates(states) != -1) {
+                menu->log_menu_state = 60;
+                menu->achievement_log_unlock_timer = -60;
+                break;
+            }
 
             int32_t cursor = menu->achievement_log_cursor_idx;
 
@@ -1790,6 +1816,84 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             } else {
                 ttyd::win_log::monosiriMain(menu->tattle_log_menu_work);
             }
+            break;
+        }
+        case 60: {
+            // Unlocking animation for achievements menu.
+
+            int8_t states[70];
+            int32_t unlock_cell = GetAchievementStates(states);
+
+            int32_t cursor = menu->achievement_log_cursor_idx;
+
+            if (menu->achievement_log_unlock_timer < 0) {
+                ++menu->achievement_log_unlock_timer;
+            } else {
+                --menu->achievement_log_unlock_timer;
+
+                // Calculate camera shake offset (cosine w/quadratic damping).
+                float shake_time =
+                    2.0f - menu->achievement_log_unlock_timer / 30.0f;
+                if (shake_time > 1.0f) shake_time = 1.0f;
+                float shake_offset = 3.0f;
+                shake_offset *= ttyd::_core_cos(shake_time * 8 * 3.14159265f);
+                shake_offset *= (1.0f - shake_time) * (1.0f - shake_time);
+                menu->achievement_log_cam_shake_offset = shake_offset;
+            }
+
+            if (menu->achievement_log_unlock_timer == 0) {
+                if (unlock_cell == -1) {
+                    menu->log_menu_state = 16;
+                    break;
+                }
+
+                int32_t ach = g_AchievementGrid[unlock_cell];
+                SetSWF(GSWF_AchUnlockQueue + ach, 0);
+                menu->achievement_log_cursor_idx = unlock_cell;
+                cursor = menu->achievement_log_cursor_idx;
+
+                // Update number of achievements unlocked / in total.
+                menu->achievement_log_completed_count = 0;
+                menu->achievement_log_total_count = 0;
+                for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+                    bool completed =
+                        g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i) &&
+                        !GetSWF(GSWF_AchUnlockQueue + i);
+                    if (completed) ++menu->achievement_log_completed_count;
+                    if (i <= AchievementId::META_ALL_ACHIEVEMENTS || completed) {
+                        ++menu->achievement_log_total_count;
+                    }
+                }
+
+                // Update number of hammers if necessary.
+                if (AchievementsManager::GetData(ach)->reward_type ==
+                    AchievementRewardType::HAMMER) {
+                    g_Mod->state_.ChangeOption(STAT_PERM_ACH_HAMMERS, 1);
+                    menu->achievement_log_hammers =
+                        g_Mod->state_.GetOption(STAT_PERM_ACH_HAMMERS);
+                }
+                
+                // Play explosion sound.
+                ttyd::sound::SoundEfxPlayEx(0x3f7, 0, 0x64, 0x40);
+
+                menu->achievement_log_unlock_timer = 60;
+            }
+
+            if (states[cursor] > 0) {
+                int32_t ach = g_AchievementGrid[cursor];
+                ttyd::win_root::winMsgEntry(
+                    menu, 0, AchievementsManager::GetData(ach)->help_msg, 0);
+            } else {
+                ttyd::win_root::winMsgEntry(
+                    menu, 0, "msg_menu_stone_none_help", 0);
+            }
+
+            // Lock cursor position based on selected entry.
+            menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
+            menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
+            menu->main_cursor_x = menu->main_cursor_target_x;
+            menu->main_cursor_y = menu->main_cursor_target_y;
+
             break;
         }
         case 1000:
@@ -2010,7 +2114,11 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
             DrawMoveLog(menu, win_x - 170.0f, win_y + 130.0f);
             break;
         case 16:
-            DrawAchievementLog(menu, win_x - 170.0f, win_y + 130.0f);
+        case 60:
+            DrawAchievementLog(
+                menu,
+                win_x - 170.0f + menu->achievement_log_cam_shake_offset,
+                win_y + 130.0f - menu->achievement_log_cam_shake_offset);
             break;
         case 17:
             DrawRecordsLog(menu, win_x - 170.0f, win_y + 130.0f);
@@ -2066,6 +2174,31 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
             gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
             uint32_t color = 0x808080FFU;
             ttyd::win_main::winTexSet_x2(banner_id, 0xb5, &position, &scale, &color);
+        }
+
+        // Draw "!" icon above achievements banner if there's a pending unlock.
+        if (submenu.id == 6 && menu->log_menu_state == 0) {
+            bool achievement_queued = false;
+            for (int32_t i = 0; i < 70; ++i) {
+                if (GetSWF(GSWF_AchUnlockQueue + i)) {
+                    achievement_queued = true;
+                    break;
+                }
+            }
+            if (achievement_queued) {
+                float offset = i == menu->log_submenu_cursor_idx ? 8.0f : 0.0f;
+                ttyd::win_main::winIconInit();
+                gc::vec3 position = {
+                    win_x + submenu.x + 116.0f - offset,
+                    win_y + submenu.y + 24.0f + offset,
+                    0.0f
+                };
+                gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+                uint32_t color = 0xFFFFFFFFU;
+                ttyd::win_main::winIconSet(
+                    IconType::STATUS_EXCLAMATION_BUTTON,
+                    &position, &scale, &color);
+            }
         }
     }
 }

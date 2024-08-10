@@ -39,6 +39,11 @@ enum GlobalWorkVars {
     GSWF_YoshiColors_End                    = GSWF_YoshiColors + 30,
     GSWF_MarioColors                        = GSWF_YoshiColors_End,
     GSWF_MarioColors_End                    = GSWF_MarioColors + 30,
+    // Used for queueing animations for achievement unlocking.
+    GSWF_AchWinQueue                        = GSWF_MarioColors_End,
+    GSWF_AchWinQueue_End                    = GSWF_AchWinQueue + 70,
+    GSWF_AchUnlockQueue                     = GSWF_AchWinQueue_End,
+    GSWF_AchUnlockQueue_End                 = GSWF_AchUnlockQueue + 70,
 };
 
 // Wrappers to ttyd::swdrv functions that handle base conversion.

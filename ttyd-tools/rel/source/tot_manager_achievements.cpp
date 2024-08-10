@@ -2,6 +2,7 @@
 
 #include "common_functions.h"
 #include "mod.h"
+#include "tot_gsw.h"
 #include "tot_state.h"
 
 #include <ttyd/evtmgr.h>
@@ -94,11 +95,6 @@ const AchievementData g_AchievementData[] = {
     { "tot_achd_69", nullptr, AchievementRewardType::YOSHI_COSTUME, 17 },
 };
 
-// Queues for popping up "Achievement unlocked" dialogs and marking off
-// completed achievements in the pause menu.
-int8_t g_WinQueue[AchievementId::MAX_ACHIEVEMENT + 1] = { -1 };
-int8_t g_MarkQueue[AchievementId::MAX_ACHIEVEMENT + 1] = { -1 };
-
 }  // namespace
 
 void AchievementsManager::Update() {
@@ -130,19 +126,10 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
 
     if (!g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach)) {
         g_Mod->state_.SetOption(FLAGS_ACHIEVEMENT, ach);
-        
-        for (int32_t i = 0; i <= AchievementId::MAX_ACHIEVEMENT; ++i) {
-            if (g_WinQueue[i] == -1) {
-                g_WinQueue[i] = ach;
-                g_WinQueue[i + 1] = -1;
-            }
-        }
-        for (int32_t i = 0; i <= AchievementId::MAX_ACHIEVEMENT; ++i) {
-            if (g_MarkQueue[i] == -1) {
-                g_MarkQueue[i] = ach;
-                g_MarkQueue[i + 1] = -1;
-            }
-        }
+
+        // Queue animations for unlocking.
+        SetSWF(GSWF_AchWinQueue + ach);
+        SetSWF(GSWF_AchUnlockQueue + ach);
 
         // For options, automatically unlock their reward (no purchase needed).
         switch (g_AchievementData[ach].reward_type) {
@@ -150,10 +137,6 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
                 g_Mod->state_.SetOption(FLAGS_OPTION_UNLOCKED, ach);
                 // Check to see if all extra options are unlocked.
                 CheckCompleted(AchievementId::META_ALL_OPTIONS);
-                break;
-            }
-            case AchievementRewardType::HAMMER: {
-                g_Mod->state_.ChangeOption(STAT_PERM_ACH_HAMMERS, 1);
                 break;
             }
         }
