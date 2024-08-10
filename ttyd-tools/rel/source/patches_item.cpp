@@ -1023,15 +1023,13 @@ void ApplyFixedPatches() {
             // Track coins, Star Pieces, and Shine Sprites gained.
             if (item_type == ItemType::COIN) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED);
-                if (g_Mod->state_.GetOption(tot::STAT_RUN_COINS_EARNED) >= 999) {
-                    tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::MISC_RUN_COINS_999);
-                }
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED);
                 if (g_Mod->state_.GetOption(tot::STAT_PERM_COINS_EARNED) >= 10000) {
                     tot::AchievementsManager::MarkCompleted(
                         tot::AchievementId::AGG_COINS_10000);
                 }
+                tot::AchievementsManager::CheckCompleted(
+                    tot::AchievementId::MISC_RUN_COINS_999);
             }
             if (item_type == ItemType::STAR_PIECE) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_STAR_PIECES);

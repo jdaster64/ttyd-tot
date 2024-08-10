@@ -151,6 +151,13 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
 void AchievementsManager::CheckCompleted(int32_t ach) {
     const auto& state = g_Mod->state_;
     switch (ach) {
+        case AchievementId::MISC_RUN_COINS_999: {
+            if (ttyd::mario_pouch::pouchGetPtr()->coins == 999 &&
+                state.GetOption(OPT_RUN_STARTED)) {
+                MarkCompleted(ach);
+            }
+            break;
+        }
         case AchievementId::MISC_CHET_RIPPO_SELL_ALL: {
             if (state.hp_level_ > 0) return;
             if (state.fp_level_ > 0) return;
