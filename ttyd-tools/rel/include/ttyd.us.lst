@@ -2142,6 +2142,7 @@
 80126c64:BtlUnit_GetFp
 80126ca8:BtlUnit_GetCoin
 80126fe8:BtlUnit_ReviseHpFp
+8012724c:BtlUnit_CanActStatus
 8012733c:BtlUnit_GetData
 801277ac:BtlUnit_OffUnitFlag
 801277bc:BtlUnit_OnUnitFlag

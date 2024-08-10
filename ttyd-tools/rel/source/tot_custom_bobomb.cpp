@@ -42,6 +42,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 }  // namespace
 
 // Function / USER_FUNC declarations.
+EVT_DECLARE_USER_FUNC(evtTot_CheckCanWaitToCounterattack, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SpawnUpDownEffect, 2)
 
 // Unit work variable definitions.
@@ -254,8 +255,14 @@ EVT_BEGIN(unitBobOmb_damage_event_spark)
     SET(LW(11), 1)
     USER_FUNC(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
     IF_EQUAL(LW(0), 1)
-        SET(LW(15), 1)
-        RUN_CHILD_EVT(PTR(&unitBobOmb_bomb_event))
+        USER_FUNC(evtTot_CheckCanWaitToCounterattack, LW(0))
+        IF_EQUAL(LW(0), 1)
+            USER_FUNC(btlevtcmd_AfterReactionEntry, -2, 52)
+            RUN_CHILD_EVT(PTR(&btldefaultevt_Damage))
+        ELSE()
+            SET(LW(15), 1)
+            RUN_CHILD_EVT(PTR(&unitBobOmb_bomb_event))
+        END_IF()
     ELSE()
         RUN_CHILD_EVT(PTR(&btldefaultevt_Damage))
     END_IF()
@@ -547,9 +554,14 @@ EVT_BEGIN(unitBobOmb_damage_event)
             CASE_OR(24)
             CASE_OR(27)
             CASE_OR(25)
-                SET(LW(15), 1)
-                RUN_CHILD_EVT(PTR(&unitBobOmb_bomb_event))
-                RETURN()
+                USER_FUNC(evtTot_CheckCanWaitToCounterattack, LW(0))
+                IF_EQUAL(LW(0), 1)
+                    USER_FUNC(btlevtcmd_AfterReactionEntry, -2, 52)
+                ELSE()
+                    SET(LW(15), 1)
+                    RUN_CHILD_EVT(PTR(&unitBobOmb_bomb_event))
+                    RETURN()
+                END_IF()
                 CASE_END()
         END_SWITCH()
     END_IF()
@@ -598,6 +610,7 @@ EVT_END()
 
 DataTableEntry unitBobOmb_data_table[] = {
     48, (void*)btldefaultevt_Dummy,
+    52, (void*)unitBobOmb_attack_event_spark,
     0, nullptr,
 };
 
@@ -726,6 +739,24 @@ BattleUnitKind unit_HyperBobOmb = {
     .init_evt_code = (void*)unitHyperBobOmb_init_event,
     .data_table = unitBobOmb_data_table,
 };
+
+EVT_DEFINE_USER_FUNC(evtTot_CheckCanWaitToCounterattack) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = ttyd::battle_sub::BattleTransID(evt, -2);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+
+    // If the attack that landed was 'indirect' (volatile explosive resistance)
+    // and the user is able to act, don't explode immediately, but queue a
+    // counter-attack instead.
+    bool can_counterattack =
+        ttyd::battle_unit::BtlUnit_CanActStatus(unit) && 
+        !ttyd::battle_unit::BtlUnit_CheckStatus(unit, StatusEffectType::OHKO) &&
+        (unit->last_target_weapon_cr_flags &
+            AttackCounterResistance_Flags::VOLATILE_EXPLOSIVE) != 0;
+    evtSetValue(evt, evt->evtArguments[0], can_counterattack);
+
+    return 2;
+}
 
 EVT_DEFINE_USER_FUNC(evtTot_SpawnUpDownEffect) {
     auto* battleWork = ttyd::battle::g_BattleWork;

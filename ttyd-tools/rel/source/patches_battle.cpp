@@ -81,6 +81,9 @@ extern "C" {
     // status_effect_patches.s
     void StartCalculateCounterDamage();
     void BranchBackCalculateCounterDamage();
+    void StartCheckExplosiveKO();
+    void BranchBackCheckExplosiveKO();
+    void ConditionalBranchCheckExplosiveKO();
     void StartToggleScopedAndCheckFreezeBreak();
     void BranchBackToggleScopedAndCheckFreezeBreak();
     void StartTrackPoisonDamage();
@@ -193,6 +196,9 @@ extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH;
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_EH;
 extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH;
+extern const int32_t g_BattleCheckDamage_CheckExplosiveKO_BH;
+extern const int32_t g_BattleCheckDamage_CheckExplosiveKO_EH;
+extern const int32_t g_BattleCheckDamage_CheckExplosiveKO_CH1;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_BH;
 extern const int32_t g_BattleCheckDamage_CalculateCounterDamage_EH;
 extern const int32_t g_BattleSetStatusDamage_Patch_FeelingFineYesCase;
@@ -1395,6 +1401,17 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleCheckDamage_CalculateCounterDamage_EH),
         reinterpret_cast<void*>(StartCalculateCounterDamage),
         reinterpret_cast<void*>(BranchBackCalculateCounterDamage));
+        
+    // Skip explosion KO logic for regular / Hyper Bob-ombs.
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(g_BattleCheckDamage_CheckExplosiveKO_BH),
+        reinterpret_cast<void*>(StartCheckExplosiveKO));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(BranchBackCheckExplosiveKO),
+        reinterpret_cast<void*>(g_BattleCheckDamage_CheckExplosiveKO_EH));
+    mod::patch::writeBranch(
+        reinterpret_cast<void*>(ConditionalBranchCheckExplosiveKO),
+        reinterpret_cast<void*>(g_BattleCheckDamage_CheckExplosiveKO_CH1));
             
     // Track damage taken.
     g_BattleDamageDirect_trampoline = mod::patch::hookFunction(

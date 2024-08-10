@@ -493,7 +493,7 @@ int32_t BtlUnit_GetCoin(BattleWorkUnit* unit);
 // BtlUnit_SetParamToPouch
 // BtlUnit_ReviseHpFp
 // BtlUnit_SetParamFromPouch
-// BtlUnit_CanActStatus
+int32_t BtlUnit_CanActStatus(BattleWorkUnit* unit);
 // BtlUnit_CanGuardStatus
 // BtlUnit_CheckData
 uint32_t BtlUnit_GetData(BattleWorkUnit* unit, int32_t data_type);

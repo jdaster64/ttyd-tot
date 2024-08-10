@@ -1,9 +1,31 @@
 .global StartCalculateCounterDamage
 .global BranchBackCalculateCounterDamage
+.global StartCheckExplosiveKO
+.global ConditionalBranchCheckExplosiveKO
+.global BranchBackCheckExplosiveKO
 .global StartToggleScopedAndCheckFreezeBreak
 .global BranchBackToggleScopedAndCheckFreezeBreak
 .global StartTrackPoisonDamage
 .global BranchBackTrackPoisonDamage
+
+
+StartCheckExplosiveKO:
+lwz %r3, 0x4 (%r27)
+cmpwi %r3, 0x12  # Hyper Bob-omb
+beq- lbl_SkipBobombExplosiveKO
+cmpwi %r3, 0x2d  # Bob-omb
+bne+ lbl_DontSkipExplosiveKO
+
+lbl_SkipBobombExplosiveKO:
+ConditionalBranchCheckExplosiveKO:
+b 0
+
+lbl_DontSkipExplosiveKO:
+# Restore original opcode, continue execution.
+lwz %r3, 0x1b0 (%r28)
+BranchBackCheckExplosiveKO:
+b 0
+
 
 StartCalculateCounterDamage:
 # Counterattack work (input to BattleCheckCounter).
