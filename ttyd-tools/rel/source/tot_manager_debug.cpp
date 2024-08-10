@@ -39,6 +39,7 @@ enum DebugManagerMode {
     DEBUG_UNLOCK_ALL_PARTNERS,  // Tower only
     DEBUG_UNLOCK_ALL_BADGES,
     DEBUG_COMPLETE_LOGS,
+    DEBUG_COMPLETE_ACHIEVEMENTS,
     DEBUG_DIFFICULTY,
     DEBUG_MAX_STATS,
     DEBUG_EXIT,
@@ -182,8 +183,6 @@ void DebugManager::Update() {
                             pouch.party_data[i].flags |= 1;
                         }
                         g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
-                        AchievementsManager::MarkCompleted(
-                            AchievementId::AGG_ALL_PARTNERS);
                     }
                     break;
                 }
@@ -227,8 +226,17 @@ void DebugManager::Update() {
                     }
                     // Set all partners as having been obtained once.
                     g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
-                    AchievementsManager::MarkCompleted(
-                        AchievementId::AGG_ALL_PARTNERS);
+                    break;
+                }
+                case DEBUG_COMPLETE_ACHIEVEMENTS: {
+                    int32_t max_achievement = AchievementId::META_ALL_ACHIEVEMENTS;
+                    if (buttons & ButtonId::L) {
+                        // Also mark off secret achievements if L is held.
+                        max_achievement = AchievementId::MAX_ACHIEVEMENT - 1;
+                    }
+                    for (int32_t i = 0; i <= max_achievement; ++i) {
+                        AchievementsManager::MarkCompleted(i);
+                    }
                     break;
                 }
             }
@@ -441,6 +449,9 @@ void DebugManager::Draw() {
             }
             case DEBUG_COMPLETE_LOGS: {
                 strcpy(buf, "Unlock All Journal Logs");     break;
+            }
+            case DEBUG_COMPLETE_ACHIEVEMENTS: {
+                strcpy(buf, "Complete All Achievements");   break;
             }
             case DEBUG_EXIT: {
                 strcpy(buf, "Exit Debug Mode");             break;

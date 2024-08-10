@@ -56,10 +56,8 @@ void CheatsManager::Update() {
     }
     if ((code_history & 0xFFFFFF) == secretCode_BumpAttack) {
         code_history = 0;
-        // Check Journal for whether the badge was already unlocked.
-        bool has_fx_badges = ttyd::swdrv::swGet(
-            ItemType::BUMP_ATTACK - ItemType::POWER_JUMP + 0x80);
-        if (!has_fx_badges && ttyd::mario_pouch::pouchGetHaveBadgeCnt() < 200) {
+        if (!ttyd::mario_pouch::pouchCheckItem(ItemType::BUMP_ATTACK) && 
+            ttyd::mario_pouch::pouchGetHaveBadgeCnt() < 200) {
             ttyd::mario_pouch::pouchGetItem(ItemType::BUMP_ATTACK);
             ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
         }

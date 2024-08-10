@@ -269,15 +269,60 @@ void SortItemLogType(WinPauseMenu* menu) {
 void GetAchievementStates(int8_t* states) {
     const auto& state = g_Mod->state_;
     for (int32_t i = 0; i < 70; ++i) {
-        states[i] = state.GetOption(FLAGS_ACHIEVEMENT, i) ? 2 : 0;
+        int32_t ach = g_AchievementGrid[i];
+        states[i] = state.GetOption(FLAGS_ACHIEVEMENT, ach) ? 2 : 0;
     }
     for (int32_t i = 0; i < 70; ++i) {
-        if (states[i] == 0 && (
+        int32_t ach = g_AchievementGrid[i];
+        if (states[i] == 0 && ach <= AchievementId::META_ALL_ACHIEVEMENTS && (
             (i % 10 > 0 && states[i -  1] == 2) ||
             (i % 10 < 9 && states[i +  1] == 2) ||
             (i / 10 > 0 && states[i - 10] == 2) ||
             (i / 10 < 6 && states[i + 10] == 2))) {
             states[i] = 1;
+        }
+    }
+}
+
+void GetAchievementRewardDetails(
+    int32_t cursor, int32_t* icon, const char** name_msg) {
+    const auto* data =  AchievementsManager::GetData(g_AchievementGrid[cursor]);
+    switch (data->reward_type) {
+        case AchievementRewardType::OPTION:
+            if (icon) *icon = IconType::VITAL_PAPER;
+            if (name_msg) *name_msg = data->reward_msg;
+            break;
+        case AchievementRewardType::HAMMER:
+            if (icon) *icon = IconType::HAMMER;
+            if (name_msg) *name_msg = 
+                ttyd::item_data::itemDataTable[ItemType::HAMMER].name;
+            break;
+        case AchievementRewardType::KEY_ITEM:
+            if (icon) *icon =
+                ttyd::item_data::itemDataTable[data->reward_id].icon_id;
+            if (name_msg) *name_msg =
+                ttyd::item_data::itemDataTable[data->reward_id].name;
+            break;
+        case AchievementRewardType::MARIO_COSTUME: {
+            const auto* cosmetic_data = CosmeticsManager::GetData(
+                CosmeticType::MARIO_COSTUME, data->reward_id);
+            if (icon) *icon = cosmetic_data->icon;
+            if (name_msg) *name_msg = cosmetic_data->name_msg;
+            break;
+        }
+        case AchievementRewardType::YOSHI_COSTUME: {
+            const auto* cosmetic_data = CosmeticsManager::GetData(
+                CosmeticType::YOSHI_COSTUME, data->reward_id);
+            if (icon) *icon = cosmetic_data->icon;
+            if (name_msg) *name_msg = cosmetic_data->name_msg;
+            break;
+        }
+        case AchievementRewardType::ATTACK_FX: {
+            const auto* cosmetic_data = CosmeticsManager::GetData(
+                CosmeticType::ATTACK_FX, data->reward_id);
+            if (icon) *icon = cosmetic_data->icon;
+            if (name_msg) *name_msg = cosmetic_data->name_msg;
+            break;
         }
     }
 }
@@ -310,9 +355,9 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
 
         int32_t darker_shade = ((i ^ (i / 10)) & 1);
         int32_t success_shade = states[i] == 2 ? 13 : 0;
-        uint32_t color = 0x606060FFU;
+        uint32_t color = 0x505050FFU;
         switch (states[i]) {
-            case 1:  color = 0xc0c0c0FFU;  break;
+            case 1:  color = 0xb0b0b0FFU;  break;
             case 2:  color = 0xFFFFFFFFU;  break;
         }
         gc::vec3 position = {
@@ -321,65 +366,40 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             0.0f
         };
         gc::vec3 scale = { 0.642857f, 0.642857f, 0.642857f };
+        ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
         ttyd::win_main::winTexSet(
             0x7b + darker_shade + success_shade, &position, &scale, &color);
+
+        // Draw icon.
+        if (states[i]) {
+            int32_t icon = 0;
+            GetAchievementRewardDetails(i, &icon, nullptr);
+            ttyd::win_main::winIconInit();
+            scale = { 0.45f, 0.45f, 0.45f };
+            color = states[i] == 2 ? 0xFFFFFFFFU : 0x000000FFU;
+            ttyd::win_main::winIconSet(icon, &position, &scale, &color);
+        }
     }
 
     // Draw large tile that shows current tile's reward.
     {
         int32_t cursor = menu->achievement_log_cursor_idx;
         int32_t success_shade = states[cursor] == 2 ? 13 : 0;
-        uint32_t color = 0x606060FFU;
+        uint32_t color = 0x505050FFU;
         switch (states[cursor]) {
-            case 1:  color = 0xc0c0c0FFU;  break;
+            case 1:  color = 0xb0b0b0FFU;  break;
             case 2:  color = 0xFFFFFFFFU;  break;
         }
-        gc::vec3 position = { win_x - 21.0f, win_y - 47.0f, 0.0f };
+        gc::vec3 position = { win_x - 21.0f, win_y - 50.0f, 0.0f };
         gc::vec3 scale = { 1.5f, 1.5f, 1.5f };
         ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
         ttyd::win_main::winTexSet(
             0x7b + success_shade, &position, &scale, &color);
 
         if (states[cursor]) {
-            const auto* data = 
-                AchievementsManager::GetData(g_AchievementGrid[cursor]);
             int32_t icon = 0;
             const char* name_msg = "";
-            switch (data->reward_type) {
-                case AchievementRewardType::OPTION:
-                    icon = IconType::VITAL_PAPER;
-                    name_msg = data->reward_msg;
-                    break;
-                case AchievementRewardType::HAMMER:
-                    icon = IconType::HAMMER;
-                    name_msg = ttyd::item_data::itemDataTable[ItemType::HAMMER].name;
-                    break;
-                case AchievementRewardType::KEY_ITEM:
-                    icon = ttyd::item_data::itemDataTable[data->reward_id].icon_id;
-                    name_msg = ttyd::item_data::itemDataTable[data->reward_id].name;
-                    break;
-                case AchievementRewardType::MARIO_COSTUME: {
-                    const auto* cosmetic_data = CosmeticsManager::GetData(
-                        CosmeticType::MARIO_COSTUME, data->reward_id);
-                    icon = cosmetic_data->icon;
-                    name_msg = cosmetic_data->name_msg;
-                    break;
-                }
-                case AchievementRewardType::YOSHI_COSTUME: {
-                    const auto* cosmetic_data = CosmeticsManager::GetData(
-                        CosmeticType::YOSHI_COSTUME, data->reward_id);
-                    icon = cosmetic_data->icon;
-                    name_msg = cosmetic_data->name_msg;
-                    break;
-                }
-                case AchievementRewardType::ATTACK_FX: {
-                    const auto* cosmetic_data = CosmeticsManager::GetData(
-                        CosmeticType::ATTACK_FX, data->reward_id);
-                    icon = cosmetic_data->icon;
-                    name_msg = cosmetic_data->name_msg;
-                    break;
-                }
-            }
+            GetAchievementRewardDetails(cursor, &icon, &name_msg);
 
             // Draw icon.
             ttyd::win_main::winIconInit();
@@ -414,18 +434,17 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         }
     }
 
-    // TODO: Tie to actual number of hammers.
-    int32_t num_hammers = 3;
     for (int32_t i = 0; i < 5; ++i) {
         ttyd::win_main::winIconInit();
         gc::vec3 position = {
             win_x - 80.0f + 30.0f * i, win_y - 155.0f - 10.0f * (i & 1), 0.0f
         };
         gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
-        uint32_t color = i < num_hammers ? 0x00000080U : 0x000000FFU;
+        uint32_t color =
+            i < menu->achievement_log_hammers ? 0x00000080U : 0x000000FFU;
         ttyd::win_main::winIconSet(IconType::HAMMER, &position, &scale, &color);
 
-        if (i < num_hammers) {
+        if (i < menu->achievement_log_hammers) {
             position.x -= 2.0f;
             position.y += 2.0f;
             color = 0xFFFFFFFFU;
@@ -775,7 +794,10 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     break;
                 }
                 case REC_ACHIEVEMENT_PCT: {
-                    sprintf(ptr, "???");
+                    sprintf(
+                        ptr, "%" PRId32 " / %" PRId32,
+                        menu->achievement_log_completed_count,
+                        menu->achievement_log_total_count);
                     break;
                 }
                 case REC_ITEM_PCT: {

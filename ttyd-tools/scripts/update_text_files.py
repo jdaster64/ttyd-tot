@@ -1806,6 +1806,236 @@ g_StringMap = {
         b"tot_rech_runstats":
             b"Various stats aggregated across\n"
             b"all of your past runs.",
+            
+            
+        # Achievement descriptions.
+        
+        b"tot_achd_00":
+            b"Perform all Stylish commands on\n"
+            b"20 different moves.",
+        b"tot_achd_01":
+            b"Buy a total of 50 items from\n"
+            b"Charlieton.",
+        b"tot_achd_02":
+            b"Deal with a total of 10 NPCs.",
+        b"tot_achd_03":
+            b"Find all partners.",
+        b"tot_achd_04":
+            b"Use 10 different Lvl. 3 moves.",
+        b"tot_achd_05":
+            b"Defeat 50 different types of\n"
+            b"midbosses.",
+        b"tot_achd_06":
+            b"Superguard 100 attacks in total.",
+        b"tot_achd_07":
+            b"Earn a total of 10,000 coins.",
+        b"tot_achd_08":
+            b"Deal a total of 50,000 damage\n"
+            b"to enemies.",
+        b"tot_achd_09":
+            b"Clear Hooktail's tower for the\n"
+            b"first time.",
+        b"tot_achd_10":
+            b"Clear a Half-length tower in\n"
+            b"1:00:00 with default settings.",
+        b"tot_achd_11":
+            b"Clear a Half-length tower in\n"
+            b"0:40:00 with default settings.",
+        b"tot_achd_12":
+            b"Clear Gloomtail's tower for the\n"
+            b"first time.",
+        b"tot_achd_13":
+            b"Clear a Full-length tower in\n"
+            b"2:00:00 with default settings.",
+        b"tot_achd_14":
+            b"Clear a Full-length tower in\n"
+            b"1:30:00 with default settings.",
+        b"tot_achd_15":
+            b"Finish an EX-difficulty tower run\n"
+            b"with default settings.",
+        b"tot_achd_16":
+            b"Clear a EX-difficulty run in\n"
+            b"3:00:00 with default settings.",
+        b"tot_achd_17":
+            b"Clear a EX-difficulty run in\n"
+            b"2:15:00 with default settings.",
+        b"tot_achd_18":
+            b"Finish a run, making deals with\n"
+            b"NPCs on 7 or more rest floors.",
+        b"tot_achd_19":
+            b"Finish a run with maximum\n"
+            b"Action Command difficulty.",
+        b"tot_achd_20":
+            b"Finish a run with no partners.",
+        b"tot_achd_21":
+            b"Finish a run with all 7 partners\n"
+            b"in your party.",
+        b"tot_achd_22":
+            b"Finish a default run without\n"
+            b"Jumping or Hammering in battle.",
+        b"tot_achd_23":
+            b"Finish a default run without\n"
+            b"ever using an item.",
+        b"tot_achd_24":
+            b"Finish a default run without\n"
+            b"ever equipping a badge.",
+        b"tot_achd_25":
+            b"Finish a run with no moves able\n"
+            b"to be upgraded further.",
+        b"tot_achd_26":
+            b"Finish a run without failing a\n"
+            b"bonus condition.",
+        b"tot_achd_27":
+            b"Finish a default run, spending\n"
+            b"3 or fewer turns on every floor.",
+        b"tot_achd_28":
+            b"Finish a default run without\n"
+            b"taking any damage.",
+        b"tot_achd_29":
+            b"Finish a run with 2x or more\n"
+            b"enemy HP and ATK.\n"
+            b"All other settings must be\n"
+            b"set to the default.",
+        b"tot_achd_30":
+            b"Finish a run with one of Mario's\n"
+            b"stats at a maximum of 1.\n"
+            b"Settings must be default, aside\n"
+            b"from setting HP/FP/BP to 0.",
+        b"tot_achd_31":
+            b"Finish a run with two of Mario's\n"
+            b"stats at a maximum of 1.\n"
+            b"Settings must be default, aside\n"
+            b"from setting HP/FP/BP to 0.",
+        b"tot_achd_32":
+            b"Beat a floor with a fainted\n"
+            b"partner.",
+        b"tot_achd_33":
+            b"Lose an item or badge to a\n" 
+            b"Bandit.",
+        b"tot_achd_34":
+            b"Detonate a Bomb Squad bomb\n"
+            b"early with Fire Drive.",
+        b"tot_achd_35":
+            b"Break an enemy's Frozen status\n"
+            b"with a hit dealing 20+ damage.",
+        b"tot_achd_36":
+            b"Deal 50 damage to a single foe\n"
+            b"using Poison status.",
+        b"tot_achd_37":
+            b"Defeat a Shrunk midboss with\n"
+            b"Gale Force or Gulp.",
+        b"tot_achd_38":
+            b"Get at least a GREAT rating on\n"
+            b"Flurrie's Thunder Storm.",
+        b"tot_achd_39":
+            b"Take a hit from a fully charged\n"
+            b"Megaton Bomb.",
+        b"tot_achd_40":
+            b"Use a Trade Off item on turn 1\n"
+            b"against the final boss.",
+        b"tot_achd_41":
+            b"Superguard one of the dragons'\n"
+            b"bite attack.",
+        b"tot_achd_42":
+            b"Clear Charlieton's inventory on\n"
+            b"a floor with Limited stock.",
+        b"tot_achd_43":
+            b"Buy a Star Piece from Dazzle\n"
+            b"for 100 or more coins.",
+        b"tot_achd_44":
+            b"Exchange all your levels in all\n"
+            b"stats with Chet Rippo.",
+        b"tot_achd_45":
+            b"Double your coins with Lumpy\n"
+            b"twice or more in a single run.",
+        b"tot_achd_46":
+            b"Use a Tower Key to skip a floor\n"
+            b"with chests already accessible.",
+        b"tot_achd_47":
+            b"Have Zess T. cook one of her\n"
+            b"signature items.",
+        b"tot_achd_48":
+            b"Have Zess T. transform an item\n"
+            b"with a Point Swap.",
+        b"tot_achd_49":
+            b"Get 10 Shine Sprites in a single\n"
+            b"tower run.",
+        b"tot_achd_50":
+            b"Reach 999 coins on hand within\n"
+            b"a tower run.",
+        b"tot_achd_51":
+            b"Purchase 5 of each type of\n"
+            b"cosmetic upgrade.",
+        b"tot_achd_52":
+            b"Unlock all tower run options.",
+        b"tot_achd_53":
+            b"Obtain all Key Items.",
+        b"tot_achd_54":
+            b"Purchase 10 items and 10 badges\n"
+            b"from the Petalburg shop.",
+        b"tot_achd_55":
+            b"Purchase all items and badges\n"
+            b"from the Petalburg shop.",
+        b"tot_achd_56":
+            b"Log all normal and rare items\n"
+            b"in the Items log.",
+        b"tot_achd_57":
+            b"100% complete the Items log.",
+        b"tot_achd_58":
+            b"100% complete the Badges log.",
+        b"tot_achd_59":
+            b"Log all regular enemies in the\n"
+            b"Tattle log.",
+        b"tot_achd_60":
+            b"100% complete the Tattle log.",
+        b"tot_achd_61":
+            b"100% complete the Moves log.",
+        b"tot_achd_62":
+            b"???", 
+            #  b"Beat the secret final boss.",
+        b"tot_achd_63":
+            b"Finish 10 tower runs across\n"
+            b"all difficulty settings.",
+        b"tot_achd_64":
+            b"Finish 25 tower runs across\n"
+            b"all difficulty settings.",
+        b"tot_achd_65":
+            b"Complete all other achievements.\n",
+        b"tot_achd_66":
+            b"???", 
+            # b"Spend exactly 417 coins in a\n"
+            # b"single tower run.",
+        b"tot_achd_67":
+            b"???", 
+            # "Deal 1,000 or more damage with\n"
+            # b"Infatuated foes in a default run.",
+        b"tot_achd_68":
+            b"???", 
+            # b"Finish a run with all of Mario's\n"
+            # b"stats at a maximum of 1.\n"
+            # b"Settings must be default, aside\n"
+            # b"from setting HP/FP/BP to 0.",
+        b"tot_achd_69":
+            b"???", 
+            # b"Take exactly 654 total damage\n"
+            # b"in a single tower run.",
+        
+        # Achievement menu option names.
+        
+        b"tot_acho_charlieton":     b"Charlieton Stock",
+        b"tot_acho_npcchoice":      b"NPC Choice",
+        b"tot_acho_partner":        b"Partner Choice",
+        b"tot_acho_acdiff":         b"AC Difficulty",
+        b"tot_acho_superguardcost": b"Superguard Cost",
+        b"tot_acho_audiencethrow":  b"Audience Throws",
+        b"tot_acho_infinitebp":     b"Infinite BP",
+        b"tot_acho_randomdamage":   b"Damage Variance",
+        b"tot_acho_revive":         b"Partner Revival",
+        b"tot_acho_bandit":         b"Bandit Escape",
+        b"tot_acho_invincrease":    b"S. Sack Size",
+        b"tot_acho_customloadout":  b"Custom Items",
+        b"tot_acho_obfuscated":     b"Obfuscated Items",
+        b"tot_acho_secretboss":     b"???",  # b"Gold Fuzzy Boss",
         
         
         # Enemy names + Tattle info (TODO)
@@ -1849,45 +2079,200 @@ g_StringMap = {
         b'tot_cos0_03':     b'Squeaky FX',
         b'tot_cos0_04':     b'Peach FX',
         b'tot_cos0_05':     b'Bowser FX',
+        b'tot_cos0_06':     b'FX 01',
+        b'tot_cos0_07':     b'FX 02',
+        b'tot_cos0_08':     b'FX 03',
+        b'tot_cos0_09':     b'FX 04',
+        b'tot_cos0_10':     b'FX 05',
+        b'tot_cos0_11':     b'FX 06',
+        b'tot_cos0_12':     b'FX 07',
+        b'tot_cos0_13':     b'FX 08',
+        b'tot_cos0_14':     b'FX 09',
+        b'tot_cos0_15':     b'FX 10',
+        
+        b'tot_cos1_01':     b'Mario',
+        b'tot_cos1_02':     b'Luigi',
+        b'tot_cos1_03':     b'Wario',
+        b'tot_cos1_04':     b'Waluigi',
+        b'tot_cos1_05':     b'Skin 05',
+        b'tot_cos1_06':     b'Skin 06',
+        b'tot_cos1_07':     b'Skin 07',
+        b'tot_cos1_08':     b'Skin 08',
+        b'tot_cos1_09':     b'Skin 09',
+        b'tot_cos1_10':     b'Skin 10',
+        b'tot_cos1_11':     b'Skin 11',
+        b'tot_cos1_12':     b'Skin 12',
+        b'tot_cos1_13':     b'Skin 13',
+        b'tot_cos1_14':     b'Skin 14',
+        b'tot_cos1_15':     b'Skin 15',
+        b'tot_cos1_16':     b'Skin 16',
+        b'tot_cos1_17':     b'Skin 17',
+        b'tot_cos1_18':     b'Skin 18',
+        b'tot_cos1_19':     b'Skin 19',
+        b'tot_cos1_20':     b'Skin 20',
+        b'tot_cos1_21':     b'Skin 21',
+        b'tot_cos1_22':     b'Skin 22',
+        b'tot_cos1_23':     b'Skin 23',
+        b'tot_cos1_24':     b'Skin 24',
+        b'tot_cos1_25':     b'Skin 25',
+        b'tot_cos1_26':     b'Skin 26',
+        
+        b'tot_cos2_01':     b'Green',
+        b'tot_cos2_02':     b'Red',
+        b'tot_cos2_03':     b'Blue',
+        b'tot_cos2_04':     b'Orange',
+        b'tot_cos2_05':     b'Pink',
+        b'tot_cos2_06':     b'Black',
+        b'tot_cos2_07':     b'White',
+        b'tot_cos2_08':     b'Skin 08',
+        b'tot_cos2_09':     b'Skin 09',
+        b'tot_cos2_10':     b'Skin 10',
+        b'tot_cos2_11':     b'Skin 11',
+        b'tot_cos2_12':     b'Skin 12',
+        b'tot_cos2_13':     b'Skin 13',
+        b'tot_cos2_14':     b'Skin 14',
+        b'tot_cos2_15':     b'Skin 15',
+        b'tot_cos2_16':     b'Skin 16',
+        b'tot_cos2_17':     b'Skin 17',
+        b'tot_cos2_18':     b'Skin 18',
+        b'tot_cos2_19':     b'Skin 19',
+        b'tot_cos2_20':     b'Skin 20',
+        b'tot_cos2_21':     b'Skin 21',
+        b'tot_cos2_22':     b'Skin 22',
         
         b'tot_cos0_01_h':
             b"Gives Mario's attacks a tinny,\n"
             b"dinging sound.",
-            
         b'tot_cos0_02_h':
             b"Gives Mario's attacks a\n"
             b"croaking sound.",
-            
         b'tot_cos0_03_h':
             b"Gives Mario's attacks a\n"
             b"mouse-like squeaking sound.",
-            
         b'tot_cos0_04_h':
             b"Gives Mario's attacks a\n"
             b"cheerful laughing sound.",
-            
         b'tot_cos0_05_h':
             b"Gives Mario's attacks a\n"
             b"dreadful roaring sound.",
+        b"tot_cos0_06_h":
+            b"Placeholder",
+        b"tot_cos0_07_h":
+            b"Placeholder",
+        b"tot_cos0_08_h":
+            b"Placeholder",
+        b"tot_cos0_09_h":
+            b"Placeholder",
+        b"tot_cos0_10_h":
+            b"Placeholder",
+        b"tot_cos0_11_h":
+            b"Placeholder",
+        b"tot_cos0_12_h":
+            b"Placeholder",
+        b"tot_cos0_13_h":
+            b"Placeholder",
+        b"tot_cos0_14_h":
+            b"Placeholder",
+        b"tot_cos0_15_h":
+            b"Placeholder",
             
-        # Achievements (TODO)
-        
-        b"in_ach_1":    b"Chest Collector",
-        b"in_ach_2":    b"Badge Buff",
-        b"in_ach_3":    b"Tattletale",
-        
-        b"msg_ach_1":
-            b"Commemorates those that have\n"
-            b"collected all unique rewards.",
+        b"tot_cos1_01_h":
+            b"Placeholder",
+        b"tot_cos1_02_h":
+            b"Placeholder",
+        b"tot_cos1_03_h":
+            b"Placeholder",
+        b"tot_cos1_04_h":
+            b"Placeholder",
+        b"tot_cos1_05_h":
+            b"Placeholder",
+        b"tot_cos1_06_h":
+            b"Placeholder",
+        b"tot_cos1_07_h":
+            b"Placeholder",
+        b"tot_cos1_08_h":
+            b"Placeholder",
+        b"tot_cos1_09_h":
+            b"Placeholder",
+        b"tot_cos1_10_h":
+            b"Placeholder",
+        b"tot_cos1_11_h":
+            b"Placeholder",
+        b"tot_cos1_12_h":
+            b"Placeholder",
+        b"tot_cos1_13_h":
+            b"Placeholder",
+        b"tot_cos1_14_h":
+            b"Placeholder",
+        b"tot_cos1_15_h":
+            b"Placeholder",
+        b"tot_cos1_16_h":
+            b"Placeholder",
+        b"tot_cos1_17_h":
+            b"Placeholder",
+        b"tot_cos1_18_h":
+            b"Placeholder",
+        b"tot_cos1_19_h":
+            b"Placeholder",
+        b"tot_cos1_20_h":
+            b"Placeholder",
+        b"tot_cos1_21_h":
+            b"Placeholder",
+        b"tot_cos1_22_h":
+            b"Placeholder",
+        b"tot_cos1_23_h":
+            b"Placeholder",
+        b"tot_cos1_24_h":
+            b"Placeholder",
+        b"tot_cos1_25_h":
+            b"Placeholder",
+        b"tot_cos1_26_h":
+            b"Placeholder",
             
-        b"msg_ach_2":
-            b"Commemorates those that have\n"
-            b"collected one of every badge.",
-            
-        b"msg_ach_3":
-            b"Commemorates those that have\n"
-            b"Tattled every kind of enemy.",
-        
+        b"tot_cos2_01_h":
+            b"Placeholder",
+        b"tot_cos2_02_h":
+            b"Placeholder",
+        b"tot_cos2_03_h":
+            b"Placeholder",
+        b"tot_cos2_04_h":
+            b"Placeholder",
+        b"tot_cos2_05_h":
+            b"Placeholder",
+        b"tot_cos2_06_h":
+            b"Placeholder",
+        b"tot_cos2_07_h":
+            b"Placeholder",
+        b"tot_cos2_08_h":
+            b"Placeholder",
+        b"tot_cos2_09_h":
+            b"Placeholder",
+        b"tot_cos2_10_h":
+            b"Placeholder",
+        b"tot_cos2_11_h":
+            b"Placeholder",
+        b"tot_cos2_12_h":
+            b"Placeholder",
+        b"tot_cos2_13_h":
+            b"Placeholder",
+        b"tot_cos2_14_h":
+            b"Placeholder",
+        b"tot_cos2_15_h":
+            b"Placeholder",
+        b"tot_cos2_16_h":
+            b"Placeholder",
+        b"tot_cos2_17_h":
+            b"Placeholder",
+        b"tot_cos2_18_h":
+            b"Placeholder",
+        b"tot_cos2_19_h":
+            b"Placeholder",
+        b"tot_cos2_20_h":
+            b"Placeholder",
+        b"tot_cos2_21_h":
+            b"Placeholder",
+        b"tot_cos2_22_h":
+            b"Placeholder",        
     },
     
     # Tower lobby.
