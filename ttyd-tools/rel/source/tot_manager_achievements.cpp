@@ -145,10 +145,17 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
         }
 
         // For options, automatically unlock their reward (no purchase needed).
-        if (g_AchievementData[ach].reward_type == AchievementRewardType::OPTION) {
-            g_Mod->state_.SetOption(FLAGS_OPTION_UNLOCKED, ach);
-            // Check to see if all extra options are unlocked.
-            CheckCompleted(AchievementId::META_ALL_OPTIONS);
+        switch (g_AchievementData[ach].reward_type) {
+            case AchievementRewardType::OPTION: {
+                g_Mod->state_.SetOption(FLAGS_OPTION_UNLOCKED, ach);
+                // Check to see if all extra options are unlocked.
+                CheckCompleted(AchievementId::META_ALL_OPTIONS);
+                break;
+            }
+            case AchievementRewardType::HAMMER: {
+                g_Mod->state_.ChangeOption(STAT_PERM_ACH_HAMMERS, 1);
+                break;
+            }
         }
     }
 

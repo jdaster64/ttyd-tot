@@ -483,7 +483,8 @@ enum Options : uint32_t {
     STAT_PERM_NPC_MOVER_TRADES  = 0x28a'3'01'07,
     STAT_PERM_NPC_ZESS_COOKS    = 0x28d'3'01'07,
     STAT_PERM_NPC_DEALS_TOTAL   = 0x290'3'01'07,
-    // Next: 0x293
+    STAT_PERM_ACH_HAMMERS       = 0x293'1'01'01,
+    // Next: 0x294
 };
 
 }  // namespace mod::tot

@@ -4,6 +4,8 @@
 #include "common_types.h"
 #include "mod.h"
 #include "tot_generate_enemy.h"
+#include "tot_manager_achievements.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -50,6 +52,17 @@ using ::ttyd::winmgr::WinMgrEntry;
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
+
+// Achievement ids corresponding to spots in the grid.
+const int8_t g_AchievementGrid[70] = {
+    69, 64, 48, 50, 49, 43, 41, 37, 17, 67,
+    60, 62, 61,  7, 18, 33, 20, 29, 16, 27,
+    26, 56, 11,  2, 34, 21,  3,  8, 15, 52,
+    44, 25, 10,  9,  4, 54, 12, 13, 14, 46,
+    24, 45, 19,  1,  0, 22,  6, 35, 39, 59,
+    28, 58, 53, 42, 32, 36, 40, 63, 30, 31,
+    66, 55, 57, 47, 38, 23,  5, 51, 65, 68,
+};
 
 enum RecordLogOptions {
     // All record-log specific options should have negative values.
@@ -251,6 +264,203 @@ void SortItemLogType(WinPauseMenu* menu) {
     menu->has_sorted = !menu->has_sorted;
     menu->recipe_log_cursor_idx = 0;
     menu->recipe_log_page_num = 0;
+}
+
+void GetAchievementStates(int8_t* states) {
+    const auto& state = g_Mod->state_;
+    for (int32_t i = 0; i < 70; ++i) {
+        states[i] = state.GetOption(FLAGS_ACHIEVEMENT, i) ? 2 : 0;
+    }
+    for (int32_t i = 0; i < 70; ++i) {
+        if (states[i] == 0 && (
+            (i % 10 > 0 && states[i -  1] == 2) ||
+            (i % 10 < 9 && states[i +  1] == 2) ||
+            (i / 10 > 0 && states[i - 10] == 2) ||
+            (i / 10 < 6 && states[i + 10] == 2))) {
+            states[i] = 1;
+        }
+    }
+}
+
+void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
+    int8_t states[70];
+    GetAchievementStates(states);
+
+    ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+    // Draw square drop shadows.
+    for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+        // Skip squares that don't have a visible shadow.
+        if (i % 10 < 8 && i / 10 < 5);
+        // Skip drawing corner squares if not completed.
+        if (states[i] != 2 && g_AchievementGrid[i] >= 66) continue;
+
+        gc::vec3 position = {
+            win_x + 105.0f + 36.0f * (i % 10),
+            win_y - 14.0f - 36.0f * (i / 10),
+            0.0f
+        };
+        gc::vec3 scale = { 0.642857f, 0.642857f, 0.642857f };
+        uint32_t color = 0x00000080U;
+        ttyd::win_main::winTexSet(0x7b, &position, &scale, &color);
+    }
+    // Draw main square backgrounds.
+    for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+        // Skip drawing corner squares if not completed.
+        if (states[i] != 2 && g_AchievementGrid[i] >= 66) continue;
+
+        int32_t darker_shade = ((i ^ (i / 10)) & 1);
+        int32_t success_shade = states[i] == 2 ? 13 : 0;
+        uint32_t color = 0x606060FFU;
+        switch (states[i]) {
+            case 1:  color = 0xc0c0c0FFU;  break;
+            case 2:  color = 0xFFFFFFFFU;  break;
+        }
+        gc::vec3 position = {
+            win_x + 101.0f + 36.0f * (i % 10),
+            win_y - 10.0f - 36.0f * (i / 10),
+            0.0f
+        };
+        gc::vec3 scale = { 0.642857f, 0.642857f, 0.642857f };
+        ttyd::win_main::winTexSet(
+            0x7b + darker_shade + success_shade, &position, &scale, &color);
+    }
+
+    // Draw large tile that shows current tile's reward.
+    {
+        int32_t cursor = menu->achievement_log_cursor_idx;
+        int32_t success_shade = states[cursor] == 2 ? 13 : 0;
+        uint32_t color = 0x606060FFU;
+        switch (states[cursor]) {
+            case 1:  color = 0xc0c0c0FFU;  break;
+            case 2:  color = 0xFFFFFFFFU;  break;
+        }
+        gc::vec3 position = { win_x - 21.0f, win_y - 47.0f, 0.0f };
+        gc::vec3 scale = { 1.5f, 1.5f, 1.5f };
+        ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+        ttyd::win_main::winTexSet(
+            0x7b + success_shade, &position, &scale, &color);
+
+        if (states[cursor]) {
+            const auto* data = 
+                AchievementsManager::GetData(g_AchievementGrid[cursor]);
+            int32_t icon = 0;
+            const char* name_msg = "";
+            switch (data->reward_type) {
+                case AchievementRewardType::OPTION:
+                    icon = IconType::VITAL_PAPER;
+                    name_msg = data->reward_msg;
+                    break;
+                case AchievementRewardType::HAMMER:
+                    icon = IconType::HAMMER;
+                    name_msg = ttyd::item_data::itemDataTable[ItemType::HAMMER].name;
+                    break;
+                case AchievementRewardType::KEY_ITEM:
+                    icon = ttyd::item_data::itemDataTable[data->reward_id].icon_id;
+                    name_msg = ttyd::item_data::itemDataTable[data->reward_id].name;
+                    break;
+                case AchievementRewardType::MARIO_COSTUME: {
+                    const auto* cosmetic_data = CosmeticsManager::GetData(
+                        CosmeticType::MARIO_COSTUME, data->reward_id);
+                    icon = cosmetic_data->icon;
+                    name_msg = cosmetic_data->name_msg;
+                    break;
+                }
+                case AchievementRewardType::YOSHI_COSTUME: {
+                    const auto* cosmetic_data = CosmeticsManager::GetData(
+                        CosmeticType::YOSHI_COSTUME, data->reward_id);
+                    icon = cosmetic_data->icon;
+                    name_msg = cosmetic_data->name_msg;
+                    break;
+                }
+                case AchievementRewardType::ATTACK_FX: {
+                    const auto* cosmetic_data = CosmeticsManager::GetData(
+                        CosmeticType::ATTACK_FX, data->reward_id);
+                    icon = cosmetic_data->icon;
+                    name_msg = cosmetic_data->name_msg;
+                    break;
+                }
+            }
+
+            // Draw icon.
+            ttyd::win_main::winIconInit();
+            gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+            color = states[cursor] == 2 ? 0xFFFFFFFFU : 0x000000FFU;
+            ttyd::win_main::winIconSet(icon, &position, &scale, &color);
+
+            // Draw nameplate.
+            ttyd::win_root::winNameGX(
+                position.x - 85.0f, position.y - 42.0f, 170.0f, 0.0f, menu, 1);
+
+            if (states[cursor] < 2) name_msg = "msg_menu_stone_none_help";
+            const char* name = msgSearch(name_msg);
+            int32_t width = ttyd::fontmgr::FontGetMessageWidth(name);
+            float x_scale = 1.0f;
+            float max_width = 180.0f;
+            if (width > max_width) {
+                x_scale = max_width / width;
+                width = max_width;
+            }
+
+            ttyd::win_main::winFontInit();
+            gc::vec3 text_position = { 
+                position.x - width * 0.75f * 0.5f,
+                position.y - 48.f,
+                0.0f
+            };
+            gc::vec3 text_scale = { 0.75f * x_scale, 0.75f, 0.75f };
+            uint32_t text_color = 0xFFFFFFFFU;
+            ttyd::win_main::winFontSetEdgeWidth(
+                &text_position, &text_scale, &text_color, max_width, name);
+        }
+    }
+
+    // TODO: Tie to actual number of hammers.
+    int32_t num_hammers = 3;
+    for (int32_t i = 0; i < 5; ++i) {
+        ttyd::win_main::winIconInit();
+        gc::vec3 position = {
+            win_x - 80.0f + 30.0f * i, win_y - 155.0f - 10.0f * (i & 1), 0.0f
+        };
+        gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
+        uint32_t color = i < num_hammers ? 0x00000080U : 0x000000FFU;
+        ttyd::win_main::winIconSet(IconType::HAMMER, &position, &scale, &color);
+
+        if (i < num_hammers) {
+            position.x -= 2.0f;
+            position.y += 2.0f;
+            color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(IconType::HAMMER, &position, &scale, &color);
+        }
+    }
+
+    // Draw window with number of completed achievements.
+    ttyd::win_root::winKirinukiGX(
+        win_x - 71.0f, win_y - 190.0f, 110.0f, 41.0f, menu, 0);
+    {
+        ttyd::win_main::winFontInit();
+        char buf[8];
+        sprintf(
+            buf, "%" PRId32 "/%" PRId32,
+            menu->achievement_log_completed_count,
+            menu->achievement_log_total_count);
+        int32_t width = ttyd::fontmgr::FontGetMessageWidth(buf);
+        gc::vec3 position = {
+            win_x - 0.0f - 0.75f * width * 0.5f,
+            win_y - 201.0f,
+            0.0f
+        };
+        gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+        uint32_t color = 0x000000FFU;
+        ttyd::win_main::winFontSet(&position, &scale, &color, buf);
+    }
+    {
+        // Draw ribbon next to completed number.
+        ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+        gc::vec3 position = { win_x - 46.0f, win_y - 210.0f, 0.0f };
+        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+        uint32_t color = 0xFFFFFFFFU;
+        ttyd::win_main::winTexSet(0xb0, &position, &scale, &color);
+    }
 }
 
 void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
@@ -739,30 +949,32 @@ void ReplaceLogSortMethods() {
 }
 
 void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
-    // Hardcode Journal menu to have three submenus: Tattles, Items, Badges.
     menu->log_menu_state = 0;
     menu->log_submenu_cursor_idx = 0;
-    menu->log_submenu_count = 5;
+    menu->log_submenu_count = 6;
     for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
         auto& submenu = menu->log_submenu_info[i];
-        submenu.x = 0.0f;
-        submenu.target_x = 0.0f;
-        const float banner_y = 45.0f * (menu->log_submenu_count * 0.5f - i);
+        const float banner_x = 120.f * (i < 3 ? -1 : 1);
+        const float banner_y = 45.0f * (1.5f - i % 3);
+        submenu.x = banner_x;
+        submenu.target_x = banner_x;
         submenu.y = banner_y;
         submenu.target_y = banner_y;
         submenu.state = 0;
         submenu.timer = 0;
     }
-    menu->log_submenu_info[0].id = 4;
-    menu->log_submenu_info[0].help_msg = "msg_menu_kiroku_mono";
+    menu->log_submenu_info[0].id = 6;
+    menu->log_submenu_info[0].help_msg = "msg_menu_achievements";
     menu->log_submenu_info[1].id = 3;
     menu->log_submenu_info[1].help_msg = "msg_menu_kiroku_ryori";
     menu->log_submenu_info[2].id = 2;
     menu->log_submenu_info[2].help_msg = "msg_menu_kiroku_badge";
     menu->log_submenu_info[3].id = 5;
     menu->log_submenu_info[3].help_msg = "msg_menu_move_log";
-    menu->log_submenu_info[4].id = 7;
-    menu->log_submenu_info[4].help_msg = "msg_menu_move_records";
+    menu->log_submenu_info[4].id = 4;
+    menu->log_submenu_info[4].help_msg = "msg_menu_kiroku_mono";
+    menu->log_submenu_info[5].id = 7;
+    menu->log_submenu_info[5].help_msg = "msg_menu_records";
   
     menu->badge_log_total_count = 0;
     menu->badge_log_obtained_count = 0;
@@ -868,12 +1080,27 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
 
         if (completed) ++menu->move_log_completed_count;
     }
+
+    menu->achievement_log_cursor_idx = 33;
+    menu->achievement_log_completed_count = 0;
+    menu->achievement_log_total_count = 0;
+    for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+        bool completed = g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i);
+        if (g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i)) {
+            ++menu->achievement_log_completed_count;
+        }
+        if (i <= AchievementId::META_ALL_ACHIEVEMENTS || completed) {
+            ++menu->achievement_log_total_count;
+        }
+    }
+    menu->achievement_log_hammers = g_Mod->state_.GetOption(STAT_PERM_ACH_HAMMERS);
 }
 
 void LogMenuInit2(ttyd::win_root::WinPauseMenu* menu) {
-    menu->main_cursor_target_x = -128.0f;
-    menu->main_cursor_target_y = 8.0f +
-        45.0f * (menu->log_submenu_count * 0.5f - menu->log_submenu_cursor_idx);
+    menu->main_cursor_target_x = 
+        -128.0f + 120.0f * (menu->log_submenu_cursor_idx < 3 ? -1 : 1);
+    menu->main_cursor_target_y =
+        8.0f + 45.0f * (1.5f - menu->log_submenu_cursor_idx % 3);
 
     menu->badge_log_win_offset_x = 320.0f;
     menu->badge_log_win_target_x = 320.0f;
@@ -914,24 +1141,21 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             if (buttons_pressed & ButtonId::B) {
                 ttyd::pmario_sound::psndSFXOn((char *)0x20013);
                 return -1;
-            }
-            if (buttons_pressed & ButtonId::START) {
+            } else if (buttons_pressed & ButtonId::START) {
                 return -2;
-            }        
-            if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
-                int32_t prev_idx = menu->log_submenu_cursor_idx;
-                --menu->log_submenu_cursor_idx;
-                if (menu->log_submenu_cursor_idx < 0) 
-                    menu->log_submenu_cursor_idx = menu->log_submenu_count - 1;
-                if (prev_idx != menu->log_submenu_cursor_idx)
-                    ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
+                menu->log_submenu_cursor_idx
+                    += (menu->log_submenu_cursor_idx % 3 == 0 ? 2 : -1);
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
-                int32_t prev_idx = menu->log_submenu_cursor_idx;
-                ++menu->log_submenu_cursor_idx;
-                if (menu->log_submenu_cursor_idx >= menu->log_submenu_count) 
-                    menu->log_submenu_cursor_idx = 0;
-                if (prev_idx != menu->log_submenu_cursor_idx)
-                    ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+                menu->log_submenu_cursor_idx
+                    += (menu->log_submenu_cursor_idx % 3 == 2 ? -2 : 1);
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            } else if ((menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) ||
+                (menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT)) {
+                menu->log_submenu_cursor_idx
+                    += (menu->log_submenu_cursor_idx >= 3 ? -3 : 3);
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
             } else if (buttons_pressed & ButtonId::A) {
                 for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
                     menu->log_submenu_info[i].state = 30;
@@ -957,10 +1181,10 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 ttyd::pmario_sound::psndSFXOn((char *)0x20012);
             }
             
-            menu->main_cursor_target_x = -128.0f;
+            menu->main_cursor_target_x =
+                -128.0f + 120.0f * (menu->log_submenu_cursor_idx < 3 ? -1 : 1);
             menu->main_cursor_target_y =
-                 8.0f +
-                 (45.0f * menu->log_submenu_count * 0.5f - 45.0f * menu->log_submenu_cursor_idx);
+                 8.0f + 45.0f * (1.5f - menu->log_submenu_cursor_idx % 3);
             ttyd::win_root::winMsgEntry(
                 menu, 0, menu->log_submenu_info[menu->log_submenu_cursor_idx].help_msg, 0);
             
@@ -1335,6 +1559,66 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
 
             break;
         }
+        case 16: {
+            // Achievement log.
+
+            int8_t states[70];
+            GetAchievementStates(states);
+
+            int32_t cursor = menu->achievement_log_cursor_idx;
+
+            if (menu->buttons_pressed & ButtonId::START) {
+                return -2;
+            } else if (menu->buttons_pressed & ButtonId::B) {
+                ttyd::pmario_sound::psndSFXOn((char *)0x20013);
+                for (int32_t i = 0; i < menu->log_submenu_count; ++i) {
+                    menu->log_submenu_info[i].state = 40;
+                }
+                menu->log_submenu_info[menu->log_submenu_cursor_idx].state = 20;
+                menu->log_menu_state = 0;
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
+                if (cursor > 9 && 
+                    !((cursor == 10 || cursor == 19) && !states[cursor - 10])) {
+                    menu->achievement_log_cursor_idx -= 10;
+                    cursor = menu->achievement_log_cursor_idx;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
+                if (cursor < 60 && 
+                    !((cursor == 50 || cursor == 59) && !states[cursor + 10])) {
+                    menu->achievement_log_cursor_idx += 10;
+                    cursor = menu->achievement_log_cursor_idx;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) {
+                if (cursor % 10 > 0 && 
+                    !((cursor == 1 || cursor == 61) && !states[cursor - 1])) {
+                    cursor = --menu->achievement_log_cursor_idx;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) {
+                if (cursor % 10 < 9 && 
+                    !((cursor == 8 || cursor == 68) && !states[cursor + 1])) {
+                    cursor = ++menu->achievement_log_cursor_idx;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20035);
+            }
+
+            if (states[cursor] > 0) {
+                int32_t ach = g_AchievementGrid[cursor];
+                ttyd::win_root::winMsgEntry(
+                    menu, 0, AchievementsManager::GetData(ach)->help_msg, 0);
+            } else {
+                ttyd::win_root::winMsgEntry(
+                    menu, 0, "msg_menu_stone_none_help", 0);
+            }
+
+            // Set cursor position based on selected entry.
+            menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
+            menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
+
+            break;
+        }
         case 17: {
             // Move log.
 
@@ -1509,7 +1793,7 @@ void LogMenuMain2(ttyd::win_root::WinPauseMenu* menu) {
         switch(submenu.state) {
             case 10:
                 // Opening submenu, vertical slide.
-                submenu.target_x = 0.0f;
+                submenu.target_x = 120.0f * (i < 3 ? -1 : 1);
                 submenu.target_y = 140.0f;
                 submenu.timer = 0;
                 ++submenu.state;
@@ -1525,7 +1809,7 @@ void LogMenuMain2(ttyd::win_root::WinPauseMenu* menu) {
                 break;
             case 20:
                 // Closing submenu, horizontal slide.
-                submenu.target_x = 0.0f;
+                submenu.target_x = 120.0f * (i < 3 ? -1 : 1);
                 submenu.target_y = 140.0f;
                 submenu.timer = 0;
                 ++submenu.state;
@@ -1533,23 +1817,23 @@ void LogMenuMain2(ttyd::win_root::WinPauseMenu* menu) {
             case 21:
                 // Closing submenu, vertical slide.
                 if (8 < ++submenu.timer) {
-                    submenu.target_x = 0.0f;
-                    submenu.target_y = 45.0f * (menu->log_submenu_count * 0.5f - i);
+                    submenu.target_x = 120.0f * (i < 3 ? -1 : 1);
+                    submenu.target_y = 45.0f * (1.5f - i % 3);
                     submenu.timer = 0;
                     ++submenu.state;
                 }
                 break;
             case 30:
                 // Opened a different submenu; slide out.
-                submenu.target_x = 0.0f;
+                submenu.target_x = 120.0f * (i < 3 ? -1 : 1);
                 submenu.target_y = -160.0f;
                 submenu.timer = 0;
                 ++submenu.state;
                 break;
             case 40:
                 // Closed a different submenu; slide in.
-                submenu.target_x = 0.0f;
-                submenu.target_y = 45.0f * (menu->log_submenu_count * 0.5f - i);
+                submenu.target_x = 120.0f * (i < 3 ? -1 : 1);
+                submenu.target_y = 45.0f * (1.5f - i % 3);
                 submenu.timer = 0;
                 ++submenu.state;
                 break;
@@ -1691,7 +1975,7 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
         }
     }
   
-    // Tattle log menu.
+    // Other menus.
     switch (menu->log_menu_state) {
         case 14:
         case 20:
@@ -1700,14 +1984,15 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
         case 1001:
              ttyd::win_log::monoshiriGX(win_x - 170.0f, win_y + 130.0f, menu);
              break;
-    }
-
-    // New menus.
-    if (menu->log_menu_state == 15) {
-        DrawMoveLog(menu, win_x - 170.0f, win_y + 130.0f);
-    }
-    if (menu->log_menu_state == 17) {
-        DrawRecordsLog(menu, win_x - 170.0f, win_y + 130.0f);
+        case 15:
+            DrawMoveLog(menu, win_x - 170.0f, win_y + 130.0f);
+            break;
+        case 16:
+            DrawAchievementLog(menu, win_x - 170.0f, win_y + 130.0f);
+            break;
+        case 17:
+            DrawRecordsLog(menu, win_x - 170.0f, win_y + 130.0f);
+            break;
     }
   
     // Draw banners for submenus.

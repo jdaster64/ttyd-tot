@@ -1229,9 +1229,13 @@ g_StringMap = {
             b'Information about the moves\n'
             b'Mario and party can perform.',
         
-        b"msg_menu_move_records":
+        b"msg_menu_records":
             b"Records of past runs' stats and\n"
             b'your overall completion progress.',
+        
+        b"msg_menu_achievements":
+            b"Review your achievements and\n"
+            b'the rewards earned from them.',
             
         b"tot_movelog_jump":        b"Jump Moves",
         b"tot_movelog_hammer":      b"Hammer Moves",
