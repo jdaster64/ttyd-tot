@@ -753,7 +753,7 @@ void SelectChestContents() {
         top_level_weights[0] += (partner_pool_size - default_pool_size);
     } else if (partner_pool_size < default_pool_size) {
         // Decrease partner weight, slightly decrease Star Power weight.
-        kMoveWeights[3] *= partner_pool_size / default_pool_size;
+        kMoveWeights[3] = kMoveWeights[3] * partner_pool_size / default_pool_size;
         kMoveWeights[2] -= 2 * (default_pool_size - partner_pool_size);
         // Slightly decrease overall move weight.
         top_level_weights[0] -= 1.75 * (default_pool_size - partner_pool_size);
