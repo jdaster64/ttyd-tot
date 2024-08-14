@@ -2977,6 +2977,9 @@
 // eff_stamp_n64.o
 801eaf74:effStampN64Entry
 
+// eff_vapor_n64.o
+801f4200:effVaporN64Entry
+
 // battle_enemy_item.o
 801f8dd0:_check_status_recover_item
 801f8fa8:_check_status_support_item
@@ -3594,10 +3597,10 @@
 40,5,0003d900:unit_FlowerFuzzy
 40,5,0002c068:unit_Pokey
 40,5,00044ac0:unit_PoisonPokey
-40,5,000a0a90:unit_PalePiranha
-40,5,0007a860:unit_PutridPiranha
-40,5,00061df0:unit_FrostPiranha
-40,5,00059158:unit_PiranhaPlant
+// 40,5,000a0a90:unit_PalePiranha
+// 40,5,0007a860:unit_PutridPiranha
+// 40,5,00061df0:unit_FrostPiranha
+// 40,5,00059158:unit_PiranhaPlant
 40,5,0001e868:unit_CrazeeDayzee
 40,5,0006fd08:unit_Pider
 40,5,00073ae8:unit_Arantula
