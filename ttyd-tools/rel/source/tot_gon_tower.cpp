@@ -306,7 +306,7 @@ EVT_END()
 // Runs when exiting a regular tower floor.
 EVT_BEGIN(Tower_IncrementFloor)
     // If chest unclaimed but accessible, give achievement for skipping.
-    IF_EQUAL((int32_t)GSW_Tower_DisplayChestIcons, 1)
+    IF_EQUAL((int32_t)GSW_Tower_ChestClaimed, 0)
         USER_FUNC(evtTot_MarkCompletedAchievement, AchievementId::MISC_KEY_SKIP_CHEST)
     END_IF()
     // Increment floor number and run end-of-floor logic.
