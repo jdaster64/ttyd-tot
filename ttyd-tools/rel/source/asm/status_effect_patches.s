@@ -13,7 +13,7 @@ StartCheckExplosiveKO:
 lwz %r3, 0x4 (%r27)
 cmpwi %r3, 0x12  # Hyper Bob-omb
 beq- lbl_SkipBobombExplosiveKO
-cmpwi %r3, 0x2d  # Bob-omb
+cmpwi %r3, 0x2b  # Bob-omb
 bne+ lbl_DontSkipExplosiveKO
 
 lbl_SkipBobombExplosiveKO:
