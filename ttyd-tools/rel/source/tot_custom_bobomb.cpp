@@ -272,16 +272,7 @@ EVT_END()
 EVT_BEGIN(unitBobOmb_attack_event_spark)
     SET(LW(9), PTR(&unitBobOmb_weaponBomb))
 
-    // Hyper Bob-ombs should not check for items when angry.
-    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(5))
-    IF_NOT_EQUAL(LW(5), (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB)
-        USER_FUNC(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
-        IF_NOT_EQUAL(LW(0), 0)
-            RUN_CHILD_EVT(LW(0))
-            USER_FUNC(btlevtcmd_StartWaitEvent, -2)
-            RETURN()
-        END_IF()
-    END_IF()
+    // Neither type should check for using items when angry.
 
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
