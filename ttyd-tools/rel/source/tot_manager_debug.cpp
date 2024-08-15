@@ -18,6 +18,7 @@
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/msgdrv.h>
+#include <ttyd/sound.h>
 #include <ttyd/swdrv.h>
 #include <ttyd/system.h>
 
@@ -43,7 +44,10 @@ enum DebugManagerMode {
     DEBUG_DIFFICULTY,
     DEBUG_MAX_STATS,
     DEBUG_EXIT,
-    DEBUG_MAX
+    DEBUG_MAX,
+
+    // Not accessible but supported.
+    DEBUG_SOUND_TEST,
 };
     
 namespace {
@@ -57,6 +61,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 int32_t g_DebugMode = DEBUG_OFF;
 int32_t g_CursorPos = 0;
 int32_t g_DebugEnemies[5] = { -1, -1, -1, -1, -1 };
+int32_t g_LastSoundPlayed = -1;
 
 // Gets all buttons pressed the current frame, converting stick inputs into
 // the respective D-Pad directions.
@@ -138,6 +143,12 @@ void DebugManager::Update() {
                     return;
                 }
                 case DEBUG_ENEMIES: {
+                    // Go to submenu on next frame.
+                    g_DebugMode = g_CursorPos;
+                    g_CursorPos = 0;
+                    return;
+                }
+                case DEBUG_SOUND_TEST: {
                     // Go to submenu on next frame.
                     g_DebugMode = g_CursorPos;
                     g_CursorPos = 0;
@@ -376,6 +387,29 @@ void DebugManager::Update() {
                 enemy_type += dir;
             }
         } while (true);
+    } else if (g_DebugMode == DEBUG_SOUND_TEST) {
+        int32_t dir = 0;
+        if (button_trg & (ButtonId::DPAD_UP | ButtonId::DPAD_RIGHT)) {
+            dir = 1;
+        } else if (button_trg & (ButtonId::DPAD_DOWN | ButtonId::DPAD_LEFT)) {
+            dir = -1;
+        } else if (button_trg & ButtonId::Y) {
+            // Stop previous sound and play currently selected one.
+            if (g_LastSoundPlayed >= 0) {
+                ttyd::sound::SoundEfxStop(g_LastSoundPlayed);
+            }
+            if (buttons & ButtonId::L) {
+                g_DebugMode = DEBUG_OFF;
+                return;
+            }
+            g_LastSoundPlayed = 
+                ttyd::sound::SoundEfxPlayEx(g_CursorPos, 0, 0x64, 0x40);
+        }
+        if (buttons & ButtonId::L) {
+            dir *= 16;
+        }
+        g_CursorPos += dir;
+        if (g_CursorPos < 0) g_CursorPos = 0;
     } else if (g_DebugMode == DEBUG_FLOOR) {
         int32_t dir = 0;
         if (button_trg & (ButtonId::DPAD_UP | ButtonId::DPAD_RIGHT)) {
@@ -453,6 +487,9 @@ void DebugManager::Draw() {
             case DEBUG_COMPLETE_ACHIEVEMENTS: {
                 strcpy(buf, "Complete All Achievements");   break;
             }
+            case DEBUG_SOUND_TEST: {
+                strcpy(buf, "Test Sound Effects");          break;
+            }
             case DEBUG_EXIT: {
                 strcpy(buf, "Exit Debug Mode");             break;
             }
@@ -522,6 +559,14 @@ void DebugManager::Draw() {
         DrawText(
             "Warning: don't change floor during a warp transition!",
             0, -90, 0xFFu, true, ~0U, 0.6f, /* top-middle */ 1);
+    } else if (g_DebugMode == DEBUG_SOUND_TEST) {
+        sprintf(buf, "0x%" PRIx32, g_CursorPos);
+        DrawCenteredTextWindow(
+            buf, 0, -60, 0xFFu, true, 0xFFFFFFFFu, 0.7f, red_alpha, 10, 7);
+        // Draw main menu text to make it look like a contextual menu.
+        DrawCenteredTextWindow(
+            "Test Sound Effects",
+            0, -20, 0xFFu, true, 0xFFFFFFFFu, 0.7f, black_alpha, 10, 7);
     }
     
     // Display a string confirming that debug enemies are queued.

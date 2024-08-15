@@ -1129,6 +1129,7 @@
 800dc214:psndStopAllFadeOut
 
 // sound.o
+800e0c38:SoundEfxStop
 800e0ca0:SoundEfxPlayEx
 
 // evt_mario.o
