@@ -3144,6 +3144,12 @@
 803b8040:marioAttackEvent_Muki
 804285b0:_sac_muki_power_per_arrow
 
+// eff_gonbaba_breath.o
+8025ac70:effGonbabaBreathDisp
+8025b270:effGonbabaBreathMain
+8025b904:effGonbabaBreathEntry
+8025bad8:init_breath
+
 // evt_memcard.o
 // .text 
 8025c0b8:memcard_write

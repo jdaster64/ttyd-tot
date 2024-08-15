@@ -5,6 +5,7 @@
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/dispdrv.h>
+#include <ttyd/eff_gonbaba_breath.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/seqdrv.h>
@@ -26,6 +27,7 @@ using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::battle_unit::BattleWorkUnitPart;
 using ::ttyd::dispdrv::CameraId;
+using ::ttyd::eff_gonbaba_breath::EffGonbabaBreathWork;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::npcdrv::FbatBattleInformation;
 using ::ttyd::seqdrv::SeqIndex;
@@ -226,6 +228,8 @@ int32_t (*g_weaponGetPower_Deka_trampoline)(
 int32_t (*g_main_muki_trampoline)(EvtEntry*, bool) = nullptr;
 // sac_suki.o  8024fa74
 int32_t (*g_sac_suki_set_weapon_trampoline)(EvtEntry*, bool) = nullptr;
+// eff_gonbaba_breath.o 8025bad8
+void (*g_init_breath_trampoline)(EffGonbabaBreathWork*, int32_t, int32_t) = nullptr;
 // evt_memcard.o  8025c0b8
 int32_t (*g_memcard_write_trampoline)(EvtEntry*, bool) = nullptr;
 // evt_memcard.o  8025c454

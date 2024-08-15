@@ -32,6 +32,7 @@
 #include <ttyd/battle_status_effect.h>
 #include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
+#include <ttyd/eff_gonbaba_breath.h>
 #include <ttyd/eff_stamp_n64.h>
 #include <ttyd/effdrv.h>
 #include <ttyd/evtmgr.h>
@@ -144,6 +145,7 @@ using ::ttyd::battle::BattleWork;
 using ::ttyd::battle::BattleWorkCommand;
 using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_damage::CounterattackWork;
+using ::ttyd::eff_gonbaba_breath::EffGonbabaBreathWork;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
@@ -192,6 +194,7 @@ extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
 extern void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*);
 extern int32_t (*g_btlevtcmd_AnnounceMessage_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
+extern void (*g_init_breath_trampoline)(EffGonbabaBreathWork*, int32_t, int32_t);
 // Patch addresses.
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH;
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_EH;
@@ -233,6 +236,7 @@ extern const int32_t g_BattleSetStatusDamage_FeelingFine_SwitchTable;
 
 int32_t g_PartySwitchNextFpCost = 1;
 int32_t g_PartySwitchPlayerInitiated = false;
+int32_t g_GonbabaBreathDir = 0;
 
 namespace battle {
 
@@ -1786,6 +1790,18 @@ void ApplyFixedPatches() {
             ReorderAndFilterWeaponTargets();
             return g_btlevtcmd_GetSelectEnemy_trampoline(evt, isFirstCall);
         });
+
+    // Reverse direction of fire particles from Hooktail, etc. breath.
+    g_init_breath_trampoline = patch::hookFunction(
+        ttyd::eff_gonbaba_breath::init_breath,
+        [](EffGonbabaBreathWork* work, int32_t unk0, int32_t type) {
+            // Run original logic.
+            g_init_breath_trampoline(work, unk0, type);
+            // Reverse direction of particles if set.
+            if (g_GonbabaBreathDir == 1) {
+                work->velocity.x *= -1.0f;
+            }
+        });
 }
 
 void SetTargetAudienceAmount() {
@@ -1997,6 +2013,11 @@ EVT_DEFINE_USER_FUNC(evtTot_ApplyCustomStatus) {
     // Queue custom status message.
     QueueCustomStatusMessage(unit, announce_msg);
     
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_SetGonbabaBreathDir) {
+    g_GonbabaBreathDir = evtGetValue(evt, evt->evtArguments[0]);
     return 2;
 }
 

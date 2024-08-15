@@ -1,6 +1,7 @@
 #include "tot_custom_rel.h"     // For externed units
 
 #include "evt_cmd.h"
+#include "patches_battle.h"
 
 #include <gc/types.h>
 #include <ttyd/battle.h>
@@ -561,7 +562,6 @@ EVT_BEGIN(unitPiranha_breath_attack_event)
     END_BROTHER()
 
     // Visual effects.
-    // TODO: Test at varying sizes / directions.
     BROTHER_EVT()
         USER_FUNC(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
         SWITCH(LW(11))
@@ -613,12 +613,22 @@ EVT_BEGIN(unitPiranha_breath_attack_event)
                 ADDF(LW(1), LW(6))
                 SUB(LW(2), 5)
 
+                // Reverse effect if facing right.
+                USER_FUNC(btlevtcmd_GetFaceDirection, -2, LW(4))
+                IF_EQUAL(LW(4), 1)
+                    USER_FUNC(
+                        infinite_pit::battle::evtTot_SetGonbabaBreathDir, 1)
+                END_IF()
+
                 // Fire effect.
-                // TODO: Bowser's effect can't reverse for enemy targets.
                 MULF(LW(5), FLOAT(3.5))
                 USER_FUNC(
                     evt_eff, PTR(""), PTR("gonbaba_breath"), 7,
                     LW(0), LW(1), LW(2), LW(5), 75, 0, 0, 0, 0, 0, 0)
+
+                // Set effect to left-facing by default, after attack.
+                WAIT_FRM(100)
+                USER_FUNC(infinite_pit::battle::evtTot_SetGonbabaBreathDir, 0)
         END_SWITCH()
     END_BROTHER()
 

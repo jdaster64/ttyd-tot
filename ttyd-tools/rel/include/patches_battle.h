@@ -82,4 +82,8 @@ bool CheckPlayAttackFx(uint32_t flags, gc::vec3* position);
 // Params: unit, part, status_flag, color1 & color2 (rgb), sfx, announce_msg
 EVT_DECLARE_USER_FUNC(evtTot_ApplyCustomStatus, 7)
 
+// Changes the direction the Hooktail, etc. fire breath effect travels in.
+// arg0 = 0 for left, 1 for right.
+EVT_DECLARE_USER_FUNC(evtTot_SetGonbabaBreathDir, 1)
+
 }
