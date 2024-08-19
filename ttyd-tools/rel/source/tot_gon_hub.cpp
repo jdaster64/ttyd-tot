@@ -11,6 +11,7 @@
 #include <ttyd/evt_bero.h>
 #include <ttyd/evt_cam.h>
 #include <ttyd/evt_damage.h>
+#include <ttyd/evt_door.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_hit.h>
 #include <ttyd/evt_map.h>
@@ -33,6 +34,7 @@ namespace {
 // Including entire namespaces for convenience.
 using namespace ::ttyd::evt_bero;
 using namespace ::ttyd::evt_cam;
+using namespace ::ttyd::evt_door;
 using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_hit;
 using namespace ::ttyd::evt_map;
@@ -56,10 +58,35 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 
 }  // namespace
 
+// gon_10 NPC names.
+constexpr char g_NpcNokonokoA[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "A";
+constexpr char g_NpcNokonokoB[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "B";
+constexpr char g_NpcNokonokoC[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "C";
+constexpr char g_NpcNokonokoD[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "D";
+constexpr char g_NpcNokonokoF[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "F";
+constexpr char g_NpcInnkeeper[] = "\x8f\x68\x93\x58\x88\xf5";
+constexpr char g_NpcShopkeeper[] = "\x93\x58\x88\xf5";
+constexpr char g_NpcHooktail[] = "\x83\x6f\x83\x6f";
+constexpr char g_NpcGeneralWhite[] = "\x83\x7a\x83\x8f\x83\x43\x83\x67";
+
+// gon_11 NPC names.
+constexpr char g_NpcNokonokoG[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "G";
+constexpr char g_NpcNokonokoH[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "H";
+constexpr char g_NpcNokonokoI[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "I";
+constexpr char g_NpcNokonokoK[] = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "K";
+constexpr char g_NpcMayorKroop[] = "\x91\xba\x92\xb7";
+constexpr char g_NpcGatekeeper[] = "\x96\xe5\x94\xd4\x83\x6d\x83\x52\x83\x6d\x83\x52";
+constexpr char g_NpcKoops[] = "\x83\x6d\x83\x52\x83\x5e\x83\x8d\x83\x45";
+constexpr char g_NpcKoopley[] = "\x83\x6d\x83\x52\x83\x5e\x83\x8d\x83\x45\x95\x83";
+constexpr char g_NpcKoopieKoo[] = "\x83\x6d\x83\x52\x83\x8a\x83\x93";
+
+// Structure forward declarations.
 extern const BeroEntry gon_10_entry_data[3];
 extern const BeroEntry gon_11_entry_data[3];
 extern const NpcSetupInfo gon_10_npc_data[10];
 extern const NpcSetupInfo gon_11_npc_data[10];
+extern const DoorSubmapInfo gon_10_door_data[3];
+extern const DoorSubmapInfo gon_11_door_data[3];
 extern HitReturnPoint gon_10_hit_return_points[10];
 extern HitReturnPoint gon_11_hit_return_points[13];
 
@@ -79,13 +106,13 @@ EVT_BEGIN(gon_10_InitEvt)
 
     USER_FUNC(evt_map_playanim, PTR("S_kawa"), 1, 0)
 
-    // TODO: Door setup.
-    // SET(LW(0), PTR(&yado_data))
-    // RUN_CHILD_EVT(PTR(&evt_door_setup))
-    // SET(LW(0), PTR(&mise_data))
-    // RUN_CHILD_EVT(PTR(&evt_door_setup))
-    // SET(LW(0), PTR(&ie_data))
-    // RUN_CHILD_EVT(PTR(&evt_door_setup))
+    // Door setup.
+    SET(LW(0), PTR(&gon_10_door_data[0]))
+    RUN_CHILD_EVT(evt_door_setup)
+    SET(LW(0), PTR(&gon_10_door_data[1]))
+    RUN_CHILD_EVT(evt_door_setup)
+    SET(LW(0), PTR(&gon_10_door_data[2]))
+    RUN_CHILD_EVT(evt_door_setup)
 
     // TODO: Shop and inn setup.
     // USER_FUNC(evt_shop_setup, PTR(&obj_list), PTR(&goods_list), PTR(&shopper_data), PTR(&trade_list))
@@ -133,13 +160,13 @@ EVT_BEGIN(gon_11_InitEvt)
 
     USER_FUNC(evt_map_playanim, PTR("S_kawa"), 1, 0)
 
-    // TODO: Door setup.
-    // SET(LW(0), PTR(&son_data))
-    // RUN_CHILD_EVT(PTR(&evt_door_setup))
-    // SET(LW(0), PTR(&taro_data))
-    // RUN_CHILD_EVT(PTR(&evt_door_setup))
-    // SET(LW(0), PTR(&ie_data))
-    // RUN_CHILD_EVT(PTR(&evt_door_setup))
+    // Door setup.
+    SET(LW(0), PTR(&gon_11_door_data[0]))
+    RUN_CHILD_EVT(evt_door_setup)
+    SET(LW(0), PTR(&gon_11_door_data[1]))
+    RUN_CHILD_EVT(evt_door_setup)
+    SET(LW(0), PTR(&gon_11_door_data[2]))
+    RUN_CHILD_EVT(evt_door_setup)
 
     // Not sure what these do...
     USER_FUNC(evt_map_playanim, PTR("S_mon"), 2, 0)
@@ -243,14 +270,14 @@ const BeroEntry gon_11_entry_data[3] = {
 
 const NpcSetupInfo gon_10_npc_data[10] = {
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "A",  // nokonokoA
+        .name = g_NpcNokonokoA,
         .flags = 0,
         .initEvtCode = nullptr,     // (void*)nokonoko_A_init
         .regularEvtCode = nullptr,  // (void*)nokonoko_A_regl
         .talkEvtCode = nullptr,     // (void*)nokonoko_A_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "B",  // nokonokoB
+        .name = g_NpcNokonokoB,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_B_regl
@@ -258,41 +285,41 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .deadEvtCode = nullptr,     // (void*)nokonoko_B_damage
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "C",  // nokonokoC
+        .name = g_NpcNokonokoC,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_C_regl
         .talkEvtCode = nullptr,     // (void*)nokonoko_C_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "D",  // nokonokoD
+        .name = g_NpcNokonokoD,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .talkEvtCode = nullptr,     // (void*)nokonoko_D_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "F",  // nokonokoF
+        .name = g_NpcNokonokoF,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .talkEvtCode = nullptr,     // (void*)nokonoko_F_talk
     },
     {
-        .name = "\x8f\x68\x93\x58\x88\xf5",             // hotel staff
+        .name = g_NpcInnkeeper,
         .flags = 0,
         .initEvtCode = npc_init_evt,
     },
     {
-        .name = "\x93\x58\x88\xf5",                     // store clerk
+        .name = g_NpcShopkeeper,
         .flags = 0,
         .initEvtCode = npc_init_evt,
     },
     {
-        .name = "\x83\x6f\x83\x6f",                     // Hooktail??
+        .name = g_NpcHooktail,
         .flags = 0,
         .initEvtCode = npc_init_evt,
     },
     {
-        .name = "\x83\x7a\x83\x8f\x83\x43\x83\x67",     // General White
+        .name = g_NpcGeneralWhite,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)init_white
         .talkEvtCode = nullptr,     // (void*)talk_white
@@ -301,61 +328,199 @@ const NpcSetupInfo gon_10_npc_data[10] = {
 
 const NpcSetupInfo gon_11_npc_data[10] = {
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "G",  // nokonokoG
+        .name = g_NpcNokonokoG,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_G_regl
         .talkEvtCode = nullptr,     // (void*)nokonoko_G_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "H",  // nokonokoH
+        .name = g_NpcNokonokoH,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_H_regl
         .talkEvtCode = nullptr,     // (void*)nokonoko_H_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "I",  // nokonokoI
+        .name = g_NpcNokonokoI,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_I_regl
         .talkEvtCode = nullptr,     // (void*)nokonoko_I_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x6d\x83\x52" "K",  // nokonokoK
+        .name = g_NpcNokonokoK,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .talkEvtCode = nullptr,     // (void*)nokonoko_K_talk
     },
     {
-        .name = "\x91\xba\x92\xb7",                     // Mayor Kroop
+        .name = g_NpcMayorKroop,
         .flags = 0x4000'0600,
         .initEvtCode = npc_init_evt,
         .talkEvtCode = nullptr,     // (void*)boss_noko_talk
     },
     {
-        .name = "\x96\xe5\x94\xd4\x83\x6d\x83\x52\x83\x6d\x83\x52",  // Gatekeeper
+        .name = g_NpcGatekeeper,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)monban_init
         .talkEvtCode = nullptr,     // (void*)monban_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x5e\x83\x8d\x83\x45",          // Koops
+        .name = g_NpcKoops,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)nokotarou_init
         .talkEvtCode = nullptr,     // (void*)nokotarou_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x5e\x83\x8d\x83\x45\x95\x83",  // Koopley
+        .name = g_NpcKoopley,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)nokotarou_init
         .talkEvtCode = nullptr,     // (void*)nokotarou_talk
     },
     {
-        .name = "\x83\x6d\x83\x52\x83\x8a\x83\x93",         // Koopie Koo
+        .name = g_NpcKoopieKoo,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)nokorin_init
         .talkEvtCode = nullptr,     // (void*)nokorin_talk
+    },
+};
+
+const char* gon_10_door_1_npcs[] = { g_NpcInnkeeper, nullptr };
+const char* gon_10_door_1_map_groups[] = { "S_yad_mae", nullptr };
+const char* gon_10_door_2_npcs[] = { g_NpcShopkeeper, nullptr };
+const char* gon_10_door_3_npcs[] = { g_NpcNokonokoD, nullptr };
+const char* gon_10_door_3_map_groups[] = { "S_ie_mae", nullptr };
+
+const DoorSubmapInfo gon_10_door_data[3] = {
+    {
+        .type = 1,
+        .in_pos = 9,
+        .in_hitobj = "A_yad_doa01",
+        .out_pos = 9,
+        .out_hitobj = "A_yad_in_doa",
+        .anim_1 = "S_yado_open",
+        .anim_2 = "S_yado_doa_open",
+        .anim_3 = "S_yado_close",
+        .anim_4 = "S_yado_doa_close",
+        .outside_group = "S_yad_mae",
+        .door_group = "S_yad_doa01",
+        .inside_group_s = "S_yado_in",
+        .inside_group_a = "A_yado_in",
+        .init_inside_group_s = "S_yado_in",
+        .init_inside_group_a = "A_yado_in",
+        .npc_list = gon_10_door_1_npcs,
+        .map_group_list = gon_10_door_1_map_groups,
+    },
+    {
+        .type = 1,
+        .in_pos = 9,
+        .in_hitobj = "A_mise_doa",
+        .out_pos = 9,
+        .out_hitobj = "A_mise_in_doa",
+        .anim_1 = "S_mise_open",
+        .anim_2 = "S_mise_doa_open",
+        .anim_3 = "S_mise_close",
+        .anim_4 = "S_mise_doa_close",
+        .outside_group = "S_mise_mae",
+        .door_group = "S_mise_doa",
+        .inside_group_s = "S_mise_in",
+        .inside_group_a = "A_mise_in",
+        .init_inside_group_s = "S_mise_in",
+        .init_inside_group_a = "A_mise_in",
+        .npc_list = gon_10_door_2_npcs,
+    },
+    {
+        .type = 1,
+        .in_pos = 9,
+        .in_hitobj = "A_ie_doa",
+        .out_pos = 9,
+        .out_hitobj = "A_ie_in_doa",
+        .anim_1 = "S_ie_open",
+        .anim_2 = "S_ie_doa_open",
+        .anim_3 = "S_ie_close",
+        .anim_4 = "S_ie_doa_close",
+        .outside_group = "S_ie_mae",
+        .door_group = "S_ie_doa",
+        .inside_group_s = "S_ie_in",
+        .inside_group_a = "A_ie_in",
+        .init_inside_group_s = "S_ie_in",
+        .init_inside_group_a = "A_ie_in",
+        .npc_list = gon_10_door_3_npcs,
+        .map_group_list = gon_10_door_3_map_groups,
+    },
+};
+
+const char* gon_11_door_1_npcs[] = { g_NpcMayorKroop, nullptr };
+const char* gon_11_door_1_mobjs[] = { "kururin3", nullptr };
+const char* gon_11_door_1_items[] = { "iri_08", nullptr };
+const char* gon_11_door_2_npcs[] = { g_NpcKoops, nullptr };
+const char* gon_11_door_2_map_groups[] = { "S_taro_in", nullptr };
+const char* gon_11_door_2_mobjs[] = { "box", nullptr };
+const char* gon_11_door_2_items[] = { "item_01", nullptr };
+const char* gon_11_door_3_npcs[] = { g_NpcNokonokoK, nullptr };
+const char* gon_11_door_3_map_groups[] = { "S_ie_mae", nullptr };
+
+const DoorSubmapInfo gon_11_door_data[3] = {
+    {
+        .type = 1,
+        .in_pos = 9,
+        .in_hitobj = "A_son_doa",
+        .out_pos = 9,
+        .out_hitobj = "A_son_in_doa",
+        .anim_1 = "S_son_open",
+        .anim_2 = "S_son_doa_open",
+        .anim_3 = "S_son_close",
+        .anim_4 = "S_son_doa_close",
+        .outside_group = "S_son_mae",
+        .door_group = "S_son_doa1",
+        .inside_group_s = "S_son_in",
+        .inside_group_a = "A_son_in",
+        .init_inside_group_s = "S_son_in",
+        .init_inside_group_a = "A_son_in",
+        .npc_list = gon_11_door_1_npcs,
+        .mobj_list = gon_11_door_1_mobjs,
+        .item_obj_list = gon_11_door_1_items,
+    },
+    {
+        .type = 1,
+        .in_pos = 9,
+        .in_hitobj = "A_taro_doa",
+        .out_pos = 9,
+        .out_hitobj = "A_taro_in_doa",
+        .anim_1 = "S_taro_open",
+        .anim_2 = "S_taro_doa_open",
+        .anim_3 = "S_taro_close",
+        .anim_4 = "S_taro_doa_close",
+        .outside_group = "S_taro_mae",
+        .door_group = "S_taro_doa",
+        .inside_group_s = "S_taro_in",
+        .inside_group_a = "A_taro_in",
+        .init_inside_group_s = "S_taro_in",
+        .init_inside_group_a = "A_taro_in",
+        .npc_list = gon_11_door_2_npcs,
+        .map_group_list = gon_11_door_2_map_groups,
+        .mobj_list = gon_11_door_2_mobjs,
+        .item_obj_list = gon_11_door_2_items,
+    },
+    {
+        .type = 1,
+        .in_pos = 9,
+        .in_hitobj = "A_ie_doa",
+        .out_pos = 9,
+        .out_hitobj = "S_ie_in_doa",
+        .anim_1 = "S_ie_open",
+        .anim_2 = "S_ie_doa_open",
+        .anim_3 = "S_ie_close",
+        .anim_4 = "S_ie_doa_close",
+        .outside_group = "S_ie_mae",
+        .door_group = "S_ie_doa",
+        .inside_group_s = "S_ie_in",
+        .inside_group_a = "A_ie_in",
+        .init_inside_group_s = "S_ie_in",
+        .init_inside_group_a = "A_ie_in",
+        .npc_list = gon_11_door_3_npcs,
+        .map_group_list = gon_11_door_3_map_groups,
     },
 };
 

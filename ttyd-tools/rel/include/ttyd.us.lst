@@ -1272,6 +1272,35 @@
 800e7840:evt_mario_paper_pose_dokan
 800e7e04:evt_mario_dokan_prepare
 
+// evt_door.o
+// .text
+800e7f70:evt_door_end_wait
+800e7f8c:evt_door_set_param
+800e8004:evt_door_data_copy
+800e8090:npc_hide_onoff
+800e8134:evt_door_load_mapflag
+800e8194:evt_door_save_mapflag
+800e81f4:evt_door_param
+800e8594:door_dark_flag
+800e85f4:door_dark_flag_sub
+800e884c:door_position_sub
+800e8d08:get_noclip_map
+800e8da4:npc_light
+800e8f20:npc_dark
+800e909c:animation
+800e9138:init_inside_group
+800e91ac:inside_group
+800e9220:door_group
+800e9274:outside_group
+800e92c8:in_pos
+800e934c:out_pos
+800e93d0:inout_hit
+800e946c:door_entry
+800e96e0:snd_door_out
+800e9708:snd_door_in
+// .data
+8032f390:evt_door_setup
+
 // evt_party.o
 800e9730:N_evt_party_cloud_lock_animations_on_off
 800e97d8:evt_party_cloud_breathout
