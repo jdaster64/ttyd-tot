@@ -108,6 +108,49 @@
 80010c64:dispReInit
 80010c70:dispInit
 
+// hitdrv.o
+80013cec:hitBindUpdate
+80013df8:hitBindMapObj
+80013ef0:hitGetDamageReturnPos
+80013efc:hitGrpDamageReturnSet
+80013fc4:hitDamageReturnSet
+80014310:hitGetAttr
+80014328:hitGetName
+800143c4:hitObjGetNormal
+8001449c:hitObjGetPos
+800145ec:hitObjGetPosSub
+80014b58:hitNameToPtr
+80014c08:hitCheckSphereFilter
+800151a0:hitCheckAttr
+800152d4:chkFilterAttr
+800152ec:hitCheckVecHitObjXZ
+800153d0:checkTriVec_xz
+8001577c:hitCheckFilter
+800158a4:hitCheckVecFilter
+800165a8:hitCalcVtxPosition
+80016a5c:hitReCalcMatrix2
+80016f08:hitReCalcMatrix
+80016f68:hitGrpAttrOff
+80017040:hitGrpAttrOn
+80017118:hitAtrOff
+8001742c:hitAtrOn
+8001773c:hitObjAttrOff
+80017810:hitObjAttrOn
+800178e4:hitGrpFlagOff
+800179bc:hitGrpFlagOn
+80017a94:hitFlgOff
+80017dac:hitFlgOn
+800180bc:hitObjFlagOff
+80018190:hitObjFlagOn
+80018264:hitMain
+800184b0:hitDelete
+000155e8:hitEntryMOBJ
+80018658:hitEntry
+800186f4:hitEntrySub
+8001896c:_hitEnt
+80018df8:hitReInit
+00015e98:hitInit
+
 // icondrv.o
 80019120:iconNumberDispGx
 8001a29c:iconGetTexObj
@@ -2170,6 +2213,14 @@
 8012984c:BattleRunHitEvent
 801298d0:BattleRunHitEventDirect
 80129994:BattleCheckEndUnitInitEvent
+
+// evt_damage.o
+// .text
+8012abe4:evt_gazigazi_move_position
+// .data
+803646e8:evt_gazigazi_entry
+8036474c:evt_gazigazi_anim_loop
+8036479c:evt_gazigazi_appear
 
 // battle_monosiri.o
 8012ed2c:battleSetUnitMonosiriFlag

@@ -1,11 +1,15 @@
 #include "patches_field.h"
 
+#include "evt_cmd.h"
 #include "mod.h"
 #include "patch.h"
 #include "tot_manager_cosmetics.h"
 
 #include <gc/types.h>
 #include <ttyd/battle_monosiri.h>
+#include <ttyd/evt_npc.h>
+#include <ttyd/evtmgr.h>
+#include <ttyd/evtmgr_cmd.h>
 #include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/pmario_sound.h>
@@ -39,6 +43,7 @@ namespace mod::infinite_pit {
 // Declarations of patches.
 extern const int32_t g_mot_hammer_PickHammerFieldSfx_BH;
 extern const int32_t g_mot_hammer_PickHammerFieldSfx_EH;
+extern const int32_t g_mot_damage_Patch_DisableFallDamage;
 extern const int32_t g_chorobon_move_event_Patch_SetScale;
 extern const int32_t g_chorobon_find_event_Patch_SetScale;
 extern const int32_t g_chorobon_lost_event_Patch_SetScale;
@@ -47,7 +52,10 @@ extern const int32_t g_chorobon_return_event_Patch_SetScale;
 namespace field {
 
 namespace {
-    
+
+// For convenience.
+using namespace ::ttyd::evt_npc;
+
 using ::ttyd::npcdrv::NpcTribeDescription;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
@@ -61,6 +69,11 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_mot_hammer_PickHammerFieldSfx_EH),
         reinterpret_cast<void*>(StartPlayFieldHammerFX),
         reinterpret_cast<void*>(BranchBackPlayFieldHammerFX));
+
+    // Disable damage after falling into water.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_mot_damage_Patch_DisableFallDamage),
+        0x38600000U /* li r3, 0 */);
 
     // Correcting heights in NPC tribe description data.
     NpcTribeDescription* tribe_descs = ttyd::npc_data::npcTribe;

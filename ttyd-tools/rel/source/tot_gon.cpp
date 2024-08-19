@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "tot_custom_rel.h"
+#include "tot_gon_hub.h"
 #include "tot_gon_lobby.h"
 #include "tot_gon_opening.h"
 #include "tot_gon_tower.h"
@@ -179,6 +180,8 @@ void Prolog() {
     ttyd::mapdata::relSetEvtAddr("gon_00", GetLobbyInitEvt());
     ttyd::mapdata::relSetEvtAddr("gon_01", GetTowerInitEvt());
     ttyd::mapdata::relSetEvtAddr("gon_05", GetTowerInitEvt());
+    ttyd::mapdata::relSetEvtAddr("gon_10", GetWestSideInitEvt());
+    ttyd::mapdata::relSetEvtAddr("gon_11", GetEastSideInitEvt());
     ttyd::mapdata::relSetEvtAddr("gon_12", GetOpeningInitEvt());
     ttyd::mapdata::relSetBtlAddr("gon", g_SetupDataTbl, g_SetupNoTbl);
 }

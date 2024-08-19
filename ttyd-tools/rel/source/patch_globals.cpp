@@ -325,6 +325,7 @@ extern const int32_t g_BtlUnit_CheckPinchStatus_PerilThreshold_BH = 0x80126e20;
 extern const int32_t g_BtlUnit_CheckPinchStatus_DangerThreshold_BH = 0x80126e84;
 extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitAlloc = 0x8012903c;
 extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitMemset = 0x80129058;
+extern const int32_t g_mot_damage_Patch_DisableFallDamage = 0x8013b570;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_BH = 0x8013d140;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_EH = 0x8013d144;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_CH1 = 0x8013d404;
