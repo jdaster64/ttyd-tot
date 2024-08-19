@@ -141,6 +141,14 @@ EVT_DECLARE_USER_FUNC(evtTot_IncrementFloor, 1)
 // Returns the current floor number.
 EVT_DECLARE_USER_FUNC(evtTot_GetFloor, 1)
 
+// Returns whether the current floor is a special type of room.
+// Final boss floor.
+EVT_DECLARE_USER_FUNC(evtTot_IsFinalFloor, 1)
+// Midboss (not Atomic Boo) floor.
+EVT_DECLARE_USER_FUNC(evtTot_IsMidbossFloor, 1)
+// Rest floor (no enemies, shop + NPCs only).
+EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
+
 // Returns the current seed.
 EVT_DECLARE_USER_FUNC(evtTot_GetSeed, 1)
 

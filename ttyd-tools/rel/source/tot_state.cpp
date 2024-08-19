@@ -801,6 +801,28 @@ EVT_DEFINE_USER_FUNC(evtTot_GetFloor) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_IsFinalFloor) {
+    bool is_final_floor = g_Mod->state_.IsFinalBossFloor();
+    evtSetValue(evt, evt->evtArguments[0], is_final_floor);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_IsMidbossFloor) {
+    bool is_midboss_floor = 
+        (g_Mod->state_.floor_ % 8 == 0) && 
+        (g_Mod->state_.floor_ % 32 != 0);
+    evtSetValue(evt, evt->evtArguments[0], is_midboss_floor);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
+    auto& state = g_Mod->state_;
+    int32_t floor = state.floor_;
+    bool is_rest_floor = floor == 0 || (floor % 8 == 7);
+    evtSetValue(evt, evt->evtArguments[0], is_rest_floor);
+    return 2;
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_GetSeed) {
     uint32_t seed = g_Mod->state_.seed_;
     evtSetValue(evt, evt->evtArguments[0], seed);

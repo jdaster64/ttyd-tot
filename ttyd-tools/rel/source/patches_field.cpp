@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "patch.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_state.h"
 
 #include <gc/types.h>
 #include <ttyd/battle_monosiri.h>
@@ -11,6 +12,7 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/npc_data.h>
+#include <ttyd/npc_event.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/pmario_sound.h>
 #include <ttyd/system.h>
@@ -59,8 +61,68 @@ using namespace ::ttyd::evt_npc;
 using ::ttyd::npcdrv::NpcTribeDescription;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
+namespace NpcAiType = ::ttyd::npc_data::NpcAiType;
 
 }
+
+EVT_BEGIN(evtTot_WizzerdInitWrapper)
+    RUN_CHILD_EVT(ttyd::npc_event::mahoon_init_event)
+    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_npc_set_scale, PTR("slave_0"), 2, 2, 2)
+        USER_FUNC(evt_npc_set_scale, PTR("slave_1"), 2, 2, 2)
+        USER_FUNC(evt_npc_set_scale, PTR("slave_2"), 2, 2, 2)
+        USER_FUNC(evt_npc_set_scale, PTR("slave_3"), 2, 2, 2)
+    END_IF()
+    RETURN()
+EVT_END()
+
+// Runs passively when Wizzerd on field is in most movement states.
+EVT_BEGIN(evtTot_WizzerdHandsIdle)
+    USER_FUNC(evt_npc_get_dir, PTR("me"), LW(12))
+
+    // Scale to 1x if non-midboss, or 2x if midboss.
+    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(13))
+    ADD(LW(13), 1)
+
+    SET(LW(14), 0)
+    DO(4)
+        SWITCH(LW(14))
+            CASE_EQUAL(0)
+                SET(LW(5), PTR("slave_0"))
+                SET(LW(6), 25)
+                SET(LW(7), 5)
+            CASE_EQUAL(1)
+                SET(LW(5), PTR("slave_1"))
+                SET(LW(6), -25)
+                SET(LW(7), 5)
+            CASE_EQUAL(2)
+                SET(LW(5), PTR("slave_2"))
+                SET(LW(6), 25)
+                SET(LW(7), 30)
+            CASE_EQUAL(3)
+                SET(LW(5), PTR("slave_3"))
+                SET(LW(6), -25)
+                SET(LW(7), 30)
+        END_SWITCH()
+        MUL(LW(6), LW(13))
+        MUL(LW(7), LW(13))
+
+        USER_FUNC(evt_npc_set_ry, LW(5), LW(12))
+        USER_FUNC(evt_npc_get_position, PTR("me"), LW(0), LW(1), LW(2))
+        USER_FUNC(evt_npc_add_dirdist, LW(0), LW(2), LW(12), LW(6))
+        ADD(LW(1), LW(7))
+        USER_FUNC(evt_npc_set_position, LW(5), LW(0), LW(1), LW(2))
+
+        ADD(LW(14), 1)
+    WHILE()
+
+    // Pad out to length of original event section.
+    0, 0, 0, 0, 0, 0, 0,
+
+    // No return; patched over part of existing events.
+EVT_PATCH_END()
+static_assert(sizeof(evtTot_WizzerdHandsIdle) == 0x1a0);
 
 void ApplyFixedPatches() {
     // Replaces logic for picking a FX to play on hammering in the field.
@@ -74,6 +136,32 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_mot_damage_Patch_DisableFallDamage),
         0x38600000U /* li r3, 0 */);
+
+    // Add support for midboss scale to Wizzerd field AI.
+    ttyd::npc_data::npc_ai_type_table[NpcAiType::WIZZERD].initEvtCode = 
+        const_cast<int32_t*>(evtTot_WizzerdInitWrapper);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(
+            reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_move_event) + 0x28),
+        evtTot_WizzerdHandsIdle, sizeof(evtTot_WizzerdHandsIdle));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(
+            reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_find_event) + 0x14),
+        evtTot_WizzerdHandsIdle, sizeof(evtTot_WizzerdHandsIdle));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(
+            reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_lost_event) + 0x14),
+        evtTot_WizzerdHandsIdle, sizeof(evtTot_WizzerdHandsIdle));
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(
+            reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_return_event) + 0x14),
+        evtTot_WizzerdHandsIdle, sizeof(evtTot_WizzerdHandsIdle));
+
+    // Null out set scale events for Fuzzies' field AI, since they're unused.
+    memset((void*)g_chorobon_move_event_Patch_SetScale, 0, 0x18);
+    memset((void*)g_chorobon_find_event_Patch_SetScale, 0, 0x18);
+    memset((void*)g_chorobon_lost_event_Patch_SetScale, 0, 0x18);
+    memset((void*)g_chorobon_return_event_Patch_SetScale, 0, 0x18);
 
     // Correcting heights in NPC tribe description data.
     NpcTribeDescription* tribe_descs = ttyd::npc_data::npcTribe;
@@ -97,12 +185,6 @@ void ApplyFixedPatches() {
     tribe_descs[238].modelName = "c_bomhey_h";
     tribe_descs[288].nameJp = "cosmic_boo";
     tribe_descs[288].modelName = "c_atmic_trs_p";
-
-    // Null out set scale events for Fuzzies on overworld.
-    memset((void*)g_chorobon_move_event_Patch_SetScale, 0, 0x18);
-    memset((void*)g_chorobon_find_event_Patch_SetScale, 0, 0x18);
-    memset((void*)g_chorobon_lost_event_Patch_SetScale, 0, 0x18);
-    memset((void*)g_chorobon_return_event_Patch_SetScale, 0, 0x18);
     
     // TODO: Move to patches_ui.h?
     // Fix captures / location information in Tattle menu.

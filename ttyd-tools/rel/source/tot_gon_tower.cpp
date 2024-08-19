@@ -107,9 +107,6 @@ NpcSetupInfo g_EnemyNpcSetup[3];
 EVT_DECLARE_USER_FUNC(evtTot_ClearBattleResult, 0)
 EVT_DECLARE_USER_FUNC(evtTot_HasBackupSave, 1)
 EVT_DECLARE_USER_FUNC(evtTot_LoadBackupSaveData, 0)
-EVT_DECLARE_USER_FUNC(evtTot_IsFinalFloor, 1)
-EVT_DECLARE_USER_FUNC(evtTot_IsMidbossFloor, 1)
-EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_MakeKeyTable, 3)
 EVT_DECLARE_USER_FUNC(evtTot_OverrideLockKey, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
@@ -1114,31 +1111,6 @@ EVT_DEFINE_USER_FUNC(evtTot_LoadBackupSaveData) {
 EVT_DEFINE_USER_FUNC(evtTot_ClearBattleResult) {
     auto* fbat = (ttyd::npcdrv::FbatData*)ttyd::npcdrv::fbatGetPointer();
     fbat->battleInfo.wResult = 0;
-    return 2;
-}
-
-// Returns whether the floor is a "rest floor" (no enemies).
-EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
-    auto& state = g_Mod->state_;
-    int32_t floor = state.floor_;
-    bool is_rest_floor = floor == 0 || (floor % 8 == 7);
-    evtSetValue(evt, evt->evtArguments[0], is_rest_floor);
-    return 2;
-}
-
-// Returns whether the floor is the final floor.
-EVT_DEFINE_USER_FUNC(evtTot_IsFinalFloor) {
-    bool is_final_floor = g_Mod->state_.IsFinalBossFloor();
-    evtSetValue(evt, evt->evtArguments[0], is_final_floor);
-    return 2;
-}
-
-// Returns whether the floor has a midboss.
-EVT_DEFINE_USER_FUNC(evtTot_IsMidbossFloor) {
-    bool is_midboss_floor = 
-        (g_Mod->state_.floor_ % 8 == 0) && 
-        (g_Mod->state_.floor_ % 32 != 0);
-    evtSetValue(evt, evt->evtArguments[0], is_midboss_floor);
     return 2;
 }
 

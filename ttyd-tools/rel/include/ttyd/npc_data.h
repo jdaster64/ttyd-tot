@@ -10,6 +10,67 @@ struct NpcTribeDescription;
 
 namespace ttyd::npc_data {
 
+namespace NpcAiType {
+    enum e {
+        NONE = 0,
+        GENERAL_IMMOVABLE,
+        UNK_EVENTS,
+        TEST_ENEMY,
+        GOOMBA,
+        SPIKY_GOOMBA,
+        PARAGOOMBA,
+        KOOPA_TROOPA,
+        PARATROOPA,
+        BUZZY,
+        BUZZY_CEILING,
+        SPIKE_TOP,
+        SPIKE_TOP_CEILING,
+        PARABUZZY,
+        DULL_BONES,
+        DRY_BONES,
+        FUZZY,
+        GOLD_FUZZY,
+        BILL_BLASTER,
+        BULLET_BILL,
+        POKEY,
+        BALD_CLEFT,
+        CLEFT,
+        BRISTLE,
+        X_NAUT,  // Uses Goomba events
+        YUX,
+        X_YUX,
+        PIDER,
+        PIRANHA_PLANT,
+        PUFF,
+        BANDIT,  // Uses Goomba events
+        SWOOPER_CEILING,
+        SWOOPER_FLYING,
+        BOO,
+        CRAZEE_DAYZEE,
+        AMAZY_DAYZEE,
+        EMBER,
+        BULKY_BOB_OMB,
+        WIZZERD,
+        X_NAUT_PHD,
+        SPINIA,
+        MAGIKOOPA_FLYING,
+        MAGIKOOPA_GROUNDED,
+        HAMMER_BRO,
+        CHAIN_CHOMP,
+        KOOPATROL,
+        _2D_GENERAL_IMMOVABLE,
+        _2D_GOOMBA,
+        _2D_X_NAUT,
+        _2D_X_NAUT_PIPE,
+        _2D_X_NAUT_PIPE_GENERATOR,
+        _2D_X_NAUT_DESCENDING,
+        _2D_X_NAUT_AQUATIC,
+        _2D_BLOOPER,
+        _2D_X_NAUT_PHD,
+        UNK_EVENTS_2,
+    };
+}
+
 // Non-exhaustive; only ones that are considered for spawning in ToT.
 namespace NpcTribeType {
     enum e {
