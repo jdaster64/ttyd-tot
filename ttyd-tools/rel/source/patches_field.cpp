@@ -50,6 +50,7 @@ extern const int32_t g_chorobon_move_event_Patch_SetScale;
 extern const int32_t g_chorobon_find_event_Patch_SetScale;
 extern const int32_t g_chorobon_lost_event_Patch_SetScale;
 extern const int32_t g_chorobon_return_event_Patch_SetScale;
+extern const int32_t g_zakowiz_find_event_Patch_ProjectileScaleHook;
 
 namespace field {
 
@@ -64,6 +65,24 @@ namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace NpcAiType = ::ttyd::npc_data::NpcAiType;
 
 }
+
+EVT_BEGIN(evtTot_HammerBroInitWrapper)
+    RUN_CHILD_EVT(ttyd::npc_event::hbross_init_event)
+    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_npc_set_scale, PTR("slave_0"), 2, 2, 2)
+    END_IF()
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(evtTot_DryBonesInitWrapper)
+    RUN_CHILD_EVT(ttyd::npc_event::karon_init_event)
+    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_npc_set_scale, PTR("slave_0"), 2, 2, 2)
+    END_IF()
+    RETURN()
+EVT_END()
 
 EVT_BEGIN(evtTot_WizzerdInitWrapper)
     RUN_CHILD_EVT(ttyd::npc_event::mahoon_init_event)
@@ -124,6 +143,25 @@ EVT_BEGIN(evtTot_WizzerdHandsIdle)
 EVT_PATCH_END()
 static_assert(sizeof(evtTot_WizzerdHandsIdle) == 0x1a0);
 
+EVT_BEGIN(evtTot_XNautPhdProjectilePosition)
+    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(4))
+    ADD(LW(4), 1)
+    USER_FUNC(evt_npc_set_scale, PTR("slave_0"), LW(4), LW(4), LW(4))
+    MUL(LW(4), 25)
+    USER_FUNC(evt_npc_add_dirdist, LW(0), LW(2), LW(3), LW(4))
+    ADD(LW(1), LW(4))
+    USER_FUNC(evt_npc_set_position, PTR("slave_0"), LW(0), LW(1), LW(2))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(evtTot_XNautPhdProjectilePosition_Hook)
+    RUN_CHILD_EVT(evtTot_XNautPhdProjectilePosition)
+    // Pad out to length of original event section.
+    0, 0, 0, 0, 0, 0, 0,
+    // No return; patched over part of existing event.
+EVT_PATCH_END()
+static_assert(sizeof(evtTot_XNautPhdProjectilePosition_Hook) == 0x24);
+
 void ApplyFixedPatches() {
     // Replaces logic for picking a FX to play on hammering in the field.
     mod::patch::writeBranchPair(
@@ -156,6 +194,18 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(
             reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_return_event) + 0x14),
         evtTot_WizzerdHandsIdle, sizeof(evtTot_WizzerdHandsIdle));
+
+    // Add support for midboss scale to X-Naut PhD's projectiles.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_zakowiz_find_event_Patch_ProjectileScaleHook),
+        evtTot_XNautPhdProjectilePosition_Hook,
+        sizeof(evtTot_XNautPhdProjectilePosition_Hook));
+
+    // Add support for midboss scale to Hammer Bros., Dry Bones' projectiles.
+    ttyd::npc_data::npc_ai_type_table[NpcAiType::DRY_BONES].initEvtCode = 
+        const_cast<int32_t*>(evtTot_DryBonesInitWrapper);
+    ttyd::npc_data::npc_ai_type_table[NpcAiType::HAMMER_BRO].initEvtCode = 
+        const_cast<int32_t*>(evtTot_HammerBroInitWrapper);
 
     // Null out set scale events for Fuzzies' field AI, since they're unused.
     memset((void*)g_chorobon_move_event_Patch_SetScale, 0, 0x18);

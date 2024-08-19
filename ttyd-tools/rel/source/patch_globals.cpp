@@ -430,6 +430,7 @@ extern const int32_t g_chorobon_move_event_Patch_SetScale = 0x803427e8;
 extern const int32_t g_chorobon_find_event_Patch_SetScale = 0x803429c8;
 extern const int32_t g_chorobon_lost_event_Patch_SetScale = 0x80342a00;
 extern const int32_t g_chorobon_return_event_Patch_SetScale = 0x80342a38;
+extern const int32_t g_zakowiz_find_event_Patch_ProjectileScaleHook = 0x8034812c;
 extern const int32_t g_BattleSetStatusDamage_FeelingFine_SwitchTable = 0x8034c8b4;
 extern const int32_t g_subsetevt_blow_dead_Patch_GetRewards = 0x80351ea4;
 extern const int32_t g_subsetevt_shot_damage_Patch_SuperInvolvedWeapon = 0x80351f40;
