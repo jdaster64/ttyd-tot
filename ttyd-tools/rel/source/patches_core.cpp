@@ -125,6 +125,7 @@ void OnFileLoad(bool new_file = true) {
         // Set story progress / some tutorial flags.
         ttyd::swdrv::swInit();
         ttyd::swdrv::swByteSet(0, 405);     // post-game vanilla story progress
+        ttyd::swdrv::swSet(0);              // Shop tutorial
         ttyd::swdrv::swSet(0xe9);           // Save Block tutorial
         ttyd::swdrv::swSet(0xea);           // Heart Block tutorial
         ttyd::swdrv::swSet(0xeb);           // Item tutorial

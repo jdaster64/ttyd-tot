@@ -109,7 +109,7 @@ void pouchSetHP(int16_t hp);
 int16_t pouchGetMaxHP();
 int16_t pouchGetHP();
 // pouchAddHP
-// pouchAddStarPiece
+int32_t pouchAddStarPiece(int16_t star_pieces);
 // pouchGetStarPiece
 // pouchSetSuperCoin
 // pouchGetSuperCoin

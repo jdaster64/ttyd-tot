@@ -267,6 +267,7 @@ extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH = 0x800d4c94;
 extern const int32_t g_pouchGetItem_CheckMaxInv_BH = 0x800d533c;
 extern const int32_t g_pouchGetEmptyHaveItemCnt_CheckMaxInv_BH = 0x800d5638;
 extern const int32_t g_pouchInit_FixAllocLeak_BH = 0x800d59dc;
+extern const int32_t g_evt_shop_setup_Patch_DisableShopperTalkEvt = 0x800ef87c;
 extern const int32_t g_continueGame_Patch_SkipZeroingGswfs = 0x800f3ecc;
 extern const int32_t g_loadMain_Patch_SkipZeroingGswfs = 0x800f6358;
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH = 0x800fa224;

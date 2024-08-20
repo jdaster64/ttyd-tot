@@ -2282,7 +2282,12 @@ g_StringMap = {
         b"tot_cos2_21_h":
             b"Placeholder",
         b"tot_cos2_22_h":
-            b"Placeholder",        
+            b"Placeholder",
+            
+        # Placeholder NPC dialogue (map-agnostic).
+            
+        b"tot_npc_generic":
+            b"[Placeholder] I'm interactable.\n<k>",
     },
     
     # Tower lobby.
@@ -2617,9 +2622,6 @@ g_StringMap = {
         
         b"tot_npc_yesnoopt":
             b"<select 0 1 0 40>\nYes\nNo",
-            
-        b"tot_npc_generic":
-            b"[Placeholder] I'm interactable.\n<k>",
         
         # Charlieton
         
@@ -3304,6 +3306,36 @@ g_StringMap = {
         # Bonetail fake death (unused).
         b"tot_dragon02_90":
             b"[Placeholder] Dead?",
+    },
+    
+    # West side of Petalburg hub.
+    'gon_10': {
+    
+        # Shopkeeper.
+    
+        b"tot_shopkeep_00":
+            b"It's <NUM> coin<S> for\n"
+            b"<AN_ITEM>.\n<wait 250>\n"
+            b"Would you like one?\n<o>",
+    
+        b"tot_shopkeep_01":
+            b"<p>\n"
+            b"Oops! <wait 250>Oh, gee, I'm sorry.\n"
+            b"<wait 250>\n"
+            b"You don't have enough coins.\n<k>",
+    
+        b"tot_shopkeep_11":
+            b"<p>\nThank you so very much!\n<k>",
+    
+        b"tot_shopkeep_22":
+            b"<p>\nCome again, OK?\n<k>",
+    
+        b"tot_shopkeep_24":
+            b"<select 0 1 0 40>\nYes\nNo",
+    },
+    
+    # East side of Petalburg hub.
+    'gon_11': {
     },
     
     # Opening cutscene in Petal Meadows.

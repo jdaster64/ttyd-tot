@@ -19,11 +19,13 @@
 #include <ttyd/evt_mobj.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
+#include <ttyd/evt_shop.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
 #include <ttyd/evt_window.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/hitdrv.h>
+#include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
 #include <ttyd/npcdrv.h>
 
@@ -42,6 +44,7 @@ using namespace ::ttyd::evt_mario;
 using namespace ::ttyd::evt_mobj;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
+using namespace ::ttyd::evt_shop;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::evt_window;
@@ -55,6 +58,7 @@ using ::ttyd::npcdrv::NpcSetupInfo;
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
 namespace BeroType = ::ttyd::evt_bero::BeroType;
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 }  // namespace
 
@@ -89,12 +93,22 @@ extern const DoorSubmapInfo gon_10_door_data[3];
 extern const DoorSubmapInfo gon_11_door_data[3];
 extern HitReturnPoint gon_10_hit_return_points[10];
 extern HitReturnPoint gon_11_hit_return_points[13];
+extern const char* shop_obj_list[12];
+extern ShopItem shop_buy_list[6];
+extern ShopItem shop_trade_list[6];
+extern ShopkeeperData shopkeeper_data;
+
+EVT_BEGIN(Npc_GenericTalk)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, PTR("me"))
+    RETURN()
+EVT_END()
 
 EVT_BEGIN(gon_10_InitEvt)
     SET(LW(0), PTR(&gon_10_entry_data))
     USER_FUNC(evt_bero_get_info)
     USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STG1_NOK1"))
     USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG1_NOK1"))
+    USER_FUNC(evt_npc_setup, PTR(&gon_10_npc_data))
 
     // TODO: Add a one-time opening cutscene on first visit.
     IF_SMALL(0, 1)
@@ -114,9 +128,8 @@ EVT_BEGIN(gon_10_InitEvt)
     SET(LW(0), PTR(&gon_10_door_data[2]))
     RUN_CHILD_EVT(evt_door_setup)
 
-    // TODO: Shop and inn setup.
-    // USER_FUNC(evt_shop_setup, PTR(&obj_list), PTR(&goods_list), PTR(&shopper_data), PTR(&trade_list))
-    // USER_FUNC(evt_kinopio_setup, PTR(&kino_dt))
+    // TODO: Dynamically populate shop list.
+    USER_FUNC(evt_shop_setup, PTR(&shop_obj_list), PTR(&shop_buy_list), PTR(&shopkeeper_data), PTR(&shop_trade_list))
     
     // TODO: Save block.
     // USER_FUNC(evt_mobj_save_blk, PTR("mobj_save"), 155, 60, -60, 0, 0)
@@ -274,14 +287,14 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .flags = 0,
         .initEvtCode = nullptr,     // (void*)nokonoko_A_init
         .regularEvtCode = nullptr,  // (void*)nokonoko_A_regl
-        .talkEvtCode = nullptr,     // (void*)nokonoko_A_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoB,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_B_regl
-        .talkEvtCode = nullptr,     // (void*)nokonoko_B_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
         .deadEvtCode = nullptr,     // (void*)nokonoko_B_damage
     },
     {
@@ -289,29 +302,31 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_C_regl
-        .talkEvtCode = nullptr,     // (void*)nokonoko_C_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoD,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .talkEvtCode = nullptr,     // (void*)nokonoko_D_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoF,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .talkEvtCode = nullptr,     // (void*)nokonoko_F_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcInnkeeper,
         .flags = 0,
         .initEvtCode = npc_init_evt,
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcShopkeeper,
         .flags = 0,
         .initEvtCode = npc_init_evt,
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcHooktail,
@@ -332,33 +347,33 @@ const NpcSetupInfo gon_11_npc_data[10] = {
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_G_regl
-        .talkEvtCode = nullptr,     // (void*)nokonoko_G_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoH,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_H_regl
-        .talkEvtCode = nullptr,     // (void*)nokonoko_H_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoI,
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = nullptr,  // (void*)nokonoko_I_regl
-        .talkEvtCode = nullptr,     // (void*)nokonoko_I_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoK,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .talkEvtCode = nullptr,     // (void*)nokonoko_K_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcMayorKroop,
         .flags = 0x4000'0600,
         .initEvtCode = npc_init_evt,
-        .talkEvtCode = nullptr,     // (void*)boss_noko_talk
+        .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcGatekeeper,
@@ -550,6 +565,28 @@ HitReturnPoint gon_11_hit_return_points[13] = {
     { "mod_010", { 0.0f, -1000.0f, 0.0f }, },
     { "A_hasi1", { 0.0f, -1000.0f, 0.0f }, },
 };
+
+const char* shop_obj_list[12] = {
+    "S_item_01", "A_item_01",
+    "S_item_02", "A_item_02",
+    "S_item_03", "A_item_03",
+    "S_item_04", "A_item_04",
+    "S_item_05", "A_item_05",
+    "S_item_06", "A_item_06",
+};
+// TODO: Dynamically fill this array.
+ShopItem shop_buy_list[6] = {
+    { .item_id = ItemType::MUSHROOM,        .buy_price = 10, },
+    { .item_id = ItemType::SUPER_SHROOM,    .buy_price = 20, },
+    { .item_id = ItemType::ULTRA_SHROOM,    .buy_price = 30, },
+    { .item_id = ItemType::HONEY_SYRUP,     .buy_price = 40, },
+    { .item_id = ItemType::SHOOTING_STAR,   .buy_price = 50, },
+    { .item_id = ItemType::STAR_PIECE,      .buy_price = 10, },
+};
+ShopkeeperData shopkeeper_data = {
+    .npc_name = g_NpcShopkeeper,
+};
+ShopItem shop_trade_list[6] = {};
 
 const int32_t* GetWestSideInitEvt() {
     return gon_10_InitEvt;
