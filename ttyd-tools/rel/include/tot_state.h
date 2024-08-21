@@ -161,6 +161,10 @@ EVT_DECLARE_USER_FUNC(evtTot_GetEncodedOptions, 1)
 // Returns the current difficulty setting.
 EVT_DECLARE_USER_FUNC(evtTot_GetDifficulty, 1)
 
+// Updates the player's permanent currency in lockstep with current coins.
+// arg0 = 0 (coins) or 1 (Star Pieces), arg1 = amount (greater than 0).
+EVT_DECLARE_USER_FUNC(evtTot_SpendPermanentCurrency, 2)
+
 // Format of save data used by Tower of Trials mod.
 struct TotSaveData {
     uint16_t    flags;                  // 0x0
@@ -496,7 +500,10 @@ enum Options : uint32_t {
     STAT_PERM_NPC_ZESS_COOKS    = 0x28d'3'01'07,
     STAT_PERM_NPC_DEALS_TOTAL   = 0x290'3'01'07,
     STAT_PERM_ACH_HAMMERS       = 0x293'1'01'01,
-    // Next: 0x294
+    // TODO: Increase cap to 9,999 for coins (and maybe SP) in hub.
+    STAT_PERM_CURRENT_COINS     = 0x294'2'01'03,
+    STAT_PERM_CURRENT_SP        = 0x296'2'01'03,
+    // Next: 0x298
 };
 
 }  // namespace mod::tot

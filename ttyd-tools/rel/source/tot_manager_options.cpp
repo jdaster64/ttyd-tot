@@ -96,8 +96,8 @@ void OptionsManager::InitLobby() {
     for (int32_t i = 0; i < 121; ++i) pouch.key_items[i] = 0;
     for (int32_t i = 0; i < 200; ++i) pouch.badges[i] = 0;
     for (int32_t i = 0; i < 200; ++i) pouch.equipped_badges[i] = 0;
-    pouch.coins = 0;
-    pouch.star_pieces = 0;
+    pouch.coins = g_Mod->state_.GetOption(STAT_PERM_CURRENT_COINS);
+    pouch.star_pieces = g_Mod->state_.GetOption(STAT_PERM_CURRENT_SP);
     pouch.shine_sprites = 0;
     pouch.star_points = 0;
     pouch.star_powers_obtained = 0;
@@ -161,6 +161,8 @@ void OptionsManager::InitFromSelectedOptions() {
 
     pouch.star_powers_obtained = 0b11;
     pouch.max_sp = 300;
+    pouch.coins = 0;
+    pouch.star_pieces = 0;
     
     switch (state.GetOptionValue(OPT_STARTER_ITEMS)) {
         case OPTVAL_STARTER_ITEMS_BASIC: {

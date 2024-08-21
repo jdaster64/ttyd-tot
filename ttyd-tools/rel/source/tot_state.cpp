@@ -870,4 +870,15 @@ EVT_DEFINE_USER_FUNC(evtTot_GetDifficulty) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_SpendPermanentCurrency) {
+    int32_t currency_type = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t amount = evtGetValue(evt, evt->evtArguments[1]);
+    if (currency_type == 0) {
+        g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_COINS, -amount);
+    } else if (currency_type == 1) {
+        g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_SP, -amount);
+    }
+    return 2;
+}
+
 }  // namespace mod::tot

@@ -296,6 +296,26 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
             }
         }
     }
+
+    // Update currency-based aggregate stats.
+    int32_t coins_earned = state.GetOption(STAT_RUN_COINS_EARNED);
+    int32_t coins_spent = state.GetOption(STAT_RUN_COINS_SPENT);
+    int32_t sp_earned = state.GetOption(STAT_RUN_STAR_PIECES);
+    int32_t shines_earned = state.GetOption(STAT_RUN_SHINE_SPRITES);
+
+    state.ChangeOption(STAT_PERM_COINS_EARNED, coins_earned);
+    state.ChangeOption(STAT_PERM_COINS_SPENT, coins_spent);
+    state.ChangeOption(STAT_PERM_STAR_PIECES, sp_earned);
+    state.ChangeOption(STAT_PERM_SHINE_SPRITES, shines_earned);
+
+    if (state.GetOption(STAT_PERM_COINS_EARNED) >= 10000) {
+        AchievementsManager::MarkCompleted(AchievementId::AGG_COINS_10000);
+    }
+
+    // Update amount of meta-currency available in the hub.
+    state.ChangeOption(STAT_PERM_CURRENT_COINS, coins_earned);
+    state.ChangeOption(STAT_PERM_CURRENT_SP, sp_earned);
+    state.ChangeOption(STAT_PERM_CURRENT_SP, shines_earned * 3);
     
     return 2;
 }

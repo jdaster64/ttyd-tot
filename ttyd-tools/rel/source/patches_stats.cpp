@@ -64,14 +64,8 @@ void ApplyFixedPatches() {
             // Track coins gained / spent (stolen coins subtract from gained).
             if (coins < 0 && !ttyd::mariost::g_MarioSt->bInBattle) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_SPENT, -coins);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_SPENT, -coins);
             } else {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED, coins);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED, coins);
-                if (g_Mod->state_.GetOption(tot::STAT_PERM_COINS_EARNED) >= 10000) {
-                    tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::AGG_COINS_10000);
-                }
                 tot::AchievementsManager::CheckCompleted(
                     tot::AchievementId::MISC_RUN_COINS_999);
             }
