@@ -3192,6 +3192,10 @@
 8041db20:nice_event
 803b5a40:marioAttackEvent_ZubaStar
 
+// evt_urouro.o
+802372a8:urouro_main_func
+80237878:urouro_init_func
+
 // winmgr.o
 // .text
 8023976c:select_disp3_mario

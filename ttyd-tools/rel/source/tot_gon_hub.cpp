@@ -22,6 +22,7 @@
 #include <ttyd/evt_shop.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
+#include <ttyd/evt_urouro.h>
 #include <ttyd/evt_window.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/hitdrv.h>
@@ -47,6 +48,7 @@ using namespace ::ttyd::evt_npc;
 using namespace ::ttyd::evt_shop;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
+using namespace ::ttyd::evt_urouro;
 using namespace ::ttyd::evt_window;
 
 using ::ttyd::evt_bero::BeroEntry;
@@ -98,7 +100,36 @@ extern ShopItem shop_buy_list[6];
 extern ShopItem shop_trade_list[6];
 extern ShopkeeperData shopkeeper_data;
 
+EVT_BEGIN(Npc_GenericMove)
+    USER_FUNC(evt_npc_get_position, PTR("me"), LW(0), LW(1), LW(2))
+    USER_FUNC(urouro_init_func, PTR("me"), LW(0), LW(2), FLOAT(100.0), FLOAT(30.0), 0)
+    USER_FUNC(urouro_main_func, PTR("me"))
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Npc_GenericTalk)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, PTR("me"))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Villager_A_InitEvt)
+    USER_FUNC(evt_npc_flag_onoff, 1, PTR("me"), 1536)
+    // TODO: Don't run this if in first-time cutscene.
+    USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Villager_A_MoveEvt)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Gatekeeper_InitEvt)
+    // Location when standing out of the way (should never be the case):
+    // USER_FUNC(evt_npc_set_position, PTR("me"), 370, 0, -76)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Gatekeeper_TalkEvt)
     USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, PTR("me"))
     RETURN()
 EVT_END()
@@ -180,9 +211,9 @@ EVT_BEGIN(gon_11_InitEvt)
     SET(LW(0), PTR(&gon_11_door_data[2]))
     RUN_CHILD_EVT(evt_door_setup)
 
-    // Not sure what these do...
-    USER_FUNC(evt_map_playanim, PTR("S_mon"), 2, 0)
-    USER_FUNC(evt_hitobj_onoff, PTR("A_mon"), 1, 0)
+    // Run these to open the gate (should never happen):
+    // USER_FUNC(evt_map_playanim, PTR("S_mon"), 2, 0)
+    // USER_FUNC(evt_hitobj_onoff, PTR("A_mon"), 1, 0)
 
     DO(2)
         USER_FUNC(evt_sub_random, 10, LW(0))
@@ -284,23 +315,22 @@ const NpcSetupInfo gon_10_npc_data[10] = {
     {
         .name = g_NpcNokonokoA,
         .flags = 0,
-        .initEvtCode = nullptr,     // (void*)nokonoko_A_init
-        .regularEvtCode = nullptr,  // (void*)nokonoko_A_regl
+        .initEvtCode = (void*)Villager_A_InitEvt,
+        .regularEvtCode = (void*)Npc_GenericMove,
         .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoB,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .regularEvtCode = nullptr,  // (void*)nokonoko_B_regl
+        .regularEvtCode = (void*)Npc_GenericMove,
         .talkEvtCode = (void*)Npc_GenericTalk,
-        .deadEvtCode = nullptr,     // (void*)nokonoko_B_damage
     },
     {
         .name = g_NpcNokonokoC,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .regularEvtCode = nullptr,  // (void*)nokonoko_C_regl
+        .regularEvtCode = (void*)Npc_GenericMove,
         .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
@@ -333,6 +363,7 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .initEvtCode = npc_init_evt,
     },
     {
+        // Leave disabled for now.
         .name = g_NpcGeneralWhite,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)init_white
@@ -345,21 +376,21 @@ const NpcSetupInfo gon_11_npc_data[10] = {
         .name = g_NpcNokonokoG,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .regularEvtCode = nullptr,  // (void*)nokonoko_G_regl
+        .regularEvtCode = (void*)Npc_GenericMove,
         .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoH,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .regularEvtCode = nullptr,  // (void*)nokonoko_H_regl
+        .regularEvtCode = (void*)Npc_GenericMove,
         .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
         .name = g_NpcNokonokoI,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .regularEvtCode = nullptr,  // (void*)nokonoko_I_regl
+        .regularEvtCode = (void*)Npc_GenericMove,
         .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
@@ -377,22 +408,25 @@ const NpcSetupInfo gon_11_npc_data[10] = {
     {
         .name = g_NpcGatekeeper,
         .flags = 0x4000'0600,
-        .initEvtCode = nullptr,     // (void*)monban_init
-        .talkEvtCode = nullptr,     // (void*)monban_talk
+        .initEvtCode = (void*)Gatekeeper_InitEvt,
+        .talkEvtCode = (void*)Gatekeeper_TalkEvt,
     },
     {
+        // Leave disabled permanently.
         .name = g_NpcKoops,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)nokotarou_init
         .talkEvtCode = nullptr,     // (void*)nokotarou_talk
     },
     {
+        // Leave disabled for now.
         .name = g_NpcKoopley,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)nokotarou_init
         .talkEvtCode = nullptr,     // (void*)nokotarou_talk
     },
     {
+        // Leave disabled for now.
         .name = g_NpcKoopieKoo,
         .flags = 0x4000'0600,
         .initEvtCode = nullptr,     // (void*)nokorin_init
