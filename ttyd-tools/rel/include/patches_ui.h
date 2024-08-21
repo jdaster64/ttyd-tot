@@ -17,13 +17,6 @@ void DisplayUpDownNumberIcons(
     int32_t number, void* tex_obj, gc::mtx34* icon_mtx, gc::mtx34* view_mtx,
     uint32_t unk0);
 
-// Checks whether to open the moves submenu in the "Mario" tab.
-bool CheckOpenMarioMoveMenu(ttyd::win_root::WinPauseMenu* menu);
-// Prints the maximum level of each available move in the Mario tab.
-void MarioMoveMenuDisp(ttyd::win_root::WinPauseMenu* menu);
-// Prints the description for the currently hovered move in the Mario tab.
-void MarioMoveMenuMsgEntry(ttyd::win_root::WinPauseMenu* menu);
-
 // Prints the partner's description and sets their move count in the Party menu.
 void PartyMenuSetupPartnerDescAndMoveCount(ttyd::win_root::WinPauseMenu* menu);
 // Sets the move description and updates the move cursor XY pos for Party menu.

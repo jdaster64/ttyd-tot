@@ -134,9 +134,9 @@ struct WinPauseMenu {
     int32_t     sort_menu_type;                             // 0x0184
     int32_t     mario_anim_pose_id;                         // 0x0188
     int32_t     mario_anim_timer;                           // 0x018c
-    int32_t     special_move_menu_opened;                   // 0x0190
-    int32_t     special_move_cursor_idx;                    // 0x0194
-    int32_t     special_move_count;                         // 0x0198
+    int32_t     mario_move_menu_opened;                     // 0x0190
+    int32_t     mario_move_cursor_idx;                      // 0x0194
+    int32_t     mario_move_count;                           // 0x0198
 
     // "Party" menu.
     int32_t     is_swapping_party;                          // 0x019c
@@ -280,7 +280,7 @@ static_assert(sizeof(WinPauseMenu) == 0x1218);
 
 // .text
 // winMailDisp
-// winZClear
+void winZClear();
 void winKageGX(
     float x, float y, float z, float scale, WinPauseMenu* menu, uint32_t* color);
 uint32_t winSortWait(WinPauseMenu* menu);

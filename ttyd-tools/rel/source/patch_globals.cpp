@@ -178,6 +178,14 @@ void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
 void (*g_winItemMain2_trampoline)(WinPauseMenu*) = nullptr;
 // win_item.o  8016c030
 int32_t (*g_winItemMain_trampoline)(WinPauseMenu*) = nullptr;
+// win_item.o  8016d7c4
+void (*g_winMarioDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
+// win_item.o  80170488
+int32_t (*g_winMarioMain_trampoline)(WinPauseMenu*) = nullptr;
+// win_item.o  80170c90
+void (*g_winMarioInit2_trampoline)(WinPauseMenu*) = nullptr;
+// win_item.o  80170dc0
+void (*g_winMarioInit_trampoline)(WinPauseMenu*) = nullptr;
 // win_log.o  80173c70
 void (*g_winLogDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
 // win_log.o  80174758
@@ -379,11 +387,6 @@ extern const int32_t g_winPartyMain_OverrideMoveTextCursor_BH = 0x801676b8;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_EH = 0x80167718;
 extern const int32_t g_winBadge_mario_change_Patch_SkipMapAnim1 = 0x801697a0;
 extern const int32_t g_winBadge_mario_change_Patch_SkipMapAnim2 = 0x80169868;
-extern const int32_t g_winMarioDisp_MoveMenuDisp_BH = 0x8016f584;
-extern const int32_t g_winMarioDisp_MoveMenuDisp_EH = 0x8016f7f8;
-extern const int32_t g_winMarioMain_MoveDescription_BH = 0x80170c38;
-extern const int32_t g_winMarioMain_MoveDescription_EH = 0x80170c48;
-extern const int32_t g_winMarioMain_CheckOpenMoveMenu_BH = 0x801704d4;
 extern const int32_t g_acShot_dispAfterimage_Patch_numBombs = 0x80197ffb;
 extern const int32_t g_acShot_dispAfterimage_Patch_targetVar2_1 = 0x80197f6f;
 extern const int32_t g_acShot_dispAfterimage_Patch_targetVar2_2 = 0x80197fcf;

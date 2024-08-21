@@ -10,6 +10,7 @@
 #include "tot_state.h"
 #include "tot_window_item.h"
 #include "tot_window_log.h"
+#include "tot_window_mario.h"
 #include "tot_window_select.h"
 
 #include <gc/mtx.h>
@@ -60,13 +61,6 @@ extern "C" {
     void StartHakoGxCheckDrawItemIcon();
     void ReturnHakoGxCheckDrawItemIconNoItemCase();
     void ReturnHakoGxCheckDrawItemIconItemCase();
-
-    void StartCheckOpenMarioMoveMenu();
-    void BranchBackCheckOpenMarioMoveMenu();
-    void StartMarioMoveMenuDisp();
-    void BranchBackMarioMoveMenuDisp();
-    void StartMarioMoveMenuMsgEntry();
-    void BranchBackMarioMoveMenuMsgEntry();
     
     void StartPartySetPartnerDescAndMoveCount();
     void BranchBackPartySetPartnerDescAndMoveCount();
@@ -92,15 +86,7 @@ extern "C" {
     bool checkOutsidePit() {
         return strcmp("jon", mod::GetCurrentArea()) != 0;
     }
-    bool checkOpenMarioMoveMenu(ttyd::win_root::WinPauseMenu* menu) {
-        return mod::infinite_pit::ui::CheckOpenMarioMoveMenu(menu);
-    }
-    void marioMoveMenuDisp(ttyd::win_root::WinPauseMenu* menu) {
-        mod::infinite_pit::ui::MarioMoveMenuDisp(menu);
-    }
-    void marioMoveMenuMsgEntry(ttyd::win_root::WinPauseMenu* menu) {
-        mod::infinite_pit::ui::MarioMoveMenuMsgEntry(menu);
-    }
+
     void partyMenuSetupPartnerDescAndMoveCount(ttyd::win_root::WinPauseMenu* menu) {
         mod::infinite_pit::ui::PartyMenuSetupPartnerDescAndMoveCount(menu);
     }
@@ -110,6 +96,7 @@ extern "C" {
     void partyMenuDispStats(ttyd::win_root::WinPauseMenu* menu) {
         mod::infinite_pit::ui::PartyMenuDispStats(menu);
     }
+
     int32_t getIconForBadgeOrItemLogEntry(
         ttyd::win_root::WinPauseMenu* menu, bool item_log, int32_t index) {
         return mod::infinite_pit::ui::GetIconForBadgeOrItemLogEntry(
@@ -159,6 +146,10 @@ extern void (*g_itemUseDisp_trampoline)(WinMgrEntry*);
 extern void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
 extern void (*g_winItemMain2_trampoline)(WinPauseMenu*);
 extern int32_t (*g_winItemMain_trampoline)(WinPauseMenu*);
+extern void (*g_winMarioDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
+extern int32_t (*g_winMarioMain_trampoline)(WinPauseMenu*);
+extern void (*g_winMarioInit2_trampoline)(WinPauseMenu*);
+extern void (*g_winMarioInit_trampoline)(WinPauseMenu*);
 extern void (*g_winLogDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
 extern void (*g_winLogMain2_trampoline)(WinPauseMenu*);
 extern int32_t (*g_winLogMain_trampoline)(WinPauseMenu*);
@@ -316,29 +307,6 @@ void ApplyFixedPatches() {
             g__btlcmd_MakeSelectWeaponTable_Patch_GetNameFromItem),
         0x807b0004U /* lwz r3, 0x4 (r27) */);
         
-    // Apply patch to Mario menu code to open the moves menu on the jump/hammer
-    // selections as well as the Special Moves one.
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winMarioMain_CheckOpenMoveMenu_BH),
-        reinterpret_cast<void*>(StartCheckOpenMarioMoveMenu),
-        reinterpret_cast<void*>(BranchBackCheckOpenMarioMoveMenu));
-        
-    // Apply patch to Mario menu code to display the max levels of all
-    // currently unlocked jump / hammer / Special Moves.
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winMarioDisp_MoveMenuDisp_BH),
-        reinterpret_cast<void*>(g_winMarioDisp_MoveMenuDisp_EH),
-        reinterpret_cast<void*>(StartMarioMoveMenuDisp),
-        reinterpret_cast<void*>(BranchBackMarioMoveMenuDisp));
-        
-    // Apply patch to Mario menu code to show the right description
-    // of the currently selected jump / hammer / Special Move.
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_winMarioMain_MoveDescription_BH),
-        reinterpret_cast<void*>(g_winMarioMain_MoveDescription_EH),
-        reinterpret_cast<void*>(StartMarioMoveMenuMsgEntry),
-        reinterpret_cast<void*>(BranchBackMarioMoveMenuMsgEntry));
-        
     // Apply patch to Party menu code to print the party member's description
     // and update the number of options in their moves dialog.
     mod::patch::writeBranchPair(
@@ -366,6 +334,25 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_winPartyDisp_StatsHook2_EH),
         reinterpret_cast<void*>(StartPartyDispHook2),
         reinterpret_cast<void*>(BranchBackPartyDispHook2));
+
+    // Replace most win_mario functions with custom logic.
+    g_winMarioInit_trampoline = patch::hookFunction(
+        ttyd::win_mario::winMarioInit, [](WinPauseMenu* menu) {
+            tot::win::MarioMenuInit(menu);
+        });
+    g_winMarioInit2_trampoline = patch::hookFunction(
+        ttyd::win_mario::winMarioInit2, [](WinPauseMenu* menu) {
+            tot::win::MarioMenuInit2(menu);
+        });
+    g_winMarioMain_trampoline = patch::hookFunction(
+        ttyd::win_mario::winMarioMain, [](WinPauseMenu* menu) {
+            return tot::win::MarioMenuMain(menu);
+        });
+    g_winMarioDisp_trampoline = patch::hookFunction(
+        ttyd::win_mario::winMarioDisp, [](
+            CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
+            tot::win::MarioMenuDisp(camera, menu, tab_number);
+        });
 
     // Replace most win_item functions with custom logic.
     g_winItemMain_trampoline = patch::hookFunction(
@@ -590,7 +577,7 @@ bool CheckOpenMarioMoveMenu(WinPauseMenu* menu) {
             ++num_selections;
         }
     }
-    menu->special_move_count = num_selections;
+    menu->mario_move_count = num_selections;
     
     return true;
 }
@@ -661,7 +648,7 @@ void MarioMoveMenuMsgEntry(WinPauseMenu* menu) {
     for (int32_t i = 0; i < 8; ++i) {
         int32_t move = starting_move + i;
         if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
-        if (current_pos == menu->special_move_cursor_idx) {
+        if (current_pos == menu->mario_move_cursor_idx) {
             ttyd::win_root::winMsgEntry(
                 menu, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
             return;

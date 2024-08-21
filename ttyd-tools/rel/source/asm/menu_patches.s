@@ -7,13 +7,6 @@
 .global StartHakoGxCheckDrawItemIcon
 .global ReturnHakoGxCheckDrawItemIconNoItemCase
 .global ReturnHakoGxCheckDrawItemIconItemCase
-# win_mario
-.global StartCheckOpenMarioMoveMenu
-.global BranchBackCheckOpenMarioMoveMenu
-.global StartMarioMoveMenuDisp
-.global BranchBackMarioMoveMenuDisp
-.global StartMarioMoveMenuMsgEntry
-.global BranchBackMarioMoveMenuMsgEntry
 # win_party
 .global StartPartySetPartnerDescAndMoveCount
 .global BranchBackPartySetPartnerDescAndMoveCount
@@ -76,34 +69,6 @@ ReturnHakoGxCheckDrawItemIconItemCase:
 b 0
 
 ReturnHakoGxCheckDrawItemIconNoItemCase:
-b 0
-
-
-StartCheckOpenMarioMoveMenu:
-# Check for opening the menu for jumps and hammers as well.
-mr %r3, %r29
-bl checkOpenMarioMoveMenu
-cmpwi %r3, 1
-
-BranchBackCheckOpenMarioMoveMenu:
-b 0
-
-
-StartMarioMoveMenuDisp:
-# Move win_root pointer to r3.
-mr %r3, %r30
-bl marioMoveMenuDisp
-
-BranchBackMarioMoveMenuDisp:
-b 0
-
-
-StartMarioMoveMenuMsgEntry:
-# Get the correct Star Power description, given the cursor position in the menu
-# (win_root pointer already in r3).
-bl marioMoveMenuMsgEntry
-
-BranchBackMarioMoveMenuMsgEntry:
 b 0
 
 

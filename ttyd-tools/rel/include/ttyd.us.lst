@@ -281,7 +281,7 @@
 80039cb4:animPoseGetAnimDataPtr
 80039cf8:animPoseGetAnimPosePtr
 80039d0c:animGroupBaseAsync
-8.0039E+44:animSetPaperTexMtx
+80039e40:animSetPaperTexMtx
 80039f0c:animPoseDisp_MakeExtTexture
 8003a690:animPaperPoseDispSub
 8003afb0:animPaperPoseDisp
@@ -2664,6 +2664,7 @@
 80417fb4:menu_skip_list
 
 // win_mario.o
+// .text
 8016d7c4:winMarioDisp
 8016f87c:fukidashi
 801703e8:unk_801703e8
@@ -2673,6 +2674,11 @@
 80170c6c:winMarioExit
 80170c90:winMarioInit2
 80170dc0:winMarioInit
+// .data
+803776f0:linkDt
+80417fd8:hammer_help
+80417fe8:boots_help
+80417ff8:hammer_pose
 
 // win_log.o
 80171034:monosiri_disp

@@ -1221,6 +1221,29 @@ g_StringMap = {
             
         # Pause menu stuff.
         
+        # Mario menu.
+
+        b'msg_menu_mario_num_sp':
+            b'Floors',
+
+        b'msg_menu_mario_coin':
+            b'The number of coins Mario\n'
+            b'has to buy items and badges.',
+
+        b'msg_menu_mario_kakera':
+            b'Star Pieces Mario has\n'
+            b'collected.',
+
+        b'msg_menu_mario_scoin':
+            b'Shine Sprites Mario has\n'
+            b'collected.',
+
+        b'msg_menu_mario_star_p':
+            b'How many floors Mario has\n'
+            b'ascended on this run.',
+        
+        # Journal menu.
+        
         b"msg_menu_kiroku_ryori":
             b'Inspect the items Mario has\n'
             b'collected here.',
