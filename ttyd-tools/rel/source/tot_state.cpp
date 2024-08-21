@@ -5,6 +5,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_manager_options.h"
 
 #include <gc/OSLink.h>
 #include <gc/OSTime.h>
@@ -60,14 +61,19 @@ void EncodeOption(
     }
 }
 
+const int32_t kEarliestSupportedVersion = 1;
+const int32_t kCurrentVersion = 1;
+
 // Holds backup save data (updated on floor 0 and after every boss floor).
 TotSaveSlot g_BackupSave;
 bool g_HasBackupSave = false;
 
 void ComputeChecksum(TotSaveSlot& save) {
-    constexpr const char kVersion[] = "009";
+    constexpr const char kVersion[] = "010";
     strcpy(save.version, kVersion);
-    save.size = sizeof(save.data);
+
+    // Larger than necessary, to future-proof.
+    save.size = 0x3800;
     
     uint32_t checksum = 0U;
     uint8_t* ptr = (uint8_t*)&save.data;
@@ -80,10 +86,31 @@ void ComputeChecksum(TotSaveSlot& save) {
 
 }  // namespace
 
+void StateManager::Init() {
+    memset(this, 0, sizeof(StateManager));
+    version_ = kCurrentVersion;
+
+    // Initialize best run times to maximum time.
+    SetOption(STAT_PERM_HALF_BEST_TIME, 100 * 60 * 60 * 100 - 1);
+    SetOption(STAT_PERM_FULL_BEST_TIME, 100 * 60 * 60 * 100 - 1);
+    SetOption(STAT_PERM_EX_BEST_TIME,   100 * 60 * 60 * 100 - 1);
+
+    // For alpha version, always set this to 1.
+    SetOption(OPT_DEBUG_MODE_USED, 1);
+
+    InitDefaultOptions();
+}
+
 // Loading / saving functions.
 bool StateManager::Load(TotSaveSlot* save) {
-    // TODO: Check version to make sure ToT data is valid before loading.
+    // Check version to make sure ToT data is valid before loading.
+    if (save->data.tot_state.version_ < kEarliestSupportedVersion)
+        return false;
+
+    // TODO: Save version format conversion, if necessary.
     memcpy(this, &save->data.tot_state, sizeof(StateManager));
+
+    version_ = kCurrentVersion;
     
     auto* mariost = ttyd::mariost::g_MarioSt;
     auto* player = ttyd::mario::marioGetPtr();
@@ -122,9 +149,11 @@ bool StateManager::Load(TotSaveSlot* save) {
     mariost->bDvdHasError = 0;
     mariost->lastFrameRetraceTime = gc::OSTime::OSGetTime();
     
-    // TODO: Is this required if loading from a hard save?
-    // strcpy(mariost->currentAreaName, "123");
-    // mariost->pRelFileBase = nullptr;
+    if (save != &g_BackupSave) {
+        // Required for curtain transition to end if loading from a hard save.
+        strcpy(mariost->currentAreaName, "123");
+        mariost->pRelFileBase = nullptr;
+    }
     
     *(int32_t*)((uintptr_t)mariost + 0x1274) = unk1;
     *(int32_t*)((uintptr_t)mariost + 0x1294) = unk2;
@@ -210,7 +239,7 @@ void StateManager::Save(TotSaveSlot* save) {
     
     ComputeChecksum(*save);
     
-    g_HasBackupSave = true;
+    if (save == &g_BackupSave) g_HasBackupSave = true;
 }
 
 bool StateManager::HasBackupSave() const {

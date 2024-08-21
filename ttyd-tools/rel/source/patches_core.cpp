@@ -43,9 +43,16 @@ extern "C" {
     void BranchBackMapLoad();
     void StartOnMapUnload();
     void BranchBackOnMapUnload();
+    // save_file_patches.s
+    void StartSaveSlotData();
+    void BranchBackSaveSlotData();
     
     int32_t mapLoad() { return mod::infinite_pit::core::LoadMap(); }
     void onMapUnload() { mod::infinite_pit::core::OnMapUnloaded(); }
+
+    void saveSlotData(mod::tot::TotSaveSlot* slot_data) {
+        mod::g_Mod->state_.Save(slot_data);
+    }
 }
 
 namespace mod::infinite_pit {
@@ -76,6 +83,32 @@ extern const int32_t g_seq_mapChangeMain_OnMapUnload_BH;
 extern const int32_t g_seq_mapChangeMain_OnMapUnload_EH;
 extern const int32_t g_titleMain_Patch_NeverPlayDemo;
 extern const int32_t g_seq_logoMain_Patch_AlwaysSkipIntro;
+extern const int32_t g_cardWrite_SaveSlotData_BH;
+extern const int32_t g_cardWrite_SaveSlotData_EH;
+extern const int32_t g_cardmgr_Patch_SaveFileName;
+
+// All for just changing the hardcoded size of the save data; sigh.
+extern const int32_t g_read_all_main_Patch_savesize_1;
+extern const int32_t g_read_all_main_Patch_savesize_by_10_1;
+extern const int32_t g_read_all_main_Patch_savesize_2;
+extern const int32_t g_read_all_main_Patch_savesize_by_10_2;
+extern const int32_t g_read_main_Patch_savesize_1;
+extern const int32_t g_read_main_Patch_savesize_by_10_1;
+extern const int32_t g_read_main_Patch_savesize_2;
+extern const int32_t g_read_main_Patch_savesize_by_10_2;
+extern const int32_t g_write_main_Patch_savesize_1;
+extern const int32_t g_write_main_Patch_savesize_by_10_1;
+extern const int32_t g_write_main_Patch_savesize_2;
+extern const int32_t g_write_main_Patch_savesize_by_10_2;
+extern const int32_t g_create_main_Patch_savesize_1;
+extern const int32_t g_create_main_Patch_savesize_2;
+extern const int32_t g_create_main_Patch_savesize_by_10_1;
+extern const int32_t g_cardInit_Patch_savesize_1;
+extern const int32_t g_cardInit_Patch_savesize_2;
+extern const int32_t g_cardInit_Patch_savesize_by_10_1;
+extern const int32_t g_cardErase_Patch_savesize_1;
+extern const int32_t g_cardErase_Patch_savesize_2;
+extern const int32_t g_cardErase_Patch_savesize_by_10_1;
 
 namespace core {
 
@@ -107,66 +140,70 @@ void OnModuleLoaded(OSModuleInfo* module) {
 
 // Initializes various game data when loading a new file; analogous to /
 // replaces the behavior of stg0_00_init.
-void OnFileLoad(bool new_file = true) {
-    if (new_file) {
-        ttyd::mario_pouch::pouchInit();
-        // Initialize other systems / data.
-        ttyd::evt_badgeshop::badgeShop_init();
-        ttyd::evt_yuugijou::yuugijou_init();
-        ttyd::evt_johoya::johoya_init();
-        
-        ttyd::mario::marioSetCharMode(0);
-        ttyd::statuswindow::statusWinForceUpdate();
-        ttyd::mariost::g_MarioSt->lastFrameRetraceLocalTime = 0ULL;
-        // Makes Mario spawn walking into the room normally if loading a new file,
-        // rather than in place in the center of the room.
-        ttyd::mariost::g_MarioSt->flags &= ~1U;
-        
-        // Set story progress / some tutorial flags.
-        ttyd::swdrv::swInit();
-        ttyd::swdrv::swByteSet(0, 405);     // post-game vanilla story progress
-        ttyd::swdrv::swSet(0);              // Shop tutorial
-        ttyd::swdrv::swSet(0xe9);           // Save Block tutorial
-        ttyd::swdrv::swSet(0xea);           // Heart Block tutorial
-        ttyd::swdrv::swSet(0xeb);           // Item tutorial
-        ttyd::swdrv::swSet(0xec);           // Save Block tutorial-related
-        
-        // Initializes the mod's InfPit state and copies it to the pouch.
-        g_Mod->inf_state_.Load(/* new_save = */ true);
-        g_Mod->inf_state_.Save();
-        
-        // Initialize Tower of Trials-specific state & pouch stuff.
-        tot::OptionsManager::InitLobby();
+bool FreshFileInit() {
+    ttyd::mario_pouch::pouchInit();
+    // Initialize other systems / data.
+    ttyd::evt_badgeshop::badgeShop_init();
+    ttyd::evt_yuugijou::yuugijou_init();
+    ttyd::evt_johoya::johoya_init();
+    
+    ttyd::mario::marioSetCharMode(0);
+    ttyd::statuswindow::statusWinForceUpdate();
+    ttyd::mariost::g_MarioSt->lastFrameRetraceLocalTime = 0ULL;
+    // Makes Mario spawn walking into the room normally if loading a new file,
+    // rather than in place in the center of the room.
+    ttyd::mariost::g_MarioSt->flags &= ~1U;
+    
+    // Set story progress / some tutorial flags.
+    ttyd::swdrv::swInit();
+    ttyd::swdrv::swByteSet(0, 405);     // post-game vanilla story progress
+    ttyd::swdrv::swSet(0);              // Shop tutorial
+    ttyd::swdrv::swSet(0xe9);           // Save Block tutorial
+    ttyd::swdrv::swSet(0xea);           // Heart Block tutorial
+    ttyd::swdrv::swSet(0xeb);           // Item tutorial
+    ttyd::swdrv::swSet(0xec);           // Save Block tutorial-related
+    
+    // Initialize Tower of Trials-specific state & pouch stuff.
+    g_Mod->state_.Init();
+    tot::OptionsManager::InitLobby();
 
-        // Initialize best times to maximum time.
-        g_Mod->state_.SetOption(tot::STAT_PERM_HALF_BEST_TIME, 100 * 60 * 60 * 100 - 1);
-        g_Mod->state_.SetOption(tot::STAT_PERM_FULL_BEST_TIME, 100 * 60 * 60 * 100 - 1);
-        g_Mod->state_.SetOption(tot::STAT_PERM_EX_BEST_TIME, 100 * 60 * 60 * 100 - 1);
-    }
+    return true;
 }
 
-}
+}  // namespace
     
 void ApplyFixedPatches() {
+    // Load file from new save; replaces old logic completely.
     g_stg0_00_init_trampoline = patch::hookFunction(
-        ttyd::event::stg0_00_init, []() {
-            // Replaces existing logic, includes loading the mod's state.
-            OnFileLoad(/* new_file = */ true);
-        });
+        ttyd::event::stg0_00_init, []() { FreshFileInit(); });
         
+    // Load file from existing save; replaces old logic completely.
     g_cardCopy2Main_trampoline = patch::hookFunction(
         ttyd::cardmgr::cardCopy2Main, [](int32_t save_file_number) {
-            g_cardCopy2Main_trampoline(save_file_number);
-            OnFileLoad(/* new_file = */ false);
+            auto* save_data = reinterpret_cast<tot::TotSaveSlot*>(
+                *(uintptr_t*)((uintptr_t)ttyd::cardmgr::g_CardmgrWork + 0xa8)
+                + save_file_number * sizeof(tot::TotSaveSlot) + 0x2000);
 
-            // TODO: Remove this once ToT is changed to use its own save file.
-            // If invalid InfPit file loaded, give the player a Game Over.
-            if (!g_Mod->inf_state_.Load(/* new_save = */ false)) {
+            if (!g_Mod->state_.Load(save_data)) {
                 g_CueGameOver = true;
+            } else {
+                // TODO: Apply options if loading run in-progress.
+                tot::OptionsManager::ApplyOptionsOnLoad();
             }
-            // TODO: Apply options if loading file in-progress.
-            // tot::OptionsManager::ApplyOptionsOnLoad();
         });
+    
+    // Replace logic to save data to save slot.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_cardWrite_SaveSlotData_BH),
+        reinterpret_cast<void*>(g_cardWrite_SaveSlotData_EH),
+        reinterpret_cast<void*>(StartSaveSlotData),
+        reinterpret_cast<void*>(BranchBackSaveSlotData));
+
+    // Change name of save file to be distinct from vanilla TTYD's.
+    const char kSaveFileName[] = "tot_save_file";
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_cardmgr_Patch_SaveFileName),
+        kSaveFileName, sizeof(kSaveFileName));
     
     g_OSLink_trampoline = patch::hookFunction(
         gc::OSLink::OSLink, [](OSModuleInfo* new_module, void* bss) {
@@ -237,6 +274,48 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_titleMain_Patch_NeverPlayDemo),
         0x480001f0 /* unconditional branch 0x1f0 */);
+
+    // Change the hardcoded size of the save data from 0x2260 to 0x3800
+    // in a ridiculous number of places. Thanks, inlining!
+
+    const int32_t save_data_size_addresses[12] = {
+        g_read_all_main_Patch_savesize_1,
+        g_read_all_main_Patch_savesize_2,
+        g_read_main_Patch_savesize_1,
+        g_read_main_Patch_savesize_2,
+        g_write_main_Patch_savesize_1,
+        g_write_main_Patch_savesize_2,
+        g_create_main_Patch_savesize_1,
+        g_create_main_Patch_savesize_2,
+        g_cardInit_Patch_savesize_1,
+        g_cardInit_Patch_savesize_2,
+        g_cardErase_Patch_savesize_1,
+        g_cardErase_Patch_savesize_2
+    };
+    for (int32_t i = 0; i < 12; ++i) {
+        const int16_t value = 0x3800;
+        mod::patch::writePatch(
+            reinterpret_cast<void*>(save_data_size_addresses[i] + 2),
+            &value, sizeof(int16_t));
+    }
+
+    const int32_t save_data_size_by_10_addresses[9] = {
+        g_read_all_main_Patch_savesize_by_10_1,
+        g_read_all_main_Patch_savesize_by_10_2,
+        g_read_main_Patch_savesize_by_10_1,
+        g_read_main_Patch_savesize_by_10_2,
+        g_write_main_Patch_savesize_by_10_1,
+        g_write_main_Patch_savesize_by_10_2,
+        g_create_main_Patch_savesize_by_10_1,
+        g_cardInit_Patch_savesize_by_10_1,
+        g_cardErase_Patch_savesize_by_10_1,
+    };
+    for (int32_t i = 0; i < 9; ++i) {
+        const int16_t value = 0x3800 >> 4;
+        mod::patch::writePatch(
+            reinterpret_cast<void*>(save_data_size_by_10_addresses[i] + 2),
+            &value, sizeof(int16_t));
+    }
 }
 
 int32_t LoadMap() {

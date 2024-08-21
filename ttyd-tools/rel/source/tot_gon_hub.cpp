@@ -131,8 +131,7 @@ EVT_BEGIN(gon_10_InitEvt)
     // TODO: Dynamically populate shop list.
     USER_FUNC(evt_shop_setup, PTR(&shop_obj_list), PTR(&shop_buy_list), PTR(&shopkeeper_data), PTR(&shop_trade_list))
     
-    // TODO: Save block.
-    // USER_FUNC(evt_mobj_save_blk, PTR("mobj_save"), 155, 60, -60, 0, 0)
+    USER_FUNC(evt_mobj_save_blk, PTR("mobj_save"), 155, 60, -60, 0, 0)
 
     DO(5)
         USER_FUNC(evt_sub_random, 10, LW(0))

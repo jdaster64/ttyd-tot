@@ -6,6 +6,7 @@ namespace ttyd::cardmgr {
 
 extern "C" {
 
+// .text
 // memcard_open
 // statusCallback
 // readCallback
@@ -37,6 +38,9 @@ uint32_t cardIsExec();
 // cardInit
 // cardBufReset
 // cardGetFilePtr
+
+// .data
+extern void* g_CardmgrWork;
 
 }
 

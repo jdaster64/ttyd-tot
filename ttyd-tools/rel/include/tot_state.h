@@ -18,7 +18,7 @@ struct TotSaveSlot;
 class StateManager {
 public:
     // State revision; will eventually be used for versioning.
-    uint8_t     version_ = 1;
+    uint8_t     version_;
     
     // Whether in-game run timer is currently active.
     uint8_t     igt_active_;
@@ -66,6 +66,9 @@ public:
     
     // Saves various stats for current runs and all-time.
     uint8_t     play_stats_[1024];
+
+    // Initializes basic fields the first time a file is created.
+    void Init();
     
     // Loading / saving functions; copies all game data, not just ToT state.
     bool Load(TotSaveSlot* save);
@@ -176,13 +179,14 @@ struct TotSaveData {
 static_assert(sizeof(TotSaveData) == 0x2bd8);
 
 struct TotSaveSlot {
-    TotSaveData data;                   // 0x0000
-    uint8_t     pad2[0x3ff0-0x2bd8];    // 0x2bd8
+    TotSaveData data;                       // 0x0000
+    uint8_t     reserved[0x3800-0x2bd8];    // 0x2bd8
+    uint8_t     padding[0x3ff0-0x3800];     // 0x3800
     
-    char        version[4];             // 0x3ff0
-    int32_t     size;                   // 0x3ff4
-    uint32_t    checksum1;              // 0x3ff8
-    uint32_t    checksum2;              // 0x3ffc
+    char        version[4];                 // 0x3ff0
+    int32_t     size;                       // 0x3ff4
+    uint32_t    checksum1;                  // 0x3ff8
+    uint32_t    checksum2;                  // 0x3ffc
 };
 static_assert(sizeof(TotSaveSlot) == 0x4000);
 

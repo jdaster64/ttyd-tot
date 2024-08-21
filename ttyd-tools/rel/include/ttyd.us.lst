@@ -682,6 +682,7 @@
 
 // evt_mobj.o
 // .text
+80066dd4:evt_mobj_save_blk
 800670e4:evt_mobj_recovery_blk
 80067878:evt_mobj_signboard
 80067a4c:evt_mobj_itembox
@@ -962,9 +963,12 @@
 800aec18:itemInit
 
 // cardmgr.o
+// .text
 800b2388:cardCopy2Main
 800b2b80:cardGetCode
 800b2b8c:cardIsExec
+// .data
+8041eab8:g_CardmgrWork
 
 // party.o
 // .text

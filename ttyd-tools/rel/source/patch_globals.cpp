@@ -262,6 +262,35 @@ extern const int32_t g_itemseq_Bound_Patch_BounceRange = 0x800aac68;
 extern const int32_t g_itemseq_GetItem_Patch_SkipTutorials = 0x800abcd8;
 extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH = 0x800adae4;
 extern const int32_t g_itemMain_CheckItemFreeze_BH = 0x800ae0bc;
+
+// A ridiculous amount of patches to just override original expected save size.
+// checksum verification:
+extern const int32_t g_read_all_main_Patch_savesize_1 = 0x800aff34;
+extern const int32_t g_read_all_main_Patch_savesize_by_10_1 = 0x800aff80;
+extern const int32_t g_read_all_main_Patch_savesize_2 = 0x800b009c;
+extern const int32_t g_read_all_main_Patch_savesize_by_10_2 = 0x800b00e8;
+extern const int32_t g_read_main_Patch_savesize_1 = 0x800b085c;
+extern const int32_t g_read_main_Patch_savesize_by_10_1 = 0x800b08a8;
+extern const int32_t g_read_main_Patch_savesize_2 = 0x800b09c4;
+extern const int32_t g_read_main_Patch_savesize_by_10_2 = 0x800b0a10;
+extern const int32_t g_write_main_Patch_savesize_1 = 0x800b188c;
+extern const int32_t g_write_main_Patch_savesize_by_10_1 = 0x800b18d8;
+extern const int32_t g_write_main_Patch_savesize_2 = 0x800b19dc;
+extern const int32_t g_write_main_Patch_savesize_by_10_2 = 0x800b1a28;
+// checksum setting:
+extern const int32_t g_create_main_Patch_savesize_1 = 0x800af564;
+extern const int32_t g_create_main_Patch_savesize_2 = 0x800af584;
+extern const int32_t g_create_main_Patch_savesize_by_10_1 = 0x800af594;
+extern const int32_t g_cardInit_Patch_savesize_1 = 0x800b2f08;
+extern const int32_t g_cardInit_Patch_savesize_2 = 0x800b2f28;
+extern const int32_t g_cardInit_Patch_savesize_by_10_1 = 0x800b2f38;
+// save file erasure:
+extern const int32_t g_cardErase_Patch_savesize_1 = 0x800b2238;
+extern const int32_t g_cardErase_Patch_savesize_2 = 0x800b22ac;
+extern const int32_t g_cardErase_Patch_savesize_by_10_1 = 0x800b22bc;
+
+extern const int32_t g_cardWrite_SaveSlotData_BH = 0x800b1f08;
+extern const int32_t g_cardWrite_SaveSlotData_EH = 0x800b2150;
 extern const int32_t g_pouchRemoveItemIndex_CheckMaxInv_BH = 0x800d49d8;
 extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH = 0x800d4c94;
 extern const int32_t g_pouchGetItem_CheckMaxInv_BH = 0x800d533c;
@@ -423,6 +452,7 @@ extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_EH = 0x8025
 extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_CH1 = 0x80253924;
 extern const int32_t g_crashHandler_Patch_LoopForever1 = 0x8025e4a4;
 extern const int32_t g_crashHandler_Patch_LoopForever2 = 0x8025e4a8;
+extern const int32_t g_cardmgr_Patch_SaveFileName = 0x802cb0e0;
 extern const int32_t g_ac_monosiri_target_WhiteReticleScale = 0x80301250;
 extern const int32_t g_ac_monosiri_target_GreyReticleScale = 0x80301280;
 extern const int32_t g_ac_monosiri_target_ReticleZoomSpeed = 0x80428610;
