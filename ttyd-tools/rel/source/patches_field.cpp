@@ -98,6 +98,7 @@ EVT_DEFINE_USER_FUNC(evtTot_AfterBuyingShopItem) {
         work->item_flags[work->buy_item_idx] |= 1;
     } else {
         ttyd::mario_pouch::pouchAddStarPiece(1);
+        g_Mod->state_.ChangeOption(tot::STAT_PERM_CURRENT_SP, 1);
     }
     
     return 2;
