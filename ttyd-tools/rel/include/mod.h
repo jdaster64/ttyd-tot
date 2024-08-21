@@ -1,6 +1,5 @@
 #pragma once
 
-#include "mod_state.h"
 #include "tot_state.h"
 
 #include <cstdint>
@@ -20,8 +19,6 @@ public:
     
     // Holds state specific to the Tower of Trials mod.
     tot::StateManager state_;
-    // Holds state specific to the Infinite Pit mod.
-    infinite_pit::StateManager_v2 inf_state_;
 };
 
 extern Mod* g_Mod;

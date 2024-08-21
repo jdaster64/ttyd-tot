@@ -3,7 +3,6 @@
 #include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
-#include "mod_state.h"
 #include "patches_item.h"
 #include "tot_generate_enemy.h"
 #include "tot_generate_item.h"

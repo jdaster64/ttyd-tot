@@ -3,7 +3,6 @@
 #include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
-#include "mod_state.h"
 #include "tot_custom_rel.h"
 #include "tot_generate_condition.h"
 #include "tot_generate_item.h"

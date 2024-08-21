@@ -2,7 +2,6 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
-#include "mod_state.h"
 #include "patch.h"
 #include "patches_battle.h"
 #include "patches_battle_seq.h"

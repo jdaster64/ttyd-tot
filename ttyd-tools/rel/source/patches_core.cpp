@@ -4,7 +4,6 @@
 #include "common_types.h"
 #include "custom_strings.h"
 #include "mod.h"
-#include "mod_state.h"
 #include "patch.h"
 #include "patches_apply.h"
 #include "patches_mario_move.h"

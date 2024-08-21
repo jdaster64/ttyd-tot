@@ -3,7 +3,6 @@
 #include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
-#include "mod_state.h"
 #include "patch.h"
 #include "patches_mario_move.h"
 #include "tot_custom_rel.h"

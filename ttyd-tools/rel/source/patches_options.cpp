@@ -2,7 +2,6 @@
 
 #include "common_functions.h"
 #include "mod.h"
-#include "mod_state.h"
 #include "patch.h"
 #include "tot_generate_item.h"
 
