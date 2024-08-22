@@ -457,7 +457,7 @@ void ApplyFixedPatches() {
         22, 23, 13, 14, 15, 16, -1, -1, -1, 43, 44, 57, 58, 61, 62, 59,
         17,  7,  8, 60, 40, 41, 42, 50, 51, 52, 53, 24, 25, 35, 36, 37,
         38, 56, 45, 46, 26, -1, -1, 54, 55, -1, -1, -1, -1, -1, -1, -1,
-        63, -1, -1, -1, -1, -1, 39, 85, 86, -1, -1, -1,  5,  6, 49, 47,
+        63, -1, -1, -1, -1, -1, 39, -1, -1, -1, -1, -1,  5,  6, 49, 47,
         48, 31, 32,
     };
     
@@ -561,11 +561,35 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].icon_id = IconType::ATTACK_FX_B;
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].type_sort_order = 4;
 
+    itemDataTable[ItemType::TOT_KEY_ITEM_SELECTOR].name = "in_itemselect";
+    itemDataTable[ItemType::TOT_KEY_ITEM_SELECTOR].description = "msg_itemselect";
+    itemDataTable[ItemType::TOT_KEY_ITEM_SELECTOR].menu_description = "msg_itemselect";
+    itemDataTable[ItemType::TOT_KEY_ITEM_SELECTOR].icon_id = IconType::ITEM_HOG;
+    itemDataTable[ItemType::TOT_KEY_ITEM_SELECTOR].type_sort_order = 5;
+
+    itemDataTable[ItemType::TOT_KEY_BADGE_SELECTOR].name = "in_badgeselect";
+    itemDataTable[ItemType::TOT_KEY_BADGE_SELECTOR].description = "msg_badgeselect";
+    itemDataTable[ItemType::TOT_KEY_BADGE_SELECTOR].menu_description = "msg_badgeselect";
+    itemDataTable[ItemType::TOT_KEY_BADGE_SELECTOR].icon_id = IconType::BADGE_SELECTOR;
+    itemDataTable[ItemType::TOT_KEY_BADGE_SELECTOR].type_sort_order = 6;
+
+    itemDataTable[ItemType::TOT_KEY_MARIO_COSTUME].name = "in_m_emblem";
+    itemDataTable[ItemType::TOT_KEY_MARIO_COSTUME].description = "msg_m_emblem";
+    itemDataTable[ItemType::TOT_KEY_MARIO_COSTUME].menu_description = "msg_m_emblem";
+    itemDataTable[ItemType::TOT_KEY_MARIO_COSTUME].icon_id = IconType::MARIO_EMBLEM;
+    itemDataTable[ItemType::TOT_KEY_MARIO_COSTUME].type_sort_order = 7;
+
+    itemDataTable[ItemType::TOT_KEY_YOSHI_COSTUME].name = "in_y_emblem";
+    itemDataTable[ItemType::TOT_KEY_YOSHI_COSTUME].description = "msg_y_emblem";
+    itemDataTable[ItemType::TOT_KEY_YOSHI_COSTUME].menu_description = "msg_y_emblem";
+    itemDataTable[ItemType::TOT_KEY_YOSHI_COSTUME].icon_id = IconType::YOSHI_EMBLEM;
+    itemDataTable[ItemType::TOT_KEY_YOSHI_COSTUME].type_sort_order = 8;
+
     itemDataTable[ItemType::TOT_KEY_ATTACK_FX].name = "in_attack_fx";
     itemDataTable[ItemType::TOT_KEY_ATTACK_FX].description = "msg_attack_fx";
     itemDataTable[ItemType::TOT_KEY_ATTACK_FX].menu_description = "msg_attack_fx";
     itemDataTable[ItemType::TOT_KEY_ATTACK_FX].icon_id = IconType::ATTACK_FX_R;
-    itemDataTable[ItemType::TOT_KEY_ATTACK_FX].type_sort_order = 5;
+    itemDataTable[ItemType::TOT_KEY_ATTACK_FX].type_sort_order = 9;
 
     // Balance changes for individual items...
 

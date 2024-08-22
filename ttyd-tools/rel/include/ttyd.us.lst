@@ -3048,6 +3048,7 @@
 // filemgr.o
 8018a0e8:fileAsyncf
 8018a260:fileFree
+8018a2a4:_fileAlloc
 8018a61c:fileAllocf
 
 // battle_actrecord.o

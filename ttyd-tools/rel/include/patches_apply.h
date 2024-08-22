@@ -4,6 +4,7 @@
 #include "patches_battle.h"
 #include "patches_battle_seq.h"
 #include "patches_core.h"
+#include "patches_costume.h"
 #include "patches_enemy.h"
 #include "patches_enemy_fix.h"
 #include "patches_field.h"
@@ -22,6 +23,7 @@ inline void ApplyAllFixedPatches() {
     battle::ApplyFixedPatches();
     battle_seq::ApplyFixedPatches();
     core::ApplyFixedPatches();
+    costume::ApplyFixedPatches();
     enemy::ApplyFixedPatches();
     enemy_fix::ApplyFixedPatches();
     field::ApplyFixedPatches();

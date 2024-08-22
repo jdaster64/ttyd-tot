@@ -51,23 +51,11 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 
 void MarioMenuInit(WinPauseMenu* menu) {
     if ((menu->flags & 0x2000) == 0) {
-        const char* model = "a_mario";
-        switch (ttyd::mario::marioGetColor()) {
-            case 1: model = "a_mario_l";    break;
-            case 2: model = "a_mario_w";    break;
-            case 3: model = "a_mario_wl";   break;
-        }
-        menu->mario_anim_pose_id = ttyd::animdrv::animPoseEntry(model, 0);
+        menu->mario_anim_pose_id = ttyd::animdrv::animPoseEntry("a_mario", 0);
         ttyd::animdrv::animPoseSetAnim(menu->mario_anim_pose_id, "M_S_1", 1);
     } else {
-        const char* pose = "S_1";
-        switch (ttyd::mario::marioGetColor()) {
-            case 1: pose = "S_2";   break;
-            case 2: pose = "S_3";   break;
-            case 3: pose = "S_4";   break;
-        }
         menu->mario_anim_pose_id = ttyd::animdrv::animPoseEntry("d_mario", 0);
-        ttyd::animdrv::animPoseSetAnim(menu->mario_anim_pose_id, pose, 1);
+        ttyd::animdrv::animPoseSetAnim(menu->mario_anim_pose_id, "S_1", 1);
     }
     ttyd::animdrv::animPoseSetMaterialFlagOn(menu->mario_anim_pose_id, 0x1800);
     if (ttyd::mario::marioGetPtr()->flags1 & 0x4000'0000) {
@@ -213,12 +201,7 @@ int32_t MarioMenuMain(WinPauseMenu* menu) {
         ttyd::pmario_sound::psndSFXOn((char *)0x20013);
         const char* pose = "M_S_1";
         if (menu->flags & 0x2000) {
-            switch (ttyd::mario::marioGetColor()) {
-                case 0: pose = "S_1"; break;
-                case 1: pose = "S_2"; break;
-                case 2: pose = "S_3"; break;
-                case 3: pose = "S_4"; break;
-            }
+            pose = "S_1";
         }
         ttyd::animdrv::animPoseSetAnim(menu->mario_anim_pose_id, pose, 0);
         return -1;
@@ -290,12 +273,7 @@ int32_t MarioMenuMain(WinPauseMenu* menu) {
     if (menu->mario_menu_state == 2) {
         const char* pose = ttyd::win_mario::hammer_pose[pouch->hammer_level];
         if (menu->flags & 0x2000) {
-            switch (ttyd::mario::marioGetColor()) {
-                case 0: pose = "R_1";  break;
-                case 1: pose = "R_15"; break;
-                case 2: pose = "R_17"; break;
-                case 3: pose = "R_18"; break;
-            }
+            pose = "R_1";
         }
         ttyd::animdrv::animPoseSetAnim(menu->mario_anim_pose_id, pose, 0);
         if (menu->mario_anim_timer == 0) {
@@ -313,19 +291,9 @@ int32_t MarioMenuMain(WinPauseMenu* menu) {
         const char* pose = linkDt[menu->mario_menu_state].pose_1;
         if (menu->flags & 0x2000) {
             if (!strcmp(linkDt[menu->mario_menu_state].pose_3, "S_1")) {
-                switch (ttyd::mario::marioGetColor()) {
-                    case 0: pose = "S_1";  break;
-                    case 1: pose = "S_2"; break;
-                    case 2: pose = "S_3"; break;
-                    case 3: pose = "S_4"; break;
-                }
+                pose = "S_1";
             } else {
-                switch (ttyd::mario::marioGetColor()) {
-                    case 0: pose = "R_1";  break;
-                    case 1: pose = "R_15"; break;
-                    case 2: pose = "R_17"; break;
-                    case 3: pose = "R_18"; break;
-                }
+                pose = "R_1";
             }
         }
         ttyd::animdrv::animPoseSetAnim(menu->mario_anim_pose_id, pose, 0);

@@ -39,7 +39,11 @@ g_StringMap = {
         b"tot_mkey_name":           b"Master Key",
         b"in_super_peekaboo":       b"Stat Master",
         b"in_bgm":                  b"Music Toggle",
+        b"in_itemselect":           b"Item Selector",
+        b"in_badgeselect":          b"Badge Selector",
         b"in_attack_fx":            b"Attack FX",
+        b"in_m_emblem":             b"M Palette",
+        b"in_y_emblem":             b"Y Palette",
         
         # Special item descriptions.
         
@@ -86,9 +90,25 @@ g_StringMap = {
             b"Toggle the background music\n"
             b"on or off.",
 
+        b'msg_itemselect':
+            b"Choose a preferred loadout\n"
+            b"of up to 6 items.",
+
+        b'msg_badgeselect':
+            b"Choose a preferred loadout\n"
+            b"of up to 6 badges.",
+
         b'msg_attack_fx':
             b"Select which sound effects\n"
             b"play when Mario attacks.",
+
+        b'msg_y_emblem':
+            b"Select which Yoshi colors\n"
+            b"might appear in the tower.",
+
+        b'msg_m_emblem':
+            b"Select what outfit Mario\n"
+            b"will wear.",
             
         # Normal item descriptions.
         

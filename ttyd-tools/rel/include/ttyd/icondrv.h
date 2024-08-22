@@ -593,6 +593,11 @@ namespace IconType {
         PITY_STAR_P,
         HOTTEST_DOG,
         SUPER_PEEKABOO,
+        BADGE_SELECTOR,
+        MARIO_EMBLEM,
+        YOSHI_EMBLEM,
+        BP_UP_ALT_1,
+        BP_UP_ALT_2,
     };
 }
 

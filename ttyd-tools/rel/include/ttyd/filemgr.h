@@ -25,7 +25,7 @@ extern "C" {
 int32_t fileAsyncf(void* unk1, void* unk2, const char* fn, ...);
 // dvdReadDoneCallBack
 void fileFree(File* file);
-// _fileAlloc
+File* _fileAlloc(const char* fn, uint32_t unk2);
 // fileAlloc
 File* fileAllocf(void* unk1, const char* fn, ...);
 // _fileGarbage

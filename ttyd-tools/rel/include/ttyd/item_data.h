@@ -375,6 +375,8 @@ namespace ItemType {
         TOT_KEY_ATTACK_FX,
         TOT_KEY_MARIO_COSTUME,
         TOT_KEY_YOSHI_COSTUME,
+        TOT_KEY_ITEM_SELECTOR,
+        TOT_KEY_BADGE_SELECTOR,
         TOT_KEY_ITEM_MAX,
 
         TOT_TOWER_KEY = GOLD_BAR,

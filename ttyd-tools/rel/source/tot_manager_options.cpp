@@ -115,12 +115,14 @@ void OptionsManager::InitLobby() {
     // Update any stats / equipment / flags as necessary.
     ttyd::mario_pouch::pouchGetItem(ItemType::BOOTS);
     ttyd::mario_pouch::pouchGetItem(ItemType::HAMMER);
-    ttyd::mario_pouch::pouchGetItem(ItemType::W_EMBLEM);
-    ttyd::mario_pouch::pouchGetItem(ItemType::L_EMBLEM);
 
     // Testing: Give all currently implemented QoL / cosmetic key items.
     // (These items should not be deleted in the final version, ideally)
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ATTACK_FX);
+    // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_YOSHI_COSTUME);
+    // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_MARIO_COSTUME);
+    // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BADGE_SELECTOR);
+    // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ITEM_SELECTOR);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BGM_TOGGLE);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_SUPER_PEEKABOO);
@@ -130,8 +132,8 @@ void OptionsManager::InitLobby() {
     SetSWF(GSWF_TimingTutorEnabled);
     SetSWF(GSWF_BgmEnabled);
     
-    // Assign Yoshi a totally random color.
-    ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));
+    // Assign Yoshi his default color.
+    ttyd::mario_pouch::pouchSetPartyColor(4, 0);
     
     // Set starting HP, FP, BP.
     SetBaseStats();
@@ -201,6 +203,10 @@ void OptionsManager::InitFromSelectedOptions() {
         pouch.merlee_curse_uses_remaining = 0;
         pouch.turns_until_merlee_activation = 0;
     }
+    
+    // Assign Yoshi a random color.
+    // TODO: Only select between colors the player has enabled.
+    ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));
 
     ApplyOptionsOnLoad();
 

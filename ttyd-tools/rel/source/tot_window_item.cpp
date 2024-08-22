@@ -732,6 +732,7 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
                     }
                 } else {
+                    // TODO: Support remaining key items.
                     // Toggle on key items with boolean effects.
                     if (item == ItemType::TOT_KEY_ATTACK_FX) {
                         for (int32_t i = 0; i < 30; ++i) {

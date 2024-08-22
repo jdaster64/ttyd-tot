@@ -7,6 +7,7 @@
 #include <ttyd/dispdrv.h>
 #include <ttyd/eff_gonbaba_breath.h>
 #include <ttyd/evtmgr.h>
+#include <ttyd/filemgr.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/seqdrv.h>
 #include <ttyd/win_root.h>
@@ -29,6 +30,7 @@ using ::ttyd::battle_unit::BattleWorkUnitPart;
 using ::ttyd::dispdrv::CameraId;
 using ::ttyd::eff_gonbaba_breath::EffGonbabaBreathWork;
 using ::ttyd::evtmgr::EvtEntry;
+using ::ttyd::filemgr::File;
 using ::ttyd::npcdrv::FbatBattleInformation;
 using ::ttyd::seqdrv::SeqIndex;
 using ::ttyd::win_root::WinPauseMenu;
@@ -52,6 +54,10 @@ void* (*g_itemEntry_trampoline)(
     const char*, int32_t, float, float, float, uint32_t, int32_t, void*) = nullptr;
 // cardmgr.o  800b2388
 void (*g_cardCopy2Main_trampoline)(int32_t) = nullptr;
+// mario_pouch.o  800d2e28
+void (*g_pouchSetPartyColor_trampoline)(int32_t, int32_t) = nullptr;
+// mario_pouch.o  800d2e44
+int32_t (*g_pouchGetPartyColor_trampoline)(int32_t) = nullptr;
 // mario_pouch.o  800d33f8
 int32_t (*g_pouchEquipBadgeIndex_trampoline)(int32_t) = nullptr;
 // mario_pouch.o  800d35a8
@@ -200,6 +206,8 @@ void (*g_winLogInit2_trampoline)(WinPauseMenu*) = nullptr;
 void (*g_winLogInit_trampoline)(WinPauseMenu*) = nullptr;
 // unit_party_chuchurina.o  80181bdc
 int32_t (*g__make_madowase_weapon_trampoline)(EvtEntry*, bool) = nullptr;
+// filemgr.o  8018a2a4
+File* (*g__fileAlloc_trampoline)(const char*, uint32_t) = nullptr;
 // unit_party_christine.o  801895b0
 int32_t (*g_btlevtcmd_get_monosiri_msg_no_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_actrecord.o  8018ef8c
@@ -261,7 +269,11 @@ extern const int32_t g_fbatBattleMode_CalculateCoinDrops_BH = 0x80046f20;
 extern const int32_t g_fbatBattleMode_CalculateCoinDrops_EH = 0x80046fac;
 extern const int32_t g_fbatBattleMode_GivePlayerInvuln_BH = 0x8004706c;
 extern const int32_t g_fbatBattleMode_GivePlayerInvuln_EH = 0x800470c8;
+extern const int32_t g_marioMain_Patch_CheckEmblem1 = 0x8005a84c;
+extern const int32_t g_marioMain_Patch_CheckEmblem2 = 0x8005a858;
 extern const int32_t g_marioMain_Patch_SkipRunawayCoinDrop = 0x8005aa94;
+extern const int32_t g_marioSetCharMode_Patch_CheckEmblem1 = 0x8005da14;
+extern const int32_t g_marioSetCharMode_Patch_CheckEmblem2 = 0x8005da20;
 extern const int32_t g_msgWindow_Entry_Patch_FixAllocSize = 0x800816f4;
 extern const int32_t g_seq_logoMain_Patch_AlwaysSkipIntro = 0x800872c4;
 extern const int32_t g_mot_hammer_PickHammerFieldSfx_BH = 0x8009897c;
@@ -299,6 +311,13 @@ extern const int32_t g_cardErase_Patch_savesize_by_10_1 = 0x800b22bc;
 
 extern const int32_t g_cardWrite_SaveSlotData_BH = 0x800b1f08;
 extern const int32_t g_cardWrite_SaveSlotData_EH = 0x800b2150;
+extern const int32_t g_partySetFamicomMode_Patch_YoshiColor1 = 0x800b71b0;
+extern const int32_t g_partySetFamicomMode_Patch_YoshiColor2 = 0x800b7388;
+extern const int32_t g_partyReInit_Patch_YoshiColor = 0x800bd338;
+extern const int32_t g_partyEntry2Pos_Patch_YoshiColor = 0x800bd80c;
+extern const int32_t g_partyEntry2Hello_Patch_YoshiColor = 0x800bdbb8;
+extern const int32_t g_partyEntry2_Patch_YoshiColor = 0x800bdee0;
+extern const int32_t g_partyEntryMain_Patch_YoshiColor = 0x800be2ac;
 extern const int32_t g_pouchRemoveItemIndex_CheckMaxInv_BH = 0x800d49d8;
 extern const int32_t g_pouchRemoveItem_CheckMaxInv_BH = 0x800d4c94;
 extern const int32_t g_pouchGetItem_CheckMaxInv_BH = 0x800d533c;
@@ -355,6 +374,8 @@ extern const int32_t g_BattleCommandDisplay_HandleSelectSide_BH = 0x80120cf4;
 extern const int32_t g_BattleCommandDisplay_HandleSelectSide_EH = 0x80120cf8;
 extern const int32_t g_BattleCommandDisplay_HandleSelectSide_CH1 = 0x80120fa4;
 extern const int32_t g_BattleCommandInput_HandleSelectSide_BH = 0x80122e84;
+extern const int32_t g__battleGetPartyIcon_YoshiIcon_BH = 0x8012356c;
+extern const int32_t g__battleGetPartyIcon_YoshiIcon_EH = 0x801235d8;
 extern const int32_t g__btlcmd_MakeOperationTable_AppealAlways_BH = 0x801239e4;
 extern const int32_t g__btlcmd_MakeOperationTable_Patch_NoSuperCharge = 0x80123b00;
 extern const int32_t g__btlcmd_MakeSelectWeaponTable_Patch_GetNameFromItem = 0x80124924;
@@ -364,9 +385,13 @@ extern const int32_t g_BtlUnit_CheckPinchStatus_DangerThreshold_BH = 0x80126e84;
 extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitAlloc = 0x8012903c;
 extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitMemset = 0x80129058;
 extern const int32_t g_mot_damage_Patch_DisableFallDamage = 0x8013b570;
+extern const int32_t g_statusWinDisp_YoshiHeartIcon_BH = 0x8013cf48;
+extern const int32_t g_statusWinDisp_YoshiHeartIcon_EH = 0x8013cfb8;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_BH = 0x8013d140;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_EH = 0x8013d144;
 extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_CH1 = 0x8013d404;
+extern const int32_t g__mario_super_emblem_anim_set_Patch_CheckEmblem1 = 0x80145468;
+extern const int32_t g__mario_super_emblem_anim_set_Patch_CheckEmblem2 = 0x8014547c;
 extern const int32_t g_winHakoGX_SetInitialFields_BH = 0x801584ac;
 extern const int32_t g_winHakoGX_SetInitialFields_EH = 0x801584d4;
 extern const int32_t g_winHakoGX_Patch_SkipSingleBox = 0x80158728;
@@ -385,8 +410,16 @@ extern const int32_t g_winPartyMain_RotatePartnersHook_BH = 0x801675ac;
 extern const int32_t g_winPartyMain_RotatePartnersHook_EH = 0x801675ec;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_BH = 0x801676b8;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_EH = 0x80167718;
+extern const int32_t g_winPartyInit_Patch_YoshiColor = 0x80167934;
+extern const int32_t g_winPartyInit_YoshiIcon_BH = 0x80167b88;
+extern const int32_t g_winPartyInit_YoshiIcon_EH = 0x80167c30;
+extern const int32_t g_mario_change_Patch_CheckEmblem1 = 0x801696ec;
+extern const int32_t g_mario_change_Patch_CheckEmblem2 = 0x801696f8;
 extern const int32_t g_winBadge_mario_change_Patch_SkipMapAnim1 = 0x801697a0;
 extern const int32_t g_winBadge_mario_change_Patch_SkipMapAnim2 = 0x80169868;
+extern const int32_t g_evt_unitwin_disp_func_YoshiIcon_BH = 0x8017929c;
+extern const int32_t g_evt_unitwin_disp_func_YoshiIcon_EH = 0x801792f0;
+extern const int32_t g_yoshi_original_color_anim_set_Patch_YoshiColor = 0x80181270;
 extern const int32_t g_acShot_dispAfterimage_Patch_numBombs = 0x80197ffb;
 extern const int32_t g_acShot_dispAfterimage_Patch_targetVar2_1 = 0x80197f6f;
 extern const int32_t g_acShot_dispAfterimage_Patch_targetVar2_2 = 0x80197fcf;
@@ -440,11 +473,15 @@ extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule = 0x80216678;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_BH = 0x80231cc0;
 extern const int32_t g_scissor_damage_sub_ArtAttackDamage_EH = 0x80231d38;
 extern const int32_t g_scissor_damage_Patch_ArtAttackCheckImmunity = 0x80231e50;
+extern const int32_t g_select_disp_party_YoshiIcon_BH = 0x8023b644;
+extern const int32_t g_select_disp_party_YoshiIcon_EH = 0x8023b698;
 extern const int32_t g_select_disp_Patch_PitListPriceHook = 0x8023c120;
 extern const int32_t g_select_main_CheckHideTopBar_BH = 0x8023cb50;
 extern const int32_t g_select_disp_Patch_PitItemPriceHook = 0x8023d2e0;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblHi16 = 0x8023d6b4;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblLo16 = 0x8023d6bc;
+extern const int32_t g_sac_genki_disp_3D_YoshiHeartIcon_BH = 0x802463d8;
+extern const int32_t g_sac_genki_disp_3D_YoshiHeartIcon_EH = 0x8024644c;
 extern const int32_t g_sac_genki_main_base_BlinkNumbers_BH = 0x80248220;
 extern const int32_t g_sac_genki_main_base_BlinkNumbers_EH = 0x802483b4;
 extern const int32_t g_sac_genki_main_base_SetupTargets_BH = 0x80248430;

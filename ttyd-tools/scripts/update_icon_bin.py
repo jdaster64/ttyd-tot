@@ -51,6 +51,16 @@ g_NewIconDefs = [
     [(625, 0)],
     # Super Peekaboo key item
     [(626, 0)],
+    # Badge Selector key item
+    [(627, 0)],
+    # M Emblem key item
+    [(628, 0)],
+    # Y Emblem key item
+    [(629, 0)],
+    # BP Up alternate 1
+    [(630, 0)],
+    # BP Up alternate 2
+    [(631, 0)],
 ]
 g_IconDefs = []
 
