@@ -1226,6 +1226,10 @@ g_StringMap = {
         b'msg_menu_mario_num_sp':
             b'Floors',
 
+        b'msg_menu_star_power':
+            b'The maximum Star Power Mario\n'
+            b"has available for using Specials.",
+
         b'msg_menu_mario_coin':
             b'The number of coins Mario\n'
             b'has to buy items and badges.',
