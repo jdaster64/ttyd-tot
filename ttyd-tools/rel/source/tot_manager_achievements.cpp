@@ -110,10 +110,22 @@ const AchievementData* AchievementsManager::GetData(int32_t ach) {
     return &g_AchievementData[ach];
 }
 
+bool AchievementsManager::CheckCosmeticGroupUnlocked(
+    int32_t reward_type, int32_t group_id) {
+        
+    for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+        if (g_AchievementData[i].reward_type == reward_type &&
+            static_cast<int32_t>(g_AchievementData[i].reward_id) == group_id) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         if (g_AchievementData[i].reward_type == AchievementRewardType::OPTION &&
-            static_cast<uint32_t>(g_AchievementData[i].reward_type) == option) {
+            g_AchievementData[i].reward_id == option) {
             return g_Mod->state_.GetOption(FLAGS_OPTION_UNLOCKED, i);
         }
     }

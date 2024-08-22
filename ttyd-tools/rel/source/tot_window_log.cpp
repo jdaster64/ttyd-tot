@@ -336,21 +336,21 @@ void GetAchievementRewardDetails(
                 ttyd::item_data::itemDataTable[data->reward_id].name;
             break;
         case AchievementRewardType::MARIO_COSTUME: {
-            const auto* cosmetic_data = CosmeticsManager::GetData(
+            const auto* cosmetic_data = CosmeticsManager::GetGroupData(
                 CosmeticType::MARIO_COSTUME, data->reward_id);
             if (icon) *icon = cosmetic_data->icon;
             if (name_msg) *name_msg = cosmetic_data->name_msg;
             break;
         }
         case AchievementRewardType::YOSHI_COSTUME: {
-            const auto* cosmetic_data = CosmeticsManager::GetData(
+            const auto* cosmetic_data = CosmeticsManager::GetGroupData(
                 CosmeticType::YOSHI_COSTUME, data->reward_id);
             if (icon) *icon = cosmetic_data->icon;
             if (name_msg) *name_msg = cosmetic_data->name_msg;
             break;
         }
         case AchievementRewardType::ATTACK_FX: {
-            const auto* cosmetic_data = CosmeticsManager::GetData(
+            const auto* cosmetic_data = CosmeticsManager::GetGroupData(
                 CosmeticType::ATTACK_FX, data->reward_id);
             if (icon) *icon = cosmetic_data->icon;
             if (name_msg) *name_msg = cosmetic_data->name_msg;

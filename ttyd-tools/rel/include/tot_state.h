@@ -55,14 +55,16 @@ public:
     uint32_t    splits_rta_[129];
     uint32_t    splits_igt_[129];
     uint32_t    splits_battle_igt_[129];
-    uint32_t    reserved_pad_;
     
     // Permanent tracking data.
     uint32_t    achievement_flags_[4];
     uint32_t    option_unlocked_flags_[4];
-    uint32_t    midboss_defeated_flags_[4];
     uint32_t    item_encountered_flags_[8];
     uint32_t    item_purchased_flags_[8];
+    uint32_t    midboss_defeated_flags_[4];
+    uint32_t    cosmetic_purchased_flags_[4];
+    // Reserved in case similar flags are needed.
+    uint32_t    reserved_[29];
     
     // Saves various stats for current runs and all-time.
     uint8_t     play_stats_[1024];
@@ -134,7 +136,7 @@ public:
     // a valid enum value, returns a random value using ttyd::system::irand().
     uint32_t Rand(uint32_t range, int32_t sequence = -1);
 };
-static_assert(sizeof(StateManager) == 0xc00);
+static_assert(sizeof(StateManager) == 0xc80);
 
 // Standard evt wrappers to call certain functions / access fields.
 
@@ -180,11 +182,11 @@ struct TotSaveData {
     // Tower of Trials save data.
     mod::tot::StateManager tot_state;   // 0x1fd8
 };
-static_assert(sizeof(TotSaveData) == 0x2bd8);
+static_assert(sizeof(TotSaveData) == 0x2c58);
 
 struct TotSaveSlot {
     TotSaveData data;                       // 0x0000
-    uint8_t     reserved[0x3800-0x2bd8];    // 0x2bd8
+    uint8_t     reserved[0x3800-0x2c58];    // 0x2c58
     uint8_t     padding[0x3ff0-0x3800];     // 0x3800
     
     char        version[4];                 // 0x3ff0
@@ -253,14 +255,15 @@ enum RngSequence {
 
 // Different types of option values (see below for descriptions of each).
 enum OptionsType {
-    TYPE_OPT                    = 4,
-    TYPE_OPTVAL                 = 5,
-    TYPE_OPTNUM                 = 6,
-    TYPE_FLAGS_ACHIEVEMENT      = 7,
-    TYPE_FLAGS_OPT_UNLOCKED     = 8,
-    TYPE_FLAGS_ITEM_ENCOUNTERED = 9,
-    TYPE_FLAGS_ITEM_PURCHASED   = 10,
-    TYPE_FLAGS_MIDBOSS_DEFEATED = 11,
+    TYPE_OPT                        = 4,
+    TYPE_OPTVAL                     = 5,
+    TYPE_OPTNUM                     = 6,
+    TYPE_FLAGS_ACHIEVEMENT          = 7,
+    TYPE_FLAGS_OPT_UNLOCKED         = 8,
+    TYPE_FLAGS_ITEM_ENCOUNTERED     = 9,
+    TYPE_FLAGS_ITEM_PURCHASED       = 10,
+    TYPE_FLAGS_MIDBOSS_DEFEATED     = 11,
+    TYPE_FLAGS_COSMETIC_PURCHASED   = 12,
 };
 
 // An enumeration of all options (flags, option values, numeric values), 
@@ -417,6 +420,7 @@ enum Options : uint32_t {
     FLAGS_ITEM_ENCOUNTERED      = 0x900'0'00'00U,
     FLAGS_ITEM_PURCHASED        = 0xa00'0'00'00U,
     FLAGS_MIDBOSS_DEFEATED      = 0xb00'0'00'00U,
+    FLAGS_COSMETIC_PURCHASED    = 0xc00'0'00'00U,
     
     // Play stats.
 

@@ -9,12 +9,12 @@ namespace mod::tot {
 
 using namespace ::ttyd::swdrv;
 
-uint32_t GetSWF(int32_t flag_id) {
+int32_t GetSWF(int32_t flag_id) {
     return swGet(flag_id - EVT_HELPER_GSWF_BASE);
 }
 
-uint32_t GetSWByte(int32_t flag_id) {
-    return swByteGet(flag_id - EVT_HELPER_GSW_BASE);
+int32_t GetSWByte(int32_t byte_id) {
+    return swByteGet(byte_id - EVT_HELPER_GSW_BASE);
 }
 
 void SetSWF(int32_t flag_id, int32_t value) {
@@ -25,7 +25,11 @@ void SetSWF(int32_t flag_id, int32_t value) {
     }
 }
 
-uint32_t ToggleSWF(int32_t flag_id) {
+void SetSWByte(int32_t byte_id, int32_t value) {
+    return swByteSet(byte_id - EVT_HELPER_GSW_BASE, value);
+}
+
+int32_t ToggleSWF(int32_t flag_id) {
     uint32_t new_value = !GetSWF(flag_id);
     SetSWF(flag_id, new_value);
     return new_value;

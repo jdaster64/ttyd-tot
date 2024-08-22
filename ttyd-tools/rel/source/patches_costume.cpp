@@ -2,6 +2,8 @@
 
 #include "common_functions.h"
 #include "patch.h"
+#include "tot_gsw.h"
+#include "tot_manager_cosmetics.h"
 
 #include <ttyd/filemgr.h>
 #include <ttyd/icondrv.h>
@@ -9,6 +11,8 @@
 #include <ttyd/memory.h>
 
 #include <cstdint>
+#include <cstdio>
+#include <cstring>
 
 // Assembly patch functions.
 extern "C" {
@@ -27,13 +31,11 @@ extern "C" {
     void BranchBackStatusWindowYoshiIcon();
 
     int32_t getYoshiIcon(int32_t color) {
-        // TODO: Delegate to CostumeManager once more costumes are supported.
-        return ttyd::icondrv::IconType::YOSHI_GREEN + color;
+        return mod::tot::CosmeticsManager::GetYoshiCostumeData(color)->icon;
     }
 
     int32_t getYoshiHpIcon(int32_t color) {
-        // TODO: Delegate to CostumeManager once more costumes are supported.
-        return ttyd::icondrv::IconType::HUD_YOSHI_GREEN + color;
+        return mod::tot::CosmeticsManager::GetYoshiCostumeData(color)->icon_hud;
     }
 }
 
@@ -80,7 +82,24 @@ void ApplyFixedPatches() {
     // Replace filename to load when loading Mario or Yoshi's default model.
     g__fileAlloc_trampoline = patch::hookFunction(
         ttyd::filemgr::_fileAlloc, [](const char* filename, uint32_t unk0) {
-            // TODO: Implement filename replacement logic.
+            // Replace Mario's models.
+            auto* mario_data = tot::CosmeticsManager::GetMarioCostumeData(0);
+            for (int32_t i = 0; i < 4; ++i) {
+                if (!strcmp(filename, mario_data->models[i])) {
+                    int32_t color = tot::GetSWByte(tot::GSW_MarioCostume);
+                    filename =
+                        tot::CosmeticsManager::GetMarioCostumeData(color)->models[i];
+                }
+            }
+            // Replace Yoshi's models.
+            auto* yoshi_data = tot::CosmeticsManager::GetYoshiCostumeData(0);
+            for (int32_t i = 0; i < 2; ++i) {
+                if (!strcmp(filename, yoshi_data->models[i])) {
+                    int32_t color = ttyd::mario_pouch::pouchGetPartyColor(4);
+                    filename =
+                        tot::CosmeticsManager::GetYoshiCostumeData(color)->models[i];
+                }
+            }
 
             // Run original logic.
             return g__fileAlloc_trampoline(filename, unk0);
@@ -96,7 +115,7 @@ void ApplyFixedPatches() {
     g_pouchGetPartyColor_trampoline = patch::hookFunction(
         ttyd::mario_pouch::pouchGetPartyColor, [](int32_t party) {
             auto& data = ttyd::mario_pouch::pouchGetPtr()->party_data[party];
-            // TODO: Get supported color range from CostumeManager.
+            // TODO: Get supported color range from CostumeManager?
             int32_t color = Clamp(data.flags >> 11, 0, 6);
             return color;
         });

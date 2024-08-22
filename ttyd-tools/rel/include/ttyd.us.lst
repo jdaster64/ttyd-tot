@@ -2648,6 +2648,17 @@
 // .data
 803773d8:g_winPartyDt
 
+// win_badge.o
+80167c44:badge_disp
+80168610:winBadgeDisp
+80168f60:winBadgeMain2
+80168fe8:winBadgeMain
+801696c0:mario_change
+801698c4:winBadgeExit
+801698c8:winBadgeInit2
+80169a98:winBadgeInit
+80169bd0:winMakeEquipList
+
 // win_item.o
 // .text
 80169cf0:itemUseDisp2

@@ -9,14 +9,17 @@ namespace mod::tot {
 
 // GSW variables used for Tower of Trials-specific purposes.
 enum GlobalWorkVars {
-    // Used for tower + overall progression.
+    // Used for tower progression, dialogue progression, etc.
     GSW_ToT_StoryProgression                = GSW(1000),
     GSW_Tower_ChestClaimed,
     GSW_Tower_DisplayChestIcons,
     GSW_Tower_ContinuingFromGameOver,
     GSW_Battle_AtomicBoo_BreathGuardCount,
 
-    // Flags used for tower progression / one-time dialogue.
+    // Used for cosmetic choices that persist across runs.
+    GSW_MarioCostume                        = GSW(1500),
+
+    // Flags used for tower progression, dialogue progression, etc.
     GSWF_Chest_0                            = GSWF(6000),
     GSWF_Chest_1,
     GSWF_Chest_2,
@@ -32,7 +35,7 @@ enum GlobalWorkVars {
     GSWF_TimingTutorEnabled,
     GSWF_BgmEnabled,
     
-    // Used for enabling cosmetic options that persist across runs.
+    // Used for enabling cosmetic choices that persist across runs.
     GSWF_AttackFxFlags                      = GSWF(7500),
     GSWF_AttackFxFlags_End                  = GSWF_AttackFxFlags + 30,
     GSWF_YoshiColors                        = GSWF_AttackFxFlags_End,
@@ -47,9 +50,11 @@ enum GlobalWorkVars {
 };
 
 // Wrappers to ttyd::swdrv functions that handle base conversion.
-uint32_t GetSWF(int32_t flag_id);
-uint32_t GetSWByte(int32_t flag_id);
+int32_t GetSWByte(int32_t byte_id);
+void SetSWByte(int32_t byte_id, int32_t value);
+int32_t GetSWF(int32_t flag_id);
 void SetSWF(int32_t flag_id, int32_t value = 1);
-uint32_t ToggleSWF(int32_t flag_id);
+// Toggles on/off, and returns whether it finished in the 'on' state.
+int32_t ToggleSWF(int32_t flag_id);
 
 }  // namespace mod::tot

@@ -61,8 +61,8 @@ void EncodeOption(
     }
 }
 
-const int32_t kEarliestSupportedVersion = 1;
-const int32_t kCurrentVersion = 1;
+const int32_t kEarliestSupportedVersion = 2;
+const int32_t kCurrentVersion = 2;
 
 // Holds backup save data (updated on floor 0 and after every boss floor).
 TotSaveSlot g_BackupSave;
@@ -422,7 +422,8 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
         case TYPE_FLAGS_ITEM_ENCOUNTERED:
         case TYPE_FLAGS_ITEM_PURCHASED:
         case TYPE_FLAGS_OPT_UNLOCKED:
-        case TYPE_FLAGS_MIDBOSS_DEFEATED: {
+        case TYPE_FLAGS_MIDBOSS_DEFEATED:
+        case TYPE_FLAGS_COSMETIC_PURCHASED: {
             // Can use either value or manually bit-or'd "b" for setting.
             if (value == 0) value = b;
             // Check for values outside valid range.
@@ -450,6 +451,10 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
                 }
                 case TYPE_FLAGS_MIDBOSS_DEFEATED: {
                     ptr = midboss_defeated_flags_ + (value >> 5);
+                    break;
+                }
+                case TYPE_FLAGS_COSMETIC_PURCHASED: {
+                    ptr = cosmetic_purchased_flags_ + (value >> 5);
                     break;
                 }
             }
@@ -543,6 +548,10 @@ int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
         }
         case TYPE_FLAGS_MIDBOSS_DEFEATED: {
             flag_ptr = midboss_defeated_flags_ + (x >> 5);
+            break;
+        }
+        case TYPE_FLAGS_COSMETIC_PURCHASED: {
+            flag_ptr = cosmetic_purchased_flags_ + (x >> 5);
             break;
         }
         case TYPE_OPTNUM: {

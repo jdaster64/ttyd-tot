@@ -11,6 +11,7 @@
 #include <gc/types.h>
 #include <ttyd/gx/GXTev.h>
 #include <ttyd/gx/GXTransform.h>
+#include <ttyd/animdrv.h>
 #include <ttyd/dispdrv.h>
 #include <ttyd/filemgr.h>
 #include <ttyd/fontmgr.h>
@@ -21,6 +22,8 @@
 #include <ttyd/mario_party.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/pmario_sound.h>
+#include <ttyd/sound.h>
+#include <ttyd/win_badge.h>
 #include <ttyd/win_main.h>
 #include <ttyd/win_mario.h>
 #include <ttyd/win_party.h>
@@ -102,6 +105,10 @@ void DrawItemGrid(WinPauseMenu* menu, float win_x, float win_y) {
                     break;
                 case ItemType::TOT_KEY_BGM_TOGGLE:
                     item_active = GetSWF(GSWF_BgmEnabled);
+                    break;
+                case ItemType::TOT_KEY_YOSHI_COSTUME:
+                    item_active = !g_Mod->state_.GetOption(OPT_RUN_STARTED);
+                    break;
             }
         }
         
@@ -618,8 +625,30 @@ void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
         winmgr_entry->width, winmgr_entry->height - 32);
 
     for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
-        int32_t type = menu->cosmetic_options[i];
-        const auto* data = CosmeticsManager::GetData(CosmeticType::ATTACK_FX, type);
+        int32_t id = menu->cosmetic_options[i];
+
+        const char* text = "???";
+        int32_t icon = 0;
+        switch (menu->item_menu_state) {
+            case 400: {
+                auto* data = CosmeticsManager::GetAttackFxData(id);
+                text = msgSearch(data->name_msg);
+                icon = data->icon;
+                break;
+            }
+            case 401: {
+                auto* data = CosmeticsManager::GetMarioCostumeData(id);
+                text = msgSearch(data->name_msg);
+                icon = data->icon;
+                break;
+            }
+            case 402: {
+                auto* data = CosmeticsManager::GetYoshiCostumeData(id);
+                text = msgSearch(data->name_msg);
+                icon = data->icon;
+                break;
+            }
+        }
 
         float y_trans = 
             winmgr_entry->y + menu->cosmetic_menu_scroll_y - i * 24.0f - 28.0f;
@@ -630,7 +659,6 @@ void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
             continue;
         
         // Placeholders.
-        const char* text = msgSearch(data->name_msg);
         ttyd::win_main::winFontInit();
         gc::vec3 text_pos = { winmgr_entry->x + 55.0f, y_trans + 12.0f, 0.0f };
         gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
@@ -639,7 +667,6 @@ void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
         
         ttyd::win_main::winIconInit();
         {
-            int32_t icon = data->icon;
             gc::vec3 pos = { winmgr_entry->x + 30.0f, y_trans, 0.0f };
             gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
             uint32_t icon_color = 0xFFFFFFFFU;
@@ -647,7 +674,8 @@ void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
         }
         {
             // "Equipped" indicator.
-            int32_t equipped = GetSWF(GSWF_AttackFxFlags + type)
+            int32_t equipped =
+                CosmeticsManager::IsEquipped(menu->item_menu_state - 400, id)
                 ? IconType::AC_LIGHT_GREEN : IconType::SP_ORB_EMPTY;
             gc::vec3 pos = { 
                 winmgr_entry->x + winmgr_entry->width - 24.0f,
@@ -732,16 +760,36 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
                     }
                 } else {
-                    // TODO: Support remaining key items.
-                    // Toggle on key items with boolean effects.
-                    if (item == ItemType::TOT_KEY_ATTACK_FX) {
+                    // TODO: Support item loadout selectors.
+
+                    // Open selection menu for cosmetic selectors.
+                    int32_t cosmetic_type = -1;
+                    switch (item) {
+                        case ItemType::TOT_KEY_ATTACK_FX:
+                            cosmetic_type = CosmeticType::ATTACK_FX;
+                            break;
+                        case ItemType::TOT_KEY_MARIO_COSTUME:
+                            cosmetic_type = CosmeticType::MARIO_COSTUME;
+                            break;
+                        case ItemType::TOT_KEY_YOSHI_COSTUME:
+                            if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
+                                cosmetic_type = CosmeticType::YOSHI_COSTUME;
+                            } else {
+                                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                            }
+                            break;
+                    }
+                    if (cosmetic_type != -1) {
+                        menu->cosmetic_num_options = 0;
                         for (int32_t i = 0; i < 30; ++i) {
-                            // TODO: Fill with unlocked options.
-                            menu->cosmetic_options[i] = i + 1;
+                            if (CosmeticsManager::IsAvailable(
+                                cosmetic_type, i)) {
+                                menu->cosmetic_options[
+                                    menu->cosmetic_num_options++] = i;
+                            }
                         }
                         menu->cosmetic_cursor_idx = 0;
-                        menu->cosmetic_num_options = 5;
-                        menu->item_menu_state = 400;
+                        menu->item_menu_state = 400 + cosmetic_type;
                         ttyd::pmario_sound::psndSFXOn((char *)0x20012);
 
                         int32_t height =
@@ -753,35 +801,36 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                             win->width, height);
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_1);
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
-                    } else {
-                        int32_t effect_flag = 0;
-                        switch (item) {
-                            case ItemType::TOT_KEY_PEEKABOO:
-                                effect_flag = GSWF_PeekabooEnabled;
-                                break;
-                            case ItemType::TOT_KEY_SUPER_PEEKABOO:
-                                effect_flag = GSWF_SuperPeekabooEnabled;
-                                break;
-                            case ItemType::TOT_KEY_TIMING_TUTOR:
-                                effect_flag = GSWF_TimingTutorEnabled;
-                                break;
-                            case ItemType::TOT_KEY_BGM_TOGGLE:
-                                effect_flag = GSWF_BgmEnabled;
-                        }
-                        if (effect_flag) {
-                            if (ToggleSWF(effect_flag)) {
-                                ttyd::pmario_sound::psndSFXOn((char *)0x20038);
-                            } else {
-                                // Also disable Stat Master if Peekaboo disabled. 
-                                if (effect_flag == GSWF_PeekabooEnabled) {
-                                    SetSWF(GSWF_SuperPeekabooEnabled, 0);
-                                }
-                                // Fade out current BGM if disabling music.
-                                if (effect_flag == GSWF_BgmEnabled) {
-                                    ttyd::pmario_sound::psndStopAllFadeOut();
-                                }
-                                ttyd::pmario_sound::psndSFXOn((char *)0x20039);
+                    }
+                        
+                    // Toggle on key items with boolean effects.
+                    int32_t effect_flag = 0;
+                    switch (item) {
+                        case ItemType::TOT_KEY_PEEKABOO:
+                            effect_flag = GSWF_PeekabooEnabled;
+                            break;
+                        case ItemType::TOT_KEY_SUPER_PEEKABOO:
+                            effect_flag = GSWF_SuperPeekabooEnabled;
+                            break;
+                        case ItemType::TOT_KEY_TIMING_TUTOR:
+                            effect_flag = GSWF_TimingTutorEnabled;
+                            break;
+                        case ItemType::TOT_KEY_BGM_TOGGLE:
+                            effect_flag = GSWF_BgmEnabled;
+                    }
+                    if (effect_flag) {
+                        if (ToggleSWF(effect_flag)) {
+                            ttyd::pmario_sound::psndSFXOn((char *)0x20038);
+                        } else {
+                            // Also disable Stat Master if Peekaboo disabled. 
+                            if (effect_flag == GSWF_PeekabooEnabled) {
+                                SetSWF(GSWF_SuperPeekabooEnabled, 0);
                             }
+                            // Fade out current BGM if disabling music.
+                            if (effect_flag == GSWF_BgmEnabled) {
+                                ttyd::pmario_sound::psndStopAllFadeOut();
+                            }
+                            ttyd::pmario_sound::psndSFXOn((char *)0x20039);
                         }
                     }
                 }
@@ -924,7 +973,9 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
             }
             break;
         }
-        case 400: {
+        case 400:
+        case 401:
+        case 402: {
             int32_t type = menu->cosmetic_options[menu->cosmetic_cursor_idx];
 
             if (menu->buttons_pressed & ButtonId::START) {
@@ -938,10 +989,26 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
             } else if (menu->buttons_pressed & ButtonId::A) {
-                if (ToggleSWF(GSWF_AttackFxFlags + type)) {
+                if (CosmeticsManager::ToggleEquipped(
+                    menu->item_menu_state - 400, type)) {
                     ttyd::pmario_sound::psndSFXOn((char *)0x20038);
                 } else {
                     ttyd::pmario_sound::psndSFXOn((char *)0x20039);
+                }
+                // For Mario clothes specifically, reload models.
+                if (menu->item_menu_state == 401) {
+                    if (menu->mario_anim_pose_id != -1) {
+                        ttyd::animdrv::animPoseRelease(menu->mario_anim_pose_id);
+                        ttyd::mario::marioSetCharMode(0);
+                        menu->mario_anim_pose_id =
+                            ttyd::animdrv::animPoseEntry("a_mario", 0);
+                        ttyd::animdrv::animPoseSetAnim(
+                            menu->mario_anim_pose_id, "M_S_1", 1);
+                        ttyd::animdrv::animPoseSetMaterialFlagOn(
+                            menu->mario_anim_pose_id, 0x1800);
+                    } else {
+                        ttyd::mario::marioSetCharMode(0);
+                    }
                 }
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
                 if (--menu->cosmetic_cursor_idx < 0) {
@@ -969,8 +1036,23 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
             }
 
             // Update help text.
-            const auto* data = CosmeticsManager::GetData(CosmeticType::ATTACK_FX, type);
-            ttyd::win_root::winMsgEntry(menu, 0, data->help_msg, 0);
+            switch (menu->item_menu_state) {
+                case 400: {
+                    const auto* data = CosmeticsManager::GetAttackFxData(type);
+                    ttyd::win_root::winMsgEntry(menu, 0, data->help_msg, 0);
+                    break;
+                }
+                case 401: {
+                    const auto* data = CosmeticsManager::GetMarioCostumeData(type);
+                    ttyd::win_root::winMsgEntry(menu, 0, data->help_msg, 0);
+                    break;
+                }
+                case 402: {
+                    const auto* data = CosmeticsManager::GetYoshiCostumeData(type);
+                    ttyd::win_root::winMsgEntry(menu, 0, data->help_msg, 0);
+                    break;
+                }
+            }
             
             // Set cursor position.
             menu->main_cursor_target_x = -80.0f;
@@ -1066,10 +1148,16 @@ void ItemSubdialogMain1(WinMgrEntry* winmgr_entry) {
     auto* menu = (WinPauseMenu*)ttyd::win_main::winGetPtr();
   
     if (ttyd::winmgr::winMgrAction(menu->winmgr_entry_1) == 0) {
-        if (menu->item_menu_state == 300 || menu->item_menu_state == 301) {
-            DrawUseItemDialog(winmgr_entry);
-        } else if (menu->item_menu_state == 400) {
-            DrawCosmeticSelectionDialog(winmgr_entry);
+        switch (menu->item_menu_state) {
+            case 300:
+            case 301:
+                DrawUseItemDialog(winmgr_entry);
+                break;
+            case 400:
+            case 401:
+            case 402:
+                DrawCosmeticSelectionDialog(winmgr_entry);
+                break;
         }
     }
   
@@ -1101,11 +1189,19 @@ void ItemSubdialogMain2(WinMgrEntry* winmgr_entry) {
     auto* menu = (WinPauseMenu*)ttyd::win_main::winGetPtr();
     if (ttyd::winmgr::winMgrAction(menu->winmgr_entry_2) == 0) {
         const char* msg = "";
-        if (menu->item_menu_state == 300 || menu->item_menu_state == 301) {
-            // "Use it on whom?"
-            msg = msgSearch("msg_window_select_5");
-        } else if (menu->item_menu_state == 400) {
-            msg = msgSearch("tot_winsel_whichones");
+        switch (menu->item_menu_state) {
+            case 300:
+            case 301:
+                // "Use it on whom?"
+                msg = msgSearch("msg_window_select_5");
+                break;
+            case 400:
+            case 402:
+                msg = msgSearch("tot_winsel_whichones");
+                break;
+            case 401:
+                msg = msgSearch("tot_winsel_whichduds");
+                break;
         }
 
         uint16_t lines;

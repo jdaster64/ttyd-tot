@@ -104,9 +104,9 @@ namespace AchievementRewardType {
 
 struct AchievementData {
     const char* help_msg;
-    const char* reward_msg;     // Falls back to CosmeticData.name_msg if null.
+    const char* reward_msg;     // Falls back to CosmeticGroupData.name_msg if null.
     int32_t reward_type;
-    uint32_t reward_id;         // For option type / indexing into CosmeticData.
+    uint32_t reward_id;         // For option type / indexing into CosmeticGroupData.
 };
 
 class AchievementsManager {
@@ -119,14 +119,17 @@ public:
     // Gets achievement data.
     static const AchievementData* GetData(int32_t ach);
 
-    // Checks whether an option is unlocked.
-    static bool CheckOptionUnlocked(uint32_t option);
     // Marks off an achievement.
     static void MarkCompleted(int32_t ach);
     // Checks whether an achievement should be newly met, and marks it if so.
     static void CheckCompleted(int32_t ach);
     // Gets the progress for an achievement.
     static bool GetProgress(int32_t ach, int32_t* done, int32_t* total);
+
+    // Checks whether a run option is unlocked.
+    static bool CheckOptionUnlocked(uint32_t option);
+    // Checks whether a cosmetic group is unlocked (not necessarily purchased).
+    static bool CheckCosmeticGroupUnlocked(int32_t reward_type, int32_t group_id);
 };
 
 // Marks an achievement as complete.

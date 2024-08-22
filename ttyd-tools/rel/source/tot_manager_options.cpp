@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_gsw.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_state.h"
 
 #include <ttyd/item_data.h>
@@ -119,8 +120,8 @@ void OptionsManager::InitLobby() {
     // Testing: Give all currently implemented QoL / cosmetic key items.
     // (These items should not be deleted in the final version, ideally)
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ATTACK_FX);
-    // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_YOSHI_COSTUME);
-    // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_MARIO_COSTUME);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_YOSHI_COSTUME);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_MARIO_COSTUME);
     // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BADGE_SELECTOR);
     // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ITEM_SELECTOR);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BGM_TOGGLE);
@@ -205,8 +206,7 @@ void OptionsManager::InitFromSelectedOptions() {
     }
     
     // Assign Yoshi a random color.
-    // TODO: Only select between colors the player has enabled.
-    ttyd::mario_pouch::pouchSetPartyColor(4, g_Mod->state_.Rand(7));
+    CosmeticsManager::PickYoshiColor();
 
     ApplyOptionsOnLoad();
 

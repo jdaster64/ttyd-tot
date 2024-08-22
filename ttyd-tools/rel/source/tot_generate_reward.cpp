@@ -8,6 +8,7 @@
 #include "tot_generate_item.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
 #include "tot_manager_timer.h"
@@ -414,7 +415,11 @@ int32_t GetIcon(ChestData* chest) {
         case -1:    return IconType::GOOMBELLA;
         case -2:    return IconType::KOOPS;
         case -3:    return IconType::FLURRIE;
-        case -4:    return IconType::YOSHI_GREEN;
+        case -4:    {
+            // Make Yoshi's icon color match the selected color.
+            int32_t color = ttyd::mario_pouch::pouchGetPartyColor(4);
+            return CosmeticsManager::GetYoshiCostumeData(color)->icon;
+        }
         case -5:    return IconType::VIVIAN;
         case -6:    return IconType::BOBBERY;
         case -7:    return IconType::MS_MOWZ;
