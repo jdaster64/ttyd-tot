@@ -1392,6 +1392,7 @@
 // .data
 8033ca20:buy_evt
 804165ac:evt_shoplist
+8041eb60:g_ShopWork
 
 // evt_pouch.o
 800f07d0:evt_pouch_get_yoshiname

@@ -83,6 +83,7 @@ EVT_DECLARE_USER_FUNC(disp_list, 0)
 // .data
 extern int32_t buy_evt[1];
 extern int32_t evt_shoplist[1];
+extern ShopWork* g_ShopWork;
 
 }
 

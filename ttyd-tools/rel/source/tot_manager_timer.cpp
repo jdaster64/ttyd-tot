@@ -3,6 +3,7 @@
 #include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_generate_item.h"
 #include "tot_manager_achievements.h"
 #include "tot_state.h"
 
@@ -316,6 +317,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     state.ChangeOption(STAT_PERM_CURRENT_COINS, coins_earned);
     state.ChangeOption(STAT_PERM_CURRENT_SP, sp_earned);
     state.ChangeOption(STAT_PERM_CURRENT_SP, shines_earned * 3);
+
+    // Reshuffle the hub item shop.
+    state.SetOption(OPT_SHOP_ITEMS_CHOSEN, 0);
+    GenerateHubShopItems();
     
     return 2;
 }

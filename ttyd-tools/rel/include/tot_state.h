@@ -404,6 +404,7 @@ enum Options : uint32_t {
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x460'1'00'01,
     OPT_DEBUG_MODE_USED         = 0x461'1'00'01,
+    OPT_SHOP_ITEMS_CHOSEN       = 0x462'1'00'01,
     
     // Numeric options.
     // Global enemy HP and ATK scaling (0.05x ~ 10.00x in increments of 0.05).
@@ -507,7 +508,8 @@ enum Options : uint32_t {
     // TODO: Increase cap to 9,999 for coins (and maybe SP) in hub.
     STAT_PERM_CURRENT_COINS     = 0x294'2'01'03,
     STAT_PERM_CURRENT_SP        = 0x296'2'01'03,
-    // Next: 0x298
+    STAT_PERM_SHOP_ITEMS        = 0x298'1'00'05,
+    // Next: 0x29d
 };
 
 }  // namespace mod::tot

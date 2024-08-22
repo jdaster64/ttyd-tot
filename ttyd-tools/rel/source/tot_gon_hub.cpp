@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_generate_item.h"
 #include "tot_gsw.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
@@ -29,6 +30,7 @@
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
 #include <ttyd/npcdrv.h>
+#include <ttyd/system.h>
 
 namespace mod::tot::gon {
 
@@ -100,6 +102,10 @@ extern ShopItem shop_buy_list[6];
 extern ShopItem shop_trade_list[6];
 extern ShopkeeperData shopkeeper_data;
 
+// Function declarations.
+EVT_DECLARE_USER_FUNC(evtTot_SelectShopItems, 0)
+EVT_DECLARE_USER_FUNC(evtTot_DeleteShopItems, 0)
+
 EVT_BEGIN(Npc_GenericMove)
     USER_FUNC(evt_npc_get_position, PTR("me"), LW(0), LW(1), LW(2))
     USER_FUNC(urouro_init_func, PTR("me"), LW(0), LW(2), FLOAT(100.0), FLOAT(30.0), 0)
@@ -159,8 +165,9 @@ EVT_BEGIN(gon_10_InitEvt)
     SET(LW(0), PTR(&gon_10_door_data[2]))
     RUN_CHILD_EVT(evt_door_setup)
 
-    // TODO: Dynamically populate shop list.
+    USER_FUNC(evtTot_SelectShopItems)
     USER_FUNC(evt_shop_setup, PTR(&shop_obj_list), PTR(&shop_buy_list), PTR(&shopkeeper_data), PTR(&shop_trade_list))
+    USER_FUNC(evtTot_DeleteShopItems)
     
     USER_FUNC(evt_mobj_save_blk, PTR("mobj_save"), 155, 60, -60, 0, 0)
 
@@ -607,14 +614,9 @@ const char* shop_obj_list[12] = {
     "S_item_05", "A_item_05",
     "S_item_06", "A_item_06",
 };
-// TODO: Dynamically fill this array.
+// Dynamically filled; the last item will always be a Star Piece.
 ShopItem shop_buy_list[6] = {
-    { .item_id = ItemType::MUSHROOM,        .buy_price = 10, },
-    { .item_id = ItemType::SUPER_SHROOM,    .buy_price = 20, },
-    { .item_id = ItemType::ULTRA_SHROOM,    .buy_price = 30, },
-    { .item_id = ItemType::HONEY_SYRUP,     .buy_price = 40, },
-    { .item_id = ItemType::SHOOTING_STAR,   .buy_price = 50, },
-    { .item_id = ItemType::STAR_PIECE,      .buy_price = 10, },
+    {}, {}, {}, {}, {}, { .item_id = ItemType::STAR_PIECE, .buy_price = 99, },
 };
 ShopkeeperData shopkeeper_data = {
     .npc_name = g_NpcShopkeeper,
@@ -627,6 +629,42 @@ const int32_t* GetWestSideInitEvt() {
 
 const int32_t* GetEastSideInitEvt() {
     return gon_11_InitEvt;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_SelectShopItems) {
+    auto& state = g_Mod->state_;
+
+    // Pick the items if they haven't already been chosen since the last run.
+    if (!state.GetOption(OPT_SHOP_ITEMS_CHOSEN)) GenerateHubShopItems();
+
+    // Read previously selected items.
+    for (int32_t i = 0; i < 5; ++i) {
+        int32_t id = (uint8_t)state.GetOption(STAT_PERM_SHOP_ITEMS, i);
+        if (id == 255) {
+            // Sentinel.
+            shop_buy_list[i].item_id = 1;
+        } else {
+            id += ItemType::THUNDER_BOLT;
+            shop_buy_list[i].item_id = id;
+            shop_buy_list[i].buy_price = 
+                ttyd::item_data::itemDataTable[id].buy_price * 2;
+        }
+    }
+
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_DeleteShopItems) {
+    for (int32_t i = 0; i < 5; ++i) {
+        int32_t item = shop_buy_list[i].item_id;
+        // Delete sentinel items and ones that are already purchased.
+        if (item == 1 ||
+            g_Mod->state_.GetOption(
+                FLAGS_ITEM_PURCHASED, item - ItemType::THUNDER_BOLT)) {
+            ttyd::evt_shop::g_ShopWork->item_flags[i] |= 1;
+        }
+    }
+    return 2;
 }
 
 }  // namespace mod::tot::gon

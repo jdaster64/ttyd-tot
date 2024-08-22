@@ -89,6 +89,8 @@ void OptionsManager::InitLobby() {
         ObfuscateItems(false);
     }
 
+    bool hub_items_selected = g_Mod->state_.GetOption(OPT_SHOP_ITEMS_CHOSEN);
+
     g_Mod->state_.InitDefaultOptions();
     
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
@@ -145,6 +147,8 @@ void OptionsManager::InitLobby() {
     // Set run to not having started.
     g_Mod->state_.SetOption(OPT_RUN_STARTED, 0);
     g_Mod->state_.SetOption(OPT_DEBUG_MODE_USED, 0);
+    // Remember the previously set hub item shop inventory until next run.
+    if (hub_items_selected) g_Mod->state_.SetOption(OPT_SHOP_ITEMS_CHOSEN, 1);
 }
 
 void OptionsManager::InitFromSelectedOptions() {

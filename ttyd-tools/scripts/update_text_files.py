@@ -55,6 +55,10 @@ g_StringMap = {
             b'A capricious object that ranks\n'
             b'up your moves at random.',
             
+        b"msg_star_piece_inhub":
+            b"A glittering trinket that might\n"
+            b"be of value to some merchants.",
+            
         b"msg_custom_super_boots":
             b"A stronger pair of boots.",
             

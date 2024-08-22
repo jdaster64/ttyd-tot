@@ -23,6 +23,7 @@ namespace MsgKey {
         CUSTOM_TATTLE_KILLCOUNT,
         CUSTOM_TATTLE_MENU,
         MENU_MONOSIRI_DERUTOKORO,
+        MSG_STAR_PIECE,
         SYS_NO_KEY,
         TOT_MOVELOG_DESC_DYN,
     };
@@ -37,6 +38,7 @@ constexpr const char* kKeyLookups[] = {
     "custom_tattle_killcount",
     "custom_tattle_menu",
     "menu_monosiri_derutokoro",
+    "msg_star_piece",
     "sys_no_key",
     "tot_movelog_desc_dyn",
 };
@@ -96,6 +98,12 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::MENU_MONOSIRI_DERUTOKORO:
             // Get rid of extra spacing before location in Tattle log.
             return "";
+        case MsgKey::MSG_STAR_PIECE:
+            // Different descriptions in hub and during a run.
+            if (!g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) {
+                return ttyd::msgdrv::msgSearch("msg_star_piece_inhub");
+            }
+            break;
         case MsgKey::TOT_MOVELOG_DESC_DYN:
             if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
                 int32_t move = menu->move_log_cursor_idx;

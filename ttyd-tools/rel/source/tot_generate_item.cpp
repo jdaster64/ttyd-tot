@@ -297,6 +297,42 @@ void ObfuscateItems(bool enable) {
     }
 }
 
+void GenerateHubShopItems() {
+    auto& state = g_Mod->state_;
+
+    const int32_t kMaxItem = ItemType::MAX_ITEM_TYPE - ItemType::THUNDER_BOLT;
+
+    // Shuffle array of all possible item types.
+    int8_t items[ItemType::MAX_ITEM_TYPE - ItemType::THUNDER_BOLT];
+    for (int32_t i = 0; i < kMaxItem; ++i) items[i] = i;
+    for (int32_t i = 0; i < 2 * kMaxItem; ++i) {
+        int32_t x = ttyd::system::irand(kMaxItem);
+        int32_t y = ttyd::system::irand(kMaxItem);
+        int16_t temp = items[x];
+        items[x] = items[y];
+        items[y] = temp;
+    }
+
+    // Pick the first five items that are valid & encountered but not purchased.
+    int32_t num_chosen = 0;
+    for (int32_t i = 0; i < kMaxItem; ++i) {
+        int32_t id = items[i];
+        if (ttyd::item_data::itemDataTable[id + ItemType::THUNDER_BOLT]
+                .type_sort_order >= 0 &&
+            state.GetOption(FLAGS_ITEM_ENCOUNTERED, id) &&
+            !state.GetOption(FLAGS_ITEM_PURCHASED, id)) {
+            state.SetOption(STAT_PERM_SHOP_ITEMS, id, num_chosen);
+            if (++num_chosen == 5) break;
+        }
+    }
+    // Fill the rest with a sentinel.
+    for (; num_chosen < 5; ++num_chosen) {
+        state.SetOption(STAT_PERM_SHOP_ITEMS, 255, num_chosen);
+    }
+
+    state.SetOption(OPT_SHOP_ITEMS_CHOSEN, 1);
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_GetUniqueItemName) {
     static int32_t id = 0;
     static char name[16];
