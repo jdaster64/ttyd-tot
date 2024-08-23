@@ -808,7 +808,7 @@ void DrawLoadoutSelectionDialog(WinMgrEntry* winmgr_entry) {
     const float tut_text_y = 0.21f;
     const float tut_spread = 0.31f;
     const int32_t tut_icons[] = {
-        IconType::A_BUTTON, IconType::B_BUTTON, IconType::X_BUTTON
+        IconType::A_BUTTON, IconType::X_BUTTON, IconType::B_BUTTON
     };
     const char* tut_msg[] = {
         "tot_loadoutsel_add", "tot_loadoutsel_remove", "tot_loadoutsel_back"
@@ -902,10 +902,12 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                         menu->use_item_timer = 0;
                         ttyd::pmario_sound::psndSFXOn((char *)0x20012);
                         
-                        auto* win = ttyd::winmgr::winMgrGetPtr(menu->winmgr_entry_1);
                         ttyd::winmgr::winMgrSetSize(
-                            menu->winmgr_entry_1, win->x, win->y,
-                            win->width, menu->party_count * 28 + 68);
+                            menu->winmgr_entry_1, -46.f, 150.f, 350.f, 
+                            menu->party_count * 28 + 68);
+                        ttyd::winmgr::winMgrSetSize(
+                            menu->winmgr_entry_2, -280.f, 145.f, 200.f, 50.f);
+
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_1);
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
                     }
@@ -943,14 +945,14 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
 
                         menu->item_menu_state = 400 + cosmetic_type;
                         ttyd::pmario_sound::psndSFXOn((char *)0x20012);
-
+                        
                         int32_t height =
                             Min(menu->cosmetic_num_options, 8) * 24 + 32;
                         
-                        auto* win = ttyd::winmgr::winMgrGetPtr(menu->winmgr_entry_1);
                         ttyd::winmgr::winMgrSetSize(
-                            menu->winmgr_entry_1, win->x, win->y,
-                            win->width, height);
+                            menu->winmgr_entry_1, -46.f, 150.f, 350.f, height);
+                        ttyd::winmgr::winMgrSetSize(
+                            menu->winmgr_entry_2, -280.f, 145.f, 200.f, 50.f);
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_1);
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
                     }
@@ -1263,14 +1265,14 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
                 return -2;
-            } else if (menu->buttons_pressed & ButtonId::X) {
+            } else if (menu->buttons_pressed & ButtonId::B) {
                 ttyd::pmario_sound::psndSFXOn((char *)0x20013);
                 menu->item_menu_state = 10;
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
             } else if (menu->buttons_pressed & ButtonId::A) {
                 SetCurrentItemLoadoutEquipped(menu, true);
-            } else if (menu->buttons_pressed & ButtonId::B) {
+            } else if (menu->buttons_pressed & ButtonId::X) {
                 SetCurrentItemLoadoutEquipped(menu, false);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
                 if (menu->cosmetic_cursor_idx > 13) {
