@@ -158,6 +158,7 @@ EVT_BEGIN(gon_10_InitEvt)
     USER_FUNC(evt_map_playanim, PTR("S_kawa"), 1, 0)
 
     // Door setup.
+    // TODO: Close shop door and move shopkeeper outside on first visit.
     SET(LW(0), PTR(&gon_10_door_data[0]))
     RUN_CHILD_EVT(evt_door_setup)
     SET(LW(0), PTR(&gon_10_door_data[1]))

@@ -135,6 +135,7 @@ public:
 // Marks an achievement as complete.
 EVT_DECLARE_USER_FUNC(evtTot_MarkCompletedAchievement, 1)
 // Checks whether an achievement should be newly met, and marks it if so.
-EVT_DECLARE_USER_FUNC(evtTot_CheckCompletedAchievement, 1)
+// arg0 = achievement id, out arg1 = whether the achievement was newly met.
+EVT_DECLARE_USER_FUNC(evtTot_CheckCompletedAchievement, 2)
  
 }

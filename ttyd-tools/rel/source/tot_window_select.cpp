@@ -2,6 +2,7 @@
 
 #include "common_functions.h"
 #include "mod.h"
+#include "patches_field.h"
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
 #include "tot_gon_tower_npcs.h"
@@ -573,7 +574,8 @@ void DispMainWindow(WinMgrEntry* entry) {
 
             switch (sel_entry->type) {
                 case MenuType::CUSTOM_START:
-                case MenuType::TOT_CHARLIETON_SHOP: {
+                case MenuType::TOT_CHARLIETON_SHOP:
+                case MenuType::HUB_ITEM_SHOP: {
                     entry_icon = itemDataTable[row.value].icon_id;
                     entry_text = msgSearch(itemDataTable[row.value].name);
                     break;
@@ -639,12 +641,15 @@ void DispMainWindow(WinMgrEntry* entry) {
         
         switch (sel_entry->type) {
             case MenuType::CUSTOM_START:
-            case MenuType::TOT_CHARLIETON_SHOP: {
+            case MenuType::TOT_CHARLIETON_SHOP:
+            case MenuType::HUB_ITEM_SHOP: {
                 // Draw "buy prices".
                 int32_t value = itemDataTable[row.value].buy_price;
                 // For Charlieton, scale based on tower progress.
                 if (sel_entry->type == MenuType::TOT_CHARLIETON_SHOP) {
                     value = value * GetBuyPriceScale() / 100;
+                } else if (sel_entry->type == MenuType::HUB_ITEM_SHOP) {
+                    value *= 3;
                 }
                 
                 if (value > 0) {
@@ -827,6 +832,7 @@ void DispMainWindow(WinMgrEntry* entry) {
             title = msgSearch("in_konran_hammer");
             break;
         case MenuType::TOT_CHARLIETON_SHOP:
+        case MenuType::HUB_ITEM_SHOP:
             title = msgSearch("msg_window_title_1");  // "Items"
             break;
         case MenuType::TOT_CHET_RIPPO_TRADE:
@@ -865,6 +871,7 @@ void DispMainWindow(WinMgrEntry* entry) {
     switch (sel_entry->type) {
         case MenuType::CUSTOM_START:
         case MenuType::TOT_CHARLIETON_SHOP:
+        case MenuType::HUB_ITEM_SHOP:
             gc::mtx34 mtx, mtx2;
             gc::mtx::PSMTXScale(&mtx2, 0.6f, 0.6f, 0.6f);
             gc::mtx::PSMTXTrans(
@@ -922,6 +929,7 @@ void DispWindow2(WinMgrEntry* entry) {
             msg = msgSearch("in_konran_hammer");
             break;
         case MenuType::TOT_CHARLIETON_SHOP:
+        case MenuType::HUB_ITEM_SHOP:
             msg = msgSearch("msg_window_select_6");     // "Buy which one?"
             break;
         case MenuType::TOT_CHET_RIPPO_TRADE:
@@ -972,6 +980,7 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                 help_msg = msgSearch("in_konran_hammer");
                 break;
             case MenuType::TOT_CHARLIETON_SHOP:
+            case MenuType::HUB_ITEM_SHOP:
                 help_msg = msgSearch(itemDataTable[value].description);
                 break;
             case MenuType::TOT_CHET_RIPPO_TRADE:
@@ -1302,6 +1311,9 @@ void* InitNewSelectDescTable() {
     g_SelectDescList[MenuType::MOVE_UPGRADE] = WinMgrSelectDescList{ 
         .num_descs = 3, .descs = &g_CustomDescs[0]
     };
+    g_SelectDescList[MenuType::HUB_ITEM_SHOP] = WinMgrSelectDescList{ 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
+    };
     g_SelectDescList[MenuType::TOT_CHARLIETON_SHOP] = WinMgrSelectDescList{ 
         .num_descs = 3, .descs = &g_CustomDescs[0]
     };
@@ -1340,6 +1352,7 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             // Not cancellable.
             break;
         case MenuType::CUSTOM_START:
+        case MenuType::HUB_ITEM_SHOP:
         case MenuType::TOT_CHARLIETON_SHOP:
         case MenuType::TOT_CHET_RIPPO_TRADE:
         case MenuType::RUN_OPTIONS:
@@ -1403,9 +1416,16 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             sel_entry->row_data[9].value = 0xfb;
             break;
         }
+        case MenuType::HUB_ITEM_SHOP:
         case MenuType::TOT_CHARLIETON_SHOP: {
-            // Read inventory from tot_generate_item.
-            int16_t* inventory = GetCharlietonInventoryPtr();
+            // Read inventory from elsewhere.
+            int16_t* inventory;
+            if (type == MenuType::HUB_ITEM_SHOP) {
+                inventory = infinite_pit::field::GetShopBackOrderItems();
+            } else {
+                inventory = GetCharlietonInventoryPtr();
+            }
+
             int32_t num_items = 0;
             for (int16_t* ptr = inventory; *ptr != -1; ++ptr) ++num_items;
             sel_entry->num_rows = num_items;
@@ -1564,6 +1584,12 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
     switch(sel_entry->type) {
         case MenuType::CUSTOM_START:
             evt->lwData[1] = value;
+            break;
+        case MenuType::HUB_ITEM_SHOP:
+            evt->lwData[1] = value;
+            evt->lwData[2] = PTR(msgSearch(itemDataTable[value].name));
+            evt->lwData[3] = itemDataTable[value].buy_price * 3;
+            evt->lwData[4] = itemDataTable[value].bp_cost;
             break;
         case MenuType::TOT_CHARLIETON_SHOP:
             evt->lwData[1] = value;

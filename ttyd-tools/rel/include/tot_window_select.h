@@ -20,6 +20,8 @@ namespace MenuType {
         MOVE_UNLOCK,
         // Upgrading moves.
         MOVE_UPGRADE,
+        // Petalburg back-order item shop.
+        HUB_ITEM_SHOP,
         // Charlieton.
         TOT_CHARLIETON_SHOP,
         // Chet Rippo stat downgrade.

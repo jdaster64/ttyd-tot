@@ -17,10 +17,9 @@ namespace mod::tot {
 namespace {
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace ItemType = ttyd::item_data::ItemType;
-
-
 
 const AchievementData g_AchievementData[] = {
     { "tot_achd_00", nullptr, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_TIMING_TUTOR },
@@ -361,7 +360,11 @@ EVT_DEFINE_USER_FUNC(evtTot_MarkCompletedAchievement) {
 
 EVT_DEFINE_USER_FUNC(evtTot_CheckCompletedAchievement) {
     int32_t ach = evtGetValue(evt, evt->evtArguments[0]);
+    bool prev_completed = g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach);
     AchievementsManager::CheckCompleted(ach);
+    bool new_completed = 
+        !prev_completed && g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach);
+    evtSetValue(evt, evt->evtArguments[1], new_completed);
     return 2;
 }
  

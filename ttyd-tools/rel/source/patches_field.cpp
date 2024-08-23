@@ -3,8 +3,10 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "patch.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_state.h"
+#include "tot_window_select.h"
 
 #include <gc/types.h>
 #include <ttyd/battle_monosiri.h>
@@ -75,27 +77,91 @@ using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::evt_window;
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::npcdrv::NpcTribeDescription;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace NpcAiType = ::ttyd::npc_data::NpcAiType;
 
+int16_t g_ShopSignItems[256] = { -1 };
+int32_t g_NumShopSignItems = 0;
+
 }
 
-EVT_DECLARE_USER_FUNC(evtTot_AfterBuyingShopItem, 1)
+int32_t TypeSortOrderComparator(int16_t* lhs, int16_t* rhs) {
+    auto* itemData = ttyd::item_data::itemDataTable;
+    const int32_t left_sort =
+        itemData[*lhs].type_sort_order + (*lhs < ItemType::POWER_JUMP ? 0 : 200);
+    const int32_t right_sort =
+        itemData[*rhs].type_sort_order + (*rhs < ItemType::POWER_JUMP ? 0 : 200);
+    return left_sort - right_sort;
+}
+
+// Populates the list of items that can be bought from the shop sign.
+// out arg0 = the number of available items.
+EVT_DECLARE_USER_FUNC(evtTot_InitializeShopSign, 1)
+EVT_DEFINE_USER_FUNC(evtTot_InitializeShopSign) {
+    const auto& state = g_Mod->state_;
+
+    int32_t shelf_items[5];
+    for (int32_t i = 0; i < 5; ++i) {
+        shelf_items[i] = (uint8_t)state.GetOption(tot::STAT_PERM_SHOP_ITEMS, i);
+    }
+
+    g_NumShopSignItems = 0;
+    for (int32_t id = 0; id < ItemType::MAX_ITEM_TYPE - ItemType::THUNDER_BOLT; ++id) {
+        // Skip invalid, non-encountered, or already purchased items.
+        if (ttyd::item_data::itemDataTable[id + ItemType::THUNDER_BOLT]
+                .type_sort_order < 0 ||
+            !state.GetOption(tot::FLAGS_ITEM_ENCOUNTERED, id) ||
+            state.GetOption(tot::FLAGS_ITEM_PURCHASED, id)) {
+            continue;
+        }
+        // Skip items that are already on display on the shelf.
+        bool found = false;
+        for (int32_t j = 0; j < 5; ++j) {
+            if (shelf_items[j] == id) found = true;
+        }
+        if (!found) {
+            g_ShopSignItems[g_NumShopSignItems++] = id + ItemType::THUNDER_BOLT;
+        }
+    }
+    g_ShopSignItems[g_NumShopSignItems] = -1;
+    
+    // Sort items + badges by combined type sort order.
+    ttyd::system::qqsort(
+        g_ShopSignItems, g_NumShopSignItems, sizeof(int16_t),
+        (void*)TypeSortOrderComparator);
+
+    evtSetValue(evt, evt->evtArguments[0], g_NumShopSignItems);
+
+    return 2;
+}
+
+// Marks item as collected and removes it from display, if applicable.
+// arg0 = shop work, arg1 = item id (only set if item was back-order).
+EVT_DECLARE_USER_FUNC(evtTot_AfterBuyingShopItem, 2)
 EVT_DEFINE_USER_FUNC(evtTot_AfterBuyingShopItem) {
     auto* work = (ShopWork*)evtGetValue(evt, evt->evtArguments[0]);
+    int32_t item_id = evtGetValue(evt, evt->evtArguments[1]);
+    bool on_shelf = false;
+
+    // If no item id provided, must be from shelf.
+    if (item_id < 0) {
+        item_id = work->purchased_item_id;
+        on_shelf = true;
+    }
 
     // Mark normal items as permanently purchased.
-    if (work->purchased_item_id >= ItemType::THUNDER_BOLT) {
-        g_Mod->state_.SetOption(
-            tot::FLAGS_ITEM_PURCHASED, work->purchased_item_id - 0x80);
+    if (item_id >= ItemType::THUNDER_BOLT) {
+        g_Mod->state_.SetOption(tot::FLAGS_ITEM_PURCHASED, item_id - 0x80);
+
     }
 
     // Remove non-currency items from shelf.
-    if (work->purchased_item_id != ItemType::STAR_PIECE) {
-        work->item_flags[work->buy_item_idx] |= 1;
+    if (item_id != ItemType::STAR_PIECE) {
+        if (on_shelf) work->item_flags[work->buy_item_idx] |= 1;
     } else {
         ttyd::mario_pouch::pouchAddStarPiece(1);
         g_Mod->state_.ChangeOption(tot::STAT_PERM_CURRENT_SP, 1);
@@ -208,28 +274,20 @@ EVT_BEGIN(ShopBuyEvt)
     USER_FUNC(evt_set_dir_to_target, LW(9), PTR("mario"))
     USER_FUNC(evt_win_coin_on, 0, LW(8))
     USER_FUNC(_evt_shop_get_value, LW(10), LW(11), LW(12), LW(13))
-    SET(LW(14), "tot_shopkeep_00")
-    USER_FUNC(evt_sub_get_language, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(0)
-            USER_FUNC(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(11), LW(13))
-        CASE_ETC()
-            USER_FUNC(evt_msg_fill_num, 0, LW(14), LW(14), LW(13))
-            USER_FUNC(evt_msg_fill_item, 1, LW(14), LW(14), LW(11))
-            USER_FUNC(evt_msg_print, 1, LW(14), 0, LW(9))
-    END_SWITCH()
-    SET(LW(14), "tot_shopkeep_24")
-    USER_FUNC(evt_msg_select, 0, LW(14))
+
+    SET(LW(14), PTR("tot_shopkeep_00"))
+    USER_FUNC(evt_msg_fill_num, 0, LW(14), LW(14), LW(13))
+    USER_FUNC(evt_msg_fill_item, 1, LW(14), LW(14), LW(11))
+    USER_FUNC(evt_msg_print, 1, LW(14), 0, LW(9))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_24"))
     IF_EQUAL(LW(0), 1)
-        SET(LW(14), "tot_shopkeep_22")
-        USER_FUNC(evt_msg_print_add, 0, LW(14))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_22"))
         USER_FUNC(evt_win_coin_off, LW(8))
         RETURN()
     END_IF()
     USER_FUNC(evt_pouch_get_coin, LW(0))
     IF_SMALL(LW(0), LW(13))
-        SET(LW(14), "tot_shopkeep_01")
-        USER_FUNC(evt_msg_print_add, 0, LW(14))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_01"))
         USER_FUNC(evt_win_coin_off, LW(8))
         RETURN()
     END_IF()
@@ -238,14 +296,17 @@ EVT_BEGIN(ShopBuyEvt)
     MUL(LW(13), -1)
     USER_FUNC(evt_pouch_add_coin, LW(13))
     USER_FUNC(evt_win_coin_wait, LW(8))
-    USER_FUNC(point_wait)
     WAIT_MSEC(200)
     USER_FUNC(evt_win_coin_off, LW(8))
-    SET(LW(14), "tot_shopkeep_11")
-    USER_FUNC(evt_msg_print_add, 0, LW(14))
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_11"))
 
     // Mark item as collected, remove from shelf if appropriate.
-    USER_FUNC(evtTot_AfterBuyingShopItem, LW(10))
+    USER_FUNC(evtTot_AfterBuyingShopItem, LW(10), -1)
+
+    // TODO: Special dialogue + give selectors after buying 10 apiece.
+    USER_FUNC(tot::evtTot_CheckCompletedAchievement,
+        tot::AchievementId::META_ITEMS_BADGES_10, LW(1))
+
     RETURN()
 EVT_END()
 
@@ -255,9 +316,68 @@ EVT_BEGIN(ShopBuyEvt_Hook)
 EVT_END()
 
 EVT_BEGIN(ShopSignEvt)
-    // TODO: Implement "rest of the items" shop dialog.
+    USER_FUNC(evt_mario_normalize)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    // Get name of shopkeeper npc.
     USER_FUNC(shopper_name, LW(9))
-    USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, LW(9))
+
+    // Initialize the sign with all remaining items.
+    USER_FUNC(evtTot_InitializeShopSign, LW(15))
+    IF_SMALL(LW(15), 1)
+        // Turn to face each other (only in this case, for Mario).
+        USER_FUNC(evt_mario_set_dir_npc, LW(9))
+        USER_FUNC(evt_set_dir_to_target, LW(9), PTR("mario"))
+        // Placeholder text for no items available on back order.
+        USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, LW(9))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(_evt_shop_get_ptr, LW(10))
+    USER_FUNC(disp_off, LW(10))
+
+    USER_FUNC(evt_win_coin_on, 0, LW(8))
+    USER_FUNC(evt_win_other_select,
+        (uint32_t)tot::window_select::MenuType::HUB_ITEM_SHOP)
+    // Cancelled selection.
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evt_set_dir_to_target, LW(9), PTR("mario"))
+    SET(LW(14), PTR("tot_shopkeep_00"))
+    USER_FUNC(evt_msg_fill_num, 0, LW(14), LW(14), LW(3))
+    USER_FUNC(evt_msg_fill_item, 1, LW(14), LW(14), LW(2))
+    USER_FUNC(evt_msg_print, 1, LW(14), 0, LW(9))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_24"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_22"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+    USER_FUNC(evt_pouch_get_coin, LW(0))
+    IF_SMALL(LW(0), LW(3))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_01"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+    USER_FUNC(tot::evtTot_SpendPermanentCurrency, 0, LW(3))
+    MUL(LW(3), -1)
+    USER_FUNC(evt_pouch_add_coin, LW(3))
+    USER_FUNC(evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_coin_off, LW(8))
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_11"))
+
+    // Mark item as collected.
+    USER_FUNC(evtTot_AfterBuyingShopItem, LW(10), LW(1))
+
+    // TODO: Special dialogue + give selectors after buying 10 apiece.
+    USER_FUNC(tot::evtTot_CheckCompletedAchievement,
+        tot::AchievementId::META_ITEMS_BADGES_10, LW(1))
+
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()
 
@@ -362,6 +482,10 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_evt_shop_setup_Patch_DisableShopperTalkEvt),
         0x60000000 /* nop */);
+}
+
+int16_t* GetShopBackOrderItems() {
+    return g_ShopSignItems;
 }
 
 }  // namespace field

@@ -491,8 +491,10 @@ EVT_BEGIN(partyChristineAttack_Monosiri)
     // Mark Tattle log flag.
     USER_FUNC(_monosiri_flag_on, LW(3))
     // Check for completion of Tattle Log.
-    USER_FUNC(evtTot_CheckCompletedAchievement, AchievementId::META_TATTLE_LOG_BASIC)
-    USER_FUNC(evtTot_CheckCompletedAchievement, AchievementId::META_TATTLE_LOG_ALL)
+    USER_FUNC(evtTot_CheckCompletedAchievement,
+        AchievementId::META_TATTLE_LOG_BASIC, EVT_NULLPTR)
+    USER_FUNC(evtTot_CheckCompletedAchievement,
+        AchievementId::META_TATTLE_LOG_ALL, EVT_NULLPTR)
 
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("PKR_T_1"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("PKR_S_1"))
