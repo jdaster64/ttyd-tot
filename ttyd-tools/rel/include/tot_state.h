@@ -38,7 +38,7 @@ public:
     int8_t      level_selected_[MoveType::MOVE_TYPE_MAX];
     
     // Options / saved data.
-    uint32_t    option_flags_[4];   // Last 4 bytes reserved for cosmetics?
+    uint32_t    option_flags_[8];   // Last 8 bytes reserved for cosmetics.
     uint8_t     option_bytes_[64];
     
     // RNG information.
@@ -64,7 +64,7 @@ public:
     uint32_t    midboss_defeated_flags_[4];
     uint32_t    cosmetic_purchased_flags_[4];
     // Reserved in case similar flags are needed.
-    uint32_t    reserved_[29];
+    uint32_t    reserved_[25];
     
     // Saves various stats for current runs and all-time.
     uint8_t     play_stats_[1024];
@@ -402,9 +402,9 @@ enum Options : uint32_t {
     // Next: 0x446
     
     // Internal / cosmetic flag options.
-    OPT_RUN_STARTED             = 0x460'1'00'01,
-    OPT_DEBUG_MODE_USED         = 0x461'1'00'01,
-    OPT_SHOP_ITEMS_CHOSEN       = 0x462'1'00'01,
+    OPT_RUN_STARTED             = 0x4c0'1'00'01,
+    OPT_DEBUG_MODE_USED         = 0x4c1'1'00'01,
+    OPT_SHOP_ITEMS_CHOSEN       = 0x4c2'1'00'01,
     
     // Numeric options.
     // Global enemy HP and ATK scaling (0.05x ~ 10.00x in increments of 0.05).
