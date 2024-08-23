@@ -316,7 +316,7 @@ enum Options : uint32_t {
     OPTVAL_PARTNER_VIVIAN       = 0x504'4'00'05,
     OPTVAL_PARTNER_BOBBERY      = 0x504'4'00'06,
     OPTVAL_PARTNER_MOWZ         = 0x504'4'00'07,
-    OPTVAL_PARTNER_NONE         = 0x504'4'00'08,    // Not used.
+    OPTVAL_PARTNER_NONE         = 0x504'4'00'08,    // Not currently used.
     // Starting item set.
     OPT_STARTER_ITEMS           = 0x408'3'00'04,
     OPTVAL_STARTER_ITEMS_OFF    = 0x508'3'00'00,
@@ -335,17 +335,19 @@ enum Options : uint32_t {
     OPTVAL_TIMER_NONE           = 0x50d'3'00'00,
     OPTVAL_TIMER_IGT            = 0x50d'3'00'01,
     OPTVAL_TIMER_RTA            = 0x50d'3'00'02,
-    // Reserved: several options for countdown timers?
-    // Whether to enable Merlee curses.
+    // Reserved: left space for possible countdown timer options.
+    // Whether to enable Merlee curses (not currently supported).
     OPT_MERLEE_CURSE            = 0x410'1'00'01,
     // Whether to have the audience throw random items.
     OPT_AUDIENCE_RANDOM_THROWS  = 0x411'1'00'01,
+    OPTVAL_AUDIENCE_THROWS_OFF  = 0x511'1'00'00,
+    OPTVAL_AUDIENCE_THROWS_ON   = 0x511'1'00'01,
     // Whether to enable variance on all sources of variable damage.
     OPT_RANDOM_DAMAGE           = 0x412'2'00'02,
     OPTVAL_RANDOM_DAMAGE_NONE   = 0x512'2'00'00,
     OPTVAL_RANDOM_DAMAGE_25     = 0x512'2'00'01,
     OPTVAL_RANDOM_DAMAGE_50     = 0x512'2'00'02,
-    // Changes to stage hazard rates.
+    // Changes to stage hazard rates (not currently supported).
     OPT_STAGE_HAZARDS           = 0x414'3'00'04,
     OPTVAL_STAGE_HAZARDS_NORMAL = 0x514'3'00'00,
     OPTVAL_STAGE_HAZARDS_HIGH   = 0x514'3'00'01,
@@ -354,6 +356,8 @@ enum Options : uint32_t {
     OPTVAL_STAGE_HAZARDS_OFF    = 0x514'3'00'04,
     // Whether to shuffle the appearance and description of items.
     OPT_OBFUSCATE_ITEMS         = 0x417'1'00'01,
+    OPTVAL_OBFUSCATE_ITEMS_OFF  = 0x517'1'00'00,
+    OPTVAL_OBFUSCATE_ITEMS_ON   = 0x517'1'00'01,
     // Whether to auto-revive partners after finishing a battle.
     OPT_REVIVE_PARTNERS         = 0x418'1'00'01,
     OPTVAL_REVIVE_PARTNERS_OFF  = 0x518'1'00'00,
@@ -381,7 +385,7 @@ enum Options : uint32_t {
     OPT_NPC_CHOICE_2            = 0x432'4'00'09,
     OPT_NPC_CHOICE_3            = 0x436'4'00'09,
     OPT_NPC_CHOICE_4            = 0x43a'4'00'09,
-    // Determines whether the secret boss will appear.
+    // Determines whether the secret boss will appear (not currently supported).
     OPT_SECRET_BOSS             = 0x43e'2'00'02,
     OPTVAL_SECRET_BOSS_RANDOM   = 0x53e'2'00'00,
     OPTVAL_SECRET_BOSS_OFF      = 0x53e'2'00'01,
@@ -399,11 +403,18 @@ enum Options : uint32_t {
     OPTVAL_AC_1_UNSIMP          = 0x543'3'00'04,
     OPTVAL_AC_2_UNSIMP          = 0x543'3'00'05,
     OPTVAL_AC_3_UNSIMP          = 0x543'3'00'06,
-    // Next: 0x446
+    // Determines how many chests appear per floor.
+    OPT_NUM_CHESTS              = 0x446'3'00'03,
+    OPTVAL_CHESTS_DEFAULT       = 0x546'3'00'00,
+    OPTVAL_CHESTS_1             = 0x546'3'00'01,
+    OPTVAL_CHESTS_2             = 0x546'3'00'02,
+    OPTVAL_CHESTS_3             = 0x546'3'00'03,
+    OPTVAL_CHESTS_4             = 0x546'3'00'04,    // Not currently used.
+    // Next: 0x449
     
     // Internal / cosmetic flag options.
     OPT_RUN_STARTED             = 0x4c0'1'00'01,
-    OPT_DEBUG_MODE_USED         = 0x4c1'1'00'01,
+    OPT_DEBUG_MODE_ENABLED      = 0x4c1'1'00'01,
     OPT_SHOP_ITEMS_CHOSEN       = 0x4c2'1'00'01,
     
     // Numeric options.

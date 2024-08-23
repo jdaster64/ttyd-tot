@@ -750,6 +750,12 @@ void SelectChestContents() {
     // badge in its place.
     bool others_picked[] = { false, false, false, false, false };
 
+    // Reduce weight for 'other rewards' category if Doopliss curse is active.
+    int32_t doopliss_floor = state.GetOption(STAT_RUN_NPC_DOOPLISS_FLOOR);
+    if (doopliss_floor && state.floor_ - doopliss_floor < 8) {
+        top_level_weights[2] -= 5;
+    }
+
     // Change weights for moves based on how many partners are in the pool.
     const int32_t partner_pool_size = state.GetOption(OPT_MAX_PARTNERS);
     const int32_t default_pool_size =

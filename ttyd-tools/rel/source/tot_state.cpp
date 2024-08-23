@@ -95,10 +95,10 @@ void StateManager::Init() {
     SetOption(STAT_PERM_FULL_BEST_TIME, 100 * 60 * 60 * 100 - 1);
     SetOption(STAT_PERM_EX_BEST_TIME,   100 * 60 * 60 * 100 - 1);
 
-    // For alpha version, always set this to 1.
-    SetOption(OPT_DEBUG_MODE_USED, 1);
-
     InitDefaultOptions();
+
+    // For alpha version, always set this to 1.
+    SetOption(OPT_DEBUG_MODE_ENABLED, 1);
 }
 
 // Loading / saving functions.
@@ -269,7 +269,8 @@ void StateManager::InitDefaultOptions() {
     bp_level_ = 1;
     max_inventory_ = 6;
     
-    memset(option_flags_, 0, sizeof(option_flags_));
+    // Don't clear internal options.
+    memset(option_flags_, 0, sizeof(uint32_t) * 6);
     memset(option_bytes_, 0, sizeof(option_bytes_));
     // Only reset per-run play stats.
     memset(play_stats_, 0, 0x100);
@@ -341,12 +342,16 @@ bool StateManager::VerifyDefaultsExceptEnemyScaling() {
         GetOption(OPT_MAX_PARTNERS) != 3) return false;
     if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
         GetOption(OPT_MAX_PARTNERS) != 4) return false;
+    if (!CheckOptionValue(OPTVAL_CHESTS_DEFAULT)) return false;
     if (!CheckOptionValue(OPTVAL_PARTNER_RANDOM)) return false;
     if (!CheckOptionValue(OPTVAL_DROP_STANDARD)) return false;
     if (!CheckOptionValue(OPTVAL_STARTER_ITEMS_BASIC)) return false;
     if (!CheckOptionValue(OPTVAL_REVIVE_PARTNERS_ON)) return false;
     if (!CheckOptionValue(OPTVAL_BANDIT_NO_REFIGHT)) return false;
     if (!CheckOptionValue(OPTVAL_AC_DEFAULT)) return false;
+    if (!CheckOptionValue(OPTVAL_AUDIENCE_THROWS_OFF)) return false;
+    if (!CheckOptionValue(OPTVAL_RANDOM_DAMAGE_NONE)) return false;
+    if (!CheckOptionValue(OPTVAL_OBFUSCATE_ITEMS_OFF)) return false;
     if (!CheckOptionValue(OPTVAL_SECRET_BOSS_RANDOM)) return false;
     if (!CheckOptionValue(OPTVAL_CHARLIETON_NORMAL)) return false;
     if (GetOption(OPT_NPC_CHOICE_1) != gon::GetNumSecondaryNpcTypes()) return false;
@@ -369,12 +374,16 @@ bool StateManager::VerifyDefaultsExceptMarioScaling() {
         GetOption(OPT_MAX_PARTNERS) != 3) return false;
     if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
         GetOption(OPT_MAX_PARTNERS) != 4) return false;
+    if (!CheckOptionValue(OPTVAL_CHESTS_DEFAULT)) return false;
     if (!CheckOptionValue(OPTVAL_PARTNER_RANDOM)) return false;
     if (!CheckOptionValue(OPTVAL_DROP_STANDARD)) return false;
     if (!CheckOptionValue(OPTVAL_STARTER_ITEMS_BASIC)) return false;
     if (!CheckOptionValue(OPTVAL_REVIVE_PARTNERS_ON)) return false;
     if (!CheckOptionValue(OPTVAL_BANDIT_NO_REFIGHT)) return false;
     if (!CheckOptionValue(OPTVAL_AC_DEFAULT)) return false;
+    if (!CheckOptionValue(OPTVAL_AUDIENCE_THROWS_OFF)) return false;
+    if (!CheckOptionValue(OPTVAL_RANDOM_DAMAGE_NONE)) return false;
+    if (!CheckOptionValue(OPTVAL_OBFUSCATE_ITEMS_OFF)) return false;
     if (!CheckOptionValue(OPTVAL_SECRET_BOSS_RANDOM)) return false;
     if (!CheckOptionValue(OPTVAL_CHARLIETON_NORMAL)) return false;
     if (GetOption(OPT_NPC_CHOICE_1) != gon::GetNumSecondaryNpcTypes()) return false;
@@ -622,6 +631,7 @@ const char* StateManager::GetEncodedOptions() const {
             return "Default";
     }
 
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NUM_CHESTS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_BATTLE_DROPS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_STARTER_ITEMS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_MAX_PARTNERS);
@@ -636,12 +646,16 @@ const char* StateManager::GetEncodedOptions() const {
     EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_ATK);
     EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_SUPERGUARD_SP_COST);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_AC_DIFFICULTY);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_RANDOM_DAMAGE);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_AUDIENCE_RANDOM_THROWS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_OBFUSCATE_ITEMS);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_BANDIT_ESCAPE);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_CHARLIETON_STOCK);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_1);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_2);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_3);
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_4);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_SECRET_BOSS);
 
     const int32_t kEncodedByteCount = (encoded_bit_count + 5) / 6;
     for (int32_t i = 0; i < kEncodedByteCount; ++i) {

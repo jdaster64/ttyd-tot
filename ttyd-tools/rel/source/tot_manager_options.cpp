@@ -85,14 +85,14 @@ void SetBaseStats() {
 }
 
 void OptionsManager::InitLobby() {
-    // Un-obfuscate items if previously enabled.
-    if (g_Mod->state_.GetOption(tot::OPT_OBFUSCATE_ITEMS)) {
+    auto& state = g_Mod->state_;
+
+    // Un-obfuscate items if enabled during the previous run.
+    if (state.GetOption(OPT_RUN_STARTED) && state.GetOption(OPT_OBFUSCATE_ITEMS)) {
         ObfuscateItems(false);
     }
 
-    bool hub_items_selected = g_Mod->state_.GetOption(OPT_SHOP_ITEMS_CHOSEN);
-
-    g_Mod->state_.InitDefaultOptions();
+    state.InitDefaultOptions();
     
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
@@ -100,8 +100,8 @@ void OptionsManager::InitLobby() {
     for (int32_t i = 0; i < 121; ++i) pouch.key_items[i] = 0;
     for (int32_t i = 0; i < 200; ++i) pouch.badges[i] = 0;
     for (int32_t i = 0; i < 200; ++i) pouch.equipped_badges[i] = 0;
-    pouch.coins = g_Mod->state_.GetOption(STAT_PERM_CURRENT_COINS);
-    pouch.star_pieces = g_Mod->state_.GetOption(STAT_PERM_CURRENT_SP);
+    pouch.coins = state.GetOption(STAT_PERM_CURRENT_COINS);
+    pouch.star_pieces = state.GetOption(STAT_PERM_CURRENT_SP);
     pouch.shine_sprites = 0;
     pouch.star_points = 0;
     pouch.star_powers_obtained = 0;
@@ -146,10 +146,7 @@ void OptionsManager::InitLobby() {
     MoveManager::Init();
     
     // Set run to not having started.
-    g_Mod->state_.SetOption(OPT_RUN_STARTED, 0);
-    g_Mod->state_.SetOption(OPT_DEBUG_MODE_USED, 0);
-    // Remember the previously set hub item shop inventory until next run.
-    if (hub_items_selected) g_Mod->state_.SetOption(OPT_SHOP_ITEMS_CHOSEN, 1);
+    state.SetOption(OPT_RUN_STARTED, 0);
 }
 
 void OptionsManager::InitFromSelectedOptions() {
@@ -218,9 +215,9 @@ void OptionsManager::InitFromSelectedOptions() {
         }
     }
     
-    // Start with Merlee curse, if enabled.
-    // TODO: If enabling Merlee, make ToT Merlee unable to buff EXP gain.
-    if (state.GetOption(tot::OPT_MERLEE_CURSE)) {
+    // Start with Merlee curse, if enabled (not supported yet).
+    // TODO: If Merlee is ever supported, make her unable to buff EXP gain.
+    if (state.GetOption(OPT_MERLEE_CURSE)) {
         pouch.merlee_curse_uses_remaining = 99;
         pouch.turns_until_merlee_activation = -1;
     } else {
@@ -253,8 +250,8 @@ void OptionsManager::InitFromSelectedOptions() {
 }
 
 void OptionsManager::ApplyOptionsOnLoad() {
-    // Force item obfuscation, if enabled.
-    if (g_Mod->state_.GetOption(tot::OPT_OBFUSCATE_ITEMS)) {
+    // Redo item obfuscation, if enabled.
+    if (g_Mod->state_.GetOption(OPT_OBFUSCATE_ITEMS)) {
         g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION] = 0;
         ObfuscateItems(true);
     }

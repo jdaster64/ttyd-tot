@@ -27,13 +27,15 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Constants for secret codes.
 uint32_t secretCode_OpeningCutscene = 034345566;
-uint32_t secretCode_ObfuscateItems  = 046362123;
 uint32_t secretCode_DebugMode       = 036363636;
 uint32_t secretCode_BumpAttack      = 043652131;
 
 }
 
 void CheatsManager::Update() {
+    // Ignore all cheat codes if not using a debug-enabled file.
+    if (!g_Mod->state_.GetOption(OPT_DEBUG_MODE_ENABLED)) return;
+
     // Process cheat codes.
     static uint32_t code_history = 0;
     int32_t code = 0;
@@ -61,20 +63,10 @@ void CheatsManager::Update() {
             ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
         }
     }
-    if ((code_history & 0xFFFFFF) == secretCode_ObfuscateItems) {
-        code_history = 0;
-        if (InMainGameModes() && 
-            !g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
-            g_Mod->state_.ChangeOption(OPT_OBFUSCATE_ITEMS);
-            ttyd::sound::SoundEfxPlayEx(0x3c, 0, 0x64, 0x40);
-        }
-    }
 
-    // TODO: Disable this before public releases.
     if ((code_history & 0xFFFFFF) == secretCode_DebugMode) {
         code_history = 0;
         DebugManager::ChangeMode();
-        g_Mod->state_.SetOption(OPT_DEBUG_MODE_USED, 1);
     }
 }
 

@@ -1229,28 +1229,34 @@ int32_t GetBattleRewardTier() {
     int32_t floor = g_Mod->state_.floor_;
     // For the starter floor, you only have one choice.
     if (floor == 0) return 1;
-    
-    int32_t level_target_sum = kTargetLevelSums[GetDifficulty()];
-    int32_t level_sum = 0;
-    for (int32_t i = 0; i < 5; ++i) {
-        if (g_Enemies[i] == -1) break;
-        level_sum += kEnemyInfo[g_Enemies[i]].level;
-    }
-    level_sum *= 100;
 
-    int32_t num_chests = 1;
-    if (floor > 0 && floor % 8 == 0) {
-        // For midboss or boss floors, always 3 options.
-        num_chests = 3;
-    } else if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX)) {
-        // Increased number of chests in EX mode, min of 2 even on rest floors.
-        if (level_sum / level_target_sum >= 0) ++num_chests;
-        if (level_sum / level_target_sum >= 62) ++num_chests;
-        // Exceptionally hard layouts can give 4 chests later in the Pit.
-        if (floor > 16 && level_sum / level_target_sum >= 83) ++num_chests;
-    } else {
-        if (level_sum / level_target_sum >= 55) ++num_chests;
-        if (level_sum / level_target_sum >= 70) ++num_chests;
+    int32_t num_chests = g_Mod->state_.GetOption(OPT_NUM_CHESTS);
+
+    // If set to default, determine the number of chests based on the tower
+    // difficulty, tower progression, and enemy loadouts' sum of levels.
+    if (num_chests == 0) {
+        int32_t level_target_sum = kTargetLevelSums[GetDifficulty()];
+        int32_t level_sum = 0;
+        for (int32_t i = 0; i < 5; ++i) {
+            if (g_Enemies[i] == -1) break;
+            level_sum += kEnemyInfo[g_Enemies[i]].level;
+        }
+        level_sum *= 100;
+
+        num_chests = 1;
+        if (floor > 0 && floor % 8 == 0) {
+            // For midboss or boss floors, always 3 options.
+            num_chests = 3;
+        } else if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX)) {
+            // Increased number of chests in EX mode, min of 2 even on rest floors.
+            if (level_sum / level_target_sum >= 0) ++num_chests;
+            if (level_sum / level_target_sum >= 62) ++num_chests;
+            // Exceptionally hard layouts can give 4 chests later in the Pit.
+            if (floor > 16 && level_sum / level_target_sum >= 83) ++num_chests;
+        } else {
+            if (level_sum / level_target_sum >= 55) ++num_chests;
+            if (level_sum / level_target_sum >= 70) ++num_chests;
+        }
     }
 
     // Give an extra chest if Doopliss's effect is active (up to the max of 4).

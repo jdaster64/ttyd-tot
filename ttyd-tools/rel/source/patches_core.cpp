@@ -186,7 +186,7 @@ void ApplyFixedPatches() {
             if (!g_Mod->state_.Load(save_data)) {
                 g_CueGameOver = true;
             } else {
-                // TODO: Apply options if loading run in-progress.
+                // Apply options specific to loading run in-progress.
                 tot::OptionsManager::ApplyOptionsOnLoad();
             }
         });

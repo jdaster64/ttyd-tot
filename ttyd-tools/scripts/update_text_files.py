@@ -2100,7 +2100,7 @@ g_StringMap = {
         b"tot_acho_revive":         b"Partner Revival",
         b"tot_acho_bandit":         b"Bandit Escape",
         b"tot_acho_invincrease":    b"S. Sack Size",
-        b"tot_acho_customloadout":  b"Custom Items",
+        b"tot_acho_customloadout":  b"Custom Loadouts",
         b"tot_acho_obfuscated":     b"Obfuscated Items",
         b"tot_acho_secretboss":     b"???",  # Placeholder; b"Gold Fuzzy Boss",
         
@@ -2459,6 +2459,20 @@ g_StringMap = {
         b"tot_optr_npc_zess":           b"Zess T.",
         b"tot_optr_npc_random":         b"Random",
         b"tot_optr_npc_none":           b"None",
+        b"tot_optr_chests":             b"No. of Chests",
+        b"tot_optr_chests_default":     b"Balanced",
+        b"tot_optr_damagevar":          b"Damage Variance",
+        b"tot_optr_damagevar_0":        b"0%",
+        b"tot_optr_damagevar_25":       b"25%",
+        b"tot_optr_damagevar_50":       b"50%",
+        b"tot_optr_audthrows":          b"Audience Throws",
+        b"tot_optr_audthrows_off":      b"Normal",
+        b"tot_optr_audthrows_on":       b"Random Items",
+        b"tot_optr_itemshuffle":        b"Obfuscated Items",
+        b"tot_optr_secretboss":         b"Secret Boss",
+        b"tot_optr_secretboss_random":  b"Randomly Appears",
+        b"tot_optr_secretboss_off":     b"Never Appears",
+        b"tot_optr_secretboss_on":      b"Always Appears",
         
         b"tot_optr_off":                b"Off",
         b"tot_optr_on":                 b"On",
@@ -2578,6 +2592,26 @@ g_StringMap = {
         b"tot_opth_npc_zess":
             b"She'll use her cooking skills to\n"
             b"turn your items into rarer ones.",
+        
+        b"tot_opth_chests":
+            b"How many chests there are to\n"
+            b"choose from on every floor.",
+            
+        b"tot_opth_damagevar":
+            b"Varies all damage by up to this\n"
+            b"amount in either direction.",
+            
+        b"tot_opth_audthrows":
+            b"Whether to make the audience\n"
+            b"throw a random item every turn.",
+            
+        b"tot_opth_itemshuffle":
+            b"Shuffles all items and badges'\n"
+            b"names, icons and descriptions.",
+            
+        b"tot_opth_secretboss":
+            b"Whether or not the secret,\n"
+            b"alternate final boss can appear.",
             
         # Map text.
         
@@ -2590,7 +2624,7 @@ g_StringMap = {
             b'<kanban>\n'
             b'Current seed: <col 0000ffff>\n'
             b'%09d\n</col>\n'
-            b'Current options: <col 0000ffff>\n'
+            b'Options: <col 0000ffff>\n'
             b'%s\n</col>\n'
             b'<k>',
         
