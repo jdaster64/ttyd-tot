@@ -334,18 +334,23 @@ void MarioMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
             &position, &scale, &kWhite, msgSearch("name_mario"));
     }
     {
-        // Print filename on right of Mario head icon.
+        // Print filename centered, on right of Mario head icon.
         float mario_width =
             ttyd::fontmgr::FontGetMessageWidth(msgSearch("name_mario")) * 0.8f;
+        float max_width = 180.f - mario_width;
+
+        const char* text = g_MarioSt->saveFileName;
+        float fn_width = ttyd::fontmgr::FontGetMessageWidth(text) * 0.8f;
+        if (fn_width > max_width) fn_width = max_width;
+
         gc::vec3 position = {
-            win_x - 255.0f + 40.0f + mario_width,
+            win_x - 255.0f + 40.0f + mario_width + (max_width - fn_width) * 0.5f,
             win_y + 152.0f,
             0.0f
         };
         gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
         ttyd::win_main::winFontSetEdgeWidth(
-            &position, &scale, &kWhite, 180.f - mario_width,
-            g_MarioSt->saveFileName);
+            &position, &scale, &kWhite, max_width, text);
     }
     ttyd::win_main::winIconInit();
     {
@@ -585,7 +590,7 @@ void MarioMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
     
     ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
     for (int32_t i = 0; i < 4; ++i) {
-        gc::vec3 position = { win_x + 200.0f, win_y + 10.0f - 28.0f * i, 0.0f };
+        gc::vec3 position = { win_x + 180.0f, win_y + 10.0f - 28.0f * i, 0.0f };
         gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
         ttyd::win_main::winTexSet(0x11, &position, &scale, &kWhite);
     }

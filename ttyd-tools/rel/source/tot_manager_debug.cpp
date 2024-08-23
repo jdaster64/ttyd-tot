@@ -42,7 +42,7 @@ enum DebugManagerMode {
     DEBUG_UNLOCK_ALL_BADGES,
     DEBUG_COMPLETE_LOGS,
     DEBUG_COMPLETE_ACHIEVEMENTS,
-    DEBUG_ADD_100_COINS,
+    DEBUG_ADD_500_COINS,
     DEBUG_EXIT,
     DEBUG_MAX,
 
@@ -158,10 +158,10 @@ void DebugManager::Update() {
                     tot::OptionsManager::UpdateLevelupStats();
                     break;
                 }
-                case DEBUG_ADD_100_COINS: {
-                    ttyd::mario_pouch::pouchAddCoin(100);
+                case DEBUG_ADD_500_COINS: {
+                    ttyd::mario_pouch::pouchAddCoin(500);
                     if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
-                        g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_COINS, 100);
+                        g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_COINS, 500);
                     }
                     break;
                 }
@@ -431,8 +431,8 @@ void DebugManager::Draw() {
             case DEBUG_MAX_STATS: {
                 strcpy(buf, "Max Stats");                   break;
             }
-            case DEBUG_ADD_100_COINS: {
-                strcpy(buf, "Add 100 Coins");               break;
+            case DEBUG_ADD_500_COINS: {
+                strcpy(buf, "Add 500 Coins");               break;
             }
             case DEBUG_UNLOCK_ALL_MOVES: {
                 strcpy(buf, "Unlock All Moves");            break;

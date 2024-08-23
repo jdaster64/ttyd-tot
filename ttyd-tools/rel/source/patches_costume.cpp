@@ -27,8 +27,6 @@ extern "C" {
     void BranchBackSelectDispPartyYoshiIcon();
     void StartSweetTreatYoshiIcon();
     void BranchBackSweetTreatYoshiIcon();
-    void StartStatusWindowYoshiIcon();
-    void BranchBackStatusWindowYoshiIcon();
 
     int32_t getYoshiIcon(int32_t color) {
         return mod::tot::CosmeticsManager::GetYoshiCostumeData(color)->icon;
@@ -65,8 +63,6 @@ extern const int32_t g_winPartyInit_Patch_YoshiColor;
 extern const int32_t g_yoshi_original_color_anim_set_Patch_YoshiColor;
 extern const int32_t g__battleGetPartyIcon_YoshiIcon_BH;
 extern const int32_t g__battleGetPartyIcon_YoshiIcon_EH;
-extern const int32_t g_statusWinDisp_YoshiHeartIcon_BH;
-extern const int32_t g_statusWinDisp_YoshiHeartIcon_EH;
 extern const int32_t g_winPartyInit_YoshiIcon_BH;
 extern const int32_t g_winPartyInit_YoshiIcon_EH;
 extern const int32_t g_evt_unitwin_disp_func_YoshiIcon_BH;
@@ -164,11 +160,6 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g__battleGetPartyIcon_YoshiIcon_EH),
         reinterpret_cast<void*>(StartBattleGetPartyIconYoshi),
         reinterpret_cast<void*>(BranchBackBattleGetPartyIconYoshi));
-    mod::patch::writeBranchPair(
-        reinterpret_cast<void*>(g_statusWinDisp_YoshiHeartIcon_BH),
-        reinterpret_cast<void*>(g_statusWinDisp_YoshiHeartIcon_EH),
-        reinterpret_cast<void*>(StartStatusWindowYoshiIcon),
-        reinterpret_cast<void*>(BranchBackStatusWindowYoshiIcon));
     mod::patch::writeBranchPair(
         reinterpret_cast<void*>(g_winPartyInit_YoshiIcon_BH),
         reinterpret_cast<void*>(g_winPartyInit_YoshiIcon_EH),

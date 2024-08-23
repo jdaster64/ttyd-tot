@@ -2522,6 +2522,9 @@
 8013cb24:statusWinDisp
 8013d440:gaugeDisp
 // .data
+8036edd0:alwaysDt
+80417658:partysDt
+8041767c:statusWin_party_icon
 8041768c:gauge_back
 8041769c:gauge_wakka
 8041ebec:g_StatusWindowWork

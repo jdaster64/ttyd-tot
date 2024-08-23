@@ -62,8 +62,12 @@ int32_t (*g_pouchGetPartyColor_trampoline)(int32_t) = nullptr;
 int32_t (*g_pouchEquipBadgeIndex_trampoline)(int32_t) = nullptr;
 // mario_pouch.o  800d35a8
 void (*g_pouchReviseMarioParam_trampoline)() = nullptr;
+// mario_pouch.o 800d3d8c
+int16_t (*g_pouchAddStarPiece_trampoline)(int16_t) = nullptr;
+// mario_pouch.o 800d3dd4
+int16_t (*g_pouchSetCoin_trampoline)(int16_t) = nullptr;
 // mario_pouch.o 800d3e18
-int32_t (*g_pouchAddCoin_trampoline)(int16_t) = nullptr;
+int16_t (*g_pouchAddCoin_trampoline)(int16_t) = nullptr;
 // mario_pouch.o 800d50cc
 uint32_t (*g_pouchGetItem_trampoline)(int32_t) = nullptr;
 // pmario_sound.o  800daf24
@@ -172,8 +176,6 @@ bool (*g_BattleCheckEndUnitInitEvent_trampoline)(BattleWork*) = nullptr;
 int32_t (*g_BattleItemData_rank_up_trampoline)(EvtEntry*, bool) = nullptr;
 // statuswindow.o  8013cb24
 void (*g_statusWinDisp_trampoline)(void) = nullptr;
-// statuswindow.o  8013d440
-void (*g_gaugeDisp_trampoline)(double, double, int32_t) = nullptr;
 // win_item.o  80169cf0
 void (*g_itemUseDisp2_trampoline)(WinMgrEntry*) = nullptr;
 // win_item.o  80169ec0
@@ -385,11 +387,7 @@ extern const int32_t g_BtlUnit_CheckPinchStatus_DangerThreshold_BH = 0x80126e84;
 extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitAlloc = 0x8012903c;
 extern const int32_t g_BtlUnit_Entry_Patch_BattleWorkUnitMemset = 0x80129058;
 extern const int32_t g_mot_damage_Patch_DisableFallDamage = 0x8013b570;
-extern const int32_t g_statusWinDisp_YoshiHeartIcon_BH = 0x8013cf48;
-extern const int32_t g_statusWinDisp_YoshiHeartIcon_EH = 0x8013cfb8;
-extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_BH = 0x8013d140;
-extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_EH = 0x8013d144;
-extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_CH1 = 0x8013d404;
+extern const int32_t g_valueUpdate_Patch_DisableCoinCap = 0x8013c7e4;
 extern const int32_t g__mario_super_emblem_anim_set_Patch_CheckEmblem1 = 0x80145468;
 extern const int32_t g__mario_super_emblem_anim_set_Patch_CheckEmblem2 = 0x8014547c;
 extern const int32_t g_winHakoGX_SetInitialFields_BH = 0x801584ac;

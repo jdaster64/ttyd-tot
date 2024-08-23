@@ -8,8 +8,6 @@
 .global BranchBackSelectDispPartyYoshiIcon
 .global StartSweetTreatYoshiIcon
 .global BranchBackSweetTreatYoshiIcon
-.global StartStatusWindowYoshiIcon
-.global BranchBackStatusWindowYoshiIcon
 
 StartBattleGetPartyIconYoshi:
 bl getYoshiIcon
@@ -50,12 +48,4 @@ bl getYoshiHpIcon
 mr %r24, %r3
 
 BranchBackSweetTreatYoshiIcon:
-b 0
-
-
-StartStatusWindowYoshiIcon:
-bl getYoshiHpIcon
-sth %r3, 0x10 (%r30)
-
-BranchBackStatusWindowYoshiIcon:
 b 0

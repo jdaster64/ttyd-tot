@@ -1,5 +1,6 @@
 #include "patches_stats.h"
 
+#include "common_functions.h"
 #include "mod.h"
 #include "patch.h"
 #include "tot_manager_achievements.h"
@@ -32,7 +33,9 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 extern void (*g_BtlUnit_PayWeaponCost_trampoline)(
     BattleWorkUnit*, BattleWeapon*);
 extern int32_t (*g_pouchEquipBadgeIndex_trampoline)(int32_t);
-extern int32_t (*g_pouchAddCoin_trampoline)(int16_t);
+extern int16_t (*g_pouchAddStarPiece_trampoline)(int16_t);
+extern int16_t (*g_pouchSetCoin_trampoline)(int16_t);
+extern int16_t (*g_pouchAddCoin_trampoline)(int16_t);
 extern void (*g_BtlActRec_AddCount_trampoline)(uint8_t*);
 
 namespace stats {
@@ -59,6 +62,27 @@ void ApplyFixedPatches() {
             return g_pouchEquipBadgeIndex_trampoline(index);
         });
 
+    g_pouchAddStarPiece_trampoline = mod::patch::hookFunction(
+        ttyd::mario_pouch::pouchAddStarPiece, [](int16_t star_pieces) {
+            // Cap at 999 or 9,999 based on whether in run.
+            const int32_t cap = 
+                g_Mod->state_.GetOption(tot::OPT_RUN_STARTED) ? 999 : 9999;
+            auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+            pouch->star_pieces = Clamp(
+                static_cast<int32_t>(pouch->star_pieces + star_pieces), 0, cap);
+            return pouch->star_pieces;
+        });
+
+    g_pouchSetCoin_trampoline = mod::patch::hookFunction(
+        ttyd::mario_pouch::pouchSetCoin, [](int16_t coins) {
+            // Cap at 999 or 9,999 based on whether in run.
+            const int32_t cap = 
+                g_Mod->state_.GetOption(tot::OPT_RUN_STARTED) ? 999 : 9999;
+            auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+            pouch->coins = Clamp(static_cast<int32_t>(coins), 0, cap);
+            return pouch->coins;
+        });
+
     g_pouchAddCoin_trampoline = mod::patch::hookFunction(
         ttyd::mario_pouch::pouchAddCoin, [](int16_t coins) {
             // Track coins gained / spent (stolen coins subtract from gained).
@@ -69,8 +93,13 @@ void ApplyFixedPatches() {
                 tot::AchievementsManager::CheckCompleted(
                     tot::AchievementId::MISC_RUN_COINS_999);
             }
-            // Run coin increment logic.
-            return g_pouchAddCoin_trampoline(coins);
+            // Actually add coins; cap at 999 or 9,999 based on whether in run.
+            const int32_t cap =
+                g_Mod->state_.GetOption(tot::OPT_RUN_STARTED) ? 999 : 9999;
+            auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+            pouch->coins =
+                Clamp(static_cast<int32_t>(pouch->coins + coins), 0, cap);
+            return pouch->coins;
         });
 
     g_BtlActRec_AddCount_trampoline = mod::patch::hookFunction(

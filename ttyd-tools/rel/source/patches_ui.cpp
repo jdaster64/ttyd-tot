@@ -6,6 +6,7 @@
 #include "patch.h"
 #include "patches_item.h"
 #include "tot_generate_enemy.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
 #include "tot_state.h"
 #include "tot_window_item.h"
@@ -71,9 +72,6 @@ extern "C" {
     void StartPartyDispHook2();
     void BranchBackPartyDispHook2();
     // status_window_patches.s
-    void StartPreventDpadShortcutsOutsidePit();
-    void ConditionalBranchPreventDpadShortcutsOutsidePit();
-    void BranchBackPreventDpadShortcutsOutsidePit();
     void StartHideTopBarInSomeWindows();
     void BranchBackHideTopBarInSomeWindows();
   
@@ -83,8 +81,11 @@ extern "C" {
         mod::infinite_pit::ui::DisplayUpDownNumberIcons(
             number, tex_obj, icon_mtx, view_mtx, unk0);
     }
-    bool checkOutsidePit() {
-        return strcmp("jon", mod::GetCurrentArea()) != 0;
+
+    int32_t getIconForBadgeOrItemLogEntry(
+        ttyd::win_root::WinPauseMenu* menu, bool item_log, int32_t index) {
+        return mod::infinite_pit::ui::GetIconForBadgeOrItemLogEntry(
+            menu, item_log, index);
     }
 
     void partyMenuSetupPartnerDescAndMoveCount(ttyd::win_root::WinPauseMenu* menu) {
@@ -95,12 +96,6 @@ extern "C" {
     }
     void partyMenuDispStats(ttyd::win_root::WinPauseMenu* menu) {
         mod::infinite_pit::ui::PartyMenuDispStats(menu);
-    }
-
-    int32_t getIconForBadgeOrItemLogEntry(
-        ttyd::win_root::WinPauseMenu* menu, bool item_log, int32_t index) {
-        return mod::infinite_pit::ui::GetIconForBadgeOrItemLogEntry(
-            menu, item_log, index);
     }
 
     bool checkHideTopBarInWindow(ttyd::winmgr::WinMgrSelectEntry* sel_entry) {
@@ -140,7 +135,6 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Function hooks.
 extern void (*g_statusWinDisp_trampoline)(void);
-extern void (*g_gaugeDisp_trampoline)(double, double, int32_t);
 extern void (*g_itemUseDisp2_trampoline)(WinMgrEntry*);
 extern void (*g_itemUseDisp_trampoline)(WinMgrEntry*);
 extern void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
@@ -162,9 +156,7 @@ extern WinMgrSelectEntry* (*g_winMgrSelectEntry_trampoline)(int32_t, int32_t, in
 // Patch addresses.
 extern const int32_t g_effUpdownDisp_TwoDigitSupport_BH;
 extern const int32_t g_effUpdownDisp_TwoDigitSupport_EH;
-extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_BH;
-extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_EH;
-extern const int32_t g_statusWinDisp_HideDpadMenuOutsidePit_CH1;
+extern const int32_t g_valueUpdate_Patch_DisableCoinCap;
 extern const int32_t g_winHakoGX_SetInitialFields_BH;
 extern const int32_t g_winHakoGX_SetInitialFields_EH;
 extern const int32_t g_winHakoGX_Patch_SkipSingleBox;
@@ -204,32 +196,15 @@ namespace ui {
     
 namespace {
 
-// Displays the Star Power in 0.01 units numerically below the status window.
-void DisplayStarPowerNumber() {
-    // Don't display SP if no Star Powers have been unlocked yet.
-    if (ttyd::mario_pouch::pouchGetMaxAP() <= 0) return;
-    
-    // Don't try to display SP if the status bar is not on-screen.
-    float menu_height = *reinterpret_cast<float*>(
-        reinterpret_cast<uintptr_t>(ttyd::statuswindow::g_StatusWindowWork)
-        + 0x24);
-    if (menu_height < 100.f || menu_height > 330.f) return;
-    
-    gc::mtx34 matrix;
-    uint32_t color = ~0U;
-    int32_t current_AP = ttyd::mario_pouch::pouchGetAP();
-    gc::mtx::PSMTXTrans(&matrix, 192.f, menu_height - 100.f, 0.f);
-    ttyd::icondrv::iconNumberDispGx(
-        &matrix, current_AP, /* is_small = */ 1, &color);
-}
 
-// Display the orbs representing the Star Power (replaces the vanilla logic
-// since it wasn't built around receiving Star Powers out of order).
-void DisplayStarPowerOrbs(double x, double y, int32_t star_power) {
+
+void DrawSpGauge(float win_x, float win_y, int32_t star_power) {
+    // Cap displayed Star Power dots at 8.00.
     int32_t max_star_power = ttyd::mario_pouch::pouchGetMaxAP();
-    if (max_star_power > 800) max_star_power = 800;
-    if (star_power > max_star_power) star_power = max_star_power;
-    if (star_power < 0) star_power = 0;
+    max_star_power = Clamp(max_star_power, 0, 900);
+    star_power = Clamp(star_power, 0, max_star_power);
+
+    float spread = max_star_power <= 800 ? 32.0f : 28.0f;
     
     int32_t full_orbs = star_power / 100;
     int32_t remainder = star_power % 100;
@@ -238,8 +213,8 @@ void DisplayStarPowerOrbs(double x, double y, int32_t star_power) {
     
     if (part_frame != 0) {
         gc::vec3 pos = { 
-            static_cast<float>(x + 32.f * full_orbs),
-            static_cast<float>(y),
+            static_cast<float>(win_x + spread * full_orbs),
+            static_cast<float>(win_y),
             0.f };
         ttyd::icondrv::iconDispGx(
             1.f, &pos, 0x10, ttyd::statuswindow::gauge_wakka[part_frame]);
@@ -247,29 +222,191 @@ void DisplayStarPowerOrbs(double x, double y, int32_t star_power) {
     // Draw grey orbs up to the max amount of SP / 100 (rounded up, max of 8).
     for (int32_t i = 0; i < (max_star_power + 99) / 100; ++i) {
         gc::vec3 pos = {
-            static_cast<float>(x + 32.f * i), 
-            static_cast<float>(y + 12.f),
+            static_cast<float>(win_x + spread * i), 
+            static_cast<float>(win_y + 12.f),
             0.f };
         uint16_t icon = i < full_orbs ?
-            ttyd::statuswindow::gauge_back[i] : IconType::SP_ORB_EMPTY;
+            ttyd::statuswindow::gauge_back[i % 8] : IconType::SP_ORB_EMPTY;
         ttyd::icondrv::iconDispGx(1.f, &pos, 0x10, icon);
+    }
+    
+    // Don't try to display SP number if the status bar is not on-screen.
+    float menu_height = ttyd::statuswindow::g_StatusWindowWork->current_y;
+    if (menu_height < 100.f || menu_height > 330.f) return;
+    
+    gc::mtx34 mtx;
+    uint32_t color = ~0U;
+    star_power = ttyd::mario_pouch::pouchGetAP();
+    gc::mtx::PSMTXTrans(&mtx, 192.0f, menu_height - 100.f, 0.f);
+    ttyd::icondrv::iconNumberDispGx(&mtx, star_power, 1, &color);
+}
+
+void DrawStatusWindow() {
+    auto* work = ttyd::statuswindow::g_StatusWindowWork;
+
+    float win_x = work->current_x;
+    float win_y = work->current_y;
+
+    gc::mtx34 mtx1, mtx2;
+    uint32_t kWhite = 0xFFFF'FFFFU;
+
+    bool blink = false;
+    uint32_t blink_flags = work->stat_updated_flags;
+    if (work->stat_blink_timer > 0) {
+        --work->stat_blink_timer;
+        blink = (work->stat_blink_timer % 16) <= 5;
+    }
+
+    bool in_hub = !g_Mod->state_.GetOption(tot::OPT_RUN_STARTED);
+    bool in_battle = ttyd::mariost::g_MarioSt->bInBattle;
+
+    if (!in_hub) {
+        // Normal size green banner.
+        ttyd::statuswindow::alwaysDt[6].x_pos = 492;
+        // Change EXP icon to flag icon, reposition slightly.
+        ttyd::statuswindow::alwaysDt[7].icon_id = IconType::TACTICS_ICON;
+        ttyd::statuswindow::alwaysDt[7].scale = 0.75f;
+        ttyd::statuswindow::alwaysDt[7].y_pos = 37;
+        // Normal location for coin icon.
+        ttyd::statuswindow::alwaysDt[8].x_pos = 490;
+        ttyd::statuswindow::alwaysDt[10].x_pos = 512;
+    } else {
+        // Shorter green banner.
+        ttyd::statuswindow::alwaysDt[6].x_pos = 492 + 34;
+        // Move coin icon + x icon over to make room for fourth digit. 
+        ttyd::statuswindow::alwaysDt[8].x_pos = 468;
+        ttyd::statuswindow::alwaysDt[10].x_pos = 490;
+    }
+
+    for (int32_t i = 0; i < 13; ++i) {
+        const auto& data = ttyd::statuswindow::alwaysDt[i];
+      
+        // Skip blinking stats.
+        if (blink) {
+            if (i == 1 && (blink_flags & 1)) continue;
+            if (i == 4 && (blink_flags & 2)) continue;
+            if (i == 8 && (blink_flags & 0x10)) continue;
+            if (i == 12 && (blink_flags & 4)) continue;
+        }
+        // Skip floor icons if in the middle of a run.
+        if ((i == 7 || i == 9) && in_hub) continue;
+        // Skip Star Power background / star if not in battle.
+        if (i == 11 && !in_battle) break;
+
+        float scale = data.scale;
+        float x_scale = (i == 6 && in_hub) ? scale * 0.66667f : scale;
+      
+        gc::mtx::PSMTXTrans(&mtx1, win_x + data.x_pos, win_y - data.y_pos, 0.0f);
+        gc::mtx::PSMTXScale(&mtx2, x_scale, scale, scale);
+        gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
+        ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, data.icon_id, &kWhite);
+    }
+
+    if (!blink || !(blink_flags & 1)) {
+        gc::mtx::PSMTXTrans(&mtx1, win_x + 104.0f, win_y - 36.0f, 0.0f);
+        ttyd::icondrv::iconNumberDispGx(&mtx1, work->last_hp, 0, &kWhite);
+    }
+    gc::mtx::PSMTXTrans(&mtx1, win_x + 170.0f, win_y - 35.0f, 0.0f);
+    ttyd::icondrv::iconNumberDispGx(&mtx1, work->last_max_hp, 1, &kWhite);
+
+    if (!blink || !(blink_flags & 2)) {
+        gc::mtx::PSMTXTrans(&mtx1, win_x + 286.0f, win_y - 36.0f, 0.0f);
+        ttyd::icondrv::iconNumberDispGx(&mtx1, work->last_fp, 0, &kWhite);
+    }
+    gc::mtx::PSMTXTrans(&mtx1, win_x + 352.0f, win_y - 35.0f, 0.0f);
+    ttyd::icondrv::iconNumberDispGx(&mtx1, work->last_max_fp, 1, &kWhite);
+
+    if (!in_hub) {
+        gc::mtx::PSMTXTrans(&mtx1, win_x + 462.0f, win_y - 36.0f, 0.0f);
+        ttyd::icondrv::iconNumberDispGx(&mtx1, work->last_exp, 0, &kWhite);
+    }
+      
+    if (!blink || !(blink_flags & 0x10)) {
+        gc::mtx::PSMTXTrans(&mtx1, win_x + 572.0f, win_y - 36.0f, 0.0f);
+        ttyd::icondrv::iconNumberDispGx(&mtx1, work->last_coins, 0, &kWhite);
+    }
+     
+    // Don't draw SP bar unless in battle.
+    if (in_battle && (!blink || !(blink_flags & 4))) {
+        DrawSpGauge(win_x + 260.0f, win_y - 83.0f, work->last_sp);
+    }
+
+    // Party HP bar.
+    if (work->last_party_member != 0) {
+        // Get current party member's HP icon.
+        int32_t party_icon_id = 
+            ttyd::statuswindow::statusWin_party_icon[work->last_party_member];
+        if (work->last_party_member == 4) {
+            int32_t color = ttyd::mario_pouch::pouchGetPartyColor(4);
+            party_icon_id =
+                tot::CosmeticsManager::GetYoshiCostumeData(color)->icon_hud;
+        }
+        ttyd::statuswindow::partysDt[1].icon_id = party_icon_id;
+      
+        for (int32_t i = 0; i < 3; ++i) {
+              const auto& data = ttyd::statuswindow::partysDt[i];
+          
+              // Skip blinking stats.
+              if (i == 1 && blink && (blink_flags & 8)) continue;
+              
+              gc::mtx::PSMTXTrans(&mtx1, win_x + data.x_pos, win_y - data.y_pos, 0.0f);
+              gc::mtx::PSMTXScale(&mtx2, data.scale, data.scale, data.scale);
+              gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
+              ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, data.icon_id, &kWhite);
+        }
+
+        if (!blink || !(blink_flags & 8)) {
+            gc::mtx::PSMTXTrans(&mtx1, win_x + 104.0f, win_y - 72.0f, 0.0f);
+            ttyd::icondrv::iconNumberDispGx(&mtx1, work->last_party_hp, 0, &kWhite);
+        }
+        gc::mtx::PSMTXTrans(&mtx1, win_x + 170.0f, win_y - 71.0f, 0.0f);
+        ttyd::icondrv::iconNumberDispGx(&mtx1, work->last_party_max_hp, 1, &kWhite);
+    }
+  
+    // D-Pad Menu shortcuts.
+    if (!in_battle && (work->disp_flags & 0x100)) {
+        float ref_y = -180.0f + (work->target_y_open - work->current_y);
+        
+        gc::mtx::PSMTXTrans(&mtx1, -190.0f, ref_y, 0.0f);
+        gc::mtx::PSMTXScale(&mtx2, 0.75f, 0.75f, 0.75f);
+        gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
+        ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, IconType::HUD_DPAD, &kWhite);
+
+        gc::mtx::PSMTXTrans(&mtx1, -250.0f, ref_y + 16.0f, 0.0f);
+        gc::mtx::PSMTXScale(&mtx2, 0.75f, 0.75f, 0.75f);
+        gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
+        ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, IconType::PARTY, &kWhite);
+
+        gc::mtx::PSMTXTrans(&mtx1, -190.0f, ref_y + 50.0f, 0.0f);
+        gc::mtx::PSMTXScale(&mtx2, 0.75f, 0.75f, 0.75f);
+        gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
+        ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, IconType::GEAR, &kWhite);
+
+        gc::mtx::PSMTXTrans(&mtx1, -130.0f, ref_y + 16.0f, 0.0f);
+        gc::mtx::PSMTXScale(&mtx2, 0.75f, 0.75f, 0.75f);
+        gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
+        ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, IconType::BADGES, &kWhite);
+
+        gc::mtx::PSMTXTrans(&mtx1, -190.0f, ref_y - 25.0f, 0.0f);
+        gc::mtx::PSMTXScale(&mtx2, 0.75f, 0.75f, 0.75f);
+        gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
+        ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, IconType::JOURNAL, &kWhite);
     }
 }
 
-}
+}   // namespace
     
 void ApplyFixedPatches() {
     g_statusWinDisp_trampoline = patch::hookFunction(
         ttyd::statuswindow::statusWinDisp, []() {
-            g_statusWinDisp_trampoline();
-            DisplayStarPowerNumber();
-        });
-        
-    g_gaugeDisp_trampoline = patch::hookFunction(
-        ttyd::statuswindow::gaugeDisp, [](double x, double y, int32_t sp) {
             // Replaces the original logic completely.
-            DisplayStarPowerOrbs(x, y, sp);
+            DrawStatusWindow();
         });
+
+    // Remove status bar coin cap.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_valueUpdate_Patch_DisableCoinCap),
+        0x4800000cU  /* unconditional branch over cap code */);
         
     // Fix rank string shown in the menu.
     g_BattleGetRankNameLabel_trampoline = patch::hookFunction(
@@ -287,19 +424,6 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_effUpdownDisp_TwoDigitSupport_EH),
         reinterpret_cast<void*>(StartDispUpdownNumberIcons),
         reinterpret_cast<void*>(BranchBackDispUpdownNumberIcons));
-        
-    // Apply patches to statusWinDisp to prevent D-Pad shortcuts from appearing
-    // if the player is outside the Pit (so it doesn't interfere with the
-    // Infinite Pit options menu).
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(g_statusWinDisp_HideDpadMenuOutsidePit_BH),
-        reinterpret_cast<void*>(StartPreventDpadShortcutsOutsidePit));
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(BranchBackPreventDpadShortcutsOutsidePit),
-        reinterpret_cast<void*>(g_statusWinDisp_HideDpadMenuOutsidePit_EH));
-    mod::patch::writeBranch(
-        reinterpret_cast<void*>(ConditionalBranchPreventDpadShortcutsOutsidePit),
-        reinterpret_cast<void*>(g_statusWinDisp_HideDpadMenuOutsidePit_CH1));
         
     // Make item name in battle menu based on item data rather than weapon data.
     mod::patch::writePatch(
