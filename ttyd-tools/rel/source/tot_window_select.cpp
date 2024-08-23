@@ -110,6 +110,7 @@ OptionMenuData g_OptionMenuData[] = {
     { OPTVAL_STARTER_ITEMS_BASIC, "tot_optr_startitems_basic", nullptr, 134, false, false },
     { OPTVAL_STARTER_ITEMS_STRONG, "tot_optr_startitems_strong", nullptr, 135, false, false },
     { OPTVAL_STARTER_ITEMS_RANDOM, "tot_optr_startitems_random", nullptr, 136, false, false },
+    { OPTVAL_STARTER_ITEMS_CUSTOM, "tot_optr_startitems_custom", nullptr, 137, false, false },
     { OPT_MAX_PARTNERS, "tot_optr_maxpartners", "tot_opth_maxpartners", 140, true, false },
     { OPTVAL_NO_PARTNERS, "tot_optr_nopartners", nullptr, 141, false, false },
     { OPT_PARTNER, "tot_optr_partner", "tot_opth_partner", 150, true, false },

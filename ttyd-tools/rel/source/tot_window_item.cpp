@@ -4,6 +4,8 @@
 #include "common_types.h"
 #include "mod.h"
 #include "patches_item.h"
+#include "tot_generate_item.h"
+#include "tot_generate_reward.h"
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_state.h"
@@ -23,6 +25,7 @@
 #include <ttyd/msgdrv.h>
 #include <ttyd/pmario_sound.h>
 #include <ttyd/sound.h>
+#include <ttyd/system.h>
 #include <ttyd/win_badge.h>
 #include <ttyd/win_main.h>
 #include <ttyd/win_mario.h>
@@ -47,6 +50,9 @@ using ::ttyd::winmgr::WinMgrEntry;
 namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
+
+// Array used for item selector dialog (no reason to shoehorn into menu struct.)
+int16_t g_SelectorItems[85] = { -1 };
 
 void GetPartyMemberMenuOrder(WinPartyData** out_party_data) {
     WinPartyData* party_data = g_winPartyDt;
@@ -107,6 +113,8 @@ void DrawItemGrid(WinPauseMenu* menu, float win_x, float win_y) {
                     item_active = GetSWF(GSWF_BgmEnabled);
                     break;
                 case ItemType::TOT_KEY_YOSHI_COSTUME:
+                case ItemType::TOT_KEY_ITEM_SELECTOR:
+                case ItemType::TOT_KEY_BADGE_SELECTOR:
                     item_active = !g_Mod->state_.GetOption(OPT_RUN_STARTED);
                     break;
             }
@@ -691,6 +699,148 @@ void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
     ttyd::gx::GXTransform::GXSetScissor(0, 0, 608, 480);
 }
 
+int32_t PopulateSelectorItems(int32_t type) {
+    int32_t num_items = 0;
+    int32_t start_item =
+        type == 0 ? ItemType::THUNDER_BOLT : ItemType::POWER_JUMP;
+    int32_t end_item =
+        type == 0 ? ItemType::POWER_JUMP : ItemType::MAX_ITEM_TYPE;
+
+    for (int32_t item = start_item; item < end_item; ++item) {
+        // If item is valid & purchased, add to array.
+        if (g_Mod->state_.GetOption(
+                FLAGS_ITEM_PURCHASED, item - ItemType::THUNDER_BOLT) &&
+            ttyd::item_data::itemDataTable[item].type_sort_order >= 0) {
+            g_SelectorItems[num_items++] = item;
+        }
+    }
+    g_SelectorItems[num_items] = -1;
+    
+    ttyd::system::qqsort(
+        g_SelectorItems, num_items, sizeof(int16_t),
+        (void*)TypeSortOrderComparator);
+
+    return num_items;
+}
+
+void SetCurrentItemLoadoutEquipped(WinPauseMenu* menu, bool toggle) {
+    uint32_t size_option = menu->item_menu_state == 500
+        ? STAT_PERM_ITEM_LOAD_SIZE : STAT_PERM_BADGE_LOAD_SIZE;
+    uint32_t loadout_option = menu->item_menu_state == 500
+        ? STAT_PERM_ITEM_LOADOUT : STAT_PERM_BADGE_LOADOUT;
+
+    int32_t size = g_Mod->state_.GetOption(size_option);
+    if (toggle) {
+        int32_t current_id = g_SelectorItems[menu->cosmetic_cursor_idx];
+
+        // Don't allow equipping multiple copies of unique badges.
+        bool already_equipped = false;
+        if (RewardManager::IsUniqueBadge(current_id)) {
+            for (int32_t i = 0; i < size; ++i) {
+                int32_t item =
+                    (uint8_t)g_Mod->state_.GetOption(loadout_option, i)
+                    + ItemType::THUNDER_BOLT;
+                if (item == current_id) {
+                    already_equipped = true;
+                    break;
+                }
+            }
+        }
+
+        if (!already_equipped && size < 6) {
+            // Equip the currently selected item.
+            g_Mod->state_.SetOption(
+                loadout_option, current_id - ItemType::THUNDER_BOLT, size);
+            g_Mod->state_.ChangeOption(size_option, 1);
+            ttyd::pmario_sound::psndSFXOn((char *)0x20038);
+        } else {
+            ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+        }
+    } else {
+        if (size > 0) {
+            // Remove the last added item.
+            g_Mod->state_.ChangeOption(size_option, -1);
+            ttyd::pmario_sound::psndSFXOn((char *)0x20013);
+        } else {
+            ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+        }
+    }
+}
+
+void DrawLoadoutSelectionDialog(WinMgrEntry* winmgr_entry) {
+    auto* menu = (WinPauseMenu*)ttyd::win_main::winGetPtr();
+
+    uint32_t size_option = menu->item_menu_state == 500
+        ? STAT_PERM_ITEM_LOAD_SIZE : STAT_PERM_BADGE_LOAD_SIZE;
+    uint32_t loadout_option = menu->item_menu_state == 500
+        ? STAT_PERM_ITEM_LOADOUT : STAT_PERM_BADGE_LOADOUT;
+
+    // Draw item icons.
+    ttyd::win_main::winIconInit();
+    for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
+        int32_t icon = ttyd::item_data::itemDataTable[g_SelectorItems[i]].icon_id;
+        gc::vec3 pos = { 
+            -62.0f + 30.0f * (i % 13 - 6),
+            124.0f - 30.0f * (i / 13),
+            0.0f
+        };
+        gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+        uint32_t icon_color = 0xFFFFFFFFU;
+        ttyd::win_main::winIconSet(icon, &pos, &scale, &icon_color);
+    }
+
+    // Draw selected loadout icons.
+    for (int32_t i = 0; i < g_Mod->state_.GetOption(size_option); ++i) {
+        int32_t item =
+            (uint8_t)g_Mod->state_.GetOption(loadout_option, i) 
+            + ItemType::THUNDER_BOLT;
+
+        int32_t icon = ttyd::item_data::itemDataTable[item].icon_id;
+        gc::vec3 pos = { 50.0f * (i - 2.5f), -91.0f, 0.0f };
+        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+        uint32_t icon_color = 0xFFFFFFFFU;
+        ttyd::win_main::winIconSet(icon, &pos, &scale, &icon_color);
+    }
+
+    // Draw tutorial instructions on side.
+    const float tut_x = 0.89f;
+    const float tut_icon_y = 0.13f;
+    const float tut_text_y = 0.21f;
+    const float tut_spread = 0.31f;
+    const int32_t tut_icons[] = {
+        IconType::A_BUTTON, IconType::B_BUTTON, IconType::X_BUTTON
+    };
+    const char* tut_msg[] = {
+        "tot_loadoutsel_add", "tot_loadoutsel_remove", "tot_loadoutsel_back"
+    };
+
+    for (int32_t i = 0; i < 3; ++i) {
+        gc::vec3 pos = { 
+            winmgr_entry->x + winmgr_entry->width * tut_x,
+            winmgr_entry->y - winmgr_entry->height *(tut_icon_y + tut_spread * i),
+            0.0f
+        };
+        gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+        uint32_t icon_color = 0xFFFFFFFFU;
+        ttyd::win_main::winIconSet(tut_icons[i], &pos, &scale, &icon_color);
+    }
+    
+    ttyd::win_main::winFontInit();
+    for (int32_t i = 0; i < 3; ++i) {
+        const char* text = msgSearch(tut_msg[i]);
+        int16_t width = ttyd::fontmgr::FontGetMessageWidth(text);
+        if (width > 120) width = 120;
+        gc::vec3 pos = {
+            winmgr_entry->x + winmgr_entry->width * tut_x - width * 0.375f,
+            winmgr_entry->y - winmgr_entry->height * (tut_text_y + tut_spread * i),
+            0.0f
+        };
+        gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+        uint32_t color = 0x000000FFU;
+        ttyd::win_main::winFontSet(&pos, &scale, &color, text);
+    }
+}
+
 }  // namespace
 
 int32_t ItemMenuMain(WinPauseMenu* menu) {
@@ -760,8 +910,6 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
                     }
                 } else {
-                    // TODO: Support item loadout selectors.
-
                     // Open selection menu for cosmetic selectors.
                     int32_t cosmetic_type = -1;
                     switch (item) {
@@ -789,6 +937,10 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                             }
                         }
                         menu->cosmetic_cursor_idx = 0;
+                        menu->cosmetic_menu_offset = 0;
+                        menu->cosmetic_menu_scroll_y = 0;
+                        menu->cosmetic_menu_scroll_target_y = 0;
+
                         menu->item_menu_state = 400 + cosmetic_type;
                         ttyd::pmario_sound::psndSFXOn((char *)0x20012);
 
@@ -801,6 +953,45 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                             win->width, height);
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_1);
                         ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
+                    }
+
+                    // Open selection menu for item / badge loadout.
+                    int32_t selector_type = -1;
+                    switch (item) {
+                        case ItemType::TOT_KEY_ITEM_SELECTOR:
+                            if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
+                                selector_type = 0;
+                            } else {
+                                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                            }
+                            break;
+                        case ItemType::TOT_KEY_BADGE_SELECTOR:
+                            if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
+                                selector_type = 1;
+                            } else {
+                                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                            }
+                            break;
+                    }
+                    if (selector_type != -1) {
+                        int32_t num_selections = 
+                            PopulateSelectorItems(selector_type);
+                        if (num_selections > 0) {
+                            menu->cosmetic_cursor_idx = 0;
+                            menu->cosmetic_num_options = num_selections;
+                            menu->item_menu_state = 500 + selector_type;
+                            ttyd::pmario_sound::psndSFXOn((char *)0x20012);
+
+                            ttyd::winmgr::winMgrSetSize(
+                                menu->winmgr_entry_1, -270.f, 148.f, 540.f, 198.f);
+                            ttyd::winmgr::winMgrSetSize(
+                                menu->winmgr_entry_2, -160.f, -57.f, 320.f, 68.f);
+                            ttyd::winmgr::winMgrOpen(menu->winmgr_entry_1);
+                            ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
+                        } else {
+                            // No items / badges to select.
+                            ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                        }
                     }
                         
                     // Toggle on key items with boolean effects.
@@ -1063,6 +1254,68 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
             
             break;
         }
+        case 500:
+        case 501: {
+            int32_t item = g_SelectorItems[menu->cosmetic_cursor_idx];
+
+            if (menu->buttons_pressed & ButtonId::START) {
+                menu->use_item_type = 0;
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
+                return -2;
+            } else if (menu->buttons_pressed & ButtonId::X) {
+                ttyd::pmario_sound::psndSFXOn((char *)0x20013);
+                menu->item_menu_state = 10;
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
+            } else if (menu->buttons_pressed & ButtonId::A) {
+                SetCurrentItemLoadoutEquipped(menu, true);
+            } else if (menu->buttons_pressed & ButtonId::B) {
+                SetCurrentItemLoadoutEquipped(menu, false);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
+                if (menu->cosmetic_cursor_idx > 13) {
+                    menu->cosmetic_cursor_idx -= 13;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
+                menu->cosmetic_cursor_idx += 13;
+                if (menu->cosmetic_cursor_idx >= menu->cosmetic_num_options) {
+                    menu->cosmetic_cursor_idx = menu->cosmetic_num_options - 1;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_LEFT) {
+                if (menu->cosmetic_cursor_idx % 13 == 0) {
+                    menu->cosmetic_cursor_idx += 12;
+                } else {
+                    --menu->cosmetic_cursor_idx;
+                }
+                if (menu->cosmetic_cursor_idx >= menu->cosmetic_num_options) {
+                    menu->cosmetic_cursor_idx = menu->cosmetic_num_options - 1;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) {
+                if (++menu->cosmetic_cursor_idx % 13 == 0) {
+                    menu->cosmetic_cursor_idx -= 13;
+                }
+                if (menu->cosmetic_cursor_idx >= menu->cosmetic_num_options) {
+                    menu->cosmetic_cursor_idx = 
+                        (menu->cosmetic_num_options - 1) / 13 * 13;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            }
+
+            // Update help text.
+            ttyd::win_root::winMsgEntry(
+                menu, item, ttyd::item_data::itemDataTable[item].description, 0);
+            
+            // Set cursor position.
+            menu->main_cursor_target_x =
+                -92.0f + (menu->cosmetic_cursor_idx % 13 - 6) * 30.0f;
+            menu->main_cursor_target_y =
+                124.0f - (menu->cosmetic_cursor_idx / 13) * 30.0f;
+            
+            break;
+        }
         case 1000: {
             if (ttyd::win_root::winSortWait(menu) == 0) {
                 menu->item_menu_state = menu->parent_menu_state;
@@ -1158,6 +1411,10 @@ void ItemSubdialogMain1(WinMgrEntry* winmgr_entry) {
             case 402:
                 DrawCosmeticSelectionDialog(winmgr_entry);
                 break;
+            case 500:
+            case 501:
+                DrawLoadoutSelectionDialog(winmgr_entry);
+                break;
         }
     }
   
@@ -1202,6 +1459,10 @@ void ItemSubdialogMain2(WinMgrEntry* winmgr_entry) {
             case 401:
                 msg = msgSearch("tot_winsel_whichduds");
                 break;
+            case 500:
+            case 501:
+                // Second window not used for loadout selector.
+                return;
         }
 
         uint16_t lines;

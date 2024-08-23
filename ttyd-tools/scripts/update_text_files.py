@@ -1270,6 +1270,17 @@ g_StringMap = {
         b'msg_menu_mario_star_p':
             b'How many floors Mario has\n'
             b'ascended on this run.',
+            
+        # Item loadout selection menu.
+        
+        b'tot_loadoutsel_add':
+            b'Add Item',
+        
+        b'tot_loadoutsel_remove':
+            b'Remove',
+        
+        b'tot_loadoutsel_back':
+            b'Back',
         
         # Journal menu.
         
@@ -2392,6 +2403,7 @@ g_StringMap = {
         b"tot_optr_startitems_basic":   b"Basic",
         b"tot_optr_startitems_strong":  b"Strong",
         b"tot_optr_startitems_random":  b"Random",
+        b"tot_optr_startitems_custom":  b"Custom",
         b"tot_optr_drops":              b"Battle Drops",
         b"tot_optr_drops_def":          b"Default",
         b"tot_optr_drops_gated":        b"Condition-Gated",

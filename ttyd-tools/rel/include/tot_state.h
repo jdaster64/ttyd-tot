@@ -316,14 +316,14 @@ enum Options : uint32_t {
     OPTVAL_PARTNER_VIVIAN       = 0x504'4'00'05,
     OPTVAL_PARTNER_BOBBERY      = 0x504'4'00'06,
     OPTVAL_PARTNER_MOWZ         = 0x504'4'00'07,
-    OPTVAL_PARTNER_NONE         = 0x504'4'00'08,    // Not used yet.
+    OPTVAL_PARTNER_NONE         = 0x504'4'00'08,    // Not used.
     // Starting item set.
-    OPT_STARTER_ITEMS           = 0x408'3'00'03,
+    OPT_STARTER_ITEMS           = 0x408'3'00'04,
     OPTVAL_STARTER_ITEMS_OFF    = 0x508'3'00'00,
     OPTVAL_STARTER_ITEMS_BASIC  = 0x508'3'00'01,
     OPTVAL_STARTER_ITEMS_STRONG = 0x508'3'00'02,
     OPTVAL_STARTER_ITEMS_RANDOM = 0x508'3'00'03,
-    OPTVAL_STARTER_ITEMS_CUSTOM = 0x508'3'00'04,    // Not used yet.
+    OPTVAL_STARTER_ITEMS_CUSTOM = 0x508'3'00'04,
     // How enemies hold / drop items, and whether there are battle conditions.
     OPT_BATTLE_DROPS            = 0x40b'2'00'03,
     OPTVAL_DROP_STANDARD        = 0x50b'2'00'00,   // one drop + bonus chance
@@ -509,7 +509,11 @@ enum Options : uint32_t {
     STAT_PERM_CURRENT_COINS     = 0x294'2'01'03,
     STAT_PERM_CURRENT_SP        = 0x296'2'01'03,
     STAT_PERM_SHOP_ITEMS        = 0x298'1'00'05,
-    // Next: 0x29d
+    STAT_PERM_ITEM_LOADOUT      = 0x29d'1'00'06,
+    STAT_PERM_ITEM_LOAD_SIZE    = 0x2a3'1'01'01,
+    STAT_PERM_BADGE_LOADOUT     = 0x2a4'1'00'06,
+    STAT_PERM_BADGE_LOAD_SIZE   = 0x2aa'1'01'01,
+    // Next: 0x2ab
 };
 
 }  // namespace mod::tot

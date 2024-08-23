@@ -146,6 +146,15 @@ int32_t BuyPriceComparator(int16_t* lhs, int16_t* rhs) {
     return itemData[*lhs].buy_price - itemData[*rhs].buy_price;
 }
 
+int32_t TypeSortOrderComparator(int16_t* lhs, int16_t* rhs) {
+    auto* itemData = ttyd::item_data::itemDataTable;
+    const int32_t left_sort =
+        itemData[*lhs].type_sort_order + (*lhs < ItemType::POWER_JUMP ? 0 : 200);
+    const int32_t right_sort =
+        itemData[*rhs].type_sort_order + (*rhs < ItemType::POWER_JUMP ? 0 : 200);
+    return left_sort - right_sort;
+}
+
 int16_t g_CharlietonInventory[20 + 1] = { -1 };
 
 int16_t* GetCharlietonInventoryPtr() {

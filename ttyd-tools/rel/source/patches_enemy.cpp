@@ -19,6 +19,7 @@
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
+#include <ttyd/seqdrv.h>
 #include <ttyd/system.h>
 
 #include <cstdint>
@@ -35,6 +36,7 @@ using ::ttyd::battle::BattleWork;
 using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
+using ::ttyd::seqdrv::SeqIndex;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
@@ -207,11 +209,11 @@ void ApplyFixedPatches() {
             return unit;
         });
 
-    // Track enemy kills on deletion.
+    // Track enemy kills on deletion (unless running away).
     g_BtlUnit_Delete_trampoline = patch::hookFunction(
         ttyd::battle_unit::BtlUnit_Delete, [](BattleWorkUnit* unit) {
             int32_t idx = tot::GetCustomTattleIndex(unit->true_kind);
-            if (idx >= 0) {
+            if (idx >= 0 && ttyd::seqdrv::seqGetNextSeq() == SeqIndex::kBattle) {
                 if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, idx) < 9999)
                     g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_KILLS, 1, idx);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMIES_DEFEATED, 1);

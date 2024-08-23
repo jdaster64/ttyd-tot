@@ -3,6 +3,7 @@
 #include "common_functions.h"
 #include "mod.h"
 #include "tot_generate_item.h"
+#include "tot_generate_reward.h"
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_state.h"
@@ -124,8 +125,8 @@ void OptionsManager::InitLobby() {
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ATTACK_FX);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_YOSHI_COSTUME);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_MARIO_COSTUME);
-    // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BADGE_SELECTOR);
-    // ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ITEM_SELECTOR);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BADGE_SELECTOR);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ITEM_SELECTOR);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BGM_TOGGLE);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_SUPER_PEEKABOO);
@@ -194,6 +195,24 @@ void OptionsManager::InitFromSelectedOptions() {
             for (int32_t i = 0; i < num_items; ++i) {
                 int32_t item_type = PickRandomItem(RNG_STARTER_ITEM, 15, 5, 0, 0);
                 ttyd::mario_pouch::pouchGetItem(item_type);
+            }
+            break;
+        }
+        case OPTVAL_STARTER_ITEMS_CUSTOM: {
+            // Give the items and badges in the player's custom loadout.
+            int32_t num_items = state.GetOption(STAT_PERM_ITEM_LOAD_SIZE);
+            int32_t num_badges = state.GetOption(STAT_PERM_BADGE_LOAD_SIZE);
+            for (int32_t i = num_items - 1; i >= 0; --i) {
+                int32_t item_id =
+                    (uint8_t)state.GetOption(STAT_PERM_ITEM_LOADOUT, i)
+                    + ItemType::THUNDER_BOLT;
+                ttyd::mario_pouch::pouchGetItem(item_id);
+            }
+            for (int32_t i = num_badges - 1; i >= 0; --i) {
+                int32_t item_id =
+                    (uint8_t)state.GetOption(STAT_PERM_BADGE_LOADOUT, i)
+                    + ItemType::THUNDER_BOLT;
+                ttyd::mario_pouch::pouchGetItem(item_id);
             }
             break;
         }

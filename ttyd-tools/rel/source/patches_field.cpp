@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "patch.h"
+#include "tot_generate_item.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_state.h"
@@ -89,15 +90,6 @@ int32_t g_NumShopSignItems = 0;
 
 }
 
-int32_t TypeSortOrderComparator(int16_t* lhs, int16_t* rhs) {
-    auto* itemData = ttyd::item_data::itemDataTable;
-    const int32_t left_sort =
-        itemData[*lhs].type_sort_order + (*lhs < ItemType::POWER_JUMP ? 0 : 200);
-    const int32_t right_sort =
-        itemData[*rhs].type_sort_order + (*rhs < ItemType::POWER_JUMP ? 0 : 200);
-    return left_sort - right_sort;
-}
-
 // Populates the list of items that can be bought from the shop sign.
 // out arg0 = the number of available items.
 EVT_DECLARE_USER_FUNC(evtTot_InitializeShopSign, 1)
@@ -132,7 +124,7 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializeShopSign) {
     // Sort items + badges by combined type sort order.
     ttyd::system::qqsort(
         g_ShopSignItems, g_NumShopSignItems, sizeof(int16_t),
-        (void*)TypeSortOrderComparator);
+        (void*)tot::TypeSortOrderComparator);
 
     evtSetValue(evt, evt->evtArguments[0], g_NumShopSignItems);
 
@@ -266,6 +258,17 @@ EVT_BEGIN(XNautPhdProjectilePosition_Hook)
 EVT_PATCH_END()
 static_assert(sizeof(XNautPhdProjectilePosition_Hook) == 0x24);
 
+EVT_BEGIN(CheckItemShopAchievements)
+    USER_FUNC(tot::evtTot_CheckCompletedAchievement,
+        tot::AchievementId::META_ITEMS_BADGES_ALL, EVT_NULLPTR)
+
+    // TODO: Add special dialogue + give selector key items after 10 apiece.
+    USER_FUNC(tot::evtTot_CheckCompletedAchievement,
+        tot::AchievementId::META_ITEMS_BADGES_10, LW(1))
+
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(ShopBuyEvt)
     USER_FUNC(evt_mario_normalize)
     SET(LW(10), LW(0))
@@ -303,9 +306,7 @@ EVT_BEGIN(ShopBuyEvt)
     // Mark item as collected, remove from shelf if appropriate.
     USER_FUNC(evtTot_AfterBuyingShopItem, LW(10), -1)
 
-    // TODO: Special dialogue + give selectors after buying 10 apiece.
-    USER_FUNC(tot::evtTot_CheckCompletedAchievement,
-        tot::AchievementId::META_ITEMS_BADGES_10, LW(1))
+    RUN_CHILD_EVT(CheckItemShopAchievements)
 
     RETURN()
 EVT_END()
@@ -372,9 +373,7 @@ EVT_BEGIN(ShopSignEvt)
     // Mark item as collected.
     USER_FUNC(evtTot_AfterBuyingShopItem, LW(10), LW(1))
 
-    // TODO: Special dialogue + give selectors after buying 10 apiece.
-    USER_FUNC(tot::evtTot_CheckCompletedAchievement,
-        tot::AchievementId::META_ITEMS_BADGES_10, LW(1))
+    RUN_CHILD_EVT(CheckItemShopAchievements)
 
 LBL(99)
     USER_FUNC(evt_mario_key_onoff, 1)

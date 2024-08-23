@@ -25,6 +25,8 @@ public:
     // Picks a random unique badge to add to Charlieton's shop.
     // Returns 0 if the attempted badge is already in a chest on the same floor.
     static int32_t GetUniqueBadgeForShop();
+    // Returns whether the given badge is unique.
+    static bool IsUniqueBadge(int32_t item_id);
     // Marks unique items as being collected.
     static void MarkUniqueItemCollected(int32_t item_id);
 };

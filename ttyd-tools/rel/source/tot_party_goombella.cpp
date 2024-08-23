@@ -15,6 +15,7 @@
 #include <ttyd/battle_event_subset.h>
 #include <ttyd/battle_mario.h>
 #include <ttyd/battle_message.h>
+#include <ttyd/battle_monosiri.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
 #include <ttyd/evt_audience.h>
@@ -53,6 +54,8 @@ using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::unit_party_christine;
 
+using ::ttyd::battle::g_BattleWork;
+using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 
@@ -93,6 +96,16 @@ void MakeSelectWeaponTable(
             ++*num_options;
         }
     }
+}
+
+// Sets Tattle flags for both the current AND original type of an enemy.
+EVT_DECLARE_USER_FUNC(evtTot_SetTattleLogFlags, 1)
+EVT_DEFINE_USER_FUNC(evtTot_SetTattleLogFlags) {
+    uint32_t unit_idx = evtGetValue(evt, evt->evtArguments[0]);
+    BattleWorkUnit* unit = ttyd::battle::BattleGetUnitPtr(g_BattleWork, unit_idx);
+    ttyd::battle_monosiri::battleSetUnitMonosiriFlag(unit->current_kind);
+    ttyd::battle_monosiri::battleSetUnitMonosiriFlag(unit->true_kind);
+    return 2;
 }
 
 // Changes the Tattle action command's reticle size to fit the camera view.
@@ -488,8 +501,8 @@ EVT_BEGIN(partyChristineAttack_Monosiri)
     USER_FUNC(btlevtcmd_get_monosiri_msg_no, LW(3), LW(4), LW(0))
     USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
 
-    // Mark Tattle log flag.
-    USER_FUNC(_monosiri_flag_on, LW(3))
+    // Mark Tattle log flags.
+    USER_FUNC(evtTot_SetTattleLogFlags, LW(3))
     // Check for completion of Tattle Log.
     USER_FUNC(evtTot_CheckCompletedAchievement,
         AchievementId::META_TATTLE_LOG_BASIC, EVT_NULLPTR)

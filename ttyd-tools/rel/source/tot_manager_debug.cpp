@@ -38,6 +38,7 @@ enum DebugManagerMode {
     DEBUG_UNLOCK_ALL_MOVES,     // Tower only
     DEBUG_UNLOCK_ALL_PARTNERS,  // Tower only
     DEBUG_MAX_STATS,            // Tower only
+    DEBUG_PURCHASE_ALL_ITEMS,
     DEBUG_UNLOCK_ALL_BADGES,
     DEBUG_COMPLETE_LOGS,
     DEBUG_COMPLETE_ACHIEVEMENTS,
@@ -106,7 +107,7 @@ void UpdateMainMenuPos(int32_t change) {
             case DEBUG_UNLOCK_ALL_MOVES:
             case DEBUG_UNLOCK_ALL_PARTNERS:
             case DEBUG_MAX_STATS:
-                g_CursorPos = change > 0 ? DEBUG_UNLOCK_ALL_BADGES : DEBUG_EXIT;
+                g_CursorPos = change > 0 ? DEBUG_PURCHASE_ALL_ITEMS : DEBUG_EXIT;
                 break;
             default:
                 break;
@@ -184,6 +185,13 @@ void DebugManager::Update() {
                             pouch.party_data[i].flags |= 1;
                         }
                         g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
+                    }
+                    break;
+                }
+                case DEBUG_PURCHASE_ALL_ITEMS: {
+                    for (int32_t i = 0; i < 256; ++i) {
+                        g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, i);
+                        g_Mod->state_.SetOption(FLAGS_ITEM_PURCHASED, i);
                     }
                     break;
                 }
@@ -434,6 +442,9 @@ void DebugManager::Draw() {
             }
             case DEBUG_UNLOCK_ALL_PARTNERS: {
                 strcpy(buf, "Unlock All Partners");         break;
+            }
+            case DEBUG_PURCHASE_ALL_ITEMS: {
+                strcpy(buf, "Purchase All Items/Badges");   break;
             }
             case DEBUG_UNLOCK_ALL_BADGES: {
                 strcpy(buf, "Unlock 1 of Each Badge");      break;

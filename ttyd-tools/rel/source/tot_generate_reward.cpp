@@ -719,6 +719,10 @@ int32_t RewardManager::GetUniqueBadgeForShop() {
     return unique_badge;
 }
 
+bool RewardManager::IsUniqueBadge(int32_t item_id) {
+    return GetUniqueBadgeObtainedIndex(item_id) >= 0;
+}
+
 void RewardManager::MarkUniqueItemCollected(int32_t item_id) {
     int32_t index = GetUniqueBadgeObtainedIndex(item_id);
     if (index >= 0) {

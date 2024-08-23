@@ -19,6 +19,8 @@ int32_t PickRandomItem(
 
 // Returns a comparison value that sorts items by ascending buy price.
 int32_t BuyPriceComparator(int16_t* lhs, int16_t* rhs);
+// Returns a comparison value that sorts items/badges by type sort order.
+int32_t TypeSortOrderComparator(int16_t* lhs, int16_t* rhs);
 // Returns a pointer to Charlieton's item inventory.
 // Holds up to 20 items + a '-1' terminator.
 int16_t* GetCharlietonInventoryPtr();
