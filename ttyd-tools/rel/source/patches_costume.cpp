@@ -89,7 +89,7 @@ void ApplyFixedPatches() {
             }
             // Replace Yoshi's models.
             auto* yoshi_data = tot::CosmeticsManager::GetYoshiCostumeData(0);
-            for (int32_t i = 0; i < 2; ++i) {
+            for (int32_t i = 0; i < 3; ++i) {
                 if (!strcmp(filename, yoshi_data->models[i])) {
                     int32_t color = ttyd::mario_pouch::pouchGetPartyColor(4);
                     filename =
@@ -111,8 +111,9 @@ void ApplyFixedPatches() {
     g_pouchGetPartyColor_trampoline = patch::hookFunction(
         ttyd::mario_pouch::pouchGetPartyColor, [](int32_t party) {
             auto& data = ttyd::mario_pouch::pouchGetPtr()->party_data[party];
-            // TODO: Get supported color range from CostumeManager?
-            int32_t color = Clamp(data.flags >> 11, 0, 6);
+            int32_t max_color = tot::CosmeticsManager::GetCosmeticCount(
+                tot::CosmeticType::YOSHI_COSTUME) - 1;
+            int32_t color = Clamp(data.flags >> 11, 0, max_color);
             return color;
         });
 

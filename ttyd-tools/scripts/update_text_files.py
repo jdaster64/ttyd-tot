@@ -2173,33 +2173,43 @@ g_StringMap = {
         b'tot_cos0_13':     b'???',
         b'tot_cos0_14':     b'???',
         b'tot_cos0_15':     b'???',
+        b'tot_cos0_16':     b'???',
+        b'tot_cos0_17':     b'???',
+        b'tot_cos0_18':     b'???',
+        b'tot_cos0_19':     b'???',
+        b'tot_cos0_20':     b'???',
+        b'tot_cos0_21':     b'???',
+        b'tot_cos0_22':     b'???',
+        b'tot_cos0_23':     b'???',
+        b'tot_cos0_24':     b'???',
+        b'tot_cos0_25':     b'???',
         
         b'tot_cos1_01':     b'Mario',
         b'tot_cos1_02':     b'Luigi',
         b'tot_cos1_03':     b'Wario',
         b'tot_cos1_04':     b'Waluigi',
-        b'tot_cos1_05':     b'Skin 01',
-        b'tot_cos1_06':     b'Skin 02',
-        b'tot_cos1_07':     b'Skin 03',
-        b'tot_cos1_08':     b'Skin 04',
-        b'tot_cos1_09':     b'Skin 05',
-        b'tot_cos1_10':     b'Skin 06',
-        b'tot_cos1_11':     b'Skin 07',
-        b'tot_cos1_12':     b'Skin 08',
-        b'tot_cos1_13':     b'Skin 09',
-        b'tot_cos1_14':     b'Skin 10',
-        b'tot_cos1_15':     b'Skin 11',
-        b'tot_cos1_16':     b'Skin 12',
-        b'tot_cos1_17':     b'Skin 13',
-        b'tot_cos1_18':     b'Skin 14',
-        b'tot_cos1_19':     b'Skin 15',
-        b'tot_cos1_20':     b'Skin 16',
-        b'tot_cos1_21':     b'Skin 17',
-        b'tot_cos1_22':     b'Skin 18',
-        b'tot_cos1_23':     b'Skin 19',
-        b'tot_cos1_24':     b'Skin 20',
-        b'tot_cos1_25':     b'Skin 21',
-        b'tot_cos1_26':     b'Skin 22',
+        b'tot_cos1_05':     b'Fire Mario',
+        b'tot_cos1_06':     b'Ice Mario',
+        b'tot_cos1_07':     b'Bubble Mario',
+        b'tot_cos1_08':     b'Superball Mario',
+        b'tot_cos1_09':     b'Flying Mario',
+        b'tot_cos1_10':     b'Mario Bros.',
+        b'tot_cos1_11':     b'Classic Luigi',
+        b'tot_cos1_12':     b'SMB1 Mario',
+        b'tot_cos1_13':     b'SMBDX Luigi',
+        b'tot_cos1_14':     b'SMB3 Mario',
+        b'tot_cos1_15':     b'SMW Mario',
+        b'tot_cos1_16':     b'Mario Golf 1',
+        b'tot_cos1_17':     b'Mario Golf 2',
+        b'tot_cos1_18':     b'Smash Bros. 1',
+        b'tot_cos1_19':     b'Smash Bros. 2',
+        b'tot_cos1_20':     b'Maker Mario',
+        b'tot_cos1_21':     b'Toadette',
+        b'tot_cos1_22':     b'#417',
+        b'tot_cos1_23':     b'Shadowy Mario',
+        b'tot_cos1_24':     b'Silver',
+        b'tot_cos1_25':     b'Gold',
+        b'tot_cos1_26':     b'Platinum',
         
         b'tot_cos2_01':     b'Green',
         b'tot_cos2_02':     b'Red',
@@ -2208,21 +2218,20 @@ g_StringMap = {
         b'tot_cos2_05':     b'Pink',
         b'tot_cos2_06':     b'Black',
         b'tot_cos2_07':     b'White',
-        b'tot_cos2_08':     b'Skin 01',
-        b'tot_cos2_09':     b'Skin 02',
-        b'tot_cos2_10':     b'Skin 03',
-        b'tot_cos2_11':     b'Skin 04',
-        b'tot_cos2_12':     b'Skin 05',
-        b'tot_cos2_13':     b'Skin 06',
-        b'tot_cos2_14':     b'Skin 07',
-        b'tot_cos2_15':     b'Skin 08',
-        b'tot_cos2_16':     b'Skin 09',
-        b'tot_cos2_17':     b'Skin 10',
-        b'tot_cos2_18':     b'Skin 11',
-        b'tot_cos2_19':     b'Skin 12',
-        b'tot_cos2_20':     b'Skin 13',
-        b'tot_cos2_21':     b'Skin 14',
-        b'tot_cos2_22':     b'Skin 15',
+        b'tot_cos2_08':     b'Brown',
+        b'tot_cos2_09':     b'Scarlet',
+        b'tot_cos2_10':     b'Yellow',
+        b'tot_cos2_11':     b'Lime',
+        b'tot_cos2_12':     b'Teal',
+        b'tot_cos2_13':     b'Indigo',
+        b'tot_cos2_14':     b'Purple',
+        b'tot_cos2_15':     b'Lilac',
+        b'tot_cos2_16':     b'Fuchsia',
+        b'tot_cos2_17':     b'Grey',
+        b'tot_cos2_18':     b'#654',
+        b'tot_cos2_19':     b'Silver',
+        b'tot_cos2_20':     b'Gold',
+        b'tot_cos2_21':     b'Platinum',
         
         b'tot_cos0_01_h':
             b"Gives Mario's attacks a tinny,\n"
@@ -2259,104 +2268,162 @@ g_StringMap = {
             b"Placeholder",
         b"tot_cos0_15_h":
             b"Placeholder",
+        b"tot_cos0_16_h":
+            b"Placeholder",
+        b"tot_cos0_17_h":
+            b"Placeholder",
+        b"tot_cos0_18_h":
+            b"Placeholder",
+        b"tot_cos0_19_h":
+            b"Placeholder",
+        b"tot_cos0_20_h":
+            b"Placeholder",
+        b"tot_cos0_21_h":
+            b"Placeholder",
+        b"tot_cos0_22_h":
+            b"Placeholder",
+        b"tot_cos0_23_h":
+            b"Placeholder",
+        b"tot_cos0_24_h":
+            b"Placeholder",
+        b"tot_cos0_25_h":
+            b"Placeholder",
             
         b"tot_cos1_01_h":
-            b"Placeholder",
+            b"Red shirt, blue overalls.\n"
+            b"Unquestionably iconic!",
         b"tot_cos1_02_h":
-            b"Placeholder",
+            b"Garb of exorcists, housekeepers,\n"
+            b"and famous detectives' assisants.",
         b"tot_cos1_03_h":
-            b"Placeholder",
+            b"The real Wario's getup could\n"
+            b"never be this affordable.",
         b"tot_cos1_04_h":
-            b"Placeholder",
+            b"The perfect fit for shrinking far,\n"
+            b"far back into the shadows.",
         b"tot_cos1_05_h":
-            b"Placeholder",
+            b"Shiny white and red duds.\n"
+            b"THE original power-up.",
         b"tot_cos1_06_h":
-            b"Placeholder",
+            b"Wear these to look like one\n"
+            b"cool customer.",
         b"tot_cos1_07_h":
-            b"Placeholder",
+            b"The newest flower power in town.\n"
+            b"Hot pink and red's a choice.",
         b"tot_cos1_08_h":
-            b"Placeholder",
+            b"Honestly, it's anyone's guess if\n"
+            b"the color on this one's accurate.",
         b"tot_cos1_09_h":
-            b"Placeholder",
+            b"Way too cool-looking to have its\n"
+            b"power-up only appear in one level.",
         b"tot_cos1_10_h":
-            b"Placeholder",
+            b"Going all the way back to\n"
+            b"Brooklyn with this one!",
         b"tot_cos1_11_h":
-            b"Placeholder",
+            b"Luigi's original white-and-green\n"
+            b"style, no Fire Flower required!",
         b"tot_cos1_12_h":
-            b"Placeholder",
+            b"Earthy tones and nary a bit of\n"
+            b"blue in sight!",
         b"tot_cos1_13_h":
-            b"Placeholder",
+            b"Luigi cutting in on his bro's style,\n"
+            b"and getting in on some VS. action!",
         b"tot_cos1_14_h":
-            b"Placeholder",
+            b"Darker overalls to account for\n"
+            b"the halogen stagelights!",
         b"tot_cos1_15_h":
-            b"Placeholder",
+            b"16-bits means so many more off-reds"
+            b"and blues to choose from!",
         b"tot_cos1_16_h":
-            b"Placeholder",
+            b"Taking a break from tennis\n"
+            b"refereeing to hit the links!",
         b"tot_cos1_17_h":
-            b"Placeholder",
+            b"Casual blues, perfect for"
+            b"putting greens!",
         b"tot_cos1_18_h":
-            b"Placeholder",
+            b"All the longtime Smash fans still\n"
+            b'call this outfit "brown" out of habit.',
         b"tot_cos1_19_h":
-            b"Placeholder",
+            b"Mario's classic colors with a\n"
+            b"cotton-candy twist!",
         b"tot_cos1_20_h":
-            b"Placeholder",
+            b"The perfect look for construction\n"
+            b"work, preferably with a hard-hat.",
         b"tot_cos1_21_h":
-            b"Placeholder",
+            b"Fun fact: Toadette ditched her\n"
+            b"orange dress right after this game!",
         b"tot_cos1_22_h":
-            b"Placeholder",
+            b"Inspired by world champions' and\n"
+            b"mod creators' Pika-clone of choice.",
         b"tot_cos1_23_h":
-            b"Placeholder",
+            b"Remembering names was never\n"
+            b"so easy!",
         b"tot_cos1_24_h":
-            b"Placeholder",
+            b"Nothing showier being a living\n"
+            b"trophy, even if it's only 2nd!",
         b"tot_cos1_25_h":
-            b"Placeholder",
+            b"All that glitters is you! Wear\n"
+            b"this golden sheen with pride!",
         b"tot_cos1_26_h":
-            b"Placeholder",
+            b"Wow, you're a super player!\n"
+            b"You've really earned this!",
             
         b"tot_cos2_01_h":
-            b"Placeholder",
+            b"Placeholder (Green)",
         b"tot_cos2_02_h":
-            b"Placeholder",
+            b"Placeholder (Red)",
         b"tot_cos2_03_h":
-            b"Placeholder",
+            b"Placeholder (Blue)",
         b"tot_cos2_04_h":
-            b"Placeholder",
+            b"Placeholder (Orange)",
         b"tot_cos2_05_h":
-            b"Placeholder",
+            b"Placeholder (Pink)",
         b"tot_cos2_06_h":
-            b"Placeholder",
+            b"Placeholder (Black)",
         b"tot_cos2_07_h":
-            b"Placeholder",
+            b"Placeholder (White)",
         b"tot_cos2_08_h":
-            b"Placeholder",
+            b"A rugged rocky-brown look, right\n"
+            b"out of the prehistoric era.",
         b"tot_cos2_09_h":
-            b"Placeholder",
+            b"A vermilion hue reminiscent of\n"
+            b"vast pools of lava.",
         b"tot_cos2_10_h":
-            b"Placeholder",
+            b"A sunny look that gives you the\n"
+            b"confidence to storm fortresses.",
         b"tot_cos2_11_h":
-            b"Placeholder",
+            b"A chartreuse hue that might be\n"
+            b"found in forest underbrush.",
         b"tot_cos2_12_h":
-            b"Placeholder",
+            b"A bluish green, evoking faraway\n"
+            b"islands full of tasty treats.",
         b"tot_cos2_13_h":
-            b"Placeholder",
+            b"A striking hue fit for a king,\n"
+            b"or at least the king of dinos.",
         b"tot_cos2_14_h":
-            b"Placeholder",
+            b"A soothing shade of lavender,\n"
+            b"bringing to mind a soft rain.",
         b"tot_cos2_15_h":
-            b"Placeholder",
+            b"A royal color, perfect for\n"
+            b"one rolling in riches.",
         b"tot_cos2_16_h":
-            b"Placeholder",
+            b"A shocking magenta that's nearly\n"
+            b"out of this world!",
         b"tot_cos2_17_h":
-            b"Placeholder",
+            b"A muted beige, so samey it could\n"
+            b"make your head spin.",
         b"tot_cos2_18_h":
-            b"Placeholder",
+            b"Inspired by a starter and region\n"
+            b"with a woefully short time to shine.",
         b"tot_cos2_19_h":
-            b"Placeholder",
+            b"A steed of literal silver's\n"
+            b"nothing to sneeze at!",
         b"tot_cos2_20_h":
-            b"Placeholder",
+            b"The envy of Midas, and yet\n"
+            b"you're literally untouchable!",
         b"tot_cos2_21_h":
-            b"Placeholder",
-        b"tot_cos2_22_h":
-            b"Placeholder",
+            b"Thanks for playing this mod!\n"
+            b"You've really earned this!",
             
         # Placeholder NPC dialogue (map-agnostic).
             

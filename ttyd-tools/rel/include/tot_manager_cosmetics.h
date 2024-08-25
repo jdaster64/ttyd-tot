@@ -38,7 +38,7 @@ struct MarioCostumeData {
 struct YoshiCostumeData {
     const char* name_msg;
     const char* help_msg;
-    const char* models[2];
+    const char* models[3];
     int16_t icon;
     int16_t icon_hud;
     int32_t group_id;
@@ -62,6 +62,9 @@ public:
     static const AttackFxData* GetAttackFxData(int32_t id);
     static const MarioCostumeData* GetMarioCostumeData(int32_t id);
     static const YoshiCostumeData* GetYoshiCostumeData(int32_t id);
+
+    // Returns the last valid id for each cosmetic type.
+    static int32_t GetCosmeticCount(int32_t type);
 
     // Selects a Yoshi color at random based on currenly active selections.
     static void PickYoshiColor();

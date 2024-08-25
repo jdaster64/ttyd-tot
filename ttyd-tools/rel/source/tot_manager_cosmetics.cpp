@@ -28,7 +28,7 @@ namespace ItemType = ttyd::item_data::ItemType;
 #define MARIO_MODEL_PATHS(s, ...) \
 	{"a/a_mario_" s, _MODEL_PATH_R(s, __VA_ARGS__), "a/b_mario_" s, "a/e_mario_" s}
 #define YOSHI_MODEL_PATHS(s, ...) \
-    {"a/c_babyyoshi" s, "a/EFF_m_yoshi" s}
+    {"a/c_babyyoshi" s, "a/EFF_m_yoshi" s, "a/c_tamag" s}
 
 const CosmeticGroupData g_AttackFxGroupData[] = {
     // Not unlocked by achievements.
@@ -48,7 +48,6 @@ const CosmeticGroupData g_AttackFxGroupData[] = {
     { IconType::ATTACK_FX_G, "tot_cos0_12_g" },
     { IconType::ATTACK_FX_B, "tot_cos0_13_g" },
     { IconType::ATTACK_FX_P, "tot_cos0_14_g" },
-    { IconType::ATTACK_FX_R, "tot_cos0_15_g" },
 };
 
 const AttackFxData g_AttackFxData[] = {
@@ -192,13 +191,14 @@ const CosmeticGroupData g_YoshiCostumeGroupData[] = {
     { IconType::YOSHI_GREEN,    "tot_cos2_18" },
     { IconType::YOSHI_GREEN,    "tot_cos2_19" },
     { IconType::YOSHI_GREEN,    "tot_cos2_20" },
+    { IconType::YOSHI_GREEN,    "tot_cos2_21" },
 };
 
 const YoshiCostumeData g_YoshiCostumeData[] = {
     {
         .name_msg = "tot_cos2_01",
         .help_msg = "tot_cos2_01_h",
-        .models = { "a/c_babyyoshi", "a/EFF_m_yoshi" },
+        .models = { "a/c_babyyoshi", "a/EFF_m_yoshi", "a/c_tamago" },
         .icon = IconType::YOSHI_GREEN,
         .icon_hud = IconType::HUD_YOSHI_GREEN,
         .group_id = 0,
@@ -241,7 +241,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .models = YOSHI_MODEL_PATHS("6"),
         .icon = IconType::YOSHI_BLACK,
         .icon_hud = IconType::HUD_YOSHI_BLACK,
-        .group_id = 6,
+        .group_id = 0,
     },
     {
         .name_msg = "tot_cos2_07",
@@ -249,7 +249,15 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .models = YOSHI_MODEL_PATHS("7"),
         .icon = IconType::YOSHI_WHITE,
         .icon_hud = IconType::HUD_YOSHI_WHITE,
-        .group_id = 7,
+        .group_id = 0,
+    },
+    {
+        .name_msg = "tot_cos2_08",
+        .help_msg = "tot_cos2_08_h",
+        .models = YOSHI_MODEL_PATHS("H"),
+        .icon = IconType::YOSHI_GREEN,
+        .icon_hud = IconType::HUD_YOSHI_GREEN,
+        .group_id = 0,
     },
 };
 const int32_t g_NumYoshiCostumes =
@@ -357,6 +365,15 @@ const MarioCostumeData* CosmeticsManager::GetMarioCostumeData(int32_t id) {
 const YoshiCostumeData* CosmeticsManager::GetYoshiCostumeData(int32_t id) {
     if (id < 0 || id >= g_NumYoshiCostumes) return nullptr;
     return &g_YoshiCostumeData[id];
+}
+
+int32_t CosmeticsManager::GetCosmeticCount(int32_t type) {
+    switch (type) {
+        case CosmeticType::ATTACK_FX:       return g_NumAttackFx;
+        case CosmeticType::MARIO_COSTUME:   return g_NumMarioCostumes;
+        case CosmeticType::YOSHI_COSTUME:   return g_NumYoshiCostumes;
+    }
+    return 0;
 }
     
 void CosmeticsManager::PickYoshiColor() {
