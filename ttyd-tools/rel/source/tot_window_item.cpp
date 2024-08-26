@@ -346,8 +346,9 @@ void DrawUseItemDialog(WinMgrEntry* winmgr_entry) {
                     };              
                     gc::vec3 scale = { 0.65f, 0.65f, 0.65f };
                     uint32_t color = 0xFFFFFFFFU;
-                    ttyd::win_main::winIconSet(
-                        IconType::MARIO_HEAD, &position, &scale, &color);
+                    int32_t costume = GetSWByte(GSW_MarioCostume);
+                    int32_t icon = CosmeticsManager::GetMarioCostumeData(costume)->icon;
+                    ttyd::win_main::winIconSet(icon, &position, &scale, &color);
                 }
                 
                 // Color spots behind "HP" and "FP".

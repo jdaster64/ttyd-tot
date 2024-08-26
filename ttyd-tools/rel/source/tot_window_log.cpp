@@ -541,7 +541,8 @@ void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
     // Draw header for page.
     {
         const char* msg;
-        int32_t header_icon = IconType::MARIO_HEAD;
+        int32_t costume = GetSWByte(GSW_MarioCostume);
+        int32_t header_icon = CosmeticsManager::GetMarioCostumeData(costume)->icon;
         switch (page_number) {
             case 0:
                 msg = "tot_movelog_jump";

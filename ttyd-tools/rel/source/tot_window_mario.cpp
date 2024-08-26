@@ -3,6 +3,8 @@
 #include "common_functions.h"
 #include "common_types.h"
 #include "mod.h"
+#include "tot_gsw.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_state.h"
 
 #include <gc/mtx.h>
@@ -362,7 +364,9 @@ void MarioMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
             0.0f
         };
         gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
-        ttyd::win_main::winIconSet(IconType::MARIO_HEAD, &position, &scale, &kWhite);
+        int32_t costume = GetSWByte(GSW_MarioCostume);
+        int32_t icon = CosmeticsManager::GetMarioCostumeData(costume)->icon;
+        ttyd::win_main::winIconSet(icon, &position, &scale, &kWhite);
     }
     
     // Skip printing Mario's level + rank information.

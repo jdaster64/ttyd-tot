@@ -558,7 +558,7 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].name = "in_bgm";
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].description = "msg_bgm";
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].menu_description = "msg_bgm";
-    itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].icon_id = IconType::ATTACK_FX_B;
+    itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].icon_id = IconType::BGM_MUTE;
     itemDataTable[ItemType::TOT_KEY_BGM_TOGGLE].type_sort_order = 4;
 
     itemDataTable[ItemType::TOT_KEY_ITEM_SELECTOR].name = "in_itemselect";

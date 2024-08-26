@@ -2193,7 +2193,7 @@ g_StringMap = {
         b'tot_cos1_07':     b'Bubble Mario',
         b'tot_cos1_08':     b'Superball Mario',
         b'tot_cos1_09':     b'Flying Mario',
-        b'tot_cos1_10':     b'Mario Bros.',
+        b'tot_cos1_10':     b'Classic Mario',
         b'tot_cos1_11':     b'Classic Luigi',
         b'tot_cos1_12':     b'SMB1 Mario',
         b'tot_cos1_13':     b'SMBDX Luigi',
@@ -2293,8 +2293,8 @@ g_StringMap = {
             b"Red shirt, blue overalls.\n"
             b"Unquestionably iconic!",
         b"tot_cos1_02_h":
-            b"Garb of exorcists, housekeepers,\n"
-            b"and famous detectives' assisants.",
+            b"Garb of housekeepers, exorcists,\n"
+            b"and detectives' assisants?",
         b"tot_cos1_03_h":
             b"The real Wario's getup could\n"
             b"never be this affordable.",
@@ -2305,17 +2305,17 @@ g_StringMap = {
             b"Shiny white and red duds.\n"
             b"THE original power-up.",
         b"tot_cos1_06_h":
-            b"Wear these to look like one\n"
-            b"cool customer.",
+            b"Wear this and you're sure to be\n"
+            b"one cool customer.",
         b"tot_cos1_07_h":
-            b"The newest flower power in town.\n"
+            b"The newest flower-based power.\n"
             b"Hot pink and red's a choice.",
         b"tot_cos1_08_h":
             b"Honestly, it's anyone's guess if\n"
             b"the color on this one's accurate.",
         b"tot_cos1_09_h":
-            b"Way too cool-looking to have its\n"
-            b"power-up only appear in one level.",
+            b"Way too cool-looking a suit to\n"
+            b"only appear in one level.",
         b"tot_cos1_10_h":
             b"Going all the way back to\n"
             b"Brooklyn with this one!",
@@ -2327,34 +2327,34 @@ g_StringMap = {
             b"blue in sight!",
         b"tot_cos1_13_h":
             b"Luigi cutting in on his bro's style,\n"
-            b"and getting in on some VS. action!",
+            b"and getting in some VS. action!",
         b"tot_cos1_14_h":
             b"Darker overalls to account for\n"
             b"the halogen stagelights!",
         b"tot_cos1_15_h":
-            b"16-bits means so many more off-reds"
-            b"and blues to choose from!",
+            b"16-bits means so many more off-\n"
+            b"reds and blues to choose from!",
         b"tot_cos1_16_h":
             b"Taking a break from tennis\n"
             b"refereeing to hit the links!",
         b"tot_cos1_17_h":
-            b"Casual blues, perfect for"
+            b"Casual blues, perfect for\n"
             b"putting greens!",
         b"tot_cos1_18_h":
-            b"All the longtime Smash fans still\n"
-            b'call this outfit "brown" out of habit.',
+            b"Longtime Smash fans still call\n"
+            b'this outfit "brown" out of habit.',
         b"tot_cos1_19_h":
             b"Mario's classic colors with a\n"
             b"cotton-candy twist!",
         b"tot_cos1_20_h":
-            b"The perfect look for construction\n"
-            b"work, preferably with a hard-hat.",
+            b"Perfect for construction work,\n"
+            b"but preferably with a hard-hat.",
         b"tot_cos1_21_h":
             b"Fun fact: Toadette ditched her\n"
-            b"orange dress right after this game!",
+            b"orange dress right after TTYD!",
         b"tot_cos1_22_h":
             b"Inspired by world champions' and\n"
-            b"mod creators' Pika-clone of choice.",
+            b"mod creators' favorite alike.",
         b"tot_cos1_23_h":
             b"Remembering names was never\n"
             b"so easy!",

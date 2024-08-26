@@ -598,6 +598,12 @@ namespace IconType {
         YOSHI_EMBLEM,
         BP_UP_ALT_1,
         BP_UP_ALT_2,
+        BGM_MUTE,
+
+        YOSHI_EXTRA_ICONS,
+        YOSHI_EXTRA_HUD_ICONS = YOSHI_EXTRA_ICONS + 14,
+        MARIO_COSTUME_ICONS = YOSHI_EXTRA_HUD_ICONS + 14,
+        MARIO_COSTUME_ICONS_END = MARIO_COSTUME_ICONS + 26,
     };
 }
 
