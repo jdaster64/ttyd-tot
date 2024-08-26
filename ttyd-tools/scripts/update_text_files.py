@@ -2338,8 +2338,8 @@ g_StringMap = {
             b"Taking a break from tennis\n"
             b"refereeing to hit the links!",
         b"tot_cos1_17_h":
-            b"Casual blues, perfect for\n"
-            b"putting greens!",
+            b"Casual blues to complement the\n"
+            b"putting greens.",
         b"tot_cos1_18_h":
             b"Longtime Smash fans still call\n"
             b'this outfit "brown" out of habit.',
@@ -2354,12 +2354,12 @@ g_StringMap = {
             b"orange dress right after TTYD!",
         b"tot_cos1_22_h":
             b"Inspired by world champions' and\n"
-            b"mod creators' favorite alike.",
+            b"modders' favorite Pokemon alike.",
         b"tot_cos1_23_h":
             b"Remembering names was never\n"
             b"so easy!",
         b"tot_cos1_24_h":
-            b"Nothing showier being a living\n"
+            b"Nothing showier than a living\n"
             b"trophy, even if it's only 2nd!",
         b"tot_cos1_25_h":
             b"All that glitters is you! Wear\n"

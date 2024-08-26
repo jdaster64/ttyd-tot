@@ -474,7 +474,7 @@ uint32_t GetStatusDamageFromWeapon(
                 }
                 case StatusEffectType::POISON:
                     // Each new infliction increases power by 1.
-                    if (target->poison_turns > 0) {
+                    if (target->poison_turns > 0 && strength > 0) {
                         strength = target->poison_strength + 1;
                     }
                     if (strength > 99) strength = 99;
