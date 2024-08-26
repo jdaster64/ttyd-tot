@@ -105,8 +105,7 @@ void ApplyFixedPatches() {
     g_pouchSetPartyColor_trampoline = patch::hookFunction(
         ttyd::mario_pouch::pouchSetPartyColor, [](int32_t party, int32_t color) {
             auto& data = ttyd::mario_pouch::pouchGetPtr()->party_data[party];
-            data.flags &= ~0x1800;
-            data.flags |= (color << 11);
+            data.flags = (data.flags & 0x7ff) | (color << 11);
         });
     g_pouchGetPartyColor_trampoline = patch::hookFunction(
         ttyd::mario_pouch::pouchGetPartyColor, [](int32_t party) {

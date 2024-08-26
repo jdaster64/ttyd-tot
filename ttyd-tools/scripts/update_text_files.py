@@ -2369,19 +2369,26 @@ g_StringMap = {
             b"You've really earned this!",
             
         b"tot_cos2_01_h":
-            b"Placeholder (Green)",
+            b"The classic green Yoshi.\n"
+            b"You've seen them all over!",
         b"tot_cos2_02_h":
-            b"Placeholder (Red)",
+            b"This red Yoshi can't spit fire,\n"
+            b"but he's still a hothead!",
         b"tot_cos2_03_h":
-            b"Placeholder (Blue)",
+            b"Hop on this blue Yoshi to fly\n"
+            b"(in terms of speed, at least).",
         b"tot_cos2_04_h":
-            b"Placeholder (Orange)",
+            b"Unlike Bowser Jr.'s illusions,\n"
+            b"this Yoshi isn't water-soluble.",
         b"tot_cos2_05_h":
-            b"Placeholder (Pink)",
+            b"A cute pastel color that\n"
+            b"belies this Yoshi's toughness!",
         b"tot_cos2_06_h":
-            b"Placeholder (Black)",
+            b"A rare variety of Yoshi; like you,\n"
+            b"they're exceptionally speedy!",
         b"tot_cos2_07_h":
-            b"Placeholder (White)",
+            b"A rare variety of Yoshi known\n"
+            b"for their love of spicy stuff!",
         b"tot_cos2_08_h":
             b"A rugged rocky-brown look, right\n"
             b"out of the prehistoric era.",
@@ -2398,23 +2405,23 @@ g_StringMap = {
             b"A bluish green, evoking faraway\n"
             b"islands full of tasty treats.",
         b"tot_cos2_13_h":
-            b"A striking hue fit for a king,\n"
-            b"or at least the king of dinos.",
+            b"A striking hue fit for a king, or\n"
+            b"at least the king of dinosaurs.",
         b"tot_cos2_14_h":
+            b"A royal color, perfect for\n"
+            b"one rolling in ill-gotten riches.",
+        b"tot_cos2_15_h":
             b"A soothing shade of lavender,\n"
             b"bringing to mind a soft rain.",
-        b"tot_cos2_15_h":
-            b"A royal color, perfect for\n"
-            b"one rolling in riches.",
         b"tot_cos2_16_h":
-            b"A shocking magenta that's nearly\n"
+            b"A shocking magenta that's\n"
             b"out of this world!",
         b"tot_cos2_17_h":
-            b"A muted beige, so samey it could\n"
+            b"A muted beige so samey it could\n"
             b"make your head spin.",
         b"tot_cos2_18_h":
-            b"Inspired by a starter and region\n"
-            b"with a woefully short time to shine.",
+            b"Inspired by a Pokemon starter\n"
+            b"from an underappreciated region.",
         b"tot_cos2_19_h":
             b"A steed of literal silver's\n"
             b"nothing to sneeze at!",
