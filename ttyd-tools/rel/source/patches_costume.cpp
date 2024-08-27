@@ -9,6 +9,7 @@
 #include <ttyd/icondrv.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/memory.h>
+#include <ttyd/pmario_sound.h>
 
 #include <cstdint>
 #include <cstdio>
@@ -180,6 +181,17 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_sac_genki_disp_3D_YoshiHeartIcon_EH),
         reinterpret_cast<void*>(StartSweetTreatYoshiIcon),
         reinterpret_cast<void*>(BranchBackSweetTreatYoshiIcon));
+
+    // Change base volume of some Attack FX sounds to be more consistent.
+    // Peach voice clips...
+    ttyd::pmario_sound::pssfxlist[245].vol = 100;
+    ttyd::pmario_sound::pssfxlist[252].vol = 100;
+    ttyd::pmario_sound::pssfxlist[255].vol = 100;
+    // Bowser voice clips...
+    ttyd::pmario_sound::pssfxlist[270].vol = 100;
+    ttyd::pmario_sound::pssfxlist[273].vol = 100;
+    ttyd::pmario_sound::pssfxlist[278].vol = 100;
+    ttyd::pmario_sound::pssfxlist[290].vol = 100;
 }
 
 }  // namespace costume

@@ -2161,28 +2161,30 @@ g_StringMap = {
         b'tot_cos0_01':     b'Ding FX',
         b'tot_cos0_02':     b'Froggy FX',
         b'tot_cos0_03':     b'Squeaky FX',
-        b'tot_cos0_04':     b'Peach FX',
-        b'tot_cos0_05':     b'Bowser FX',
-        b'tot_cos0_06':     b'???',
-        b'tot_cos0_07':     b'???',
-        b'tot_cos0_08':     b'???',
-        b'tot_cos0_09':     b'???',
-        b'tot_cos0_10':     b'???',
-        b'tot_cos0_11':     b'???',
-        b'tot_cos0_12':     b'???',
-        b'tot_cos0_13':     b'???',
-        b'tot_cos0_14':     b'???',
-        b'tot_cos0_15':     b'???',
-        b'tot_cos0_16':     b'???',
-        b'tot_cos0_17':     b'???',
-        b'tot_cos0_18':     b'???',
-        b'tot_cos0_19':     b'???',
-        b'tot_cos0_20':     b'???',
-        b'tot_cos0_21':     b'???',
-        b'tot_cos0_22':     b'???',
-        b'tot_cos0_23':     b'???',
-        b'tot_cos0_24':     b'???',
-        b'tot_cos0_25':     b'???',
+        b'tot_cos0_04':     b'Tweet FX',
+        b'tot_cos0_05':     b'Crow FX',
+        b'tot_cos0_06':     b'Oink FX',
+        b'tot_cos0_07':     b'Smorg FX',
+        b'tot_cos0_08':     b'Doopliss FX',
+        b'tot_cos0_09':     b'Bandit FX',
+        b'tot_cos0_10':     b'Scream FX',
+        b'tot_cos0_11':     b'Whistle FX',
+        b'tot_cos0_12':     b'Techy FX',
+        b'tot_cos0_13':     b'Retro FX',
+        b'tot_cos0_14':     b'1-UP FX',
+        b'tot_cos0_15':     b'Pop FX',
+        b'tot_cos0_16':     b'Zip FX',
+        b'tot_cos0_17':     b'Boom FX',
+        b'tot_cos0_18':     b'Boing FX',
+        b'tot_cos0_19':     b'Crash FX',
+        b'tot_cos0_20':     b'Punch FX',
+        b'tot_cos0_21':     b'Cartoon FX',
+        b'tot_cos0_22':     b'Raspberry FX',
+        b'tot_cos0_23':     b'Jingle FX',
+        b'tot_cos0_24':     b'Crystal FX',
+        b'tot_cos0_25':     b'Warp FX',
+        b'tot_cos0_26':     b'Peach FX',
+        b'tot_cos0_27':     b'Bowser FX',
         
         b'tot_cos1_01':     b'Mario',
         b'tot_cos1_02':     b'Luigi',
@@ -2243,11 +2245,9 @@ g_StringMap = {
             b"Gives Mario's attacks a\n"
             b"mouse-like squeaking sound.",
         b'tot_cos0_04_h':
-            b"Gives Mario's attacks a\n"
-            b"cheerful laughing sound.",
+            b"Placeholder",
         b'tot_cos0_05_h':
-            b"Gives Mario's attacks a\n"
-            b"dreadful roaring sound.",
+            b"Placeholder",
         b"tot_cos0_06_h":
             b"Placeholder",
         b"tot_cos0_07_h":
@@ -2288,6 +2288,12 @@ g_StringMap = {
             b"Placeholder",
         b"tot_cos0_25_h":
             b"Placeholder",
+        b"tot_cos0_26_h":
+            b"Gives Mario's attacks a\n"
+            b"cheerful laughing sound.",
+        b"tot_cos0_27_h":
+            b"Gives Mario's attacks a\n"
+            b"dreadful roaring sound.",
             
         b"tot_cos1_01_h":
             b"Red shirt, blue overalls.\n"
@@ -2320,8 +2326,8 @@ g_StringMap = {
             b"Going all the way back to\n"
             b"Brooklyn with this one!",
         b"tot_cos1_11_h":
-            b"Luigi's original white-and-green\n"
-            b"style, no Fire Flower required!",
+            b"Luigi rocking classic white and\n"
+            b"green, no Fire Flower required!",
         b"tot_cos1_12_h":
             b"Earthy tones and nary a bit of\n"
             b"blue in sight!",
@@ -2420,8 +2426,8 @@ g_StringMap = {
             b"A muted beige so samey it could\n"
             b"make your head spin.",
         b"tot_cos2_18_h":
-            b"Inspired by a Pokemon starter\n"
-            b"from an underappreciated region.",
+            b"Reminiscent of an under-\n"
+            b"appreciated Pokemon region.",
         b"tot_cos2_19_h":
             b"A steed of literal silver's\n"
             b"nothing to sneeze at!",

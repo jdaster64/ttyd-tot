@@ -20,7 +20,7 @@ struct CosmeticGroupData {
 struct AttackFxData {
     const char* name_msg;
     const char* help_msg;
-    const char* sounds[4];
+    const char* sounds[5];
     int16_t num_sounds;
     int16_t randomize_pitch;
     int16_t icon;
@@ -63,7 +63,7 @@ public:
     static const MarioCostumeData* GetMarioCostumeData(int32_t id);
     static const YoshiCostumeData* GetYoshiCostumeData(int32_t id);
 
-    // Returns the last valid id for each cosmetic type.
+    // Returns one past the last valid id for each cosmetic type.
     static int32_t GetCosmeticCount(int32_t type);
 
     // Selects a Yoshi color at random based on currenly active selections.
@@ -72,7 +72,7 @@ public:
     // Selects an Attack FX sound based on currently active selections.
     static int32_t PickActiveFX();
     // Gets the sound effect name to play based on the id.
-    static const char* GetFXName(int32_t id);
+    static const char* GetSoundFromFXGroup(int32_t id);
 };
 
 }

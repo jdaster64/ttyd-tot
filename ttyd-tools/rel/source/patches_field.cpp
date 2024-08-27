@@ -39,11 +39,15 @@ extern "C" {
     void playFieldHammerFX(gc::vec3* position) {
         int32_t id = mod::tot::CosmeticsManager::PickActiveFX();
         if (id) {
-            const char* fx_name = mod::tot::CosmeticsManager::GetFXName(id);
-            int32_t id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);
-            // Play at one of a few random pitches.
-            int16_t pitch = 0x400 * (ttyd::system::irand(3) - 1);
-            ttyd::pmario_sound::psndSFX_pit(id, pitch);
+            const char* fx_name = mod::tot::CosmeticsManager::GetSoundFromFXGroup(id);
+            const auto* data = mod::tot::CosmeticsManager::GetAttackFxData(id);
+
+            int32_t sfx_id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);
+            if (data->randomize_pitch) {
+                // Play at one of a few random pitches.
+                int16_t pitch = 0x400 * (ttyd::system::irand(3) - 1);
+                ttyd::pmario_sound::psndSFX_pit(sfx_id, pitch);
+            }
         } else {
             // Play standard hammer impact sound.
             ttyd::pmario_sound::psndSFXOn_3D("SFX_MARIO_HAMMER_WOOD_DON1", position);

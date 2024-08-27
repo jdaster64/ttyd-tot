@@ -1946,13 +1946,16 @@ bool CheckOnSelectedSide(int32_t target_idx) {
 
 bool CheckPlayAttackFx(uint32_t flags, gc::vec3* position) {
     const int32_t id = (flags & 0x1f00'0000) / 0x100'0000;
-    const char* fx_name = tot::CosmeticsManager::GetFXName(id);
+    const char* fx_name = mod::tot::CosmeticsManager::GetSoundFromFXGroup(id);
+    const auto* data = mod::tot::CosmeticsManager::GetAttackFxData(id);
     if (!fx_name) return false;
 
     int32_t sfx_id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);
-    // Play at one of a few random pitches.
-    int16_t pitch = 0x400 * (ttyd::system::irand(3) - 1);
-    ttyd::pmario_sound::psndSFX_pit(sfx_id, pitch);
+    if (data->randomize_pitch) {
+        // Play at one of a few random pitches.
+        int16_t pitch = 0x400 * (ttyd::system::irand(3) - 1);
+        ttyd::pmario_sound::psndSFX_pit(sfx_id, pitch);
+    }
     return true;
 }
 

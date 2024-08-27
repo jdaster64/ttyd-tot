@@ -38,7 +38,7 @@ const CosmeticGroupData g_AttackFxGroupData[] = {
     { IconType::ATTACK_FX_B, "tot_cos0_03"},
     { IconType::ATTACK_FX_P, "tot_cos0_04"},
     { IconType::ATTACK_FX_R, "tot_cos0_05"},
-    // Placeholders.
+    // Unlockables.
     { IconType::ATTACK_FX_Y, "tot_cos0_06_g" },
     { IconType::ATTACK_FX_G, "tot_cos0_07_g" },
     { IconType::ATTACK_FX_B, "tot_cos0_08_g" },
@@ -54,7 +54,9 @@ const AttackFxData g_AttackFxData[] = {
     {
         .group_id = -1,
     },
+    // Group 0 (available by default):
     { 
+        // Ding FX
         .name_msg = "tot_cos0_01", 
         .help_msg = "tot_cos0_01_h",
         .sounds = { "SFX_MARIO_HAMMER_PIKKYO_Y1" },
@@ -63,39 +65,328 @@ const AttackFxData g_AttackFxData[] = {
         .icon = IconType::ATTACK_FX_Y,
         .group_id = 0,
     },
-    { 
+    {
+        // Froggy FX
         .name_msg = "tot_cos0_02", 
         .help_msg = "tot_cos0_02_h",
         .sounds = { "SFX_MARIO_HAMMER_PIKKYO_R1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_G,
+        .icon = IconType::ATTACK_FX_Y,
         .group_id = 0,
     },
-    { 
+    {
+        // Squeaky FX
         .name_msg = "tot_cos0_03", 
         .help_msg = "tot_cos0_03_h",
         .sounds = { "SFX_MARIO_HAMMER_PIKKYO_B1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_Y,
+        .group_id = 0,
+    },
+    // Group 1: Animals
+    {
+        // Tweet FX
+        .name_msg = "tot_cos0_04", 
+        .help_msg = "tot_cos0_04_h",
+        .sounds = {
+            "SFX_AMB_BIRD1",
+            "SFX_AMB_BIRD2",
+            "SFX_AMB_BIRD3",
+        },
+        .num_sounds = 3,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_G,
+        .group_id = 0,
+    },
+    {
+        // Crow FX
+        .name_msg = "tot_cos0_05", 
+        .help_msg = "tot_cos0_05_h",
+        .sounds = { "SFX_STG4_CROW_HOWL1" },
+        .num_sounds = 1,
+        .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_G,
+        .group_id = 0,
+    },
+    {
+        // Pig FX
+        .name_msg = "tot_cos0_06", 
+        .help_msg = "tot_cos0_06_h",
+        .sounds = { "SFX_STG4_VOICE_PIG1" },
+        .num_sounds = 1,
+        .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_G,
+        .group_id = 0,
+    },
+    // Group 2: Minor characters
+    {
+        // Pig FX
+        .name_msg = "tot_cos0_07", 
+        .help_msg = "tot_cos0_07_h",
+        .sounds = { "SFX_STG6_MOAMOA_VOICE1" },
+        .num_sounds = 1,
+        .randomize_pitch = 1,
         .icon = IconType::ATTACK_FX_B,
         .group_id = 0,
     },
-    { 
-        .name_msg = "tot_cos0_04", 
-        .help_msg = "tot_cos0_04_h",
-        .sounds = { "SFX_MARIO_HAMMER_PIKKYO_G1" },
+    {
+        // Pig FX
+        .name_msg = "tot_cos0_08", 
+        .help_msg = "tot_cos0_08_h",
+        .sounds = { "SFX_BOSS_RNPL_LAUGH1" },
+        .num_sounds = 1,
+        .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_B,
+        .group_id = 0,
+    },
+    {
+        // Pig FX
+        .name_msg = "tot_cos0_09", 
+        .help_msg = "tot_cos0_09_h",
+        .sounds = { "SFX_ENM_BORODO_LAUGH1" },
+        .num_sounds = 1,
+        .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_B,
+        .group_id = 0,
+    },
+    // Group 3: Crowd noises
+    {
+        // Scream FX
+        .name_msg = "tot_cos0_10",
+        .help_msg = "tot_cos0_10_h",
+        .sounds = { "SFX_AUDIENCE_PANIC_SCREAM2" },
         .num_sounds = 1,
         .randomize_pitch = 1,
         .icon = IconType::ATTACK_FX_P,
         .group_id = 0,
     },
-    { 
-        .name_msg = "tot_cos0_05", 
-        .help_msg = "tot_cos0_05_h",
-        .sounds = { "SFX_MARIO_HAMMER_PIKKYO_P1" },
+    {
+        // Whistle FX
+        .name_msg = "tot_cos0_11",
+        .help_msg = "tot_cos0_11_h",
+        .sounds = {
+            "SFX_AUDIENCE_WHISTLE1",
+            "SFX_AUDIENCE_WHISTLE2",
+            "SFX_AUDIENCE_WHISTLE3",
+        },
+        .num_sounds = 3,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_P,
+        .group_id = 0,
+    },
+    // Group 4: Digital stuff
+    {
+        // Techy FX
+        .name_msg = "tot_cos0_12", 
+        .help_msg = "tot_cos0_12_h",
+        .sounds = {
+            "SFX_PEACH_MAIL_SOUSIN2",
+            "SFX_PEACH_SCREEN_OPEN1",
+            "SFX_PEACH_ELEVATOR_ACCESS1",
+        },
+        .num_sounds = 3,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_R,
+        .group_id = 0,
+    },
+    {
+        // Retro FX
+        .name_msg = "tot_cos0_13",
+        .help_msg = "tot_cos0_13_h",
+        .sounds = {
+            "SFX_PEACH_DISC_SET1",
+            "SFX_ITEM_RANK_UP_ENEMY1",
+            "SFX_MOBJ_JUMP_STAND1",
+            "SFX_ENM_FIREB_ATTACK1",
+            "SFX_MESSAGE_SAVE_OK1",
+        },
+        .num_sounds = 5,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_R,
+        .group_id = 0,
+    },
+    {
+        // 1-UP FX
+        .name_msg = "tot_cos0_14",
+        .help_msg = "tot_cos0_14_h",
+        .sounds = { "SFX_BTL_LVUP_BLOCK_HIT1" },
+        .num_sounds = 1,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_R,
+        .group_id = 0,
+    },
+    // Group 5: Cartoon sounds 1
+    {
+        // Pop FX
+        .name_msg = "tot_cos0_15",
+        .help_msg = "tot_cos0_15_h",
+        .sounds = {
+            "SFX_BTL_CHURINA_CONFUSE1",
+            "SFX_ENM_3RD1_BOTTLE5",
+            "SFX_ENM_SAMBO_SEND_GROUP3",
+        },
+        .num_sounds = 3,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_Y,
+        .group_id = 0,
+    },
+    {
+        // Zip FX
+        .name_msg = "tot_cos0_16",
+        .help_msg = "tot_cos0_16_h",
+        .sounds = {
+            "SFX_ENM_PANSY_ESCAPE2",
+            "SFX_ENM_BORODO_ESCAPE1",
+            "SFX_ENM_JUGEM_THROW1",
+        },
+        .num_sounds = 3,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_Y,
+        .group_id = 0,
+    },
+    // Group 6: Cartoon sounds 2
+    {
+        // Boom FX
+        .name_msg = "tot_cos0_17",
+        .help_msg = "tot_cos0_17_h",
+        .sounds = { "SFX_STG5_CANNON_FIRING1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_G,
+        .group_id = 0,
+    },
+    {
+        // Boing FX
+        .name_msg = "tot_cos0_18",
+        .help_msg = "tot_cos0_18_h",
+        .sounds = {
+            "SFX_STG6_OBJ_SWITCH_APPEAR1",
+            "SFX_BTL_CLAUD_ATTACK2",
+            "SFX_STG3_AIRDUCT_SHAKE1",
+        },
+        .num_sounds = 3,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_G,
+        .group_id = 0,
+    },
+    {
+        // Crash FX
+        .name_msg = "tot_cos0_19",
+        .help_msg = "tot_cos0_19_h",
+        .sounds = {
+            "SFX_STG6_SWITCH_MOVE1",
+            "SFX_MOBJ_BLOCK_OJAMA1",
+            "SFX_BTL_SAC_ZUBA_STAR3",
+        },
+        .num_sounds = 3,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_G,
+        .group_id = 0,
+    },
+    // Group 7: Cartoon sounds 3
+    {
+        // Punch FX
+        .name_msg = "tot_cos0_20",
+        .help_msg = "tot_cos0_20_h",
+        .sounds = { "SFX_BOSS_GANSU_FIST1" },
+        .num_sounds = 1,
+        .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_B,
+        .group_id = 0,
+    },
+    {
+        // Cartoon FX
+        .name_msg = "tot_cos0_21",
+        .help_msg = "tot_cos0_21_h",
+        .sounds = {
+            "SFX_BTL_ACROBAT_MISS1",
+            "SFX_ENM_JUGEM_HOLD1",
+            "SFX_HIT_TREE1",
+            "SFX_EVT_PERAMAJIN_BLINKING1",
+            "SFX_BTL_STAGE_DAMAGE_FORK1",
+        },
+        .num_sounds = 5,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_B,
+        .group_id = 0,
+    },
+    {
+        // Raspberry FX
+        .name_msg = "tot_cos0_22",
+        .help_msg = "tot_cos0_22_h",
+        .sounds = { "SFX_STG5_SAILER_FART1" },
+        .num_sounds = 1,
+        .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_B,
+        .group_id = 0,
+    },
+    // Group 8: Miscellaneous
+    {
+        // Jingle FX
+        .name_msg = "tot_cos0_23",
+        .help_msg = "tot_cos0_23_h",
+        .sounds = {
+            "SFX_QUIZ_START1",
+            "SFX_STG6_DOUBTFUL_POINT1",
+        },
+        .num_sounds = 2,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_P,
+        .group_id = 0,
+    },
+    {
+        // Crystal FX
+        .name_msg = "tot_cos0_24",
+        .help_msg = "tot_cos0_24_h",
+        .sounds = {
+            "SFX_STG8_STAR_LIGHTUP2",
+            "SFX_KUPPA_STONE_BREAK1",
+            "SFX_STG6_ELEVATOR_BELL1",
+        },
+        .num_sounds = 3,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_P,
+        .group_id = 0,
+    },
+    {
+        // Warp FX
+        .name_msg = "tot_cos0_25",
+        .help_msg = "tot_cos0_25_h",
+        .sounds = { "SFX_STG7_WARP2" },
+        .num_sounds = 1,
+        .randomize_pitch = 1,
+        .icon = IconType::ATTACK_FX_P,
+        .group_id = 0,
+    },
+    // Group 9: Peach & Bowser
+    {
+        .name_msg = "tot_cos0_26", 
+        .help_msg = "tot_cos0_26_h",
+        .sounds = {
+            "SFX_MARIO_HAMMER_PIKKYO_G1",
+            "SFX_VOICE_PEACH_HAPPY1_1",
+            "SFX_VOICE_PEACH_QUESTION1",
+            "SFX_VOICE_PEACH_LAUGH2_1",
+        },
+        .num_sounds = 4,
+        .randomize_pitch = 0,
+        .icon = IconType::ATTACK_FX_R,
+        .group_id = 0,
+    },
+    { 
+        .name_msg = "tot_cos0_27", 
+        .help_msg = "tot_cos0_27_h",
+        .sounds = {
+            "SFX_MARIO_HAMMER_PIKKYO_P1",
+            "SFX_VOICE_KOOPA_ANGRY2_1",
+            "SFX_VOICE_KOOPA_LAUGH1_2",
+            "SFX_VOICE_KOOPA_HAPPY1_1",
+            "SFX_VOICE_KOOPA_SURPRISED1_1",
+        },
+        .num_sounds = 5,
+        .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_R,
         .group_id = 0,
     },
@@ -109,7 +400,7 @@ const CosmeticGroupData g_MarioCostumeGroupData[] = {
     { IconType::MARIO_COSTUME_ICONS +  1,   "tot_cos1_02" },  // Luigi
     { IconType::MARIO_COSTUME_ICONS +  2,   "tot_cos1_03" },  // Wario
     { IconType::MARIO_COSTUME_ICONS +  3,   "tot_cos1_04" },  // Waluigi
-    // Placeholders.
+    // Unlockables.
     { IconType::MARIO_COSTUME_ICONS +  4,   "tot_cos1_05" },
     { IconType::MARIO_COSTUME_ICONS +  5,   "tot_cos1_06" },
     { IconType::MARIO_COSTUME_ICONS +  6,   "tot_cos1_07" },
@@ -355,7 +646,7 @@ const CosmeticGroupData g_YoshiCostumeGroupData[] = {
     { IconType::YOSHI_BLUE,     "tot_cos2_03" },
     { IconType::YOSHI_ORANGE,   "tot_cos2_04" },
     { IconType::YOSHI_PINK,     "tot_cos2_05" },
-    // Placeholders.
+    // Unlockables.
     { IconType::YOSHI_BLACK,                "tot_cos2_06" },
     { IconType::YOSHI_WHITE,                "tot_cos2_07" },
     { IconType::YOSHI_EXTRA_ICONS +  0,     "tot_cos2_08" },
@@ -712,9 +1003,10 @@ int32_t CosmeticsManager::PickActiveFX() {
     return 0;
 }
 
-const char* CosmeticsManager::GetFXName(int32_t id) {
-    // TODO: Randomize, and also support random pitch.
-    return g_AttackFxData[id].sounds[0];
+const char* CosmeticsManager::GetSoundFromFXGroup(int32_t id) {
+    const auto* data = GetAttackFxData(id);
+    if (!data) return nullptr;
+    return data->sounds[ttyd::system::irand(data->num_sounds)];
 }
 
 }

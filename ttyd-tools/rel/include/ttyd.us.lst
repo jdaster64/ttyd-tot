@@ -1169,11 +1169,14 @@
 800d7394:evt_ext_entry
 
 // pmario_sound.o
+// .text
 800d9744:psndSFX_pit
 800d9848:psndSFXOn_3D
 800d98bc:psndSFXOn
 800daf24:psndBGMOn_f_d
 800dc214:psndStopAllFadeOut
+// .data
+80316b28:pssfxlist
 
 // sound.o
 800e0c38:SoundEfxStop

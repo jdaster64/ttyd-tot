@@ -6,8 +6,20 @@
 
 namespace ttyd::pmario_sound {
 
+struct PSndSfxListEntry {
+    const char* name;
+    uint16_t flags;
+    uint16_t id;
+    const char* unk_0x08;
+    int8_t vol;
+    int8_t unk_0x0d;
+    int8_t unk_0x0e[6];
+};
+static_assert(sizeof(PSndSfxListEntry) == 0x14);
+
 extern "C" {
 
+// .text
 // psndENV_LPF
 // psndENVOff_f_d
 // psndENVOff
@@ -60,6 +72,9 @@ void psndStopAllFadeOut();
 // calc3D
 // angleABf
 
+// .data
+extern PSndSfxListEntry pssfxlist[4242];
+    
 }
 
 }
