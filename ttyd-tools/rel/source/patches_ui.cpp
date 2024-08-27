@@ -382,7 +382,7 @@ void DrawStatusWindow() {
         gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
         ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, IconType::GEAR, &kWhite);
 
-        gc::mtx::PSMTXTrans(&mtx1, -130.0f, ref_y + 16.0f, 0.0f);
+        gc::mtx::PSMTXTrans(&mtx1, -120.0f, ref_y + 16.0f, 0.0f);
         gc::mtx::PSMTXScale(&mtx2, 0.75f, 0.75f, 0.75f);
         gc::mtx::PSMTXConcat(&mtx1, &mtx2, &mtx1);
         ttyd::icondrv::iconDispGxCol(&mtx1, 0x10, IconType::BADGES, &kWhite);

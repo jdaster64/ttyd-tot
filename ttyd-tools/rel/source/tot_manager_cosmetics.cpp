@@ -243,7 +243,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // SMB3
         .name_msg = "tot_cos1_14",
         .help_msg = "tot_cos1_14_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("J", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 13,
         .group_id = 0,
     },
@@ -251,7 +251,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Super Mario World
         .name_msg = "tot_cos1_15",
         .help_msg = "tot_cos1_15_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("K", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 14,
         .group_id = 0,
     },
@@ -259,7 +259,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Mario Golf 1
         .name_msg = "tot_cos1_16",
         .help_msg = "tot_cos1_16_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("M", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 15,
         .group_id = 0,
     },
@@ -267,7 +267,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Mario Golf 2
         .name_msg = "tot_cos1_17",
         .help_msg = "tot_cos1_17_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("N", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 16,
         .group_id = 0,
     },
@@ -275,7 +275,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Super Smash Bros. 1
         .name_msg = "tot_cos1_18",
         .help_msg = "tot_cos1_18_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("O", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 17,
         .group_id = 0,
     },
@@ -283,7 +283,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Super Smash Bros. 2
         .name_msg = "tot_cos1_19",
         .help_msg = "tot_cos1_19_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("P", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 18,
         .group_id = 0,
     },
@@ -291,7 +291,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Mario Maker
         .name_msg = "tot_cos1_20",
         .help_msg = "tot_cos1_20_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("Q", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 19,
         .group_id = 0,
     },
@@ -299,23 +299,23 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Toadette
         .name_msg = "tot_cos1_21",
         .help_msg = "tot_cos1_21_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("S", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 20,
         .group_id = 0,
     },
     {
-        // Secret 1
+        // Secret
         .name_msg = "tot_cos1_22",
         .help_msg = "tot_cos1_22_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("T", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 21,
         .group_id = 0,
     },
     {
-        // Secret 2
+        // Shadowy
         .name_msg = "tot_cos1_23",
         .help_msg = "tot_cos1_23_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("U", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 22,
         .group_id = 0,
     },
@@ -323,7 +323,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Silver
         .name_msg = "tot_cos1_24",
         .help_msg = "tot_cos1_24_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("X", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 23,
         .group_id = 0,
     },
@@ -331,7 +331,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Gold
         .name_msg = "tot_cos1_25",
         .help_msg = "tot_cos1_25_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("Y", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 24,
         .group_id = 0,
     },
@@ -339,7 +339,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         // Platinum
         .name_msg = "tot_cos1_26",
         .help_msg = "tot_cos1_26_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("Z", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 25,
         .group_id = 0,
     },
