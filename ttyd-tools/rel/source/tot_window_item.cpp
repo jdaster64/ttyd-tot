@@ -1249,8 +1249,8 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
             }
             
             // Set cursor position.
-            menu->main_cursor_target_x = -80.0f;
-            menu->main_cursor_target_y = 124.0f - 24.0f * 
+            menu->main_cursor_target_x = -60.0f;
+            menu->main_cursor_target_y = 123.0f - 24.0f * 
                 (menu->cosmetic_cursor_idx - menu->cosmetic_menu_offset);
             // Set window scroll offset.
             menu->cosmetic_menu_scroll_target_y = menu->cosmetic_menu_offset * 24.0f;

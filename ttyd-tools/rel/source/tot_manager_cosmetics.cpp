@@ -136,6 +136,7 @@ const CosmeticGroupData g_MarioCostumeGroupData[] = {
 
 const MarioCostumeData g_MarioCostumeData[] = {
     {
+        // Default
         .name_msg = "tot_cos1_01",
         .help_msg = "tot_cos1_01_h",
         .models = { "a/a_mario", "a/a_mario_r", "a/b_mario", "a/e_mario" },
@@ -143,6 +144,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Luigi
         .name_msg = "tot_cos1_02",
         .help_msg = "tot_cos1_02_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -150,6 +152,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Wario
         .name_msg = "tot_cos1_03",
         .help_msg = "tot_cos1_03_h",
         .models = MARIO_MODEL_PATHS("w", true),
@@ -157,77 +160,87 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Waluigi
         .name_msg = "tot_cos1_04",
         .help_msg = "tot_cos1_04_h",
         .models = MARIO_MODEL_PATHS("wl", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 3,
         .group_id = 0,
     },
-    // TODO: Models are placeholders for now.
     {
+        // Fire Mario
         .name_msg = "tot_cos1_05",
         .help_msg = "tot_cos1_05_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("A", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 4,
         .group_id = 0,
     },
     {
+        // Ice Mario
         .name_msg = "tot_cos1_06",
         .help_msg = "tot_cos1_06_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("B", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 5,
         .group_id = 0,
     },
     {
+        // Bubble Mario
         .name_msg = "tot_cos1_07",
         .help_msg = "tot_cos1_07_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("C", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 6,
         .group_id = 0,
     },
     {
+        // Superball Mario
         .name_msg = "tot_cos1_08",
         .help_msg = "tot_cos1_08_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("D", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 7,
         .group_id = 0,
     },
     {
+        // Flying Mario
         .name_msg = "tot_cos1_09",
         .help_msg = "tot_cos1_09_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("E", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 8,
         .group_id = 0,
     },
     {
+        // Classic (Mario Bros.) Mario
         .name_msg = "tot_cos1_10",
         .help_msg = "tot_cos1_10_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("F", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 9,
         .group_id = 0,
     },
     {
+        // Classic (Super Mario Bros.) Luigi
         .name_msg = "tot_cos1_11",
         .help_msg = "tot_cos1_11_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("G", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 10,
         .group_id = 0,
     },
     {
+        // SMB1 Mario
         .name_msg = "tot_cos1_12",
         .help_msg = "tot_cos1_12_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("H", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 11,
         .group_id = 0,
     },
     {
+        // SMB Deluxe Luigi
         .name_msg = "tot_cos1_13",
         .help_msg = "tot_cos1_13_h",
-        .models = MARIO_MODEL_PATHS("l", true),
+        .models = MARIO_MODEL_PATHS("I", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 12,
         .group_id = 0,
     },
     {
+        // SMB3
         .name_msg = "tot_cos1_14",
         .help_msg = "tot_cos1_14_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -235,6 +248,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Super Mario World
         .name_msg = "tot_cos1_15",
         .help_msg = "tot_cos1_15_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -242,6 +256,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Mario Golf 1
         .name_msg = "tot_cos1_16",
         .help_msg = "tot_cos1_16_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -249,6 +264,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Mario Golf 2
         .name_msg = "tot_cos1_17",
         .help_msg = "tot_cos1_17_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -256,6 +272,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Super Smash Bros. 1
         .name_msg = "tot_cos1_18",
         .help_msg = "tot_cos1_18_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -263,6 +280,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Super Smash Bros. 2
         .name_msg = "tot_cos1_19",
         .help_msg = "tot_cos1_19_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -270,6 +288,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Mario Maker
         .name_msg = "tot_cos1_20",
         .help_msg = "tot_cos1_20_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -277,6 +296,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Toadette
         .name_msg = "tot_cos1_21",
         .help_msg = "tot_cos1_21_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -284,6 +304,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Secret 1
         .name_msg = "tot_cos1_22",
         .help_msg = "tot_cos1_22_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -291,6 +312,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Secret 2
         .name_msg = "tot_cos1_23",
         .help_msg = "tot_cos1_23_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -298,6 +320,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Silver
         .name_msg = "tot_cos1_24",
         .help_msg = "tot_cos1_24_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -305,6 +328,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Gold
         .name_msg = "tot_cos1_25",
         .help_msg = "tot_cos1_25_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -312,6 +336,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Platinum
         .name_msg = "tot_cos1_26",
         .help_msg = "tot_cos1_26_h",
         .models = MARIO_MODEL_PATHS("l", true),
@@ -351,6 +376,7 @@ const CosmeticGroupData g_YoshiCostumeGroupData[] = {
 
 const YoshiCostumeData g_YoshiCostumeData[] = {
     {
+        // Green
         .name_msg = "tot_cos2_01",
         .help_msg = "tot_cos2_01_h",
         .models = { "a/c_babyyoshi", "a/EFF_m_yoshi", "a/c_tamago" },
@@ -359,6 +385,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Red
         .name_msg = "tot_cos2_02",
         .help_msg = "tot_cos2_02_h",
         .models = YOSHI_MODEL_PATHS("2"),
@@ -367,6 +394,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Blue
         .name_msg = "tot_cos2_03",
         .help_msg = "tot_cos2_03_h",
         .models = YOSHI_MODEL_PATHS("3"),
@@ -375,6 +403,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Orange
         .name_msg = "tot_cos2_04",
         .help_msg = "tot_cos2_04_h",
         .models = YOSHI_MODEL_PATHS("4"),
@@ -383,6 +412,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Pink
         .name_msg = "tot_cos2_05",
         .help_msg = "tot_cos2_05_h",
         .models = YOSHI_MODEL_PATHS("5"),
@@ -391,6 +421,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Black
         .name_msg = "tot_cos2_06",
         .help_msg = "tot_cos2_06_h",
         .models = YOSHI_MODEL_PATHS("6"),
@@ -399,6 +430,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // White
         .name_msg = "tot_cos2_07",
         .help_msg = "tot_cos2_07_h",
         .models = YOSHI_MODEL_PATHS("7"),
@@ -407,6 +439,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Brown
         .name_msg = "tot_cos2_08",
         .help_msg = "tot_cos2_08_h",
         .models = YOSHI_MODEL_PATHS("H"),
@@ -415,6 +448,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Scarlet
         .name_msg = "tot_cos2_09",
         .help_msg = "tot_cos2_09_h",
         .models = YOSHI_MODEL_PATHS("I"),
@@ -423,6 +457,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Yellow
         .name_msg = "tot_cos2_10",
         .help_msg = "tot_cos2_10_h",
         .models = YOSHI_MODEL_PATHS("J"),
@@ -431,6 +466,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Lime
         .name_msg = "tot_cos2_11",
         .help_msg = "tot_cos2_11_h",
         .models = YOSHI_MODEL_PATHS("K"),
@@ -439,6 +475,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Teal
         .name_msg = "tot_cos2_12",
         .help_msg = "tot_cos2_12_h",
         .models = YOSHI_MODEL_PATHS("L"),
@@ -447,6 +484,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Indigo
         .name_msg = "tot_cos2_13",
         .help_msg = "tot_cos2_13_h",
         .models = YOSHI_MODEL_PATHS("M"),
@@ -455,6 +493,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Purple
         .name_msg = "tot_cos2_14",
         .help_msg = "tot_cos2_14_h",
         .models = YOSHI_MODEL_PATHS("N"),
@@ -463,6 +502,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Lilac
         .name_msg = "tot_cos2_15",
         .help_msg = "tot_cos2_15_h",
         .models = YOSHI_MODEL_PATHS("P"),
@@ -471,6 +511,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Fuchsia
         .name_msg = "tot_cos2_16",
         .help_msg = "tot_cos2_16_h",
         .models = YOSHI_MODEL_PATHS("Q"),
@@ -479,6 +520,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Grey
         .name_msg = "tot_cos2_17",
         .help_msg = "tot_cos2_17_h",
         .models = YOSHI_MODEL_PATHS("R"),
@@ -487,6 +529,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Secret
         .name_msg = "tot_cos2_18",
         .help_msg = "tot_cos2_18_h",
         .models = YOSHI_MODEL_PATHS("S"),
@@ -495,6 +538,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Silver
         .name_msg = "tot_cos2_19",
         .help_msg = "tot_cos2_19_h",
         .models = YOSHI_MODEL_PATHS("X"),
@@ -503,6 +547,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Gold
         .name_msg = "tot_cos2_20",
         .help_msg = "tot_cos2_20_h",
         .models = YOSHI_MODEL_PATHS("Y"),
@@ -511,6 +556,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 0,
     },
     {
+        // Platinum
         .name_msg = "tot_cos2_21",
         .help_msg = "tot_cos2_21_h",
         .models = YOSHI_MODEL_PATHS("Z"),
