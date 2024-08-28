@@ -39,15 +39,15 @@ const CosmeticGroupData g_AttackFxGroupData[] = {
     { IconType::ATTACK_FX_P, "tot_cos0_04"},
     { IconType::ATTACK_FX_R, "tot_cos0_05"},
     // Unlockables.
-    { IconType::ATTACK_FX_Y, "tot_cos0_06_g" },
-    { IconType::ATTACK_FX_G, "tot_cos0_07_g" },
-    { IconType::ATTACK_FX_B, "tot_cos0_08_g" },
-    { IconType::ATTACK_FX_P, "tot_cos0_09_g" },
-    { IconType::ATTACK_FX_R, "tot_cos0_10_g" },
-    { IconType::ATTACK_FX_Y, "tot_cos0_11_g" },
-    { IconType::ATTACK_FX_G, "tot_cos0_12_g" },
-    { IconType::ATTACK_FX_B, "tot_cos0_13_g" },
-    { IconType::ATTACK_FX_P, "tot_cos0_14_g" },
+    { IconType::ATTACK_FX_LIME,     "tot_cos0_06_g" },  // Group 1 - Animals
+    { IconType::ATTACK_FX_G,        "tot_cos0_07_g" },  // Group 2 - Characters
+    { IconType::ATTACK_FX_AQUA,     "tot_cos0_08_g" },  // Group 3 - Crowd
+    { IconType::ATTACK_FX_B,        "tot_cos0_09_g" },  // Group 4 - Retro
+    { IconType::ATTACK_FX_PURPLE,   "tot_cos0_10_g" },  // Group 5 - Cartoon 1
+    { IconType::ATTACK_FX_FUCHSIA,  "tot_cos0_11_g" },  // Group 6 - Cartoon 2
+    { IconType::ATTACK_FX_P,        "tot_cos0_12_g" },  // Group 7 - Cartoon 3
+    { IconType::ATTACK_FX_R,        "tot_cos0_13_g" },  // Group 8 - Misc.
+    { IconType::ATTACK_FX_BROWN,    "tot_cos0_14_g" },  // Group 9 - Peach, Bowser
 };
 
 const AttackFxData g_AttackFxData[] = {
@@ -97,7 +97,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_G,
+        .icon = IconType::ATTACK_FX_LIME,
         .group_id = 0,
     },
     {
@@ -107,7 +107,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG4_CROW_HOWL1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_G,
+        .icon = IconType::ATTACK_FX_LIME,
         .group_id = 0,
     },
     {
@@ -117,38 +117,38 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG4_VOICE_PIG1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_G,
+        .icon = IconType::ATTACK_FX_LIME,
         .group_id = 0,
     },
     // Group 2: Minor characters
     {
-        // Pig FX
+        // Smorg FX
         .name_msg = "tot_cos0_07", 
         .help_msg = "tot_cos0_07_h",
         .sounds = { "SFX_STG6_MOAMOA_VOICE1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_B,
+        .icon = IconType::ATTACK_FX_G,
         .group_id = 0,
     },
     {
-        // Pig FX
+        // Doopliss FX
         .name_msg = "tot_cos0_08", 
         .help_msg = "tot_cos0_08_h",
         .sounds = { "SFX_BOSS_RNPL_LAUGH1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_B,
+        .icon = IconType::ATTACK_FX_G,
         .group_id = 0,
     },
     {
-        // Pig FX
+        // Bandit FX
         .name_msg = "tot_cos0_09", 
         .help_msg = "tot_cos0_09_h",
         .sounds = { "SFX_ENM_BORODO_LAUGH1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_B,
+        .icon = IconType::ATTACK_FX_G,
         .group_id = 0,
     },
     // Group 3: Crowd noises
@@ -159,7 +159,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_AUDIENCE_PANIC_SCREAM2" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_P,
+        .icon = IconType::ATTACK_FX_AQUA,
         .group_id = 0,
     },
     {
@@ -173,7 +173,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_P,
+        .icon = IconType::ATTACK_FX_AQUA,
         .group_id = 0,
     },
     // Group 4: Digital stuff
@@ -188,7 +188,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_R,
+        .icon = IconType::ATTACK_FX_B,
         .group_id = 0,
     },
     {
@@ -204,7 +204,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 5,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_R,
+        .icon = IconType::ATTACK_FX_B,
         .group_id = 0,
     },
     {
@@ -214,7 +214,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_BTL_LVUP_BLOCK_HIT1" },
         .num_sounds = 1,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_R,
+        .icon = IconType::ATTACK_FX_B,
         .group_id = 0,
     },
     // Group 5: Cartoon sounds 1
@@ -229,7 +229,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_Y,
+        .icon = IconType::ATTACK_FX_PURPLE,
         .group_id = 0,
     },
     {
@@ -243,7 +243,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_Y,
+        .icon = IconType::ATTACK_FX_PURPLE,
         .group_id = 0,
     },
     // Group 6: Cartoon sounds 2
@@ -254,7 +254,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG5_CANNON_FIRING1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_G,
+        .icon = IconType::ATTACK_FX_FUCHSIA,
         .group_id = 0,
     },
     {
@@ -268,7 +268,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_G,
+        .icon = IconType::ATTACK_FX_FUCHSIA,
         .group_id = 0,
     },
     {
@@ -282,7 +282,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_G,
+        .icon = IconType::ATTACK_FX_FUCHSIA,
         .group_id = 0,
     },
     // Group 7: Cartoon sounds 3
@@ -293,7 +293,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_BOSS_GANSU_FIST1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_B,
+        .icon = IconType::ATTACK_FX_P,
         .group_id = 0,
     },
     {
@@ -304,12 +304,11 @@ const AttackFxData g_AttackFxData[] = {
             "SFX_BTL_ACROBAT_MISS1",
             "SFX_ENM_JUGEM_HOLD1",
             "SFX_HIT_TREE1",
-            "SFX_EVT_PERAMAJIN_BLINKING1",
             "SFX_BTL_STAGE_DAMAGE_FORK1",
         },
-        .num_sounds = 5,
+        .num_sounds = 4,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_B,
+        .icon = IconType::ATTACK_FX_P,
         .group_id = 0,
     },
     {
@@ -319,7 +318,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG5_SAILER_FART1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_B,
+        .icon = IconType::ATTACK_FX_P,
         .group_id = 0,
     },
     // Group 8: Miscellaneous
@@ -333,7 +332,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 2,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_P,
+        .icon = IconType::ATTACK_FX_R,
         .group_id = 0,
     },
     {
@@ -347,7 +346,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_P,
+        .icon = IconType::ATTACK_FX_R,
         .group_id = 0,
     },
     {
@@ -357,7 +356,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG7_WARP2" },
         .num_sounds = 1,
         .randomize_pitch = 1,
-        .icon = IconType::ATTACK_FX_P,
+        .icon = IconType::ATTACK_FX_R,
         .group_id = 0,
     },
     // Group 9: Peach & Bowser
@@ -372,7 +371,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 4,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_R,
+        .icon = IconType::ATTACK_FX_BROWN,
         .group_id = 0,
     },
     { 
@@ -387,7 +386,7 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 5,
         .randomize_pitch = 0,
-        .icon = IconType::ATTACK_FX_R,
+        .icon = IconType::ATTACK_FX_BROWN,
         .group_id = 0,
     },
 };

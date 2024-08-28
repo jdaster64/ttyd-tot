@@ -2147,16 +2147,15 @@ g_StringMap = {
         
         # Cosmetic names and descriptions.
         
-        b'tot_cos0_06_g':     b'FX Pack 01',
-        b'tot_cos0_07_g':     b'FX Pack 02',
-        b'tot_cos0_08_g':     b'FX Pack 03',
-        b'tot_cos0_09_g':     b'FX Pack 04',
-        b'tot_cos0_10_g':     b'FX Pack 05',
-        b'tot_cos0_11_g':     b'FX Pack 06',
-        b'tot_cos0_12_g':     b'FX Pack 07',
-        b'tot_cos0_13_g':     b'FX Pack 08',
-        b'tot_cos0_14_g':     b'FX Pack 09',
-        b'tot_cos0_15_g':     b'FX Pack 10',
+        b'tot_cos0_06_g':     b'Animal FX',
+        b'tot_cos0_07_g':     b'Character FX',
+        b'tot_cos0_08_g':     b'Crowd FX',
+        b'tot_cos0_09_g':     b'Digital FX',
+        b'tot_cos0_10_g':     b'Cartoon FX 1',
+        b'tot_cos0_11_g':     b'Cartoon FX 2',
+        b'tot_cos0_12_g':     b'Cartoon FX 3',
+        b'tot_cos0_13_g':     b'Variety FX',
+        b'tot_cos0_14_g':     b'Peach+Bowser FX',
         
         b'tot_cos0_01':     b'Ding FX',
         b'tot_cos0_02':     b'Froggy FX',
@@ -2178,7 +2177,7 @@ g_StringMap = {
         b'tot_cos0_18':     b'Boing FX',
         b'tot_cos0_19':     b'Crash FX',
         b'tot_cos0_20':     b'Punch FX',
-        b'tot_cos0_21':     b'Cartoon FX',
+        b'tot_cos0_21':     b'Wacky FX',
         b'tot_cos0_22':     b'Raspberry FX',
         b'tot_cos0_23':     b'Jingle FX',
         b'tot_cos0_24':     b'Crystal FX',
@@ -2245,52 +2244,74 @@ g_StringMap = {
             b"Gives Mario's attacks a\n"
             b"mouse-like squeaking sound.",
         b'tot_cos0_04_h':
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"cheerful tweeting sound.",
         b'tot_cos0_05_h':
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"doleful cawing sound.",
         b"tot_cos0_06_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"greedy oinking sound.",
         b"tot_cos0_07_h":
-            b"Placeholder",
+            b"Gives Mario's attacks an\n"
+            b"unnerving swarming sound.",
         b"tot_cos0_08_h":
-            b"Placeholder",
+            b"Gives Mario's attacks an\n"
+            b"evil cackling sound.",
         b"tot_cos0_09_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"chuckling sound.",
         b"tot_cos0_10_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"screaming sound.",
         b"tot_cos0_11_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"whistling sound.",
         b"tot_cos0_12_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"variety of digital sounds.",
         b"tot_cos0_13_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"variety of familiar sounds.",
         b"tot_cos0_14_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"re-invigorating sound.",
         b"tot_cos0_15_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"variety of popping sounds.",
         b"tot_cos0_16_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"variety of zippy sounds.",
         b"tot_cos0_17_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"booming explosive sound.",
         b"tot_cos0_18_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"variety of bouncy sounds.",
         b"tot_cos0_19_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"variety of crashing sounds.",
         b"tot_cos0_20_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"meaty punching sound.",
         b"tot_cos0_21_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"variety of cartoony sounds.",
         b"tot_cos0_22_h":
-            b"Placeholder",
+            b"Gives Mario's attacks an\n"
+            b"odiferous sound?",
         b"tot_cos0_23_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"quizzical jingle.",
         b"tot_cos0_24_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"variety of crystalline sounds.",
         b"tot_cos0_25_h":
-            b"Placeholder",
+            b"Gives Mario's attacks a\n"
+            b"60's sci-fi sound.",
         b"tot_cos0_26_h":
             b"Gives Mario's attacks a\n"
-            b"cheerful laughing sound.",
+            b"positively peachy sound.",
         b"tot_cos0_27_h":
             b"Gives Mario's attacks a\n"
             b"dreadful roaring sound.",
