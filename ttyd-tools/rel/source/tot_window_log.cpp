@@ -94,6 +94,24 @@ struct RecordLogEntry {
     const char* desc_msg;
 };
 const RecordLogEntry kRecordLogEntries[] = {
+    { REC_EMPTY, "tot_recn_runstats_1", "tot_rech_runstats" },
+    { STAT_RUN_TURNS_SPENT, "tot_optr_turnsspent", "tot_rech_runstats" },
+    { STAT_RUN_TIMES_RAN_AWAY, "tot_optr_timesran", "tot_rech_runstats" },
+    { STAT_RUN_ENEMY_DAMAGE, "tot_optr_enemydamage", "tot_rech_runstats" },
+    { STAT_RUN_PLAYER_DAMAGE, "tot_optr_playerdamage", "tot_rech_runstats" },
+    { STAT_RUN_COINS_EARNED, "tot_optr_coinsearned", "tot_rech_runstats" },
+    { STAT_RUN_COINS_SPENT, "tot_optr_coinsspent", "tot_rech_runstats" },
+    { STAT_RUN_STAR_PIECES, "tot_optr_starpieces", "tot_rech_runstats" },
+    { STAT_RUN_SHINE_SPRITES, "tot_optr_shinesprites", "tot_rech_runstats" },
+    { REC_EMPTY, "tot_recn_runstats_2", "tot_rech_runstats" },
+    { STAT_RUN_ITEMS_USED, "tot_optr_itemsused", "tot_rech_runstats" },
+    { STAT_RUN_ITEMS_BOUGHT, "tot_optr_itemsbought", "tot_rech_runstats" },
+    { STAT_RUN_FP_SPENT, "tot_optr_fpspent", "tot_rech_runstats" },
+    { STAT_RUN_SP_SPENT, "tot_optr_spspent", "tot_rech_runstats" },
+    { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", "tot_rech_runstats" },
+    { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", "tot_rech_runstats" },
+    { STAT_RUN_NPCS_DEALT_WITH, "tot_optr_npcsmet", "tot_rech_runstats" },
+    { STAT_RUN_CONTINUES, "tot_optr_continues", "tot_rech_runstats" },
     { REC_EMPTY, "tot_recn_overall", "tot_rech_progression" },
     { REC_COMPLETION_PCT, "tot_recn_completion_pct", "tot_rech_progression" },
     { REC_ACHIEVEMENT_PCT, "tot_recn_achievement_pct", "tot_rech_progression" },
@@ -121,33 +139,33 @@ const RecordLogEntry kRecordLogEntries[] = {
     { STAT_PERM_HALF_BEST_TIME, "tot_recn_half_time", "tot_rech_wins" },
     { STAT_PERM_FULL_BEST_TIME, "tot_recn_full_time", "tot_rech_wins" },
     { STAT_PERM_EX_BEST_TIME, "tot_recn_ex_time", "tot_rech_wins" },
-    { REC_EMPTY, "tot_recn_runstats_1", "tot_rech_runstats" },
-    { STAT_PERM_FLOORS, "tot_recn_floors", "tot_rech_runstats" },
-    { STAT_PERM_TURNS_SPENT, "tot_recn_turns", "tot_rech_runstats" },
-    { STAT_PERM_TIMES_RAN_AWAY, "tot_recn_runaway", "tot_rech_runstats" },
-    { STAT_PERM_ENEMIES_DEFEATED, "tot_recn_kills", "tot_rech_runstats" },
-    { STAT_PERM_ENEMY_DAMAGE, "tot_recn_edamage", "tot_rech_runstats" },
-    { STAT_PERM_PLAYER_DAMAGE, "tot_recn_pdamage", "tot_rech_runstats" },
-    { STAT_PERM_SUPERGUARDS, "tot_recn_superguards", "tot_rech_runstats" },
-    { STAT_PERM_CONDITIONS_MET, "tot_recn_conditions", "tot_rech_runstats" },
-    { REC_EMPTY, "tot_recn_runstats_2", "tot_rech_runstats" },
-    { STAT_PERM_FP_SPENT, "tot_recn_fpspent", "tot_rech_runstats" },
-    { STAT_PERM_SP_SPENT, "tot_recn_spspent", "tot_rech_runstats" },
-    { STAT_PERM_STAR_PIECES, "tot_recn_starpieces", "tot_rech_runstats" },
-    { STAT_PERM_SHINE_SPRITES, "tot_recn_shinesprites", "tot_rech_runstats" },
-    { STAT_PERM_COINS_EARNED, "tot_recn_coinsearned", "tot_rech_runstats" },
-    { STAT_PERM_COINS_SPENT, "tot_recn_coinsspent", "tot_rech_runstats" },
-    { STAT_PERM_ITEMS_USED, "tot_recn_itemsused", "tot_rech_runstats" },
-    { STAT_PERM_ITEMS_BOUGHT, "tot_recn_itemsbought", "tot_rech_runstats" },
-    { REC_EMPTY, "tot_recn_runstats_3", "tot_rech_runstats" },
-    { STAT_PERM_NPC_WONKY_TRADES, "tot_recn_wonky", "tot_rech_runstats" },
-    { STAT_PERM_NPC_DAZZLE_TRADES, "tot_recn_dazzle", "tot_rech_runstats" },
-    { STAT_PERM_NPC_RIPPO_TRADES, "tot_recn_rippo", "tot_rech_runstats" },
-    { STAT_PERM_NPC_LUMPY_TRADES, "tot_recn_lumpy", "tot_rech_runstats" },
-    { STAT_PERM_NPC_GRUBBA_DEAL, "tot_recn_grubba", "tot_rech_runstats" },
-    { STAT_PERM_NPC_DOOPLISS_DEAL, "tot_recn_doopliss", "tot_rech_runstats" },
-    { STAT_PERM_NPC_MOVER_TRADES, "tot_recn_mover", "tot_rech_runstats" },
-    { STAT_PERM_NPC_ZESS_COOKS, "tot_recn_zess", "tot_rech_runstats" },
+    { REC_EMPTY, "tot_recn_aggstats_1", "tot_rech_aggstats" },
+    { STAT_PERM_FLOORS, "tot_recn_floors", "tot_rech_aggstats" },
+    { STAT_PERM_TURNS_SPENT, "tot_recn_turns", "tot_rech_aggstats" },
+    { STAT_PERM_TIMES_RAN_AWAY, "tot_recn_runaway", "tot_rech_aggstats" },
+    { STAT_PERM_ENEMIES_DEFEATED, "tot_recn_kills", "tot_rech_aggstats" },
+    { STAT_PERM_ENEMY_DAMAGE, "tot_recn_edamage", "tot_rech_aggstats" },
+    { STAT_PERM_PLAYER_DAMAGE, "tot_recn_pdamage", "tot_rech_aggstats" },
+    { STAT_PERM_SUPERGUARDS, "tot_recn_superguards", "tot_rech_aggstats" },
+    { STAT_PERM_CONDITIONS_MET, "tot_recn_conditions", "tot_rech_aggstats" },
+    { REC_EMPTY, "tot_recn_aggstats_2", "tot_rech_aggstats" },
+    { STAT_PERM_FP_SPENT, "tot_recn_fpspent", "tot_rech_aggstats" },
+    { STAT_PERM_SP_SPENT, "tot_recn_spspent", "tot_rech_aggstats" },
+    { STAT_PERM_STAR_PIECES, "tot_recn_starpieces", "tot_rech_aggstats" },
+    { STAT_PERM_SHINE_SPRITES, "tot_recn_shinesprites", "tot_rech_aggstats" },
+    { STAT_PERM_COINS_EARNED, "tot_recn_coinsearned", "tot_rech_aggstats" },
+    { STAT_PERM_COINS_SPENT, "tot_recn_coinsspent", "tot_rech_aggstats" },
+    { STAT_PERM_ITEMS_USED, "tot_recn_itemsused", "tot_rech_aggstats" },
+    { STAT_PERM_ITEMS_BOUGHT, "tot_recn_itemsbought", "tot_rech_aggstats" },
+    { REC_EMPTY, "tot_recn_aggstats_3", "tot_rech_aggstats" },
+    { STAT_PERM_NPC_WONKY_TRADES, "tot_recn_wonky", "tot_rech_aggstats" },
+    { STAT_PERM_NPC_DAZZLE_TRADES, "tot_recn_dazzle", "tot_rech_aggstats" },
+    { STAT_PERM_NPC_RIPPO_TRADES, "tot_recn_rippo", "tot_rech_aggstats" },
+    { STAT_PERM_NPC_LUMPY_TRADES, "tot_recn_lumpy", "tot_rech_aggstats" },
+    { STAT_PERM_NPC_GRUBBA_DEAL, "tot_recn_grubba", "tot_rech_aggstats" },
+    { STAT_PERM_NPC_DOOPLISS_DEAL, "tot_recn_doopliss", "tot_rech_aggstats" },
+    { STAT_PERM_NPC_MOVER_TRADES, "tot_recn_mover", "tot_rech_aggstats" },
+    { STAT_PERM_NPC_ZESS_COOKS, "tot_recn_zess", "tot_rech_aggstats" },
 };
 const int32_t kNumRecordLogEntries = sizeof(kRecordLogEntries) / sizeof(RecordLogEntry);
 
@@ -993,6 +1011,30 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                         state.GetOption(STAT_PERM_CONDITIONS_TOTAL), ptr);
                     break;
                 }
+                case STAT_RUN_TURNS_SPENT: {
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_RUN_TURNS_SPENT), ptr);
+                    sprintf(
+                        ptr, " (Max: %" PRId32 ")",
+                        state.GetOption(STAT_RUN_MOST_TURNS_RECORD));
+                    break;
+                }
+                case STAT_RUN_CONDITIONS_MET: {
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_RUN_CONDITIONS_MET), ptr);
+                    ptr += sprintf(ptr, " / ");
+                    ptr += IntegerToFmtString(
+                        state.GetOption(STAT_RUN_CONDITIONS_TOTAL), ptr);
+                    break;
+                }
+                case STAT_RUN_NPCS_DEALT_WITH: {
+                    int32_t deals = 0;
+                    for (int32_t i = 0; i < 8; ++i) {
+                        deals += !!state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i);
+                    }
+                    sprintf(ptr, "%" PRId32, deals);
+                    break;
+                }
                 default: {
                     ptr += IntegerToFmtString(
                         state.GetOption(record.option), ptr);
@@ -1008,7 +1050,8 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
     }
 
     // Draw L/R button icon / arrows.
-    if (page_first_entry != 0) {
+    int32_t min_entry = g_Mod->state_.GetOption(OPT_RUN_STARTED) ? 0 : 18;
+    if (page_first_entry > min_entry) {
         {
             ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
             gc::vec3 position = { win_x + 440.0f, win_y + 18.0f, 0.0f };
@@ -1175,6 +1218,10 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     menu->move_log_cursor_idx = 0;
     ProgressManager::GetMoveLogProgress(
         &menu->move_log_obtained_count, &menu->move_log_completed_count, nullptr);
+
+    // Records log has current run stats first, if currently in a run.
+    menu->records_log_cursor_idx =
+        g_Mod->state_.GetOption(OPT_RUN_STARTED) ? 1 : 19;
 
     menu->achievement_log_cursor_idx = 33;
     menu->achievement_log_completed_count = 0;
@@ -1771,7 +1818,11 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             break;
         }
         case 17: {
-            // Move log.
+            // Records log.
+            
+            // Records log has current run stats first, if currently in a run.
+            const int32_t min_entry =
+                g_Mod->state_.GetOption(OPT_RUN_STARTED) ? 0 : 18;
 
             if (menu->buttons_pressed & ButtonId::START) {
                 return -2;
@@ -1784,8 +1835,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 menu->log_menu_state = 0;
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
                 while (true) {
-                    if (--menu->records_log_cursor_idx < 0) {
-                        menu->records_log_cursor_idx = 1;
+                    if (--menu->records_log_cursor_idx < min_entry) {
+                        menu->records_log_cursor_idx = min_entry + 1;
                         break;
                     }
                     if (kRecordLogEntries[menu->records_log_cursor_idx].option 
@@ -1808,7 +1859,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                        (menu->buttons_repeated & ButtonId::L)) {
                 menu->records_log_cursor_idx = 
                     menu->records_log_cursor_idx / 9 * 9 - 9;
-                if (menu->records_log_cursor_idx < 0) {
+                if (menu->records_log_cursor_idx < min_entry) {
                     menu->records_log_cursor_idx += 9;
                 }
                 ++menu->records_log_cursor_idx;

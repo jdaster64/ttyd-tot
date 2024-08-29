@@ -1296,8 +1296,8 @@ g_StringMap = {
             b'Mario and party can perform.',
         
         b"msg_menu_records":
-            b"Records of past runs' stats and\n"
-            b'your overall completion progress.',
+            b"Records of various stats and\n"
+            b'overall completion progress.',
         
         b"msg_menu_achievements":
             b"Review your achievements and\n"
@@ -1803,10 +1803,16 @@ g_StringMap = {
             b"\nLv. 3: Heal up to 15 HP for\n"
             b"both Mario and Mowz for 10 FP.",
             
-            
         # Records log text.
+        b"tot_recn_runstats_1":         b"Run Stats (1/2)",
+        b"tot_recn_runstats_2":         b"Run Stats (2/2)",
+        b"tot_recn_runs":               b"Run Completions",
+        b"tot_recn_aggstats_1":         b"Overall Stats (1/3)",
+        b"tot_recn_aggstats_2":         b"Overall Stats (2/3)",
+        b"tot_recn_aggstats_3":         b"Overall Stats (3/3)",
+        b"tot_recn_hub":                b"Hub Progression",
+        b"tot_recn_overall":            b"Overall Progress",
         
-        b"tot_recn_overall":            b"Completion",
         b"tot_recn_playtime":           b"Total Play Time",
         b"tot_recn_completion_pct":     b"Completion %",
         b"tot_recn_achievement_pct":    b"Achievement Log",
@@ -1815,7 +1821,6 @@ g_StringMap = {
         b"tot_recn_tattle_pct":         b"Tattle Log",
         b"tot_recn_move_pct":           b"Moves Obtained",
         b"tot_recn_move_cmp_pct":       b"Move Completion",
-        b"tot_recn_hub":                b"Hub Progression",
         b"tot_recn_hub_pct":            b"Completion %",
         b"tot_recn_hub_keyitems":       b"Key Items",
         b"tot_recn_hub_items":          b"Items Bought",
@@ -1824,7 +1829,6 @@ g_StringMap = {
         b"tot_recn_hub_marioskins":     b"Mario Costumes",
         b"tot_recn_hub_yoshiskins":     b"Yoshi Colors",
         b"tot_recn_hub_attackfx":       b"Attack FX",
-        b"tot_recn_runs":               b"Run Completions",
         b"tot_recn_half_wins":          b"Half Length",
         b"tot_recn_full_wins":          b"Full Length",
         b"tot_recn_ex_wins":            b"EX Difficulty",
@@ -1833,7 +1837,6 @@ g_StringMap = {
         b"tot_recn_half_time":          b"Half Length",
         b"tot_recn_full_time":          b"Full Length",
         b"tot_recn_ex_time":            b"EX Difficulty",
-        b"tot_recn_runstats_1":         b"Run Stats (1/3)",
         b"tot_recn_floors":             b"Floors Cleared",
         b"tot_recn_turns":              b"Turns Spent",
         b"tot_recn_runaway":            b"Times Ran Away",
@@ -1842,7 +1845,6 @@ g_StringMap = {
         b"tot_recn_pdamage":            b"Player Damage",
         b"tot_recn_coinsearned":        b"Coins Earned",
         b"tot_recn_coinsspent":         b"Coins Spent",
-        b"tot_recn_runstats_2":         b"Run Stats (2/3)",
         b"tot_recn_fpspent":            b"FP Spent",
         b"tot_recn_spspent":            b"SP Spent",
         b"tot_recn_superguards":        b"Superguards",
@@ -1851,7 +1853,6 @@ g_StringMap = {
         b"tot_recn_shinesprites":       b"Shine Sprites",
         b"tot_recn_itemsused":          b"Items Used",
         b"tot_recn_itemsbought":        b"Items Bought",
-        b"tot_recn_runstats_3":         b"Run Stats (3/3)",
         b"tot_recn_wonky":              b"Wonky Deals",
         b"tot_recn_dazzle":             b"Dazzle Deals",
         b"tot_recn_rippo":              b"Chet Rippo Deals",
@@ -1871,8 +1872,43 @@ g_StringMap = {
             b"How many successful runs were\n"
             b"completed, and best clear times.",
         b"tot_rech_runstats":
+            b"Various stats for your current\n"
+            b"attempted tower run.",
+        b"tot_rech_aggstats":
             b"Various stats aggregated across\n"
             b"all of your past runs.",
+    
+        # Records Log + Final results window.
+        
+        b"tot_winsel_runstats_topbar":
+            b"Run Results",
+            
+        b"tot_winsel_runresults_header":
+            b"Stats",
+            
+        b"tot_winsel_runsplits_header":
+            b"Splits",
+            
+        b"tot_optr_turnsspent":         b"Total Turns Spent",
+        b"tot_optr_turnsavg":           b"Average Turns",
+        b"tot_optr_turnsmost":          b"Most Turns",
+        b"tot_optr_battletimeavg":      b"Average Battle Time",
+        b"tot_optr_battletimemost":     b"Longest Battle",
+        b"tot_optr_timesran":           b"Times Ran Away",
+        b"tot_optr_enemydamage":        b"Damage Dealt",
+        b"tot_optr_playerdamage":       b"Damage Taken",
+        b"tot_optr_itemsused":          b"Items Used",
+        b"tot_optr_shinesprites":       b"Shine Sprites",
+        b"tot_optr_starpieces":         b"Star Pieces",
+        b"tot_optr_coinsearned":        b"Coins Earned",
+        b"tot_optr_coinsspent":         b"Coins Spent",
+        b"tot_optr_fpspent":            b"FP Spent",
+        b"tot_optr_spspent":            b"SP Spent",
+        b"tot_optr_superguards":        b"Superguards",
+        b"tot_optr_conditionsmet":      b"Conditions Met",
+        b"tot_optr_npcsmet":            b"NPC Deals Taken",
+        b"tot_optr_itemsbought":        b"Items Bought",
+        b"tot_optr_continues":          b"Continues",
             
             
         # Achievement descriptions.
@@ -3306,35 +3342,6 @@ g_StringMap = {
     
     # Tower final floor.
     'gon_05': {
-    
-        # Final results window.
-        
-        b"tot_winsel_runstats_topbar":
-            b"Run Results",
-            
-        b"tot_winsel_runresults_header":
-            b"Stats",
-            
-        b"tot_winsel_runsplits_header":
-            b"Splits",
-            
-        b"tot_optr_turnsspent":         b"Total Turns Spent",
-        b"tot_optr_turnsavg":           b"Average Turns",
-        b"tot_optr_turnsmost":          b"Most Turns",
-        b"tot_optr_battletimeavg":      b"Average Battle Time",
-        b"tot_optr_battletimemost":     b"Longest Battle",
-        b"tot_optr_timesran":           b"Times Ran Away",
-        b"tot_optr_enemydamage":        b"Damage Dealt",
-        b"tot_optr_playerdamage":       b"Damage Taken",
-        b"tot_optr_itemsused":          b"Items Used",
-        b"tot_optr_shinesprites":       b"Shine Sprites",
-        b"tot_optr_starpieces":         b"Star Pieces",
-        b"tot_optr_coinsearned":        b"Coins Earned",
-        b"tot_optr_coinsspent":         b"Coins Spent",
-        b"tot_optr_fpspent":            b"FP Spent",
-        b"tot_optr_spspent":            b"SP Spent",
-        b"tot_optr_superguards":        b"Superguards",
-        b"tot_optr_conditionsmet":      b"Conditions Met",
         
         # Dragon field dialogue.
         
