@@ -10,7 +10,7 @@ namespace mod::tot {
 
 namespace AchievementId {
     enum e {
-        AGG_STYLISH_20 = 0,
+        AGG_STYLISH_15 = 0,
         AGG_BUY_ITEMS_50,
         AGG_NPC_DEALS_10,
         AGG_ALL_PARTNERS,

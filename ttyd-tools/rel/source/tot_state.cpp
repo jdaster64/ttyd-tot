@@ -109,14 +109,6 @@ void StateManager::Init() {
     // TODO: Implement unlocking these key items naturally.
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BADGE_SELECTOR);
     ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ITEM_SELECTOR);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BGM_TOGGLE);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_SUPER_PEEKABOO);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_PEEKABOO);
-    SetSWF(GSWF_PeekabooEnabled);
-    SetSWF(GSWF_SuperPeekabooEnabled);
-    SetSWF(GSWF_TimingTutorEnabled);
-    SetSWF(GSWF_BgmEnabled);
 }
 
 // Loading / saving functions.

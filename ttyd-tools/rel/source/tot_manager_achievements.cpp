@@ -152,6 +152,29 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
                 CheckCompleted(AchievementId::META_ALL_OPTIONS);
                 break;
             }
+            case AchievementRewardType::KEY_ITEM: {
+                int32_t item = g_AchievementData[ach].reward_id;
+                // Award item and enable corresponding 'activated' flag.
+                if (!ttyd::mario_pouch::pouchCheckItem(item)) {
+                    ttyd::mario_pouch::pouchGetItem(item);
+                    switch (item) {
+                        case ItemType::TOT_KEY_PEEKABOO:
+                            SetSWF(GSWF_PeekabooEnabled);
+                            break;
+                        case ItemType::TOT_KEY_SUPER_PEEKABOO:
+                            SetSWF(GSWF_PeekabooEnabled);
+                            SetSWF(GSWF_SuperPeekabooEnabled);
+                            break;
+                        case ItemType::TOT_KEY_TIMING_TUTOR:
+                            SetSWF(GSWF_TimingTutorEnabled);
+                            break;
+                        case ItemType::TOT_KEY_BGM_TOGGLE:
+                            SetSWF(GSWF_BgmEnabled);
+                            break;
+                    }
+                }
+                break;
+            }
         }
     }
 

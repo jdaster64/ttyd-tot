@@ -375,7 +375,7 @@ void MoveManager::LogMoveStylish(int32_t move_type, uint32_t stylish_flags) {
     value |= stylish_flags ? stylish_flags : MoveLogFlags::STYLISH_ALL;
     g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, value, move_type);
 
-    // Check for new completion of "20 Stylishes".
+    // Check for new completion of "15 Stylishes".
     int32_t stylish_count = 0;
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
         uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, i);
@@ -383,8 +383,8 @@ void MoveManager::LogMoveStylish(int32_t move_type, uint32_t stylish_flags) {
             ++stylish_count;
         }
     }
-    if (stylish_count >= 20) {
-        AchievementsManager::MarkCompleted(AchievementId::AGG_STYLISH_20);
+    if (stylish_count >= 15) {
+        AchievementsManager::MarkCompleted(AchievementId::AGG_STYLISH_15);
     }
 
     // Check for move log completion.

@@ -1878,7 +1878,7 @@ g_StringMap = {
         
         b"tot_achd_00":
             b"Perform all Stylish commands on\n"
-            b"20 different moves.",
+            b"15 different moves.",
         b"tot_achd_01":
             b"Buy a total of 50 items from\n"
             b"Charlieton.",
