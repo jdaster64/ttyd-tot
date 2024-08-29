@@ -7,6 +7,7 @@
 #include "patches_field.h"
 #include "tot_generate_enemy.h"
 #include "tot_gon_tower.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
@@ -209,6 +210,10 @@ void DebugManager::Update() {
                         if (!ttyd::mario_pouch::pouchCheckItem(i)) {
                             ttyd::mario_pouch::pouchGetItem(i);
                         }
+                        SetSWF(GSWF_PeekabooEnabled);
+                        SetSWF(GSWF_SuperPeekabooEnabled);
+                        SetSWF(GSWF_TimingTutorEnabled);
+                        SetSWF(GSWF_BgmEnabled);
                     }
                     break;
                 }

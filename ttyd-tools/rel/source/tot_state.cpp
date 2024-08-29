@@ -105,10 +105,6 @@ void StateManager::Init() {
     if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "xyzzy")) {
         SetOption(OPT_DEBUG_MODE_ENABLED, 1);
     }
-
-    // TODO: Implement unlocking these key items naturally.
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BADGE_SELECTOR);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ITEM_SELECTOR);
 }
 
 // Loading / saving functions.

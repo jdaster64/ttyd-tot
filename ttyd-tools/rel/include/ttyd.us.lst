@@ -155,6 +155,7 @@
 80019120:iconNumberDispGx
 8001a29c:iconGetTexObj
 8001a4bc:iconDispGxCol
+8001a6e0:iconDispGx2
 8001a918:iconDispGx
 8001a93c:iconDispGxAlpha
 

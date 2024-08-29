@@ -3540,11 +3540,23 @@ g_StringMap = {
         b"tot_shopkeep_11":
             b"<p>\nThank you so very much!\n<k>",
     
+        b"tot_shopkeep_19":
+            b"<p>\nYou've been quite the repeat\n"
+            b"customer! As a reward, <k>",
+    
         b"tot_shopkeep_22":
             b"<p>\nCome again, OK?\n<k>",
     
         b"tot_shopkeep_24":
             b"<select 0 1 0 40>\nYes\nNo",
+    
+        b"tot_shopkeep_30":
+            b"<p>\nYou've been quite the repeat\n"
+            b"customer! Here, take these as\n"
+            b"a reward, on the house!\n<k>",
+    
+        b"tot_shopkeep_31":
+            b"Thank you so very much!\n<k>",
     
         b"tot_shopkeep_yesno":
             b"<select 0 1 0 40>\nYes\nNo",

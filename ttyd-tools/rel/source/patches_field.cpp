@@ -11,6 +11,7 @@
 
 #include <gc/types.h>
 #include <ttyd/battle_monosiri.h>
+#include <ttyd/evt_item.h>
 #include <ttyd/evt_mario.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
@@ -73,6 +74,7 @@ namespace field {
 namespace {
 
 // For convenience.
+using namespace ::ttyd::evt_item;
 using namespace ::ttyd::evt_mario;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
@@ -262,14 +264,50 @@ EVT_BEGIN(XNautPhdProjectilePosition_Hook)
 EVT_PATCH_END()
 static_assert(sizeof(XNautPhdProjectilePosition_Hook) == 0x24);
 
-EVT_BEGIN(CheckItemShopAchievements)
+EVT_BEGIN(ItemShop_GoodbyeEvt)
     USER_FUNC(tot::evtTot_CheckCompletedAchievement,
         tot::AchievementId::META_ITEMS_BADGES_ALL, EVT_NULLPTR)
 
-    // TODO: Add special dialogue + give selector key items after 10 apiece.
     USER_FUNC(tot::evtTot_CheckCompletedAchievement,
         tot::AchievementId::META_ITEMS_BADGES_10, LW(1))
 
+    // After meeting the 10 items + badges achievement, give selector items.
+    IF_SMALL(LW(1), 1)
+        GOTO(80)
+    END_IF()
+    // Skip cutscene if both key items already obtained (via debug).
+    USER_FUNC(evt_pouch_check_item, (int32_t)ItemType::TOT_KEY_ITEM_SELECTOR, LW(1))
+    USER_FUNC(evt_pouch_check_item, (int32_t)ItemType::TOT_KEY_BADGE_SELECTOR, LW(2))
+    IF_EQUAL(LW(1), 1)
+        IF_EQUAL(LW(2), 1)
+            GOTO(80)
+        END_IF()
+    END_IF()
+
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_30"))
+
+    IF_EQUAL(LW(1), 0)
+        USER_FUNC(tot::evtTot_GetUniqueItemName, LW(0))
+        USER_FUNC(
+            evt_item_entry, LW(0), (int32_t)ItemType::TOT_KEY_ITEM_SELECTOR,
+            FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+        USER_FUNC(evt_item_get_item, LW(0))
+    END_IF()
+    IF_EQUAL(LW(2), 0)
+        USER_FUNC(tot::evtTot_GetUniqueItemName, LW(0))
+        USER_FUNC(
+            evt_item_entry, LW(0), (int32_t)ItemType::TOT_KEY_BADGE_SELECTOR,
+            FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+        USER_FUNC(evt_item_get_item, LW(0))
+    END_IF()
+    
+    USER_FUNC(evt_msg_print, 0, PTR("tot_shopkeep_31"), 0, LW(9))
+    GOTO(99)
+
+LBL(80)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_11"))
+    
+LBL(99)
     RETURN()
 EVT_END()
 
@@ -305,12 +343,11 @@ EVT_BEGIN(ShopBuyEvt)
     USER_FUNC(evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(evt_win_coin_off, LW(8))
-    USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_11"))
 
     // Mark item as collected, remove from shelf if appropriate.
     USER_FUNC(evtTot_AfterBuyingShopItem, LW(10), -1)
 
-    RUN_CHILD_EVT(CheckItemShopAchievements)
+    RUN_CHILD_EVT(ItemShop_GoodbyeEvt)
 
     RETURN()
 EVT_END()
@@ -372,12 +409,11 @@ EVT_BEGIN(ShopSignEvt)
     USER_FUNC(evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(evt_win_coin_off, LW(8))
-    USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_11"))
 
     // Mark item as collected.
     USER_FUNC(evtTot_AfterBuyingShopItem, LW(10), LW(1))
 
-    RUN_CHILD_EVT(CheckItemShopAchievements)
+    RUN_CHILD_EVT(ItemShop_GoodbyeEvt)
 
 LBL(99)
     USER_FUNC(evt_mario_key_onoff, 1)

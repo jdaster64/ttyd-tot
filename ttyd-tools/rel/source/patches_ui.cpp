@@ -50,6 +50,9 @@
 
 // Assembly patch functions.
 extern "C" {
+    // currency_patches.s
+    void StartSkipDrawingXIfCurrencyHigh();
+    void BranchBackSkipDrawingXIfCurrencyHigh();
     // eff_updown_disp_patches.s
     void StartDispUpdownNumberIcons();
     void BranchBackDispUpdownNumberIcons();
@@ -187,6 +190,7 @@ extern const int32_t g_winMarioDisp_MoveMenuDisp_EH;
 extern const int32_t g_winMarioMain_MoveDescription_BH;
 extern const int32_t g_winMarioMain_MoveDescription_EH;
 extern const int32_t g_winMarioMain_CheckOpenMoveMenu_BH;
+extern const int32_t g_coin_disp_SkipXForHighCurrency_BH;
 extern const int32_t g_select_main_CheckHideTopBar_BH;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblHi16;
 extern const int32_t g_winMgrSelectEntry_Patch_SelectDescTblLo16;
@@ -635,6 +639,12 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_select_main_CheckHideTopBar_BH),
         reinterpret_cast<void*>(StartHideTopBarInSomeWindows),
         reinterpret_cast<void*>(BranchBackHideTopBarInSomeWindows));
+
+    // For currency popup windows, hide the "X" if the amount is over 999.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_coin_disp_SkipXForHighCurrency_BH),
+        reinterpret_cast<void*>(StartSkipDrawingXIfCurrencyHigh),
+        reinterpret_cast<void*>(BranchBackSkipDrawingXIfCurrencyHigh));
 }
 
 void DisplayUpDownNumberIcons(

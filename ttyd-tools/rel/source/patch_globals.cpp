@@ -465,6 +465,7 @@ extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_EH = 0x80202618;
 extern const int32_t g_battleAcMain_ButtonDown_CheckComplete_CH1 = 0x8020263c;
 extern const int32_t g_BattleBreakSlot_PointInc_EnableAlways_BH = 0x802034b4;
 extern const int32_t g_effStarPointDisp_Patch_SetIconId = 0x8020af38;
+extern const int32_t g_coin_disp_SkipXForHighCurrency_BH = 0x80209d30;
 extern const int32_t g_btlseqEnd_JudgeRuleEarly_BH = 0x80215348;
 extern const int32_t g_btlseqEnd_Patch_CheckDisableExpLevel = 0x802157e0;
 extern const int32_t g_btlseqEnd_Patch_RemoveJudgeRule = 0x80216678;
