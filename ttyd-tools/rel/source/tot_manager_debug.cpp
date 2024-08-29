@@ -39,10 +39,12 @@ enum DebugManagerMode {
     DEBUG_UNLOCK_ALL_PARTNERS,  // Tower only
     DEBUG_MAX_STATS,            // Tower only
     DEBUG_PURCHASE_ALL_ITEMS,
+    DEBUG_PURCHASE_ALL_COSMETICS,
+    DEBUG_UNLOCK_ALL_KEY_ITEMS,
     DEBUG_UNLOCK_ALL_BADGES,
     DEBUG_COMPLETE_LOGS,
     DEBUG_COMPLETE_ACHIEVEMENTS,
-    DEBUG_ADD_500_COINS,
+    DEBUG_ADD_CURRENCY,
     DEBUG_EXIT,
     DEBUG_MAX,
 
@@ -158,10 +160,12 @@ void DebugManager::Update() {
                     tot::OptionsManager::UpdateLevelupStats();
                     break;
                 }
-                case DEBUG_ADD_500_COINS: {
+                case DEBUG_ADD_CURRENCY: {
                     ttyd::mario_pouch::pouchAddCoin(500);
+                    ttyd::mario_pouch::pouchAddStarPiece(50);
                     if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
                         g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_COINS, 500);
+                        g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_SP, 50);
                     }
                     break;
                 }
@@ -189,6 +193,22 @@ void DebugManager::Update() {
                     for (int32_t i = 0; i < 256; ++i) {
                         g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, i);
                         g_Mod->state_.SetOption(FLAGS_ITEM_PURCHASED, i);
+                    }
+                    break;
+                }
+                case DEBUG_PURCHASE_ALL_COSMETICS: {
+                    for (int32_t i = 0; i < 96; ++i) {
+                        if (i % 32 == 0) continue;
+                        g_Mod->state_.SetOption(FLAGS_COSMETIC_PURCHASED, i);
+                    }
+                    break;
+                }
+                case DEBUG_UNLOCK_ALL_KEY_ITEMS: {
+                    for (int32_t i = ItemType::TOT_KEY_PEEKABOO;
+                         i < ItemType::TOT_KEY_ITEM_MAX; ++i) {
+                        if (!ttyd::mario_pouch::pouchCheckItem(i)) {
+                            ttyd::mario_pouch::pouchGetItem(i);
+                        }
                     }
                     break;
                 }
@@ -431,8 +451,8 @@ void DebugManager::Draw() {
             case DEBUG_MAX_STATS: {
                 strcpy(buf, "Max Stats");                   break;
             }
-            case DEBUG_ADD_500_COINS: {
-                strcpy(buf, "Add 500 Coins");               break;
+            case DEBUG_ADD_CURRENCY: {
+                strcpy(buf, "Add 500 Coins + 50 Star Pieces"); break;
             }
             case DEBUG_UNLOCK_ALL_MOVES: {
                 strcpy(buf, "Unlock All Moves");            break;
@@ -442,6 +462,12 @@ void DebugManager::Draw() {
             }
             case DEBUG_PURCHASE_ALL_ITEMS: {
                 strcpy(buf, "Purchase All Items/Badges");   break;
+            }
+            case DEBUG_PURCHASE_ALL_COSMETICS: {
+                strcpy(buf, "Purchase All Cosmetics");      break;
+            }
+            case DEBUG_UNLOCK_ALL_KEY_ITEMS: {
+                strcpy(buf, "Unlock All Key Items");        break;
             }
             case DEBUG_UNLOCK_ALL_BADGES: {
                 strcpy(buf, "Unlock 1 of Each Badge");      break;

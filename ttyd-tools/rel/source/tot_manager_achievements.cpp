@@ -111,11 +111,13 @@ const AchievementData* AchievementsManager::GetData(int32_t ach) {
 
 bool AchievementsManager::CheckCosmeticGroupUnlocked(
     int32_t reward_type, int32_t group_id) {
+    // Special case for cosmetics that are always available for purchase.
+    if (group_id == 0) return true;
         
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         if (g_AchievementData[i].reward_type == reward_type &&
             static_cast<int32_t>(g_AchievementData[i].reward_id) == group_id) {
-            return true;
+            return g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i);
         }
     }
     return false;
@@ -189,29 +191,14 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
         }
         case AchievementId::META_COSMETICS_5: {
             int32_t cosmetics = 0;
-            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
-                if (g_AchievementData[i].reward_type == 
-                    AchievementRewardType::MARIO_COSTUME) {
-                    if (state.GetOption(FLAGS_OPTION_UNLOCKED, i)) ++cosmetics;
+            for (int32_t type = 0; type <= 2; ++type) {
+                for (int32_t i = 0; i < 30; ++i) {
+                    if (state.GetOption(FLAGS_COSMETIC_PURCHASED, type * 32 + i))
+                        ++cosmetics;
                 }
+                if (cosmetics < 5) return;
+                cosmetics = 0;
             }
-            if (cosmetics < 5) return;
-            cosmetics = 0;
-            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
-                if (g_AchievementData[i].reward_type == 
-                    AchievementRewardType::YOSHI_COSTUME) {
-                    if (state.GetOption(FLAGS_OPTION_UNLOCKED, i)) ++cosmetics;
-                }
-            }
-            if (cosmetics < 5) return;
-            cosmetics = 0;
-            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
-                if (g_AchievementData[i].reward_type == 
-                    AchievementRewardType::ATTACK_FX) {
-                    if (state.GetOption(FLAGS_OPTION_UNLOCKED, i)) ++cosmetics;
-                }
-            }
-            if (cosmetics < 5) return;
             MarkCompleted(ach);
             break;
         }

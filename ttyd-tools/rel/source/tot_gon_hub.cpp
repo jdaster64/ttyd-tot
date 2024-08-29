@@ -4,6 +4,8 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
 
@@ -15,11 +17,13 @@
 #include <ttyd/evt_door.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_hit.h>
+#include <ttyd/evt_item.h>
 #include <ttyd/evt_map.h>
 #include <ttyd/evt_mario.h>
 #include <ttyd/evt_mobj.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
+#include <ttyd/evt_pouch.h>
 #include <ttyd/evt_shop.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
@@ -29,8 +33,13 @@
 #include <ttyd/hitdrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
+#include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/system.h>
+
+#include <cinttypes>
+#include <cstdio>
+#include <cstring>
 
 namespace mod::tot::gon {
 
@@ -42,11 +51,13 @@ using namespace ::ttyd::evt_cam;
 using namespace ::ttyd::evt_door;
 using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_hit;
+using namespace ::ttyd::evt_item;
 using namespace ::ttyd::evt_map;
 using namespace ::ttyd::evt_mario;
 using namespace ::ttyd::evt_mobj;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
+using namespace ::ttyd::evt_pouch;
 using namespace ::ttyd::evt_shop;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
@@ -63,6 +74,7 @@ namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
 namespace BeroType = ::ttyd::evt_bero::BeroType;
 namespace ItemType = ::ttyd::item_data::ItemType;
+namespace NpcTribeType = ::ttyd::npc_data::NpcTribeType;
 
 }  // namespace
 
@@ -103,8 +115,177 @@ extern ShopItem shop_trade_list[6];
 extern ShopkeeperData shopkeeper_data;
 
 // Function declarations.
+EVT_DECLARE_USER_FUNC(evtTot_GetCosmeticShopMsg, 3)
+EVT_DECLARE_USER_FUNC(evtTot_GetNumCosmeticsUnlockable, 2)
+EVT_DECLARE_USER_FUNC(evtTot_UnlockCosmetic, 2)
 EVT_DECLARE_USER_FUNC(evtTot_SelectShopItems, 0)
 EVT_DECLARE_USER_FUNC(evtTot_DeleteShopItems, 0)
+
+// LW(15) = Cosmetic type (0 ~ 2).
+EVT_BEGIN(CosmeticShops_CommonTalkEvt)
+    USER_FUNC(evt_mario_normalize)
+    USER_FUNC(evt_mario_key_onoff, 0)
+
+    // Set type of sel window / corresponding key item based on cosmetic type.
+    SWITCH(LW(15))
+        CASE_EQUAL((int32_t)CosmeticType::ATTACK_FX)
+            SET(LW(10), (int32_t)window_select::MenuType::COSMETICS_SHOP_ATTACK_FX)
+            SET(LW(11), (int32_t)ItemType::TOT_KEY_ATTACK_FX)
+        CASE_EQUAL((int32_t)CosmeticType::MARIO_COSTUME)
+            SET(LW(10), (int32_t)window_select::MenuType::COSMETICS_SHOP_MARIO_COSTUME)
+            SET(LW(11), (int32_t)ItemType::TOT_KEY_MARIO_COSTUME)
+        CASE_ETC()
+            SET(LW(10), (int32_t)window_select::MenuType::COSMETICS_SHOP_YOSHI_COSTUME)
+            SET(LW(11), (int32_t)ItemType::TOT_KEY_YOSHI_COSTUME)
+    END_SWITCH()
+
+    USER_FUNC(evtTot_GetNumCosmeticsUnlockable, LW(15), LW(0))
+    IF_SMALL_EQUAL(LW(0), 0)
+        USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 10, LW(13))
+        USER_FUNC(evt_msg_print, 0, LW(13), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 11, LW(13))
+    USER_FUNC(evt_msg_print, 0, LW(13), 0, PTR("me"))
+
+LBL(10)
+    USER_FUNC(evt_win_coin_on, 2, LW(8))
+LBL(11)
+    USER_FUNC(evt_win_other_select, LW(10))
+    // Cancelled selection.
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(evt_win_coin_off, LW(8))
+        USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 20, LW(13))
+        USER_FUNC(evt_msg_print, 0, LW(13), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+    // Made selection; 1 = subtype, 2 = name string, 3 = price.
+
+    USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 12, LW(13))
+    USER_FUNC(evt_msg_fill_num, 0, LW(13), LW(13), LW(3))
+    USER_FUNC(evt_msg_fill_item, 1, LW(13), LW(13), LW(2))
+    USER_FUNC(evt_msg_print, 1, LW(13), 0, PTR("me"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_yesno"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 30, LW(13))
+        USER_FUNC(evt_msg_print_add, 0, LW(13))
+        GOTO(11)
+    END_IF()
+    USER_FUNC(evt_pouch_get_starpiece, LW(0))
+    IF_SMALL(LW(0), LW(3))
+        USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 13, LW(13))
+        USER_FUNC(evt_msg_print_add, 0, LW(13))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(99)
+    END_IF()
+    USER_FUNC(tot::evtTot_SpendPermanentCurrency, 1, LW(3))
+    MUL(LW(3), -1)
+    USER_FUNC(evt_pouch_add_starpiece, LW(3))
+    USER_FUNC(evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_coin_off, LW(8))
+
+    // Mark cosmetic as collected.
+    USER_FUNC(evtTot_UnlockCosmetic, LW(15), LW(1))
+
+    // Check for completing meta cosmetic purchasing achievement.
+    USER_FUNC(evtTot_CheckCompletedAchievement,
+        AchievementId::META_COSMETICS_5, EVT_NULLPTR)
+
+    // Check for cosmetic's corresponding key item, and give it if missing.
+    USER_FUNC(evt_pouch_check_item, LW(11), LW(0))
+    IF_LARGE_EQUAL(LW(0), 1)
+        GOTO(80)
+    END_IF()
+    USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 40, LW(13))
+    USER_FUNC(evt_msg_print_add, 0, LW(13))
+    // Give item directly.
+    USER_FUNC(evtTot_GetUniqueItemName, LW(0))
+    USER_FUNC(evt_item_entry, LW(0), LW(11), FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+    USER_FUNC(evt_item_get_item, LW(0))
+
+    // If there are more cosmetics available, prompt for buying more.
+    USER_FUNC(evtTot_GetNumCosmeticsUnlockable, LW(15), LW(0))
+    IF_LARGE(LW(0), 0)
+        USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 17, LW(13))
+        USER_FUNC(evt_msg_print, 0, LW(13), 0, PTR("me"))
+        GOTO(10)
+    END_IF()
+    USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 18, LW(13))
+    USER_FUNC(evt_msg_print, 0, LW(13), 0, PTR("me"))
+
+LBL(80)
+
+    // If there are more cosmetics available, prompt for buying more.
+    USER_FUNC(evtTot_GetNumCosmeticsUnlockable, LW(15), LW(0))
+    IF_LARGE(LW(0), 0)
+        USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 15, LW(13))
+        USER_FUNC(evt_msg_print_add, 0, LW(13))
+        GOTO(10)
+    END_IF()
+    USER_FUNC(evtTot_GetCosmeticShopMsg, LW(15), 16, LW(13))
+    USER_FUNC(evt_msg_print_add, 0, LW(13))
+
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(CosmeticShopA_TalkEvt)
+    SET(LW(15), (int32_t)CosmeticType::ATTACK_FX)
+    RUN_CHILD_EVT(CosmeticShops_CommonTalkEvt)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(CosmeticShopM_TalkEvt)
+    SET(LW(15), (int32_t)CosmeticType::MARIO_COSTUME)
+    RUN_CHILD_EVT(CosmeticShops_CommonTalkEvt)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(CosmeticShopY_TalkEvt)
+    SET(LW(15), (int32_t)CosmeticType::YOSHI_COSTUME)
+    RUN_CHILD_EVT(CosmeticShops_CommonTalkEvt)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(CosmeticShops_InitEvt)
+    // Mario costume shopkeeper (red).
+    SET(LW(0), "cshopkeep_M")
+    USER_FUNC(evt_npc_entry, LW(0), PTR(
+        ttyd::npc_data::npcTribe[NpcTribeType::TOAD_SISTER_R].modelName))
+    USER_FUNC(evt_npc_set_tribe, LW(0), PTR(
+        ttyd::npc_data::npcTribe[NpcTribeType::TOAD_SISTER_R].nameJp))
+    USER_FUNC(evt_npc_change_interrupt, LW(0), 6, PTR(&CosmeticShopM_TalkEvt))
+    USER_FUNC(evt_npc_flag_onoff, 1, LW(0), 1536)
+    USER_FUNC(evt_npc_set_ry, LW(0), 270)
+    USER_FUNC(evt_npc_set_position, LW(0), -60, 0, 340)
+
+    // Attack FX shopkeeper (pink).
+    SET(LW(0), "cshopkeep_A")
+    USER_FUNC(evt_npc_entry, LW(0), PTR(
+        ttyd::npc_data::npcTribe[NpcTribeType::TOAD_SISTER_P].modelName))
+    USER_FUNC(evt_npc_set_tribe, LW(0), PTR(
+        ttyd::npc_data::npcTribe[NpcTribeType::TOAD_SISTER_P].nameJp))
+    USER_FUNC(evt_npc_change_interrupt, LW(0), 6, PTR(&CosmeticShopA_TalkEvt))
+    USER_FUNC(evt_npc_flag_onoff, 1, LW(0), 1536)
+    USER_FUNC(evt_npc_set_ry, LW(0), 270)
+    USER_FUNC(evt_npc_set_position, LW(0), 0, 0, 425)
+
+    // Yoshi costume shopkeeper (green).
+    SET(LW(0), "cshopkeep_Y")
+    USER_FUNC(evt_npc_entry, LW(0), PTR(
+        ttyd::npc_data::npcTribe[NpcTribeType::TOAD_SISTER_G].modelName))
+    USER_FUNC(evt_npc_set_tribe, LW(0), PTR(
+        ttyd::npc_data::npcTribe[NpcTribeType::TOAD_SISTER_G].nameJp))
+    USER_FUNC(evt_npc_change_interrupt, LW(0), 6, PTR(&CosmeticShopY_TalkEvt))
+    USER_FUNC(evt_npc_flag_onoff, 1, LW(0), 1536)
+    USER_FUNC(evt_npc_set_ry, LW(0), 270)
+    USER_FUNC(evt_npc_set_position, LW(0), 60, 0, 340)
+
+    RETURN()
+EVT_END()
 
 EVT_BEGIN(Npc_GenericMove)
     USER_FUNC(evt_npc_get_position, PTR("me"), LW(0), LW(1), LW(2))
@@ -207,7 +388,8 @@ EVT_BEGIN(gon_11_InitEvt)
     USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("S_dakan"), 1)
     USER_FUNC(evt_hitobj_onoff, PTR("A_dokan"), 1, 0)
 
-    // TODO: Initialize Toad sister NPCs after a couple successful runs.
+    // TODO: Only init Toad sister NPCs after a couple successful runs.
+    RUN_CHILD_EVT(CosmeticShops_InitEvt)
 
     USER_FUNC(evt_map_playanim, PTR("S_kawa"), 1, 0)
 
@@ -630,6 +812,32 @@ const int32_t* GetWestSideInitEvt() {
 
 const int32_t* GetEastSideInitEvt() {
     return gon_11_InitEvt;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetCosmeticShopMsg) {
+    static char buf[16];
+    int32_t cosmetic_type = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t msg_num = evtGetValue(evt, evt->evtArguments[1]);
+    sprintf(buf, "tot_cshop%" PRId32 "_%02" PRId32, cosmetic_type, msg_num);
+    evtSetValue(evt, evt->evtArguments[2], PTR(buf));
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetNumCosmeticsUnlockable) {
+    int32_t cosmetic_type = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t num_cosmetics = 0;
+    for (int32_t i = 1; i <= 30; ++i) {
+        num_cosmetics += CosmeticsManager::IsPurchaseable(cosmetic_type, i);
+    }
+    evtSetValue(evt, evt->evtArguments[1], num_cosmetics);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_UnlockCosmetic) {
+    int32_t cosmetic_type = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t cosmetic_id = evtGetValue(evt, evt->evtArguments[1]);
+    CosmeticsManager::MarkAsPurchased(cosmetic_type, cosmetic_id);
+    return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_SelectShopItems) {

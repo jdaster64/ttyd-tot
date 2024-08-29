@@ -97,7 +97,6 @@ void OptionsManager::InitLobby() {
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
     for (int32_t i = 0; i < 20; ++i) pouch.items[i] = 0;
-    for (int32_t i = 0; i < 121; ++i) pouch.key_items[i] = 0;
     for (int32_t i = 0; i < 200; ++i) pouch.badges[i] = 0;
     for (int32_t i = 0; i < 200; ++i) pouch.equipped_badges[i] = 0;
     pouch.coins = state.GetOption(STAT_PERM_CURRENT_COINS);
@@ -116,25 +115,11 @@ void OptionsManager::InitLobby() {
     // Give a small amount of audience by default.
     pouch.audience_level = 10.0f;
     
-    // Update any stats / equipment / flags as necessary.
-    ttyd::mario_pouch::pouchGetItem(ItemType::BOOTS);
-    ttyd::mario_pouch::pouchGetItem(ItemType::HAMMER);
-
-    // Testing: Give all currently implemented QoL / cosmetic key items.
-    // (These items should not be deleted in the final version, ideally)
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ATTACK_FX);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_YOSHI_COSTUME);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_MARIO_COSTUME);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BADGE_SELECTOR);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ITEM_SELECTOR);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BGM_TOGGLE);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_SUPER_PEEKABOO);
-    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_PEEKABOO);
-    SetSWF(GSWF_PeekabooEnabled);
-    SetSWF(GSWF_SuperPeekabooEnabled);
-    SetSWF(GSWF_TimingTutorEnabled);
-    SetSWF(GSWF_BgmEnabled);
+    // Remove tier 2+ equipment if it was obtained in a previous run.
+    ttyd::mario_pouch::pouchRemoveItem(ItemType::SUPER_BOOTS);
+    ttyd::mario_pouch::pouchRemoveItem(ItemType::ULTRA_BOOTS);
+    ttyd::mario_pouch::pouchRemoveItem(ItemType::SUPER_HAMMER);
+    ttyd::mario_pouch::pouchRemoveItem(ItemType::ULTRA_HAMMER);
     
     // Assign Yoshi his default color.
     ttyd::mario_pouch::pouchSetPartyColor(4, 0);

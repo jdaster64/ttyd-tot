@@ -116,7 +116,7 @@ int16_t pouchAddStarPiece(int16_t star_pieces);
 int16_t pouchSetCoin(int16_t coins);
 int16_t pouchAddCoin(int16_t coins);
 // pouchGetCoin
-// pouchSortItem
+void pouchSortItem(int32_t sort_type);
 // comp_kind_r
 // comp_aiueo_r
 int32_t comp_kind(int16_t* lhs, int16_t* rhs);

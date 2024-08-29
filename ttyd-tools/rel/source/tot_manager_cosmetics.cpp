@@ -51,8 +51,9 @@ const CosmeticGroupData g_AttackFxGroupData[] = {
 };
 
 const AttackFxData g_AttackFxData[] = {
+    // Dummy 0th entry; never unlockable.
     {
-        .group_id = -1,
+        .group_id = 99,
     },
     // Group 0 (available by default):
     { 
@@ -62,6 +63,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_MARIO_HAMMER_PIKKYO_Y1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .price = 3,
         .icon = IconType::ATTACK_FX_Y,
         .group_id = 0,
     },
@@ -72,6 +74,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_MARIO_HAMMER_PIKKYO_R1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .price = 3,
         .icon = IconType::ATTACK_FX_Y,
         .group_id = 0,
     },
@@ -82,6 +85,7 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_MARIO_HAMMER_PIKKYO_B1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .price = 3,
         .icon = IconType::ATTACK_FX_Y,
         .group_id = 0,
     },
@@ -97,8 +101,9 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
+        .price = 3,
         .icon = IconType::ATTACK_FX_LIME,
-        .group_id = 0,
+        .group_id = 6,
     },
     {
         // Crow FX
@@ -107,8 +112,9 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG4_CROW_HOWL1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .price = 3,
         .icon = IconType::ATTACK_FX_LIME,
-        .group_id = 0,
+        .group_id = 6,
     },
     {
         // Pig FX
@@ -117,8 +123,9 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG4_VOICE_PIG1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .price = 3,
         .icon = IconType::ATTACK_FX_LIME,
-        .group_id = 0,
+        .group_id = 6,
     },
     // Group 2: Minor characters
     {
@@ -129,7 +136,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 1,
         .randomize_pitch = 1,
         .icon = IconType::ATTACK_FX_G,
-        .group_id = 0,
+        .group_id = 7,
     },
     {
         // Doopliss FX
@@ -139,7 +146,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 1,
         .randomize_pitch = 1,
         .icon = IconType::ATTACK_FX_G,
-        .group_id = 0,
+        .group_id = 7,
     },
     {
         // Bandit FX
@@ -149,7 +156,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 1,
         .randomize_pitch = 1,
         .icon = IconType::ATTACK_FX_G,
-        .group_id = 0,
+        .group_id = 7,
     },
     // Group 3: Crowd noises
     {
@@ -160,7 +167,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 1,
         .randomize_pitch = 1,
         .icon = IconType::ATTACK_FX_AQUA,
-        .group_id = 0,
+        .group_id = 8,
     },
     {
         // Whistle FX
@@ -174,7 +181,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 3,
         .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_AQUA,
-        .group_id = 0,
+        .group_id = 8,
     },
     // Group 4: Digital stuff
     {
@@ -189,7 +196,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 3,
         .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_B,
-        .group_id = 0,
+        .group_id = 9,
     },
     {
         // Retro FX
@@ -205,7 +212,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 5,
         .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_B,
-        .group_id = 0,
+        .group_id = 9,
     },
     {
         // 1-UP FX
@@ -215,7 +222,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 1,
         .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_B,
-        .group_id = 0,
+        .group_id = 9,
     },
     // Group 5: Cartoon sounds 1
     {
@@ -230,7 +237,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 3,
         .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_PURPLE,
-        .group_id = 0,
+        .group_id = 10,
     },
     {
         // Zip FX
@@ -244,7 +251,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 3,
         .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_PURPLE,
-        .group_id = 0,
+        .group_id = 10,
     },
     // Group 6: Cartoon sounds 2
     {
@@ -255,7 +262,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 1,
         .randomize_pitch = 1,
         .icon = IconType::ATTACK_FX_FUCHSIA,
-        .group_id = 0,
+        .group_id = 11,
     },
     {
         // Boing FX
@@ -269,7 +276,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 3,
         .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_FUCHSIA,
-        .group_id = 0,
+        .group_id = 11,
     },
     {
         // Crash FX
@@ -283,7 +290,7 @@ const AttackFxData g_AttackFxData[] = {
         .num_sounds = 3,
         .randomize_pitch = 0,
         .icon = IconType::ATTACK_FX_FUCHSIA,
-        .group_id = 0,
+        .group_id = 11,
     },
     // Group 7: Cartoon sounds 3
     {
@@ -293,8 +300,9 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_BOSS_GANSU_FIST1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .price = 7,
         .icon = IconType::ATTACK_FX_P,
-        .group_id = 0,
+        .group_id = 12,
     },
     {
         // Cartoon FX
@@ -308,8 +316,9 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 4,
         .randomize_pitch = 0,
+        .price = 7,
         .icon = IconType::ATTACK_FX_P,
-        .group_id = 0,
+        .group_id = 12,
     },
     {
         // Raspberry FX
@@ -318,8 +327,9 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG5_SAILER_FART1" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .price = 7,
         .icon = IconType::ATTACK_FX_P,
-        .group_id = 0,
+        .group_id = 12,
     },
     // Group 8: Miscellaneous
     {
@@ -332,8 +342,9 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 2,
         .randomize_pitch = 0,
+        .price = 7,
         .icon = IconType::ATTACK_FX_R,
-        .group_id = 0,
+        .group_id = 13,
     },
     {
         // Crystal FX
@@ -346,8 +357,9 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 3,
         .randomize_pitch = 0,
+        .price = 7,
         .icon = IconType::ATTACK_FX_R,
-        .group_id = 0,
+        .group_id = 13,
     },
     {
         // Warp FX
@@ -356,8 +368,9 @@ const AttackFxData g_AttackFxData[] = {
         .sounds = { "SFX_STG7_WARP2" },
         .num_sounds = 1,
         .randomize_pitch = 1,
+        .price = 7,
         .icon = IconType::ATTACK_FX_R,
-        .group_id = 0,
+        .group_id = 13,
     },
     // Group 9: Peach & Bowser
     {
@@ -371,11 +384,12 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 4,
         .randomize_pitch = 0,
+        .price = 15,
         .icon = IconType::ATTACK_FX_BROWN,
-        .group_id = 0,
+        .group_id = 14,
     },
     { 
-        .name_msg = "tot_cos0_27", 
+        .name_msg = "tot_cos0_27",
         .help_msg = "tot_cos0_27_h",
         .sounds = {
             "SFX_MARIO_HAMMER_PIKKYO_P1",
@@ -386,8 +400,9 @@ const AttackFxData g_AttackFxData[] = {
         },
         .num_sounds = 5,
         .randomize_pitch = 0,
+        .price = 15,
         .icon = IconType::ATTACK_FX_BROWN,
-        .group_id = 0,
+        .group_id = 14,
     },
 };
 const int32_t g_NumAttackFx = sizeof(g_AttackFxData) / sizeof(AttackFxData);
@@ -426,12 +441,12 @@ const CosmeticGroupData g_MarioCostumeGroupData[] = {
 
 const MarioCostumeData g_MarioCostumeData[] = {
     {
-        // Default
+        // Default (always unlocked).
         .name_msg = "tot_cos1_01",
         .help_msg = "tot_cos1_01_h",
         .models = { "a/a_mario", "a/a_mario_r", "a/b_mario", "a/e_mario" },
         .icon = IconType::MARIO_COSTUME_ICONS + 0,
-        .group_id = 0,
+        .group_id = -1,
     },
     {
         // Luigi
@@ -463,7 +478,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .help_msg = "tot_cos1_05_h",
         .models = MARIO_MODEL_PATHS("A", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 4,
-        .group_id = 0,
+        .group_id = 5,
     },
     {
         // Ice Mario
@@ -471,7 +486,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .help_msg = "tot_cos1_06_h",
         .models = MARIO_MODEL_PATHS("B", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 5,
-        .group_id = 0,
+        .group_id = 6,
     },
     {
         // Bubble Mario
@@ -479,7 +494,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .help_msg = "tot_cos1_07_h",
         .models = MARIO_MODEL_PATHS("C", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 6,
-        .group_id = 0,
+        .group_id = 7,
     },
     {
         // Superball Mario
@@ -487,151 +502,169 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .help_msg = "tot_cos1_08_h",
         .models = MARIO_MODEL_PATHS("D", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 7,
-        .group_id = 0,
+        .group_id = 8,
     },
     {
         // Flying Mario
         .name_msg = "tot_cos1_09",
         .help_msg = "tot_cos1_09_h",
         .models = MARIO_MODEL_PATHS("E", true),
+        .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 8,
-        .group_id = 0,
+        .group_id = 9,
     },
     {
         // Classic (Mario Bros.) Mario
         .name_msg = "tot_cos1_10",
         .help_msg = "tot_cos1_10_h",
         .models = MARIO_MODEL_PATHS("F", true),
+        .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 9,
-        .group_id = 0,
+        .group_id = 10,
     },
     {
         // Classic (Super Mario Bros.) Luigi
         .name_msg = "tot_cos1_11",
         .help_msg = "tot_cos1_11_h",
         .models = MARIO_MODEL_PATHS("G", true),
+        .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 10,
-        .group_id = 0,
+        .group_id = 11,
     },
     {
         // SMB1 Mario
         .name_msg = "tot_cos1_12",
         .help_msg = "tot_cos1_12_h",
         .models = MARIO_MODEL_PATHS("H", true),
+        .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 11,
-        .group_id = 0,
+        .group_id = 12,
     },
     {
         // SMB Deluxe Luigi
         .name_msg = "tot_cos1_13",
         .help_msg = "tot_cos1_13_h",
         .models = MARIO_MODEL_PATHS("I", true),
+        .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 12,
-        .group_id = 0,
+        .group_id = 13,
     },
     {
         // SMB3
         .name_msg = "tot_cos1_14",
         .help_msg = "tot_cos1_14_h",
         .models = MARIO_MODEL_PATHS("J", true),
+        .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 13,
-        .group_id = 0,
+        .group_id = 14,
     },
     {
         // Super Mario World
         .name_msg = "tot_cos1_15",
         .help_msg = "tot_cos1_15_h",
         .models = MARIO_MODEL_PATHS("K", true),
+        .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 14,
-        .group_id = 0,
+        .group_id = 15,
     },
     {
         // Mario Golf 1
         .name_msg = "tot_cos1_16",
         .help_msg = "tot_cos1_16_h",
         .models = MARIO_MODEL_PATHS("M", true),
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 15,
-        .group_id = 0,
+        .group_id = 16,
     },
     {
         // Mario Golf 2
         .name_msg = "tot_cos1_17",
         .help_msg = "tot_cos1_17_h",
         .models = MARIO_MODEL_PATHS("N", true),
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 16,
-        .group_id = 0,
+        .group_id = 17,
     },
     {
         // Super Smash Bros. 1
         .name_msg = "tot_cos1_18",
         .help_msg = "tot_cos1_18_h",
         .models = MARIO_MODEL_PATHS("O", true),
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 17,
-        .group_id = 0,
+        .group_id = 18,
     },
     {
         // Super Smash Bros. 2
         .name_msg = "tot_cos1_19",
         .help_msg = "tot_cos1_19_h",
         .models = MARIO_MODEL_PATHS("P", true),
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 18,
-        .group_id = 0,
+        .group_id = 19,
     },
     {
         // Mario Maker
         .name_msg = "tot_cos1_20",
         .help_msg = "tot_cos1_20_h",
         .models = MARIO_MODEL_PATHS("Q", true),
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 19,
-        .group_id = 0,
+        .group_id = 20,
     },
     {
         // Toadette
         .name_msg = "tot_cos1_21",
         .help_msg = "tot_cos1_21_h",
         .models = MARIO_MODEL_PATHS("S", true),
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 20,
-        .group_id = 0,
+        .group_id = 21,
     },
     {
         // Secret
         .name_msg = "tot_cos1_22",
         .help_msg = "tot_cos1_22_h",
         .models = MARIO_MODEL_PATHS("T", true),
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 21,
-        .group_id = 0,
+        .group_id = 22,
     },
     {
         // Shadowy
         .name_msg = "tot_cos1_23",
         .help_msg = "tot_cos1_23_h",
         .models = MARIO_MODEL_PATHS("U", true),
+        .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 22,
-        .group_id = 0,
+        .group_id = 23,
     },
     {
         // Silver
         .name_msg = "tot_cos1_24",
         .help_msg = "tot_cos1_24_h",
         .models = MARIO_MODEL_PATHS("X", true),
+        .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 23,
-        .group_id = 0,
+        .group_id = 24,
     },
     {
         // Gold
         .name_msg = "tot_cos1_25",
         .help_msg = "tot_cos1_25_h",
         .models = MARIO_MODEL_PATHS("Y", true),
+        .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 24,
-        .group_id = 0,
+        .group_id = 25,
     },
     {
         // Platinum
         .name_msg = "tot_cos1_26",
         .help_msg = "tot_cos1_26_h",
         .models = MARIO_MODEL_PATHS("Z", true),
+        .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 25,
-        .group_id = 0,
+        .group_id = 26,
     },
 };
 const int32_t g_NumMarioCostumes =
@@ -666,13 +699,13 @@ const CosmeticGroupData g_YoshiCostumeGroupData[] = {
 
 const YoshiCostumeData g_YoshiCostumeData[] = {
     {
-        // Green
+        // Green (always unlocked).
         .name_msg = "tot_cos2_01",
         .help_msg = "tot_cos2_01_h",
         .models = { "a/c_babyyoshi", "a/EFF_m_yoshi", "a/c_tamago" },
         .icon = IconType::YOSHI_GREEN,
         .icon_hud = IconType::HUD_YOSHI_GREEN,
-        .group_id = 0,
+        .group_id = -1,
     },
     {
         // Red
@@ -715,144 +748,160 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_06",
         .help_msg = "tot_cos2_06_h",
         .models = YOSHI_MODEL_PATHS("6"),
+        .price = 10,
         .icon = IconType::YOSHI_BLACK,
         .icon_hud = IconType::HUD_YOSHI_BLACK,
-        .group_id = 0,
+        .group_id = 6,
     },
     {
         // White
         .name_msg = "tot_cos2_07",
         .help_msg = "tot_cos2_07_h",
         .models = YOSHI_MODEL_PATHS("7"),
+        .price = 10,
         .icon = IconType::YOSHI_WHITE,
         .icon_hud = IconType::HUD_YOSHI_WHITE,
-        .group_id = 0,
+        .group_id = 7,
     },
     {
         // Brown
         .name_msg = "tot_cos2_08",
         .help_msg = "tot_cos2_08_h",
         .models = YOSHI_MODEL_PATHS("H"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 0,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 0,
-        .group_id = 0,
+        .group_id = 8,
     },
     {
         // Scarlet
         .name_msg = "tot_cos2_09",
         .help_msg = "tot_cos2_09_h",
         .models = YOSHI_MODEL_PATHS("I"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 1,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 1,
-        .group_id = 0,
+        .group_id = 9,
     },
     {
         // Yellow
         .name_msg = "tot_cos2_10",
         .help_msg = "tot_cos2_10_h",
         .models = YOSHI_MODEL_PATHS("J"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 2,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 2,
-        .group_id = 0,
+        .group_id = 10,
     },
     {
         // Lime
         .name_msg = "tot_cos2_11",
         .help_msg = "tot_cos2_11_h",
         .models = YOSHI_MODEL_PATHS("K"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 3,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 3,
-        .group_id = 0,
+        .group_id = 11,
     },
     {
         // Teal
         .name_msg = "tot_cos2_12",
         .help_msg = "tot_cos2_12_h",
         .models = YOSHI_MODEL_PATHS("L"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 4,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 4,
-        .group_id = 0,
+        .group_id = 12,
     },
     {
         // Indigo
         .name_msg = "tot_cos2_13",
         .help_msg = "tot_cos2_13_h",
         .models = YOSHI_MODEL_PATHS("M"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 5,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 5,
-        .group_id = 0,
+        .group_id = 13,
     },
     {
         // Purple
         .name_msg = "tot_cos2_14",
         .help_msg = "tot_cos2_14_h",
         .models = YOSHI_MODEL_PATHS("N"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 6,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 6,
-        .group_id = 0,
+        .group_id = 14,
     },
     {
         // Lilac
         .name_msg = "tot_cos2_15",
         .help_msg = "tot_cos2_15_h",
         .models = YOSHI_MODEL_PATHS("P"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 7,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 7,
-        .group_id = 0,
+        .group_id = 15,
     },
     {
         // Fuchsia
         .name_msg = "tot_cos2_16",
         .help_msg = "tot_cos2_16_h",
         .models = YOSHI_MODEL_PATHS("Q"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 8,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 8,
-        .group_id = 0,
+        .group_id = 16,
     },
     {
         // Grey
         .name_msg = "tot_cos2_17",
         .help_msg = "tot_cos2_17_h",
         .models = YOSHI_MODEL_PATHS("R"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 9,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 9,
-        .group_id = 0,
+        .group_id = 17,
     },
     {
         // Secret
         .name_msg = "tot_cos2_18",
         .help_msg = "tot_cos2_18_h",
         .models = YOSHI_MODEL_PATHS("S"),
+        .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 10,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 10,
-        .group_id = 0,
+        .group_id = 18,
     },
     {
         // Silver
         .name_msg = "tot_cos2_19",
         .help_msg = "tot_cos2_19_h",
         .models = YOSHI_MODEL_PATHS("X"),
+        .price = 25,
         .icon = IconType::YOSHI_EXTRA_ICONS + 11,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 11,
-        .group_id = 0,
+        .group_id = 19,
     },
     {
         // Gold
         .name_msg = "tot_cos2_20",
         .help_msg = "tot_cos2_20_h",
         .models = YOSHI_MODEL_PATHS("Y"),
+        .price = 25,
         .icon = IconType::YOSHI_EXTRA_ICONS + 12,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 12,
-        .group_id = 0,
+        .group_id = 20,
     },
     {
         // Platinum
         .name_msg = "tot_cos2_21",
         .help_msg = "tot_cos2_21_h",
         .models = YOSHI_MODEL_PATHS("Z"),
+        .price = 25,
         .icon = IconType::YOSHI_EXTRA_ICONS + 13,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 13,
-        .group_id = 0,
+        .group_id = 21,
     },
 };
 const int32_t g_NumYoshiCostumes =
@@ -900,17 +949,42 @@ void CosmeticsManager::MarkAsPurchased(int32_t type, int32_t id) {
     g_Mod->state_.SetOption(FLAGS_COSMETIC_PURCHASED, type * 32 + id);
 }
 
+bool CosmeticsManager::IsPurchaseable(int32_t type, int32_t id) {
+    // Return false if the option is already unlocked.
+    if (g_Mod->state_.GetOption(FLAGS_COSMETIC_PURCHASED, type * 32 + id))
+        return false;
+
+    switch (type) {
+        case CosmeticType::ATTACK_FX: {
+            auto* data = GetAttackFxData(id);
+            if (!data || data->group_id < 0) return false;
+            return AchievementsManager::CheckCosmeticGroupUnlocked(
+                AchievementRewardType::ATTACK_FX, data->group_id);
+        }
+        case CosmeticType::MARIO_COSTUME: {
+            auto* data = GetMarioCostumeData(id);
+            if (!data || data->group_id < 0) return false;
+            return AchievementsManager::CheckCosmeticGroupUnlocked(
+                AchievementRewardType::MARIO_COSTUME, data->group_id);
+        }
+        case CosmeticType::YOSHI_COSTUME: {
+            auto* data = GetYoshiCostumeData(id);
+            if (!data || data->group_id < 0) return false;
+            return AchievementsManager::CheckCosmeticGroupUnlocked(
+                AchievementRewardType::YOSHI_COSTUME, data->group_id);
+        }
+    }
+    return false;
+}
+
 bool CosmeticsManager::IsAvailable(int32_t type, int32_t id) {
     switch (type) {
         case CosmeticType::ATTACK_FX: {
             auto* data = GetAttackFxData(id);
             if (!data) return false;
-            // TODO: For testing only!
-            if (data->group_id == 0) return true;
-            
-            if (data->group_id == 0 || 
-                AchievementsManager::CheckCosmeticGroupUnlocked(
-                    AchievementRewardType::ATTACK_FX, data->group_id)) {
+            if (data->group_id < 0) return true;
+            if (AchievementsManager::CheckCosmeticGroupUnlocked(
+                AchievementRewardType::ATTACK_FX, data->group_id)) {
                 return g_Mod->state_.GetOption(FLAGS_COSMETIC_PURCHASED, id);
             }
             break;
@@ -918,12 +992,9 @@ bool CosmeticsManager::IsAvailable(int32_t type, int32_t id) {
         case CosmeticType::MARIO_COSTUME: {
             auto* data = GetMarioCostumeData(id);
             if (!data) return false;
-            // TODO: For testing only!
-            if (data->group_id == 0) return true;
-
-            if (data->group_id == 0 || 
-                AchievementsManager::CheckCosmeticGroupUnlocked(
-                    AchievementRewardType::MARIO_COSTUME, data->group_id)) {
+            if (data->group_id < 0) return true;
+            if (AchievementsManager::CheckCosmeticGroupUnlocked(
+                AchievementRewardType::MARIO_COSTUME, data->group_id)) {
                 return g_Mod->state_.GetOption(FLAGS_COSMETIC_PURCHASED, id + 32);
             }
             break;
@@ -931,12 +1002,9 @@ bool CosmeticsManager::IsAvailable(int32_t type, int32_t id) {
         case CosmeticType::YOSHI_COSTUME: {
             auto* data = GetYoshiCostumeData(id);
             if (!data) return false;
-            // TODO: For testing only!
-            if (data->group_id == 0) return true;
-            
-            if (data->group_id == 0 || 
-                AchievementsManager::CheckCosmeticGroupUnlocked(
-                    AchievementRewardType::YOSHI_COSTUME, data->group_id)) {
+            if (data->group_id < 0) return true;
+            if (AchievementsManager::CheckCosmeticGroupUnlocked(
+                AchievementRewardType::YOSHI_COSTUME, data->group_id)) {
                 return g_Mod->state_.GetOption(FLAGS_COSMETIC_PURCHASED, id + 64);
             }
             break;

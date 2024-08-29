@@ -88,6 +88,9 @@ namespace NpcTribeType {
         DOOGAN_YELLOW   = 0x5f,
         MOVER           = 0x6b,
         GRUBBA          = 0x74,
+        TOAD_SISTER_R   = 0x79,
+        TOAD_SISTER_P   = 0x7a,
+        TOAD_SISTER_G   = 0x7b,
         DOOPLISS        = 0x95,
     };
 }

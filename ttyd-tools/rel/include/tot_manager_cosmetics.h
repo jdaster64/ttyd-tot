@@ -21,8 +21,9 @@ struct AttackFxData {
     const char* name_msg;
     const char* help_msg;
     const char* sounds[5];
-    int16_t num_sounds;
-    int16_t randomize_pitch;
+    int8_t num_sounds;
+    int8_t randomize_pitch;
+    int16_t price = 5;
     int16_t icon;
     int16_t group_id;
 };
@@ -31,17 +32,19 @@ struct MarioCostumeData {
     const char* name_msg;
     const char* help_msg;
     const char* models[4];
+    int16_t price = 5;
     int16_t icon;
-    int16_t group_id;
+    int32_t group_id;
 };
 
 struct YoshiCostumeData {
     const char* name_msg;
     const char* help_msg;
     const char* models[3];
+    int16_t price = 5;
     int16_t icon;
     int16_t icon_hud;
-    int32_t group_id;
+    int16_t group_id;
 };
     
 class CosmeticsManager {
@@ -55,7 +58,9 @@ public:
     static bool ToggleEquipped(int32_t type, int32_t id);
     // Marks the current cosmetic as purchased.
     static void MarkAsPurchased(int32_t type, int32_t id);
-    // Returns whether the given cosmetic is unlocked + purchased.
+    // Returns whether the given cosmetic is unlockable but not purchased.
+    static bool IsPurchaseable(int32_t type, int32_t id);
+    // Returns whether the given cosmetic is currently unlocked and purchased.
     static bool IsAvailable(int32_t type, int32_t id);
 
     // Returns the data for the given Attack FX option or Mario / Yoshi costume.

@@ -161,6 +161,10 @@ bool FreshFileInit() {
     ttyd::swdrv::swSet(0xea);           // Heart Block tutorial
     ttyd::swdrv::swSet(0xeb);           // Item tutorial
     ttyd::swdrv::swSet(0xec);           // Save Block tutorial-related
+
+    // Give core key items.
+    ttyd::mario_pouch::pouchGetItem(ItemType::BOOTS);
+    ttyd::mario_pouch::pouchGetItem(ItemType::HAMMER);
     
     // Initialize Tower of Trials-specific state & pouch stuff.
     g_Mod->state_.Init();

@@ -5,6 +5,7 @@
 #include "patch.h"
 #include "patches_battle.h"
 #include "patches_battle_seq.h"
+#include "tot_generate_item.h"
 #include "tot_generate_reward.h"
 #include "tot_manager_achievements.h"
 #include "tot_state.h"
@@ -1084,9 +1085,11 @@ void ApplyFixedPatches() {
                     tot::AchievementId::META_BADGE_LOG_ALL);
             }
 
-            // Check for having collected all Key Items.
+            // If getting a key item, sort by type + check for all collected.
             if (item_type >= ItemType::TOT_KEY_PEEKABOO && 
                 item_type < ItemType::TOT_KEY_ITEM_MAX) {
+                // Sort key items by type.
+                ttyd::mario_pouch::pouchSortItem(3);
                 tot::AchievementsManager::CheckCompleted(
                     tot::AchievementId::META_ALL_KEY_ITEMS);
             }

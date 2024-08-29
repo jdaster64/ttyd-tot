@@ -1203,6 +1203,9 @@ g_StringMap = {
         
         b"tot_winsel_titlemove":      b"Move",
         b"tot_winsel_whichunlock":    b"Which move?",
+        b"tot_winsel_titleattackfx":  b"Attack FX",
+        b"tot_winsel_titlecolor":     b"Color",
+        b"tot_winsel_titlecostume":   b"Costume",
         b"tot_winsel_titlestat":      b"Stat Lvl.",
         b"tot_winsel_tradewhichstat": b"Trade which?",
         b"tot_winsel_whichduds":      b"Which getup?",
@@ -2235,8 +2238,8 @@ g_StringMap = {
         b'tot_cos2_21':     b'Platinum',
         
         b'tot_cos0_01_h':
-            b"Gives Mario's attacks a tinny,\n"
-            b"dinging sound.",
+            b"Gives Mario's attacks a\n"
+            b"tinny, dinging sound.",
         b'tot_cos0_02_h':
             b"Gives Mario's attacks a\n"
             b"croaking sound.",
@@ -3542,10 +3545,132 @@ g_StringMap = {
     
         b"tot_shopkeep_24":
             b"<select 0 1 0 40>\nYes\nNo",
+    
+        b"tot_shopkeep_yesno":
+            b"<select 0 1 0 40>\nYes\nNo",
     },
     
     # East side of Petalburg hub.
     'gon_11': {
+            
+        # Cosmetic shopkeepers.
+    
+        b"tot_shopkeep_yesno":
+            b"<select 0 1 0 40>\nYes\nNo",
+            
+        b"tot_cshop0_10":
+            b"[Placeholder] No unlockables!\n<k>",
+            
+        b"tot_cshop1_10":
+            b"[Placeholder] No unlockables!\n<k>",
+            
+        b"tot_cshop2_10":
+            b"[Placeholder] No unlockables!\n<k>",
+            
+        b"tot_cshop0_11":
+            b"[Placeholder] Which one?\n<k>",
+            
+        b"tot_cshop1_11":
+            b"[Placeholder] Which one?\n<k>",
+            
+        b"tot_cshop2_11":
+            b"[Placeholder] Which one?\n<k>",
+    
+        b"tot_cshop0_12":
+            b"It's <NUM> Star Piece<S> for\n"
+            b"the <ITEM> pack.\n<wait 250>\n"
+            b"Are you sure you want it?\n<o>",
+    
+        b"tot_cshop1_12":
+            b"It's <NUM> Star Piece<S> for\n"
+            b"the <ITEM> costume.\n<wait 250>\n"
+            b"Are you sure you want it?\n<o>",
+    
+        b"tot_cshop2_12":
+            b"It's <NUM> Star Piece<S> for\n"
+            b"the <ITEM> costume.\n<wait 250>\n"
+            b"Are you sure you want it?\n<o>",
+            
+        b"tot_cshop0_13":
+            b"<p>\n[Placeholder] Not enough!\n<k>",
+            
+        b"tot_cshop1_13":
+            b"<p>\n[Placeholder] Not enough!\n<k>",
+            
+        b"tot_cshop2_13":
+            b"<p>\n[Placeholder] Not enough!\n<k>",
+            
+        b"tot_cshop0_14":
+            b"<p>\n[Placeholder] Which one?\n<k>",
+            
+        b"tot_cshop1_14":
+            b"<p>\n[Placeholder] Which one?\n<k>",
+            
+        b"tot_cshop2_14":
+            b"<p>\n[Placeholder] Which one?\n<k>",
+            
+        b"tot_cshop0_15":
+            b"<p>\n[Placeholder] Another?\n<k>",
+            
+        b"tot_cshop1_15":
+            b"<p>\n[Placeholder] Another?\n<k>",
+            
+        b"tot_cshop2_15":
+            b"<p>\n[Placeholder] Another?\n<k>",
+            
+        b"tot_cshop0_16":
+            b"<p>\n[Placeholder] No more!\n<k>",
+            
+        b"tot_cshop1_16":
+            b"<p>\n[Placeholder] No more!\n<k>",
+            
+        b"tot_cshop2_16":
+            b"<p>\n[Placeholder] No more!\n<k>",
+            
+        b"tot_cshop0_17":
+            b"[Placeholder] Another?\n<k>",
+            
+        b"tot_cshop1_17":
+            b"[Placeholder] Another?\n<k>",
+            
+        b"tot_cshop2_17":
+            b"[Placeholder] Another?\n<k>",
+            
+        b"tot_cshop0_18":
+            b"[Placeholder] No more!\n<k>",
+            
+        b"tot_cshop1_18":
+            b"[Placeholder] No more!\n<k>",
+            
+        b"tot_cshop2_18":
+            b"[Placeholder] No more!\n<k>",
+            
+        b"tot_cshop0_20":
+            b"[Placeholder] Goodbye!\n<k>",
+            
+        b"tot_cshop1_20":
+            b"[Placeholder] Goodbye!\n<k>",
+            
+        b"tot_cshop2_20":
+            b"[Placeholder] Goodbye!\n<k>",
+            
+        b"tot_cshop0_30":
+            b"<p>\n[Placeholder] Something else?\n<k>",
+            
+        b"tot_cshop1_30":
+            b"<p>\n[Placeholder] Something else?\n<k>",
+            
+        b"tot_cshop2_30":
+            b"<p>\n[Placeholder] Something else?\n<k>",
+            
+        b"tot_cshop0_40":
+            b"<p>\n[Placeholder] Key item get!\n<k>",
+            
+        b"tot_cshop1_40":
+            b"<p>\n[Placeholder] Key item get!\n<k>",
+            
+        b"tot_cshop2_40":
+            b"<p>\n[Placeholder] Key item get!\n<k>",
     },
     
     # Opening cutscene in Petal Meadows.

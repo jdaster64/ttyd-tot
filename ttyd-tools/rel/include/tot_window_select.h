@@ -24,6 +24,10 @@ namespace MenuType {
         HUB_ITEM_SHOP,
         // Charlieton.
         TOT_CHARLIETON_SHOP,
+        // Cosmetics shops.
+        COSMETICS_SHOP_ATTACK_FX,
+        COSMETICS_SHOP_MARIO_COSTUME,
+        COSMETICS_SHOP_YOSHI_COSTUME,
         // Chet Rippo stat downgrade.
         TOT_CHET_RIPPO_TRADE,
         // Run options menu (in lobby):

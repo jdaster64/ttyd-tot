@@ -5,12 +5,14 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_gsw.h"
 #include "tot_manager_options.h"
 
 #include <gc/OSLink.h>
 #include <gc/OSTime.h>
 #include <third_party/fasthash.h>
 #include <ttyd/evtmgr_cmd.h>
+#include <ttyd/item_data.h>
 #include <ttyd/mario.h>
 #include <ttyd/mario_party.h>
 #include <ttyd/mario_pouch.h>
@@ -27,6 +29,8 @@ namespace {
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
+
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 void GetOptionParts(
     uint32_t v, int32_t* t, int32_t* x, int32_t* y, int32_t* a, int32_t* b) {
@@ -61,8 +65,8 @@ void EncodeOption(
     }
 }
 
-const int32_t kEarliestSupportedVersion = 2;
-const int32_t kCurrentVersion = 2;
+const int32_t kEarliestSupportedVersion = 3;
+const int32_t kCurrentVersion = 3;
 
 // Holds backup save data (updated on floor 0 and after every boss floor).
 TotSaveSlot g_BackupSave;
@@ -97,8 +101,22 @@ void StateManager::Init() {
 
     InitDefaultOptions();
 
-    // For alpha version, always set this to 1.
-    SetOption(OPT_DEBUG_MODE_ENABLED, 1);
+    // Only enable debug options with a specific save file name.
+    if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "xyzzy")) {
+        SetOption(OPT_DEBUG_MODE_ENABLED, 1);
+    }
+
+    // TODO: Implement unlocking these key items naturally.
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BADGE_SELECTOR);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_ITEM_SELECTOR);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_BGM_TOGGLE);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_TIMING_TUTOR);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_SUPER_PEEKABOO);
+    ttyd::mario_pouch::pouchGetItem(ItemType::TOT_KEY_PEEKABOO);
+    SetSWF(GSWF_PeekabooEnabled);
+    SetSWF(GSWF_SuperPeekabooEnabled);
+    SetSWF(GSWF_TimingTutorEnabled);
+    SetSWF(GSWF_BgmEnabled);
 }
 
 // Loading / saving functions.
@@ -304,7 +322,7 @@ void StateManager::ApplyPresetOptions() {
             uint32_t difficulty_option = GetOptionValue(OPT_DIFFICULTY);
             uint32_t timer_option = GetOptionValue(OPT_TIMER_DISPLAY);
 
-            memset(option_flags_, 0, sizeof(option_flags_));
+            memset(option_flags_, 0, sizeof(uint32_t) * 6);
             memset(option_bytes_, 0, sizeof(option_bytes_));
 
             SetOption(OPTVAL_PRESET_DEFAULT);

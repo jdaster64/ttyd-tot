@@ -1407,6 +1407,8 @@
 800f0e20:evt_pouch_add_item
 800f0fe8:evt_pouch_add_coin
 800f1018:evt_pouch_get_coin
+800f0ec0:evt_pouch_add_starpiece
+800f0ef0:evt_pouch_get_starpiece
 
 // npc_event.o
 // .text

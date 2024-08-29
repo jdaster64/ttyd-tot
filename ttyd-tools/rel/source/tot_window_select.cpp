@@ -6,6 +6,7 @@
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
@@ -593,6 +594,24 @@ void DispMainWindow(WinMgrEntry* entry) {
                     entry_text = msgSearch(itemDataTable[row.value].name);
                     break;
                 }
+                case MenuType::COSMETICS_SHOP_ATTACK_FX: {
+                    auto* data = CosmeticsManager::GetAttackFxData(row.value);
+                    entry_icon = data->icon;
+                    entry_text = msgSearch(data->name_msg);
+                    break;
+                }
+                case MenuType::COSMETICS_SHOP_MARIO_COSTUME: {
+                    auto* data = CosmeticsManager::GetMarioCostumeData(row.value);
+                    entry_icon = data->icon;
+                    entry_text = msgSearch(data->name_msg);
+                    break;
+                }
+                case MenuType::COSMETICS_SHOP_YOSHI_COSTUME: {
+                    auto* data = CosmeticsManager::GetYoshiCostumeData(row.value);
+                    entry_icon = data->icon;
+                    entry_text = msgSearch(data->name_msg);
+                    break;
+                }
                 case MenuType::TOT_CHET_RIPPO_TRADE: {
                     switch (row.value) {
                         case 1:
@@ -655,14 +674,33 @@ void DispMainWindow(WinMgrEntry* entry) {
         switch (sel_entry->type) {
             case MenuType::CUSTOM_START:
             case MenuType::TOT_CHARLIETON_SHOP:
-            case MenuType::HUB_ITEM_SHOP: {
+            case MenuType::HUB_ITEM_SHOP:
+            case MenuType::COSMETICS_SHOP_ATTACK_FX:
+            case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+            case MenuType::COSMETICS_SHOP_YOSHI_COSTUME: {
                 // Draw "buy prices".
-                int32_t value = itemDataTable[row.value].buy_price;
+                int32_t value = 0;
                 // For Charlieton, scale based on tower progress.
-                if (sel_entry->type == MenuType::TOT_CHARLIETON_SHOP) {
-                    value = value * GetBuyPriceScale() / 100;
-                } else if (sel_entry->type == MenuType::HUB_ITEM_SHOP) {
-                    value *= 3;
+                switch (sel_entry->type) {
+                    case MenuType::TOT_CHARLIETON_SHOP:
+                        value = itemDataTable[row.value].buy_price * 
+                            GetBuyPriceScale() / 100;
+                        break;
+                    case MenuType::HUB_ITEM_SHOP:
+                        value = itemDataTable[row.value].buy_price * 3;
+                        break;
+                    case MenuType::COSMETICS_SHOP_ATTACK_FX:
+                        value = CosmeticsManager::GetAttackFxData(row.value)->price;
+                        break;
+                    case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+                        value = CosmeticsManager::GetMarioCostumeData(row.value)->price;
+                        break;
+                    case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
+                        value = CosmeticsManager::GetYoshiCostumeData(row.value)->price;
+                        break;
+                    default:
+                        value = itemDataTable[row.value].buy_price;
+                        break;
                 }
                 
                 if (value > 0) {
@@ -848,6 +886,15 @@ void DispMainWindow(WinMgrEntry* entry) {
         case MenuType::HUB_ITEM_SHOP:
             title = msgSearch("msg_window_title_1");  // "Items"
             break;
+        case MenuType::COSMETICS_SHOP_ATTACK_FX:
+            title = msgSearch("tot_winsel_titleattackfx");
+            break;
+        case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+            title = msgSearch("tot_winsel_titlecostume");
+            break;
+        case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
+            title = msgSearch("tot_winsel_titlecolor");
+            break;
         case MenuType::TOT_CHET_RIPPO_TRADE:
             title = msgSearch("tot_winsel_titlestat");
             break;
@@ -881,21 +928,30 @@ void DispMainWindow(WinMgrEntry* entry) {
     }
 
     // Draw white circle + currency icon in upper-right corner.
+    int32_t currency_icon = 0;
     switch (sel_entry->type) {
         case MenuType::CUSTOM_START:
         case MenuType::TOT_CHARLIETON_SHOP:
         case MenuType::HUB_ITEM_SHOP:
-            gc::mtx34 mtx, mtx2;
-            gc::mtx::PSMTXScale(&mtx2, 0.6f, 0.6f, 0.6f);
-            gc::mtx::PSMTXTrans(
-                &mtx, entry->x + 268.0f, entry->y - 18.0f, 0.0f);
-            gc::mtx::PSMTXConcat(&mtx, &mtx2, &mtx);
-            ttyd::icondrv::iconDispGxCol(
-                &mtx, 0x10, IconType::BLACK_WITH_WHITE_CIRCLE, &kOffWhite);
-
-            gc::vec3 icon_pos = { entry->x + 268.0f, entry->y - 12.0f, 0.0f };
-            ttyd::icondrv::iconDispGx(0.6f, &icon_pos, 0x10, IconType::COIN);
+            currency_icon = IconType::COIN;
             break;
+        case MenuType::COSMETICS_SHOP_ATTACK_FX:
+        case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+        case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
+            currency_icon = IconType::STAR_PIECE;
+            break;
+    }
+    if (currency_icon) {
+        gc::mtx34 mtx, mtx2;
+        gc::mtx::PSMTXScale(&mtx2, 0.6f, 0.6f, 0.6f);
+        gc::mtx::PSMTXTrans(
+            &mtx, entry->x + 268.0f, entry->y - 18.0f, 0.0f);
+        gc::mtx::PSMTXConcat(&mtx, &mtx2, &mtx);
+        ttyd::icondrv::iconDispGxCol(
+            &mtx, 0x10, IconType::BLACK_WITH_WHITE_CIRCLE, &kOffWhite);
+
+        gc::vec3 icon_pos = { entry->x + 268.0f, entry->y - 12.0f, 0.0f };
+        ttyd::icondrv::iconDispGx(0.6f, &icon_pos, 0x10, currency_icon);
     }
     
     // Draw cursor and scrolling arrows, if necessary.
@@ -943,6 +999,9 @@ void DispWindow2(WinMgrEntry* entry) {
             break;
         case MenuType::TOT_CHARLIETON_SHOP:
         case MenuType::HUB_ITEM_SHOP:
+        case MenuType::COSMETICS_SHOP_ATTACK_FX:
+        case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+        case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
             msg = msgSearch("msg_window_select_6");     // "Buy which one?"
             break;
         case MenuType::TOT_CHET_RIPPO_TRADE:
@@ -995,6 +1054,18 @@ void DispSelectionHelp(WinMgrEntry* entry) {
             case MenuType::TOT_CHARLIETON_SHOP:
             case MenuType::HUB_ITEM_SHOP:
                 help_msg = msgSearch(itemDataTable[value].description);
+                break;
+            case MenuType::COSMETICS_SHOP_ATTACK_FX:
+                help_msg = msgSearch(
+                    CosmeticsManager::GetAttackFxData(value)->help_msg);
+                break;
+            case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+                help_msg = msgSearch(
+                    CosmeticsManager::GetMarioCostumeData(value)->help_msg);
+                break;
+            case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
+                help_msg = msgSearch(
+                    CosmeticsManager::GetYoshiCostumeData(value)->help_msg);
                 break;
             case MenuType::TOT_CHET_RIPPO_TRADE:
                 help_msg = msgSearch("tot_desc_chet_adjustnone");
@@ -1330,6 +1401,15 @@ void* InitNewSelectDescTable() {
     g_SelectDescList[MenuType::TOT_CHARLIETON_SHOP] = WinMgrSelectDescList{ 
         .num_descs = 3, .descs = &g_CustomDescs[0]
     };
+    g_SelectDescList[MenuType::COSMETICS_SHOP_ATTACK_FX] = WinMgrSelectDescList{ 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
+    };
+    g_SelectDescList[MenuType::COSMETICS_SHOP_MARIO_COSTUME] = WinMgrSelectDescList{ 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
+    };
+    g_SelectDescList[MenuType::COSMETICS_SHOP_YOSHI_COSTUME] = WinMgrSelectDescList{ 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
+    };
     g_SelectDescList[MenuType::TOT_CHET_RIPPO_TRADE] = WinMgrSelectDescList{
         .num_descs = 3, .descs = &g_CustomDescs[0]
     };
@@ -1367,6 +1447,9 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
         case MenuType::CUSTOM_START:
         case MenuType::HUB_ITEM_SHOP:
         case MenuType::TOT_CHARLIETON_SHOP:
+        case MenuType::COSMETICS_SHOP_ATTACK_FX:
+        case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+        case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
         case MenuType::TOT_CHET_RIPPO_TRADE:
         case MenuType::RUN_OPTIONS:
         case MenuType::RUN_RESULTS_STATS:
@@ -1450,6 +1533,29 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
                 sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
             for (int32_t i = 0; i < num_items; ++i) {
                 sel_entry->row_data[i].value = inventory[i];
+            }
+            break;
+        }
+        case MenuType::COSMETICS_SHOP_ATTACK_FX:
+        case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+        case MenuType::COSMETICS_SHOP_YOSHI_COSTUME: {
+            int32_t cosmetic_type = type - MenuType::COSMETICS_SHOP_ATTACK_FX;
+            int32_t num_cosmetics = 0;
+            int8_t cosmetics[30];
+            for (int32_t i = 1; i <= 30; ++i) {
+                if (CosmeticsManager::IsPurchaseable(cosmetic_type, i))
+                    cosmetics[num_cosmetics++] = i;
+            }
+
+            sel_entry->num_rows = num_cosmetics;
+            sel_entry->row_data = 
+                (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
+                    0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+            memset(
+                sel_entry->row_data, 0,
+                sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+            for (int32_t i = 0; i < num_cosmetics; ++i) {
+                sel_entry->row_data[i].value = cosmetics[i];
             }
             break;
         }
@@ -1602,7 +1708,6 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
             evt->lwData[1] = value;
             evt->lwData[2] = PTR(msgSearch(itemDataTable[value].name));
             evt->lwData[3] = itemDataTable[value].buy_price * 3;
-            evt->lwData[4] = itemDataTable[value].bp_cost;
             break;
         case MenuType::TOT_CHARLIETON_SHOP:
             evt->lwData[1] = value;
@@ -1610,6 +1715,24 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
             evt->lwData[3] = 
                 itemDataTable[value].buy_price * GetBuyPriceScale() / 100;
             evt->lwData[4] = itemDataTable[value].bp_cost;
+            break;
+        case MenuType::COSMETICS_SHOP_ATTACK_FX:
+            evt->lwData[1] = value;
+            evt->lwData[2] = 
+                PTR(msgSearch(CosmeticsManager::GetAttackFxData(value)->name_msg));
+            evt->lwData[3] = CosmeticsManager::GetAttackFxData(value)->price;
+            break;
+        case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
+            evt->lwData[1] = value;
+            evt->lwData[2] = 
+                PTR(msgSearch(CosmeticsManager::GetMarioCostumeData(value)->name_msg));
+            evt->lwData[3] = CosmeticsManager::GetMarioCostumeData(value)->price;
+            break;
+        case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
+            evt->lwData[1] = value;
+            evt->lwData[2] = 
+                PTR(msgSearch(CosmeticsManager::GetYoshiCostumeData(value)->name_msg));
+            evt->lwData[3] = CosmeticsManager::GetYoshiCostumeData(value)->price;
             break;
         case MenuType::TOT_CHET_RIPPO_TRADE:
             evt->lwData[1] = value;
