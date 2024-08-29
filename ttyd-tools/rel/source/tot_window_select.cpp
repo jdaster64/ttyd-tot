@@ -6,6 +6,7 @@
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
 #include "tot_manager_timer.h"
@@ -166,6 +167,10 @@ OptionMenuData g_OptionMenuData[] = {
     { OPT_NPC_CHOICE_2, "tot_optr_npc_2", nullptr, 301, true, false },
     { OPT_NPC_CHOICE_3, "tot_optr_npc_3", nullptr, 302, true, false },
     { OPT_NPC_CHOICE_4, "tot_optr_npc_4", nullptr, 303, true, false },
+    { OPT_SECRET_BOSS, "tot_optr_secretboss", "tot_opth_secretboss", 400, true, false },
+    { OPTVAL_SECRET_BOSS_RANDOM, "tot_optr_secretboss_random", nullptr, 401, false, false },
+    { OPTVAL_SECRET_BOSS_OFF, "tot_optr_secretboss_off", nullptr, 402, false, false },
+    { OPTVAL_SECRET_BOSS_ON, "tot_optr_secretboss_on", nullptr, 403, false, false },
 };
 
 uint32_t OptionLookup(uint16_t lookup_key) {
@@ -175,6 +180,19 @@ uint32_t OptionLookup(uint16_t lookup_key) {
         }
     }
     return -1;
+}
+
+bool OptionUnlocked(const OptionMenuData& data) {
+    switch (data.option) {
+        case OPT_NPC_CHOICE_1:
+        case OPT_NPC_CHOICE_2:
+        case OPT_NPC_CHOICE_3:
+        case OPT_NPC_CHOICE_4:
+            // All NPC choices unlocked at once.
+            return AchievementsManager::CheckOptionUnlocked(OPT_NPC_CHOICE_1);
+        default:
+            return AchievementsManager::CheckOptionUnlocked(data.option);
+    }
 }
 
 const char* OptionName(uint16_t lookup_key) {
@@ -375,8 +393,25 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
             } else {
                 // Change the option, wrapping around if necessary.
                 state.NextOption(option, change);
-                // Special handling for NPC options.
+
+                // Special handling for particular options.
                 switch (option) {
+                    case OPT_MARIO_BP:
+                        // If Infinite BP isn't unlocked, skip it.
+                        if (state.CheckOptionValue(OPTVAL_INFINITE_BP) &&
+                            !AchievementsManager::CheckOptionUnlocked(
+                                OPTVAL_INFINITE_BP)) {
+                            state.NextOption(option, change);
+                        }
+                        break;
+                    case OPT_STARTER_ITEMS:
+                        // If "custom" starting items isn't unlocked, skip it.
+                        if (state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) &&
+                            !AchievementsManager::CheckOptionUnlocked(
+                                OPTVAL_STARTER_ITEMS_CUSTOM)) {
+                            state.NextOption(option, change);
+                        }
+                        break;
                     case OPT_NPC_CHOICE_1:
                     case OPT_NPC_CHOICE_2:
                     case OPT_NPC_CHOICE_3:
@@ -1645,13 +1680,19 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
         case MenuType::RUN_RESULTS_STATS: {
             // Assign options from g_OptionMenuData.
             int32_t num_options = 0;
+            uint16_t options[64];
             for (const auto& data : g_OptionMenuData) {
                 if (sel_entry->type == MenuType::RUN_OPTIONS) {
-                    if (data.in_run_options) ++num_options;
+                    if (data.in_run_options && OptionUnlocked(data)) {
+                        options[num_options++] = data.lookup_key;
+                    }
                 } else {
-                    if (data.in_run_stats) ++num_options;
+                    if (data.in_run_stats) {
+                        options[num_options++] = data.lookup_key;
+                    }
                 }
             }
+            
             sel_entry->num_rows = num_options;
             sel_entry->row_data =
                 (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
@@ -1659,15 +1700,8 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             memset(
                 sel_entry->row_data, 0,
                 sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
-            int32_t i = 0;
-            for (const auto& data : g_OptionMenuData) {
-                if (sel_entry->type == MenuType::RUN_OPTIONS) {
-                    if (!data.in_run_options) continue;
-                } else {
-                    if (!data.in_run_stats) continue;
-                }
-                sel_entry->row_data[i].value = data.lookup_key;
-                ++i;
+            for (int32_t i = 0; i < num_options; ++i) {
+                sel_entry->row_data[i].value = options[i];
             }
             break;
         }

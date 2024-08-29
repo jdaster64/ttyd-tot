@@ -1313,7 +1313,7 @@ g_StringMap = {
         
         # Level descriptions for moves in Moves log.
         
-        # Placeholders.
+        # Dummy text for if you don't have a level unlocked yet.
         b"tot_movelog_d001": b"\nLv. 1: ???\n",
         b"tot_movelog_d002": b"\nLv. 2: ???\n",
         b"tot_movelog_d003": b"\nLv. 3: ???",
@@ -2057,8 +2057,7 @@ g_StringMap = {
         b"tot_achd_61":
             b"100% complete the Moves log.",
         b"tot_achd_62":
-            b"???", 
-            #  b"Beat the secret final boss.",
+            b"Beat the secret final boss.",
         b"tot_achd_63":
             b"Finish 10 tower runs across\n"
             b"all difficulty settings.",
@@ -2068,27 +2067,19 @@ g_StringMap = {
         b"tot_achd_65":
             b"Complete all other achievements.\n",
         b"tot_achd_66":
-            b"???",
-            # Placeholder;
-            # b"Spend exactly 417 coins in a\n"
-            # b"single tower run.",
+            b"Spend exactly 417 coins in a\n"
+            b"single tower run.",
         b"tot_achd_67":
-            b"???", 
-            # Placeholder;
-            # "Deal 1,000 or more damage with\n"
-            # b"Infatuated foes in a default run.",
+            b"Deal 1,000 or more damage with\n"
+            b"Infatuated foes in a default run.",
         b"tot_achd_68":
-            b"???", 
-            # Placeholder;
-            # b"Finish a run with all of Mario's\n"
-            # b"stats at a maximum of 1.\n"
-            # b"Settings must be default, aside\n"
-            # b"from setting HP/FP/BP to 0.",
+            b"Finish a run with all of Mario's\n"
+            b"stats at a maximum of 1.\n"
+            b"Settings must be default, aside\n"
+            b"from setting HP/FP/BP to 0.",
         b"tot_achd_69":
-            b"???", 
-            # Placeholder;
-            # b"Take exactly 654 total damage\n"
-            # b"in a single tower run.",
+            b"Take exactly 654 total damage\n"
+            b"in a single tower run.",
         
         # Achievement menu option names.
         
@@ -2098,14 +2089,14 @@ g_StringMap = {
         b"tot_acho_acdiff":         b"AC Difficulty",
         b"tot_acho_superguardcost": b"Superguard Cost",
         b"tot_acho_audiencethrow":  b"Audience Throws",
-        b"tot_acho_infinitebp":     b"Infinite BP",
         b"tot_acho_randomdamage":   b"Damage Variance",
         b"tot_acho_revive":         b"Partner Revival",
         b"tot_acho_bandit":         b"Bandit Escape",
         b"tot_acho_invincrease":    b"S. Sack Size",
-        b"tot_acho_customloadout":  b"Custom Loadouts",
         b"tot_acho_obfuscated":     b"Obfuscated Items",
-        b"tot_acho_secretboss":     b"???",  # Placeholder; b"Gold Fuzzy Boss",
+        b"tot_acho_secretboss":     b"Secret Boss",
+        b"tot_acho_infinitebp":     b"BP: Infinite",
+        b"tot_acho_customloadout":  b"Items: Custom",
         
         b"tot_ach_usehammer":
             b"Use a Hammer to unlock an\n"
@@ -2143,7 +2134,7 @@ g_StringMap = {
         b'btl_hlp_iron_sinemon':
             b"That's an Iron Cleft.\n"
             b'<wait 250>\n'
-            b'These guys are so tough,<wait 50> that\n'
+            b'These guys are so tough,<wait 50>\n'
             b'any hit only leaves a scratch!\n<k>\n<p>\n',
         
         # TODO: Menu Tattles for all enemies. - b"menu_enemy_001", etc.

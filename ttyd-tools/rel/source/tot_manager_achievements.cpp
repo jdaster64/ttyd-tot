@@ -30,16 +30,16 @@ const AchievementData g_AchievementData[] = {
     { "tot_achd_05", nullptr, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_SUPER_PEEKABOO },
     { "tot_achd_06", "tot_acho_superguardcost", AchievementRewardType::OPTION, OPTNUM_SUPERGUARD_SP_COST },
     { "tot_achd_07", nullptr, AchievementRewardType::ATTACK_FX, 10 },
-    { "tot_achd_08", nullptr, AchievementRewardType::MARIO_COSTUME, 12 },
+    { "tot_achd_08", nullptr, AchievementRewardType::MARIO_COSTUME, 19 },
     { "tot_achd_09", nullptr, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_PEEKABOO },
     { "tot_achd_10", nullptr, AchievementRewardType::ATTACK_FX, 9 },
     { "tot_achd_11", nullptr, AchievementRewardType::ATTACK_FX, 14 },
     { "tot_achd_12", nullptr, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_BGM_TOGGLE },
     { "tot_achd_13", nullptr, AchievementRewardType::YOSHI_COSTUME, 7 },
     { "tot_achd_14", nullptr, AchievementRewardType::YOSHI_COSTUME, 6 },
-    { "tot_achd_15", nullptr, AchievementRewardType::MARIO_COSTUME, 14 },
+    { "tot_achd_15", nullptr, AchievementRewardType::MARIO_COSTUME, 12 },
     { "tot_achd_16", nullptr, AchievementRewardType::MARIO_COSTUME, 13 },
-    { "tot_achd_17", nullptr, AchievementRewardType::MARIO_COSTUME, 19 },
+    { "tot_achd_17", nullptr, AchievementRewardType::MARIO_COSTUME, 14 },
     { "tot_achd_18", nullptr, AchievementRewardType::HAMMER, 0 },
     { "tot_achd_19", nullptr, AchievementRewardType::ATTACK_FX, 11 },
     { "tot_achd_20", nullptr, AchievementRewardType::MARIO_COSTUME, 11 },
@@ -130,7 +130,8 @@ bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
             return g_Mod->state_.GetOption(FLAGS_OPTION_UNLOCKED, i);
         }
     }
-    return false;
+    // No achievement has the option tied to it, so always return true.
+    return true;
 }
 
 void AchievementsManager::MarkCompleted(int32_t ach) {
