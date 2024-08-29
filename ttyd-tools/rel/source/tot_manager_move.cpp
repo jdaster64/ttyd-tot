@@ -402,6 +402,12 @@ const char* MoveManager::GetLogDescription(int32_t move_type) {
     return buf;
 }
 
+bool MoveManager::PartnerNeverObtained(int32_t move_type) {
+    if (move_type < MoveType::GOOMBELLA_BASE) return false;
+    int32_t partner_flag = 1 << ((move_type - MoveType::GOOMBELLA_BASE) / 6 + 1);
+    return !(g_Mod->state_.GetOption(STAT_PERM_PARTNERS_OBTAINED) & partner_flag);
+}
+
 uint32_t GetWeaponPowerFromSelectedLevel(
     BattleWorkUnit* unit1, BattleWeapon* weapon, BattleWorkUnit* unit2,
     BattleWorkUnitPart* part) {

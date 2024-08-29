@@ -628,6 +628,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = MARIO_MODEL_PATHS("T", true),
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 21,
+        .secret = true,
         .group_id = 22,
     },
     {
@@ -637,6 +638,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = MARIO_MODEL_PATHS("U", true),
         .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 22,
+        .secret = true,
         .group_id = 23,
     },
     {
@@ -664,6 +666,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = MARIO_MODEL_PATHS("Z", true),
         .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 25,
+        .secret = true,
         .group_id = 26,
     },
 };
@@ -871,6 +874,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .price = 10,
         .icon = IconType::YOSHI_EXTRA_ICONS + 10,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 10,
+        .secret = true,
         .group_id = 18,
     },
     {

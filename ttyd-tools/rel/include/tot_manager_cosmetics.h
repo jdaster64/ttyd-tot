@@ -25,7 +25,8 @@ struct AttackFxData {
     int8_t randomize_pitch;
     int16_t price = 5;
     int16_t icon;
-    int16_t group_id;
+    int8_t secret = false;
+    int8_t group_id;
 };
 
 struct MarioCostumeData {
@@ -34,7 +35,8 @@ struct MarioCostumeData {
     const char* models[4];
     int16_t price = 5;
     int16_t icon;
-    int32_t group_id;
+    int16_t secret = false;
+    int16_t group_id;
 };
 
 struct YoshiCostumeData {
@@ -44,7 +46,8 @@ struct YoshiCostumeData {
     int16_t price = 5;
     int16_t icon;
     int16_t icon_hud;
-    int16_t group_id;
+    int8_t secret = false;
+    int8_t group_id;
 };
     
 class CosmeticsManager {

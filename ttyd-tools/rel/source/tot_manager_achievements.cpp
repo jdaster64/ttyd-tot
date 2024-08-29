@@ -358,11 +358,6 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
     }
 }
 
-bool AchievementsManager::GetProgress(int32_t ach, int32_t* done, int32_t* total) {
-    // TODO: Implement.
-    return false;
-}
-
 EVT_DEFINE_USER_FUNC(evtTot_MarkCompletedAchievement) {
     int32_t ach = evtGetValue(evt, evt->evtArguments[0]);
     AchievementsManager::MarkCompleted(ach);

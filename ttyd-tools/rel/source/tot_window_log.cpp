@@ -7,6 +7,7 @@
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_manager_progress.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -75,13 +76,13 @@ enum RecordLogOptions {
     REC_ITEM_PCT,
     REC_BADGE_PCT,
     REC_MOVE_PCT,
+    REC_MOVE_CMP_PCT,
     REC_TATTLE_PCT,
     REC_ACHIEVEMENT_PCT,
     REC_HUB_PROGRESS_PCT,
     REC_HUB_ITEMS,
     REC_HUB_BADGES,
     REC_HUB_KEY_ITEMS,
-    REC_HUB_OPTIONS,
     REC_HUB_MARIO_SKINS,
     REC_HUB_YOSHI_SKINS,
     REC_HUB_ATTACK_FX,
@@ -94,19 +95,19 @@ struct RecordLogEntry {
 };
 const RecordLogEntry kRecordLogEntries[] = {
     { REC_EMPTY, "tot_recn_overall", "tot_rech_progression" },
-    { REC_PLAY_TIME, "tot_recn_playtime", "tot_rech_progression" },
     { REC_COMPLETION_PCT, "tot_recn_completion_pct", "tot_rech_progression" },
     { REC_ACHIEVEMENT_PCT, "tot_recn_achievement_pct", "tot_rech_progression" },
     { REC_ITEM_PCT, "tot_recn_item_pct", "tot_rech_progression" },
     { REC_BADGE_PCT, "tot_recn_badge_pct", "tot_rech_progression" },
-    { REC_MOVE_PCT, "tot_recn_move_pct", "tot_rech_progression" },
     { REC_TATTLE_PCT, "tot_recn_tattle_pct", "tot_rech_progression" },
-    { REC_HUB_PROGRESS_PCT, "tot_recn_hub_pct", "tot_rech_hub_pct" },
+    { REC_MOVE_PCT, "tot_recn_move_pct", "tot_rech_progression" },
+    { REC_MOVE_CMP_PCT, "tot_recn_move_cmp_pct", "tot_rech_progression" },
+    { REC_PLAY_TIME, "tot_recn_playtime", "tot_rech_progression" },
     { REC_EMPTY, "tot_recn_hub", "tot_rech_hub_pct" },
+    { REC_HUB_PROGRESS_PCT, "tot_recn_hub_pct", "tot_rech_hub_pct" },
+    { REC_HUB_KEY_ITEMS, "tot_recn_hub_keyitems", "tot_rech_hub_pct" },
     { REC_HUB_ITEMS, "tot_recn_hub_items", "tot_rech_hub_pct" },
     { REC_HUB_BADGES, "tot_recn_hub_badges", "tot_rech_hub_pct" },
-    { REC_HUB_KEY_ITEMS, "tot_recn_hub_keyitems", "tot_rech_hub_pct" },
-    { REC_HUB_OPTIONS, "tot_recn_hub_options", "tot_rech_hub_pct" },
     { REC_HUB_MARIO_SKINS, "tot_recn_hub_marioskins", "tot_rech_hub_pct" },
     { REC_HUB_YOSHI_SKINS, "tot_recn_hub_yoshiskins", "tot_rech_hub_pct" },
     { REC_HUB_ATTACK_FX, "tot_recn_hub_attackfx", "tot_rech_hub_pct" },
@@ -811,6 +812,29 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                 record.option == REC_EMPTY ? 0x403030FFU : 0x000000FFU;
             const char* name =
                 record.name_msg ? msgSearch(record.name_msg) : "";
+
+            // Hide cosmetics' descriptions until purchasing one of each's type.
+            switch (record.option) {
+                case REC_HUB_ATTACK_FX: {
+                    int32_t cur, tot;
+                    ProgressManager::GetHubAttackFXProgress(&cur, &tot);
+                    if (cur < 1) name = "???";
+                    break;
+                }
+                case REC_HUB_MARIO_SKINS: {
+                    int32_t cur, tot;
+                    ProgressManager::GetHubMarioCostumeProgress(&cur, &tot);
+                    if (cur < 1) name = "???";
+                    break;
+                }
+                case REC_HUB_YOSHI_SKINS: {
+                    int32_t cur, tot;
+                    ProgressManager::GetHubYoshiCostumeProgress(&cur, &tot);
+                    if (cur < 1) name = "???";
+                    break;
+                }
+            }
+
             ttyd::win_main::winFontSet(&position, &scale, &color, name);
         }
 
@@ -829,74 +853,105 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     break;
                 }
                 case REC_COMPLETION_PCT: {
-                    sprintf(ptr, "???");
+                    sprintf(
+                        ptr, "%.1f%%", 
+                        ProgressManager::GetOverallProgression() * 0.01f);
                     break;
                 }
                 case REC_ACHIEVEMENT_PCT: {
-                    sprintf(
-                        ptr, "%" PRId32 " / %" PRId32,
-                        menu->achievement_log_completed_count,
-                        menu->achievement_log_total_count);
+                    int32_t cur, tot;
+                    ProgressManager::GetAchievementLogProgress(&cur, &tot);
+                    sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
                     break;
                 }
                 case REC_ITEM_PCT: {
-                    sprintf(
-                        ptr, "%" PRId32 " / %" PRId32,
-                        menu->recipe_log_obtained_count,
-                        menu->recipe_log_total_count);
+                    int32_t cur, tot;
+                    ProgressManager::GetItemLogProgress(&cur, &tot);
+                    sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
                     break;
                 }
                 case REC_BADGE_PCT: {
-                    sprintf(
-                        ptr, "%" PRId32 " / %" PRId32,
-                        menu->badge_log_obtained_count,
-                        menu->badge_log_total_count);
+                    int32_t cur, tot;
+                    ProgressManager::GetBadgeLogProgress(&cur, &tot);
+                    sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
                     break;
                 }
                 case REC_MOVE_PCT: {
+                    // Show number of moves obtained out of the total.
+                    int32_t obt, tot;
+                    ProgressManager::GetMoveLogProgress(&obt, nullptr, &tot);
                     sprintf(
-                        ptr, "%" PRId32 " / %" PRId32,
-                        menu->move_log_completed_count,
-                        MoveType::MOVE_TYPE_MAX);
+                        ptr, "%" PRId32 " / %" PRId32, obt, tot);
+                    break;
+                }
+                case REC_MOVE_CMP_PCT: {
+                    // Show number of moves completed out of the total.
+                    int32_t com, tot;
+                    int32_t score =
+                        ProgressManager::GetMoveLogProgress(nullptr, &com, &tot);
+                    sprintf(
+                        ptr, "%" PRId32 " / %" PRId32 " (%.1f%%)", 
+                        com, tot, score * 0.01f);
                     break;
                 }
                 case REC_TATTLE_PCT: {
-                    sprintf(
-                        ptr, "%" PRId32 " / %" PRId32,
-                        menu->tattle_log_obtained_count,
-                        menu->tattle_log_total_count);
+                    int32_t cur, tot;
+                    ProgressManager::GetTattleLogProgress(&cur, &tot);
+                    sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
                     break;
                 }
                 case REC_HUB_PROGRESS_PCT: {
-                    sprintf(ptr, "???");
-                    break;
-                }
-                case REC_HUB_ITEMS: {
-                    sprintf(ptr, "???");
-                    break;
-                }
-                case REC_HUB_BADGES: {
-                    sprintf(ptr, "???");
+                    sprintf(
+                        ptr, "%.1f%%", 
+                        ProgressManager::GetOverallHubProgression() * 0.01f);
                     break;
                 }
                 case REC_HUB_KEY_ITEMS: {
-                    sprintf(ptr, "???");
+                    int32_t cur, tot;
+                    ProgressManager::GetKeyItemProgress(&cur, &tot);
+                    sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
                     break;
                 }
-                case REC_HUB_OPTIONS: {
-                    sprintf(ptr, "???");
+                case REC_HUB_ITEMS: {
+                    int32_t cur, tot;
+                    ProgressManager::GetHubItemProgress(&cur, &tot);
+                    sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
                     break;
                 }
-                case REC_HUB_MARIO_SKINS: {
-                    sprintf(ptr, "???");
-                    break;
-                }
-                case REC_HUB_YOSHI_SKINS: {
-                    sprintf(ptr, "???");
+                case REC_HUB_BADGES: {
+                    int32_t cur, tot;
+                    ProgressManager::GetHubBadgeProgress(&cur, &tot);
+                    sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
                     break;
                 }
                 case REC_HUB_ATTACK_FX: {
-                    sprintf(ptr, "???");
+                    int32_t cur, tot;
+                    ProgressManager::GetHubAttackFXProgress(&cur, &tot);
+                    if (cur > 0) {
+                        sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
+                    } else {
+                        sprintf(ptr, "???");
+                    }
+                    break;
+                }
+                case REC_HUB_MARIO_SKINS: {
+                    int32_t cur, tot;
+                    ProgressManager::GetHubMarioCostumeProgress(&cur, &tot);
+                    if (cur > 0) {
+                        sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
+                    } else {
+                        sprintf(ptr, "???");
+                    }
+                    break;
+                }
+                case REC_HUB_YOSHI_SKINS: {
+                    int32_t cur, tot;
+                    ProgressManager::GetHubYoshiCostumeProgress(&cur, &tot);
+                    if (cur > 0) {
+                        sprintf(ptr, "%" PRId32 " / %" PRId32, cur, tot);
+                    } else {
+                        sprintf(ptr, "???");
+                    }
                     break;
                 }
                 case STAT_PERM_HALF_FINISHES: {
@@ -1010,6 +1065,8 @@ void ReplaceLogSortMethods() {
 }
 
 void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
+    ProgressManager::RefreshCache();
+
     menu->log_menu_state = 0;
     menu->log_submenu_cursor_idx = 0;
     menu->log_submenu_count = 6;
@@ -1085,19 +1142,18 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     menu->recipe_log_showcased_y = -300.0f;
     menu->recipe_log_showcased_target_y = -300.0f;
   
-    menu->tattle_log_total_count = 0;
-    menu->tattle_log_obtained_count = 0;
+    ProgressManager::GetTattleLogProgress(
+        &menu->tattle_log_obtained_count, &menu->tattle_log_total_count);
+
+    int32_t num_tattles = 0;
     for (int32_t i = 1; i < 0xd8; ++i) {
-        auto* monosiri = ttyd::battle_monosiri::battleGetUnitMonosiriPtr(i);
-        if (monosiri->menu_tattle && tot::GetCustomTattleIndex(i) >= 0) {
-            menu->tattle_logs[menu->tattle_log_total_count].order = 
+        int32_t custom_tattle_idx = tot::GetCustomTattleIndex(i);
+        if (custom_tattle_idx >= 0 &&
+            custom_tattle_idx <= menu->tattle_log_total_count) {
+            menu->tattle_logs[num_tattles].order = 
                 ttyd::win_root::enemy_monoshiri_sort_table[i];
-            menu->tattle_logs[menu->tattle_log_total_count].id = i;
-            
-            // TODO: Restrict the total count to lower numbers based on which
-            // Pits have been cleared / whether Gold Fuzzy has been encountered.
-            ++menu->tattle_log_total_count;
-            menu->tattle_log_obtained_count += ttyd::swdrv::swGet(i + 0x117a);
+            menu->tattle_logs[num_tattles].id = i;
+            ++num_tattles;
         }
     }
     // Bubble sort tattle log entries by type-sort order.
@@ -1117,30 +1173,8 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     menu->tattle_log_page_num = 0;
 
     menu->move_log_cursor_idx = 0;
-    menu->move_log_obtained_count = 0;
-    menu->move_log_completed_count = 0;
-    for (int32_t move = 0; move < MoveType::MOVE_TYPE_MAX; ++move) {
-        uint32_t move_flags = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, move);
-        const auto* move_data = MoveManager::GetMoveData(move);
-        if (move_flags & MoveLogFlags::UNLOCKED_LV_1)
-            ++menu->move_log_obtained_count;
-
-        // Check for whether the move has been unlocked (implicitly) and used
-        // at every level, and had its Stylish commands performed, if any.
-        bool completed = true;
-        if (!(move_flags & MoveLogFlags::USED_LV_1))
-            completed = false;
-        if (move_data->max_level >= 2 && !(move_flags & MoveLogFlags::USED_LV_2))
-            completed = false;
-        if (move_data->max_level >= 3 && !(move_flags & MoveLogFlags::USED_LV_3))
-            completed = false;
-        if ((move < MoveType::SP_SWEET_TREAT || move > MoveType::SP_SUPERNOVA)
-            && move != MoveType::GOOMBELLA_RALLY_WINK
-            && (move_flags & MoveLogFlags::STYLISH_ALL) != MoveLogFlags::STYLISH_ALL)
-            completed = false;
-
-        if (completed) ++menu->move_log_completed_count;
-    }
+    ProgressManager::GetMoveLogProgress(
+        &menu->move_log_obtained_count, &menu->move_log_completed_count, nullptr);
 
     menu->achievement_log_cursor_idx = 33;
     menu->achievement_log_completed_count = 0;

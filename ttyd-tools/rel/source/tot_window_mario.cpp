@@ -5,6 +5,7 @@
 #include "mod.h"
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_manager_progress.h"
 #include "tot_state.h"
 
 #include <gc/mtx.h>
@@ -67,6 +68,8 @@ void MarioMenuInit(WinPauseMenu* menu) {
     
     menu->mario_move_menu_opened = 0;
     menu->mario_move_cursor_idx = 0;
+
+    ProgressManager::RefreshCache();
 }
 
 void MarioMenuInit2(WinPauseMenu* menu) {
@@ -530,8 +533,6 @@ void MarioMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
     }
     
     // Bottom-right stats section.
-    // TODO: Replace Star Points with completion percentage.
-    // TODO: Remove Shine Sprites when not in the middle of a run?
     
     winKirinukiGX(win_x + 10.0f, win_y + 30.0f, 260.0f, 150.0f, menu, 0);
     
@@ -539,7 +540,7 @@ void MarioMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
     for (int32_t i = 0; i < 5; ++i) {
         int32_t icons[] = {
             IconType::COIN, IconType::STAR_PIECE, IconType::SHINE_SPRITE, 
-            IconType::STAR_POINT, IconType::PLAY_TIME_ICON
+            IconType::GOLDBOB_GUIDE, IconType::PLAY_TIME_ICON
         };
         gc::vec3 position = { win_x + 30.0f, win_y + 10.0f - 28.0f * i, 0.0f };
         gc::vec3 scale = { 0.62f, 0.62f, 0.62f };
@@ -558,19 +559,27 @@ void MarioMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
         gc::vec3 position = { win_x + 45.0f, win_y + 22.0f - 28.0f * i, 0.0f };
         gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
         ttyd::win_main::winFontSetWidth(
-            &position, &scale, &kBlack, 140.0f, msgSearch(text[i]));
+            &position, &scale, &kBlack, 125.0f, msgSearch(text[i]));
     }
     
-    const int32_t stat_amounts[4] = {
+    const int32_t stat_amounts[3] = {
         pouch->coins,
         pouch->star_pieces,
-        pouch->shine_sprites,
-        pouch->star_points
+        pouch->shine_sprites
     };
-    for (int32_t i = 0; i < 4; ++i) {
-        gc::vec3 position = { win_x + 215.0f, win_y + 22.0f - 28.0f * i, 0.0f };
+    for (int32_t i = 0; i < 3; ++i) {
+        gc::vec3 position = { win_x + 220.0f, win_y + 22.0f - 28.0f * i, 0.0f };
         gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-        ttyd::win_main::winFontSetR(&position, &scale, &kBlack, "%d", stat_amounts[i]);
+        ttyd::win_main::winFontSetR(
+            &position, &scale, &kBlack, "%d", stat_amounts[i]);
+    }
+
+    {
+        gc::vec3 position = { win_x + 220.0f, win_y + 22.0f - 28.0f * 3, 0.0f };
+        gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+        ttyd::win_main::winFontSetR(
+            &position, &scale, &kBlack, "%.1f%%", 
+            ProgressManager::GetOverallProgression() * 0.01f);
     }
     
     int32_t h, m, s, cs;
@@ -582,26 +591,16 @@ void MarioMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
         m = 59;
     }
     {
-        gc::vec3 position = { win_x + 168.0f, win_y + 22.0f - 112.0f, 0.0f };
+        gc::vec3 position = { win_x + 220.0f, win_y + 22.0f - 112.0f, 0.0f };
         gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-        ttyd::win_main::winFontSetR(&position, &scale, &kBlack, "%02d", h);
-    }
-    {
-        gc::vec3 position = { win_x + 215.0f, win_y + 22.0f - 112.0f, 0.0f };
-        gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
-        ttyd::win_main::winFontSetR(&position, &scale, &kBlack, "%02d", m);
+        ttyd::win_main::winFontSetR(&position, &scale, &kBlack, "%02d:%02d", h, m);
     }
     
     ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
-    for (int32_t i = 0; i < 4; ++i) {
+    for (int32_t i = 0; i < 3; ++i) {
         gc::vec3 position = { win_x + 180.0f, win_y + 10.0f - 28.0f * i, 0.0f };
         gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
         ttyd::win_main::winTexSet(0x11, &position, &scale, &kWhite);
-    }
-    {
-        gc::vec3 position = { win_x + 220.0f, win_y + 10.0f - 112.0f, 0.0f };
-        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
-        ttyd::win_main::winTexSet(0x12, &position, &scale, &kWhite);
     }
     
     // Mario animation.

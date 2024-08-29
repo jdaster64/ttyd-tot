@@ -181,6 +181,8 @@ public:
     static void LogMoveStylish(int32_t move_type, uint32_t stylish_flags = 0);
     // Returns the description of a move in the Move Log, including level info.
     static const char* GetLogDescription(int32_t move_type);
+    // Returns true if the partner for the given move has never been unlocked.
+    static bool PartnerNeverObtained(int32_t move_type);
 };
 
 // battle_weapon_power-like interface for scaling ATK based on a move.

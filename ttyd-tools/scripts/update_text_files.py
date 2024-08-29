@@ -1252,7 +1252,7 @@ g_StringMap = {
         # Mario menu.
 
         b'msg_menu_mario_num_sp':
-            b'Floors',
+            b'Completion',
 
         b'msg_menu_star_power':
             b'The maximum Star Power Mario\n'
@@ -1809,20 +1809,21 @@ g_StringMap = {
         b"tot_recn_overall":            b"Completion",
         b"tot_recn_playtime":           b"Total Play Time",
         b"tot_recn_completion_pct":     b"Completion %",
+        b"tot_recn_achievement_pct":    b"Achievement Log",
         b"tot_recn_item_pct":           b"Items Log",
         b"tot_recn_badge_pct":          b"Badge Log",
-        b"tot_recn_move_pct":           b"Moves Log",
         b"tot_recn_tattle_pct":         b"Tattle Log",
-        b"tot_recn_achievement_pct":    b"Achievement Log",
-        b"tot_recn_hub_pct":            b"Hub Progression",
+        b"tot_recn_move_pct":           b"Moves Obtained",
+        b"tot_recn_move_cmp_pct":       b"Move Completion",
         b"tot_recn_hub":                b"Hub Progression",
+        b"tot_recn_hub_pct":            b"Completion %",
+        b"tot_recn_hub_keyitems":       b"Key Items",
         b"tot_recn_hub_items":          b"Items Bought",
         b"tot_recn_hub_badges":         b"Badges Bought",
-        b"tot_recn_hub_keyitems":       b"Key Items Bought",
         b"tot_recn_hub_options":        b"Options Bought",
-        b"tot_recn_hub_marioskins":     b"???",
-        b"tot_recn_hub_yoshiskins":     b"???",
-        b"tot_recn_hub_attackfx":       b"???",
+        b"tot_recn_hub_marioskins":     b"Mario Costumes",
+        b"tot_recn_hub_yoshiskins":     b"Yoshi Colors",
+        b"tot_recn_hub_attackfx":       b"Attack FX",
         b"tot_recn_runs":               b"Run Completions",
         b"tot_recn_half_wins":          b"Half Length",
         b"tot_recn_full_wins":          b"Full Length",
@@ -2138,6 +2139,9 @@ g_StringMap = {
             b'any hit only leaves a scratch!\n<k>\n<p>\n',
         
         # TODO: Menu Tattles for all enemies. - b"menu_enemy_001", etc.
+        
+        b'menu_enemy_400':
+            b"[Placeholder] Fuzzy Horde",
         
         # Cosmetic names and descriptions.
         
