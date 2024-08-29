@@ -516,9 +516,8 @@ enum Options : uint32_t {
     STAT_PERM_NPC_ZESS_COOKS    = 0x28d'3'01'07,
     STAT_PERM_NPC_DEALS_TOTAL   = 0x290'3'01'07,
     STAT_PERM_ACH_HAMMERS       = 0x293'1'01'01,
-    // TODO: Increase cap to 9,999 for coins (and maybe SP) in hub.
-    STAT_PERM_CURRENT_COINS     = 0x294'2'01'03,
-    STAT_PERM_CURRENT_SP        = 0x296'2'01'03,
+    STAT_PERM_CURRENT_COINS     = 0x294'2'01'04,
+    STAT_PERM_CURRENT_SP        = 0x296'2'01'04,
     STAT_PERM_SHOP_ITEMS        = 0x298'1'00'05,
     STAT_PERM_ITEM_LOADOUT      = 0x29d'1'00'06,
     STAT_PERM_ITEM_LOAD_SIZE    = 0x2a3'1'01'01,
