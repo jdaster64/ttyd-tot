@@ -15,7 +15,7 @@ namespace AchievementId {
         AGG_NPC_DEALS_10,
         AGG_ALL_PARTNERS,
         AGG_USE_LV_3_MOVES_10,
-        AGG_MIDBOSS_TYPES_50,
+        AGG_MIDBOSS_TYPES_40,
         AGG_SUPERGUARD_100,
         AGG_COINS_10000,
         AGG_DAMAGE_50000,

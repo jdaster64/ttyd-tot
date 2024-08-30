@@ -170,6 +170,9 @@ bool FreshFileInit() {
     g_Mod->state_.Init();
     tot::OptionsManager::InitLobby();
 
+    // Turn background music on, by default.
+    tot::SetSWF(tot::GSWF_BgmEnabled);
+
     return true;
 }
 

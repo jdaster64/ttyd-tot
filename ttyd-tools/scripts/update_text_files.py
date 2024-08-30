@@ -1271,8 +1271,8 @@ g_StringMap = {
             b'collected.',
 
         b'msg_menu_mario_star_p':
-            b'How many floors Mario has\n'
-            b'ascended on this run.',
+            b'Total progress on achievements,\n'
+            b'Journal logs, and shop purchases.',
             
         # Item loadout selection menu.
         
@@ -1926,7 +1926,7 @@ g_StringMap = {
         b"tot_achd_04":
             b"Use 10 different Lvl. 3 moves.",
         b"tot_achd_05":
-            b"Defeat 50 different types of\n"
+            b"Defeat 40 different types of\n"
             b"midbosses.",
         b"tot_achd_06":
             b"Superguard 100 attacks in total.",
