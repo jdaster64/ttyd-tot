@@ -137,7 +137,7 @@ void OptionsManager::InitLobby() {
 void OptionsManager::InitFromSelectedOptions() {
     auto& state = g_Mod->state_;
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-    if (state.seed_ == 0) state.PickRandomSeed();
+    if (state.seed_ == 0) state.SelectRandomSeed();
 
     // Make levels for disabled / infinite stats 0 / 99 respectively.
     if (state.GetOption(OPT_MARIO_HP) == 0) state.hp_level_ = 0;

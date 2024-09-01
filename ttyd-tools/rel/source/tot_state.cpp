@@ -256,157 +256,6 @@ TotSaveSlot* StateManager::GetBackupSave() const {
     return &g_BackupSave;
 }
 
-void StateManager::PickRandomSeed() {
-    uint64_t time = gc::OSTime::OSGetTime();
-    seed_ = third_party::fasthash64(&time, sizeof(time), 417) % 999'999'999 + 1;
-}
-
-void StateManager::InitDefaultOptions() {
-    // Pick a random seed, and reset all RNG states to the start.
-    PickRandomSeed();
-    for (int32_t i = 0; i < RNG_SEQUENCE_MAX; ++i) rng_states_[i] = 0;
-    
-    // Set floor to 0 (starting floor that only gives a partner).
-    floor_ = 0;
-    // Set stat upgrades to base # of levels.
-    hp_level_ = 2;
-    hp_p_level_ = 2;
-    fp_level_ = 1;
-    bp_level_ = 1;
-    max_inventory_ = 6;
-    
-    // Don't clear internal options.
-    memset(option_flags_, 0, sizeof(uint32_t) * 6);
-    memset(option_bytes_, 0, sizeof(option_bytes_));
-    // Only reset per-run play stats.
-    memset(play_stats_, 0, 0x100);
-
-    // Set non-zero default values to their default values.
-    SetOption(OPTVAL_PRESET_DEFAULT);
-    SetOption(OPTVAL_DIFFICULTY_FULL);
-    SetOption(OPTVAL_STARTER_ITEMS_BASIC);
-    SetOption(OPTVAL_REVIVE_PARTNERS_ON);
-    SetOption(OPTVAL_AC_DEFAULT);
-    SetOption(OPT_NPC_CHOICE_1, gon::GetNumSecondaryNpcTypes());
-    SetOption(OPT_NPC_CHOICE_2, gon::GetNumSecondaryNpcTypes());
-    SetOption(OPT_NPC_CHOICE_3, gon::GetNumSecondaryNpcTypes());
-    SetOption(OPT_NPC_CHOICE_4, gon::GetNumSecondaryNpcTypes());
-    SetOption(OPT_MARIO_HP, 5);
-    SetOption(OPT_MARIO_FP, 5);
-    SetOption(OPT_MARIO_BP, 5);
-    SetOption(OPT_PARTNER_HP, 5);
-    SetOption(OPT_INVENTORY_SACK_SIZE, 2);
-    SetOption(OPTNUM_ENEMY_HP, 100);
-    SetOption(OPTNUM_ENEMY_ATK, 100);
-    SetOption(OPT_MAX_PARTNERS, 4);
-    
-    g_HasBackupSave = false;
-}
-
-void StateManager::ApplyPresetOptions() {
-    switch (GetOptionValue(OPT_PRESET)) {
-        case OPTVAL_PRESET_DEFAULT: {
-            // Preserve preset, timer and difficulty settings, overwrite others.
-            uint32_t difficulty_option = GetOptionValue(OPT_DIFFICULTY);
-            uint32_t timer_option = GetOptionValue(OPT_TIMER_DISPLAY);
-
-            memset(option_flags_, 0, sizeof(uint32_t) * 6);
-            memset(option_bytes_, 0, sizeof(option_bytes_));
-
-            SetOption(OPTVAL_PRESET_DEFAULT);
-            SetOption(difficulty_option);
-            SetOption(timer_option);
-
-            // Set non-zero default values to their default values.
-            SetOption(OPTVAL_STARTER_ITEMS_BASIC);
-            SetOption(OPTVAL_REVIVE_PARTNERS_ON);
-            SetOption(OPTVAL_AC_DEFAULT);
-            SetOption(OPT_NPC_CHOICE_1, gon::GetNumSecondaryNpcTypes());
-            SetOption(OPT_NPC_CHOICE_2, gon::GetNumSecondaryNpcTypes());
-            SetOption(OPT_NPC_CHOICE_3, gon::GetNumSecondaryNpcTypes());
-            SetOption(OPT_NPC_CHOICE_4, gon::GetNumSecondaryNpcTypes());
-            SetOption(OPT_MARIO_HP, 5);
-            SetOption(OPT_MARIO_FP, 5);
-            SetOption(OPT_MARIO_BP, 5);
-            SetOption(OPT_PARTNER_HP, 5);
-            SetOption(OPT_INVENTORY_SACK_SIZE, 2);
-            SetOption(OPTNUM_ENEMY_HP, 100);
-            SetOption(OPTNUM_ENEMY_ATK, 100);
-            if (CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
-                SetOption(OPT_MAX_PARTNERS, 3);
-            } else {
-                SetOption(OPT_MAX_PARTNERS, 4);
-            }
-
-            break;
-        }
-    }
-}
-
-bool StateManager::VerifyDefaultsExceptEnemyScaling() {
-    if (CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
-        GetOption(OPT_MAX_PARTNERS) != 3) return false;
-    if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
-        GetOption(OPT_MAX_PARTNERS) != 4) return false;
-    if (!CheckOptionValue(OPTVAL_CHESTS_DEFAULT)) return false;
-    if (!CheckOptionValue(OPTVAL_PARTNER_RANDOM)) return false;
-    if (!CheckOptionValue(OPTVAL_DROP_STANDARD)) return false;
-    if (!CheckOptionValue(OPTVAL_STARTER_ITEMS_BASIC)) return false;
-    if (!CheckOptionValue(OPTVAL_REVIVE_PARTNERS_ON)) return false;
-    if (!CheckOptionValue(OPTVAL_BANDIT_NO_REFIGHT)) return false;
-    if (!CheckOptionValue(OPTVAL_AC_DEFAULT)) return false;
-    if (!CheckOptionValue(OPTVAL_AUDIENCE_THROWS_OFF)) return false;
-    if (!CheckOptionValue(OPTVAL_RANDOM_DAMAGE_NONE)) return false;
-    if (!CheckOptionValue(OPTVAL_OBFUSCATE_ITEMS_OFF)) return false;
-    if (!CheckOptionValue(OPTVAL_SECRET_BOSS_RANDOM)) return false;
-    if (!CheckOptionValue(OPTVAL_CHARLIETON_NORMAL)) return false;
-    if (GetOption(OPT_NPC_CHOICE_1) != gon::GetNumSecondaryNpcTypes()) return false;
-    if (GetOption(OPT_NPC_CHOICE_2) != gon::GetNumSecondaryNpcTypes()) return false;
-    if (GetOption(OPT_NPC_CHOICE_3) != gon::GetNumSecondaryNpcTypes()) return false;
-    if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
-        GetOption(OPT_NPC_CHOICE_4) != gon::GetNumSecondaryNpcTypes()) return false;
-    if (GetOption(OPTNUM_SUPERGUARD_SP_COST) != 0) return false;
-    if (GetOption(OPT_INVENTORY_SACK_SIZE) != 2) return false;
-    if (GetOption(OPT_MARIO_HP) != 5) return false;
-    if (GetOption(OPT_MARIO_FP) != 5) return false;
-    if (GetOption(OPT_MARIO_BP) != 5) return false;
-    if (GetOption(OPT_PARTNER_HP) != 5) return false;
-
-    return true;
-}
-
-bool StateManager::VerifyDefaultsExceptMarioScaling() {
-    if (CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
-        GetOption(OPT_MAX_PARTNERS) != 3) return false;
-    if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
-        GetOption(OPT_MAX_PARTNERS) != 4) return false;
-    if (!CheckOptionValue(OPTVAL_CHESTS_DEFAULT)) return false;
-    if (!CheckOptionValue(OPTVAL_PARTNER_RANDOM)) return false;
-    if (!CheckOptionValue(OPTVAL_DROP_STANDARD)) return false;
-    if (!CheckOptionValue(OPTVAL_STARTER_ITEMS_BASIC)) return false;
-    if (!CheckOptionValue(OPTVAL_REVIVE_PARTNERS_ON)) return false;
-    if (!CheckOptionValue(OPTVAL_BANDIT_NO_REFIGHT)) return false;
-    if (!CheckOptionValue(OPTVAL_AC_DEFAULT)) return false;
-    if (!CheckOptionValue(OPTVAL_AUDIENCE_THROWS_OFF)) return false;
-    if (!CheckOptionValue(OPTVAL_RANDOM_DAMAGE_NONE)) return false;
-    if (!CheckOptionValue(OPTVAL_OBFUSCATE_ITEMS_OFF)) return false;
-    if (!CheckOptionValue(OPTVAL_SECRET_BOSS_RANDOM)) return false;
-    if (!CheckOptionValue(OPTVAL_CHARLIETON_NORMAL)) return false;
-    if (GetOption(OPT_NPC_CHOICE_1) != gon::GetNumSecondaryNpcTypes()) return false;
-    if (GetOption(OPT_NPC_CHOICE_2) != gon::GetNumSecondaryNpcTypes()) return false;
-    if (GetOption(OPT_NPC_CHOICE_3) != gon::GetNumSecondaryNpcTypes()) return false;
-    if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
-        GetOption(OPT_NPC_CHOICE_4) != gon::GetNumSecondaryNpcTypes()) return false;
-    if (GetOption(OPTNUM_SUPERGUARD_SP_COST) != 0) return false;
-    if (GetOption(OPT_INVENTORY_SACK_SIZE) != 2) return false;
-    
-    if (GetOption(OPTNUM_ENEMY_HP) != 100) return false;
-    if (GetOption(OPTNUM_ENEMY_ATK) != 100) return false;
-    if (GetOption(OPT_PARTNER_HP) != 5) return false;
-
-    return true;   
-}
-
 bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
     int32_t t, x, y, a, b;
     GetOptionParts(option, &t, &x, &y, &a, &b);
@@ -623,6 +472,157 @@ bool StateManager::CheckOptionValue(uint32_t option_value) const {
     const uint32_t start_bit = x & 31;
     const int32_t value = GetShiftedBitMask(word, start_bit, start_bit + y - 1);
     return value == b;
+}
+
+void StateManager::SelectRandomSeed() {
+    uint64_t time = gc::OSTime::OSGetTime();
+    seed_ = third_party::fasthash64(&time, sizeof(time), 417) % 999'999'999 + 1;
+}
+
+void StateManager::InitDefaultOptions() {
+    // Pick a random seed, and reset all RNG states to the start.
+    SelectRandomSeed();
+    for (int32_t i = 0; i < RNG_SEQUENCE_MAX; ++i) rng_states_[i] = 0;
+    
+    // Set floor to 0 (starting floor that only gives a partner).
+    floor_ = 0;
+    // Set stat upgrades to base # of levels.
+    hp_level_ = 2;
+    hp_p_level_ = 2;
+    fp_level_ = 1;
+    bp_level_ = 1;
+    max_inventory_ = 6;
+    
+    // Don't clear internal options.
+    memset(option_flags_, 0, sizeof(uint32_t) * 6);
+    memset(option_bytes_, 0, sizeof(option_bytes_));
+    // Only reset per-run play stats.
+    memset(play_stats_, 0, 0x100);
+
+    // Set non-zero default values to their default values.
+    SetOption(OPTVAL_PRESET_DEFAULT);
+    SetOption(OPTVAL_DIFFICULTY_FULL);
+    SetOption(OPTVAL_STARTER_ITEMS_BASIC);
+    SetOption(OPTVAL_REVIVE_PARTNERS_ON);
+    SetOption(OPTVAL_AC_DEFAULT);
+    SetOption(OPT_NPC_CHOICE_1, gon::GetNumSecondaryNpcTypes());
+    SetOption(OPT_NPC_CHOICE_2, gon::GetNumSecondaryNpcTypes());
+    SetOption(OPT_NPC_CHOICE_3, gon::GetNumSecondaryNpcTypes());
+    SetOption(OPT_NPC_CHOICE_4, gon::GetNumSecondaryNpcTypes());
+    SetOption(OPT_MARIO_HP, 5);
+    SetOption(OPT_MARIO_FP, 5);
+    SetOption(OPT_MARIO_BP, 5);
+    SetOption(OPT_PARTNER_HP, 5);
+    SetOption(OPT_INVENTORY_SACK_SIZE, 2);
+    SetOption(OPTNUM_ENEMY_HP, 100);
+    SetOption(OPTNUM_ENEMY_ATK, 100);
+    SetOption(OPT_MAX_PARTNERS, 4);
+    
+    g_HasBackupSave = false;
+}
+
+void StateManager::ApplyPresetOptions() {
+    switch (GetOptionValue(OPT_PRESET)) {
+        case OPTVAL_PRESET_DEFAULT: {
+            // Preserve preset, timer and difficulty settings, overwrite others.
+            uint32_t difficulty_option = GetOptionValue(OPT_DIFFICULTY);
+            uint32_t timer_option = GetOptionValue(OPT_TIMER_DISPLAY);
+
+            memset(option_flags_, 0, sizeof(uint32_t) * 6);
+            memset(option_bytes_, 0, sizeof(option_bytes_));
+
+            SetOption(OPTVAL_PRESET_DEFAULT);
+            SetOption(difficulty_option);
+            SetOption(timer_option);
+
+            // Set non-zero default values to their default values.
+            SetOption(OPTVAL_STARTER_ITEMS_BASIC);
+            SetOption(OPTVAL_REVIVE_PARTNERS_ON);
+            SetOption(OPTVAL_AC_DEFAULT);
+            SetOption(OPT_NPC_CHOICE_1, gon::GetNumSecondaryNpcTypes());
+            SetOption(OPT_NPC_CHOICE_2, gon::GetNumSecondaryNpcTypes());
+            SetOption(OPT_NPC_CHOICE_3, gon::GetNumSecondaryNpcTypes());
+            SetOption(OPT_NPC_CHOICE_4, gon::GetNumSecondaryNpcTypes());
+            SetOption(OPT_MARIO_HP, 5);
+            SetOption(OPT_MARIO_FP, 5);
+            SetOption(OPT_MARIO_BP, 5);
+            SetOption(OPT_PARTNER_HP, 5);
+            SetOption(OPT_INVENTORY_SACK_SIZE, 2);
+            SetOption(OPTNUM_ENEMY_HP, 100);
+            SetOption(OPTNUM_ENEMY_ATK, 100);
+            if (CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
+                SetOption(OPT_MAX_PARTNERS, 3);
+            } else {
+                SetOption(OPT_MAX_PARTNERS, 4);
+            }
+
+            break;
+        }
+    }
+}
+
+bool StateManager::VerifyDefaultsExceptEnemyScaling() {
+    if (CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
+        GetOption(OPT_MAX_PARTNERS) != 3) return false;
+    if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
+        GetOption(OPT_MAX_PARTNERS) != 4) return false;
+    if (!CheckOptionValue(OPTVAL_CHESTS_DEFAULT)) return false;
+    if (!CheckOptionValue(OPTVAL_PARTNER_RANDOM)) return false;
+    if (!CheckOptionValue(OPTVAL_DROP_STANDARD)) return false;
+    if (!CheckOptionValue(OPTVAL_STARTER_ITEMS_BASIC)) return false;
+    if (!CheckOptionValue(OPTVAL_REVIVE_PARTNERS_ON)) return false;
+    if (!CheckOptionValue(OPTVAL_BANDIT_NO_REFIGHT)) return false;
+    if (!CheckOptionValue(OPTVAL_AC_DEFAULT)) return false;
+    if (!CheckOptionValue(OPTVAL_AUDIENCE_THROWS_OFF)) return false;
+    if (!CheckOptionValue(OPTVAL_RANDOM_DAMAGE_NONE)) return false;
+    if (!CheckOptionValue(OPTVAL_OBFUSCATE_ITEMS_OFF)) return false;
+    if (!CheckOptionValue(OPTVAL_SECRET_BOSS_RANDOM)) return false;
+    if (!CheckOptionValue(OPTVAL_CHARLIETON_NORMAL)) return false;
+    if (GetOption(OPT_NPC_CHOICE_1) != gon::GetNumSecondaryNpcTypes()) return false;
+    if (GetOption(OPT_NPC_CHOICE_2) != gon::GetNumSecondaryNpcTypes()) return false;
+    if (GetOption(OPT_NPC_CHOICE_3) != gon::GetNumSecondaryNpcTypes()) return false;
+    if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
+        GetOption(OPT_NPC_CHOICE_4) != gon::GetNumSecondaryNpcTypes()) return false;
+    if (GetOption(OPTNUM_SUPERGUARD_SP_COST) != 0) return false;
+    if (GetOption(OPT_INVENTORY_SACK_SIZE) != 2) return false;
+    if (GetOption(OPT_MARIO_HP) != 5) return false;
+    if (GetOption(OPT_MARIO_FP) != 5) return false;
+    if (GetOption(OPT_MARIO_BP) != 5) return false;
+    if (GetOption(OPT_PARTNER_HP) != 5) return false;
+
+    return true;
+}
+
+bool StateManager::VerifyDefaultsExceptMarioScaling() {
+    if (CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
+        GetOption(OPT_MAX_PARTNERS) != 3) return false;
+    if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
+        GetOption(OPT_MAX_PARTNERS) != 4) return false;
+    if (!CheckOptionValue(OPTVAL_CHESTS_DEFAULT)) return false;
+    if (!CheckOptionValue(OPTVAL_PARTNER_RANDOM)) return false;
+    if (!CheckOptionValue(OPTVAL_DROP_STANDARD)) return false;
+    if (!CheckOptionValue(OPTVAL_STARTER_ITEMS_BASIC)) return false;
+    if (!CheckOptionValue(OPTVAL_REVIVE_PARTNERS_ON)) return false;
+    if (!CheckOptionValue(OPTVAL_BANDIT_NO_REFIGHT)) return false;
+    if (!CheckOptionValue(OPTVAL_AC_DEFAULT)) return false;
+    if (!CheckOptionValue(OPTVAL_AUDIENCE_THROWS_OFF)) return false;
+    if (!CheckOptionValue(OPTVAL_RANDOM_DAMAGE_NONE)) return false;
+    if (!CheckOptionValue(OPTVAL_OBFUSCATE_ITEMS_OFF)) return false;
+    if (!CheckOptionValue(OPTVAL_SECRET_BOSS_RANDOM)) return false;
+    if (!CheckOptionValue(OPTVAL_CHARLIETON_NORMAL)) return false;
+    if (GetOption(OPT_NPC_CHOICE_1) != gon::GetNumSecondaryNpcTypes()) return false;
+    if (GetOption(OPT_NPC_CHOICE_2) != gon::GetNumSecondaryNpcTypes()) return false;
+    if (GetOption(OPT_NPC_CHOICE_3) != gon::GetNumSecondaryNpcTypes()) return false;
+    if (!CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
+        GetOption(OPT_NPC_CHOICE_4) != gon::GetNumSecondaryNpcTypes()) return false;
+    if (GetOption(OPTNUM_SUPERGUARD_SP_COST) != 0) return false;
+    if (GetOption(OPT_INVENTORY_SACK_SIZE) != 2) return false;
+    
+    if (GetOption(OPTNUM_ENEMY_HP) != 100) return false;
+    if (GetOption(OPTNUM_ENEMY_ATK) != 100) return false;
+    if (GetOption(OPT_PARTNER_HP) != 5) return false;
+
+    return true;   
 }
 
 // Returns a string representing the current options encoded.

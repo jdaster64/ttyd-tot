@@ -363,7 +363,7 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
             // Modify the selected seed 
             uint32_t buttons = g_MarioSt->gamepad_buttons_pressed[0];
             if (buttons & ButtonId::X) {
-                state.PickRandomSeed();
+                state.SelectRandomSeed();
                 // Play menu back-out sound to indicate randomization action.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x2002b);
             } else if (buttons & ButtonId::L) {

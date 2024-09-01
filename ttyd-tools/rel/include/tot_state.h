@@ -77,18 +77,6 @@ public:
     void Save(TotSaveSlot* save);
     bool HasBackupSave() const;
     TotSaveSlot* GetBackupSave() const;
-
-    // Picks a random seed.
-    void PickRandomSeed(); 
-    // Initialize all settings to default.
-    void InitDefaultOptions();
-    // Resets settings based on the currently selected preset.
-    void ApplyPresetOptions();
-
-    // Verifies that settings are default except enemy stat scaling.
-    bool VerifyDefaultsExceptEnemyScaling();
-    // Verifies that settings are default except Mario's stat scaling.
-    bool VerifyDefaultsExceptMarioScaling();
     
     // Sets / adjusts options, play stats, achievements, etc.
     // If OPTVAL is provided for 'SetOption', value parameter is ignored.
@@ -110,8 +98,24 @@ public:
     
     // Returns values as / checks values against OPTVAL.
     uint32_t GetOptionValue(uint32_t option) const;
-    bool CheckOptionValue(uint32_t option_value) const;
+    bool CheckOptionValue(uint32_t option_value) const; 
+
+    // Sets the current seed to a random value.
+    void SelectRandomSeed();
     
+    // TODO: Move to OptionsManager?
+    // Initialize all settings to default.
+    void InitDefaultOptions();
+    // Resets settings based on the currently selected preset.
+    void ApplyPresetOptions();
+
+    // TODO: Move to OptionsManager!
+    // Verifies that settings are default except enemy stat scaling.
+    bool VerifyDefaultsExceptEnemyScaling();
+    // Verifies that settings are default except Mario's stat scaling.
+    bool VerifyDefaultsExceptMarioScaling();
+    
+    // TODO: Move to OptionsManager?
     // Returns a string representing the current options encoded.
     const char* GetEncodedOptions() const;
     

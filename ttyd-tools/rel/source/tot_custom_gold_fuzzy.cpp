@@ -1,6 +1,8 @@
 #include "tot_custom_rel.h"     // For externed unit definitions.
 
 #include "evt_cmd.h"
+#include "mod.h"
+#include "tot_state.h"
 
 #include <gc/mtx.h>
 #include <gc/types.h>
@@ -24,6 +26,7 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/extdrv.h>
+#include <ttyd/icondrv.h>
 #include <ttyd/mariost.h>
 #include <ttyd/system.h>
 
@@ -82,6 +85,7 @@ struct FuzzyCenterDistance {
 void chorogun_ext_init();
 void chorogun_ext_main();
 void chorogun_ext_disp(CameraId camera, void* user_data);
+void DebugDispChorogunCount(CameraId camera, void* user_data);
 EVT_DECLARE_USER_FUNC(chorogun_escape_all, 0)
 EVT_DECLARE_USER_FUNC(chorogun_escape, 1)
 EVT_DECLARE_USER_FUNC(chorogun_after_attack, 0)
@@ -634,10 +638,6 @@ EVT_BEGIN(unitFuzzyHorde_attack_event)
     END_IF()
     SET(LW(14), 1)
     DO(0)
-        IF_LARGE(LW(14), LW(15))
-            DO_BREAK()
-        END_IF()
-
         BROTHER_EVT()
             USER_FUNC(chorogun_dive_target, 30, LW(6))
             WAIT_FRM(30)
@@ -655,23 +655,28 @@ EVT_BEGIN(unitFuzzyHorde_attack_event)
         END_BROTHER()
 
         ADD(LW(14), 1)
+        IF_SMALL_EQUAL(LW(14), LW(15))
+            // Between lunges, wait 60 frames, reduced by a random interval of
+            // increasingly wide range based on how low the Horde's HP is.
+            // (From 0 frames at full health to 0-40 frames at <= 40% max HP)
+            SET(LW(1), 1000)
+            USER_FUNC(chorogun_get_alive_num, LW(0))
+            SUB(LW(1), LW(0))
+            DIV(LW(1), 15)
+            ADD(LW(1), 1)
 
-        // Between lunges, wait 60 frames, reduced by an increasingly large
-        // random interval based on how low the Horde's HP is.
-        // (Up to 40 frames at 40% of max).
-        SET(LW(1), 1000)
-        USER_FUNC(chorogun_get_alive_num, LW(0))
-        SUB(LW(1), LW(0))
-        DIV(LW(1), 15)
-        ADD(LW(1), 1)
+            USER_FUNC(evt_sub_random, 99, LW(0))
+            MUL(LW(0), LW(1))
+            DIV(LW(0), 100)
 
-        USER_FUNC(evt_sub_random, 99, LW(0))
-        MUL(LW(0), LW(1))
-        DIV(LW(0), 100)
-
-        SET(LW(1), 60)
-        SUB(LW(1), LW(0))
-        WAIT_FRM(LW(1))
+            SET(LW(1), 60)
+            SUB(LW(1), LW(0))
+            WAIT_FRM(LW(1))
+        ELSE()
+            // Wait a full 60 frames after the last lunge.
+            WAIT_FRM(60)
+            DO_BREAK()
+        END_IF()
     WHILE()
     GOTO(98)
     LBL(98)
@@ -1717,6 +1722,21 @@ void chorogun_ext_disp(CameraId camera, void* user_data) {
     ttyd::extdrv::extLoadTextureExit();
 }
 
+void DebugDispChorogunCount(CameraId camera, void* user_data) {
+    // Only display in debug mode.
+    if (!g_Mod->state_.GetOption(OPT_DEBUG_MODE_ENABLED)) return;
+
+    int32_t live_num = 0;
+    for (int32_t i = 0; i < ttyd::extdrv::extGetPoseNum(); ++i) {
+        if (g_ChorogunWork[i].flags & 1) ++live_num;
+    }
+    gc::mtx34 mtx;
+    gc::mtx::PSMTXTrans(&mtx, 250.0f, -180.0f, 0.0f);
+    uint32_t color = 0xFFFFFFFFU;
+    if (live_num)
+        ttyd::icondrv::iconNumberDispGx(&mtx, live_num, true, &color);
+}
+
 void chorogun_ext_main() {
     auto* chorogunWork = g_ChorogunWork;
     auto* poseWork = ttyd::extdrv::extGetPosePtr();
@@ -2038,6 +2058,7 @@ void chorogun_ext_main() {
     }
   
     ttyd::dispdrv::dispEntry(CameraId::k3d, 1, 0.0f, chorogun_ext_disp, nullptr);
+    ttyd::dispdrv::dispEntry(CameraId::k2d, 1, 902.0f, DebugDispChorogunCount, nullptr);
 }
 
 void chorogun_ext_init() {
