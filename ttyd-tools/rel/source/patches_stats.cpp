@@ -85,20 +85,25 @@ void ApplyFixedPatches() {
 
     g_pouchAddCoin_trampoline = mod::patch::hookFunction(
         ttyd::mario_pouch::pouchAddCoin, [](int16_t coins) {
-            // Track coins gained / spent (stolen coins subtract from gained).
-            if (coins < 0 && !ttyd::mariost::g_MarioSt->bInBattle) {
-                g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_SPENT, -coins);
-            } else {
-                g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED, coins);
-                tot::AchievementsManager::CheckCompleted(
-                    tot::AchievementId::MISC_RUN_COINS_999);
-            }
             // Actually add coins; cap at 999 or 9,999 based on whether in run.
             const int32_t cap =
                 g_Mod->state_.GetOption(tot::OPT_RUN_STARTED) ? 999 : 9999;
             auto* pouch = ttyd::mario_pouch::pouchGetPtr();
             pouch->coins =
                 Clamp(static_cast<int32_t>(pouch->coins + coins), 0, cap);
+
+            // Track coins gained / spent during runs.
+            // (Bandits stealing coins count as negative coins gained.)
+            if (g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) {
+                if (coins < 0 && !ttyd::mariost::g_MarioSt->bInBattle) {
+                    g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_SPENT, -coins);
+                } else {
+                    g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED, coins);
+                    tot::AchievementsManager::CheckCompleted(
+                        tot::AchievementId::MISC_RUN_COINS_999);
+                }
+            }
+
             return pouch->coins;
         });
 

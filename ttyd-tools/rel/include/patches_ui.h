@@ -1,16 +1,20 @@
 #pragma once
 
 #include <gc/types.h>
-#include <ttyd/win_party.h>
 
 #include <cstdint>
 
+namespace ttyd::seq_load { struct SeqLoadWinDataEntry; }
 namespace ttyd::win_root { struct WinPauseMenu; }
 
 namespace mod::infinite_pit::ui {
 
 // Apply patches to the HUD, pause menu, etc.
 void ApplyFixedPatches();
+
+// Displays completion percentage + run progress on file select screen.
+void DisplayFileSelectProgress(
+    ttyd::seq_load::SeqLoadWinDataEntry* win, int32_t file, int32_t file_hovered);
 
 // Correctly displays multi-digit Charge / ATK / DEF-change number icons.
 void DisplayUpDownNumberIcons(

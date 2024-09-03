@@ -130,10 +130,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 state.SetOption(STAT_PERM_HALF_BEST_TIME, igt_centis);
             AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_FIRST);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
-                if (igt_centis < 60 * 360000) {
+                if (igt_centis < 60 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_SPEED1);
                 }
-                if (igt_centis < 40 * 360000) {
+                if (igt_centis < 40 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_SPEED2);
                 }
             }
@@ -144,10 +144,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 state.SetOption(STAT_PERM_FULL_BEST_TIME, igt_centis);
             AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_FIRST);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
-                if (igt_centis < 120 * 360000) {
+                if (igt_centis < 120 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_SPEED1);
                 }
-                if (igt_centis < 90 * 360000) {
+                if (igt_centis < 90 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_SPEED2);
                 }
             }
@@ -158,10 +158,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 state.SetOption(STAT_PERM_EX_BEST_TIME, igt_centis);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
                 AchievementsManager::MarkCompleted(AchievementId::RUN_EX_FIRST);
-                if (igt_centis < 180 * 360000) {
+                if (igt_centis < 180 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_EX_SPEED1);
                 }
-                if (igt_centis < 135 * 360000) {
+                if (igt_centis < 140 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_EX_SPEED2);
                 }
             }

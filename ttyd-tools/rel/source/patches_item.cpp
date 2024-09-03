@@ -1043,7 +1043,13 @@ void ApplyFixedPatches() {
     
     // Override item-get logic for special items.
     g_pouchGetItem_trampoline = mod::patch::hookFunction(
-        ttyd::mario_pouch::pouchGetItem, [](int32_t item_type) {
+        ttyd::mario_pouch::pouchGetItem, [](int32_t item_type) {            
+            // Handle items with special effects in ToT.
+            if (tot::RewardManager::HandleRewardItemPickup(item_type)) 
+                return 1U;
+            
+            uint32_t return_value = g_pouchGetItem_trampoline(item_type);
+            
             // Track coins, Star Pieces, and Shine Sprites gained.
             if (item_type == ItemType::COIN) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED);
@@ -1060,12 +1066,6 @@ void ApplyFixedPatches() {
                         tot::AchievementId::MISC_SHINES_10);
                 }
             }
-            
-            // Handle items with special effects in ToT.
-            if (tot::RewardManager::HandleRewardItemPickup(item_type)) 
-                return 1U;
-            
-            uint32_t return_value = g_pouchGetItem_trampoline(item_type);
 
             // Mark unique items as being collected.
             if (return_value) {

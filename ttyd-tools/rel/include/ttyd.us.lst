@@ -968,6 +968,7 @@
 800b2388:cardCopy2Main
 800b2b80:cardGetCode
 800b2b8c:cardIsExec
+800b33e4:cardGetFilePtr
 // .data
 8041eab8:g_CardmgrWork
 
@@ -1633,6 +1634,16 @@
 804169a4:zakoM2D_dead_event
 8034bf14:gesso2D_init_event
 8034bf9c:gesso2D_move_event
+
+// seq_load.o
+// .text
+800f39dc:continueGame
+800f3f2c:loadDraw
+800f5ad4:loadMain
+800f6f68:seq_loadMain
+800f727c:seq_loadExit
+800f72b8:seq_loadInit
+800f72e4:unk_800f72e4
 
 // battle.o
 // .text

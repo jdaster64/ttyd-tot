@@ -1211,7 +1211,11 @@ g_StringMap = {
         b"tot_winsel_whichduds":      b"Which getup?",
         b"tot_winsel_whichones":      b"Which ones?",
         
-        # TODO: Move this and other Gold Fuzzy dialogue to the final boss area.
+        # File select text.
+        
+        b"tot_file_completion":       b"Completion",
+        
+        # TODO: Move this and other Gold Fuzzy dialogue to the final boss map.
         
         b"tot_gfz_call_horde":
             b"Meee-OOOF!<wait 250> Hey!<wait 250> Ow!\n"
@@ -1961,7 +1965,7 @@ g_StringMap = {
             b"3:00:00 with default settings.",
         b"tot_achd_17":
             b"Clear a EX-difficulty run in\n"
-            b"2:15:00 with default settings.",
+            b"2:20:00 with default settings.",
         b"tot_achd_18":
             b"Finish a run, making deals with\n"
             b"NPCs on 7 or more rest floors.",
@@ -2171,7 +2175,7 @@ g_StringMap = {
         b'btl_hlp_iron_sinemon':
             b"That's an Iron Cleft.\n"
             b'<wait 250>\n'
-            b'These guys are so tough,<wait 50>\n'
+            b'These guys are so tough,\n<wait 50>\n'
             b'any hit only leaves a scratch!\n<k>\n<p>\n',
         
         # TODO: Menu Tattles for all enemies. - b"menu_enemy_001", etc.

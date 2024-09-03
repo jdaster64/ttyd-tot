@@ -24,6 +24,7 @@
 #include <ttyd/battle_mario.h>
 #include <ttyd/battle_monosiri.h>
 #include <ttyd/battle_seq_end.h>
+#include <ttyd/cardmgr.h>
 #include <ttyd/dispdrv.h>
 #include <ttyd/eff_updown.h>
 #include <ttyd/evtmgr.h>
@@ -34,6 +35,7 @@
 #include <ttyd/mario_party.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/msgdrv.h>
+#include <ttyd/seq_load.h>
 #include <ttyd/sound.h>
 #include <ttyd/statuswindow.h>
 #include <ttyd/win_item.h>
@@ -56,6 +58,11 @@ extern "C" {
     // eff_updown_disp_patches.s
     void StartDispUpdownNumberIcons();
     void BranchBackDispUpdownNumberIcons();
+    // file_select_patches.s
+    void StartDrawFileLevelString();
+    void BranchBackDrawFileLevelString();
+    void StartDrawFileCrystalStars();
+    void BranchBackDrawFileCrystalStars();
     // menu_patches.s
     void StartHakoGxInitializeFields();
     void BranchBackHakoGxInitializeFields();
@@ -77,6 +84,12 @@ extern "C" {
     // status_window_patches.s
     void StartHideTopBarInSomeWindows();
     void BranchBackHideTopBarInSomeWindows();
+
+    void dispFileSelectProgress(
+        ttyd::seq_load::SeqLoadWinDataEntry* win, int32_t file, 
+        int32_t file_hovered) {
+        mod::infinite_pit::ui::DisplayFileSelectProgress(win, file, file_hovered);
+    }
   
     void dispUpdownNumberIcons(
         int32_t number, void* tex_obj, gc::mtx34* icon_mtx, gc::mtx34* view_mtx,
@@ -157,6 +170,10 @@ extern const char* (*g_BattleGetRankNameLabel_trampoline)(int32_t);
 extern int32_t (*g_winMgrSelectOther_trampoline)(WinMgrSelectEntry*, EvtEntry*);
 extern WinMgrSelectEntry* (*g_winMgrSelectEntry_trampoline)(int32_t, int32_t, int32_t);
 // Patch addresses.
+extern const int32_t g_loadDraw_DrawLevelString_BH;
+extern const int32_t g_loadDraw_DrawLevelString_EH;
+extern const int32_t g_loadDraw_DrawCrystalStars_BH;
+extern const int32_t g_loadDraw_DrawCrystalStars_EH;
 extern const int32_t g_effUpdownDisp_TwoDigitSupport_BH;
 extern const int32_t g_effUpdownDisp_TwoDigitSupport_EH;
 extern const int32_t g_valueUpdate_Patch_DisableCoinCap;
@@ -420,6 +437,19 @@ void ApplyFixedPatches() {
             if (rank < 0 || rank > 3) rank = 0;
             return ttyd::battle_seq_end::_rank_up_data[rank].mario_menu_msg;
         });
+
+    // Apply patches to loadDraw code to show completion percentage and current
+    // run progress (if applicable) instead of level on the file select screen.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_loadDraw_DrawLevelString_BH),
+        reinterpret_cast<void*>(g_loadDraw_DrawLevelString_EH),
+        reinterpret_cast<void*>(StartDrawFileLevelString),
+        reinterpret_cast<void*>(BranchBackDrawFileLevelString));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_loadDraw_DrawCrystalStars_BH),
+        reinterpret_cast<void*>(g_loadDraw_DrawCrystalStars_EH),
+        reinterpret_cast<void*>(StartDrawFileCrystalStars),
+        reinterpret_cast<void*>(BranchBackDrawFileCrystalStars));
         
     // Apply patch to effUpdownDisp code to display the correct number
     // when Charging / +ATK/DEF-ing by more than 9 points.
@@ -649,6 +679,62 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_coin_disp_SkipXForHighCurrency_BH),
         reinterpret_cast<void*>(StartSkipDrawingXIfCurrencyHigh),
         reinterpret_cast<void*>(BranchBackSkipDrawingXIfCurrencyHigh));
+}
+
+void DisplayFileSelectProgress(
+    ttyd::seq_load::SeqLoadWinDataEntry* win, int32_t file, int32_t file_hovered) {
+    // Load data from currently_pointed save file.
+    const auto* raw_save_data = (tot::TotSaveSlot*)(
+        (uintptr_t)ttyd::cardmgr::cardGetFilePtr() + file * 0x4000 + 0x2000);
+    const tot::StateManager& state = raw_save_data->data.tot_state;
+    int32_t flags = state.floor_ / 8;
+    int32_t max_flags =
+        state.GetOption(tot::OPT_RUN_STARTED) ? state.GetNumFloors() / 8 - 1 : 0;
+    float completion_pct = state.completion_score_ * 0.01f;
+    if (completion_pct < 1.0f) completion_pct = 0;
+    
+    // Print completion percentage in place of level.
+    char text[64];
+    sprintf(
+        text, "%s %.1f%%", msgSearch("tot_file_completion"), completion_pct);
+    
+    int16_t width = ttyd::fontmgr::FontGetMessageWidth(text);
+    if (width > 200.0f) {
+        gc::vec3 scale = { 200.0f / width, 1.0f, 1.0f };
+        width = 200.0f;
+        ttyd::fontmgr::FontDrawScaleVec(&scale);
+    }
+    
+    ttyd::fontmgr::FontDrawString(win->x - 0.5f * width, win->y + 30.0f, text);
+        
+    gc::vec3 default_scale = { 1.0f, 1.0f, 1.0f };
+    ttyd::fontmgr::FontDrawScaleVec(&default_scale);
+    
+    // Print flag icons showing run progress, if saved in the middle of a run.
+    if (max_flags == 0) return;
+    
+    for (int32_t i = 0; i < max_flags; ++i) {
+        gc::vec3 position = {
+            win->x + (i - max_flags / 2) * 32.0f - 10.0f,
+            win->y - 52.0f,
+            0.0f
+        };
+        
+        gc::mtx34 mtx;
+        gc::mtx::PSMTXTrans(
+            &mtx, position.x + 2.0f, position.y - 2.0f, position.z);
+        
+        uint32_t shadow_color = i < flags ? 0x0000'0080U : 0x0000'00A0U;
+        uint32_t color = file == file_hovered ? 0xFFFF'FFFFU : 0xA0A0'A0FFU;
+        
+        ttyd::icondrv::iconDispGxCol(
+            &mtx, 0, IconType::TACTICS_ICON, &shadow_color);
+        if (i < flags) {
+            gc::mtx::PSMTXTrans(&mtx, position.x, position.y, position.z);
+            ttyd::icondrv::iconDispGxCol(
+                &mtx, 0, IconType::TACTICS_ICON, &color);
+        }
+    }
 }
 
 void DisplayUpDownNumberIcons(

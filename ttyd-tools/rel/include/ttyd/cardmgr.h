@@ -37,7 +37,7 @@ uint32_t cardIsExec();
 // unk_JP_US_EU_09_800b2c2c
 // cardInit
 // cardBufReset
-// cardGetFilePtr
+void* cardGetFilePtr();
 
 // .data
 extern void* g_CardmgrWork;

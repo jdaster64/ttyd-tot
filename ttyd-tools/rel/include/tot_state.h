@@ -63,10 +63,14 @@ public:
     uint32_t    item_purchased_flags_[8];
     uint32_t    midboss_defeated_flags_[4];
     uint32_t    cosmetic_purchased_flags_[4];
-    // Reserved in case similar flags are needed.
-    uint32_t    reserved_[25];
+    // Reserved in case similar flags are needed in the future.
+    uint32_t    reserved_flags_[24];
+
+    // Saves the current completion progress as an easily accessible integer.
+    int32_t     completion_score_;
     
     // Saves various stats for current runs and all-time.
+    // Currently, the first 0x100 bytes are used for current-run stats.
     uint8_t     play_stats_[1024];
 
     // Initializes basic fields the first time a file is created.
