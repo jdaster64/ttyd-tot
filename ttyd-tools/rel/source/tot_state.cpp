@@ -164,7 +164,6 @@ bool StateManager::Load(TotSaveSlot* save) {
         // If in the middle of a run, treat like a continue from a Game Over.
         if (GetOption(OPT_RUN_STARTED)) {
             SetSWByte(GSW_Tower_ContinuingFromGameOver, 1);
-            SetSWByte(GSW_Tower_ChestClaimed, 0);
         }
     }
     
