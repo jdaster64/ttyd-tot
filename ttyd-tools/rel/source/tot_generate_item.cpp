@@ -57,22 +57,22 @@ uint16_t* PopulateFromBitfield(
     return arr;
 }
 
-template <class T> inline void KnuthShuffle(T* arr, int32_t size) {
+template <class T> inline void KnuthShuffle(T* arr, int32_t size, int32_t rng) {
     auto& state = g_Mod->state_;
     for (int32_t i = size-1; i > 0; --i) {
-        int32_t j = state.Rand(i+1, RNG_ITEM_OBFUSCATION);
+        int32_t j = state.Rand(i+1, rng);
         T temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
     }
 }
 
-template <class T> inline void KnuthUnshuffle(T* arr, int32_t size) {
+template <class T> inline void KnuthUnshuffle(T* arr, int32_t size, int32_t rng) {
     auto& state = g_Mod->state_;
     for (int32_t i = 1; i < size; ++i) {
-        --state.rng_states_[RNG_ITEM_OBFUSCATION];
-        int32_t j = state.Rand(i+1, RNG_ITEM_OBFUSCATION);
-        --state.rng_states_[RNG_ITEM_OBFUSCATION];
+        --state.rng_states_[rng];
+        int32_t j = state.Rand(i+1, rng);
+        --state.rng_states_[rng];
         T temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
@@ -201,7 +201,7 @@ void ObfuscateItems(bool enable) {
     if (enable) {        
         // Shuffle names.
         memcpy(shuffled_ids, ids, sizeof(ids));
-        KnuthShuffle(shuffled_ids, num_badges_and_items);
+        KnuthShuffle(shuffled_ids, num_badges_and_items, RNG_ITEM_OBFUSCATION);
         for (int32_t i = 0; i < num_badges_and_items; ++i) {
             data[i] = reinterpret_cast<uint32_t>(
                 itemData[shuffled_ids[i]].name);
@@ -212,7 +212,7 @@ void ObfuscateItems(bool enable) {
         
         // Shuffle description & menu description (same order for both).
         memcpy(shuffled_ids, ids, sizeof(ids));
-        KnuthShuffle(shuffled_ids, num_badges_and_items);
+        KnuthShuffle(shuffled_ids, num_badges_and_items, RNG_ITEM_OBFUSCATION);
         for (int32_t i = 0; i < num_badges_and_items; ++i) {
             data[i] = reinterpret_cast<uint32_t>(
                 itemData[shuffled_ids[i]].description);
@@ -232,7 +232,7 @@ void ObfuscateItems(bool enable) {
         
         // Shuffle icons.
         memcpy(shuffled_ids, ids, sizeof(ids));
-        KnuthShuffle(shuffled_ids, num_badges_and_items);
+        KnuthShuffle(shuffled_ids, num_badges_and_items, RNG_ITEM_OBFUSCATION);
         for (int32_t i = 0; i < num_badges_and_items; ++i) {
             data[i] = itemData[shuffled_ids[i]].icon_id;
         }
@@ -242,8 +242,8 @@ void ObfuscateItems(bool enable) {
         
         // Shuffle sort order, separately for items and badges.
         memcpy(shuffled_ids, ids, sizeof(ids));
-        KnuthShuffle(shuffled_ids, num_items);
-        KnuthShuffle(shuffled_ids + num_items, num_badges);
+        KnuthShuffle(shuffled_ids, num_items, RNG_ITEM_OBFUSCATION);
+        KnuthShuffle(shuffled_ids + num_items, num_badges, RNG_ITEM_OBFUSCATION);
         for (int32_t i = 0; i < num_badges_and_items; ++i) {
             data[i] = itemData[shuffled_ids[i]].type_sort_order;
         }
@@ -254,8 +254,8 @@ void ObfuscateItems(bool enable) {
         memcpy(shuffled_ids, ids, sizeof(ids));
         
         // Unshuffle sort order, separately for items and badges.
-        KnuthUnshuffle(shuffled_ids + num_items, num_badges);
-        KnuthUnshuffle(shuffled_ids, num_items);
+        KnuthUnshuffle(shuffled_ids + num_items, num_badges, RNG_ITEM_OBFUSCATION);
+        KnuthUnshuffle(shuffled_ids, num_items, RNG_ITEM_OBFUSCATION);
         for (int32_t i = 0; i < num_badges_and_items; ++i) {
             data[i] = itemData[shuffled_ids[i]].type_sort_order;
         }
@@ -265,7 +265,7 @@ void ObfuscateItems(bool enable) {
         
         // Unshuffle icons.
         memcpy(shuffled_ids, ids, sizeof(ids));
-        KnuthUnshuffle(shuffled_ids, num_badges_and_items);
+        KnuthUnshuffle(shuffled_ids, num_badges_and_items, RNG_ITEM_OBFUSCATION);
         for (int32_t i = 0; i < num_badges_and_items; ++i) {
             data[i] = itemData[shuffled_ids[i]].icon_id;
         }
@@ -275,7 +275,7 @@ void ObfuscateItems(bool enable) {
         
         // Unshuffle description & menu description (same order for both).
         memcpy(shuffled_ids, ids, sizeof(ids));
-        KnuthUnshuffle(shuffled_ids, num_badges_and_items);
+        KnuthUnshuffle(shuffled_ids, num_badges_and_items, RNG_ITEM_OBFUSCATION);
         for (int32_t i = 0; i < num_badges_and_items; ++i) {
             data[i] = reinterpret_cast<uint32_t>(
                 itemData[shuffled_ids[i]].description);
@@ -295,7 +295,7 @@ void ObfuscateItems(bool enable) {
         
         // Unshuffle names.
         memcpy(shuffled_ids, ids, sizeof(ids));
-        KnuthUnshuffle(shuffled_ids, num_badges_and_items);
+        KnuthUnshuffle(shuffled_ids, num_badges_and_items, RNG_ITEM_OBFUSCATION);
         for (int32_t i = 0; i < num_badges_and_items; ++i) {
             data[i] = reinterpret_cast<uint32_t>(
                 itemData[shuffled_ids[i]].name);
@@ -311,16 +311,10 @@ void GenerateHubShopItems() {
 
     const int32_t kMaxItem = ItemType::MAX_ITEM_TYPE - ItemType::THUNDER_BOLT;
 
-    // Shuffle array of all possible item types.
-    int8_t items[ItemType::MAX_ITEM_TYPE - ItemType::THUNDER_BOLT];
+    // Do unbiased shuffle of array of all possible item types.
+    int16_t items[ItemType::MAX_ITEM_TYPE - ItemType::THUNDER_BOLT];
     for (int32_t i = 0; i < kMaxItem; ++i) items[i] = i;
-    for (int32_t i = 0; i < 2 * kMaxItem; ++i) {
-        int32_t x = ttyd::system::irand(kMaxItem);
-        int32_t y = ttyd::system::irand(kMaxItem);
-        int16_t temp = items[x];
-        items[x] = items[y];
-        items[y] = temp;
-    }
+    KnuthShuffle(items, sizeof(items) / sizeof(int16_t), RNG_VANILLA);
 
     // Pick the first five items that are valid & encountered but not purchased.
     int32_t num_chosen = 0;
