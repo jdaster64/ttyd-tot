@@ -9,6 +9,7 @@
 #include "patches_mario_move.h"
 #include "patches_options.h"
 #include "tot_manager_options.h"
+#include "tot_manager_progress.h"
 #include "tot_gsw.h"
 #include "tot_state.h"
 
@@ -343,6 +344,11 @@ int32_t LoadMap() {
         ttyd::seq_mapchange::_load(
             mario_st->currentMapName, ttyd::seq_mapchange::NextMap,
             ttyd::seq_mapchange::NextBero);
+
+        // Update the completion percentage every time a map is loaded.
+        tot::ProgressManager::RefreshCache();
+        tot::ProgressManager::GetOverallProgression();
+
         return 2;
     }
     

@@ -314,8 +314,8 @@ EVT_BEGIN(Tower_IncrementFloor)
 EVT_END()
 
 // Spawn heart block. LW(15) = Whether to spawn it statically on load.
-EVT_BEGIN(Tower_SpawnHeartBlock)
-    // Spawn on left side for rest floors, right side for boss floors.
+EVT_BEGIN(Tower_SpawnHeartSaveBlock)
+    // Heart block position; leftmost cell for rest floors, rightmost for boss.
     USER_FUNC(evtTot_IsRestFloor, LW(4))
     IF_EQUAL(LW(4), 1)
         SET(LW(0), -150)
@@ -324,6 +324,12 @@ EVT_BEGIN(Tower_SpawnHeartBlock)
     END_IF()
     SET(LW(1), 60)
     SET(LW(2), -200)
+
+    // Save block position; on right side of room, just below the door.
+    SET(LW(6), 160)
+    SET(LW(7), 60)
+    SET(LW(8), 50)
+
     IF_EQUAL(LW(15), 0)
         // Wait and play bomb effect if spawning dynamically.
         WAIT_MSEC(100)
@@ -333,10 +339,22 @@ EVT_BEGIN(Tower_SpawnHeartBlock)
         USER_FUNC(
             evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
             -100, 60, -80, 0)
+
+        // Play bomb effect for save block as well.
+        USER_FUNC(
+            evt_eff, PTR(""), PTR("bomb"), 0, LW(6), LW(7), LW(8), FLOAT(1.0),
+            0, 0, 0, 0, 0, 0, 0)
+    END_IF()
+
+    // Spawn save block, but only on boss floors.
+    USER_FUNC(evtTot_GetFloor, LW(3))
+    IF_LARGE(LW(3), 0)
+        IF_EQUAL(LW(4), 0)
+            USER_FUNC(evt_mobj_save_blk, PTR("sbox"), LW(6), LW(7), LW(8), 0, 0)
+        END_IF()
     END_IF()
     
-    // Coin price = 10 + 5 for each boss floor after the first.
-    USER_FUNC(evtTot_GetFloor, LW(3))
+    // Set heart block coin price = 10 + 5 for each boss floor after the first.
     SUB(LW(3), 1)
     DIV(LW(3), 8)
     MUL(LW(3), 5)
@@ -439,12 +457,12 @@ EVT_BEGIN(Tower_OpenExit)
         WAIT_FRM(2)
     END_IF()
 
-    // Spawn Heart Block on boss floors.
+    // Spawn Heart Block + Save block on boss floors.
     USER_FUNC(evtTot_GetFloor, LW(10))
     IF_LARGE(LW(10), 0)
         MOD(LW(10), 8)
         IF_EQUAL(LW(10), 0)
-            RUN_EVT(Tower_SpawnHeartBlock)
+            RUN_EVT(Tower_SpawnHeartSaveBlock)
         END_IF()
     END_IF()
     
@@ -846,7 +864,7 @@ EVT_BEGIN(Tower_NpcSetup)
 
             // Also spawn a Heart Block, statically.
             SET(LW(15), 1)
-            RUN_EVT(Tower_SpawnHeartBlock)
+            RUN_EVT(Tower_SpawnHeartSaveBlock)
         END_IF()
     ELSE()
         // Regular enemy floor; spawn enemies.
@@ -991,11 +1009,11 @@ EVT_BEGIN(gon_01_InitEvt)
         // Continuing from a Game Over...
         // Set up loading zones.
         RUN_CHILD_EVT(PTR(&Tower_BeroSetup))
-        // Spawn Heart Block statically.
+        // Spawn Heart + Save Block statically.
         USER_FUNC(evtTot_GetFloor, LW(15))
         IF_LARGE(LW(15), 0)
             SET(LW(15), 1)
-            RUN_EVT(Tower_SpawnHeartBlock)
+            RUN_EVT(Tower_SpawnHeartSaveBlock)
         END_IF()
         // Open grate statically.
         SET(LW(15), 1)

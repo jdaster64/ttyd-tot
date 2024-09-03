@@ -691,7 +691,9 @@ void DisplayFileSelectProgress(
     int32_t max_flags =
         state.GetOption(tot::OPT_RUN_STARTED) ? state.GetNumFloors() / 8 - 1 : 0;
     float completion_pct = state.completion_score_ * 0.01f;
-    if (completion_pct < 1.0f) completion_pct = 0;
+    if (completion_pct < 0.5f) completion_pct = 0;
+
+    ttyd::fontmgr::FontDrawStart();
     
     // Print completion percentage in place of level.
     char text[64];
@@ -707,34 +709,52 @@ void DisplayFileSelectProgress(
     
     ttyd::fontmgr::FontDrawString(win->x - 0.5f * width, win->y + 30.0f, text);
         
-    gc::vec3 default_scale = { 1.0f, 1.0f, 1.0f };
-    ttyd::fontmgr::FontDrawScaleVec(&default_scale);
-    
-    // Print flag icons showing run progress, if saved in the middle of a run.
-    if (max_flags == 0) return;
-    
-    for (int32_t i = 0; i < max_flags; ++i) {
+    // Print flag icons showing midbosses defeated, if last save was mid-run.
+    // Any unused space is padded with little circle icons.
+    int32_t flags_start = 7;
+    switch (max_flags) {
+        case 7: flags_start = 0; break;
+        case 3: flags_start = 2; break;
+    }
+    for (int32_t i = 0; i < 7; ++i) {
+        int32_t icon_id = IconType::TACTICS_ICON;
+        float scale = 0.8f;
+        bool flag_collected = i - flags_start < flags;
+        float y_offset = 0.0f;
+        if (i < flags_start || i >= flags_start + max_flags) {
+            icon_id = IconType::SP_ORB_YELLOW;
+            scale = 0.45f;
+            flag_collected = false;
+            y_offset = 8.0f;
+        }
+
         gc::vec3 position = {
-            win->x + (i - max_flags / 2) * 32.0f - 10.0f,
-            win->y - 52.0f,
+            win->x + i * 30.0f - 95.0f,
+            win->y - 50.0f + y_offset,
             0.0f
         };
         
-        gc::mtx34 mtx;
-        gc::mtx::PSMTXTrans(
-            &mtx, position.x + 2.0f, position.y - 2.0f, position.z);
-        
-        uint32_t shadow_color = i < flags ? 0x0000'0080U : 0x0000'00A0U;
-        uint32_t color = file == file_hovered ? 0xFFFF'FFFFU : 0xA0A0'A0FFU;
-        
-        ttyd::icondrv::iconDispGxCol(
-            &mtx, 0, IconType::TACTICS_ICON, &shadow_color);
-        if (i < flags) {
+        gc::mtx34 mtx, mtx2;
+        gc::mtx::PSMTXTrans(&mtx, position.x + 1.0f, position.y - 1.0f, position.z);
+        gc::mtx::PSMTXScale(&mtx2, scale, scale, scale);
+        gc::mtx::PSMTXConcat(&mtx, &mtx2, &mtx);
+        uint32_t shadow_color = 0x0000'0080U;
+        ttyd::icondrv::iconDispGxCol(&mtx, 0, icon_id, &shadow_color);
+
+        if (flag_collected) {
             gc::mtx::PSMTXTrans(&mtx, position.x, position.y, position.z);
-            ttyd::icondrv::iconDispGxCol(
-                &mtx, 0, IconType::TACTICS_ICON, &color);
+            gc::mtx::PSMTXScale(&mtx2, scale, scale, scale);
+            gc::mtx::PSMTXConcat(&mtx, &mtx2, &mtx);
+            uint32_t color = file == file_hovered ? 0xFFFF'FFFFU : 0xA0A0'A0FFU;
+            ttyd::icondrv::iconDispGxCol(&mtx, 0, icon_id, &color);
         }
     }
+
+    // Prepare for future font draw calls (play time, etc.)
+        
+    gc::vec3 default_scale = { 1.0f, 1.0f, 1.0f };
+    ttyd::fontmgr::FontDrawStart();
+    ttyd::fontmgr::FontDrawScaleVec(&default_scale);
 }
 
 void DisplayUpDownNumberIcons(

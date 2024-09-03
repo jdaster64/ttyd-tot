@@ -7,6 +7,7 @@
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
 #include "tot_manager_options.h"
+#include "tot_manager_progress.h"
 
 #include <gc/OSLink.h>
 #include <gc/OSTime.h>
@@ -159,6 +160,12 @@ bool StateManager::Load(TotSaveSlot* save) {
         // Required for curtain transition to end if loading from a hard save.
         strcpy(mariost->currentAreaName, "123");
         mariost->pRelFileBase = nullptr;
+
+        // If in the middle of a run, treat like a continue from a Game Over.
+        if (GetOption(OPT_RUN_STARTED)) {
+            SetSWByte(GSW_Tower_ContinuingFromGameOver, 1);
+            SetSWByte(GSW_Tower_ChestClaimed, 0);
+        }
     }
     
     *(int32_t*)((uintptr_t)mariost + 0x1274) = unk1;
@@ -196,6 +203,10 @@ void StateManager::Save(TotSaveSlot* save) {
     auto* player = ttyd::mario::marioGetPtr();
     
     memset(save, 0, sizeof(TotSaveSlot));
+
+    // Update the completion percentage before saving.
+    ProgressManager::RefreshCache();
+    ProgressManager::GetOverallProgression();
     
     mariost->saveLastPlayerPosition.x = player->playerPosition[0];
     mariost->saveLastPlayerPosition.y = player->playerPosition[1];
