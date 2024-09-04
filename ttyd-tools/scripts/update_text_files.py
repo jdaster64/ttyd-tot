@@ -1084,6 +1084,10 @@ g_StringMap = {
             b"Arm a bomb that does massive\n"
             b"damage to all combatants.",
             
+        b'msg_pch_heart_catch':
+            b"Steal an item or badge from\n"
+            b'any enemy.',
+            
         b"msg_pch_madowaseru":
             b"Tease enemies with some sly\n"
             b"moves, confusing them.",
@@ -1551,6 +1555,9 @@ g_StringMap = {
         b"tot_movelog_d313":
             b"\nLv. 3: Deals 4+4 damage\n"
             b"for 4 FP.",
+        b"tot_movelog_d321":
+            b"\nShows current HP, ATK & DEF\n"
+            b"for all enemies of a given type.",
         b"tot_movelog_d331":
             b"\nLv. 1: Deals 2+2 DEF-piercing\n"
             b"damage for 2 FP.",
@@ -1575,6 +1582,8 @@ g_StringMap = {
         b"tot_movelog_d353":
             b"\nLv. 3: Deals 3 damage per\n"
             b"hit, diminishing, for 7 FP.",
+        b"tot_movelog_d361":
+            b"\nCosts 4 FP to use.",
         # Koops moves.
         b"tot_movelog_d411":
             b"\nLv. 1: Deals 3 damage\n"
@@ -1594,6 +1603,8 @@ g_StringMap = {
         b"tot_movelog_d423":
             b"\nLv. 3: Deals 5 damage to\n"
             b"grounded foes for 6 FP.",
+        b"tot_movelog_d431":
+            b"\nCosts 2 FP to use.",
         b"tot_movelog_d441":
             b"\nLv. 1: Shields Mario for\n"
             b"up to two hits for 4 FP.",
@@ -1631,6 +1642,9 @@ g_StringMap = {
         b"tot_movelog_d513":
             b"\nLv. 3: Deals 8 damage\n"
             b"for 4 FP.",
+        b"tot_movelog_d521":
+            b"\nCosts 5 FP. Works better on\n"
+            b"foes with low HP or Tiny status.",
         b"tot_movelog_d531":
             b"\nLv. 1: Drains 4 HP from an\n"
             b"enemy for 3 FP.",
@@ -1640,6 +1654,9 @@ g_StringMap = {
         b"tot_movelog_d533":
             b"\nLv. 3: Drains 8 HP from an\n"
             b"enemy for 7 FP.",
+        b"tot_movelog_d541":
+            b"\nApplies up to 4 turns of Dodgy\n"
+            b"on Mario and Flurrie for 4 FP.",
         b"tot_movelog_d551":
             b"\nLv. 1: Deals 3 piercing damage\n"
             b"and 1-turn Freeze for 5 FP.",
@@ -1649,6 +1666,9 @@ g_StringMap = {
         b"tot_movelog_d553":
             b"\nLv. 3: Deals 5 piercing damage\n"
             b"and 3-turn Freeze for 9 FP.",
+        b"tot_movelog_d561":
+            b"\nDeals up to 10 piercing damage\n"
+            b"on all foes for 9 FP.",
         # Yoshi moves.
         b"tot_movelog_d611":
             b"\nLv. 1: Hits up to 4 times for\n"
@@ -1677,6 +1697,9 @@ g_StringMap = {
         b"tot_movelog_d633":
             b"\nLv. 3: Toss up to 5 eggs\n"
             b"for 2 damage for 7 FP.",
+        b"tot_movelog_d641":
+            b"\nCosts 5 FP. Works better on\n"
+            b"foes with low HP or Tiny status.",
         b"tot_movelog_d651":
             b"\nLv. 1: Toss up to 2 eggs\n"
             b"for 3-turn Shrink for 3 FP.",
@@ -1732,6 +1755,9 @@ g_StringMap = {
         b"tot_movelog_d753":
             b"\nLv. 3: Deals 7 piercing damage\n"
             b"and 3-turn Burn for 8 FP.",
+        b"tot_movelog_d761":
+            b"\nCosts 5 FP to use. Only one foe\n"
+            b"can be Infatuated at a time.",
         # Bobbery moves.
         b"tot_movelog_d811":
             b"\nLv. 1: Deals 3 damage\n"
@@ -1751,6 +1777,9 @@ g_StringMap = {
         b"tot_movelog_d823":
             b"\nLv. 3: Throw four bombs for\n"
             b"3 piercing damage, for 6 FP.",
+        b"tot_movelog_d831":
+            b"\nCounters enemy direct attacks\n"
+            b"for up to 4 turns, for 4 FP.",
         b"tot_movelog_d841":
             b"\nLv. 1: Throw two bombs, which\n"
             b"inflict 5-Turn Poison, for 3 FP.",
@@ -1769,6 +1798,9 @@ g_StringMap = {
         b"tot_movelog_d853":
             b"\nLv. 3: Deals 9 damage to all\n"
             b"enemies for 10 FP.",
+        b"tot_movelog_d861":
+            b"\nDeals up to 20 damage to all\n"
+            b"combatants for 10 FP.",
         # Ms. Mowz moves.
         b"tot_movelog_d911":
             b"\nLv. 1: Deals 3 piercing hits for\n"
@@ -1779,15 +1811,20 @@ g_StringMap = {
         b"tot_movelog_d913":
             b"\nLv. 3: Deals 5 piercing hits for\n"
             b"diminishing damage for 4 FP.",
+        b"tot_movelog_d921":
+            b"\nCosts 5 FP. Ignores contact\n"
+            b"hazards, except lit Bob-ombs.",
         b"tot_movelog_d931":
-            b"\nLv. 1: 2-turn Confuse, with a\n"
+            b"\nLv. 1: 1-turn Confuse, with a\n"
             b"failed act rate of 50% for 2 FP.",
         b"tot_movelog_d932":
-            b"\nLv. 2: 2-turn Confuse, with a\n"
+            b"\nLv. 2: 1-turn Confuse, with a\n"
             b"failed act rate of 70% for 4 FP.",
         b"tot_movelog_d933":
-            b"\nLv. 3: 2-turn Confuse, with a\n"
+            b"\nLv. 3: 1-turn Confuse, with a\n"
             b"failed act rate of 90% for 7 FP.",
+        b"tot_movelog_d941":
+            b"\nCosts 2 FP to use.",
         b"tot_movelog_d951":
             b"\nLv. 1: Deals 3 piercing damage\n"
             b"and 50% 1-turn Dizzy for 4 FP.",

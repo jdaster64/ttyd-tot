@@ -119,8 +119,8 @@ const char* GetLogMoveLevelDesc(int32_t move_type, int32_t level) {
         ? move_type / 8 : move_type / 6 - 1;
     int32_t move_class_idx = move_type < MoveType::GOOMBELLA_BASE
         ? move_type + 1 - move_class * 8 : move_type + 1 - (move_class + 1) * 6;
-    if (level > g_MoveData[move_type].max_level || g_MoveData[move_type].max_level == 1) {
-        // Level does not exist or no distinguishing needed; return empty string.
+    if (level > g_MoveData[move_type].max_level) {
+        // Level does not exist; return empty string.
         return "";
     } else if (
         // Never unlocked; return 00X placeholder that always says "Lv. X: ???".
