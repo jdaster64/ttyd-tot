@@ -2031,7 +2031,9 @@ g_StringMap = {
             b"bonus condition.",
         b"tot_achd_27":
             b"Finish a default run, spending\n"
-            b"3 or fewer turns on every floor.",
+            b"3 or fewer turns on each fight.\n"
+            b"Running away will still add\n"
+            b"any turns spent to the total.",
         b"tot_achd_28":
             b"Finish a default run without\n"
             b"taking any damage.",
@@ -2044,12 +2046,16 @@ g_StringMap = {
             b"Finish a run with one of Mario's\n"
             b"stats at a maximum of 1.\n"
             b"Settings must be default, aside\n"
-            b"from setting HP/FP/BP to 0.",
+            b"from forcing any stat to 0.\n"
+            b"You can also start at default,\n"
+            b"using Chet Rippo to sell stats.",
         b"tot_achd_31":
             b"Finish a run with two of Mario's\n"
             b"stats at a maximum of 1.\n"
             b"Settings must be default, aside\n"
-            b"from setting HP/FP/BP to 0.",
+            b"from forcing any stat to 0.\n"
+            b"You can also start at default,\n"
+            b"using Chet Rippo to sell stats.",
         b"tot_achd_32":
             b"Beat a floor with a fainted\n"
             b"partner.",
@@ -2154,7 +2160,9 @@ g_StringMap = {
             b"Finish a run with all of Mario's\n"
             b"stats at a maximum of 1.\n"
             b"Settings must be default, aside\n"
-            b"from setting HP/FP/BP to 0.",
+            b"from forcing any stat to 0.\n"
+            b"You can also start at default,\n"
+            b"using Chet Rippo to sell stats.",
         b"tot_achd_69":
             b"Take exactly 654 total damage\n"
             b"in a single tower run.",
