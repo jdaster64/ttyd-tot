@@ -83,6 +83,7 @@ namespace NpcTribeType {
         GRIFTY          = 0x16,
         CHARLIETON      = 0x17,
         HOWZ_SELLER     = 0x1a,
+        HOOKTAIL        = 0x21,
         LUMPY           = 0x35,
         ZESS_T          = 0x51,
         DOOGAN_YELLOW   = 0x5f,
@@ -92,6 +93,10 @@ namespace NpcTribeType {
         TOAD_SISTER_P   = 0x7a,
         TOAD_SISTER_G   = 0x7b,
         DOOPLISS        = 0x95,
+        GLOOMTAIL       = 0xc6,
+        PIDER           = 0x10a,
+        ARANTULA        = 0x10b,
+        BONETAIL        = 0x145,
     };
 }
     

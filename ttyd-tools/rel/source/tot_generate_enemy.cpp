@@ -50,6 +50,7 @@ using ::ttyd::npcdrv::NpcTribeDescription;
 
 namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
+namespace NpcAiType = ::ttyd::npc_data::NpcAiType;
 
 // Stats for a type of enemy (e.g. Hyper Goomba).
 struct EnemyTypeInfo {
@@ -643,6 +644,28 @@ void SelectEnemies() {
                 enemy_type = BattleUnitType::GLOOMTAIL;
                 break;
         }
+
+        // Determine whether to use Gold Fuzzy alternate boss.
+        switch (state.GetOptionValue(OPT_SECRET_BOSS)) {
+            case OPTVAL_SECRET_BOSS_ON:
+                enemy_type = BattleUnitType::GOLD_FUZZY;
+                break;
+            case OPTVAL_SECRET_BOSS_RANDOM:
+                // Don't allow the alternate boss before clearing a difficulty.
+                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
+                    !state.GetOption(STAT_PERM_HALF_FINISHES)) break;
+                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL) && 
+                    !state.GetOption(STAT_PERM_FULL_FINISHES)) break;
+                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) && 
+                    !state.GetOption(STAT_PERM_EX_FINISHES)) break;
+ 
+                // Otherwise, 20% chance of encountering the alternate boss.
+                if (state.Rand(100, RNG_ALTERNATE_BOSS) < 20) {
+                    enemy_type = BattleUnitType::GOLD_FUZZY;
+                }
+                break;
+        }
+
         for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
         g_Enemies[0] = enemy_type;
         g_NumEnemies = 1;
@@ -913,6 +936,8 @@ void BuildBattle(
     } else {
         // Make a copy of NPC so type can be swapped to Bonetail after fight.
         num_npcs = 2;
+        // Always set bosses to basic "Gold Fuzzy" AI type.
+        npc_ai = &ttyd::npc_data::npc_ai_type_table[NpcAiType::GOLD_FUZZY];
     }
     
     memset(npc_setup_info, 0, sizeof(NpcSetupInfo) * 3);
@@ -1006,10 +1031,13 @@ void BuildBattle(
     }
     
     if (state.IsFinalBossFloor()) {
-        battle->music_name = "BGM_BOSS_STG1_GONBABA1";
+        if (g_Enemies[0] != BattleUnitType::GOLD_FUZZY) {
+            battle->music_name = "BGM_BOSS_STG1_GONBABA1";
+        } else {
+            battle->music_name = "BGM_CHUBOSS_BATTLE1";
+        }
     } else if (state.floor_ == 32) {
         battle->music_name = "BGM_BOSS_STG4_RUNPELL1";
-        // "BGM_CHUBOSS_BATTLE1" = regular midboss theme, I prefer Doopliss's.
     } else if (IsMidbossFloor(state.floor_)) {
         battle->music_name = "BGM_KOBOSS_BATTLE1";
     } else {
@@ -1079,6 +1107,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     evtSetValue(evt, evt->evtArguments[4], x_pos);
     evtSetValue(evt, evt->evtArguments[5], y_pos);
     evtSetValue(evt, evt->evtArguments[6], z_pos);
+    evtSetValue(evt, evt->evtArguments[7], g_Enemies[0] == BattleUnitType::GOLD_FUZZY);
 
     // Double effective height of midboss field NPCs (for "!" indicator, mostly).
     if (IsMidbossFloor(g_Mod->state_.floor_)) {

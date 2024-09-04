@@ -257,8 +257,9 @@ enum RngSequence {
     RNG_SECONDARY_NPC           = 32,
     RNG_STAR_PIECE_CHEST        = 33,
     RNG_MYSTERY_COOK_RESULT     = 34,
+    RNG_ALTERNATE_BOSS          = 35,
     
-    RNG_SEQUENCE_MAX            = 35,
+    RNG_SEQUENCE_MAX            = 36,
 };
 
 // Different types of option values (see below for descriptions of each).

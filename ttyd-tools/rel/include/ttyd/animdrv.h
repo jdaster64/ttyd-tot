@@ -49,6 +49,20 @@ struct AnimPoseData {
 };
 static_assert(sizeof(AnimPoseData) == 0x44);
 
+struct AnimPose {
+    int32_t flags;
+    int32_t type_flags;
+    int32_t ref_count;
+    int32_t heap_type;
+    int32_t file_idx;
+    int32_t cur_anim_idx;
+    uint64_t local_time;
+    float frame_counter;
+    float anim_frame;
+    int8_t dummy_0x028[0x170 - 0x028];
+};
+static_assert(sizeof(AnimPose) == 0x170);
+
 extern "C" {
 
 // animPoseGetGroupName
@@ -66,7 +80,7 @@ extern "C" {
 // animPoseGetCurrentAnim
 // animPoseGetAnimBaseDataPtr
 AnimPoseData* animPoseGetAnimDataPtr(int32_t pose_idx);
-// animPoseGetAnimPosePtr
+AnimPose* animPoseGetAnimPosePtr(int32_t pose_idx);
 // animGroupBaseAsync
 // animSetPaperTexMtx
 // animPoseDisp_MakeExtTexture

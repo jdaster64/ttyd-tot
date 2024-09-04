@@ -14,6 +14,7 @@
 #include "tot_window_select.h"
 
 #include <gc/types.h>
+#include <ttyd/animdrv.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/database.h>
@@ -91,12 +92,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 namespace NpcTribeType = ::ttyd::npc_data::NpcTribeType;
 
 const char kPitNpcName[] = "npc_enemy";
-const char kPiderName[] = "\x83\x70\x83\x43\x83\x5f\x81\x5b\x83\x58";
-const char kArantulaName[] = 
-    "\x83\x60\x83\x85\x83\x89\x83\x93\x83\x5e\x83\x89\x81\x5b";
-const char kBonetailNpcName[] = "npc_enemy_2";
-const char kBonetailModelName[] = "c_gonbaba_z";
-const char kBonetailTribeName[] = "\x83\x5d\x83\x93\x83\x6f\x83\x6f";
+const char kPitBossNpc2Name[] = "npc_enemy_2";
 
 // Info for custom NPCs.
 NpcSetupInfo g_EnemyNpcSetup[3];
@@ -112,6 +108,7 @@ EVT_DECLARE_USER_FUNC(evtTot_OverrideLockKey, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
 EVT_DECLARE_USER_FUNC(evtTot_UpdateDestinationMap, 0)
 EVT_DECLARE_USER_FUNC(evtTot_WaitForDragonLanding, 1)
+EVT_DECLARE_USER_FUNC(evtTot_WaitNpcAnimFrame, 2)
 
 // Other declarations.
 extern BeroEntry normal_room_entry_data[3];
@@ -559,6 +556,44 @@ EVT_BEGIN(Tower_CheckGameOver)
     RETURN()
 EVT_END()
 
+// Victory sequence at the end of a run.
+// LW(15) should be set to how long to delay the ending stats from popping up.
+EVT_BEGIN(Tower_VictorySequence)
+    // Increment floor to lock timer.
+    USER_FUNC(evtTot_ToggleIGT, 0)
+    USER_FUNC(evtTot_IncrementFloor, 1)
+    USER_FUNC(evtTot_TrackCompletedRun)
+    WAIT_MSEC(LW(15))
+    
+    // TODO: Flesh out victory animations, results, ...
+
+    // Show run stats + timer splits dialog.
+LBL(10)
+    USER_FUNC(evt_win_other_select,
+        (uint32_t)window_select::MenuType::RUN_RESULTS_STATS)
+LBL(20)
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_other_select,
+        (uint32_t)window_select::MenuType::RUN_RESULTS_SPLITS)
+    IF_EQUAL(LW(0), 0)
+        // If "cancelled", go back to regular stats window.
+        WAIT_MSEC(200)
+        GOTO(10)
+    END_IF()
+
+    // TODO: Show reward results dialog.
+
+    WAIT_MSEC(500)
+    // Despawn partner.
+    USER_FUNC(evt_mario_goodbye_party, 0)
+    // Reload into lobby.
+    USER_FUNC(evtTot_SetPreviousPartner, 0)
+    USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("w_bero"))
+
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Tower_DragonFelledShake)
     USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
     USER_FUNC(evt_snd_sfxon, PTR("SFX_STG1_GNB_DOWN1"), 0)
@@ -735,7 +770,7 @@ EVT_BEGIN(Tower_FinalBossEvent)
     USER_FUNC(evtTot_GetDifficulty, LW(1))
     IF_EQUAL(LW(1), (int32_t)OPTVAL_DIFFICULTY_FULL_EX)
         USER_FUNC(evt_npc_set_position, LW(13), 0, -1000, 0)
-        SET(LW(13), PTR(kBonetailNpcName))
+        SET(LW(13), PTR(kPitBossNpc2Name))
     END_IF()
 
     USER_FUNC(evt_cam3d_evt_set, 0, 30, 842, 0, 135, 150, 0, 11)
@@ -770,35 +805,138 @@ EVT_BEGIN(Tower_FinalBossEvent)
         USER_FUNC(evt_snd_sfxoff, LW(3))
     END_INLINE()
 
-    // Increment floor to lock timer.
-    USER_FUNC(evtTot_ToggleIGT, 0)
-    USER_FUNC(evtTot_IncrementFloor, 1)
-    USER_FUNC(evtTot_TrackCompletedRun)
-    WAIT_MSEC(5000)
+    // Handle stopping timer, triggering achievements, results screens, etc.
+    SET(LW(15), 5000)
+    RUN_CHILD_EVT(Tower_VictorySequence)
+
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_GoldFuzzyIdleSfx)
+    SET(LW(13), PTR(kPitNpcName))
+    DO(0)
+        USER_FUNC(evtTot_WaitNpcAnimFrame, LW(13), 35)
+        USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d, 
+            PTR("SFX_STG1_CHORO_MOVE1"), LW(0), LW(1), LW(2), 0)
+        USER_FUNC(evtTot_WaitNpcAnimFrame, LW(13), 50)
+        USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d,
+            PTR("SFX_STG1_CHORO_G_WAIT2"), LW(0), LW(1), LW(2), 0)
+        USER_FUNC(evtTot_WaitNpcAnimFrame, LW(13), 95)
+        USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d,
+            PTR("SFX_STG1_CHORO_G_WAIT1"), LW(0), LW(1), LW(2), 0)
+        USER_FUNC(evtTot_WaitNpcAnimFrame, LW(13), -1)
+    WHILE()
+    RETURN()
+EVT_END()
+
+// Runs event for encountering final boss.
+EVT_BEGIN(Tower_GoldFuzzyBossEvent)
+    // Entry animation.
+    USER_FUNC(evt_hitobj_onoff, PTR("baba"), 1, 0)
+    USER_FUNC(evt_map_set_fog, 2, 400, 1000, 0, 10, 40)
+    USER_FUNC(evt_map_fog_onoff, 1)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mario_normalize)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 10, 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("CBN_S_1"))
+    USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 150, 0, -150)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitBossNpc2Name), PTR("GNB_H_3"))
+    USER_FUNC(evt_cam3d_evt_set, -480, 150, 459, -480, 67, -13, 0, 11)
+    USER_FUNC(evt_mario_set_pos, -560, 10, 0)
+    USER_FUNC(evt_party_set_pos, 0, -600, 10, 0)
+    USER_FUNC(evt_seq_wait, 2)
+
+    INLINE_EVT()
+        SET(LW(1), 0)
+        RUN_EVT(bero_close_door_play_se)
+        USER_FUNC(evt_sub_intpl_msec_init, 11, 180, 0, 500)
+        DO(0)
+            USER_FUNC(evt_sub_intpl_msec_get_value)
+            RUN_CHILD_EVT(Tower_BossDoor_Close)
+            IF_EQUAL(LW(1), 0)
+                DO_BREAK()
+            END_IF()
+        WHILE()
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.00), 200)
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.00), 100)
+    END_INLINE()
+    INLINE_EVT()
+        USER_FUNC(evt_party_move_pos2, 0, -490, 0, FLOAT(120.0))
+    END_INLINE()
+    USER_FUNC(evt_mario_mov_pos2, -450, 0, FLOAT(120.0))
+    RUN_EVT(bero_case_entry)
+    WAIT_MSEC(1300)
+
+    // TODO: Non-placeholder encounter message.
+    USER_FUNC(evt_msg_print, 0, PTR("tot_field_dragon00_00"), 0, 0)
+
+    USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_eff_fukidashi, 0, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
+    USER_FUNC(evt_eff_fukidashi, 3, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
+    USER_FUNC(evt_mario_set_pose, PTR("M_N_5B"))
+    WAIT_MSEC(2000)
+    USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
+    USER_FUNC(evt_mario_set_dir_npc, PTR(kPitNpcName))
+    USER_FUNC(evt_party_set_dir_npc, 0, PTR(kPitNpcName))
+
+    // TODO: Hone camera location, add dialogue, have Fuzzy jump toward Mario.
+    RUN_EVT_ID(Tower_GoldFuzzyIdleSfx, LW(15))
+    USER_FUNC(evt_cam3d_evt_set, 0, 60, 230, 0, 10, -70, 250, 11)
+    WAIT_MSEC(6000)
+    DELETE_EVT(LW(15))
+
+    USER_FUNC(evt_npc_battle_start, PTR(kPitNpcName))
     
-    // TODO: Flesh out victory animations, results, ...
-
-    // Show run stats + timer splits dialog.
-LBL(10)
-    USER_FUNC(evt_win_other_select,
-        (uint32_t)window_select::MenuType::RUN_RESULTS_STATS)
-LBL(20)
-    WAIT_MSEC(200)
-    USER_FUNC(evt_win_other_select,
-        (uint32_t)window_select::MenuType::RUN_RESULTS_SPLITS)
-    IF_EQUAL(LW(0), 0)
-        // If "cancelled", go back to regular stats window.
-        WAIT_MSEC(200)
-        GOTO(10)
+    // Handle game over sequence.
+    USER_FUNC(evt_npc_wait_battle_end)
+    USER_FUNC(evt_npc_get_battle_result, LW(0))
+    IF_EQUAL(LW(0), 3)
+        // Turn on red fog, turn door model back on and point at player.
+        USER_FUNC(evt_map_set_fog, 2, 400, 1000, 40, 0, 20)
+        USER_FUNC(evt_map_fog_onoff, 1)
+        // USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("door10"), 1)
+        // USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("kesu"), 1)
+        USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
+        USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
+        USER_FUNC(evt_cam3d_evt_off, 0, 11)
+        RUN_CHILD_EVT(&Tower_RunGameOverScript)
+        RETURN()
     END_IF()
+    
+    // Otherwise, play boss death animation.
 
-    WAIT_MSEC(500)
-    // Despawn partner.
-    USER_FUNC(evt_mario_goodbye_party, 0)
-    // Reload into lobby.
-    USER_FUNC(evtTot_SetPreviousPartner, 0)
-    USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-    USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("w_bero"))
+    // Spawn Mario + partner in room, dragon already felled in background.
+    SET(LW(13), PTR(kPitBossNpc2Name))
+    USER_FUNC(evt_cam3d_evt_set, 0, 30, 842, 0, 135, 150, 0, 11)
+    USER_FUNC(evt_npc_set_position, LW(13), 0, 0, -140)
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("GNB_H_3"))
+    USER_FUNC(evt_map_fog_onoff, 0)
+    USER_FUNC(evt_mario_set_pos, 25, 10, 150)
+    USER_FUNC(evt_mario_set_dir, 270, 0, 0)
+    USER_FUNC(evt_party_set_pos, 0, -25, 10, 150)
+    USER_FUNC(evt_party_set_dir, 0, 90, -1)
+
+    // Make Fuzzy do regular death animation.
+    SET(LW(13), PTR(kPitNpcName))
+    USER_FUNC(evt_npc_set_position, LW(13), 0, 5, 0)
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("CBN_Y_1"))
+    // TODO: Add death text.
+    WAIT_MSEC(1000)
+    USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
+    USER_FUNC(evt_eff, 
+        0, PTR("kemuri_test"), 4, LW(0), LW(1), LW(2), 
+        FLOAT(0.80), 0, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_ENEMY_DIE1"), 0)
+    USER_FUNC(evt_npc_delete, LW(13))
+    USER_FUNC(evt_npc_return_interrupt, LW(13))
+
+    // Handle stopping timer, triggering achievements, results screens, etc.
+    SET(LW(15), 2000)
+    RUN_CHILD_EVT(Tower_VictorySequence)
 
     RETURN()
 EVT_END()
@@ -808,13 +946,30 @@ EVT_BEGIN(Tower_FinalBossSetup)
     // Get battle / NPC info.
     USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
     SET(LW(1), PTR(g_EnemyNpcSetup))
-    USER_FUNC(evtTot_GetEnemyNpcInfo, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
+    USER_FUNC(evtTot_GetEnemyNpcInfo,
+        LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), LW(7))
+
+    // If in EX mode, a second NPC is needed for swapping to Bonetail.
+    SET(LW(9), PTR(npcTribe[NpcTribeType::BONETAIL].modelName))
+    SET(LW(10), PTR(npcTribe[NpcTribeType::BONETAIL].nameJp))
+    // If using alternate boss, second NPC should be the regular boss instead.
+    IF_EQUAL(LW(7), 1)
+        USER_FUNC(evtTot_GetDifficulty, LW(8))
+        SWITCH(LW(8))
+            CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_HALF)
+                SET(LW(9), PTR(npcTribe[NpcTribeType::HOOKTAIL].modelName))
+                SET(LW(10), PTR(npcTribe[NpcTribeType::HOOKTAIL].nameJp))
+            CASE_ETC()
+                SET(LW(9), PTR(npcTribe[NpcTribeType::GLOOMTAIL].modelName))
+                SET(LW(10), PTR(npcTribe[NpcTribeType::GLOOMTAIL].nameJp))
+        END_SWITCH()
+    END_IF()
     
     // Set up main NPC, and Bonetail NPC to swap to for EX difficulty.
     USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
     USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
-    USER_FUNC(evt_npc_entry, PTR(kBonetailNpcName), PTR(kBonetailModelName))
-    USER_FUNC(evt_npc_set_tribe, PTR(kBonetailNpcName), PTR(kBonetailTribeName))
+    USER_FUNC(evt_npc_entry, PTR(kPitBossNpc2Name), LW(9))
+    USER_FUNC(evt_npc_set_tribe, PTR(kPitBossNpc2Name), LW(10))
     USER_FUNC(evt_npc_setup, LW(1))
 
     USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 0, 0)
@@ -823,16 +978,23 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 33554496)
     USER_FUNC(evt_npc_pera_onoff, PTR(kPitNpcName), 0)
     USER_FUNC(evt_npc_set_ry, PTR(kPitNpcName), 0)
-    USER_FUNC(evt_npc_set_scale, PTR(kPitNpcName), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
+    IF_EQUAL(LW(7), 0)
+        USER_FUNC(
+            evt_npc_set_scale, PTR(kPitNpcName), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
+    END_IF()
 
-    USER_FUNC(evt_npc_set_position, PTR(kBonetailNpcName), 0, -1000, 0)
-    USER_FUNC(evt_npc_set_anim, PTR(kBonetailNpcName), PTR("GNB_H_3"))
-    USER_FUNC(evt_npc_flag_onoff, 1, PTR(kBonetailNpcName), 33554496)
-    USER_FUNC(evt_npc_pera_onoff, PTR(kBonetailNpcName), 0)
-    USER_FUNC(evt_npc_set_ry, PTR(kBonetailNpcName), 0)
-    USER_FUNC(evt_npc_set_scale, PTR(kBonetailNpcName), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
+    USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitBossNpc2Name), PTR("GNB_H_3"))
+    USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitBossNpc2Name), 33554496)
+    USER_FUNC(evt_npc_pera_onoff, PTR(kPitBossNpc2Name), 0)
+    USER_FUNC(evt_npc_set_ry, PTR(kPitBossNpc2Name), 0)
+    USER_FUNC(evt_npc_set_scale, PTR(kPitBossNpc2Name), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
     
-    RUN_EVT(&Tower_FinalBossEvent)
+    IF_EQUAL(LW(7), 0)
+        RUN_EVT(&Tower_FinalBossEvent)
+    ELSE()
+        RUN_EVT(&Tower_GoldFuzzyBossEvent)
+    END_IF()
     RETURN()
 EVT_END()
 
@@ -876,7 +1038,7 @@ EVT_BEGIN(Tower_NpcSetup)
         USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
         SET(LW(1), PTR(g_EnemyNpcSetup))
         USER_FUNC(evtTot_GetEnemyNpcInfo,
-            LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
+            LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), EVT_NULLPTR)
         
         USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
         USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
@@ -890,10 +1052,10 @@ EVT_BEGIN(Tower_NpcSetup)
 
         USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
         
-        IF_STR_EQUAL(LW(3), PTR(kPiderName))
+        IF_STR_EQUAL(LW(3), npcTribe[NpcTribeType::PIDER].nameJp)
             USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
         END_IF()
-        IF_STR_EQUAL(LW(3), PTR(kArantulaName))
+        IF_STR_EQUAL(LW(3), npcTribe[NpcTribeType::ARANTULA].nameJp)
             USER_FUNC(evt_npc_set_home_position, PTR(kPitNpcName), LW(4), LW(5), LW(6))
         END_IF()
         
@@ -1173,6 +1335,24 @@ EVT_DEFINE_USER_FUNC(evtTot_WaitForDragonLanding) {
     auto npc_name = (const char*)evtGetValue(evt, evt->evtArguments[0]);
     ttyd::npcdrv::NpcEntry* npc = ttyd::npcdrv::npcNameToPtr(npc_name);
     return npc->wKpaMobjDeadCheck ? 2 : 0;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_WaitNpcAnimFrame) {
+    auto npc_name = (const char*)evtGetValue(evt, evt->evtArguments[0]);
+    int32_t frame = evtGetValue(evt, evt->evtArguments[1]);
+    auto* npc = ttyd::npcdrv::npcNameToPtr(npc_name);
+    float cur_frame = 
+        ttyd::animdrv::animPoseGetAnimPosePtr(npc->poseId)->anim_frame;
+
+    if (frame < 0) {
+        // Block until loop number changes.
+        int32_t loop_cnt = ttyd::animdrv::animPoseGetLoopTimes(npc->poseId);
+        if (isFirstCall) {
+            evt->lwData[15] = loop_cnt;
+        }
+        return evt->lwData[15] != loop_cnt ? 2 : 0;
+    }
+    return cur_frame >= frame ? 2 : 0;
 }
 
 // Dynamically change the destination of the exit pipe.
