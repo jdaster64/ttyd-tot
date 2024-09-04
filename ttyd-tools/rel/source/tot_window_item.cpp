@@ -1276,7 +1276,7 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
             } else if (menu->buttons_pressed & ButtonId::X) {
                 SetCurrentItemLoadoutEquipped(menu, false);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
-                if (menu->cosmetic_cursor_idx > 13) {
+                if (menu->cosmetic_cursor_idx >= 13) {
                     menu->cosmetic_cursor_idx -= 13;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20005);
