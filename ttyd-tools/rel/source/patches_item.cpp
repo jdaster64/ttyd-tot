@@ -659,6 +659,14 @@ void ApplyFixedPatches() {
     ttyd::battle_item_data::ItemWeaponData_Jiwajiwa_Kinoko.hp_regen_time = 3;
     ttyd::battle_item_data::ItemWeaponData_Jiwajiwa_Syrup.fp_regen_strength = 5;
     ttyd::battle_item_data::ItemWeaponData_Jiwajiwa_Syrup.fp_regen_time = 3;
+
+    // Tasty Tonic and Healthy Salad cure ATK-Down.
+    ttyd::battle_item_data::ItemWeaponData_Sukkiri_Drink.atk_change_strength = 0;
+    ttyd::battle_item_data::ItemWeaponData_Sukkiri_Drink.atk_change_time = 0;
+    ttyd::battle_item_data::ItemWeaponData_Sukkiri_Drink.atk_change_chance = 100;
+    ttyd::battle_item_data::ItemWeaponData_HealthySalad.atk_change_strength = 0;
+    ttyd::battle_item_data::ItemWeaponData_HealthySalad.atk_change_time = 0;
+    ttyd::battle_item_data::ItemWeaponData_HealthySalad.atk_change_chance = 100;
         
     // Strawberry Cake now restores a random amount of HP/FP (5,5 base).
     SetItemRestoration(ItemType::CAKE, 5, 5);
