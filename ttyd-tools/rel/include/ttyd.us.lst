@@ -2280,6 +2280,7 @@
 801277e8:BtlUnit_OnStatusFlag
 80127814:BtlUnit_CheckStatus
 80127890:BtlUnit_CheckRecoveryStatus
+80127b58:BtlUnit_ClearStatus
 80127bac:BtlUnit_SetStatus
 80127f34:BtlUnit_GetStatus
 80128414:BtlUnit_GetHeight

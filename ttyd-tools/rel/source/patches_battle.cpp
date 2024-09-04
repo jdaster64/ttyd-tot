@@ -190,6 +190,7 @@ extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
 extern void (*g__btlcmd_SetAttackEvent_trampoline)(BattleWorkUnit*, BattleWorkCommand*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
+extern void (*g_BtlUnit_ClearStatus_trampoline)(BattleWorkUnit*);
 extern void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*);
 extern int32_t (*g_btlevtcmd_AnnounceMessage_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
@@ -1585,6 +1586,19 @@ void ApplyFixedPatches() {
                 break;
         }
     }
+
+    // Make midbosses regain their Huge status when KOed with a Life Shroom.
+    g_BtlUnit_ClearStatus_trampoline = patch::hookFunction(
+        ttyd::battle_unit::BtlUnit_ClearStatus, [](BattleWorkUnit* unit) {
+            // Run original logic.
+            g_BtlUnit_ClearStatus_trampoline(unit);
+
+            // Re-apply permanent huge status.
+            if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
+                unit->size_change_strength = 1;
+                unit->size_change_turns = 100;
+            }
+        });
         
     // Change frame windows for guarding / Superguarding at different levels
     // of Simplifiers / Unsimplifiers to be more symmetric.
