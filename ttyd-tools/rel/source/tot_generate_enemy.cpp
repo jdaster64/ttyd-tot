@@ -1130,11 +1130,16 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
     ttyd::npcdrv::npcSetBattleInfo(npc, battle_id);
     
     const auto& state = g_Mod->state_;
+    NpcBattleInfo* battle_info = &npc->battleInfo;
+
+    // Always have Pity Flower equipped on Gold Fuzzy.
+    if (g_Enemies[0] == BattleUnitType::GOLD_FUZZY) {
+        battle_info->wHeldItems[0] = ItemType::PITY_FLOWER;
+    }
     
     if (state.IsFinalBossFloor()) return 2;
     
     const int32_t reward_mode = state.GetOptionValue(OPT_BATTLE_DROPS);
-    NpcBattleInfo* battle_info = &npc->battleInfo;
     if (reward_mode == OPTVAL_DROP_NO_HELD_W_BONUS) {
         for (int32_t i = 0; i < battle_info->pConfiguration->num_enemies; ++i) {
             battle_info->wHeldItems[i] = 0;
@@ -1150,11 +1155,6 @@ EVT_DEFINE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo) {
             battle_info->wHeldItems[i] = item;
         }
     }
-
-    // Always have Pity Flower equipped on Gold Fuzzy?
-    // if (g_Enemies[0] == BattleUnitType::GOLD_FUZZY) {
-    //     battle_info->wHeldItems[0] = ItemType::PITY_FLOWER;
-    // }
     
     // Occasionally, set a battle condition for an optional bonus reward.
     SetBattleCondition(&npc->battleInfo);
@@ -1186,11 +1186,30 @@ bool GetEnemyStats(
     int32_t base_atk_pct = kStatPercents[difficulty];
     int32_t base_def_pct = kStatPercents[difficulty];
     
-    // Exception: for Atomic Boo and dragon fights, use base stats directly.
+    // Exception: for major boss fights, use base stats directly.
     if (state.floor_ % 32 == 0) {
         base_hp_pct = 100;
         base_atk_pct = 100;
         base_def_pct = 100;
+
+        // For Gold Fuzzy / Fuzzy Horde, scale stats by difficulty.
+        // TODO: Stats should probably be a little lower across the board?
+        if (unit_type == BattleUnitType::GOLD_FUZZY ||
+            unit_type == BattleUnitType::FUZZY_HORDE) {
+            switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+                case OPTVAL_DIFFICULTY_HALF:
+                    // 75 HP, 100 HP horde; 5 ATK
+                    base_hp_pct = 50;
+                    base_atk_pct = 70;
+                    break;
+                case OPTVAL_DIFFICULTY_FULL_EX:
+                    // 225 HP, 300 HP horde; 9 ATK
+                    base_hp_pct = 150;
+                    base_atk_pct = 130;
+                    break;
+                // default: 150 HP, 200 HP horde; 7 ATK
+            }
+        }
     }
     
     // Change this if adding back a boss scaling option.

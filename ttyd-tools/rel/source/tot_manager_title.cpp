@@ -14,12 +14,7 @@ namespace mod::tot {
 
 namespace {
 
-constexpr const char* kTitleInfo = "Project ToT alpha r22 2024-08-29";
-    
-// constexpr const char* kTitleInfo =
-    // "PM:TTYD Infinite Pit v2.40 r64 by jdaster64\n"
-    // "https://github.com/jdaster64/ttyd-infinite-pit\n"
-    // "Guide / Other mods: https://goo.gl/vjJjVd";
+constexpr const char* kTitleInfo = "alpha r23" "\n" "2024-09-04";
     
 }
 
@@ -34,8 +29,8 @@ void TitleScreenManager::Draw() {
         if (curtain_state >= 2 && curtain_state < 12) {
             // Draw title screen information.
             DrawCenteredTextWindow(
-                kTitleInfo, 0, -50, 0xFFu, true, 0xFFFFFFFFu, 0.7f, 
-                0x000000E5u, 15, 10);
+                kTitleInfo, 230, -180, 0xFFu, true, 0xFFFFFFFFu, 0.52f, 
+                0x000000E5u, 8, 8);
         }
     }
 }

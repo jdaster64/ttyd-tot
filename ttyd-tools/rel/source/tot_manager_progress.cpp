@@ -82,9 +82,9 @@ int32_t ProgressManager::GetOverallProgression() {
         GetOverallHubProgression();
 
         // Score:
-        // 25% for Achievements,
+        // 30% for Achievements,
         // 15% each for Move and Tattle logs,
-        // 10% each for Items and Badge logs,
+        // 7.5% each for Items and Badge logs,
         // 25% for Hub progression,
         // 1% per bonus achievement.
         //
@@ -93,11 +93,11 @@ int32_t ProgressManager::GetOverallProgression() {
         int32_t a_cur = data.achievements_current - data.achievements_secret;
         int32_t a_tot = data.achievements_total - data.achievements_secret;
 
-        score += 2500 * a_cur / a_tot;
+        score += 3000 * a_cur / a_tot;
         score += 1500 * data.moves_score / 10000;
         score += 1500 * data.tattles_current / 102;
-        score += 1000 * data.items_current / data.items_total;
-        score += 1000 * data.badges_current / data.badges_total;
+        score += 750 * data.items_current / data.items_total;
+        score += 750 * data.badges_current / data.badges_total;
         score += data.hub_score / 4;
 
         score += 100 * data.achievements_secret;
