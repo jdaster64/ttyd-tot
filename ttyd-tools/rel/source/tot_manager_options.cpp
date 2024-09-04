@@ -186,13 +186,13 @@ void OptionsManager::InitFromSelectedOptions() {
             int32_t num_badges = state.GetOption(STAT_PERM_BADGE_LOAD_SIZE);
             for (int32_t i = num_items - 1; i >= 0; --i) {
                 int32_t item_id =
-                    (uint8_t)state.GetOption(STAT_PERM_ITEM_LOADOUT, i)
+                    static_cast<uint8_t>(state.GetOption(STAT_PERM_ITEM_LOADOUT, i))
                     + ItemType::THUNDER_BOLT;
                 ttyd::mario_pouch::pouchGetItem(item_id);
             }
             for (int32_t i = num_badges - 1; i >= 0; --i) {
                 int32_t item_id =
-                    (uint8_t)state.GetOption(STAT_PERM_BADGE_LOADOUT, i)
+                    static_cast<uint8_t>(state.GetOption(STAT_PERM_BADGE_LOADOUT, i))
                     + ItemType::THUNDER_BOLT;
                 ttyd::mario_pouch::pouchGetItem(item_id);
             }

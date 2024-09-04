@@ -658,6 +658,11 @@ void SelectEnemies() {
                     !state.GetOption(STAT_PERM_FULL_FINISHES)) break;
                 if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) && 
                     !state.GetOption(STAT_PERM_EX_FINISHES)) break;
+
+                // Don't allow the alternate boss before 5 total clears.
+                if (state.GetOption(STAT_PERM_HALF_FINISHES) +
+                    state.GetOption(STAT_PERM_FULL_FINISHES) +
+                    state.GetOption(STAT_PERM_EX_FINISHES) < 5) break;
  
                 // Otherwise, 20% chance of encountering the alternate boss.
                 if (state.Rand(100, RNG_ALTERNATE_BOSS) < 20) {
