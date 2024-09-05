@@ -1870,13 +1870,13 @@ g_StringMap = {
         b"tot_recn_hub_marioskins":     b"Mario Costumes",
         b"tot_recn_hub_yoshiskins":     b"Yoshi Colors",
         b"tot_recn_hub_attackfx":       b"Attack FX",
-        b"tot_recn_half_wins":          b"Half Length",
-        b"tot_recn_full_wins":          b"Full Length",
+        b"tot_recn_half_wins":          b"Hooktail",
+        b"tot_recn_full_wins":          b"Gloomtail",
         b"tot_recn_ex_wins":            b"EX Difficulty",
         b"tot_recn_continues":          b"Total Continues",
         b"tot_recn_times":              b"Best Times (IGT)",
-        b"tot_recn_half_time":          b"Half Length",
-        b"tot_recn_full_time":          b"Full Length",
+        b"tot_recn_half_time":          b"Hooktail",
+        b"tot_recn_full_time":          b"Gloomtail",
         b"tot_recn_ex_time":            b"EX Difficulty",
         b"tot_recn_floors":             b"Floors Cleared",
         b"tot_recn_turns":              b"Turns Spent",
@@ -1980,28 +1980,28 @@ g_StringMap = {
             b"Clear Hooktail's tower for the\n"
             b"first time.",
         b"tot_achd_10":
-            b"Clear a Half-length tower in\n"
+            b"Clear Hooktail's tower in\n"
             b"1:00:00 with default settings.",
         b"tot_achd_11":
-            b"Clear a Half-length tower in\n"
+            b"Clear Hooktail's tower in\n"
             b"0:40:00 with default settings.",
         b"tot_achd_12":
             b"Clear Gloomtail's tower for the\n"
             b"first time.",
         b"tot_achd_13":
-            b"Clear a Full-length tower in\n"
+            b"Clear Gloomtail's tower in\n"
             b"2:00:00 with default settings.",
         b"tot_achd_14":
-            b"Clear a Full-length tower in\n"
+            b"Clear Gloomtail's tower in\n"
             b"1:30:00 with default settings.",
         b"tot_achd_15":
             b"Finish an EX-difficulty tower run\n"
             b"with default settings.",
         b"tot_achd_16":
-            b"Clear a EX-difficulty run in\n"
+            b"Clear an EX-difficulty run in\n"
             b"3:00:00 with default settings.",
         b"tot_achd_17":
-            b"Clear a EX-difficulty run in\n"
+            b"Clear an EX-difficulty run in\n"
             b"2:20:00 with default settings.",
         b"tot_achd_18":
             b"Finish a run, making deals with\n"
@@ -2575,10 +2575,10 @@ g_StringMap = {
         b"tot_optr_preset":             b"Preset",
         b"tot_optr_preset_custom":      b"Custom",
         b"tot_optr_preset_default":     b"Default",
-        b"tot_optr_difficulty":         b"Difficulty",
-        b"tot_optr_diff_half":          b"Half (32 floors)",
-        b"tot_optr_diff_full":          b"Full (64 floors)",
-        b"tot_optr_diff_ex":            b"EX (64 floors)",
+        b"tot_optr_difficulty":         b"Tower Type",
+        b"tot_optr_diff_half":          b"Hooktail (32f)",
+        b"tot_optr_diff_full":          b"Gloomtail (64f)",
+        b"tot_optr_diff_ex":            b"EX Difficulty (64f)",
         b"tot_optr_timertype":          b"Timer Display",
         b"tot_optr_timer_none":         b"None",
         b"tot_optr_timer_igt":          b"In-Game Time",
