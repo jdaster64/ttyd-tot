@@ -343,11 +343,9 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
     // Handle special inputs for run options window.
     if (sel_entry->type == MenuType::RUN_OPTIONS && 
         sel_entry->state == WinMgrSelectEntry_State::IN_SELECTION) {
-        // Incredibly hacky: Replace A presses with B presses.
-        if (g_MarioSt->gamepad_buttons_pressed[0] & ButtonId::A) {
-            g_MarioSt->gamepad_buttons_pressed[0] &= ~ButtonId::A;
-            g_MarioSt->gamepad_buttons_pressed[0] |= ButtonId::B;
-        }
+        // Remove A presses entirely.
+        g_MarioSt->gamepad_buttons_pressed[0] &= ~ButtonId::A;
+
         // Handle left/right presses (changing option).
         uint16_t dir_rep = ttyd::system::keyGetDirRep(0);
         int32_t change = 0;
@@ -459,6 +457,9 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
             }
         }
     }
+
+    // Update run intensity setting, in case of any changes.
+    state.SetOption(STAT_RUN_INTENSITY, OptionsManager::GetTotalIntensity());
 
     // Run vanilla selection main function.
     select_main(entry);
@@ -1180,7 +1181,7 @@ void DispSelectionHelp(WinMgrEntry* entry) {
     }
 }
 
-void DispOptionsWindowTopBar(WinMgrEntry* entry) {
+void DispResultsWindowTopBar(WinMgrEntry* entry) {
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
         WinMgrEntry_Flags::IN_FADE) != 0) return;
@@ -1197,7 +1198,7 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
     gc::vec3 text_scale = { 0.9f, 1.0f, 1.0f };
     
     ttyd::fontmgr::FontDrawStart();
-    
+
     sprintf(text, "Seed: ");
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
@@ -1206,18 +1207,19 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
 
     text_pos.x = min_x;
     text_pos.y += space_y;
-    sprintf(text, "Difficulty: ");
+    sprintf(text, "Diff./Int.: ");
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
+    int32_t intensity = g_Mod->state_.GetOption(STAT_RUN_INTENSITY);
     switch (g_Mod->state_.GetOptionValue(OPT_DIFFICULTY)) {
         case OPTVAL_DIFFICULTY_HALF:
-            sprintf(text, "32F");
+            sprintf(text, "32F (%" PRId32 "%%)", intensity);
             break;
         case OPTVAL_DIFFICULTY_FULL:
-            sprintf(text, "64F");
+            sprintf(text, "64F (%" PRId32 "%%)", intensity);
             break;
         case OPTVAL_DIFFICULTY_FULL_EX:
-            sprintf(text, "64F (EX)");
+            sprintf(text, "EX (%" PRId32 "%%)", intensity);
             break;
     }
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
@@ -1267,12 +1269,11 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
 }
 
-void DispOptionsWindowBottomBar(WinMgrEntry* entry) {
+void DispResultsWindowBottomBar(WinMgrEntry* entry) {
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
         WinMgrEntry_Flags::IN_FADE) != 0) return;
 
-    bool kIsOptions = sel_entry->type == MenuType::RUN_OPTIONS;
     uint32_t kBlack = 0x0000'00FFU;
     uint32_t kWhite = 0xFFFF'FFFFU;
     const float kContinueOffset = 0.17f;
@@ -1280,7 +1281,7 @@ void DispOptionsWindowBottomBar(WinMgrEntry* entry) {
 
     ttyd::fontmgr::FontDrawStart();
 
-    const char* msg = kIsOptions ? "Selection" : "Continue";
+    const char* msg = "Continue";
     int32_t length = ttyd::fontmgr::FontGetMessageWidth(msg);
     gc::vec3 text_pos = {
         entry->x + entry->width * (kContinueOffset + 0.22f) - length * 0.5f,
@@ -1303,12 +1304,112 @@ void DispOptionsWindowBottomBar(WinMgrEntry* entry) {
         0.0f
     };
     gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
-    ttyd::win_main::winIconSet(
-        kIsOptions ? IconType::CONTROL_STICK_CENTER : IconType::A_BUTTON, 
-        &pos, &scale, &kWhite);
+    ttyd::win_main::winIconSet(IconType::A_BUTTON, &pos, &scale, &kWhite);
 
     pos.x = entry->x + entry->width * kBackOffset;
     ttyd::win_main::winIconSet(IconType::B_BUTTON, &pos, &scale, &kWhite);
+}
+
+void DispOptionsWindowTopBar(WinMgrEntry* entry) {
+    auto* sel_entry = (WinMgrSelectEntry*)entry->param;
+    if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
+        WinMgrEntry_Flags::IN_FADE) != 0) return;
+
+    uint32_t kBlack = 0x0000'00FFU;
+    uint32_t kWhite = 0xFFFF'FFFFU;
+
+    const float kDescXOffset = 0.32f;
+    const float kDescYOffset = 0.15f;
+    const float kDescXScale = 0.75f;
+    const float kDescYScale = 0.8f;
+    const float kIconXOffset = 0.63f;
+    const float kTextXOffset = 0.67f;
+    const float kValueXOffset = 0.9f;
+    const float kOptionYOffset = 0.3f;
+    const float kTotalYOffset = 0.7f;
+    const float kTextAbsOffset = 11.0f;
+
+    ttyd::fontmgr::FontDrawStart();
+    {
+        const char* msg = msgSearch("tot_intensity_desc");
+        int32_t length = ttyd::fontmgr::FontGetMessageWidth(msg);
+        gc::vec3 text_pos = {
+            entry->x + entry->width * kDescXOffset - length * 0.5f * kDescXScale,
+            entry->y - entry->height * kDescYOffset,
+            0.0f
+        };
+        gc::vec3 text_scale = { kDescXScale, kDescYScale, 1.0f };
+        ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, msg);
+    }
+    {
+        const char* msg = "Option:";
+        gc::vec3 text_pos = {
+            entry->x + entry->width * kTextXOffset,
+            entry->y - entry->height * kOptionYOffset + kTextAbsOffset,
+            0.0f
+        };
+        gc::vec3 text_scale = { 0.9f, 0.9f, 0.9f };
+        ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, msg);
+    }
+    {
+        const char* msg = "Total:";
+        gc::vec3 text_pos = {
+            entry->x + entry->width * kTextXOffset,
+            entry->y - entry->height * kTotalYOffset + kTextAbsOffset,
+            0.0f
+        };
+        gc::vec3 text_scale = { 0.9f, 0.9f, 0.9f };
+        ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, msg);
+    }
+    {
+        gc::vec3 text_pos = {
+            entry->x + entry->width * kValueXOffset,
+            entry->y - entry->height * kOptionYOffset + kTextAbsOffset,
+            0.0f
+        };
+        gc::vec3 text_scale = { 0.9f, 0.9f, 0.9f };
+
+        int32_t value = sel_entry->row_data[sel_entry->cursor_index].value;
+        uint32_t option = OptionLookup(value);
+
+        int32_t intensity = OptionsManager::GetIntensity(option);
+        int32_t red = Clamp(intensity * 7, 0, 255);
+        int32_t blue = Clamp(-intensity * 7, 0, 255);
+        uint32_t color = (red << 24) | (blue << 8) | 0xFF;
+
+        ttyd::win_main::winFontSetR(
+            &text_pos, &text_scale, &color,
+            "%s%" PRId32 "%%", intensity > 0 ? "+" : "", intensity);
+    }
+    {
+        gc::vec3 text_pos = {
+            entry->x + entry->width * kValueXOffset,
+            entry->y - entry->height * kTotalYOffset + kTextAbsOffset,
+            0.0f
+        };
+        gc::vec3 text_scale = { 0.9f, 0.9f, 0.9f };
+
+        int32_t intensity = OptionsManager::GetTotalIntensity();
+        int32_t red = Clamp((intensity - 100) * 2, 0, 255);
+        int32_t blue = Clamp((100 - intensity) * 2, 0, 255);
+        uint32_t color = (red << 24) | (blue << 8) | 0xFF;
+
+        ttyd::win_main::winFontSetR(
+            &text_pos, &text_scale, &color, "%" PRId32 "%%", intensity);
+    }
+
+    // Draw icons for option paper and Mystery box for total rewards.
+    ttyd::win_main::winIconInit();
+    gc::vec3 pos = { 
+        entry->x + entry->width * kIconXOffset, 
+        entry->y - entry->height * kOptionYOffset,
+        0.0f
+    };
+    gc::vec3 scale = { 0.7f, 0.7f, 0.7f };
+    ttyd::win_main::winIconSet(IconType::VITAL_PAPER,  &pos, &scale, &kWhite);
+
+    pos.y = entry->y - entry->height * kTotalYOffset;
+    ttyd::win_main::winIconSet(IconType::MYSTERY,  &pos, &scale, &kWhite);
 }
 
 WinMgrSelectDescList g_SelectDescList[MenuType::MAX_MENU_TYPE];
@@ -1357,7 +1458,7 @@ WinMgrDesc g_CustomDescs[] = {
         .heading_type = WinMgrDesc_HeadingType::SINGLE_CENTERED,
         .camera_id = (int32_t)CameraId::k2d,
         .x = -250,
-        .y = 135,
+        .y = 120,
         .width = 500,
         .height = 240,
         .color = 0xFFFFFFFFU,
@@ -1368,19 +1469,19 @@ WinMgrDesc g_CustomDescs[] = {
         .fade_mode = WinMgrDesc_FadeMode::INSTANT,
         .heading_type = WinMgrDesc_HeadingType::NONE,
         .camera_id = (int32_t)CameraId::k2d,
-        .x = -200,
+        .x = -260,
         .y = 200,
-        .width = 400,
-        .height = 45,
-        .color = 0xC4ECF2FFU,
+        .width = 520,
+        .height = 60,
+        .color = 0xFFC8D4FFU,
         .main_func = nullptr,
-        .disp_func = (void*)DispOptionsWindowBottomBar,
+        .disp_func = (void*)DispOptionsWindowTopBar,
     },
     {
         .fade_mode = WinMgrDesc_FadeMode::INSTANT,
         .heading_type = WinMgrDesc_HeadingType::NONE,
         .camera_id = (int32_t)CameraId::k2d,
-        .x = -240,
+        .x = -250,
         .y = -130,
         .width = 500,
         .height = 80,
@@ -1411,7 +1512,7 @@ WinMgrDesc g_CustomDescs[] = {
         .height = 93,
         .color = 0xC4ECF2FFU,
         .main_func = nullptr,
-        .disp_func = (void*)DispOptionsWindowTopBar,
+        .disp_func = (void*)DispResultsWindowTopBar,
     },
     {
         .fade_mode = WinMgrDesc_FadeMode::INSTANT,
@@ -1423,7 +1524,7 @@ WinMgrDesc g_CustomDescs[] = {
         .height = 45,
         .color = 0xC4ECF2FFU,
         .main_func = nullptr,
-        .disp_func = (void*)DispOptionsWindowBottomBar,
+        .disp_func = (void*)DispResultsWindowBottomBar,
     },
 };
 
@@ -1812,6 +1913,8 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
             evt->lwData[1] = value;
             evt->lwData[2] = 
                 PTR(msgSearch(MoveManager::GetMoveData(value)->name_msg));
+            break;
+        case MenuType::RUN_OPTIONS:
             break;
     }
     

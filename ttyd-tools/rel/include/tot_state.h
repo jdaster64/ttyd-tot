@@ -475,7 +475,9 @@ enum Options : uint32_t {
     STAT_RUN_JUMPS_HAMMERS_USED = 0x059'1'01'02,
     STAT_RUN_BADGES_EQUIPPED    = 0x05a'1'01'02,
     STAT_RUN_INFATUATE_DAMAGE   = 0x05b'2'01'04,
-    // Next: 0x05d
+    // Tracks the current run's intensity level.
+    STAT_RUN_INTENSITY          = 0x05d'2'01'03,
+    // Next: 0x05f
 
     // Stats that persist across runs.
     STAT_PERM_ENEMY_KILLS       = 0x100'2'00'70,
@@ -525,7 +527,10 @@ enum Options : uint32_t {
     STAT_PERM_ITEM_LOAD_SIZE    = 0x2a3'1'01'01,
     STAT_PERM_BADGE_LOADOUT     = 0x2a4'1'00'06,
     STAT_PERM_BADGE_LOAD_SIZE   = 0x2aa'1'01'01,
-    // Next: 0x2ab
+    STAT_PERM_META_COINS_EARNED = 0x2ab'4'01'09,
+    STAT_PERM_META_SP_EARNED    = 0x2af'4'01'09,
+    STAT_PERM_MAX_INTENSITY     = 0x2b3'2'01'03,
+    // Next: 0x2b5
 };
 
 }  // namespace mod::tot

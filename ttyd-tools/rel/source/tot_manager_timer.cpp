@@ -260,10 +260,6 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         }
     }
 
-    if (OptionsManager::GetTotalIntensity() >= 200) {
-        AchievementsManager::MarkCompleted(AchievementId::RUN_HIGH_INTENSITY);
-    }
-
     if (OptionsManager::AllDefaultExceptZeroStatLevels()) {
         int32_t mario_hp_scale = state.GetOption(OPT_MARIO_HP);
         int32_t mario_fp_scale = state.GetOption(OPT_MARIO_FP);
@@ -299,14 +295,30 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     state.ChangeOption(STAT_PERM_STAR_PIECES, sp_earned);
     state.ChangeOption(STAT_PERM_SHINE_SPRITES, shines_earned);
 
-    if (state.GetOption(STAT_PERM_COINS_EARNED) >= 10000) {
+    // Apply intensity multiplier to currency earned.
+    int32_t intensity = state.GetOption(STAT_RUN_INTENSITY);
+    int32_t meta_coins_earned = (coins_earned * intensity + 99) / 100;
+    int32_t meta_sp_earned =
+        ((sp_earned + shines_earned * 3) * intensity + 99) / 100;
+
+    state.ChangeOption(STAT_PERM_META_COINS_EARNED, meta_coins_earned);
+    state.ChangeOption(STAT_PERM_META_SP_EARNED, meta_sp_earned);
+
+    if (state.GetOption(STAT_PERM_META_COINS_EARNED) >= 10000) {
         AchievementsManager::MarkCompleted(AchievementId::AGG_COINS_10000);
+    }
+    if (intensity >= 200) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_HIGH_INTENSITY);
     }
 
     // Update amount of meta-currency available in the hub.
-    state.ChangeOption(STAT_PERM_CURRENT_COINS, coins_earned);
-    state.ChangeOption(STAT_PERM_CURRENT_SP, sp_earned);
-    state.ChangeOption(STAT_PERM_CURRENT_SP, shines_earned * 3);
+    state.ChangeOption(STAT_PERM_CURRENT_COINS, meta_coins_earned);
+    state.ChangeOption(STAT_PERM_CURRENT_SP, meta_sp_earned);
+
+    // Update highest intensity cleared.
+    if (intensity > state.GetOption(STAT_PERM_MAX_INTENSITY)) {
+        state.SetOption(STAT_PERM_MAX_INTENSITY, intensity);
+    }
 
     // Reshuffle the hub item shop.
     state.SetOption(OPT_SHOP_ITEMS_CHOSEN, 0);

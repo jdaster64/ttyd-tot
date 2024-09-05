@@ -2565,6 +2565,10 @@ g_StringMap = {
             b"<select 0 1 0 40>\nYes\nNo",
             
         # Run options menu.
+        
+        b"tot_intensity_desc":
+            b"Increase intensity for more \n"
+            b"     end-of-run rewards!",
             
         b"tot_winsel_runoptions_header":    b"Options",
         

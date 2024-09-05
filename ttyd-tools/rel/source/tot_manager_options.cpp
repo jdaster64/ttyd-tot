@@ -364,6 +364,8 @@ void OptionsManager::OnLobbyLoad() {
     }
 
     state.ResetOptions();
+    // Set intensity level to default.
+    state.SetOption(STAT_RUN_INTENSITY, 100);
     
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
