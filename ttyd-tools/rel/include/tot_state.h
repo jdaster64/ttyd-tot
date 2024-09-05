@@ -298,7 +298,7 @@ enum OptionsType {
 //  - STAT_x:   Play stats value:   (0x XXX Y ZZ VV);
 //      Represents play_stats_ bytes [XXX, XXX+Y) (in the range 0x000 ~ 0x400).
 //          If ZZ = 0: Value is uncapped; if VV > 1, array of VVx Y-byte values.
-//          If ZZ = 1: Value is capped to +/- value with VV (1-9) digits.
+//          If ZZ = 1: Value is clamped to nonnegative values with VV (1-9) digits.
 //  - Other options (0xC0000000+) : reserved for future / other uses.
 //
 // Intentionally placed in global namespace for convenience.

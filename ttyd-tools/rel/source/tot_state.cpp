@@ -350,7 +350,9 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
                     100'000'000, 1'000'000'000
                 };
                 if (value >= powers_of_10[b]) value = powers_of_10[b] - 1;
-                if (value <= -powers_of_10[b]) value = -(powers_of_10[b] - 1);
+                if (value < 0) value = 0;
+                // TODO: Clamp to negative values, if supporting in future.
+                // if (value <= -powers_of_10[b]) value = -(powers_of_10[b] - 1);
             }
             uint32_t uint_val = static_cast<uint32_t>(value);
             for (int32_t i = y - 1; i >= 0; --i) {
