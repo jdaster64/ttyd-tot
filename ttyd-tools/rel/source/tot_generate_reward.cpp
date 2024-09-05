@@ -1158,8 +1158,11 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectMoves) {
 
 EVT_DEFINE_USER_FUNC(evtTot_GetStarPieceRolls) {
     int32_t extra_rolls = g_Mod->state_.Rand(3, RNG_STAR_PIECE_CHEST);
+    
     // Add additional Star Pieces to match the number of upgrades received.
     ttyd::mario_pouch::pouchAddStarPiece(extra_rolls);
+    g_Mod->state_.ChangeOption(STAT_RUN_STAR_PIECES, extra_rolls);
+
     evtSetValue(evt, evt->evtArguments[0], extra_rolls + 1);
     return 2;
 }

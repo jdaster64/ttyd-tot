@@ -1213,13 +1213,13 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     int32_t intensity = g_Mod->state_.GetOption(STAT_RUN_INTENSITY);
     switch (g_Mod->state_.GetOptionValue(OPT_DIFFICULTY)) {
         case OPTVAL_DIFFICULTY_HALF:
-            sprintf(text, "32F (%" PRId32 "%%)", intensity);
+            sprintf(text, "32F, %" PRId32 "%%", intensity);
             break;
         case OPTVAL_DIFFICULTY_FULL:
-            sprintf(text, "64F (%" PRId32 "%%)", intensity);
+            sprintf(text, "64F, %" PRId32 "%%", intensity);
             break;
         case OPTVAL_DIFFICULTY_FULL_EX:
-            sprintf(text, "EX (%" PRId32 "%%)", intensity);
+            sprintf(text, "EX, %" PRId32 "%%", intensity);
             break;
     }
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
