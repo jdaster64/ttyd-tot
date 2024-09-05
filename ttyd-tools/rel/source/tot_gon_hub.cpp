@@ -848,8 +848,7 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectShopItems) {
 
     // Read previously selected items.
     for (int32_t i = 0; i < 5; ++i) {
-        int32_t id = 
-            static_cast<uint8_t>(state.GetOption(STAT_PERM_SHOP_ITEMS, i));
+        int32_t id = state.GetOption(STAT_PERM_SHOP_ITEMS, i);
         if (id == 255) {
             // Sentinel.
             shop_buy_list[i].item_id = 1;

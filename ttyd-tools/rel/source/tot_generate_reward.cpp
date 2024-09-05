@@ -1091,8 +1091,7 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializePartyMember) {
     party_data.tech_level = 0;
 
     // Mark off permanent log flag for first obtaining this partner.
-    uint32_t option = 
-        static_cast<uint8_t>(g_Mod->state_.GetOption(STAT_PERM_PARTNERS_OBTAINED));
+    uint32_t option = g_Mod->state_.GetOption(STAT_PERM_PARTNERS_OBTAINED);
     option |= 1 << (-reward_type);
     g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, option);
     if (option == 0xfeU) {

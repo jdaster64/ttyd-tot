@@ -6,6 +6,7 @@
 #include "tot_custom_rel.h"
 #include "tot_generate_condition.h"
 #include "tot_generate_item.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_debug.h"
 
 #include <ttyd/battle.h>
@@ -650,7 +651,7 @@ void SelectEnemies() {
             case OPTVAL_SECRET_BOSS_ON:
                 enemy_type = BattleUnitType::GOLD_FUZZY;
                 break;
-            case OPTVAL_SECRET_BOSS_RANDOM:
+            case OPTVAL_SECRET_BOSS_RANDOM: {
                 // Don't allow the alternate boss before clearing a difficulty.
                 if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
                     !state.GetOption(STAT_PERM_HALF_FINISHES)) break;
@@ -660,15 +661,24 @@ void SelectEnemies() {
                     !state.GetOption(STAT_PERM_EX_FINISHES)) break;
 
                 // Don't allow the alternate boss before 5 total clears.
-                if (state.GetOption(STAT_PERM_HALF_FINISHES) +
+                int32_t total_clears =
+                    state.GetOption(STAT_PERM_HALF_FINISHES) +
                     state.GetOption(STAT_PERM_FULL_FINISHES) +
-                    state.GetOption(STAT_PERM_EX_FINISHES) < 5) break;
- 
-                // Otherwise, 20% chance of encountering the alternate boss.
-                if (state.Rand(100, RNG_ALTERNATE_BOSS) < 20) {
+                    state.GetOption(STAT_PERM_EX_FINISHES);
+                if (total_clears < 5) break;
+
+                // Else, 20% chance (or double if not beaten in 10 clears).
+                int32_t chance = 20;
+                if (total_clears > 10 && !state.GetOption(
+                    FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
+                    chance = 40;
+                }
+                if (static_cast<int32_t>(state.Rand(100, RNG_ALTERNATE_BOSS)) 
+                    < chance) {
                     enemy_type = BattleUnitType::GOLD_FUZZY;
                 }
                 break;
+            }
         }
 
         for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;

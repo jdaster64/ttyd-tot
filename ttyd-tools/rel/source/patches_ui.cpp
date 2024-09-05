@@ -577,8 +577,7 @@ void ApplyFixedPatches() {
     int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
     uint8_t custom_tattle_order[kNumEnemyTypes];
     for (int32_t i = 0; i <= kNumEnemyTypes; ++i) {
-        custom_tattle_order[i] = 
-            static_cast<uint8_t>(tot::GetCustomTattleIndex(i));
+        custom_tattle_order[i] = tot::GetCustomTattleIndex(i);
     }
     mod::patch::writePatch(
         ttyd::win_root::enemy_monoshiri_sort_table,
@@ -587,6 +586,9 @@ void ApplyFixedPatches() {
     // Set Tattle log string for Fuzzy Horde to something non-empty.
     ttyd::battle_monosiri::battleGetUnitMonosiriPtr(BattleUnitType::FUZZY_HORDE)
         ->menu_tattle = "menu_enemy_400";
+
+    // Remove Fuzzy Horde from Fuzzy's "same actor Tattle table".
+    ttyd::battle_monosiri::same_tbl_chorobon[1] = 0;
 
     // Replace location string in Tattle log with defeated count.
     for (int32_t i = 0; i <= kNumEnemyTypes; ++i) {

@@ -30,6 +30,9 @@ void battleSetUnitMonosiriFlag(int32_t unit_type);
 bool battleCheckUnitMonosiriFlag(ttyd::battle_unit::BattleWorkUnit* unit);
 MonosiriMsgEntry* battleGetUnitMonosiriPtr(int32_t unit_type);
 
+// .data
+extern int32_t same_tbl_chorobon[3];
+
 }
 
 }

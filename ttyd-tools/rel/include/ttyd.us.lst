@@ -2310,9 +2310,12 @@
 8036479c:evt_gazigazi_appear
 
 // battle_monosiri.o
+// .text
 8012ed2c:battleSetUnitMonosiriFlag
 8012ee3c:battleCheckUnitMonosiriFlag
 8012ef20:battleGetUnitMonosiriPtr
+// .data
+80417104:same_tbl_chorobon
 
 // battle_camera.o
 8012b06c:evt_btl_camera_wait_move_end

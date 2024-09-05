@@ -450,8 +450,10 @@ int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
             if (index < 0 || index >= b) return -1;
             byte_ptr += (index * y);
         }
-        // Start with all 0 or 1 bits based on sign of value.
-        uint32_t uint_val = (*byte_ptr & 0x80) ? ~0 : 0;
+        // Treat all numbers as unsigned by default.
+        uint32_t uint_val = 0;
+        // TODO: If signed integers are needed, use this, or use 4-byte value:
+        // uint32_t uint_val = (*byte_ptr & 0x80) ? ~0 : 0;
         for (int32_t i = 0; i < y; ++i) {
             uint_val = (uint_val << 8) + *byte_ptr++;
         }

@@ -104,8 +104,7 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializeShopSign) {
 
     int32_t shelf_items[5];
     for (int32_t i = 0; i < 5; ++i) {
-        shelf_items[i] = 
-            static_cast<uint8_t>(state.GetOption(tot::STAT_PERM_SHOP_ITEMS, i));
+        shelf_items[i] = state.GetOption(tot::STAT_PERM_SHOP_ITEMS, i);
     }
 
     g_NumShopSignItems = 0;

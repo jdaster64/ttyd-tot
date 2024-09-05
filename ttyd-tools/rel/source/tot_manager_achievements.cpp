@@ -216,7 +216,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
         case AchievementId::META_COSMETICS_5: {
             int32_t cosmetics = 0;
             for (int32_t type = 0; type <= 2; ++type) {
-                for (int32_t i = 0; i < 30; ++i) {
+                for (int32_t i = 1; i < 30; ++i) {
                     if (state.GetOption(FLAGS_COSMETIC_PURCHASED, type * 32 + i))
                         ++cosmetics;
                 }
@@ -233,6 +233,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
                     if (!state.GetOption(FLAGS_OPTION_UNLOCKED, i)) return;
                 }
             }
+            // TODO: Check for "seed set" option, if making that unlockable.
             MarkCompleted(ach);
             break;
         }
@@ -322,7 +323,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
             break;
         }
         case AchievementId::META_TATTLE_LOG_ALL: {
-            for (int32_t i = 1; i <= 100; ++i) {
+            for (int32_t i = 1; i <= 102; ++i) {
                 if (!ttyd::swdrv::swGet(i + 0x117a)) return;
             }
             MarkCompleted(ach);

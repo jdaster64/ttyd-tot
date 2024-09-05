@@ -1154,8 +1154,8 @@ EVT_BEGIN(gon_01_InitEvt)
             RUN_CHILD_EVT(PTR(&Tower_FinalBossSetup))
         ELSE()
             // Set up chests and regular NPCs.
-            RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
             RUN_CHILD_EVT(PTR(&Tower_SpawnChests))
+            RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
         END_IF()
         
         // Set up loading zones.

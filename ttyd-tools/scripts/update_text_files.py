@@ -2127,7 +2127,7 @@ g_StringMap = {
             b"Purchase all items and badges\n"
             b"from the Petalburg shop.",
         b"tot_achd_56":
-            b"Log all normal and rare items\n"
+            b"Log all common and rare items\n"
             b"in the Items log.",
         b"tot_achd_57":
             b"100% complete the Items log.",

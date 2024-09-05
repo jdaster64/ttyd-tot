@@ -738,8 +738,7 @@ void SetCurrentItemLoadoutEquipped(WinPauseMenu* menu, bool toggle) {
         bool already_equipped = false;
         if (RewardManager::IsUniqueBadge(current_id)) {
             for (int32_t i = 0; i < size; ++i) {
-                int32_t item =
-                    static_cast<uint8_t>(g_Mod->state_.GetOption(loadout_option, i))
+                int32_t item = g_Mod->state_.GetOption(loadout_option, i)
                     + ItemType::THUNDER_BOLT;
                 if (item == current_id) {
                     already_equipped = true;
@@ -792,8 +791,7 @@ void DrawLoadoutSelectionDialog(WinMgrEntry* winmgr_entry) {
 
     // Draw selected loadout icons.
     for (int32_t i = 0; i < g_Mod->state_.GetOption(size_option); ++i) {
-        int32_t item =
-            static_cast<uint8_t>(g_Mod->state_.GetOption(loadout_option, i))
+        int32_t item = g_Mod->state_.GetOption(loadout_option, i)
             + ItemType::THUNDER_BOLT;
 
         int32_t icon = ttyd::item_data::itemDataTable[item].icon_id;
