@@ -81,6 +81,12 @@ public:
     void Save(TotSaveSlot* save);
     bool HasBackupSave() const;
     TotSaveSlot* GetBackupSave() const;
+
+    // Initialize run-specific stats, options, play stats, etc. to defaults.
+    void ResetOptions();
+
+    // Sets the current seed to a random value.
+    void SelectRandomSeed();
     
     // Sets / adjusts options, play stats, achievements, etc.
     // If OPTVAL is provided for 'SetOption', value parameter is ignored.
@@ -102,26 +108,7 @@ public:
     
     // Returns values as / checks values against OPTVAL.
     uint32_t GetOptionValue(uint32_t option) const;
-    bool CheckOptionValue(uint32_t option_value) const; 
-
-    // Sets the current seed to a random value.
-    void SelectRandomSeed();
-    
-    // TODO: Move to OptionsManager?
-    // Initialize all settings to default.
-    void InitDefaultOptions();
-    // Resets settings based on the currently selected preset.
-    void ApplyPresetOptions();
-
-    // TODO: Move to OptionsManager!
-    // Verifies that settings are default except enemy stat scaling.
-    bool VerifyDefaultsExceptEnemyScaling();
-    // Verifies that settings are default except Mario's stat scaling.
-    bool VerifyDefaultsExceptMarioScaling();
-    
-    // TODO: Move to OptionsManager?
-    // Returns a string representing the current options encoded.
-    const char* GetEncodedOptions() const;
+    bool CheckOptionValue(uint32_t option_value) const;
     
     // Sets/increments the current tower floor, and makes any necessary changes.
     void IncrementFloor(int32_t change = 1);
@@ -143,6 +130,11 @@ public:
     // enum), returning a value in the range [0, range). If `sequence` is not
     // a valid enum value, returns a random value using ttyd::system::irand().
     uint32_t Rand(uint32_t range, int32_t sequence = -1);
+
+    // Static; gets parts of an option value's internal representation.
+    // Should mostly only be used internally, but exposed for OptionsManager.
+    static void GetOptionParts(
+        uint32_t v, int32_t* t, int32_t* x, int32_t* y, int32_t* a, int32_t* b);
 };
 static_assert(sizeof(StateManager) == 0xc80);
 

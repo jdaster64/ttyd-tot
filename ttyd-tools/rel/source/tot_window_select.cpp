@@ -9,6 +9,7 @@
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
+#include "tot_manager_options.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
 
@@ -396,6 +397,19 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
 
                 // Special handling for particular options.
                 switch (option) {
+                    case OPT_DIFFICULTY:
+                        // Set NPC choice 4 to None / Random by default when
+                        // swapping difficulties.
+                        if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
+                            state.SetOption(
+                                OPT_NPC_CHOICE_4,
+                                tot::gon::GetNumSecondaryNpcTypes() + 1);
+                        } else {
+                            state.SetOption(
+                                OPT_NPC_CHOICE_4,
+                                tot::gon::GetNumSecondaryNpcTypes());
+                        }
+                        break;
                     case OPT_MARIO_BP:
                         // If Infinite BP isn't unlocked, skip it.
                         if (state.CheckOptionValue(OPTVAL_INFINITE_BP) &&
@@ -416,12 +430,6 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                     case OPT_NPC_CHOICE_2:
                     case OPT_NPC_CHOICE_3:
                     case OPT_NPC_CHOICE_4: {
-                        // If in Half difficulty, force choice 4 to None.
-                        if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
-                            state.SetOption(
-                                OPT_NPC_CHOICE_4,
-                                tot::gon::GetNumSecondaryNpcTypes() + 1);
-                        }
                         // Skip past duplicate NPCs.
                         int32_t matches;
                         do {
@@ -446,7 +454,7 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
                 // Re-enforce current preset's settings, if not custom.
                 if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM)) {
-                    state.ApplyPresetOptions();
+                    OptionsManager::ApplyCurrentPresetOptions();
                 }
             }
         }
@@ -566,6 +574,7 @@ void DispMainWindow(WinMgrEntry* entry) {
     uint32_t kOffWhite = 0xF0F0'F0FFU;
     uint32_t kMedGrey = 0xA0A0'A0FFU;
     uint32_t kBlack = 0x0000'00FFU;
+    uint32_t kBlue = 0x0000'C0FFU;
     
     ttyd::gx::GXPixel::GXSetFog(/* GX_FOG_NONE */ 0, 0, 0, 0, 0, &kWhite);
     // Save previous scissor bounds.
@@ -579,6 +588,8 @@ void DispMainWindow(WinMgrEntry* entry) {
     for (int32_t i = 0; i < sel_entry->num_rows; ++i) {
         auto& row = sel_entry->row_data[i];
         float y_trans = sel_entry->list_y_offset + entry->y - 44 - offset;
+
+        uint32_t* option_text_color = &kBlack;
         
         // Only draw info for rows that are visible.
         if (y_trans - 32 <= entry->y && 
@@ -606,6 +617,9 @@ void DispMainWindow(WinMgrEntry* entry) {
                     option == OPT_NPC_CHOICE_4) {
                     row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
                 }
+
+                if (!OptionsManager::IsDefault(option))
+                    option_text_color = &kBlue;
             }
 
             uint32_t* text_color;
@@ -884,7 +898,7 @@ void DispMainWindow(WinMgrEntry* entry) {
                     if (row.flags & WinMgrSelectEntryRow_Flags::GREYED_OUT) {
                         text_color = &kMedGrey;
                     } else {
-                        text_color = &kBlack;
+                        text_color = option_text_color;
                     }
                     gc::vec3 text_pos = {
                         entry->x + entry->width - offset - length * length_factor,
@@ -1213,7 +1227,7 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
     sprintf(text, "Options: ");
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
-    sprintf(text, g_Mod->state_.GetEncodedOptions());
+    sprintf(text, OptionsManager::GetEncodedOptions());
     ttyd::win_main::winFontSetWidth(&text_pos, &text_scale, &kBlue, 270.f, text);
 
     text_pos.x = max_x;

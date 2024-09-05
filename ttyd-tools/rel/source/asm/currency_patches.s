@@ -25,7 +25,7 @@ b 0
 StartSkipDrawingXIfCurrencyHigh:
 # Load currently displayed number, rather than actual currency amount.
 lwz %r5, 0x4 (%r31)
-cmpwi %r5, 999
+cmpwi %r5, 1000
 bge- 0xc
 # Display icon 0x1de ('x' icon).
 li %r5, 0x1de

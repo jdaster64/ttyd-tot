@@ -5,6 +5,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_manager_achievements.h"
+#include "tot_manager_options.h"
 #include "tot_state.h"
 
 #include <ttyd/evtmgr.h>
@@ -259,13 +260,11 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         }
     }
 
-    if (state.VerifyDefaultsExceptEnemyScaling() &&
-        state.GetOption(OPTNUM_ENEMY_HP) >= 200 &&
-        state.GetOption(OPTNUM_ENEMY_ATK) >= 200) {
-        AchievementsManager::MarkCompleted(AchievementId::RUN_DOUBLE_HP_ATK);
+    if (OptionsManager::GetTotalIntensity() >= 200) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_HIGH_INTENSITY);
     }
 
-    if (state.VerifyDefaultsExceptMarioScaling()) {
+    if (OptionsManager::AllDefaultExceptZeroStatLevels()) {
         int32_t mario_hp_scale = state.GetOption(OPT_MARIO_HP);
         int32_t mario_fp_scale = state.GetOption(OPT_MARIO_FP);
         int32_t mario_bp_scale = state.GetOption(OPT_MARIO_BP);
@@ -273,28 +272,19 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         int32_t mario_fp_level = state.fp_level_;
         int32_t mario_bp_level = state.bp_level_;
 
-        int32_t not_default_or_zero = 0;
         int32_t zero = 0;
-        if (mario_hp_scale != 0 && mario_hp_scale != 5) ++not_default_or_zero;
-        if (mario_fp_scale != 0 && mario_fp_scale != 5) ++not_default_or_zero;
-        if (mario_bp_scale != 0 && mario_bp_scale != 5) ++not_default_or_zero;
         if (mario_hp_scale == 0 || mario_hp_level == 0) ++zero;
         if (mario_fp_scale == 0 || mario_fp_level == 0) ++zero;
         if (mario_bp_scale == 0 || mario_bp_level == 0) ++zero;
 
-        if (not_default_or_zero == 0) {
-            if (zero >= 1) {
-                AchievementsManager::MarkCompleted(
-                    AchievementId::RUN_ZERO_STAT_1);
-            }
-            if (zero >= 2) {
-                AchievementsManager::MarkCompleted(
-                    AchievementId::RUN_ZERO_STAT_2);
-            }
-            if (zero >= 3) {
-                AchievementsManager::MarkCompleted(
-                    AchievementId::SECRET_ZERO_STATS_3);
-            }
+        if (zero >= 1) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_ZERO_STAT_1);
+        }
+        if (zero >= 2) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_ZERO_STAT_2);
+        }
+        if (zero >= 3) {
+            AchievementsManager::MarkCompleted(AchievementId::SECRET_ZERO_STATS_3);
         }
     }
 

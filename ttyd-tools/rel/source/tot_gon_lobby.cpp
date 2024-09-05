@@ -211,12 +211,12 @@ const int32_t* GetLobbyInitEvt() {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_TowerInitLobby) {
-    OptionsManager::InitLobby();
+    OptionsManager::OnLobbyLoad();
     return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_TowerInitFromOptions) {
-    OptionsManager::InitFromSelectedOptions();
+    OptionsManager::OnRunStart();
     return 2;
 }
 

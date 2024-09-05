@@ -2039,10 +2039,8 @@ g_StringMap = {
             b"Finish a default run without\n"
             b"taking any damage.",
         b"tot_achd_29":
-            b"Finish a run with 2x or more\n"
-            b"enemy HP and ATK.\n"
-            b"All other settings must be\n"
-            b"set to the default.",
+            b"Finish a run with an intensity\n"
+            b"rating of 200% or higher.",
         b"tot_achd_30":
             b"Finish a run with one of Mario's\n"
             b"stats at a maximum of 1.\n"

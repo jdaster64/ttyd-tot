@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
+#include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_state.h"
@@ -16,6 +17,67 @@ namespace mod::tot {
 namespace {
 
 namespace ItemType = ::ttyd::item_data::ItemType;
+
+struct RunOptionMetadata {
+    uint32_t option;
+    uint32_t default_optval;
+    int32_t  default_value;             // Used instead if default_optval = 0.
+    int8_t   check_for_default;
+    int8_t   check_for_default_stat;
+};
+RunOptionMetadata g_OptionMetadata[] = {
+    { OPT_PRESET, 0, -1, false, false },
+    { OPT_DIFFICULTY, 0, -1, false, false },
+    { OPT_TIMER_DISPLAY, 0, -1, false, false },
+    { OPT_NUM_CHESTS, OPTVAL_CHESTS_DEFAULT, -1, true, false },
+    { OPT_BATTLE_DROPS, OPTVAL_DROP_STANDARD, -1, true, false },
+    { OPT_STARTER_ITEMS, OPTVAL_STARTER_ITEMS_BASIC, -1, true, false },
+    { OPT_MAX_PARTNERS, 0, -1, true, false },
+    { OPT_PARTNER, OPTVAL_PARTNER_RANDOM, -1, true, false },
+    { OPT_REVIVE_PARTNERS, OPTVAL_REVIVE_PARTNERS_ON, -1, true, false },
+    { OPT_MARIO_HP, 0, 5, true, true },
+    { OPT_MARIO_FP, 0, 5, true, true },
+    { OPT_MARIO_BP, 0, 5, true, true },
+    { OPT_PARTNER_HP, 0, 5, true, true },
+    { OPT_INVENTORY_SACK_SIZE, 0, 2, true, false },
+    { OPTNUM_ENEMY_HP, 0, 100, true, false },
+    { OPTNUM_ENEMY_ATK, 0, 100, true, false },
+    { OPTNUM_SUPERGUARD_SP_COST, 0, 0, true, false },
+    { OPT_AC_DIFFICULTY, OPTVAL_AC_DEFAULT, -1, true, false },
+    { OPT_RANDOM_DAMAGE, OPTVAL_RANDOM_DAMAGE_NONE, -1, true, false },
+    { OPT_AUDIENCE_RANDOM_THROWS, OPTVAL_AUDIENCE_THROWS_OFF, -1, true, false },
+    { OPT_OBFUSCATE_ITEMS, OPTVAL_OBFUSCATE_ITEMS_OFF, -1, true, false },
+    { OPT_BANDIT_ESCAPE, OPTVAL_BANDIT_NO_REFIGHT, -1, true, false },
+    { OPT_CHARLIETON_STOCK, OPTVAL_CHARLIETON_NORMAL, -1, true, false },
+    { OPT_NPC_CHOICE_1, 0, -1, true, false },
+    { OPT_NPC_CHOICE_2, 0, -1, true, false },
+    { OPT_NPC_CHOICE_3, 0, -1, true, false },
+    { OPT_NPC_CHOICE_4, 0, -1, true, false },
+    { OPT_SECRET_BOSS, OPTVAL_SECRET_BOSS_RANDOM, -1, true, false },
+};
+
+void EncodeOption(
+    int8_t* encoding_bytes, int32_t& encoded_bit_count, uint32_t option) {
+    int32_t t, x, y, a, b;
+    StateManager::GetOptionParts(option, &t, &x, &y, &a, &b);
+    int32_t bits_left = 6 - (encoded_bit_count % 6);
+    int32_t num_bits  = t == TYPE_OPTNUM ? 8 : y;
+    int32_t divisor   = t == TYPE_OPTNUM ? a : 1;
+    int32_t value = g_Mod->state_.GetOption(option) / divisor;
+
+    while (num_bits > 0) {
+        encoding_bytes[encoded_bit_count / 6]
+            |= (value << (encoded_bit_count % 6)) & 63;
+        if (num_bits > bits_left) {
+            encoded_bit_count += bits_left;
+            value >>= bits_left;
+            bits_left = 6;
+        } else {
+            encoded_bit_count += num_bits;
+        }
+        num_bits -= bits_left;
+    }
+}
 
 // Mario, then partners' HP scaling, in internal order.
 const int32_t kHpMultipliers[] = { 100, 100, 80, 120, 80, 120, 100, 80 };
@@ -84,7 +146,216 @@ void SetBaseStats() {
     
 }
 
-void OptionsManager::InitLobby() {
+void OptionsManager::ApplyCurrentPresetOptions() {
+    switch (g_Mod->state_.GetOptionValue(OPT_PRESET)) {
+        case OPTVAL_PRESET_DEFAULT: {
+            for (const auto& data : g_OptionMetadata) {
+                if (!data.check_for_default) continue;
+                g_Mod->state_.SetOption(data.option, GetDefaultValue(data.option));
+            }
+            break;
+        }
+    }
+}
+
+int32_t OptionsManager::GetDefaultValue(uint32_t option) {
+    int32_t value = -1;
+    switch (option) {
+        case OPT_MAX_PARTNERS:
+            if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_HALF))
+                return 3;
+            return 4;
+        case OPT_NPC_CHOICE_1:
+        case OPT_NPC_CHOICE_2:
+        case OPT_NPC_CHOICE_3:
+            return gon::GetNumSecondaryNpcTypes();
+        case OPT_NPC_CHOICE_4:
+            if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_HALF))
+                return gon::GetNumSecondaryNpcTypes() + 1;
+            return gon::GetNumSecondaryNpcTypes();
+        default: {
+            for (const auto& data : g_OptionMetadata) {
+                if (data.option == option) {
+                    if (data.default_optval)
+                        return data.default_optval & 0xff;
+                    return data.default_value;
+                }
+            }
+            break;
+        }
+    }
+    return value;
+}
+
+bool OptionsManager::IsDefault(uint32_t option) {
+    for (const auto& data : g_OptionMetadata) {
+        if (data.option == option) {
+            if (!data.check_for_default) return true;
+            return g_Mod->state_.GetOption(option) == GetDefaultValue(option);
+        }
+    }
+    // Should not be reached for any valid option.
+    return true;
+}
+
+bool OptionsManager::AllDefault() {
+    for (const auto& data : g_OptionMetadata) {
+        if (!data.check_for_default)
+            continue;
+        if (g_Mod->state_.GetOption(data.option) != GetDefaultValue(data.option))
+            return false;
+    }
+    return true;
+}
+
+bool OptionsManager::AllDefaultExceptZeroStatLevels() {
+    for (const auto& data : g_OptionMetadata) {
+        if (!data.check_for_default)
+            continue;
+        // Allow stats to be set to zero.
+        if (data.check_for_default_stat && !g_Mod->state_.GetOption(data.option))
+            continue;
+        if (g_Mod->state_.GetOption(data.option) != GetDefaultValue(data.option))
+            return false;
+    }
+    return true;
+}
+
+int32_t OptionsManager::GetIntensity(uint32_t option) {
+    const auto& state = g_Mod->state_;
+
+    switch (option) {
+        case OPT_DIFFICULTY:
+            return state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) ? 20 : 0;
+        case OPT_NUM_CHESTS:
+            switch (state.GetOption(option)) {
+                case 1:
+                    return 10;
+                case 2:
+                case 3:
+                    return -10;
+                case 4:
+                    return -20;
+            }
+            break;
+        case OPT_BATTLE_DROPS:
+            switch (state.GetOptionValue(option)) {
+                case OPTVAL_DROP_HELD_FROM_BONUS:
+                case OPTVAL_DROP_NO_HELD_W_BONUS:
+                    return 10;
+                case OPTVAL_DROP_ALL_HELD:
+                    return -30;
+            }
+            break;
+        case OPT_MARIO_HP:
+        case OPT_MARIO_FP:
+        case OPT_MARIO_BP:
+            return (5 - state.GetOption(option)) * 5;
+        case OPT_PARTNER_HP:
+            // If partners are disabled, their max HP setting is irrelevant.
+            if (state.CheckOptionValue(OPTVAL_NO_PARTNERS)) return 0;
+            return (5 - state.GetOption(option)) * 5;
+        case OPT_INVENTORY_SACK_SIZE:
+            return (2 - state.GetOption(option)) * 10;
+        case OPTNUM_ENEMY_HP:
+        case OPTNUM_ENEMY_ATK: {
+            int32_t value = Clamp(state.GetOption(option), 0, 200);
+            if (value > 100) {
+                return (value - 100) * 2 / 5;
+            } else {
+                return (value - 100);
+            }
+        }
+        case OPTNUM_SUPERGUARD_SP_COST:
+            // 0 to 20 for 0.00 to 1.00 SP, rounding up.
+            return (state.GetOption(option) + 4) / 5;
+        case OPT_STARTER_ITEMS:
+            return state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) ? -30 : 0;
+        case OPT_AUDIENCE_RANDOM_THROWS:
+            return state.GetOption(option) ? -30 : 0;
+        case OPT_OBFUSCATE_ITEMS:
+            return state.GetOption(option) ? 30 : 0;
+        case OPT_CHARLIETON_STOCK:
+            switch (state.GetOptionValue(option)) {
+                case OPTVAL_CHARLIETON_LIMITED:
+                case OPTVAL_CHARLIETON_SMALLER:
+                    return 10;
+            }
+            break;
+    }
+
+    // All other options / option values have no impact on intensity.
+    return 0;
+}
+
+int32_t OptionsManager::GetTotalIntensity() {
+    int32_t total = 100;
+    for (const auto& data : g_OptionMetadata) {
+        total += GetIntensity(data.option);
+    }
+    if (total < 5) total = 5;
+    return total;
+}
+
+const char* OptionsManager::GetEncodedOptions() {
+    static char encoding_str[24] = { 0 };
+    int8_t encoding_bytes[24] = { (int8_t)g_Mod->state_.version_, 99 };
+    int32_t encoded_bit_count = 12;
+
+    // If a preset is selected, use its name instead.
+    switch (g_Mod->state_.GetOptionValue(OPT_PRESET)) {
+        case OPTVAL_PRESET_DEFAULT:
+            return "Default";
+    }
+
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NUM_CHESTS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_BATTLE_DROPS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_STARTER_ITEMS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MAX_PARTNERS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_REVIVE_PARTNERS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_FP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_BP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_INVENTORY_SACK_SIZE);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_HP);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_ATK);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_SUPERGUARD_SP_COST);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_AC_DIFFICULTY);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_RANDOM_DAMAGE);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_AUDIENCE_RANDOM_THROWS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_OBFUSCATE_ITEMS);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_BANDIT_ESCAPE);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_CHARLIETON_STOCK);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_1);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_2);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_3);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_4);
+    EncodeOption(encoding_bytes, encoded_bit_count, OPT_SECRET_BOSS);
+
+    const int32_t kEncodedByteCount = (encoded_bit_count + 5) / 6;
+    for (int32_t i = 0; i < kEncodedByteCount; ++i) {
+        if (encoding_bytes[i] < 26) {
+            encoding_str[i] = 'A' + encoding_bytes[i];
+        } else if (encoding_bytes[i] < 52) {
+            encoding_str[i] = 'a' + encoding_bytes[i] - 26;
+        } else if (encoding_bytes[i] < 62) {
+            encoding_str[i] = '0' + encoding_bytes[i] - 52;
+        } else if (encoding_bytes[i] == 62) {
+            encoding_str[i] = '!';
+        } else if (encoding_bytes[i] == 63) {
+            encoding_str[i] = '?';
+        } else {
+            encoding_str[i] = '.';
+        }
+    }
+    encoding_str[kEncodedByteCount] = 0;
+
+    return encoding_str;
+}
+
+void OptionsManager::OnLobbyLoad() {
     auto& state = g_Mod->state_;
 
     // Un-obfuscate items if enabled during the previous run.
@@ -92,7 +363,7 @@ void OptionsManager::InitLobby() {
         ObfuscateItems(false);
     }
 
-    state.InitDefaultOptions();
+    state.ResetOptions();
     
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     
@@ -134,7 +405,7 @@ void OptionsManager::InitLobby() {
     state.SetOption(OPT_RUN_STARTED, 0);
 }
 
-void OptionsManager::InitFromSelectedOptions() {
+void OptionsManager::OnRunStart() {
     auto& state = g_Mod->state_;
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     if (state.seed_ == 0) state.SelectRandomSeed();
@@ -211,7 +482,7 @@ void OptionsManager::InitFromSelectedOptions() {
     // Assign Yoshi a random color.
     CosmeticsManager::PickYoshiColor();
 
-    ApplyOptionsOnLoad();
+    OnRunResumeFromFileSelect();
 
     switch (state.GetOptionValue(OPT_DIFFICULTY)) {
         case OPTVAL_DIFFICULTY_HALF:
@@ -232,7 +503,7 @@ void OptionsManager::InitFromSelectedOptions() {
     state.TimerStart();
 }
 
-void OptionsManager::ApplyOptionsOnLoad() {
+void OptionsManager::OnRunResumeFromFileSelect() {
     // Redo item obfuscation, if enabled.
     if (g_Mod->state_.GetOption(OPT_OBFUSCATE_ITEMS)) {
         g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION] = 0;

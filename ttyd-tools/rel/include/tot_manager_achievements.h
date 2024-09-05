@@ -40,7 +40,7 @@ namespace AchievementId {
         RUN_ALL_CONDITIONS_MET,
         RUN_ALL_FLOORS_3_TURN,
         RUN_NO_DAMAGE,
-        RUN_DOUBLE_HP_ATK,
+        RUN_HIGH_INTENSITY,
         RUN_ZERO_STAT_1,
         RUN_ZERO_STAT_2,
         
