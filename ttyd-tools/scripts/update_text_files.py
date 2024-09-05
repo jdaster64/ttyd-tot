@@ -2031,9 +2031,10 @@ g_StringMap = {
             b"bonus condition.",
         b"tot_achd_27":
             b"Finish a default run, spending\n"
-            b"3 or fewer turns on each fight.\n"
-            b"Running away will still add\n"
-            b"any turns spent to the total.",
+            b"3 or fewer turns on each floor.\n"
+            b"Running away from battle still\n"
+            b"counts any full or partial turns\n"
+            b"spent toward that floor's total.",
         b"tot_achd_28":
             b"Finish a default run without\n"
             b"taking any damage.",
