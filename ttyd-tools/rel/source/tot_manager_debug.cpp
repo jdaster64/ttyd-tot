@@ -167,6 +167,8 @@ void DebugManager::Update() {
                     if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
                         g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_COINS, 500);
                         g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_SP, 50);
+                    } else {
+                        g_Mod->state_.ChangeOption(STAT_RUN_STAR_PIECES, 50);
                     }
                     break;
                 }

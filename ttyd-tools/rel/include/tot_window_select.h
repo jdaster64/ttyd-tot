@@ -36,6 +36,8 @@ namespace MenuType {
         RUN_RESULTS_STATS,
         // Run results: timer splits.
         RUN_RESULTS_SPLITS,
+        // Run results: currency rewards screen.
+        RUN_RESULTS_REWARD,
         
         MAX_MENU_TYPE,
     };

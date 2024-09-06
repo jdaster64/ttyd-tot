@@ -1930,6 +1930,9 @@ g_StringMap = {
         b"tot_winsel_runsplits_header":
             b"Splits",
             
+        b"tot_winsel_runrewards_header":
+            b"Rewards",
+            
         b"tot_optr_turnsspent":         b"Total Turns Spent",
         b"tot_optr_turnsavg":           b"Average Turns",
         b"tot_optr_turnsmost":          b"Most Turns",

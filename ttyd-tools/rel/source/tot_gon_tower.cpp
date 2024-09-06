@@ -581,7 +581,10 @@ LBL(20)
         GOTO(10)
     END_IF()
 
-    // TODO: Show reward results dialog.
+    // Show reward summary dialog.
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_other_select,
+        (uint32_t)window_select::MenuType::RUN_RESULTS_REWARD)
 
     WAIT_MSEC(500)
     // Despawn partner.

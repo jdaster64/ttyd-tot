@@ -344,6 +344,7 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
     if (sel_entry->type == MenuType::RUN_OPTIONS && 
         sel_entry->state == WinMgrSelectEntry_State::IN_SELECTION) {
         // Remove A presses entirely.
+        // TODO: Convert into right presses?
         g_MarioSt->gamepad_buttons_pressed[0] &= ~ButtonId::A;
 
         // Handle left/right presses (changing option).
@@ -1412,6 +1413,561 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
     ttyd::win_main::winIconSet(IconType::MYSTERY,  &pos, &scale, &kWhite);
 }
 
+namespace RewardsWinState {
+    enum e {
+        START = 0,
+        COINS_APPEAR,
+        COINS_COUNT,
+        COINS_COUNT_DONE,
+        COINS_MULTIPLY,
+        COINS_AWARD,
+        COINS_AWARD_DONE,
+        SP_APPEAR,
+        SP_COUNT,
+        SP_COUNT_DONE,
+        SHINES_APPEAR,
+        SHINES_COUNT,
+        SHINES_COUNT_DONE,
+        SP_MULTIPLY,
+        SP_AWARD,
+        DONE,
+    };
+}
+
+int32_t g_RewardsWinState = RewardsWinState::START;
+int32_t g_RewardsWinTimer = 0;
+int32_t g_RewardsTempValues[2] = { 0, 0 };
+int32_t g_RewardsEarnedValues[2] = { 0, 0 };
+int32_t g_RewardsTarget = 0;
+
+void MainRewardsResults(WinMgrEntry* entry) {
+    const auto& state = g_Mod->state_;
+    bool check_coin_sound = false;
+
+    int32_t intensity = state.GetOption(STAT_RUN_INTENSITY);
+    g_RewardsEarnedValues[0] = 
+        (state.GetOption(STAT_RUN_COINS_EARNED) * intensity + 99) / 100;
+    g_RewardsEarnedValues[1] = 
+        ((state.GetOption(STAT_RUN_STAR_PIECES) 
+        + state.GetOption(STAT_RUN_SHINE_SPRITES) * 3) * intensity + 99) / 100;
+
+    switch (g_RewardsWinState) {
+        case RewardsWinState::START:
+            ++g_RewardsWinState;
+            g_RewardsWinTimer = 60;
+            g_RewardsTarget = 0;
+            break;
+        case RewardsWinState::COINS_COUNT_DONE:
+        case RewardsWinState::COINS_AWARD_DONE:
+        case RewardsWinState::SP_COUNT_DONE:
+        case RewardsWinState::SHINES_COUNT_DONE:
+            ++g_RewardsWinState;
+            g_RewardsWinTimer = 80;
+            break;
+        case RewardsWinState::COINS_APPEAR:
+            if (--g_RewardsWinTimer == 0) {
+                ++g_RewardsWinState;
+                g_RewardsTempValues[0] = 0;
+                g_RewardsTarget = state.GetOption(STAT_RUN_COINS_EARNED);
+            }
+            break;
+        case RewardsWinState::COINS_MULTIPLY:
+            if (--g_RewardsWinTimer == 0) {
+                ++g_RewardsWinState;
+                g_RewardsTempValues[0] = 0;
+                g_RewardsTarget = g_RewardsEarnedValues[0];
+            }
+            break;
+        case RewardsWinState::COINS_COUNT:
+        case RewardsWinState::COINS_AWARD:
+            check_coin_sound = true;
+            if (g_RewardsTempValues[0] < g_RewardsTarget) {
+                int32_t increment = 
+                    Clamp((g_RewardsTarget - g_RewardsTempValues[0]) / 10, 1, 100);
+                g_RewardsTempValues[0] += increment;
+            } else {
+                ++g_RewardsWinState;
+                g_RewardsWinTimer = 60;
+            }
+            break;
+        case RewardsWinState::SP_APPEAR:
+            if (--g_RewardsWinTimer == 0) {
+                ++g_RewardsWinState;
+                g_RewardsTempValues[1] = 0;
+                g_RewardsTarget = state.GetOption(STAT_RUN_STAR_PIECES);
+            }
+            break;
+        case RewardsWinState::SHINES_APPEAR:
+            if (--g_RewardsWinTimer == 0) {
+                ++g_RewardsWinState;
+                g_RewardsTempValues[1] = 0;
+                g_RewardsTarget = state.GetOption(STAT_RUN_SHINE_SPRITES) * 3;
+            }
+            break;
+        case RewardsWinState::SP_MULTIPLY:
+            if (--g_RewardsWinTimer == 0) {
+                ++g_RewardsWinState;
+                g_RewardsTempValues[1] = 0;
+                g_RewardsTarget = g_RewardsEarnedValues[1];
+            }
+            break;
+        case RewardsWinState::SP_COUNT:
+        case RewardsWinState::SHINES_COUNT:
+        case RewardsWinState::SP_AWARD:
+            check_coin_sound = true;
+            if (g_RewardsTempValues[1] < g_RewardsTarget) {
+                int32_t increment = 
+                    Clamp((g_RewardsTarget - g_RewardsTempValues[1]) / 10, 1, 100);
+                g_RewardsTempValues[1] += increment;
+            } else {
+                ++g_RewardsWinState;
+                g_RewardsWinTimer = 60;
+            }
+            break;
+        case RewardsWinState::DONE:
+            // Count down to "Continue" message; can cancel at any time.
+            if (g_RewardsWinTimer > 0) --g_RewardsWinTimer;
+            break;
+    }
+
+    if (check_coin_sound) {
+        if (g_RewardsWinTimer == 0) {
+            ttyd::pmario_sound::psndSFXOn((char *)0x2005b);
+            g_RewardsWinTimer = 7;
+        } else {
+            --g_RewardsWinTimer;
+        }
+    }
+
+    // Suppress A and B button presses until animation is in the "Done" state.
+    if (g_RewardsWinState != RewardsWinState::DONE) {
+        g_MarioSt->gamepad_buttons_pressed[0] &= ~ButtonId::A;
+        g_MarioSt->gamepad_buttons_pressed[0] &= ~ButtonId::B;
+    }
+
+    // Run vanilla selection main function.
+    select_main(entry);
+}
+
+void DispRewardsResults(WinMgrEntry* entry) {
+    auto* sel_entry = (WinMgrSelectEntry*)entry->param;
+    if ((winmgr_work->entries[sel_entry->entry_indices[0]].flags & 
+        WinMgrEntry_Flags::IN_FADE) != 0) return;
+
+    const auto& state = g_Mod->state_;
+    int32_t intensity = state.GetOption(STAT_RUN_INTENSITY);
+
+    const float kPlusXOffset    = 0.05f;
+    const float kIconsXOffset   = 0.15f;
+    const float kCurrXOffset    = 0.20f;
+    const float kTimesXOffset   = 0.43f;
+    const float kValue1XOffset  = 0.60f;
+    const float kEqualsXOffset  = 0.65f;
+    const float kValue2XOffset  = 0.88f;
+
+    const float kCoins1YOffset  = 0.13f;
+    const float kCoins2YOffset  = 0.27f;
+    const float kSp1YOffset     = 0.49f;
+    const float kSp2YOffset     = 0.63f;
+    const float kSp3YOffset     = 0.77f;
+
+    const float kAButtonXOffset = 0.35f;
+    const float kATextXOffset   = 0.41f;
+    const float kAButtonYOffset = 0.91f;
+
+    const float kTextYOffset    = 12.0f;
+
+    uint32_t kWhite = 0xFFFFFFFFU;
+    uint32_t kBlack = 0x000000FFU;
+    uint32_t kRed   = 0xC00000FFU;
+    
+    int32_t coins_earned = state.GetOption(STAT_RUN_COINS_EARNED);
+    int32_t meta_coins_earned = g_RewardsEarnedValues[0];
+    int32_t sp_earned = state.GetOption(STAT_RUN_STAR_PIECES);
+    int32_t shines_earned = state.GetOption(STAT_RUN_SHINE_SPRITES);
+    int32_t meta_sp_earned = g_RewardsEarnedValues[1];
+
+    // Update counts with in-progress values while counting.
+    switch (g_RewardsWinState) {
+        case RewardsWinState::COINS_COUNT:
+            coins_earned = g_RewardsTempValues[0];
+            break;
+        case RewardsWinState::COINS_AWARD:
+            meta_coins_earned = g_RewardsTempValues[0];
+            break;
+        case RewardsWinState::SP_COUNT:
+            sp_earned = g_RewardsTempValues[1];
+            break;
+        case RewardsWinState::SHINES_COUNT:
+            shines_earned = g_RewardsTempValues[1];
+            break;
+        case RewardsWinState::SP_AWARD:
+            meta_sp_earned = g_RewardsTempValues[1];
+            break;
+    }
+
+    // Draw elements (intentional fallthrough on every case).
+    switch (g_RewardsWinState) {
+        case RewardsWinState::DONE:
+            if (g_RewardsWinTimer == 0) {
+                {
+                    gc::vec3 position = {
+                        entry->x + entry->width * kAButtonXOffset,
+                        entry->y - entry->height * kAButtonYOffset,
+                        0.0f
+                    };
+                    gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+                    ttyd::win_main::winIconInit();
+                    ttyd::win_main::winIconSet(
+                        IconType::A_BUTTON, &position, &scale, &kWhite);
+                }
+                {
+                    const char* text = "Continue";
+                    gc::vec3 position = {
+                        entry->x + entry->width * kATextXOffset,
+                        entry->y - entry->height * kAButtonYOffset + kTextYOffset,
+                        0.0f
+                    };
+                    gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                    ttyd::win_main::winFontInit();
+                    ttyd::win_main::winFontSetEdge(
+                        &position, &scale, &kWhite, text);
+                }
+            }
+        case RewardsWinState::SP_AWARD:
+            {
+                const char* text = "=";
+                gc::vec3 position = {
+                    entry->x + entry->width * kEqualsXOffset,
+                    entry->y - entry->height * kSp3YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
+            }
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue2XOffset,
+                    entry->y - entry->height * kSp3YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(
+                    &position, &scale, &kRed, "%" PRId32, meta_sp_earned);
+            }
+        case RewardsWinState::SP_MULTIPLY:
+            {
+                const char* text = "Intensity Bonus";
+                gc::vec3 position = {
+                    entry->x + entry->width * kPlusXOffset,
+                    entry->y - entry->height * kSp3YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSet(&position, &scale, &kBlack, text);
+            }
+            {
+                const char* text = "x";
+                gc::vec3 position = {
+                    entry->x + entry->width * kTimesXOffset,
+                    entry->y - entry->height * kSp3YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
+            }
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue1XOffset,
+                    entry->y - entry->height * kSp3YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(
+                    &position, &scale, &kBlack, "%" PRId32 "%%", intensity);
+            }
+        case RewardsWinState::SHINES_COUNT_DONE:
+        case RewardsWinState::SHINES_COUNT:
+            {
+                const char* text = "x 3 =";
+                gc::vec3 position = {
+                    entry->x + entry->width * kEqualsXOffset,
+                    entry->y - entry->height * kSp2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
+            }
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue2XOffset,
+                    entry->y - entry->height * kSp2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(
+                    &position, &scale, &kBlack, "%" PRId32, shines_earned);
+            }
+        case RewardsWinState::SHINES_APPEAR:
+            {
+                const char* text = "+";
+                gc::vec3 position = {
+                    entry->x + entry->width * kPlusXOffset,
+                    entry->y - entry->height * kSp2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSet(&position, &scale, &kBlack, text);
+            }
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kIconsXOffset,
+                    entry->y - entry->height * kSp2YOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+                ttyd::win_main::winIconInit();
+                ttyd::win_main::winIconSet(
+                    IconType::SHINE_SPRITE, &position, &scale, &kWhite);
+            }
+            {
+                const char* text = "Shine Sprites";
+                gc::vec3 position = {
+                    entry->x + entry->width * kCurrXOffset,
+                    entry->y - entry->height * kSp2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSet(&position, &scale, &kBlack, text);
+            }
+        case RewardsWinState::SP_COUNT_DONE:
+        case RewardsWinState::SP_COUNT:
+            {
+                const char* text = "x 1 =";
+                gc::vec3 position = {
+                    entry->x + entry->width * kEqualsXOffset,
+                    entry->y - entry->height * kSp1YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
+            }
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue2XOffset,
+                    entry->y - entry->height * kSp1YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(
+                    &position, &scale, &kBlack, "%" PRId32, sp_earned);
+            }
+        case RewardsWinState::SP_APPEAR:
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kIconsXOffset,
+                    entry->y - entry->height * kSp1YOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+                ttyd::win_main::winIconInit();
+                ttyd::win_main::winIconSet(
+                    IconType::STAR_PIECE, &position, &scale, &kWhite);
+            }
+            {
+                const char* text = "Star Pieces";
+                gc::vec3 position = {
+                    entry->x + entry->width * kCurrXOffset,
+                    entry->y - entry->height * kSp1YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSet(&position, &scale, &kBlack, text);
+            }
+        case RewardsWinState::COINS_AWARD_DONE:
+        case RewardsWinState::COINS_AWARD:
+            {
+                const char* text = "=";
+                gc::vec3 position = {
+                    entry->x + entry->width * kEqualsXOffset,
+                    entry->y - entry->height * kCoins2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
+            }
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue2XOffset,
+                    entry->y - entry->height * kCoins2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(
+                    &position, &scale, &kRed, "%" PRId32, meta_coins_earned);
+            }
+        case RewardsWinState::COINS_MULTIPLY:
+            {
+                const char* text = "Intensity Bonus";
+                gc::vec3 position = {
+                    entry->x + entry->width * kPlusXOffset,
+                    entry->y - entry->height * kCoins2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSet(&position, &scale, &kBlack, text);
+            }
+            {
+                const char* text = "x";
+                gc::vec3 position = {
+                    entry->x + entry->width * kTimesXOffset,
+                    entry->y - entry->height * kCoins2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
+            }
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue1XOffset,
+                    entry->y - entry->height * kCoins2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(
+                    &position, &scale, &kBlack, "%" PRId32 "%%", intensity);
+            }
+        case RewardsWinState::COINS_COUNT_DONE:
+        case RewardsWinState::COINS_COUNT:
+            {
+                const char* text = "x";
+                gc::vec3 position = {
+                    entry->x + entry->width * kEqualsXOffset,
+                    entry->y - entry->height * kCoins1YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
+            }
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue2XOffset,
+                    entry->y - entry->height * kCoins1YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(
+                    &position, &scale, &kBlack, "%" PRId32, coins_earned);
+            }
+        case RewardsWinState::COINS_APPEAR:
+            {
+                gc::vec3 position = {
+                    entry->x + entry->width * kIconsXOffset,
+                    entry->y - entry->height * kCoins1YOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+                ttyd::win_main::winIconInit();
+                ttyd::win_main::winIconSet(
+                    IconType::COIN, &position, &scale, &kWhite);
+            }
+            {
+                const char* text = "Coins";
+                gc::vec3 position = {
+                    entry->x + entry->width * kCurrXOffset,
+                    entry->y - entry->height * kCoins1YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSet(&position, &scale, &kBlack, text);
+            }
+        case RewardsWinState::START:
+            // Draw window title.
+            {
+                const char* text = msgSearch("tot_winsel_runrewards_header");
+                int32_t length = ttyd::fontmgr::FontGetMessageWidth(text);
+                if (length > 120) length = 120;
+                ttyd::win_main::winFontInit();
+                
+                gc::vec3 position = {
+                    entry->x + (entry->width - length) * 0.5f,
+                    entry->y + 14.0f,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontSetEdgeWidth(
+                    &position, &scale, &kWhite, 120.0, text);
+            }
+            break;
+    }
+}
+
+void DispRewardsWindow(WinMgrEntry* entry, int32_t currency_type) {
+    auto* sel_entry = (WinMgrSelectEntry*)entry->param;
+    if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
+        WinMgrEntry_Flags::IN_FADE) != 0) return;
+
+    const auto& state = g_Mod->state_;
+    const float win_x = currency_type == 0 ? -240.0f : 90.0f;
+    const float win_y = -164.0f;
+
+    int32_t icon = currency_type == 0 ? IconType::COIN : IconType::STAR_PIECE;
+    int32_t count_state = currency_type == 0 
+        ? RewardsWinState::COINS_AWARD : RewardsWinState::SP_AWARD;
+
+    int32_t value = state.GetOption(
+        currency_type == 0 ? STAT_PERM_CURRENT_COINS : STAT_PERM_CURRENT_SP);
+    value -= g_RewardsEarnedValues[currency_type];
+    // Add currency earned as it's counting up.
+    if (g_RewardsWinState >= count_state) {
+        value += g_RewardsTempValues[currency_type];
+    }
+
+    gc::mtx34 mtx1, mtx2;
+    gc::mtx::PSMTXTrans(&mtx1, win_x + 30.0f, win_y - 38.0f,  0.0f);
+    gc::mtx::PSMTXScale(&mtx2, 0.7f, 0.7f, 0.7f);
+    gc::mtx::PSMTXConcat(&mtx1,&mtx2,&mtx1);
+    
+    ttyd::icondrv::iconDispGx2(&mtx1, 0x10, icon);
+    
+    if (value < 1000) {
+        gc::mtx::PSMTXTrans(&mtx1, win_x + 58.0f, win_y - 38.0f,  0.0f);
+        ttyd::icondrv::iconDispGx2(&mtx1, 0x10, IconType::NUMBER_TIMES_SMALL);
+    }
+    
+    gc::mtx::PSMTXTrans(&mtx1, win_x + 124.0f, win_y - 38.0f,  0.0f);
+    uint32_t color = 0xFFFFFFFFU;
+    ttyd::icondrv::iconNumberDispGx(&mtx1, value, 0, &color);
+}
+
+void DispCoinRewardsWindow(WinMgrEntry* entry) {
+    DispRewardsWindow(entry, 0);
+}
+
+void DispSpRewardsWindow(WinMgrEntry* entry) {
+    DispRewardsWindow(entry, 1);
+}
+
 WinMgrSelectDescList g_SelectDescList[MenuType::MAX_MENU_TYPE];
 
 WinMgrDesc g_CustomDescs[] = {
@@ -1526,6 +2082,43 @@ WinMgrDesc g_CustomDescs[] = {
         .main_func = nullptr,
         .disp_func = (void*)DispResultsWindowBottomBar,
     },
+    // Descs 9-11 - Currency results windows.
+    {
+        .fade_mode = WinMgrDesc_FadeMode::SCALE_AND_ROTATE,
+        .heading_type = WinMgrDesc_HeadingType::SINGLE_CENTERED,
+        .camera_id = (int32_t)CameraId::k2d,
+        .x = -250,
+        .y = 96,
+        .width = 500,
+        .height = 240,
+        .color = 0xFFFFFFFFU,
+        .main_func = (void*)MainRewardsResults,
+        .disp_func = (void*)DispRewardsResults,
+    },
+    {
+        .fade_mode = WinMgrDesc_FadeMode::SCALE_AND_ROTATE,
+        .heading_type = WinMgrDesc_HeadingType::NONE,
+        .camera_id = (int32_t)CameraId::k2d,
+        .x = -240,
+        .y = -164,
+        .width = 150,
+        .height = 45,
+        .color = 0xFFFFFFFFU,
+        .main_func = nullptr,
+        .disp_func = (void*)DispCoinRewardsWindow,
+    },
+    {
+        .fade_mode = WinMgrDesc_FadeMode::SCALE_AND_ROTATE,
+        .heading_type = WinMgrDesc_HeadingType::NONE,
+        .camera_id = (int32_t)CameraId::k2d,
+        .x = 90,
+        .y = -164,
+        .width = 150,
+        .height = 45,
+        .color = 0xFFFFFFFFU,
+        .main_func = nullptr,
+        .disp_func = (void*)DispSpRewardsWindow,
+    },
 };
 
 }  // namespace
@@ -1572,6 +2165,9 @@ void* InitNewSelectDescTable() {
     g_SelectDescList[MenuType::RUN_RESULTS_SPLITS] = WinMgrSelectDescList{
         .num_descs = 3, .descs = &g_CustomDescs[6]
     };
+    g_SelectDescList[MenuType::RUN_RESULTS_REWARD] = WinMgrSelectDescList{
+        .num_descs = 3, .descs = &g_CustomDescs[9]
+    };
     return g_SelectDescList;
 }
 
@@ -1604,6 +2200,7 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
         case MenuType::RUN_OPTIONS:
         case MenuType::RUN_RESULTS_STATS:
         case MenuType::RUN_RESULTS_SPLITS:
+        case MenuType::RUN_RESULTS_REWARD:
         default:
             sel_entry->flags |= WinMgrSelectEntry_Flags::CANCELLABLE;
             break;
@@ -1820,22 +2417,35 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             }
             break;
         }
-        case MenuType::RUN_RESULTS_SPLITS: {
+        case MenuType::RUN_RESULTS_SPLITS:
+        case MenuType::RUN_RESULTS_REWARD: {
             // Add a single dummy entry.
             sel_entry->num_rows = 1;
             sel_entry->row_data =
                 (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
                     0, sizeof(WinMgrSelectEntryRow));
             memset(sel_entry->row_data, 0, sizeof(WinMgrSelectEntryRow));
+
+            // Reset rewards window state.
+            g_RewardsWinState = RewardsWinState::START;
+            g_RewardsWinTimer = 0;
             break;
         }
     }
-    
+
     // Shrink the window if it's fewer than eight entries.
-    if (type != MenuType::RUN_RESULTS_SPLITS && sel_entry->num_rows < 8) {
-        int32_t height_reduction = (8 - sel_entry->num_rows) * 24;
-        auto& entry = winmgr_work->entries[sel_entry->entry_indices[0]];
-        entry.height -= height_reduction;
+    switch (type) {
+        case MenuType::RUN_RESULTS_SPLITS:
+        case MenuType::RUN_RESULTS_REWARD:
+            // Not actually selection windows, so leave at full height.
+            break;
+        default:
+            if (sel_entry->num_rows < 8) {
+                int32_t height_reduction = (8 - sel_entry->num_rows) * 24;
+                auto& entry = winmgr_work->entries[sel_entry->entry_indices[0]];
+                entry.height -= height_reduction;
+            }
+            break;
     }
     
     return sel_entry;
@@ -1913,8 +2523,6 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
             evt->lwData[1] = value;
             evt->lwData[2] = 
                 PTR(msgSearch(MoveManager::GetMoveData(value)->name_msg));
-            break;
-        case MenuType::RUN_OPTIONS:
             break;
     }
     

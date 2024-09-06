@@ -120,6 +120,7 @@ extern "C" {
             case mod::tot::window_select::MenuType::RUN_OPTIONS:
             case mod::tot::window_select::MenuType::RUN_RESULTS_SPLITS:
             case mod::tot::window_select::MenuType::RUN_RESULTS_STATS:
+            case mod::tot::window_select::MenuType::RUN_RESULTS_REWARD:
                 return true;
         }
         return false;
