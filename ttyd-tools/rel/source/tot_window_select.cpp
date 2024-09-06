@@ -1567,12 +1567,12 @@ void DispRewardsResults(WinMgrEntry* entry) {
 
     const float kCoins1YOffset  = 0.13f;
     const float kCoins2YOffset  = 0.27f;
-    const float kSp1YOffset     = 0.49f;
-    const float kSp2YOffset     = 0.63f;
-    const float kSp3YOffset     = 0.77f;
+    const float kSp1YOffset     = 0.48f;
+    const float kSp2YOffset     = 0.62f;
+    const float kSp3YOffset     = 0.76f;
 
-    const float kAButtonXOffset = 0.35f;
-    const float kATextXOffset   = 0.41f;
+    const float kAButtonXOffset = 0.37f;
+    const float kATextXOffset   = 0.42f;
     const float kAButtonYOffset = 0.91f;
 
     const float kTextYOffset    = 12.0f;
@@ -1584,7 +1584,7 @@ void DispRewardsResults(WinMgrEntry* entry) {
     int32_t coins_earned = state.GetOption(STAT_RUN_COINS_EARNED);
     int32_t meta_coins_earned = g_RewardsEarnedValues[0];
     int32_t sp_earned = state.GetOption(STAT_RUN_STAR_PIECES);
-    int32_t shines_earned = state.GetOption(STAT_RUN_SHINE_SPRITES);
+    int32_t shines_earned = state.GetOption(STAT_RUN_SHINE_SPRITES) * 3;
     int32_t meta_sp_earned = g_RewardsEarnedValues[1];
 
     // Update counts with in-progress values while counting.
@@ -1616,7 +1616,7 @@ void DispRewardsResults(WinMgrEntry* entry) {
                         entry->y - entry->height * kAButtonYOffset,
                         0.0f
                     };
-                    gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+                    gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
                     ttyd::win_main::winIconInit();
                     ttyd::win_main::winIconSet(
                         IconType::A_BUTTON, &position, &scale, &kWhite);
@@ -1628,7 +1628,7 @@ void DispRewardsResults(WinMgrEntry* entry) {
                         entry->y - entry->height * kAButtonYOffset + kTextYOffset,
                         0.0f
                     };
-                    gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
                     ttyd::win_main::winFontInit();
                     ttyd::win_main::winFontSetEdge(
                         &position, &scale, &kWhite, text);
