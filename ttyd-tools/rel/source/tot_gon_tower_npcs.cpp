@@ -1470,6 +1470,7 @@ EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
             auto& coins = ttyd::mario_pouch::pouchGetPtr()->coins;
             state.SetOption(STAT_RUN_NPC_LUMPY_COINS, coins);
             state.SetOption(STAT_RUN_NPC_LUMPY_FLOOR, floor);
+            state.ChangeOption(STAT_RUN_COINS_EARNED, -coins);
             state.ChangeOption(STAT_PERM_NPC_LUMPY_TRADES, 1);
             state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             coins = 0;

@@ -1848,9 +1848,10 @@ g_StringMap = {
         b"tot_recn_runstats_1":         b"Run Stats (1/2)",
         b"tot_recn_runstats_2":         b"Run Stats (2/2)",
         b"tot_recn_runs":               b"Run Completions",
-        b"tot_recn_aggstats_1":         b"Overall Stats (1/3)",
-        b"tot_recn_aggstats_2":         b"Overall Stats (2/3)",
-        b"tot_recn_aggstats_3":         b"Overall Stats (3/3)",
+        b"tot_recn_aggstats_1":         b"Overall Stats (1/4)",
+        b"tot_recn_aggstats_2":         b"Overall Stats (2/4)",
+        b"tot_recn_aggstats_3":         b"Overall Stats (3/4)",
+        b"tot_recn_aggstats_4":         b"Overall Stats (4/4)",
         b"tot_recn_hub":                b"Hub Progression",
         b"tot_recn_overall":            b"Overall Progress",
         
@@ -1873,23 +1874,29 @@ g_StringMap = {
         b"tot_recn_half_wins":          b"Hooktail",
         b"tot_recn_full_wins":          b"Gloomtail",
         b"tot_recn_ex_wins":            b"EX Difficulty",
-        b"tot_recn_continues":          b"Total Continues",
+        b"tot_recn_intensity":          b"Max Intensity",
         b"tot_recn_times":              b"Best Times (IGT)",
         b"tot_recn_half_time":          b"Hooktail",
         b"tot_recn_full_time":          b"Gloomtail",
         b"tot_recn_ex_time":            b"EX Difficulty",
+        b"tot_recn_attempts":           b"Total Attempts",
+        b"tot_recn_clears":             b"Total Clears",
         b"tot_recn_floors":             b"Floors Cleared",
+        b"tot_recn_continues":          b"Total Continues",
         b"tot_recn_turns":              b"Turns Spent",
         b"tot_recn_runaway":            b"Times Ran Away",
         b"tot_recn_kills":              b"Foes Defeated",
+        b"tot_recn_midkills":           b"Unique Midbosses",
         b"tot_recn_edamage":            b"Enemy Damage",
         b"tot_recn_pdamage":            b"Player Damage",
-        b"tot_recn_coinsearned":        b"Coins Earned",
-        b"tot_recn_coinsspent":         b"Coins Spent",
         b"tot_recn_fpspent":            b"FP Spent",
         b"tot_recn_spspent":            b"SP Spent",
         b"tot_recn_superguards":        b"Superguards",
         b"tot_recn_conditions":         b"Conditions Met",
+        b"tot_recn_mcoinsearned":       b"Coins Awarded",
+        b"tot_recn_mspearned":          b"Star Pcs. Awarded",
+        b"tot_recn_rcoinsearned":       b"Coins Earned",
+        b"tot_recn_rcoinsspent":        b"Coins Spent",
         b"tot_recn_starpieces":         b"Star Pieces",
         b"tot_recn_shinesprites":       b"Shine Sprites",
         b"tot_recn_itemsused":          b"Items Used",
@@ -1902,6 +1909,7 @@ g_StringMap = {
         b"tot_recn_doopliss":           b"Doopliss Deals",
         b"tot_recn_mover":              b"Mover Deals",
         b"tot_recn_zess":               b"Zess T. Deals",
+        b"tot_recn_unkdeals":           b"??? Deals",
 
         b"tot_rech_progression":
             b"Total playtime and Journal\n"
@@ -1975,9 +1983,10 @@ g_StringMap = {
         b"tot_achd_06":
             b"Superguard 100 attacks in total.",
         b"tot_achd_07":
-            b"Earn a total of 10,000 coins.",
+            b"Win a total of 10,000 coins\n"
+            b"from tower runs.",
         b"tot_achd_08":
-            b"Deal a total of 50,000 damage\n"
+            b"Deal a total of 25,000 damage\n"
             b"to enemies.",
         b"tot_achd_09":
             b"Clear Hooktail's tower for the\n"

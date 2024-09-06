@@ -18,7 +18,7 @@ namespace AchievementId {
         AGG_MIDBOSS_TYPES_40,
         AGG_SUPERGUARD_100,
         AGG_COINS_10000,
-        AGG_DAMAGE_50000,
+        AGG_DAMAGE_25000,
 
         RUN_HALF_FIRST,
         RUN_HALF_SPEED1,

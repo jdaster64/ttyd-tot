@@ -86,6 +86,9 @@ enum RecordLogOptions {
     REC_HUB_MARIO_SKINS,
     REC_HUB_YOSHI_SKINS,
     REC_HUB_ATTACK_FX,
+    REC_TOTAL_ATTEMPTS,
+    REC_TOTAL_FINISHES,
+    REC_UNIQUE_MIDBOSSES,
 };
 
 struct RecordLogEntry {
@@ -134,30 +137,39 @@ const RecordLogEntry kRecordLogEntries[] = {
     { STAT_PERM_HALF_FINISHES, "tot_recn_half_wins", "tot_rech_wins" },
     { STAT_PERM_FULL_FINISHES, "tot_recn_full_wins", "tot_rech_wins" },
     { STAT_PERM_EX_FINISHES, "tot_recn_ex_wins", "tot_rech_wins" },
-    { STAT_PERM_CONTINUES, "tot_recn_continues", "tot_rech_wins" },
+    { STAT_PERM_MAX_INTENSITY, "tot_recn_intensity", "tot_rech_wins" },
     { REC_EMPTY, "tot_recn_times", "tot_rech_wins" },
     { STAT_PERM_HALF_BEST_TIME, "tot_recn_half_time", "tot_rech_wins" },
     { STAT_PERM_FULL_BEST_TIME, "tot_recn_full_time", "tot_rech_wins" },
     { STAT_PERM_EX_BEST_TIME, "tot_recn_ex_time", "tot_rech_wins" },
     { REC_EMPTY, "tot_recn_aggstats_1", "tot_rech_aggstats" },
+    { REC_TOTAL_ATTEMPTS, "tot_recn_attempts", "tot_rech_aggstats" },
+    { REC_TOTAL_FINISHES, "tot_recn_clears", "tot_rech_aggstats" },
+    { STAT_PERM_MAX_INTENSITY, "tot_recn_intensity", "tot_rech_aggstats" },
+    { STAT_PERM_CONTINUES, "tot_recn_continues", "tot_rech_aggstats" },
     { STAT_PERM_FLOORS, "tot_recn_floors", "tot_rech_aggstats" },
     { STAT_PERM_TURNS_SPENT, "tot_recn_turns", "tot_rech_aggstats" },
     { STAT_PERM_TIMES_RAN_AWAY, "tot_recn_runaway", "tot_rech_aggstats" },
+    { REC_EMPTY, nullptr, "tot_rech_wins" },
+    { REC_EMPTY, "tot_recn_aggstats_2", "tot_rech_aggstats" },
     { STAT_PERM_ENEMIES_DEFEATED, "tot_recn_kills", "tot_rech_aggstats" },
+    { REC_UNIQUE_MIDBOSSES, "tot_recn_midkills", "tot_rech_aggstats" },
     { STAT_PERM_ENEMY_DAMAGE, "tot_recn_edamage", "tot_rech_aggstats" },
     { STAT_PERM_PLAYER_DAMAGE, "tot_recn_pdamage", "tot_rech_aggstats" },
-    { STAT_PERM_SUPERGUARDS, "tot_recn_superguards", "tot_rech_aggstats" },
-    { STAT_PERM_CONDITIONS_MET, "tot_recn_conditions", "tot_rech_aggstats" },
-    { REC_EMPTY, "tot_recn_aggstats_2", "tot_rech_aggstats" },
     { STAT_PERM_FP_SPENT, "tot_recn_fpspent", "tot_rech_aggstats" },
     { STAT_PERM_SP_SPENT, "tot_recn_spspent", "tot_rech_aggstats" },
+    { STAT_PERM_CONDITIONS_MET, "tot_recn_conditions", "tot_rech_aggstats" },
+    { STAT_PERM_SUPERGUARDS, "tot_recn_superguards", "tot_rech_aggstats" },
+    { REC_EMPTY, "tot_recn_aggstats_3", "tot_rech_aggstats" },
+    { STAT_PERM_META_COINS_EARNED, "tot_recn_mcoinsearned", "tot_rech_aggstats" },
+    { STAT_PERM_META_SP_EARNED, "tot_recn_mspearned", "tot_rech_aggstats" },
+    { STAT_PERM_COINS_EARNED, "tot_recn_rcoinsearned", "tot_rech_aggstats" },
+    { STAT_PERM_COINS_SPENT, "tot_recn_rcoinsspent", "tot_rech_aggstats" },
     { STAT_PERM_STAR_PIECES, "tot_recn_starpieces", "tot_rech_aggstats" },
     { STAT_PERM_SHINE_SPRITES, "tot_recn_shinesprites", "tot_rech_aggstats" },
-    { STAT_PERM_COINS_EARNED, "tot_recn_coinsearned", "tot_rech_aggstats" },
-    { STAT_PERM_COINS_SPENT, "tot_recn_coinsspent", "tot_rech_aggstats" },
     { STAT_PERM_ITEMS_USED, "tot_recn_itemsused", "tot_rech_aggstats" },
     { STAT_PERM_ITEMS_BOUGHT, "tot_recn_itemsbought", "tot_rech_aggstats" },
-    { REC_EMPTY, "tot_recn_aggstats_3", "tot_rech_aggstats" },
+    { REC_EMPTY, "tot_recn_aggstats_4", "tot_rech_aggstats" },
     { STAT_PERM_NPC_WONKY_TRADES, "tot_recn_wonky", "tot_rech_aggstats" },
     { STAT_PERM_NPC_DAZZLE_TRADES, "tot_recn_dazzle", "tot_rech_aggstats" },
     { STAT_PERM_NPC_RIPPO_TRADES, "tot_recn_rippo", "tot_rech_aggstats" },
@@ -831,8 +843,30 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
             const char* name =
                 record.name_msg ? msgSearch(record.name_msg) : "";
 
-            // Hide cosmetics' descriptions until purchasing one of each's type.
+            // Hide some descriptions until certain progression thresholds.
             switch (record.option) {
+                case STAT_PERM_FULL_FINISHES:
+                case STAT_PERM_FULL_BEST_TIME:
+                    if (state.GetOption(STAT_PERM_FULL_ATTEMPTS) < 1)
+                        name = "???";
+                    break;
+                case STAT_PERM_EX_FINISHES:
+                case STAT_PERM_EX_BEST_TIME:
+                    if (state.GetOption(STAT_PERM_FULL_FINISHES) < 1)
+                        name = "???";
+                    break;
+                case STAT_PERM_NPC_WONKY_TRADES:
+                case STAT_PERM_NPC_DAZZLE_TRADES:
+                case STAT_PERM_NPC_RIPPO_TRADES:
+                case STAT_PERM_NPC_LUMPY_TRADES:
+                case STAT_PERM_NPC_GRUBBA_DEAL:
+                case STAT_PERM_NPC_DOOPLISS_DEAL:
+                case STAT_PERM_NPC_MOVER_TRADES:
+                case STAT_PERM_NPC_ZESS_COOKS:
+                    if (state.GetOption(record.option) < 1) {
+                        name = msgSearch("tot_recn_unkdeals");
+                    }
+                    break;
                 case REC_HUB_ATTACK_FX: {
                     int32_t cur, tot;
                     ProgressManager::GetHubAttackFXProgress(&cur, &tot);
@@ -970,6 +1004,36 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     } else {
                         sprintf(ptr, "???");
                     }
+                    break;
+                }
+                case REC_TOTAL_ATTEMPTS: {
+                    int32_t count = 0;
+                    count += state.GetOption(STAT_PERM_HALF_ATTEMPTS);
+                    count += state.GetOption(STAT_PERM_FULL_ATTEMPTS);
+                    count += state.GetOption(STAT_PERM_EX_ATTEMPTS);
+                    sprintf(ptr, "%" PRId32, count);
+                    break;
+                }
+                case REC_TOTAL_FINISHES: {
+                    int32_t count = 0;
+                    count += state.GetOption(STAT_PERM_HALF_FINISHES);
+                    count += state.GetOption(STAT_PERM_FULL_FINISHES);
+                    count += state.GetOption(STAT_PERM_EX_FINISHES);
+                    sprintf(ptr, "%" PRId32, count);
+                    break;
+                }
+                case REC_UNIQUE_MIDBOSSES: {
+                    int32_t count = 0;
+                    for (int32_t i = 0; i < 128; ++i) {
+                        count += state.GetOption(FLAGS_MIDBOSS_DEFEATED, i);
+                    }
+                    sprintf(ptr, "%" PRId32, count);
+                    break;
+                }
+                case STAT_PERM_MAX_INTENSITY: {
+                    sprintf(
+                        ptr, "%" PRId32 "%%", 
+                        state.GetOption(STAT_PERM_MAX_INTENSITY));
                     break;
                 }
                 case STAT_PERM_HALF_FINISHES: {

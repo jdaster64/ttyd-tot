@@ -1659,9 +1659,9 @@ void DispRewardsResults(WinMgrEntry* entry) {
             }
         case RewardsWinState::SP_MULTIPLY:
             {
-                const char* text = "Intensity Bonus";
+                const char* text = "Intensity Mult.";
                 gc::vec3 position = {
-                    entry->x + entry->width * kPlusXOffset,
+                    entry->x + entry->width * kPlusXOffset + 3.0f,
                     entry->y - entry->height * kSp3YOffset + kTextYOffset,
                     0.0f
                 };
@@ -1822,9 +1822,9 @@ void DispRewardsResults(WinMgrEntry* entry) {
             }
         case RewardsWinState::COINS_MULTIPLY:
             {
-                const char* text = "Intensity Bonus";
+                const char* text = "Intensity Mult.";
                 gc::vec3 position = {
-                    entry->x + entry->width * kPlusXOffset,
+                    entry->x + entry->width * kPlusXOffset + 3.0f,
                     entry->y - entry->height * kCoins2YOffset + kTextYOffset,
                     0.0f
                 };
