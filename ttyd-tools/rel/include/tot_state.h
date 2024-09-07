@@ -530,7 +530,9 @@ enum Options : uint32_t {
     STAT_PERM_META_COINS_EARNED = 0x2ab'4'01'09,
     STAT_PERM_META_SP_EARNED    = 0x2af'4'01'09,
     STAT_PERM_MAX_INTENSITY     = 0x2b3'2'01'03,
-    // Next: 0x2b5
+    STAT_PERM_REWARDS_OFFERED   = 0x2b5'3'00'18,
+    STAT_PERM_REWARDS_TAKEN     = 0x2fd'3'00'18,
+    // Next: 0x345
 };
 
 }  // namespace mod::tot

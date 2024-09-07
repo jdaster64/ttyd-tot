@@ -41,6 +41,9 @@ EVT_DECLARE_USER_FUNC(evtTot_GenerateChestContents, 0)
 // arg5     = item pickup callback script
 EVT_DECLARE_USER_FUNC(evtTot_GetChestData, 6)
 
+// Records the selected chest number as collected.
+EVT_DECLARE_USER_FUNC(evtTot_MarkChestCollected, 1)
+
 // Raises the max level of a random move (in-battle).
 // arg0 = (out) announcement string.
 EVT_DECLARE_USER_FUNC(evtTot_RankUpRandomMoveInBattle, 1)

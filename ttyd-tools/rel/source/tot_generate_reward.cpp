@@ -80,7 +80,20 @@ enum RewardType {
     REWARD_HAMMER           = -9,
     REWARD_SPECIAL_MOVE     = -10,
     REWARD_COINS            = -11,
-    REWARD_FULL_HEAL        = -12,
+
+    // Used only for tracking number of given reward encountered / taken.
+    REWARD_TRACKING_HP_UP   = -12,
+    REWARD_TRACKING_FP_UP   = -13,
+    REWARD_TRACKING_BP_UP   = -14,
+    REWARD_TRACKING_HP_UP_P = -15,
+    REWARD_TRACKING_INV_UP  = -16,
+    REWARD_TRACKING_SHINE   = -17,
+    REWARD_TRACKING_STAR_PIECE = -18,
+    REWARD_TRACKING_UNIQUE_BADGE = -19,
+    REWARD_TRACKING_OTHER_BADGE = -20,
+
+    // No longer used.
+    REWARD_FULL_HEAL        = -21,
     
     // Used to determine how many chests should be filled.
     REWARD_PLACEHOLDER      = -999,
@@ -444,6 +457,54 @@ void DisplayIcons(CameraId camera, void* user_data) {
         pos.y += 75.f;
         ttyd::icondrv::iconDispGxAlpha(
             1.0f, &pos, 0, GetIcon(chest), g_ChestDrawAlpha);
+    }
+}
+
+// Updates play stat for number of times a reward type appeared / was taken.
+void TrackChestReward(int32_t reward_type, int32_t collected) {
+    // Convert individual items to their tracking ids.
+    switch (reward_type) {
+        case REWARD_HP_UP:
+            reward_type = REWARD_TRACKING_HP_UP;
+            break;
+        case REWARD_FP_UP:
+            reward_type = REWARD_TRACKING_FP_UP;
+            break;
+        case REWARD_BP_UP:
+            reward_type = REWARD_TRACKING_BP_UP;
+            break;
+        case REWARD_HP_UP_P:
+            reward_type = REWARD_TRACKING_HP_UP_P;
+            break;
+        case REWARD_INV_UP:
+            reward_type = REWARD_TRACKING_INV_UP;
+            break;
+        case REWARD_SHINE_SPRITE:
+            reward_type = REWARD_TRACKING_SHINE;
+            break;
+        case REWARD_STAR_PIECE:
+            reward_type = REWARD_TRACKING_STAR_PIECE;
+            break;
+    }
+
+    if (reward_type < 0) {
+        // Do nothing.
+    } else if (reward_type >= ItemType::DIAMOND_STAR && 
+               reward_type <= ItemType::CRYSTAL_STAR) {
+        reward_type = REWARD_SPECIAL_MOVE;
+    } else if (GetUniqueBadgeObtainedIndex(reward_type) >= 0) {
+        reward_type = REWARD_TRACKING_UNIQUE_BADGE;
+    } else {
+        reward_type = REWARD_TRACKING_OTHER_BADGE;
+    }
+
+    // Convert to positive, 0 indexed value.
+    reward_type = -reward_type + 1;
+
+    if (collected) {
+        g_Mod->state_.ChangeOption(STAT_PERM_REWARDS_TAKEN, 1, reward_type);
+    } else {
+        g_Mod->state_.ChangeOption(STAT_PERM_REWARDS_OFFERED, 1, reward_type);
     }
 }
 
@@ -940,6 +1001,8 @@ void SelectChestContents() {
         
         chest->item = reward;
         chest->pickup_script = (void*)pickup_script;
+
+        TrackChestReward(chest->item, false);
     }
 }
 
@@ -972,6 +1035,12 @@ EVT_DEFINE_USER_FUNC(evtTot_GetChestData) {
     evtSetValue(evt, evt->evtArguments[3], g_Chests[idx].home_pos.z);
     evtSetValue(evt, evt->evtArguments[4], g_Chests[idx].item);
     evtSetValue(evt, evt->evtArguments[5], PTR(g_Chests[idx].pickup_script));
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_MarkChestCollected) {
+    int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
+    TrackChestReward(g_Chests[idx].item, true);
     return 2;
 }
 

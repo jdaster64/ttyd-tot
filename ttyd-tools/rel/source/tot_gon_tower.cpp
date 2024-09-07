@@ -215,6 +215,7 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     SET((int32_t)GSW_Tower_DisplayChestIcons, 2)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evtTot_GetChestData, LW(9), LW(10), LW(11), LW(12), LW(13), LW(14))
+    USER_FUNC(evtTot_MarkChestCollected, LW(9))
     SWITCH(LW(13))
         CASE_SMALL_EQUAL(-1)    // move, partner, coin rewards
         CASE_BETWEEN((int32_t)ItemType::DIAMOND_STAR, (int32_t)ItemType::CRYSTAL_STAR)
