@@ -1461,8 +1461,10 @@ void MainRewardsResults(WinMgrEntry* entry) {
         case RewardsWinState::COINS_AWARD_DONE:
         case RewardsWinState::SP_COUNT_DONE:
         case RewardsWinState::SHINES_COUNT_DONE:
-            ++g_RewardsWinState;
-            g_RewardsWinTimer = 80;
+            if (--g_RewardsWinTimer == 0) {
+                ++g_RewardsWinState;
+                g_RewardsWinTimer = 45;
+            }
             break;
         case RewardsWinState::COINS_APPEAR:
             if (--g_RewardsWinTimer == 0) {
@@ -1487,7 +1489,7 @@ void MainRewardsResults(WinMgrEntry* entry) {
                 g_RewardsTempValues[0] += increment;
             } else {
                 ++g_RewardsWinState;
-                g_RewardsWinTimer = 60;
+                g_RewardsWinTimer = 30;
             }
             break;
         case RewardsWinState::SP_APPEAR:
@@ -1516,12 +1518,16 @@ void MainRewardsResults(WinMgrEntry* entry) {
         case RewardsWinState::SP_AWARD:
             check_coin_sound = true;
             if (g_RewardsTempValues[1] < g_RewardsTarget) {
-                int32_t increment = 
-                    Clamp((g_RewardsTarget - g_RewardsTempValues[1]) / 10, 1, 100);
-                g_RewardsTempValues[1] += increment;
+                // Only count up when coin sound plays, unlike coins.
+                if (g_RewardsWinTimer == 0) {
+                    int32_t increment =
+                        g_RewardsWinState == RewardsWinState::SHINES_COUNT ? 3 :
+                            Clamp((g_RewardsTarget - g_RewardsTempValues[1]) / 15, 1, 100);
+                    g_RewardsTempValues[1] += increment;
+                }
             } else {
                 ++g_RewardsWinState;
-                g_RewardsWinTimer = 60;
+                g_RewardsWinTimer = 30;
             }
             break;
         case RewardsWinState::DONE:
@@ -1531,9 +1537,9 @@ void MainRewardsResults(WinMgrEntry* entry) {
     }
 
     if (check_coin_sound) {
-        if (g_RewardsWinTimer == 0) {
+        if (g_RewardsWinTimer == 0 || g_RewardsWinTimer >= 30) {
             ttyd::pmario_sound::psndSFXOn((char *)0x2005b);
-            g_RewardsWinTimer = 7;
+            g_RewardsWinTimer += 7;
         } else {
             --g_RewardsWinTimer;
         }
@@ -1694,7 +1700,7 @@ void DispRewardsResults(WinMgrEntry* entry) {
         case RewardsWinState::SHINES_COUNT_DONE:
         case RewardsWinState::SHINES_COUNT:
             {
-                const char* text = "x 3 =";
+                const char* text = "=";
                 gc::vec3 position = {
                     entry->x + entry->width * kEqualsXOffset,
                     entry->y - entry->height * kSp2YOffset + kTextYOffset,
@@ -1739,6 +1745,17 @@ void DispRewardsResults(WinMgrEntry* entry) {
                     IconType::SHINE_SPRITE, &position, &scale, &kWhite);
             }
             {
+                const char* text = "x 3";
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue1XOffset,
+                    entry->y - entry->height * kSp2YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
+            }
+            {
                 const char* text = "Shine Sprites";
                 gc::vec3 position = {
                     entry->x + entry->width * kCurrXOffset,
@@ -1752,7 +1769,7 @@ void DispRewardsResults(WinMgrEntry* entry) {
         case RewardsWinState::SP_COUNT_DONE:
         case RewardsWinState::SP_COUNT:
             {
-                const char* text = "x 1 =";
+                const char* text = "=";
                 gc::vec3 position = {
                     entry->x + entry->width * kEqualsXOffset,
                     entry->y - entry->height * kSp1YOffset + kTextYOffset,
@@ -1784,6 +1801,17 @@ void DispRewardsResults(WinMgrEntry* entry) {
                 ttyd::win_main::winIconInit();
                 ttyd::win_main::winIconSet(
                     IconType::STAR_PIECE, &position, &scale, &kWhite);
+            }
+            {
+                const char* text = "x 1";
+                gc::vec3 position = {
+                    entry->x + entry->width * kValue1XOffset,
+                    entry->y - entry->height * kSp1YOffset + kTextYOffset,
+                    0.0f
+                };
+                gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+                ttyd::win_main::winFontInit();
+                ttyd::win_main::winFontSetR(&position, &scale, &kBlack, text);
             }
             {
                 const char* text = "Star Pieces";

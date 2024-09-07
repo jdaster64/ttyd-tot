@@ -128,6 +128,7 @@ namespace {
 
 // Forward declarations.
 EVT_DECLARE_USER_FUNC(ToggleCookingItemTypeToHeldItem, 1)
+EVT_DECLARE_USER_FUNC(evtTot_GetDummyPoisonShroomWeapon, 1)
 EVT_DECLARE_USER_FUNC(evtTot_RecoverStarPower, 0)
 EVT_DECLARE_USER_FUNC(evtTot_StoreGradualStarPower, 0)
 EVT_DECLARE_USER_FUNC(evtTot_PickRandomStatus, 1)
@@ -245,6 +246,36 @@ EVT_BEGIN(MeteorMealAttackEvent)
     RETURN()
 EVT_END()
 
+// Wrapper to Poison Shroom event that makes it have no effect on Fuzzy Horde.
+EVT_BEGIN(PoisonShroomWrapperEvent)
+    SET(LW(12), PTR(&ttyd::battle_item_data::ItemWeaponData_PoisonKinoko))
+    RUN_CHILD_EVT(ttyd::battle_item_data::ItemEvent_GetTarget)
+    IF_EQUAL(LW(10), -1)
+        GOTO(99)
+    END_IF()
+    USER_FUNC(btlevtcmd_GetUnitKind, LW(10), LW(0))
+    IF_NOT_EQUAL(LW(0), (int32_t)BattleUnitType::FUZZY_HORDE)
+        // Run original weapon logic.
+        RUN_CHILD_EVT(ttyd::battle_item_data::ItemEvent_Poison_Kinoko)
+        GOTO(99)
+    END_IF()
+
+    // Special handling: for Fuzzy Horde, do 0-damage hit, since the normal
+    // effect trivializes the fight and the healing could cause issues.
+    USER_FUNC(evtTot_GetDummyPoisonShroomWeapon, LW(12))
+    RUN_CHILD_EVT(ttyd::battle_item_data::ItemEvent_Support_Sub_UseDeclere)
+    WAIT_FRM(30)
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
+    RUN_CHILD_EVT(ttyd::battle_item_data::ItemEvent_Support_Sub_Effect)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BTL_ATTACK_MISS2"), 0, 0, 0, 0)
+    WAIT_FRM(40)
+    RUN_CHILD_EVT(ttyd::battle_item_data::_return_home_event)
+    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    
+LBL(99)
+    RETURN()
+EVT_END()
+
 // Custom attack event for Love Pudding and Peach Tart.
 EVT_BEGIN(RngStatusAttackEvent)
     USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
@@ -289,6 +320,21 @@ EVT_DEFINE_USER_FUNC(ToggleCookingItemTypeToHeldItem) {
     } else {
         weapon.item_id = 0;
     }
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetDummyPoisonShroomWeapon) {
+    static BattleWeapon weapon;
+    memcpy(
+        &weapon, &ttyd::battle_item_data::ItemWeaponData_PoisonKinoko, 
+        sizeof(BattleWeapon));
+    weapon.damage_function = (void*)ttyd::battle_weapon_power::weaponGetPowerDefault;
+    weapon.damage_function_params[0] = 0;
+    weapon.poison_strength = 0;
+    weapon.poison_chance = 0;
+    weapon.poison_time = 0;
+
+    evtSetValue(evt, evt->evtArguments[0], PTR(&weapon));
     return 2;
 }
 
@@ -814,7 +860,7 @@ void ApplyFixedPatches() {
     kFruitParfaitParams.fp_regen_time = 3;
     itemDataTable[ItemType::FRUIT_PARFAIT].weapon_params = &kFruitParfaitParams;
 
-    // Make Poison Mushrooms able to target anyone, and make enemies prefer
+    // Make Poison Shrooms able to target anyone, and make enemies prefer
     // to target Mario's team or characters that are in Peril.
     ttyd::battle_item_data::ItemWeaponData_PoisonKinoko.target_class_flags = 
         0x01100060;
@@ -823,6 +869,9 @@ void ApplyFixedPatches() {
     // Make Poison Mushrooms poison & halve HP 67% of the time instead of 80%.
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_ItemEvent_Poison_Kinoko_PoisonChance), 67);
+    // Add a wrapper to attack event that makes Fuzzy Horde unaffected.
+    ttyd::battle_item_data::ItemWeaponData_PoisonKinoko.attack_evt_code =
+        const_cast<int32_t*>(PoisonShroomWrapperEvent);
 
     // Meteor Meal restores HP and FP over time.
     SetItemRestoration(ItemType::METEOR_MEAL, 0, 0);
