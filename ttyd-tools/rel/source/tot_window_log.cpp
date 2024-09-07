@@ -150,7 +150,7 @@ const RecordLogEntry kRecordLogEntries[] = {
     { STAT_PERM_FLOORS, "tot_recn_floors", "tot_rech_aggstats" },
     { STAT_PERM_TURNS_SPENT, "tot_recn_turns", "tot_rech_aggstats" },
     { STAT_PERM_TIMES_RAN_AWAY, "tot_recn_runaway", "tot_rech_aggstats" },
-    { REC_EMPTY, nullptr, "tot_rech_wins" },
+    { STAT_PERM_NPC_DEALS_TOTAL, "tot_optr_npcsmet", "tot_rech_aggstats" },
     { REC_EMPTY, "tot_recn_aggstats_2", "tot_rech_aggstats" },
     { STAT_PERM_ENEMIES_DEFEATED, "tot_recn_kills", "tot_rech_aggstats" },
     { REC_UNIQUE_MIDBOSSES, "tot_recn_midkills", "tot_rech_aggstats" },
@@ -161,23 +161,14 @@ const RecordLogEntry kRecordLogEntries[] = {
     { STAT_PERM_CONDITIONS_MET, "tot_recn_conditions", "tot_rech_aggstats" },
     { STAT_PERM_SUPERGUARDS, "tot_recn_superguards", "tot_rech_aggstats" },
     { REC_EMPTY, "tot_recn_aggstats_3", "tot_rech_aggstats" },
-    { STAT_PERM_META_COINS_EARNED, "tot_recn_mcoinsearned", "tot_rech_aggstats" },
-    { STAT_PERM_META_SP_EARNED, "tot_recn_mspearned", "tot_rech_aggstats" },
     { STAT_PERM_COINS_EARNED, "tot_recn_rcoinsearned", "tot_rech_aggstats" },
     { STAT_PERM_COINS_SPENT, "tot_recn_rcoinsspent", "tot_rech_aggstats" },
     { STAT_PERM_STAR_PIECES, "tot_recn_starpieces", "tot_rech_aggstats" },
     { STAT_PERM_SHINE_SPRITES, "tot_recn_shinesprites", "tot_rech_aggstats" },
     { STAT_PERM_ITEMS_USED, "tot_recn_itemsused", "tot_rech_aggstats" },
     { STAT_PERM_ITEMS_BOUGHT, "tot_recn_itemsbought", "tot_rech_aggstats" },
-    { REC_EMPTY, "tot_recn_aggstats_4", "tot_rech_aggstats" },
-    { STAT_PERM_NPC_WONKY_TRADES, "tot_recn_wonky", "tot_rech_aggstats" },
-    { STAT_PERM_NPC_DAZZLE_TRADES, "tot_recn_dazzle", "tot_rech_aggstats" },
-    { STAT_PERM_NPC_RIPPO_TRADES, "tot_recn_rippo", "tot_rech_aggstats" },
-    { STAT_PERM_NPC_LUMPY_TRADES, "tot_recn_lumpy", "tot_rech_aggstats" },
-    { STAT_PERM_NPC_GRUBBA_DEAL, "tot_recn_grubba", "tot_rech_aggstats" },
-    { STAT_PERM_NPC_DOOPLISS_DEAL, "tot_recn_doopliss", "tot_rech_aggstats" },
-    { STAT_PERM_NPC_MOVER_TRADES, "tot_recn_mover", "tot_rech_aggstats" },
-    { STAT_PERM_NPC_ZESS_COOKS, "tot_recn_zess", "tot_rech_aggstats" },
+    { STAT_PERM_META_COINS_EARNED, "tot_recn_mcoinsearned", "tot_rech_aggstats" },
+    { STAT_PERM_META_SP_EARNED, "tot_recn_mspearned", "tot_rech_aggstats" },
 };
 const int32_t kNumRecordLogEntries = sizeof(kRecordLogEntries) / sizeof(RecordLogEntry);
 
@@ -855,6 +846,12 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     if (state.GetOption(STAT_PERM_FULL_FINISHES) < 1)
                         name = "???";
                     break;
+                case STAT_RUN_NPCS_DEALT_WITH:
+                    if (state.GetOption(STAT_PERM_NPC_DEALS_TOTAL) < 1) {
+                        name = msgSearch("tot_recn_unkdeals");
+                    }
+                    break;
+                case STAT_PERM_NPC_DEALS_TOTAL:
                 case STAT_PERM_NPC_WONKY_TRADES:
                 case STAT_PERM_NPC_DAZZLE_TRADES:
                 case STAT_PERM_NPC_RIPPO_TRADES:
