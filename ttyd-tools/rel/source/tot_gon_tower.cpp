@@ -1365,10 +1365,22 @@ EVT_DEFINE_USER_FUNC(evtTot_WaitNpcAnimFrame) {
 // It's probably sufficient to update normal_room_entry_data on leaving a floor.
 EVT_DEFINE_USER_FUNC(evtTot_UpdateDestinationMap) {
     const char* exit_bero = "e_bero";
-    
+
     int32_t floor = g_Mod->state_.floor_;
-    bool is_penultimate_floor = g_Mod->state_.IsFinalBossFloor(floor + 1);
-    const char* next_map = is_penultimate_floor ? "gon_05" : "gon_01";
+
+    static const char* kMaps[] = {
+        "gon_01", "gon_02", "gon_03", "gon_04", "gon_05"
+    };
+    int32_t map_idx = 0;
+    if (g_Mod->state_.IsFinalBossFloor(floor + 1)) {
+        // If next floor is boss floor, point to final boss room.
+        map_idx = 4;
+    } else if (floor > 0) {
+        // Floor 16-31 should point to second, 32-47 to third, etc.
+        map_idx = floor / 16;
+    }
+
+    const char* next_map = kMaps[map_idx];
     const char* next_bero = "w_bero";
     
     // Update the destination of the exit loading zone to match the floor.

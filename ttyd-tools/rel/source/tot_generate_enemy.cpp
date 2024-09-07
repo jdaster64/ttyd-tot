@@ -1037,6 +1037,15 @@ void BuildBattle(
     
     // Point the passed-in battle setup's loadouts to the constructed party.
     battle->flag_off_loadouts[0].group_data = &g_CustomBattleParty;
+
+    // Update the background based on the current floor, if not a boss battle.
+    static const char* kStageBgDirs[] = {
+        "stg_01_3", "stg_01_7", "stg_01_8", "stg_01_9"
+    };
+    if (!state.IsFinalBossFloor()) {
+        battle->flag_off_loadouts[0].stage_data->current_stage_data_dir =
+            kStageBgDirs[(state.floor_ - 1) / 16];
+    }
     
     // Set the battle's audience weights based on the custom ones set above.
     for (int32_t i = 0; i < 12; ++i) {
