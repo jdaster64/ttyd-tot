@@ -3636,19 +3636,19 @@ g_PetalburgWestStrings = {
         
     b"tot_shopkeep_tut_body":
         b"<p>\nIf you've come across an item\n"
-        b"or badge in the tower, you might\n"
-        b"see it on the shelf here.\n<k>\n"
+        b"or badge in the tower, you\n"
+        b"might see it on the shelf here.\n<k>\n"
         b"<p>\nIf something catches your eye,\n"
         b"just walk up to it and I can\n"
-        b"cut you a deal!\n<k>\n"
+        b"sell it for a top-notch price!\n<k>\n"
         b"<p>\nItems don't have any use here\n"
-        b"in town, but you can pick a few\n"
-        b"to bring into the tower.\n<k>\n"
+        b"in town, but you can select\n"
+        b"a few to bring into the tower.\n<k>\n"
         b"<p>\nFinally, if there's an item you\n"
-        b"know you've seen before, but it\n"
-        b"isn't on display right now,\n<k>\n"
+        b"know you've seen before, but\n"
+        b"it isn't on display right now,\n<k>\n"
         b"<p>\nread that sign back there to\n"
-        b"get it on back-order. That'll cost\n"
+        b"get it on back-order. It'll cost\n"
         b"you a bit extra, though!\n<k>\n"
         b"<p>\nWant me to run that all\n"
         b"by you again?\n<o>",
@@ -3679,7 +3679,7 @@ g_PetalburgEastStrings = {
     b"tot_cshopkeep_tut1":
         b"Hi, Mario! <wait 150>So nice of you to\n"
         b"take on those big, <wait 170>bad <wait 170>dragons\n"
-        b"and their fancy towers!!!\n<k>"
+        b"up in their fancy towers!\n<k>"
         b"<p>\nRemember us, the Traveling \n"
         b"Sisters 3?\n<k>",
         
@@ -3697,21 +3697,21 @@ g_PetalburgEastStrings = {
         b"a look sometime? \xde\n<k>",
         
     b"tot_cshop0_10":
-        b"Hi, Mario! <wait 150>I'm afraid\n"
-        b"I'm fresh out of musical\n"
-        b"doodads right now! \xd0\n<k>",
+        b"Hi, Mario! <wait 150>I'm afraid I'm fresh\n"
+        b"out of those musical doodads\n"
+        b"right now! \xd0\n<k>",
         
     b"tot_cshop1_10":
         b"Hi, Mario, looking sharp!\n"
-        b"<wait 200>I'm out of new outfits\n"
-        b"at the moment.\n<k>"
+        b"<wait 200>I'm out of new outfits at\n"
+        b"the moment.\n<k>"
         b"<p>\nYou're really rocking that\n"
         b"look right now, though!\n<k>",
         
     b"tot_cshop2_10":
-        b"Hi, Mario! \xde <wait 150>I haven't\n"
-        b"come across any new colored\n"
-        b"Yoshis recently!\n<k>"
+        b"Hi, Mario! \xde\n"
+        b"<wait 150>I haven't come across any\n"
+        b"new Yoshi varieties recently!\n<k>"
         b"<p>\nPerhaps another time!\n<k>",
         
     b"tot_cshop0_11":
@@ -3723,9 +3723,9 @@ g_PetalburgEastStrings = {
         b"were you thinking about?\n<k>",
         
     b"tot_cshop2_11":
-        b"Hi, Mario! \xde <wait 150>I love seeing\n"
-        b"all the different colors Yoshis\n"
-        b"come in. Any catch your eye?\n<k>",
+        b"Hi, Mario! <wait 150>I love seeing all the\n"
+        b"different colors Yoshis come in.\n"
+        b"Any catching your eye? \xde\n<k>",
 
     b"tot_cshop0_12":
         b"It's <NUM> Star Piece<S> for\n"
@@ -3809,8 +3809,8 @@ g_PetalburgEastStrings = {
         
     b"tot_cshop0_40":
         b"<p>\nThanks a bunch! \xd0\n"
-        b"<wait 200>Here's a trinket to go with it,\n"
-        b"<wait 200>on the house!\n<k>",
+        b"<wait 200>Here's a little trinket to keep\n"
+        b"you organized, <wait 200>on the house!\n<k>",
         
     b"tot_cshop1_40":
         b"<p>\nFantastic choice! <wait 150>Here's a\n"
@@ -3818,9 +3818,9 @@ g_PetalburgEastStrings = {
         b"your wardrobe going forward.\n<k>",
         
     b"tot_cshop2_40":
-        b"<p>\nGreat choice! <wait 200>Oh, <wait 100>this\n"
-        b"should help you find different\n"
-        b"Yoshi varieties out in the wild.\n<k>",
+        b"<p>\nGreat choice! <wait 200>Oh, <wait 100>this here'll\n"
+        b"help you find different Yoshi\n"
+        b"varieties out in the wild. \xde\n<k>",
 }
 
 g_OpeningCutsceneStrings = {
