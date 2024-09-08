@@ -30,6 +30,7 @@ enum GlobalWorkVars {
     GSWF_Battle_Hooktail_BiteReactionSeen,
     GSWF_HubShopTutorial,
     GSWF_CosmeticShopTutorial,
+    GSWF_RunOptionsTutorial,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

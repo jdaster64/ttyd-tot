@@ -2811,6 +2811,18 @@ g_TowerLobbyStrings = {
         b"alternate final boss can appear.",
         
     # Map text.
+        
+    b"tot_lobby_opttutorial":
+        b"<system>\n<p>\n"
+        b"Use this sign to customize\n"
+        b"various options for your next\n"
+        b"tower run to your liking!\n<k>\n"
+        b"<p>\nCertain options will increase\n"
+        b"or decrease a run's Intensity,\n"
+        b"affecting the rewards earned.\n<k>\n"
+        b"<p>The rest are just for fun!\n"
+        b"<wait 250>Press left/right to change\n"
+        b"settings, and B to back out.\n<k>",
     
     b"tot_lobby_frontsign":
         b'<kanban>\n'
