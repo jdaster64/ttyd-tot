@@ -498,16 +498,6 @@ void ApplyFixedPatches() {
     tribe_descs[238].modelName = "c_bomhey_h";
     tribe_descs[288].nameJp = "cosmic_boo";
     tribe_descs[288].modelName = "c_atmic_trs_p";
-    
-    // TODO: Move to patches_ui.h?
-    // Fix captures / location information in Tattle menu.
-    auto* tattle_inf = ttyd::battle_monosiri::battleGetUnitMonosiriPtr(0);
-    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].model_name = "c_atmic_trs_p";
-    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].pose_name = "Z_1";
-    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].location_name = "menu_monosiri_shiga";
-    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].model_name = "c_bomhey_h";
-    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].pose_name = "BOM_Z_1";
-    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].location_name = "menu_monosiri_shiga";
 
     // Replace shop buy_evt and evt_shoplist.
     mod::patch::writePatch(

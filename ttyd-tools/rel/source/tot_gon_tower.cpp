@@ -1328,7 +1328,6 @@ EVT_DEFINE_USER_FUNC(evtTot_OverrideLockKey) {
 
 // Overrides the previous party member that was out.
 EVT_DEFINE_USER_FUNC(evtTot_SetPreviousPartner) {
-    // TODO: Read from saved data if continuing, or will that be handled?
     auto* player = ttyd::mario::marioGetPtr();
     player->prevFollowerId[0] = 0;
     return 2;

@@ -584,9 +584,16 @@ void ApplyFixedPatches() {
         ttyd::win_root::enemy_monoshiri_sort_table,
         custom_tattle_order, sizeof(custom_tattle_order));
     
+    auto* tattle_inf = ttyd::battle_monosiri::battleGetUnitMonosiriPtr(0);
+    // Set models / default poses for new enemy types.
+    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].model_name = "c_atmic_trs_p";
+    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].pose_name = "Z_1";
+    tattle_inf[BattleUnitType::TOT_COSMIC_BOO].location_name = "menu_monosiri_shiga";
+    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].model_name = "c_bomhey_h";
+    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].pose_name = "BOM_Z_1";
+    tattle_inf[BattleUnitType::TOT_HYPER_BOB_OMB].location_name = "menu_monosiri_shiga";
     // Set Tattle log string for Fuzzy Horde to something non-empty.
-    ttyd::battle_monosiri::battleGetUnitMonosiriPtr(BattleUnitType::FUZZY_HORDE)
-        ->menu_tattle = "menu_enemy_400";
+    tattle_inf[BattleUnitType::FUZZY_HORDE].menu_tattle = "menu_enemy_400";
 
     // Remove Fuzzy Horde from Fuzzy's "same actor Tattle table".
     ttyd::battle_monosiri::same_tbl_chorobon[1] = 0;
