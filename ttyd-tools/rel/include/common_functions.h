@@ -65,7 +65,10 @@ int32_t DurationTicksToFmtString(int64_t val, char* out_buf);
 // Returns the number of characters printed to the string.
 int32_t DurationCentisToFmtString(int32_t val, char* out_buf);
 
-// Template functions for min / max / clamping a value to a range.
+// Template functions for abs / min / max / clamping a value to a range.
+template <class T> inline T AbsF(const T& value) {
+    return value < 0.0 ? -value : value;
+}
 template <class T> inline T Min(const T& lhs, const T& rhs) {
     return lhs < rhs ? lhs : rhs;
 }

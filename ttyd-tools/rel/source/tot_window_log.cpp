@@ -540,6 +540,38 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         uint32_t color = 0xFFFFFFFFU;
         ttyd::win_main::winTexSet(0xb0, &position, &scale, &color);
     }
+
+    // Draw flashing red boxes on unbreakable tiles when using a hammer.
+    if (menu->achievement_log_using_hammer &&
+        !menu->achievement_log_unlock_timer) {
+        // Pulse ~once every second, using absolute cosine curve.
+        int32_t alpha = 0x20 + 0x60 * AbsF(ttyd::_core_cos((
+                (ttyd::mariost::g_MarioSt->currentRetraceCount & 0x7f)
+                * 3.14159265f / 64.0f
+            )));
+
+        for (int32_t i = 0; i < 70; ++i) {
+            // Skip corners and already unlocked tiles.
+            if (i == 0 || i == 9 || i == 60 || i == 69) continue;
+            if (states[i] == 2) continue;
+            // Skip tiles that are breakable, but not currently selected.
+            if (!IsUnbreakable(i) && i != menu->achievement_log_cursor_idx)
+                continue;
+            
+            ttyd::win_main::winIconInit();
+            gc::vec3 position = {
+                win_x + 101.0f + 36.0f * (i % 10),
+                win_y - 10.0f - 36.0f * (i / 10),
+                0.0f
+            };
+            gc::vec3 scale = { 1.125f, 1.125f, 1.125f };
+            // Flash unbreakable tiles red, selected breakable one white.
+            uint32_t color =
+                (IsUnbreakable(i) ? 0xFF000000U : 0xFFFFFF00U) | alpha;
+            ttyd::win_main::winIconSet(
+                IconType::TOT_BLANK, &position, &scale, &color);
+        }
+    }
 }
 
 void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
@@ -581,6 +613,11 @@ void DrawMoveLog(WinPauseMenu* menu, float win_x, float win_y) {
                         ttyd::win_party::g_winPartyDt[page_number - 3].name;
                     header_icon = 
                         ttyd::win_party::g_winPartyDt[page_number - 3].icon_id;
+                    // Always display Yoshi as green if not currently in party.
+                    if (page_number == 6 && 
+                        !(ttyd::mario_pouch::pouchGetPtr()->party_data[4].flags & 1)) {
+                        header_icon = IconType::YOSHI_GREEN;
+                    }
                 } else {
                     msg = "msg_menu_stone_none_help";
                     header_icon = -1;
