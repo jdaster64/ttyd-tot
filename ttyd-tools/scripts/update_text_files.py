@@ -3664,119 +3664,151 @@ g_PetalburgEastStrings = {
     b"tot_shopkeep_yesno":
         b"<select 0 1 0 40>\nYes\nNo",
         
+    b"tot_cshopkeep_tut1":
+        b"Hi, Mario! <wait 150>So nice of you to\n"
+        b"take on those big, <wait 170>bad <wait 170>dragons\n"
+        b"and their fancy towers!!!\n<k>"
+        b"<p>\nRemember us, the Traveling \n"
+        b"Sisters 3?\n<k>",
+        
+    b"tot_cshopkeep_tut2":
+        b"We're finally settling down here\n"
+        b"in Petalburg, and we've got lots\n"
+        b"of goodies for sale! \xd0\n<k>",
+        
+    b"tot_cshopkeep_tut3":
+        b"We each specialize in different\n"
+        b"types of special flair. <wait 250>Outfits,\n"
+        b"<wait 120>musical trinkets,<wait 120> you name it!\n<k>\n"
+        b"<p>\nWhy don't you bring us some\n"
+        b"shiny Star Pieces and take\n"
+        b"a look sometime? \xde\n<k>",
+        
     b"tot_cshop0_10":
-        b"[Placeholder] No unlockables!\n<k>",
+        b"Hi, Mario! <wait 150>I'm afraid\n"
+        b"I'm fresh out of musical\n"
+        b"doodads right now! \xd0\n<k>",
         
     b"tot_cshop1_10":
-        b"[Placeholder] No unlockables!\n<k>",
+        b"Hi, Mario, looking sharp!\n"
+        b"<wait 200>I'm out of new outfits\n"
+        b"at the moment.\n<k>"
+        b"<p>\nYou're really rocking that\n"
+        b"look right now, though!\n<k>",
         
     b"tot_cshop2_10":
-        b"[Placeholder] No unlockables!\n<k>",
+        b"Hi, Mario! \xde <wait 150>I haven't\n"
+        b"come across any new colored\n"
+        b"Yoshis recently!\n<k>"
+        b"<p>\nPerhaps another time!\n<k>",
         
     b"tot_cshop0_11":
-        b"[Placeholder] Which one?\n<k>",
+        b"Hi, Mario! <wait 150>Any of these\n"
+        b"sound good to you? \xd0\n<k>",
         
     b"tot_cshop1_11":
-        b"[Placeholder] Which one?\n<k>",
+        b"Hi, Mario! <wait 150>What new outfits\n"
+        b"were you thinking about?\n<k>",
         
     b"tot_cshop2_11":
-        b"[Placeholder] Which one?\n<k>",
+        b"Hi, Mario! \xde <wait 150>I love seeing\n"
+        b"all the different colors Yoshis\n"
+        b"come in. Any catch your eye?\n<k>",
 
     b"tot_cshop0_12":
         b"It's <NUM> Star Piece<S> for\n"
         b"the <ITEM> pack.\n<wait 250>\n"
-        b"Are you sure you want it?\n<o>",
+        b"Sound good? \xd0\n<o>",
 
     b"tot_cshop1_12":
         b"It's <NUM> Star Piece<S> for\n"
-        b"the <ITEM> costume.\n<wait 250>\n"
-        b"Are you sure you want it?\n<o>",
+        b"that <ITEM> outfit.\n<wait 250>\n"
+        b"What do you think? Is it you?\n<o>",
 
     b"tot_cshop2_12":
         b"It's <NUM> Star Piece<S> for\n"
-        b"the <ITEM> costume.\n<wait 250>\n"
-        b"Are you sure you want it?\n<o>",
+        b"the <ITEM> Yoshi variety.\n<wait 250>\n"
+        b"What do you think? \xde\n<o>",
         
     b"tot_cshop0_13":
-        b"<p>\n[Placeholder] Not enough!\n<k>",
+        b"<p>\nAhh, that's not quite\n"
+        b"enough! <wait 200>So sorry! \xd0\n<k>",
         
     b"tot_cshop1_13":
-        b"<p>\n[Placeholder] Not enough!\n<k>",
+        b"<p>\nCan't go that low, I'm afraid!\n<k>",
         
     b"tot_cshop2_13":
-        b"<p>\n[Placeholder] Not enough!\n<k>",
-        
-    b"tot_cshop0_14":
-        b"<p>\n[Placeholder] Which one?\n<k>",
-        
-    b"tot_cshop1_14":
-        b"<p>\n[Placeholder] Which one?\n<k>",
-        
-    b"tot_cshop2_14":
-        b"<p>\n[Placeholder] Which one?\n<k>",
+        b"<p>\nAfraid you're a little short,\n<wait 200>sorry! \xde\n<k>",
         
     b"tot_cshop0_15":
-        b"<p>\n[Placeholder] Another?\n<k>",
+        b"<p>\nWant anything else? \xd0\n<k>",
         
     b"tot_cshop1_15":
-        b"<p>\n[Placeholder] Another?\n<k>",
+        b"<p>\nAnything else suit you?\n<k>",
         
     b"tot_cshop2_15":
-        b"<p>\n[Placeholder] Another?\n<k>",
+        b"<p>\nAny others look cool? \xde\n<k>",
         
     b"tot_cshop0_16":
-        b"<p>\n[Placeholder] No more!\n<k>",
+        b"<p>\nThanks a bunch! \xd0\n<k>",
         
     b"tot_cshop1_16":
-        b"<p>\n[Placeholder] No more!\n<k>",
+        b"<p>\nLooking good!\n<k>",
         
     b"tot_cshop2_16":
-        b"<p>\n[Placeholder] No more!\n<k>",
+        b"<p>\nGlad I could help you! \xde\n<k>",
         
     b"tot_cshop0_17":
-        b"[Placeholder] Another?\n<k>",
+        b"Want anything else? \xd0\n<k>",
         
     b"tot_cshop1_17":
-        b"[Placeholder] Another?\n<k>",
+        b"Anything else suit you?\n<k>",
         
     b"tot_cshop2_17":
-        b"[Placeholder] Another?\n<k>",
+        b"Any others look cool? \xde\n<k>",
         
     b"tot_cshop0_18":
-        b"[Placeholder] No more!\n<k>",
+        b"Thanks a bunch! \xd0\n<k>",
         
     b"tot_cshop1_18":
-        b"[Placeholder] No more!\n<k>",
+        b"Looking good!\n<k>",
         
     b"tot_cshop2_18":
-        b"[Placeholder] No more!\n<k>",
+        b"Glad I could help! \xde\n<k>",
         
     b"tot_cshop0_20":
-        b"[Placeholder] Goodbye!\n<k>",
+        b"Next time! \xd0\n<k>",
         
     b"tot_cshop1_20":
-        b"[Placeholder] Goodbye!\n<k>",
+        b"See you around!\n<k>",
         
     b"tot_cshop2_20":
-        b"[Placeholder] Goodbye!\n<k>",
+        b"After a while! \xde\n<k>",
         
     b"tot_cshop0_30":
-        b"<p>\n[Placeholder] Something else?\n<k>",
+        b"<p>\nAhh, I see; anything else? \xd0\n<k>",
         
     b"tot_cshop1_30":
-        b"<p>\n[Placeholder] Something else?\n<k>",
+        b"<p>\nNo dice, huh? <wait 200>Anything else\n"
+        b"suit your fancy?\n<k>",
         
     b"tot_cshop2_30":
-        b"<p>\n[Placeholder] Something else?\n<k>",
+        b"<p>\nToo exotic? \xde\nWhat else, then?<k>",
         
     b"tot_cshop0_40":
-        b"<p>\n[Placeholder] Key item get!\n<k>",
+        b"<p>\nThanks a bunch! \xd0\n"
+        b"<wait 200>Here's a trinket to go with it,\n"
+        b"<wait 200>on the house!\n<k>",
         
     b"tot_cshop1_40":
-        b"<p>\n[Placeholder] Key item get!\n<k>",
+        b"<p>\nFantastic choice! <wait 150>Here's a\n"
+        b"little something to help manage\n"
+        b"your wardrobe going forward.\n<k>",
         
     b"tot_cshop2_40":
-        b"<p>\n[Placeholder] Key item get!\n<k>",
+        b"<p>\nGreat choice! <wait 200>Oh, <wait 100>this\n"
+        b"should help you find different\n"
+        b"Yoshi varieties out in the wild.\n<k>",
 }
 
 g_OpeningCutsceneStrings = {
