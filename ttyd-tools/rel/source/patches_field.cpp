@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "patch.h"
 #include "tot_generate_item.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_state.h"
@@ -363,14 +364,34 @@ EVT_BEGIN(ShopSignEvt)
     // Get name of shopkeeper npc.
     USER_FUNC(shopper_name, LW(9))
 
+    // Check for tutorial dialogue.
+    IF_EQUAL((int32_t)tot::GSWF_HubShopTutorial, 0)
+        // Turn to face each other.
+        USER_FUNC(evt_mario_set_dir_npc, LW(9))
+        USER_FUNC(evt_set_dir_to_target, LW(9), PTR("mario"))
+
+        USER_FUNC(evt_msg_print, 0, PTR("tot_shopkeep_tut"), 0, LW(9))
+LBL(10)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_tut_body"))
+        USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_tutrepeat"))
+        IF_EQUAL(LW(0), 0)
+            GOTO(10)
+        END_IF()
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_11"))
+
+        // Explanation complete.
+        SET((int32_t)tot::GSWF_HubShopTutorial, 1)
+        GOTO(99)
+    END_IF()
+
     // Initialize the sign with all remaining items.
     USER_FUNC(evtTot_InitializeShopSign, LW(15))
     IF_SMALL(LW(15), 1)
         // Turn to face each other (only in this case, for Mario).
         USER_FUNC(evt_mario_set_dir_npc, LW(9))
         USER_FUNC(evt_set_dir_to_target, LW(9), PTR("mario"))
-        // Placeholder text for no items available on back order.
-        USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, LW(9))
+        // Dialogue for no items available on back order.
+        USER_FUNC(evt_msg_print, 0, PTR("tot_shopkeep_nobackorder"), 0, LW(9))
         GOTO(99)
     END_IF()
 

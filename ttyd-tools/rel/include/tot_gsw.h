@@ -28,12 +28,14 @@ enum GlobalWorkVars {
     GSWF_Lobby_InConfirm,
     GSWF_Lobby_Confirmed,
     GSWF_Battle_Hooktail_BiteReactionSeen,
+    GSWF_HubShopTutorial,
+    GSWF_CosmeticShopTutorial,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),
     GSWF_SuperPeekabooEnabled,
     GSWF_TimingTutorEnabled,
-    GSWF_BgmEnabled,
+    GSWF_BgmEnabled, 
     
     // Used for enabling cosmetic choices that persist across runs.
     GSWF_AttackFxFlags                      = GSWF(7500),
