@@ -2831,7 +2831,7 @@ g_TowerLobbyStrings = {
     
     b"tot_lobby_backsign":
         b'<kanban>\n'
-        b'Current seed: <col 0000ffff>\n'
+        b'Seed: <col 0000ffff>\n'
         b'%09d\n</col>\n'
         b'Options: <col 0000ffff>\n'
         b'%s\n</col>\n'
@@ -2843,15 +2843,25 @@ g_TowerLobbyStrings = {
 }
 
 g_TowerStrings = {
-    # Sign information. (TODO: Might not even exist in final game)
+    # Sign information.
 
     b'tot_floor_sign':
         b'<kanban>\n'
-        b'Seed: <col 0000ffff>\n'
+        b'<pos 153 0>\n'
+        b'Floor: <col cc0000ff>\n'
+        b'%02d\n</col>\n'
+        b'<pos 0 27>\n'
+        b'Seed: <col 0000ccff>\n'
         b'%09d\n</col>\n'
-        b'Options: <col 0000ffff>\n'
+        b'<pos 0 54>\n'
+        b'Options: <col 0000ccff>\n'
         b'%s\n</col>\n'
-        b'Floor: <col 0000ffff>\n'
+        b'<k>',
+
+    b'tot_floor_sign_noopt':
+        b'<kanban>\n'
+        b'<pos 100 27>\n'
+        b'Floor: <col cc0000ff>\n'
         b'%02d\n</col>\n'
         b'<k>',
 

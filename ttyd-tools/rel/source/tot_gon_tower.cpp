@@ -196,10 +196,13 @@ EVT_END()
 EVT_BEGIN(Tower_SignEvt)
     USER_FUNC(evt_npc_stop_for_event)
     USER_FUNC(evt_mario_key_onoff, 0)
-    USER_FUNC(evtTot_GetSeed, LW(0))
-    USER_FUNC(evtTot_GetEncodedOptions, LW(1))
-    USER_FUNC(evtTot_GetFloor, LW(2))
+    USER_FUNC(evtTot_GetFloor, LW(0))
+    USER_FUNC(evtTot_GetSeed, LW(1))
+    USER_FUNC(evtTot_GetEncodedOptions, LW(2))
+
+    // TODO: Replace sign with one that doesn't have seed/options on early runs.
     USER_FUNC(evt_msg_print_insert, 0, PTR("tot_floor_sign"), 0, 0, LW(0), LW(1), LW(2))
+
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_npc_start_for_event)
     RETURN()
