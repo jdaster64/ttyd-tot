@@ -2866,72 +2866,92 @@ g_TowerStrings = {
         b"<keyxon>\nThat's Charlieton, the\n"
         b"merchant.<dkey><wait 300></dkey> I guess he sells his\n"
         b"wares here, too.\n<k>\n<p>\n"
-        b"But...<wait 100>it looks like his stuff\n"
+        b"But... <wait 100>it looks like his stuff\n"
         b"gets more expensive the\n"
-        b"deeper he is in the Pit.\n<k>\n<p>\n"
+        b"higher we get in the tower.\n<k>\n<p>\n"
         b"I'm happy to be able to shop\n"
         b"here and all, but sheesh...\n"
         b"<wait 300>\n"
         b"Well, it's your money.\n<k>",
         
     b"npc_lumpy":
-        b"<keyxon>\n[Placeholder] That's Lumpy.\n"
-        b"<dkey><wait 300></dkey>\n"
-        b"If you invest coins, it might pay\n"
-        b"back dividends later... <dkey><wait 200></dkey>or not.\n<k>",
+        b"That's Lumpy. <dkey><wait 300></dkey>\n"
+        b"He says if\n"
+        b"you invest in him, he'll pay\n"
+        b"back big dividends later...\n<k>\n<p>\n"
+        b"He does seem trustworthy,\n"
+        b"but what if we don't end up\n"
+        b"seeing him again? <wait 250>Hmm...\n<k>",
         
     b"npc_doopliss":
-        b"<keyxon>\n[Placeholder] That's Doopliss.\n"
-        b"<dkey><wait 300></dkey>\n"
-        b"He'll make the next floors tougher,\n"
-        b"but more chests will appear.\n<k>",
+        b"<keyxon>\nThat's Doopliss. <dkey><wait 300></dkey>\n"
+        b"His magic can\n"
+        b"make more chests appear, but\n"
+        b"will make enemies stronger!\n<k>\n<p>\n"
+        b"What do you think, Mario?\n"
+        b"<wait 150>Is it worth the risk?\n<k>",
         
     b"npc_grubba":
-        b"<keyxon>\n[Placeholder] That's Grubba.\n"
-        b"<dkey><wait 300></dkey>\n"
-        b"Meeting his conditions yields\n"
-        b"2x coins, but fail, and get 0!\n<k>",
+        b"<keyxon>\nThat's Grubba. <dkey><wait 300></dkey>\n"
+        b"He'll give us\n"
+        b"special fighting conditions\n"
+        b"for the next few floors.\n<k>\n<p>\n"
+        b"If we can pull them off, we'll\n"
+        b"win double the normal coins,\n"
+        b"but if we fail, we get nothing!\n<k>",
         
     b"npc_chet":
-        b"<keyxon>\n[Placeholder] That's Chet Rippo.\n"
-        b"<dkey><wait 300></dkey>\n"
-        b"You can pay him to swap levels\n"
-        b"for extra Shine Sprites.\n<k>",
+        b"<keyxon>\nThat's Chet Rippo. <dkey><wait 300></dkey>\n\n"
+        b"He's absolutely loaded with\n"
+        b"extra Shine Sprites!\n<k>\n<p>\n"
+        b"We'll have to give up a level\n"
+        b"of one of our stats if we want\n"
+        b"them, though. <wait 100>Yikes!\n<k>\n<p>\n"
+        b"At least he's not literally\n"
+        b"asking for an arm and a leg,\n"
+        b"I guess?\n<k>",
         
     b"npc_wonky":
-        b"<keyxon>\n[Placeholder] That's Wonky.\n"
-        b"<dkey><wait 300></dkey>\n"
-        b"He'll take our unwanted items or\n"
-        b"badges for a few coins.\n<k>",
+        b"<keyxon>\nThat's Wonky. <dkey><wait 300></dkey>\n"
+        b"He's really\n"
+        b"gotten into collecting stuff,\n"
+        b"but isn't very... <wait 150>discerning.\n<k>\n<p>\n"
+        b"He'll take our unwanted items\n"
+        b"or badges for a few coins.\n"
+        b"<wait 250>One man's trash, as they say!\n<k>",
         
     b"npc_dazzle":
-        b"<keyxon>\n[Placeholder] That's Dazzle.\n"
-        b"<dkey><wait 300></dkey>\n"
-        b"He'll sell us extra Star Pieces\n"
-        b"to help rank up our moves.\n<k>",
+        b"<keyxon>\nThat's Dazzle. <dkey><wait 300></dkey>\n"
+        b"He's hoping\n"
+        b"to offload some of his Star\n"
+        b"Piece collection for coins.\n<k>\n<p>\n"
+        b"He'll give you a freebie to\n"
+        b"start, but will raise his price\n"
+        b"once he thinks you're hooked.\n<k>\n<p>\n"
+        b"The places folks will go\n"
+        b"these days to make money...\n"
+        b"<wait 200>kinda wild, don'tcha think?\n<k>",
         
     b"npc_mover":
-        b"<keyxon>\n[Placeholder] That's a Mover.\n"
-        b"<dkey><wait 300></dkey>\n"
-        b"Word has it, he can help us get\n"
-        b"through the tower faster.\n<k>",
+        b"<keyxon>\nHe's a Mover. <dkey><wait 300></dkey>\n"
+        b"Word has it,\n"
+        b"he cracked the tower's locks\n"
+        b"the day it opened. <wait 150>Wow.\n<k>\n<p>\n"
+        b"He's asking a hefty price for\n"
+        b"his keys, but I dunno, <wait 150>skipping a\n"
+        b"hard fight could be worth it!\n<k>",
         
     b"npc_zess":
-        b"<keyxon>\n[Placeholder] That's Zess T.\n"
+        b"<keyxon>\nThat's Zess T., the chef.\n"
         b"<dkey><wait 300></dkey>\n"
-        b"She's a wonderful cook that can\n"
-        b"turn our items into rarer ones.\n<k>",
-        
-    b"\x83\x70\x83\x8f\x81\x5b\x83\x5f\x83\x45\x83\x93\x89\xae":
-        b"<keyxon>\nThat's Chet Rippo, the\n"
-        b"adjuster.<dkey><wait 300></dkey> Seems he's found a\n"
-        b"new niche here in the Pit.\n<k>\n<p>\n"
-        b"He'll take your unwanted\n"
-        b"items, badges, and level-ups\n"
-        b"in exchange for a few coins.\n<k>\n<p>\n"
-        b"Me, <wait 200>I wouldn't trust this guy\n"
-        b"personally, Mario, but I guess\n"
-        b"if you're desperate...\n<k>",
+        b"Hope she's still not mad about\n"
+        b"that contact lens incident...\n<k>\n<p>\n"
+        b"She's got an all-new recipe\n"
+        b"book, and can cook stuff\n"
+        b"using any common item!\n<k>\n<p>\n"
+        b"She can also make signature\n"
+        b"dishes with rarer items, and\n"
+        b"maybe even wilder stuff!\n<k>",
     
     # NPC text.
     
