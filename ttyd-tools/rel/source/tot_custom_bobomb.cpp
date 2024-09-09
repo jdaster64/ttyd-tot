@@ -750,9 +750,10 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckCanWaitToCounterattack) {
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
 
     // If the attack that landed was 'indirect' (volatile explosive resistance)
-    // and the user is able to act, don't explode immediately, but queue a
-    // counter-attack instead.
+    // and the user is able to act and won't die anyway,
+    // don't explode immediately, but queue a counter-attack instead.
     bool can_counterattack =
+        unit->current_hp > 0 &&
         ttyd::battle_unit::BtlUnit_CanActStatus(unit) && 
         !ttyd::battle_unit::BtlUnit_CheckStatus(unit, StatusEffectType::OHKO) &&
         (unit->last_target_weapon_cr_flags &
