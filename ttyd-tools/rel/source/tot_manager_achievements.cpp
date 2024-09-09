@@ -2,6 +2,7 @@
 
 #include "common_functions.h"
 #include "mod.h"
+#include "tot_generate_enemy.h"
 #include "tot_gsw.h"
 #include "tot_state.h"
 
@@ -316,15 +317,21 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
             break;
         }
         case AchievementId::META_TATTLE_LOG_BASIC: {
-            for (int32_t i = 1; i <= 95; ++i) {
-                if (!ttyd::swdrv::swGet(i + 0x117a)) return;
+            for (int32_t i = 1; i < 0xd8; ++i) {
+                int32_t custom_tattle_idx = GetCustomTattleIndex(i);
+                if (custom_tattle_idx >= 1 && custom_tattle_idx <= 95) {
+                    if (!ttyd::swdrv::swGet(i + 0x117a)) return;
+                }
             }
             MarkCompleted(ach);
             break;
         }
         case AchievementId::META_TATTLE_LOG_ALL: {
-            for (int32_t i = 1; i <= 102; ++i) {
-                if (!ttyd::swdrv::swGet(i + 0x117a)) return;
+            for (int32_t i = 1; i < 0xd8; ++i) {
+                int32_t custom_tattle_idx = GetCustomTattleIndex(i);
+                if (custom_tattle_idx >= 1 && custom_tattle_idx <= 102) {
+                    if (!ttyd::swdrv::swGet(i + 0x117a)) return;
+                }
             }
             MarkCompleted(ach);
             break;
