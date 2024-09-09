@@ -917,8 +917,9 @@ void ApplyFixedPatches() {
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::MULTIPLE_TARGET;
     kLovePuddingParams.special_property_flags |=
+        AttackSpecialProperty_Flags::CANNOT_MISS |
         AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE |
-        AttackSpecialProperty_Flags::DEFENSE_PIERCING;
+        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED;
     kLovePuddingParams.attack_evt_code = 
         const_cast<int32_t*>(RngStatusAttackEvent);
     itemDataTable[ItemType::LOVE_PUDDING].weapon_params = &kLovePuddingParams;
@@ -933,6 +934,10 @@ void ApplyFixedPatches() {
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
         AttackTargetClass_Flags::MULTIPLE_TARGET;
+    kPeachTartParams.special_property_flags |=
+        AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE |
+        AttackSpecialProperty_Flags::DEFENSE_PIERCING |
+        AttackSpecialProperty_Flags::USABLE_IF_CONFUSED;
     itemDataTable[ItemType::PEACH_TART].weapon_params = &kPeachTartParams;
 
 
