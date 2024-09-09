@@ -6,6 +6,7 @@
 import os
 import subprocess
 import sys
+from collections import ChainMap
 from pathlib import Path
 
 import flags    # jdalib
@@ -2864,11 +2865,6 @@ g_TowerStrings = {
         b'Floor: <col cc0000ff>\n'
         b'%02d\n</col>\n'
         b'<k>',
-
-    # Area tattle. (TODO: Write final script)
-    
-    b"msg_kuri_map":
-        b"Placeholder area tattle \xd0\n<k>",
     
     # NPC tattles.
 
@@ -3443,6 +3439,50 @@ g_TowerStrings = {
         b"<select 0 1 0 40>\nYes\nNo",
 }
 
+g_Tower1Strings = {
+    # Goombella area tattle.
+    b"msg_kuri_map":
+        b"This is Hooktail Castle. <wait 250>Well,\n"
+        b"at least it was at some point...\n"
+        b"<wait 200>it's more of a tower now.\n<k>\n<p>\n"
+        b"No telling how far up this\n"
+        b"goes, but let's stick it out and\n"
+        b"show that dragon who's boss!\n<k>",
+}
+
+g_Tower2Strings = {
+    # Goombella area tattle.
+    b"msg_kuri_map":
+        b"This is Hooktail Castle.\n"
+        b"<wait 250>It seems the decor's changed...\n"
+        b"<wait 200>looks kind of nice, honestly.\n<k>\n<p>\n"
+        b"We've made a good bit of\n"
+        b"progress, Mario, but we can't\n"
+        b"stop now! <wait 200>C'mon!\n<k>",
+}
+
+g_Tower3Strings = {
+    # Goombella area tattle.
+    b"msg_kuri_map":
+        b"This is Hooktail Castle.\n"
+        b"<wait 250>Ugh, this color combination\n"
+        b"is making me sick.\n<k>\n<p>\n"
+        b"We've got to be more than\n"
+        b"halfway up by now, right?\n"
+        b"<wait 200>Let's keep powering through...\n<k>",
+}
+
+g_Tower4Strings = {
+    # Goombella area tattle.
+    b"msg_kuri_map":
+        b"This is Hooktail Castle.\n"
+        b"<wait 250>Wow, the atmosphere here's\n"
+        b"really intense!\n<k>\n<p>\n"
+        b"We must be close now, but\n"
+        b"these fights are really tough!\n"
+        b"<wait 200>Don't let your guard down!\n<k>",
+}
+
 g_TowerBossFloorStrings = {
     # Dragon field dialogue.
     
@@ -3901,10 +3941,10 @@ g_StringMap = {
     'gon_00': g_TowerLobbyStrings,
     
     # Tower floors.
-    'gon_01': g_TowerStrings,
-    'gon_02': g_TowerStrings,
-    'gon_03': g_TowerStrings,
-    'gon_04': g_TowerStrings,
+    'gon_01': ChainMap(g_TowerStrings, g_Tower1Strings),
+    'gon_02': ChainMap(g_TowerStrings, g_Tower2Strings),
+    'gon_03': ChainMap(g_TowerStrings, g_Tower3Strings),
+    'gon_04': ChainMap(g_TowerStrings, g_Tower4Strings),
     
     # Tower boss floor.
     'gon_05': g_TowerBossFloorStrings,
