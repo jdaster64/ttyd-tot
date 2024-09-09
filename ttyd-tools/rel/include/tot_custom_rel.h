@@ -125,7 +125,7 @@ extern ttyd::battle_database_common::BattleUnitKind unit_Bonetail;
 extern ttyd::battle_database_common::BattleUnitKind unit_GoldFuzzy;
 extern ttyd::battle_database_common::BattleUnitKind unit_FuzzyHorde;
 
-// Other structures referenced by patches, etc.
+// Other functions and structures referenced by patches, etc.
 extern ttyd::battle_database_common::BattleWeapon unitBobOmb_weaponBomb;
 extern ttyd::battle_database_common::BattleWeapon unitDragon_weaponBite;
 extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;
@@ -133,6 +133,50 @@ extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_ZYux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_XYux_Main;
 extern int8_t defense_GreenMagikoopa[5];
+
+// Hooked / patched for Infatuate reasons.
+EVT_DECLARE_USER_FUNC(unitBoo_teresa_check_trans, 1);
+EVT_DECLARE_USER_FUNC(unitDarkBoo_teresa_check_trans, 1);
+
+extern ttyd::battle_database_common::BattleWeapon unitHyperGoomba_weaponCharge;
+extern ttyd::battle_database_common::BattleWeapon unitHyperParagoomba_weaponChargePara;
+extern ttyd::battle_database_common::BattleWeapon unitHyperParagoomba_weaponCharge;
+extern ttyd::battle_database_common::BattleWeapon unitHyperSpikyGoomba_weaponCharge;
+extern ttyd::battle_database_common::BattleWeapon unitKoopatrol_weaponCharge;
+extern ttyd::battle_database_common::BattleWeapon unitDarkKoopatrol_weaponCharge;
+extern ttyd::battle_database_common::BattleWeapon unitDarkLakitu_weaponCharge;
+extern ttyd::battle_database_common::BattleWeapon unitSkyBlueSpiny_weaponCharge;
+extern ttyd::battle_database_common::BattleWeapon unitBoo_weaponInvis;
+extern ttyd::battle_database_common::BattleWeapon unitDarkBoo_weaponInvis;
+extern ttyd::battle_database_common::BattleWeapon unitWizzerd_weaponHuge;
+extern ttyd::battle_database_common::BattleWeapon unitWizzerd_weaponDef;
+extern ttyd::battle_database_common::BattleWeapon unitDarkWizzerd_weaponInvis;
+extern ttyd::battle_database_common::BattleWeapon unitDarkWizzerd_weaponDodgy;
+extern ttyd::battle_database_common::BattleWeapon unitDarkWizzerd_weaponHuge;
+extern ttyd::battle_database_common::BattleWeapon unitDarkWizzerd_weaponDef;
+extern ttyd::battle_database_common::BattleWeapon unitEliteWizzerd_weaponInvis;
+extern ttyd::battle_database_common::BattleWeapon unitEliteWizzerd_weaponDodgy;
+extern ttyd::battle_database_common::BattleWeapon unitEliteWizzerd_weaponHuge;
+extern ttyd::battle_database_common::BattleWeapon unitEliteWizzerd_weaponDef;
+extern ttyd::battle_database_common::BattleWeapon unitMagikoopa_weaponHuge;
+extern ttyd::battle_database_common::BattleWeapon unitMagikoopa_weaponElectric;
+extern ttyd::battle_database_common::BattleWeapon unitMagikoopa_weaponInvis;
+extern ttyd::battle_database_common::BattleWeapon unitMagikoopa_weaponDef;
+extern ttyd::battle_database_common::BattleWeapon unitGreenMagikoopa_weaponHuge;
+extern ttyd::battle_database_common::BattleWeapon unitGreenMagikoopa_weaponElectric;
+extern ttyd::battle_database_common::BattleWeapon unitGreenMagikoopa_weaponInvis;
+extern ttyd::battle_database_common::BattleWeapon unitGreenMagikoopa_weaponDef;
+extern ttyd::battle_database_common::BattleWeapon unitRedMagikoopa_weaponHuge;
+extern ttyd::battle_database_common::BattleWeapon unitRedMagikoopa_weaponElectric;
+extern ttyd::battle_database_common::BattleWeapon unitRedMagikoopa_weaponInvis;
+extern ttyd::battle_database_common::BattleWeapon unitRedMagikoopa_weaponDef;
+extern ttyd::battle_database_common::BattleWeapon unitWhiteMagikoopa_weaponHuge;
+extern ttyd::battle_database_common::BattleWeapon unitWhiteMagikoopa_weaponElectric;
+extern ttyd::battle_database_common::BattleWeapon unitWhiteMagikoopa_weaponInvis;
+extern ttyd::battle_database_common::BattleWeapon unitWhiteMagikoopa_weaponDef;
+extern ttyd::battle_database_common::BattleWeapon unitXNaut_weaponPotion;
+extern ttyd::battle_database_common::BattleWeapon unitEliteXNaut_weaponPotion;
+extern ttyd::battle_database_common::BattleWeapon unitXNautPhD_weaponPotion;
 
 // Individual evt instructions referenced by patches, etc.
 extern int32_t evt_Koopatrol_NormalAttackReturnLbl_PatchLoc[1];

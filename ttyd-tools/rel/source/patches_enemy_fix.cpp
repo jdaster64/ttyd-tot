@@ -91,6 +91,8 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Function hooks.
 extern int32_t (*g_btlevtcmd_CheckSpace_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_BattleCheckConcluded_trampoline)(BattleWork*);
+extern int32_t (*g_unitBoo_teresa_check_trans_trampoline)(EvtEntry*, bool);
+extern int32_t (*g_unitDarkBoo_teresa_check_trans_trampoline)(EvtEntry*, bool);
 // Patch addresses.
 extern const int32_t g_BattleAudienceDetectTargetPlayer_CheckPlayer_BH;
 extern const int32_t g_BattleAudienceDetectTargetPlayer_CheckPlayer_EH;
@@ -285,6 +287,116 @@ void ApplyFixedPatches() {
         });
         
     // Individual enemy behavior, etc. patches.
+
+    // Boo and Dark Boo should not try to use team-invis attack when Infatuated.
+    // (They already don't try to use it in Confusion)
+    g_unitBoo_teresa_check_trans_trampoline = patch::hookFunction(
+        unitBoo_teresa_check_trans, [](EvtEntry* evt, bool isFirstCall) {
+            // Check for Infatuation first.
+            auto* battleWork = ttyd::battle::g_BattleWork;
+            int32_t self_id = ttyd::battle_sub::BattleTransID(evt, -2);
+            auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, self_id);
+            if (unit->alliance == 0) {
+                evtSetValue(evt, evt->evtArguments[1], 0);
+                return 2;
+            }
+            // Run original logic.
+            return g_unitBoo_teresa_check_trans_trampoline(evt, isFirstCall);
+        });
+    g_unitDarkBoo_teresa_check_trans_trampoline = patch::hookFunction(
+        unitDarkBoo_teresa_check_trans, [](EvtEntry* evt, bool isFirstCall) {
+            // Check for Infatuation first.
+            auto* battleWork = ttyd::battle::g_BattleWork;
+            int32_t self_id = ttyd::battle_sub::BattleTransID(evt, -2);
+            auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, self_id);
+            if (unit->alliance == 0) {
+                evtSetValue(evt, evt->evtArguments[1], 0);
+                return 2;
+            }
+            // Run original logic.
+            return g_unitDarkBoo_teresa_check_trans_trampoline(evt, isFirstCall);
+        });
+
+    // Make a bunch of enemy self-targeting attacks unguardable, so they
+    // can't have defensive actions stored.
+    unitHyperGoomba_weaponCharge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitHyperParagoomba_weaponChargePara.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitHyperParagoomba_weaponCharge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitHyperSpikyGoomba_weaponCharge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitKoopatrol_weaponCharge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitDarkKoopatrol_weaponCharge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitDarkLakitu_weaponCharge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitSkyBlueSpiny_weaponCharge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitBoo_weaponInvis.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitDarkBoo_weaponInvis.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitWizzerd_weaponHuge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitWizzerd_weaponDef.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitDarkWizzerd_weaponInvis.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitDarkWizzerd_weaponDodgy.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitDarkWizzerd_weaponHuge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitDarkWizzerd_weaponDef.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitEliteWizzerd_weaponInvis.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitEliteWizzerd_weaponDodgy.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitEliteWizzerd_weaponHuge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitEliteWizzerd_weaponDef.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitMagikoopa_weaponHuge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitMagikoopa_weaponElectric.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitMagikoopa_weaponInvis.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitMagikoopa_weaponDef.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitGreenMagikoopa_weaponHuge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitGreenMagikoopa_weaponElectric.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitGreenMagikoopa_weaponInvis.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitGreenMagikoopa_weaponDef.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitRedMagikoopa_weaponHuge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitRedMagikoopa_weaponElectric.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitRedMagikoopa_weaponInvis.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitRedMagikoopa_weaponDef.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitWhiteMagikoopa_weaponHuge.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitWhiteMagikoopa_weaponElectric.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitWhiteMagikoopa_weaponInvis.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitWhiteMagikoopa_weaponDef.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitXNaut_weaponPotion.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitEliteXNaut_weaponPotion.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
+    unitXNautPhD_weaponPotion.special_property_flags
+        |= AttackSpecialProperty_Flags::UNGUARDABLE;
     
     // Patch Gale Force coins / EXP out for enemies that had special logic
     // for handling it in the original game (mostly cloning enemies).

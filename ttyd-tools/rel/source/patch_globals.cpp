@@ -257,6 +257,11 @@ int32_t (*g_memcard_code_trampoline)(EvtEntry*, bool) = nullptr;
 // os.a OSLink.c  8029a8e4
 bool (*g_OSLink_trampoline)(OSModuleInfo*, void*) = nullptr;
 
+// custom REL unit_teresa
+int32_t (*g_unitBoo_teresa_check_trans_trampoline)(EvtEntry*, bool) = nullptr;
+// custom REL unit_purple_teresa
+int32_t (*g_unitDarkBoo_teresa_check_trans_trampoline)(EvtEntry*, bool) = nullptr;
+
 // Branch / patch addresses (BH / EH / CH# = begin / end / conditional hooks).
 
 extern const int32_t g_seq_mapChangeMain_OnMapUnload_BH = 0x80007e18;
