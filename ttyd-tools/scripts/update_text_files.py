@@ -3511,7 +3511,7 @@ g_Tower4Strings = {
 }
 
 g_TowerBossFloorStrings = {
-    # Dragon field dialogue.
+    # Field dialogue.
     
     b"tot_field_dragon00_00":
         b"[Placeholder] Encounter<k>",
@@ -3520,6 +3520,9 @@ g_TowerBossFloorStrings = {
         b"[Placeholder] Encounter<k>",
     
     b"tot_field_dragon02_00":
+        b"[Placeholder] Encounter<k>",
+        
+    b"tot_field_gfz_00":
         b"[Placeholder] Encounter<k>",
     
     # Dragon fight dialogue.

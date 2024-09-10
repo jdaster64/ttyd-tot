@@ -568,8 +568,6 @@ EVT_BEGIN(Tower_VictorySequence)
     USER_FUNC(evtTot_IncrementFloor, 1)
     USER_FUNC(evtTot_TrackCompletedRun)
     WAIT_MSEC(LW(15))
-    
-    // TODO: Flesh out victory animations, results, ...
 
     // Show run stats + timer splits dialog.
 LBL(10)
@@ -892,9 +890,33 @@ EVT_BEGIN(Tower_GoldFuzzyBossEvent)
 
     // TODO: Hone camera location, add dialogue, have Fuzzy jump toward Mario.
     RUN_EVT_ID(Tower_GoldFuzzyIdleSfx, LW(15))
-    USER_FUNC(evt_cam3d_evt_set, 0, 60, 230, 0, 10, -70, 250, 11)
-    WAIT_MSEC(6000)
+    USER_FUNC(evt_cam3d_evt_set, 0, 75, 230, 0, 25, -70, 250, 11)
+    WAIT_MSEC(500)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_field_gfz_00"), 0, PTR(kPitNpcName))
     DELETE_EVT(LW(15))
+    BROTHER_EVT()
+        // Slow camera pan.
+        USER_FUNC(evt_cam3d_evt_set, -450, 75, 230, -450, 25, -70, 2000, 11)
+    END_BROTHER()
+
+    // Should be three quick, low hops and a higher jump.
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("CBN_W_1"))
+    USER_FUNC(evt_npc_get_position, PTR(kPitNpcName), LW(0), LW(1), LW(2))
+    DO(3)
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_CHORO_MOVE1"), LW(0), LW(1), LW(2), 0)
+        SUB(LW(0), 115)
+        USER_FUNC(evt_npc_jump_position_nohit, PTR(kPitNpcName), LW(0), LW(1), LW(2), 500, FLOAT(35.0))
+    WHILE()
+    BROTHER_EVT()
+        WAIT_MSEC(160)
+        USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_2"), LW(0), LW(1), LW(2), 0)
+        USER_FUNC(evt_mario_set_pose, PTR("M_N_7"))
+    END_BROTHER()
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_CHORO_MOVE1"), LW(0), LW(1), LW(2), 0)
+    SET(LW(0), -445)
+    ADD(LW(1), 5)
+    USER_FUNC(evt_npc_jump_position_nohit, PTR(kPitNpcName), LW(0), LW(1), LW(2), 950, FLOAT(75.0))
 
     USER_FUNC(evt_npc_battle_start, PTR(kPitNpcName))
     
@@ -902,11 +924,9 @@ EVT_BEGIN(Tower_GoldFuzzyBossEvent)
     USER_FUNC(evt_npc_wait_battle_end)
     USER_FUNC(evt_npc_get_battle_result, LW(0))
     IF_EQUAL(LW(0), 3)
-        // Turn on red fog, turn door model back on and point at player.
+        // Turn on red fog, despawn NPCs, and point at player.
         USER_FUNC(evt_map_set_fog, 2, 400, 1000, 40, 0, 20)
         USER_FUNC(evt_map_fog_onoff, 1)
-        // USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("door10"), 1)
-        // USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("kesu"), 1)
         USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
         USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
         USER_FUNC(evt_cam3d_evt_off, 0, 11)
@@ -917,6 +937,7 @@ EVT_BEGIN(Tower_GoldFuzzyBossEvent)
     // Otherwise, play boss death animation.
 
     // Spawn Mario + partner in room, dragon already felled in background.
+    USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
     SET(LW(13), PTR(kPitBossNpc2Name))
     USER_FUNC(evt_cam3d_evt_set, 0, 30, 842, 0, 135, 150, 0, 11)
     USER_FUNC(evt_npc_set_position, LW(13), 0, 0, -140)
@@ -931,7 +952,7 @@ EVT_BEGIN(Tower_GoldFuzzyBossEvent)
     SET(LW(13), PTR(kPitNpcName))
     USER_FUNC(evt_npc_set_position, LW(13), 0, 5, 0)
     USER_FUNC(evt_npc_set_anim, LW(13), PTR("CBN_Y_1"))
-    // TODO: Add death text.
+    // TODO: Add death text?
     WAIT_MSEC(1000)
     USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
     USER_FUNC(evt_eff, 
