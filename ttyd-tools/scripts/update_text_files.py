@@ -3695,6 +3695,17 @@ g_TowerBossFloorStrings = {
 }
 
 g_PetalburgWestStrings = {
+    # First cutscene.
+    
+    b"tot_town_firstvisit_00":
+        b"[Placeholder] Text 0\n<k>",
+    
+    b"tot_town_firstvisit_01":
+        b"[Placeholder] Text 1\n<k>",
+    
+    b"tot_town_firstvisit_02":
+        b"[Placeholder] Text 2\n<k>",
+
     # Shopkeeper.
 
     b"tot_shopkeep_00":

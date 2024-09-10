@@ -24,6 +24,7 @@
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
 #include <ttyd/evt_pouch.h>
+#include <ttyd/evt_seq.h>
 #include <ttyd/evt_shop.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
@@ -58,6 +59,7 @@ using namespace ::ttyd::evt_mobj;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
 using namespace ::ttyd::evt_pouch;
+using namespace ::ttyd::evt_seq;
 using namespace ::ttyd::evt_shop;
 using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
@@ -378,7 +380,7 @@ EVT_END()
 EVT_BEGIN(Villager_A_InitEvt)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR("me"), 1536)
     // TODO: Don't run this if in first-time cutscene.
-    USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
+    // USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
     RETURN()
 EVT_END()
 
@@ -397,6 +399,51 @@ EVT_BEGIN(Gatekeeper_TalkEvt)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(FirstVisit_Evt)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_snd_bgm_scope, 0, 1)
+    USER_FUNC(evt_mario_set_pos, -545, 0, 0)
+    USER_FUNC(evt_npc_set_position, PTR(g_NpcNokonokoA), -250, 0, 65)
+    USER_FUNC(evt_cam3d_evt_set, 730, 617, 915, 245, 93, 144, 0, 11)
+    USER_FUNC(evt_seq_wait, 2)
+    INLINE_EVT()
+        USER_FUNC(evt_cam3d_evt_set, FLOAT(-450.0), FLOAT(400.0), FLOAT(840.0), FLOAT(-300.0), FLOAT(165.0), FLOAT(255.0), 6000, 13)
+        WAIT_MSEC(8500)
+        USER_FUNC(evt_cam3d_evt_set, FLOAT(-380.0), FLOAT(90.0), FLOAT(352.0), FLOAT(-380.0), FLOAT(35.0), FLOAT(47.0), 0, 13)
+    END_INLINE()
+    WAIT_MSEC(6000)
+    USER_FUNC(evt_mario_mov_pos2, -400, 65, FLOAT(120.0))
+    WAIT_MSEC(500)
+    USER_FUNC(evt_npc_move_position, PTR(g_NpcNokonokoA), -350, 65, 0, FLOAT(60.0), 0)
+    WAIT_MSEC(50)
+    USER_FUNC(evt_set_dir_to_target, PTR(g_NpcNokonokoA), PTR("mario"))
+    USER_FUNC(evt_msg_print, 0, PTR("tot_town_firstvisit_00"), 0, PTR(g_NpcNokonokoA))
+    USER_FUNC(evt_mario_get_motion, LW(0))
+    INLINE_EVT()
+        USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_HAND_UP1_1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE()
+    USER_FUNC(evt_mario_set_pose, PTR("M_I_2"))
+    WAIT_MSEC(1600)
+    USER_FUNC(evt_mario_set_motion, LW(0))
+    USER_FUNC(evt_msg_print, 0, PTR("tot_town_firstvisit_01"), 0, PTR(g_NpcNokonokoA))
+    WAIT_MSEC(100)
+    INLINE_EVT()
+        USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_HAND_UP1_4"), LW(0), LW(1), LW(2), 0)
+    END_INLINE()
+    USER_FUNC(evt_mario_set_pose, PTR("M_I_2"))
+    WAIT_MSEC(2000)
+    USER_FUNC(evt_mario_set_motion, LW(0))
+    WAIT_MSEC(250)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_town_firstvisit_02"), 0, PTR(g_NpcNokonokoA))
+    USER_FUNC(evt_cam3d_evt_off, 500, 4)
+    USER_FUNC(evt_snd_bgmon_f, 768, PTR("BGM_STG1_NOK1"), 2000)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    USER_FUNC(evt_snd_bgm_scope, 0, 0)
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(gon_10_InitEvt)
     SET(LW(0), PTR(&gon_10_entry_data))
     USER_FUNC(evt_bero_get_info)
@@ -405,11 +452,11 @@ EVT_BEGIN(gon_10_InitEvt)
     USER_FUNC(evt_npc_setup, PTR(&gon_10_npc_data))
 
     // TODO: Add a one-time opening cutscene on first visit.
-    IF_SMALL(0, 1)
+    IF_SMALL(2, 1)
         RUN_CHILD_EVT(evt_bero_info_run)
     ELSE()
         RUN_EVT(bero_case_entry)
-        // RUN_EVT for first time opening cutscene event.
+        RUN_EVT(FirstVisit_Evt)
     END_IF()
 
     USER_FUNC(evt_map_playanim, PTR("S_kawa"), 1, 0)
@@ -582,7 +629,7 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .name = g_NpcNokonokoA,
         .flags = 0,
         .initEvtCode = (void*)Villager_A_InitEvt,
-        .regularEvtCode = (void*)Npc_GenericMove,
+        .regularEvtCode = (void*)Villager_A_MoveEvt,
         .talkEvtCode = (void*)Npc_GenericTalk,
     },
     {
