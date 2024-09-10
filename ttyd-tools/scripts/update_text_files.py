@@ -3173,11 +3173,10 @@ g_TowerStrings = {
         b"<dynamic 3>extra</dynamic> tough!\n<k>\n<p>\n"
         b"In exchange, I'll make it so\n"
         b"more chests appear on every\n"
-        b"floor. <wait 150>You game, slick?\n<o>",
+        b"floor. <wait 150>You game, pal?\n<o>",
         
     b"tot_doopliss_accept":
-        b"<p>\nHee hee! Don't get clobbered\n"
-        b"out there!\n<k>",
+        b"<p>\nYou got it, Slick! Here goes!\n<k>",
         
     b"tot_doopliss_decline":
         b"<p>\nAw, you're no fun!\n<k>",

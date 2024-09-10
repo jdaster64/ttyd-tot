@@ -11,12 +11,14 @@
 #include "tot_window_select.h"
 
 #include <ttyd/evt_badgeshop.h>
+#include <ttyd/evt_eff.h>
 #include <ttyd/evt_item.h>
 #include <ttyd/evt_mario.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
 #include <ttyd/evt_pouch.h>
 #include <ttyd/evt_shop.h>
+#include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
 #include <ttyd/evt_win.h>
 #include <ttyd/evt_window.h>
@@ -38,12 +40,14 @@ namespace mod::tot::gon {
 namespace {
 
 // Including entire namespaces for convenience.
+using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_item;
 using namespace ::ttyd::evt_mario;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
 using namespace ::ttyd::evt_pouch;
 using namespace ::ttyd::evt_shop;
+using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::evt_win;
 using namespace ::ttyd::evt_window;
@@ -644,9 +648,33 @@ EVT_BEGIN(TowerNpc_DooplissTalk)
         GOTO(99)
     END_IF()
 
-    // TODO: Play a sound effect or visual effect?
-    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::DOOPLISS)
     USER_FUNC(evt_msg_print_add, 0, PTR("tot_doopliss_accept"))
+
+    WAIT_MSEC(100)
+    USER_FUNC(evt_npc_get_position, PTR("me"), LW(0), LW(1), LW(2))
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_ARM_UP1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_npc_set_anim, PTR("me"), PTR("A_3A"))
+    WAIT_MSEC(600)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_ARM_UP1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_npc_set_anim, PTR("me"), PTR("A_3A"))
+    WAIT_MSEC(600)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_ARM_UP1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_npc_set_anim, PTR("me"), PTR("A_3A"))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_LAUGH1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_npc_set_anim, PTR("me"), PTR("A_3B"))
+    WAIT_MSEC(800)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_EYE_SHINE1"), LW(0), LW(1), LW(2), 0)
+    ADD(LW(0), -6)
+    ADD(LW(1), 33)
+    USER_FUNC(evt_eff, PTR(""), PTR("toge_flush"), 3, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+    ADD(LW(0), 7)
+    ADD(LW(1), -1)
+    USER_FUNC(evt_eff, PTR(""), PTR("toge_flush"), 3, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MSEC(1000)
+
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::DOOPLISS)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_doopliss_active"), 0, PTR("me"))
 
 LBL(99)
     USER_FUNC(evt_mario_key_onoff, 1)
