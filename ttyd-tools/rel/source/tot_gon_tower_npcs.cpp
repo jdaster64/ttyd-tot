@@ -253,6 +253,7 @@ EVT_DECLARE_USER_FUNC(evtTot_GetRecipeOptionsString, 2)
 EVT_DECLARE_USER_FUNC(evtTot_GetSelectedRecipeMode, 3)
 EVT_DECLARE_USER_FUNC(evtTot_AddIngredient, 1)
 EVT_DECLARE_USER_FUNC(evtTot_MakeIngredientList, 3)
+EVT_DECLARE_USER_FUNC(evtTot_MakeRecipeList, 4)
 EVT_DECLARE_USER_FUNC(evtTot_ResetIngredients, 0)
 EVT_DECLARE_USER_FUNC(evtTot_GetRecipeResults, 3)
 EVT_DECLARE_USER_FUNC(evtTot_GetItemName, 2)
@@ -918,16 +919,18 @@ LBL(50)
     USER_FUNC(evtTot_GetItemName, LW(8), LW(6))
 
     USER_FUNC(evtTot_GetRecipeResults, LW(10), LW(11), LW(12))
-    IF_LARGE(LW(10), 1)
+    IF_SMALL(LW(10), 2)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_zess_onlyrecipe"), 0, PTR("me"))
+    ELSE()
         USER_FUNC(evt_msg_print, 0, PTR("tot_zess_whichrecipe"), 0, PTR("me"))
-        USER_FUNC(evtTot_MakeIngredientList, LW(14), LW(13), LW(1))
-        USER_FUNC(evt_win_item_select, 0, LW(13), LW(0), 0)
-        IF_EQUAL(LW(0), -1)
-            USER_FUNC(evt_msg_print, 0, PTR("tot_zess_nochooserecipe"), 0, PTR("me"))
-            GOTO(99)
-        END_IF()
-        SET(LW(11), LW(0))
     END_IF()
+    USER_FUNC(evtTot_MakeRecipeList, LW(13), LW(10), LW(11), LW(12))
+    USER_FUNC(evt_win_item_select, 0, LW(13), LW(0), 0)
+    IF_EQUAL(LW(0), -1)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_zess_nochooserecipe"), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+    SET(LW(11), LW(0))
 
     IF_LARGE(LW(5), 0)
         // Prompt with coin cost.
@@ -1322,18 +1325,6 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeIngredientList) {
     int32_t mode = evtGetValue(evt, evt->evtArguments[0]);
     int32_t index = 0;
 
-    // Actually asking for list of recipe options.
-    if (mode == RecipeMode::SINGLE_ITEM && g_CurrentIngredients[0]) {
-        g_IngredientList[0] =
-            g_RecipeInfo[g_CurrentIngredients[0] - ItemType::GOLD_BAR].recipe_1;
-        g_IngredientList[1] =
-            g_RecipeInfo[g_CurrentIngredients[0] - ItemType::GOLD_BAR].recipe_2;
-        g_IngredientList[2] = -1;
-        evtSetValue(evt, evt->evtArguments[1], PTR(&g_IngredientList[0]));
-        evtSetValue(evt, evt->evtArguments[2], 2);
-        return 2;
-    }
-
     const auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     for (int32_t i = 0; i < 20; ++i) {
         int32_t item = pouch.items[i];
@@ -1369,6 +1360,19 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeIngredientList) {
     g_IngredientList[index] = -1;
     evtSetValue(evt, evt->evtArguments[1], PTR(&g_IngredientList[0]));
     evtSetValue(evt, evt->evtArguments[2], index);
+
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_MakeRecipeList) {
+    static int32_t g_IngredientList[3];
+    
+    int32_t num_recipes = evtGetValue(evt, evt->evtArguments[1]);
+    for (int32_t i = 0; i < num_recipes; ++i) {
+        g_IngredientList[i] = evtGetValue(evt, evt->evtArguments[i + 2]);
+    }
+    g_IngredientList[num_recipes] = -1;
+    evtSetValue(evt, evt->evtArguments[0], PTR(&g_IngredientList[0]));
 
     return 2;
 }
