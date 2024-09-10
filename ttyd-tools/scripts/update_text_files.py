@@ -3048,53 +3048,67 @@ g_TowerStrings = {
         b"<select 0 2 0 40>\nItems\nBadges",
         
     b"tot_wonky_noitems":
-        b"<p>\n[Placeholder] No items!\n<k>",
+        b"<p>\nYou haven't got any items!\n"
+        b"<wait 250>Oh, don't tease me so!\n<k>",
         
     b"tot_wonky_nobadges":
-        b"<p>\n[Placeholder] No badges!\n<k>",
+        b"<p>\nMy friend, if you had any\n"
+        b"badges on you, I'd know it,\n"
+        b"<wait 200>believe me!\n<k>",
         
     b"tot_wonky_whichitem":
-        b"<p>\n[Placeholder] Which one?\n<k>",
+        b"<p>\nOoh, let me see! Which one?\n<k>",
         
     b"tot_wonky_itemok":
-        b"[Placeholder] How about I\n"
-        b"give <NUM> coin<S> for your\n"
-        b"<ITEM>. Deal?\n<o>",
+        b"Oh, that's nice! <wait 250>I'd say\n"
+        b"your <ITEM> is\n"
+        b"worth... <NUM> coin<S>, <wait 150>yes?\n<o>",
         
     b"tot_wonky_itemdifferent":
-        b"<p>\n[Placeholder] Anything else?\n<k>",
+        b"<p>\nIs that so? How very sad...\n"
+        b"<wait 250>Perhaps something else?\n<k>",
         
     b"tot_wonky_thanksnext":
-        b"<p>\n[Placeholder] Any more?\n<o>",
+        b"<p>\nAnything else I can take\n"
+        b"off your hands?\n<o>",
         
     b"tot_wonky_thankslast":
-        b"<p>\n[Placeholder] Thanks!\n<k>",
+        b"<p>\nDon't be a stranger!\n<k>",
     
     b"tot_wonky_exit":
-        b"<p>\n[Placeholder] Exit text\n<k>",
+        b"<p>\nDon't be a stranger!\n<k>",
         
     b"tot_chet_intro":
-        b"[Placeholder] I can give you\n"
-        b"Shine Sprites in exchange for\n"
-        b"your stats. Deal?\n<o>",
+        b"My, <wait 150>ahem, <wait 150>mystical artifacts\n"
+        b"aren't for just anyone to\n"
+        b"walk up and stare at, <wait 150>bud.\n<k>\n<p>\n"
+        b"I could let <wait 150>o<wait 110>n<wait 110>e of these\n"
+        b"Shine Sprites go, but it'll cost\n"
+        b"you a stat level. <wait 200>Deal?\n<o>",
         
     b"tot_chet_nostats":
-        b"<p>\n[Placeholder] No stats!\n<k>",
+        b"<p>\nYou don't even have any\n"
+        b"stats to lower, man! <wait 250>Stop\n"
+        b"wasting my time!\n<k>",
         
     b"tot_chet_nocoins":
-        b"<p>\n[Placeholder] Not enough!\n<k>",
+        b"<p>\nYou're broke, buster! Hit\nthe road!\n<k>",
     
     b"tot_chet_whichstat":
-        b"<p>\n[Placeholder] Which stat?\n<k>",
+        b"<p>\nAh, now we're in business!\n"
+        b"Which stat are you gonna\n"
+        b"give up?\n<k>",
     
     b"tot_chet_different":
-        b"<p>\n[Placeholder] Anything else?\n<k>",
+        b"<p>\nHmph! <wait 200>Aren't we choosy?\n"
+        b"<wait 250>Anything else, then?\n<k>",
     
     b"tot_chet_confirm":
-        b"[Placeholder] Your %s?\n"
-        b"It'll fall from level %d to %d\n"
+        b"Your %s, eh? <wait 150>All right,\n"
+        b"it'll fall from level %d to %d\n"
         b"in exchange for a Shine Sprite.\n<k>\n<p>\n"
-        b"The fee will be %d coins.\nDeal?\n<o>",
+        b"The adjustment fee will be\n"
+        b"%d coins. <wait 200>Deal?\n<o>",
         
     b"tot_chet_decline":
         b"<p>\nThen get outta here!\n<k>",
@@ -3103,85 +3117,93 @@ g_TowerStrings = {
         b"<p>\nNow get outta here!\n<k>",
         
     b"tot_dazzle_intro":
-        b"[Placeholder] I'm Dazzle,\n"
+        b"I'm Dazzle, the famous\n"
         b"Star Piece collector\n"
         b"extraordinaire!\n<k>\n<p>\n"
-        b"I can let you have one\n"
-        b"for free, but if you want\n"
-        b"more, it'll cost you! Deal?\n<o>",
+        b"I'll give you one of these\n"
+        b"beauties for free, but any\n"
+        b"more'll cost you! Want one?\n<o>",
         
     b"tot_dazzle_offer":
-        b"[Placeholder] I can let you\n"
+        b"Oh, what fun! I can let you\n"
         b"have another Star Piece for\n"
         b"%d coins. Deal?\n<o>",
         
     b"tot_dazzle_nocoins":
-        b"<p>\n[Placeholder] Not enough!\n<k>",
+        b"<p>\nYou're too low on coins!\n"
+        b"<wait 200>I can't let something this\n"
+        b"pretty go for such a sum...\n<k>",
         
     b"tot_dazzle_decline":
-        b"<p>\n[Placeholder] Oh, too bad!\n<k>",
+        b"<p>\nOh, too bad! I can't imagine\n"
+        b"the sorrow you must feel,\n"
+        b"<wait 200>forsaken by the stars!\n<k>",
         
     b"tot_grubba_intro":
-        b"[Placeholder] Want conditions\n"
-        b"every floor? If you meet them,\n"
-        b"you'll double your winnings!\n<k>\n<p>\n"
-        b"If you don't meet them, you'll\n"
-        b"wind up with a fat sack o' nothin'.\n"
+        b"Well, howdy, Gonzales! Fancy\n"
+        b"meetin' you here in this here\n"
+        b"tower! <wait 200>Howzabout a deal?\n<k>\n<p>\n"
+        b"You keep up my patented,\n"
+        b"crowd-pleasin' fighting rules,\n"
+        b"<wait 150>and get 2x the coins! <wait 250>Wham!\n<k>\n<p>\n"
+        b"If you don't meet 'em, you'll\n"
+        b"wind up with a sack o' nothin'.\n"
         b"What say ya, Gonzales?\n<o>",
         
     b"tot_grubba_accept":
-        b"<p>\n[Placeholder] Now, THAT's\n"
-        b"what I'm talkin' about! Now get\n"
-        b"out there and whomp 'em!\n<k>",
+        b"<p>\nNow, <wait 100>THAT's <wait 100>what I like to\n"
+        b"hear, champ! <wait 200>You get out\n"
+        b"there and whoop 'em for me!\n<k>",
         
     b"tot_grubba_decline":
-        b"<p>\n[Placeholder] Come on, son,\n"
-        b"where's yer fightin' spirit?\n<k>",
+        b"<p>\nNow come on, son, <wait 150>where's\n"
+        b"yer fightin' spirit?\n<k>",
         
     b"tot_grubba_active":
-        b"[Placeholder] Get out there\n"
-        b"and show those yokels what\n"
+        b"Get out there and show\n"
+        b"those yokels the stuff yer\n"
         b"yer made of, Gonzales!\n<k>",
         
     b"tot_doopliss_intro":
-        b"[Placeholder] Hey, Slick!\n"
+        b"Heya, Slick!\n"
         b"Looking for a challenge?\n<k>\n<p>\n"
         b"I'll use my magic to make\n"
         b"the enemies on the next set of\n"
-        b"floors extra tough.\n<k>\n<p>\n"
-        b"In exchange, you might get\n"
-        b"more rewards to choose from\n"
-        b"after battle. Deal?\n<o>",
+        b"floors <wait 30>\n"
+        b"<dynamic 3>extra</dynamic> tough!\n<k>\n<p>\n"
+        b"In exchange, I'll make it so\n"
+        b"more chests appear on every\n"
+        b"floor. <wait 150>You game, slick?\n<o>",
         
     b"tot_doopliss_accept":
-        b"<p>\n[Placeholder] Hee hee!\n"
-        b"Don't get clobbered out there!\n<k>",
+        b"<p>\nHee hee! Don't get clobbered\n"
+        b"out there!\n<k>",
         
     b"tot_doopliss_decline":
-        b"<p>\n[Placeholder]\nAw, you're no fun!\n<k>",
+        b"<p>\nAw, you're no fun!\n<k>",
         
     b"tot_doopliss_active":
-        b"[Placeholder] Hee hee!\n"
-        b"Don't get clobbered out there!\n<k>",
+        b"Hee hee! Don't get clobbered\n"
+        b"out there!\n<k>",
         
     b"tot_lumpy_intronocoin":
-        b"[Placeholder] Hello! I'm Lumpy.\n"
-        b"If you lend me all your coins,\n"
-        b"I'll pay you interest later.\n<k>\n<p>\n"
+        b"Hello! I'm Lumpy. <wait 200>If you lend\n"
+        b"me all your coins, I'll pay you\n"
+        b"back double later, <wait 200>I promise!\n<k>\n<p>\n"
         b"Or at least I would, if you\n"
         b"had any coins on you right now.\n"
         b"Good luck on your travels!\n<k>",
         
     b"tot_lumpy_intro":
-        b"[Placeholder] Hello! I'm Lumpy.\n"
-        b"If you lend me all your coins,\n"
-        b"I'll pay you interest later.\n<k>\n<p>\n"
+        b"Hello! I'm Lumpy. <wait 200>If you lend\n"
+        b"me all your coins, I'll pay you\n"
+        b"back double later, <wait 200>I promise!\n<k>\n<p>\n"
         b"Sound like a deal?\n<o>",
         
     b"tot_lumpy_reward":
-        b"[Placeholder] Oh, hey!\n"
-        b"Thanks for the loan earlier;\n"
-        b"here it is with 100% interest!\n<k>\n<o>",
+        b"Oh, hey! Thanks for the\n"
+        b"loan earlier. <wait 200>Here's the cash\n"
+        b"back, with 100% interest!\n<k>\n<o>",
         
     b"tot_lumpy_goodluck":
         b"Good luck on your travels!\n<k>",
@@ -3204,13 +3226,11 @@ g_TowerStrings = {
         
     b"tot_mover_intro":
         b"Hey.<wait 250> Wassup?<wait 250> I'm a Mover.\n"
-        b'<wait 250>\n'
-        b'I know a few things about\n'
-        b'getting through this tower.\n<k>\n<p>\n'
-        b'For a few coins, I can get you\n'
-        b'the key to where you wanna go.\n'
-        b'<wait 250>\n'
-        b"Whaddya thinkin'?\n<o>",
+        b"<wait 250>I know a few things about\n"
+        b"getting through this tower.\n<k>\n<p>\n"
+        b"For a few coins, I can get you\n"
+        b"the key to where you wanna go.\n"
+        b"<wait 250>\nWhaddya thinkin'?\n<o>",
         
     b"tot_mover_menu":
         b"<select 0 2 0 40>\n"
@@ -3219,54 +3239,55 @@ g_TowerStrings = {
         b"I'm good, thanks!",
         
     b"tot_mover_decline":
-        b"<p>\n[Placeholder] That's too bad.\n<k>",
+        b"<p>\nAw, that's too bad.\n"
+        b"<wait 250>Guess the secrets of the\n"
+        b"tower will remain a mystery...\n<k>",
         
     b"tot_mover_offer0":
-        b"<p>\n[Placeholder] A Tower Key\n"
-        b"is gonna run you %d coins.\n"
-        b"<wait 250>Deal?\n<o>",
+        b"<p>\nA Tower Key, huh?\n"
+        b"That'll run you %d coins.\n"
+        b"<wait 250>Do we have a deal?\n<o>",
         
     b"tot_mover_offer1":
-        b"<p>\n[Placeholder] A Master Key\n"
-        b"is gonna run you %d coins.\n"
-        b"<wait 250>Deal?\n<o>",
+        b"<p>\nAh, the Master Key.\n"
+        b"That'll run you %d coins.\n"
+        b"<wait 250>Do we have a deal?\n<o>",
         
     b"tot_mover_nocoins":
         b'<p>\n'
         b'Hey! <wait 100>You need more coins.\n'
-        b'<wait 250>\n'
-        b"Sorry, but a guy's gotta make\n"
+        b"<wait 250>Sorry, but a guy's gotta make\n"
         b'a living, know what I mean?\n'
         b'<k>',
 
     b'tot_mover_success':
-        b'[Placeholder] Awright! \n'
-        b'<wait 150>My secret paths are...secret!<wait 250> \n'
-        b"We never spoke, <wait 150> got it?\n<k>",
+        b"Awright! <wait 150>My secret paths\n"
+        b"are... <wait 150>secret!<wait 250> We never spoke,\n"
+        b"<wait 150>capiche?\n<k>",
         
     b"tot_mover_active":
-        b"[Placeholder] We never spoke,\n"
-        b"<wait 150>got it?\n<k>",
+        b"We never spoke, <wait 150>got it?\n<k>",
         
     b"tot_mover_full_inv":
         b'<p>\n'
         b"Hey! <wait 100>You're looking loaded up\n"
-        b'on gear already.<wait 250> You still sure\n'
+        b"on gear already.<wait 250> You still sure\n"
         b"ya got room for this?\n<o>",
         
     b"tot_zess_intro":
-        b"[Placeholder] I'm Zess T.<wait 250> \n"
-        b"I love to cook! You provide the\n"
-        b"items, I work my magic.\n<k>\n<p>\n"
-        b"What can I do for you today?\n<o>",
+        b"I'm Zess T.<wait 250> I love to cook!\n"
+        b"<wait 200>You provide the items, and\n"
+        b"I work my magic.\n<k>\n<p>\n"
+        b"What can I do for you\n"
+        b"today, <wait 200>Twinkle-toes?\n<o>",
         
     b"tot_zess_intronoitems":
-        b"[Placeholder] I'm Zess T.<wait 250> \n"
-        b"I love to cook! You provide the\n"
-        b"items, I work my magic.\n<k>\n<p>\n"
+        b"I'm Zess T.<wait 250> I love to cook!\n"
+        b"<wait 200>You provide the items, and\n"
+        b"I work my magic.\n<k>\n<p>\n"
         b"It seems you don't have any\n"
         b"I can work with at the moment,\n"
-        b"though. Next time, then!\n<k>",
+        b"though. Next time, Bigfoot!\n<k>",
         
     b"tot_zess_decline":
         b"<p>\nOh, that's too bad!\n<k>",
@@ -3274,7 +3295,7 @@ g_TowerStrings = {
     b"tot_zess_nochooserecipe":
         b"Indecisive, are we? <wait 250>Oh well,\n"
         b"I'll be here if you make up\n"
-        b"your mind later...\n<k>",
+        b"your mind later, Squashy...\n<k>",
         
     b"tot_zess_which1st":
         b"<p>\nWhich would you like to use?\n<k>",
@@ -3282,28 +3303,33 @@ g_TowerStrings = {
     b"tot_zess_which2nd":
         b"Mm-hmm, got it. <wait 250>What else?\n<k>",
         
+    b"tot_zess_onlyrecipe":
+        b"Ah yes, I think I've got a\n"
+        b"recipe for that. <wait 200>This tickle\n"
+        b"your fancy, Mr. Left-feet?\n<k>",
+        
     b"tot_zess_whichrecipe":
-        b"[Placeholder] I've got a\n"
-        b"couple of dishes that use that.\n"
+        b"I've got a couple dishes\n"
+        b"that use that ingredient.\n"
         b"<wait 250>Which one do you want?\n<k>",
     
     b"tot_zess_giveup":
-        b"[Placeholder] What's wrong?\n"
-        b"Still want me to cook?\n<o>",
+        b"What's wrong, Cap'n Klutz?\n"
+        b"Still want me to cook or not?\n<o>",
         
     b"tot_zess_confirmcost":
-        b"[Placeholder] All right, I'll\n"
+        b"All right, Tootsies, I'll\n"
         b"cook that right up for you\n"
         b"for %d coins.<wait 250> OK?\n<o>",
         
     b"tot_zess_declinecost":
-        b"<p>\n[Placeholder] Hmph, my art\n"
-        b"isn't free. <wait 250>Come back if you\n"
-        b"want anything else.\n<k>",
+        b"<p>\nHmph, <wait 150>my art isn't free.\n"
+        b"<wait 250>Come back if you change\n"
+        b"your mind, Dr. Doofus!\n<k>",
         
     b"tot_zess_confirmswap":
-        b"[Placeholder] All right, I'll\n"
-        b"swap that %s\n"
+        b"All right, I'll swap that\n"
+        b"%s around\n"
         b"for you, free of charge. OK?\n<o>",
         
     b"tot_zess_cookagain":
@@ -3311,9 +3337,11 @@ g_TowerStrings = {
         b"else?\n<o>",
         
     b"tot_zess_nomoretocook":
-        b"[Placeholder] Well, I've done\n"
-        b"all I can do. <wait 200>Enjoy the fruit\n"
-        b"of my culinary magic!\n<k>",
+        b"Well, I've done all I can do.\n"
+        b"<wait 200>Enjoy the fruit of my culinary\n"
+        b"magic, Contact-Lens Killer!\n<k>\n<p>\n"
+        b"Okay, admittedly that one\n"
+        b"was a bit on the nose...\n<k>",
         
     # NPC-related menu / help text.
     
