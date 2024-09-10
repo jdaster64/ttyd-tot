@@ -1319,6 +1319,9 @@ int32_t GetBattleRewardTier() {
         if (floor > 0 && floor % 8 == 0) {
             // For midboss or boss floors, always 3 options.
             num_chests = 3;
+        } else if (floor % 8 == 7) {
+            // For rest floors, always 1 option.
+            num_chests = 1;
         } else if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX)) {
             // Increased number of chests in EX mode, min of 2 even on rest floors.
             if (level_sum / level_target_sum >= 0) ++num_chests;

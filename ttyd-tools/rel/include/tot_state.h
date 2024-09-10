@@ -283,15 +283,18 @@ enum OptionsType {
 //  - FLAGS_x:  Tracking flags:     (0xW 00 0 00 VV);
 //      Represents VV'th bit in one of the tracking bitfields, based on W:
 //          W = 7: achievement_flags_
-//          W = 8: move_encountered_flags_
+//          W = 8: option_unlocked_flags_
 //          W = 9: item_encountered_flags_
 //          W = A: item_purchased_flags_
-//          W = B: option_unlocked_flags_
+//          W = B: midboss_defeated_flags_
+//          W = C: cosmetic_purchased_flags_
 //  - STAT_x:   Play stats value:   (0x XXX Y ZZ VV);
 //      Represents play_stats_ bytes [XXX, XXX+Y) (in the range 0x000 ~ 0x400).
-//          If ZZ = 0: Value is uncapped; if VV > 1, array of VVx Y-byte values.
-//          If ZZ = 1: Value is clamped to nonnegative values with VV (1-9) digits.
-//  - Other options (0xC0000000+) : reserved for future / other uses.
+//          If ZZ & 1: Value is capped to values of up to VV (1-9) digits.
+//                     Otherwise, value is uncapped, and if VV > 1,
+//                     value is actually an array of VVx Y-byte values.
+//          If ZZ & 2: Value(s) should be interpreted as signed.
+//  - Other options (0xD0000000+) : reserved for future / other uses.
 //
 // Intentionally placed in global namespace for convenience.
 enum Options : uint32_t {
@@ -453,7 +456,7 @@ enum Options : uint32_t {
     STAT_RUN_FP_SPENT           = 0x01c'3'01'06,
     STAT_RUN_SP_SPENT           = 0x01f'3'01'06,
     STAT_RUN_SUPERGUARDS        = 0x022'3'01'06,
-    STAT_RUN_NPCS_SELECTED      = 0x025'1'00'08,
+    STAT_RUN_NPCS_SELECTED      = 0x025'1'02'08,
     STAT_RUN_NPCS_DEALT_WITH    = 0x02d'1'00'08,
     STAT_RUN_NPC_SP_PURCHASED   = 0x035'1'01'03,
     STAT_RUN_NPC_DAZZLE_FLOOR   = 0x036'1'01'03,

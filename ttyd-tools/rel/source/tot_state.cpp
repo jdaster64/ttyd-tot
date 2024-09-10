@@ -339,11 +339,8 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
         // Play stats.
         default: {
             uint8_t* ptr = play_stats_ + x;
-            if (a == 0 && b > 1) {
-                // Index into array of values.
-                if (index < 0 || index >= b) return false;
-                ptr += (index * y);
-            } else if (a == 1) {
+            // Capped, not an array.
+            if (a & 1) {
                 // Clamp number to b digits long.
                 if (b < 1 || b > 9) return false;
                 static const constexpr int32_t powers_of_10[] = {
@@ -351,9 +348,17 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
                     100'000'000, 1'000'000'000
                 };
                 if (value >= powers_of_10[b]) value = powers_of_10[b] - 1;
-                if (value < 0) value = 0;
-                // TODO: Clamp to negative values, if supporting in future.
-                // if (value <= -powers_of_10[b]) value = -(powers_of_10[b] - 1);
+                if (a & 2) {
+                    // Signed, clamp min at -max.
+                    if (value <= -powers_of_10[b]) value = -(powers_of_10[b] - 1);
+                } else {
+                    // Unsigned, clamp min at 0.
+                    if (value < 0) value = 0;
+                }
+            } else if (b > 1) {
+                // Index into array of values.
+                if (index < 0 || index >= b) return false;
+                ptr += (index * y);
             }
             uint32_t uint_val = static_cast<uint32_t>(value);
             for (int32_t i = y - 1; i >= 0; --i) {
@@ -448,15 +453,17 @@ int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
         return *byte_ptr * a;
     } else {
         // Index into array, if STAT_x option is an array.
-        if (a == 0 && b > 1) {
+        if (!(a & 1) && b > 1) {
             // Value is out of range for array.
             if (index < 0 || index >= b) return -1;
             byte_ptr += (index * y);
         }
         // Treat all numbers as unsigned by default.
         uint32_t uint_val = 0;
-        // TODO: If signed integers are needed, use this, or use 4-byte value:
-        // uint32_t uint_val = (*byte_ptr & 0x80) ? ~0 : 0;
+        // Treat number as signed if A has flag 0x2 set.
+        if (a & 2) {
+            uint_val = (*byte_ptr & 0x80) ? ~0 : 0;
+        }
         for (int32_t i = 0; i < y; ++i) {
             uint_val = (uint_val << 8) + *byte_ptr++;
         }

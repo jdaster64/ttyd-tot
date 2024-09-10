@@ -59,11 +59,15 @@ RunOptionMetadata g_OptionMetadata[] = {
 void EncodeOption(
     int8_t* encoding_bytes, int32_t& encoded_bit_count, uint32_t option) {
     int32_t t, x, y, a, b;
+
     StateManager::GetOptionParts(option, &t, &x, &y, &a, &b);
     int32_t bits_left = 6 - (encoded_bit_count % 6);
     int32_t num_bits  = t == TYPE_OPTNUM ? 8 : y;
     int32_t divisor   = t == TYPE_OPTNUM ? a : 1;
     int32_t value = g_Mod->state_.GetOption(option) / divisor;
+    int32_t default_value = OptionsManager::GetDefaultValue(option) / divisor;
+    // XOR with default values to make options string look sparser.
+    value ^= default_value;
 
     while (num_bits > 0) {
         encoding_bytes[encoded_bit_count / 6]
