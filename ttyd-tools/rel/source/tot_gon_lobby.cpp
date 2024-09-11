@@ -98,7 +98,13 @@ EVT_END()
 EVT_BEGIN(Lobby_ConfirmStart)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_set_mov_spd, FLOAT(0.00))
-    USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_confirmstart"), 0, 0)
+
+    IF_LARGE_EQUAL((int32_t)GSW_Tower_TutorialClears, 2)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_confirmstart"), 0, 0)
+    ELSE()
+        USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_confirmstart_noopt"), 0, 0)
+    END_IF()
+
     USER_FUNC(evt_msg_select, 0, PTR("tot_lobby_optyesno"))
     USER_FUNC(evt_msg_continue)
     SET(LW(3), LW(0))
@@ -147,13 +153,15 @@ EVT_BEGIN(gon_00_InitEvt)
     USER_FUNC(evt_bero_get_info)
     RUN_CHILD_EVT(evt_bero_info_run)
     
-    // Spawn signs.
-    USER_FUNC(
-        evt_mobj_signboard, PTR("board"), -95, 0, -40,
-        PTR(&Lobby_FrontSignEvt), LSWF(0))
-    USER_FUNC(
-        evt_mobj_signboard, PTR("board2"), 95, 0, -40, 
-        PTR(&Lobby_BackSignEvt), LSWF(0))
+    // Spawn options + current setting signs if done with tutorial runs.
+    IF_LARGE_EQUAL((int32_t)GSW_Tower_TutorialClears, 2)
+        USER_FUNC(
+            evt_mobj_signboard, PTR("board"), -95, 0, -40,
+            PTR(&Lobby_FrontSignEvt), LSWF(0))
+        USER_FUNC(
+            evt_mobj_signboard, PTR("board2"), 95, 0, -40, 
+            PTR(&Lobby_BackSignEvt), LSWF(0))
+    END_IF()
 
     RUN_EVT(Lobby_ConfirmationTrigger)
         

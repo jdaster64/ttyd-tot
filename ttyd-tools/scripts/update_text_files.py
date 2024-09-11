@@ -1972,9 +1972,10 @@ g_GlobalStrings = {
         b"Buy a total of 50 items from\n"
         b"Charlieton.",
     b"tot_achd_02":
-        b"Deal with a total of 10 NPCs.",
+        b"Make deals with a total of 10\n"
+        b"NPCs across all tower runs.",
     b"tot_achd_03":
-        b"Find all partners.",
+        b"Recruit all partners.",
     b"tot_achd_04":
         b"Use 10 different Lvl. 3 moves.",
     b"tot_achd_05":
@@ -2567,6 +2568,10 @@ g_TowerLobbyStrings = {
         
     # General lobby text.
     
+    b"tot_lobby_confirmstart_noopt":
+        b"<system>\n<p>\n"
+        b"Are you prepared to start?\n<o>",
+    
     b"tot_lobby_confirmstart":
         b"<system>\n<p>\n"
         b"Are you prepared to start with\n"
@@ -2861,7 +2866,7 @@ g_TowerStrings = {
 
     b'tot_floor_sign_noopt':
         b'<kanban>\n'
-        b'<pos 100 27>\n'
+        b'<pos 153 27>\n'
         b'Floor: <col cc0000ff>\n'
         b'%02d\n</col>\n'
         b'<k>',

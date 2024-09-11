@@ -424,6 +424,7 @@ void OptionsManager::OnRunStart() {
     // Force special options for tutorial runs.
     switch (GetSWByte(GSW_Tower_TutorialClears)) {
         case 0:
+            state.SetOption(OPTVAL_PRESET_CUSTOM);
             // Hooktail's tower.
             state.SetOption(OPTVAL_DIFFICULTY_HALF);
             state.SetOption(OPT_MAX_PARTNERS, 3);
@@ -438,6 +439,7 @@ void OptionsManager::OnRunStart() {
             state.SetOption(OPTVAL_SECRET_BOSS_OFF);
             break;
         case 1:
+            state.SetOption(OPTVAL_PRESET_CUSTOM);
             // Gloomtail's tower (already default).
             // Force the first four NPC types to ease the player into mechanics.
             state.SetOption(OPT_NPC_CHOICE_1, 0);

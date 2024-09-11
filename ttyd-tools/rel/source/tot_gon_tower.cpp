@@ -200,8 +200,13 @@ EVT_BEGIN(Tower_SignEvt)
     USER_FUNC(evtTot_GetSeed, LW(1))
     USER_FUNC(evtTot_GetEncodedOptions, LW(2))
 
-    // TODO: Replace sign with one that doesn't have seed/options on early runs.
-    USER_FUNC(evt_msg_print_insert, 0, PTR("tot_floor_sign"), 0, 0, LW(0), LW(1), LW(2))
+    IF_SMALL((int32_t)GSW_Tower_TutorialClears, 2)
+        // For tutorial runs, only show the floor number.
+        USER_FUNC(evt_msg_print_insert, 0, PTR("tot_floor_sign_noopt"), 0, 0, LW(0), LW(1), LW(2))
+    ELSE()
+        // Afterward, show the floor number, seed, and options.
+        USER_FUNC(evt_msg_print_insert, 0, PTR("tot_floor_sign"), 0, 0, LW(0), LW(1), LW(2))
+    END_IF()
 
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_npc_start_for_event)
@@ -569,6 +574,11 @@ EVT_BEGIN(Tower_VictorySequence)
     USER_FUNC(evtTot_TrackCompletedRun)
     WAIT_MSEC(LW(15))
 
+    // Skip run results at the end of tutorial runs.
+    IF_SMALL((int32_t)GSW_Tower_TutorialClearAttempts, 3)
+        GOTO(99)
+    END_IF()
+
     // Show run stats + timer splits dialog.
 LBL(10)
     USER_FUNC(evt_win_other_select,
@@ -588,6 +598,7 @@ LBL(20)
     USER_FUNC(evt_win_other_select,
         (uint32_t)window_select::MenuType::RUN_RESULTS_REWARD)
 
+LBL(99)
     WAIT_MSEC(500)
     // Despawn partner.
     USER_FUNC(evt_mario_goodbye_party, 0)

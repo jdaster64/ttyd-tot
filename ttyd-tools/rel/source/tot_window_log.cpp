@@ -883,6 +883,10 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     if (state.GetOption(STAT_PERM_FULL_FINISHES) < 1)
                         name = "???";
                     break;
+                case STAT_PERM_MAX_INTENSITY:
+                    if (!GetSWF(GSWF_RunOptionsTutorial)) 
+                        name = "???";
+                    break;
                 case STAT_RUN_NPCS_DEALT_WITH:
                     if (state.GetOption(STAT_PERM_NPC_DEALS_TOTAL) < 1) {
                         name = msgSearch("tot_recn_unkdeals");
@@ -1065,9 +1069,13 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     break;
                 }
                 case STAT_PERM_MAX_INTENSITY: {
-                    sprintf(
-                        ptr, "%" PRId32 "%%", 
-                        state.GetOption(STAT_PERM_MAX_INTENSITY));
+                    if (GetSWF(GSWF_RunOptionsTutorial)) {
+                        sprintf(
+                            ptr, "%" PRId32 "%%", 
+                            state.GetOption(STAT_PERM_MAX_INTENSITY));
+                    } else {
+                        sprintf(ptr, "???");
+                    }
                     break;
                 }
                 case STAT_PERM_HALF_FINISHES: {
