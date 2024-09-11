@@ -591,10 +591,10 @@ LBL(20)
     WAIT_MSEC(500)
     // Despawn partner.
     USER_FUNC(evt_mario_goodbye_party, 0)
-    // Reload into lobby.
+    // Reload into west Petalburg.
     USER_FUNC(evtTot_SetPreviousPartner, 0)
     USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-    USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("w_bero"))
+    USER_FUNC(evt_bero_mapchange, PTR("gon_10"), PTR("w_bero"))
 
     RETURN()
 EVT_END()

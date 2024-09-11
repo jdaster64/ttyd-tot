@@ -150,8 +150,8 @@ bool FreshFileInit() {
     ttyd::mario::marioSetCharMode(0);
     ttyd::statuswindow::statusWinForceUpdate();
     ttyd::mariost::g_MarioSt->lastFrameRetraceLocalTime = 0ULL;
-    // Makes Mario spawn walking into the room normally if loading a new file,
-    // rather than in place in the center of the room.
+    // Spawns Mario from the intended loading zone; also has other effects
+    // on first file boot like suppressing pulling back the curtain.
     ttyd::mariost::g_MarioSt->flags &= ~1U;
     
     // Set story progress / some tutorial flags.
@@ -233,9 +233,9 @@ void ApplyFixedPatches() {
             } else if (
                 seq == SeqIndex::kMapChange && !strcmp(mapName, "aaa_00") && 
                 !strcmp(beroName, "prologue")) {
-                // If loading a new file, load the player into the tower lobby.
-                mapName = "gon_00";
-                beroName = "w_bero";
+                // If loading a new file, load the player into the opening map.
+                mapName = "gon_12";
+                beroName = "dokan_2";
             }
             g_seqSetSeq_trampoline(seq, mapName, beroName);
         });

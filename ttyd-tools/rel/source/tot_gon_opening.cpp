@@ -73,7 +73,9 @@ EVT_BEGIN(Opening_CutsceneFirstEvt)
     USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG1_HEI1"))
     USER_FUNC(evt_snd_bgm_scope, 0, 1)
     USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mario_set_party, 0, 1)
     USER_FUNC(evt_party_stop, 0)
+    USER_FUNC(evt_fade_entry, 0x1c, 0, 0, 0, 0)     // Manually open curtain
     USER_FUNC(evt_fade_set_mapchange_type, 0, -1, -1, 9, 300)
     USER_FUNC(evt_fade_set_mapchange_type, 1, -1, -1, 9, 300)
     USER_FUNC(evt_cam_letter_box_onoff, 1, 0)
@@ -271,9 +273,10 @@ EVT_BEGIN(Opening_TriggerHooktailEvt)
     END_INLINE()
 
     WAIT_FRM(15)
+    // Load player into Petalburg west map.
     USER_FUNC(evt_snd_bgmoff, 513)
     USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-    USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("w_bero"))
+    USER_FUNC(evt_bero_mapchange, PTR("gon_10"), PTR("w_bero"))
     
     RETURN()
 EVT_END()

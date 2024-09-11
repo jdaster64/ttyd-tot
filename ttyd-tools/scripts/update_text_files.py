@@ -3695,18 +3695,37 @@ g_TowerBossFloorStrings = {
 }
 
 g_PetalburgWestStrings = {
-    # First cutscene.
+
+    # "First visit" cutscene.
     
     b"tot_town_firstvisit_00":
-        b"[Placeholder] Text 0\n<k>",
+        b"Oh, Mario! <wait 100>You got here\n"
+        b"just in time! <wait 200>I suppose you're\n"
+        b"aware that dragon's back!?\n<k>",
     
     b"tot_town_firstvisit_01":
-        b"[Placeholder] Text 1\n<k>",
+        b"Oh, it's terrible! It seems\n"
+        b"the castle's been fortified\n"
+        b"considerably since last time.\n<k>\n<p>\n"
+        b"Tons of rooms, <wait 100>overrun with\n"
+        b"all sorts of enemies, <wait 200>and\n"
+        b"who knows what else?\n<k>\n<p>\n"
+        b"I don't know what she's\n"
+        b"planning, <wait 150>but something's\n"
+        b"gotta be done about it!\n<k>",
     
     b"tot_town_firstvisit_02":
-        b"[Placeholder] Text 2\n<k>",
+        b"I'm glad to hear you say\n"
+        b"that, Mario. <wait 150>We all owe you\n"
+        b"an eternal debt already!\n<k>\n<p>\n"
+        b"I know there's not much we\n"
+        b"can do to help right now, <wait 150>but\n"
+        b"we're behind you all the way!\n<k>\n<p>\n"
+        b"Please do come on back if you\n"
+        b"run into trouble! <wait 200>Rest assured,\n"
+        b"we'll keep this town safe.\n<k>",
 
-    # Shopkeeper.
+    # Shopkeeper dialogue.
 
     b"tot_shopkeep_00":
         b"It's <NUM> coin<S> for\n"
@@ -3779,6 +3798,8 @@ g_PetalburgWestStrings = {
 
     b"tot_shopkeep_yesno":
         b"<select 0 1 0 40>\nYes\nNo",
+        
+    # TODO: More Koopa dialogue, regular NPC dialogue.
 }
 
 g_PetalburgEastStrings = {
@@ -3969,9 +3990,12 @@ g_OpeningCutsceneStrings = {
         b"I thought we taught Hooktail\n"
         b"a lesson last time! <wait 150>What's she\n"
         b"doing back here now?\n<k>\n<p>\n"
-        b"I've got a bad feeling about\n"
-        b"this, Mario. <wait 250>Let's investigate and\n"
-        b"make sure everything's OK! \n<k>",
+        b"I've got a really bad feeling\n"
+        b"about this, Mario. <wait 250>We should\n"
+        b"probably see what's up!\n<k>\n<p>\n"
+        b"I'll go on ahead to the castle,\n"
+        b"<wait 150>you go and check up on\n"
+        b"the folks in town!\n<k>",
 }
 
 g_StringMap = {

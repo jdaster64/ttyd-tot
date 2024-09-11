@@ -26,8 +26,7 @@ namespace {
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Constants for secret codes.
-uint32_t secretCode_OpeningCutscene = 034345566;
-uint32_t secretCode_DebugMode       = 036363636;
+uint32_t secretCode_DebugMode       = 063636;
 uint32_t secretCode_BumpAttack      = 043652131;
 
 }
@@ -46,15 +45,12 @@ void CheatsManager::Update() {
     if (ttyd::system::keyGetButtonTrg(0) & ButtonId::X) code = 5;
     if (ttyd::system::keyGetButtonTrg(0) & ButtonId::Y) code = 6;
     if (code) code_history = (code_history << 3) | code;
-    
-    if ((code_history & 0xFFFFFF) == secretCode_OpeningCutscene &&
-        !strcmp(GetCurrentMap(), "gon_00") &&
-        !g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
+
+    if ((code_history & 0xFFFFFF) == secretCode_DebugMode) {
         code_history = 0;
-        ttyd::mario::marioGetPtr()->prevFollowerId[0] = 1;
-        ttyd::seqdrv::seqSetSeq(
-            ttyd::seqdrv::SeqIndex::kMapChange, "gon_12", "dokan_2");
+        DebugManager::ChangeMode();
     }
+    
     if ((code_history & 0xFFFFFF) == secretCode_BumpAttack) {
         code_history = 0;
         if (!ttyd::mario_pouch::pouchCheckItem(ItemType::BUMP_ATTACK) && 
@@ -62,11 +58,6 @@ void CheatsManager::Update() {
             ttyd::mario_pouch::pouchGetItem(ItemType::BUMP_ATTACK);
             ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
         }
-    }
-
-    if ((code_history & 0xFFFFFF) == secretCode_DebugMode) {
-        code_history = 0;
-        DebugManager::ChangeMode();
     }
 }
 
