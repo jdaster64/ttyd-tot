@@ -14,7 +14,10 @@ enum GlobalWorkVars {
     GSW_Tower_ChestClaimed,
     GSW_Tower_DisplayChestIcons,
     GSW_Tower_ContinuingFromGameOver,
+    GSW_Tower_TutorialClearAttempts,
+    GSW_Tower_TutorialClears,
     GSW_Battle_AtomicBoo_BreathGuardCount,
+    GSW_Hub_WelcomeKoopaCutsceneState,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),

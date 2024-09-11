@@ -503,6 +503,12 @@ void OptionsManager::OnRunStart() {
         default:
             break;
     }
+
+    int32_t tut_attempts = GetSWByte(GSW_Tower_TutorialClearAttempts);
+    int32_t tut_clears = GetSWByte(GSW_Tower_TutorialClears);
+    if (tut_clears < 2 && tut_attempts == tut_clears) {
+        SetSWByte(GSW_Tower_TutorialClearAttempts, ++tut_attempts);
+    }
     
     // Start timers and mark run as started.
     state.SetOption(OPT_RUN_STARTED, 1);

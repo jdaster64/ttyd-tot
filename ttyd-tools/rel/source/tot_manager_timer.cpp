@@ -4,6 +4,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_generate_item.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
@@ -318,6 +319,12 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     // Update highest intensity cleared.
     if (intensity > state.GetOption(STAT_PERM_MAX_INTENSITY)) {
         state.SetOption(STAT_PERM_MAX_INTENSITY, intensity);
+    }
+
+    // Update number of 'tutorial' tower run clears.
+    int32_t tut_clears = GetSWByte(GSW_Tower_TutorialClears);
+    if (tut_clears < 2) {
+        SetSWByte(GSW_Tower_TutorialClearAttempts, ++tut_clears);
     }
 
     // Reshuffle the hub item shop.

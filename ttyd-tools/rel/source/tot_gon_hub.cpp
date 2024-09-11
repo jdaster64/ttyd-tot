@@ -379,8 +379,10 @@ EVT_END()
 
 EVT_BEGIN(Villager_A_InitEvt)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR("me"), 1536)
-    // TODO: Don't run this if in first-time cutscene.
-    // USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
+    // Don't set the NPC's position when doing the opening cutscene.
+    IF_LARGE((int32_t)GSW_Hub_WelcomeKoopaCutsceneState, 0)
+        USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
+    END_IF()
     RETURN()
 EVT_END()
 
@@ -441,6 +443,9 @@ EVT_BEGIN(FirstVisit_Evt)
     USER_FUNC(evt_snd_bgmon_f, 768, PTR("BGM_STG1_NOK1"), 2000)
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_snd_bgm_scope, 0, 0)
+
+    ADD((int32_t)GSW_Hub_WelcomeKoopaCutsceneState, 1)
+
     RETURN()
 EVT_END()
 
@@ -451,10 +456,10 @@ EVT_BEGIN(gon_10_InitEvt)
     USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG1_NOK1"))
     USER_FUNC(evt_npc_setup, PTR(&gon_10_npc_data))
 
-    // TODO: Add a one-time opening cutscene on first visit.
-    IF_SMALL(2, 1)
+    IF_LARGE((int32_t)GSW_Hub_WelcomeKoopaCutsceneState, 0)
         RUN_CHILD_EVT(evt_bero_info_run)
     ELSE()
+        // Run overview cutscene the first time you enter the town.
         RUN_EVT(bero_case_entry)
         RUN_EVT(FirstVisit_Evt)
     END_IF()
