@@ -1918,8 +1918,8 @@ g_GlobalStrings = {
         b"Unlockables purchased from\n"
         b"various vendors in Petalburg.",
     b"tot_rech_wins":
-        b"How many successful runs were\n"
-        b"completed, and best clear times.",
+        b"How many runs were completed,\n"
+        b"and fastest default clear times.",
     b"tot_rech_runstats":
         b"Various stats for your current\n"
         b"attempted tower run.",
@@ -1972,8 +1972,8 @@ g_GlobalStrings = {
         b"Buy a total of 50 items from\n"
         b"Charlieton.",
     b"tot_achd_02":
-        b"Make deals with a total of 10\n"
-        b"NPCs across all tower runs.",
+        b"Make deals with a total of\n"
+        b"10 NPCs across all tower runs.",
     b"tot_achd_03":
         b"Recruit all partners.",
     b"tot_achd_04":

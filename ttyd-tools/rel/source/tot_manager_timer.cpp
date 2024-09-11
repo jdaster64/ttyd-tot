@@ -128,8 +128,6 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     switch (state.GetOptionValue(OPT_DIFFICULTY)) {
         case OPTVAL_DIFFICULTY_HALF:
             state.ChangeOption(STAT_PERM_HALF_FINISHES);
-            if (igt_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME))
-                state.SetOption(STAT_PERM_HALF_BEST_TIME, igt_centis);
             AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_FIRST);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
                 if (igt_centis < 60 * 6000) {
@@ -138,12 +136,12 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 40 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_SPEED2);
                 }
+                if (igt_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME))
+                    state.SetOption(STAT_PERM_HALF_BEST_TIME, igt_centis);
             }
             break;
         case OPTVAL_DIFFICULTY_FULL:
             state.ChangeOption(STAT_PERM_FULL_FINISHES);
-            if (igt_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME))
-                state.SetOption(STAT_PERM_FULL_BEST_TIME, igt_centis);
             AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_FIRST);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
                 if (igt_centis < 120 * 6000) {
@@ -152,12 +150,12 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 90 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_SPEED2);
                 }
+                if (igt_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME))
+                    state.SetOption(STAT_PERM_FULL_BEST_TIME, igt_centis);
             }
             break;
         case OPTVAL_DIFFICULTY_FULL_EX:
             state.ChangeOption(STAT_PERM_EX_FINISHES);
-            if (igt_centis < state.GetOption(STAT_PERM_EX_BEST_TIME))
-                state.SetOption(STAT_PERM_EX_BEST_TIME, igt_centis);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
                 AchievementsManager::MarkCompleted(AchievementId::RUN_EX_FIRST);
                 if (igt_centis < 180 * 6000) {
@@ -166,6 +164,8 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 140 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_EX_SPEED2);
                 }
+                if (igt_centis < state.GetOption(STAT_PERM_EX_BEST_TIME))
+                    state.SetOption(STAT_PERM_EX_BEST_TIME, igt_centis);
             }
             break;
         default:
