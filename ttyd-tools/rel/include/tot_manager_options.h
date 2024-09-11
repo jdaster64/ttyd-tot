@@ -33,8 +33,8 @@ public:
     static const char* GetEncodedOptions();
 
     // For applying run options when starting, resuming or ending a run.
-    // Sets up options, stats, etc. from cold boot / when loading tower lobby.
-    static void OnLobbyLoad();
+    // Resets options, stats, etc. from cold boot / when loading lobby or hub.
+    static void ResetAfterRun();
     // Sets up options, stats, etc. on run start.
     static void OnRunStart();
     // Sets up options when loading a file with a run already in progress.
@@ -43,5 +43,8 @@ public:
     // Updates HP, FP, and BP according to current fields in tot_state.
     static void UpdateLevelupStats();
 };
+
+// Wrapper to ResetAfterRun, run when loading gon_00 (lobby) or gon_10 (hub).
+EVT_DECLARE_USER_FUNC(evtTot_ResetSettingsAfterRun, 0)
 
 }

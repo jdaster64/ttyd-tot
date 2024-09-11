@@ -295,6 +295,14 @@ int32_t SelectPartner() {
     for (int32_t i = 0; i < 50; ++i) {
         int32_t value = state.Rand(7, RNG_REWARD_PARTNER);
         int32_t reward_type = -(value + 1);
+
+        // Only allow Goombella, Koops and Ms. Mowz as partners for first run.
+        if (GetSWByte(GSW_Tower_TutorialClears) == 0) {
+            if (reward_type != REWARD_GOOMBELLA &&
+                reward_type != REWARD_KOOPS && reward_type != REWARD_MOWZ) {
+                continue;
+            }
+        }
         
         // Once the player has filled their partner pool...
         if (GetNumActivePartners() >= state.GetOption(OPT_MAX_PARTNERS)) {

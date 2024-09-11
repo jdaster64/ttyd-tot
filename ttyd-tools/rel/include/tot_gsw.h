@@ -14,9 +14,9 @@ enum GlobalWorkVars {
     GSW_Tower_ChestClaimed,
     GSW_Tower_DisplayChestIcons,
     GSW_Tower_ContinuingFromGameOver,
+    GSW_Battle_AtomicBoo_BreathGuardCount,
     GSW_Tower_TutorialClearAttempts,
     GSW_Tower_TutorialClears,
-    GSW_Battle_AtomicBoo_BreathGuardCount,
     GSW_Hub_WelcomeKoopaCutsceneState,
 
     // Used for cosmetic choices that persist across runs.
@@ -34,6 +34,7 @@ enum GlobalWorkVars {
     GSWF_HubShopTutorial,
     GSWF_CosmeticShopTutorial,
     GSWF_RunOptionsTutorial,
+    GSWF_RunSettingsCleared,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

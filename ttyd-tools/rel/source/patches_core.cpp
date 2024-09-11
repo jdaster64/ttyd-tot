@@ -169,7 +169,7 @@ bool FreshFileInit() {
     
     // Initialize Tower of Trials-specific state & pouch stuff.
     g_Mod->state_.Init();
-    tot::OptionsManager::OnLobbyLoad();
+    tot::OptionsManager::ResetAfterRun();
 
     // Turn background music on, by default.
     tot::SetSWF(tot::GSWF_BgmEnabled);

@@ -43,6 +43,7 @@ enum DebugManagerMode {
     DEBUG_PURCHASE_ALL_COSMETICS,
     DEBUG_UNLOCK_ALL_KEY_ITEMS,
     DEBUG_UNLOCK_ALL_BADGES,
+    DEBUG_COMPLETE_TUTORIAL,
     DEBUG_COMPLETE_LOGS,
     DEBUG_COMPLETE_ACHIEVEMENTS,
     DEBUG_ADD_CURRENCY,
@@ -240,6 +241,15 @@ void DebugManager::Update() {
                         ttyd::mario_pouch::pouchGetHaveBadgeCnt(),
                         sizeof(int16_t),
                         (void*)ttyd::mario_pouch::comp_kind);
+                    break;
+                }
+                case DEBUG_COMPLETE_TUTORIAL: {
+                    SetSWByte(GSW_Tower_TutorialClearAttempts, 3);
+                    SetSWByte(GSW_Tower_TutorialClears, 2);
+                    SetSWByte(GSW_Hub_WelcomeKoopaCutsceneState, 1);
+                    SetSWF(GSWF_CosmeticShopTutorial);
+                    SetSWF(GSWF_HubShopTutorial);
+                    SetSWF(GSWF_RunOptionsTutorial);
                     break;
                 }
                 case DEBUG_COMPLETE_LOGS: {
@@ -478,6 +488,9 @@ void DebugManager::Draw() {
             }
             case DEBUG_UNLOCK_ALL_BADGES: {
                 strcpy(buf, "Unlock 1 of Each Badge");      break;
+            }
+            case DEBUG_COMPLETE_TUTORIAL: {
+                strcpy(buf, "Skip All Tutorials");          break;
             }
             case DEBUG_COMPLETE_LOGS: {
                 strcpy(buf, "Unlock All Journal Logs");     break;

@@ -6,6 +6,7 @@
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_manager_options.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
 
@@ -450,6 +451,9 @@ EVT_BEGIN(FirstVisit_Evt)
 EVT_END()
 
 EVT_BEGIN(gon_10_InitEvt)
+    // Reset settings from last run, if not done already.
+    USER_FUNC(evtTot_ResetSettingsAfterRun)
+
     SET(LW(0), PTR(&gon_10_entry_data))
     USER_FUNC(evt_bero_get_info)
     USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STG1_NOK1"))

@@ -47,7 +47,6 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 
 extern const BeroEntry gon_00_entry_data[4];
 
-EVT_DECLARE_USER_FUNC(evtTot_TowerInitLobby, 0)
 EVT_DECLARE_USER_FUNC(evtTot_TowerInitFromOptions, 0)
 EVT_DECLARE_USER_FUNC(evtTot_InConfirmTriggerVolume, 4)
 
@@ -60,8 +59,8 @@ EVT_BEGIN(Lobby_EnterTowerEvt)
 EVT_END()
 
 EVT_BEGIN(Lobby_ExitTowerEvt)
-    // Re-init everything from scratch.
-    USER_FUNC(evtTot_TowerInitLobby)
+    // Reset settings from last run, if not done already.
+    USER_FUNC(evtTot_ResetSettingsAfterRun)
     RETURN()
 EVT_END()
 
@@ -216,11 +215,6 @@ const BeroEntry gon_00_entry_data[4] = {
 
 const int32_t* GetLobbyInitEvt() {
     return gon_00_InitEvt;
-}
-
-EVT_DEFINE_USER_FUNC(evtTot_TowerInitLobby) {
-    OptionsManager::OnLobbyLoad();
-    return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_TowerInitFromOptions) {

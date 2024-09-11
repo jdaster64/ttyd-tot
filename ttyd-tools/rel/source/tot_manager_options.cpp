@@ -359,8 +359,11 @@ const char* OptionsManager::GetEncodedOptions() {
     return encoding_str;
 }
 
-void OptionsManager::OnLobbyLoad() {
+void OptionsManager::ResetAfterRun() {
     auto& state = g_Mod->state_;
+
+    // Settings already cleared; don't need to be reset.
+    if (GetSWF(GSWF_RunSettingsCleared)) return;
 
     // Un-obfuscate items if enabled during the previous run.
     if (state.GetOption(OPT_RUN_STARTED) && state.GetOption(OPT_OBFUSCATE_ITEMS)) {
@@ -409,12 +412,44 @@ void OptionsManager::OnLobbyLoad() {
     
     // Set run to not having started.
     state.SetOption(OPT_RUN_STARTED, 0);
+    // Set flag indicating settings have already been cleared.
+    SetSWF(GSWF_RunSettingsCleared, 1);
 }
 
 void OptionsManager::OnRunStart() {
     auto& state = g_Mod->state_;
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
     if (state.seed_ == 0) state.SelectRandomSeed();
+
+    // Force special options for tutorial runs.
+    switch (GetSWByte(GSW_Tower_TutorialClears)) {
+        case 0:
+            // Hooktail's tower.
+            state.SetOption(OPTVAL_DIFFICULTY_HALF);
+            state.SetOption(OPT_MAX_PARTNERS, 3);
+            // Always start with Goombella.
+            state.SetOption(OPTVAL_PARTNER_GOOMBELLA);
+            // Disable NPCs.
+            state.SetOption(OPT_NPC_CHOICE_1, gon::GetNumSecondaryNpcTypes() + 1);
+            state.SetOption(OPT_NPC_CHOICE_2, gon::GetNumSecondaryNpcTypes() + 1);
+            state.SetOption(OPT_NPC_CHOICE_3, gon::GetNumSecondaryNpcTypes() + 1);
+            state.SetOption(OPT_NPC_CHOICE_4, gon::GetNumSecondaryNpcTypes() + 1);
+            // Disable secret boss.
+            state.SetOption(OPTVAL_SECRET_BOSS_OFF);
+            break;
+        case 1:
+            // Gloomtail's tower (already default).
+            // Force the first four NPC types to ease the player into mechanics.
+            state.SetOption(OPT_NPC_CHOICE_1, 0);
+            state.SetOption(OPT_NPC_CHOICE_2, 1);
+            state.SetOption(OPT_NPC_CHOICE_3, 2);
+            state.SetOption(OPT_NPC_CHOICE_4, 3);
+            // Disable secret boss.
+            state.SetOption(OPTVAL_SECRET_BOSS_OFF);
+            break;
+        default:
+            break;
+    }
 
     // Make levels for disabled / infinite stats 0 / 99 respectively.
     if (state.GetOption(OPT_MARIO_HP) == 0) state.hp_level_ = 0;
@@ -504,11 +539,15 @@ void OptionsManager::OnRunStart() {
             break;
     }
 
+    // Update global variable to track whether the first / second tutorial runs
+    // were started, or a run was started after the second tutorial run.
     int32_t tut_attempts = GetSWByte(GSW_Tower_TutorialClearAttempts);
-    int32_t tut_clears = GetSWByte(GSW_Tower_TutorialClears);
-    if (tut_clears < 2 && tut_attempts == tut_clears) {
+    if (tut_attempts == GetSWByte(GSW_Tower_TutorialClears)) {
         SetSWByte(GSW_Tower_TutorialClearAttempts, ++tut_attempts);
     }
+
+    // Set flag to indicate settings should be cleared on next lobby/hub load.
+    SetSWF(GSWF_RunSettingsCleared, 0);
     
     // Start timers and mark run as started.
     state.SetOption(OPT_RUN_STARTED, 1);
@@ -580,6 +619,11 @@ void OptionsManager::UpdateLevelupStats() {
             ttyd::mario_pouch::_party_max_hp_table[i * 4] = pouch.party_data[i].max_hp;
         }
     }
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_ResetSettingsAfterRun) {
+    OptionsManager::ResetAfterRun();
+    return 2;
 }
 
 }  // namespace mod::tot
