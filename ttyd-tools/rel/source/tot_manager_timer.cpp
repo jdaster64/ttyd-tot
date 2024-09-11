@@ -324,7 +324,7 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     // Update number of 'tutorial' tower run clears.
     int32_t tut_clears = GetSWByte(GSW_Tower_TutorialClears);
     if (tut_clears < 2) {
-        SetSWByte(GSW_Tower_TutorialClearAttempts, ++tut_clears);
+        SetSWByte(GSW_Tower_TutorialClears, ++tut_clears);
     }
 
     // Reshuffle the hub item shop.

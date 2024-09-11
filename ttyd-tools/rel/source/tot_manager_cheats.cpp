@@ -26,7 +26,7 @@ namespace {
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Constants for secret codes.
-uint32_t secretCode_DebugMode       = 063636;
+uint32_t secretCode_DebugMode       = 036363636;
 uint32_t secretCode_BumpAttack      = 043652131;
 
 }
