@@ -350,10 +350,21 @@ EVT_END()
 
 EVT_BEGIN(Npc_ShopkeepTalk)
     // Get name of shopkeeper npc.
-    USER_FUNC(shopper_name, LW(9))
+    SET(LW(9), PTR(g_NpcShopkeeper))
+
+    IF_SMALL((int32_t)GSW_Tower_TutorialClears, 1)
+        // Turn to face each other.
+        USER_FUNC(evt_mario_set_dir_npc, LW(9))
+        USER_FUNC(evt_set_dir_to_target, LW(9), PTR("mario"))
+
+        // Special dialogue for shop not being open yet.
+        USER_FUNC(evt_msg_print, 0, PTR("tot_shopkeep_closed"), 0, LW(9))
+
+        GOTO(99)
+    END_IF()
 
     // Check for tutorial dialogue.
-    IF_EQUAL((int32_t)tot::GSWF_HubShopTutorial, 0)
+    IF_EQUAL((int32_t)GSWF_HubShopTutorial, 0)
         // Turn to face each other.
         USER_FUNC(evt_mario_set_dir_npc, LW(9))
         USER_FUNC(evt_set_dir_to_target, LW(9), PTR("mario"))
@@ -470,18 +481,24 @@ EVT_BEGIN(gon_10_InitEvt)
 
     USER_FUNC(evt_map_playanim, PTR("S_kawa"), 1, 0)
 
-    // Door setup.
-    // TODO: Close shop door and move shopkeeper outside on first visit.
+    // Building interiors setup.
     SET(LW(0), PTR(&gon_10_door_data[0]))
-    RUN_CHILD_EVT(evt_door_setup)
-    SET(LW(0), PTR(&gon_10_door_data[1]))
     RUN_CHILD_EVT(evt_door_setup)
     SET(LW(0), PTR(&gon_10_door_data[2]))
     RUN_CHILD_EVT(evt_door_setup)
 
-    USER_FUNC(evtTot_SelectShopItems)
-    USER_FUNC(evt_shop_setup, PTR(&shop_obj_list), PTR(&shop_buy_list), PTR(&shopkeeper_data), PTR(&shop_trade_list))
-    USER_FUNC(evtTot_DeleteShopItems)
+    IF_LARGE_EQUAL((int32_t)GSW_Tower_TutorialClears, 1)
+        // Only open item shop after the first tutorial run clear.
+        SET(LW(0), PTR(&gon_10_door_data[1]))
+        RUN_CHILD_EVT(evt_door_setup)
+
+        USER_FUNC(evtTot_SelectShopItems)
+        USER_FUNC(evt_shop_setup, PTR(&shop_obj_list), PTR(&shop_buy_list), PTR(&shopkeeper_data), PTR(&shop_trade_list))
+        USER_FUNC(evtTot_DeleteShopItems)
+    ELSE()
+        // Place shopkeeper outside of shop otherwise.
+        USER_FUNC(evt_npc_set_position, PTR(g_NpcShopkeeper), -10, 70, -262)
+    END_IF()
     
     USER_FUNC(evt_mobj_save_blk, PTR("mobj_save"), 155, 60, -60, 0, 0)
 
@@ -520,8 +537,10 @@ EVT_BEGIN(gon_11_InitEvt)
     USER_FUNC(evt_mapobj_flag_onoff, 1, 1, PTR("S_dakan"), 1)
     USER_FUNC(evt_hitobj_onoff, PTR("A_dokan"), 1, 0)
 
-    // TODO: Only init Toad sister NPCs after a couple successful runs.
-    RUN_CHILD_EVT(CosmeticShops_InitEvt)
+    // Toad sister NPCs should only appear after the first couple of runs.
+    IF_LARGE_EQUAL((int32_t)GSW_Tower_TutorialClears, 2)
+        RUN_CHILD_EVT(CosmeticShops_InitEvt)
+    END_IF()
 
     USER_FUNC(evt_map_playanim, PTR("S_kawa"), 1, 0)
 

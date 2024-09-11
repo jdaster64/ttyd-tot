@@ -3763,11 +3763,19 @@ g_PetalburgWestStrings = {
 
     b"tot_shopkeep_31":
         b"Thank you so very much!\n<k>",
+        
+    b"tot_shopkeep_closed":
+        b"Hiya, Mario! <wait 200>I haven't had\n"
+        b"any customers recently, <wait 150>so I\n"
+        b"haven't set up shop just yet.\n<k>\n<p>\n"
+        b"Come back in a little while,\n"
+        b"and I'll make sure to have\n"
+        b"everything shop-shape! <wait 200>Ha!\n<k>",
 
     b"tot_shopkeep_tut":
-        b"Hiya! <wait 250>Since you're new here,\n"
-        b"let me give you the run-down\n"
-        b"on how this shop works.\n<k>\n<o>",
+        b"Hiya, Mario! <wait 200>I've redone the\n"
+        b"the place recently, <wait 100>so let me\n"
+        b"give you a quick run-down.\n<k>\n<o>",
         
     b"tot_shopkeep_tut_body":
         b"<p>\nIf you've come across an item\n"
