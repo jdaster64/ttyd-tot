@@ -652,29 +652,35 @@ void SelectEnemies() {
                 enemy_type = BattleUnitType::GOLD_FUZZY;
                 break;
             case OPTVAL_SECRET_BOSS_RANDOM: {
-                // Don't allow the alternate boss before clearing a difficulty.
-                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
-                    !state.GetOption(STAT_PERM_HALF_FINISHES)) break;
-                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL) && 
-                    !state.GetOption(STAT_PERM_FULL_FINISHES)) break;
-                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) && 
-                    !state.GetOption(STAT_PERM_EX_FINISHES)) break;
 
-                // Don't allow the alternate boss before 5 total clears.
+                // Base chance of using the alternate boss, out of 100.
+                int32_t boss_chance = 20;
+
                 int32_t total_clears =
                     state.GetOption(STAT_PERM_HALF_FINISHES) +
                     state.GetOption(STAT_PERM_FULL_FINISHES) +
                     state.GetOption(STAT_PERM_EX_FINISHES);
-                if (total_clears < 5) break;
 
-                // Else, 20% chance (or double if not beaten in 10 clears).
-                int32_t chance = 20;
-                if (total_clears > 10 && !state.GetOption(
+                if (!state.GetOption(
                     FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
-                    chance = 40;
+                    // Don't allow secret boss on the 1st clear of a difficulty.
+                    if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
+                        !state.GetOption(STAT_PERM_HALF_FINISHES)) break;
+                    if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL) && 
+                        !state.GetOption(STAT_PERM_FULL_FINISHES)) break;
+                    if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) && 
+                        !state.GetOption(STAT_PERM_EX_FINISHES)) break;
+
+                    // Don't allow the alternate boss before 5 total clears.
+                    if (total_clears < 5) break;
+
+                    // If secret boss not beaten in over 10 total clears,
+                    // double the chance of it appearing.
+                    if (total_clears > 10) boss_chance = 40;
                 }
+
                 if (static_cast<int32_t>(state.Rand(100, RNG_ALTERNATE_BOSS)) 
-                    < chance) {
+                    < boss_chance) {
                     enemy_type = BattleUnitType::GOLD_FUZZY;
                 }
                 break;

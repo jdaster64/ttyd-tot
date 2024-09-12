@@ -543,9 +543,9 @@ void OptionsManager::OnRunStart() {
 
     // Update global variable to track whether the first / second tutorial runs
     // were started, or a run was started after the second tutorial run.
-    int32_t tut_attempts = GetSWByte(GSW_Tower_TutorialClearAttempts);
-    if (tut_attempts == GetSWByte(GSW_Tower_TutorialClears)) {
-        SetSWByte(GSW_Tower_TutorialClearAttempts, ++tut_attempts);
+    int32_t tut_clears = GetSWByte(GSW_Tower_TutorialClears);
+    if (GetSWByte(GSW_Tower_TutorialClearAttempts) <= tut_clears) {
+        SetSWByte(GSW_Tower_TutorialClearAttempts, tut_clears + 1);
     }
 
     // Set flag to indicate settings should be cleared on next lobby/hub load.
