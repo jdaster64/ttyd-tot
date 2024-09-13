@@ -14,7 +14,7 @@ namespace mod::tot {
 
 namespace {
 
-constexpr const char* kTitleInfo = "alpha r24" "\n" "2024-09-11";
+constexpr const char* kTitleInfo = "alpha r25" "\n" "2024-09-13";
     
 }
 
