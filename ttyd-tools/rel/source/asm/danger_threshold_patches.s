@@ -7,6 +7,15 @@
 .global StartCheckPartnerPinchDisp
 .global BranchBackCheckPartnerPinchDisp
 
+.global StartFieldDangerIdleCheck1
+.global BranchBackFieldDangerIdleCheck1
+.global StartFieldDangerIdleCheck2
+.global BranchBackFieldDangerIdleCheck2
+.global StartFieldDangerIdleCheck3
+.global BranchBackFieldDangerIdleCheck3
+.global StartFieldDangerIdleCheck4
+.global BranchBackFieldDangerIdleCheck4
+
 StartSetDangerThreshold:
 # Save registers.
 stwu %sp, -0x18 (%sp)
@@ -75,4 +84,24 @@ lbz %r5, 0xc (%r6)
 lbz %r4, 0xd (%r6)
 cmpw %r3, %r5
 BranchBackCheckPartnerPinchDisp:
+b 0
+
+StartFieldDangerIdleCheck1:
+bl getMarioHpForFieldAnim
+BranchBackFieldDangerIdleCheck1:
+b 0
+
+StartFieldDangerIdleCheck2:
+bl getMarioHpForFieldAnim
+BranchBackFieldDangerIdleCheck2:
+b 0
+
+StartFieldDangerIdleCheck3:
+bl getMarioHpForFieldAnim
+BranchBackFieldDangerIdleCheck3:
+b 0
+
+StartFieldDangerIdleCheck4:
+bl getMarioHpForFieldAnim
+BranchBackFieldDangerIdleCheck4:
 b 0

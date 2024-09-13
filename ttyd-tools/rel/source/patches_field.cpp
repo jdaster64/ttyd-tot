@@ -23,6 +23,7 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
+#include <ttyd/mario_party.h>
 #include <ttyd/mario_pouch.h>
 #include <ttyd/npc_data.h>
 #include <ttyd/npc_event.h>
@@ -37,6 +38,15 @@ extern "C" {
     // attack_fx_patches.s
     void StartPlayFieldHammerFX();
     void BranchBackPlayFieldHammerFX();
+    // danger_threshold_patches.s
+    void StartFieldDangerIdleCheck1();
+    void BranchBackFieldDangerIdleCheck1();
+    void StartFieldDangerIdleCheck2();
+    void BranchBackFieldDangerIdleCheck2();
+    void StartFieldDangerIdleCheck3();
+    void BranchBackFieldDangerIdleCheck3();
+    void StartFieldDangerIdleCheck4();
+    void BranchBackFieldDangerIdleCheck4();
     
     void playFieldHammerFX(gc::vec3* position) {
         int32_t id = mod::tot::CosmeticsManager::PickActiveFX();
@@ -55,13 +65,34 @@ extern "C" {
             ttyd::pmario_sound::psndSFXOn_3D("SFX_MARIO_HAMMER_WOOD_DON1", position);
         }
     }
+
+    int32_t getMarioHpForFieldAnim() {
+        // Return a fake value for the purposes of setting Mario's field anim.
+        const auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+        int32_t fake_hp = 10;
+
+        const int32_t danger_threshold = (pouch.max_hp * 3 + 5) / 10;
+        if (pouch.current_hp <= 0) {
+            fake_hp = 0;
+        } else if (pouch.current_hp <= danger_threshold) {
+            fake_hp = 5;
+        }
+
+        return fake_hp;
+    }
 }
 
 namespace mod::infinite_pit {
 
-// Declarations of patches.
+// Function hooks.
+extern int32_t (*g_partyGetHp_trampoline)(int32_t);
+// Patch addresses.
 extern const int32_t g_mot_hammer_PickHammerFieldSfx_BH;
 extern const int32_t g_mot_hammer_PickHammerFieldSfx_EH;
+extern const int32_t g_mot_stay_MarioCheckDangerIdleAnim1_BH;
+extern const int32_t g_mot_stay_MarioCheckDangerIdleAnim2_BH;
+extern const int32_t g_mot_stay_MarioCheckDangerIdleAnim3_BH;
+extern const int32_t g_mot_stay_MarioCheckDangerIdleAnim4_BH;
 extern const int32_t g_evt_shop_setup_Patch_DisableShopperTalkEvt;
 extern const int32_t g_mot_damage_Patch_DisableFallDamage;
 extern const int32_t g_chorobon_move_event_Patch_SetScale;
@@ -447,6 +478,44 @@ EVT_BEGIN(ShopSignEvt_Hook)
 EVT_END()
 
 void ApplyFixedPatches() {
+    // Apply patches to make Mario's idle animation match Danger threshold.
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_mot_stay_MarioCheckDangerIdleAnim1_BH),
+        reinterpret_cast<void*>(StartFieldDangerIdleCheck1),
+        reinterpret_cast<void*>(BranchBackFieldDangerIdleCheck1));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_mot_stay_MarioCheckDangerIdleAnim2_BH),
+        reinterpret_cast<void*>(StartFieldDangerIdleCheck2),
+        reinterpret_cast<void*>(BranchBackFieldDangerIdleCheck2));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_mot_stay_MarioCheckDangerIdleAnim3_BH),
+        reinterpret_cast<void*>(StartFieldDangerIdleCheck3),
+        reinterpret_cast<void*>(BranchBackFieldDangerIdleCheck3));
+    mod::patch::writeBranchPair(
+        reinterpret_cast<void*>(g_mot_stay_MarioCheckDangerIdleAnim4_BH),
+        reinterpret_cast<void*>(StartFieldDangerIdleCheck4),
+        reinterpret_cast<void*>(BranchBackFieldDangerIdleCheck4));
+    
+    // Override the function that checks for party Danger animation on field.
+    g_partyGetHp_trampoline = patch::hookFunction(
+        ttyd::mario_party::partyGetHp, [](int32_t party_idx) {
+            // Replace logic; this is only ever used in field animation context,
+            // so we can just return what the game 'thinks' are Danger values.
+            int32_t fake_hp = 10;
+            if (party_idx > 0 && party_idx < 8) {
+                const auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+                const int32_t max_hp = pouch.party_data[party_idx].max_hp;
+                const int32_t danger_threshold = (max_hp * 3 + 5) / 10;
+                const int32_t actual_hp = pouch.party_data[party_idx].current_hp;
+                if (actual_hp <= 0) {
+                    fake_hp = 0;
+                } else if (actual_hp <= danger_threshold) {
+                    fake_hp = 5;
+                }
+            }
+            return fake_hp;
+        });
+
     // Replaces logic for picking a FX to play on hammering in the field.
     mod::patch::writeBranchPair(
         reinterpret_cast<void*>(g_mot_hammer_PickHammerFieldSfx_BH),

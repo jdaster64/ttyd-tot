@@ -2555,6 +2555,7 @@
 8013de10:evt_seq_set_seq
 
 // mario_party.o
+80140ea4:partyGetHp
 80140fb8:marioGetExtraPartyId
 80141050:marioGetPartyId
 801410e8:marioGetParty

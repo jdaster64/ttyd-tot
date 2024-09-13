@@ -8,7 +8,7 @@ namespace ttyd::mario_party {
 extern "C" {
 
 // partyGetTechLv
-// partyGetHp
+int32_t partyGetHp(int32_t party_idx);
 // partyChkJoin
 // partyLeft
 // partyJoin

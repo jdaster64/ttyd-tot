@@ -178,6 +178,8 @@ bool (*g_BattleCheckEndUnitInitEvent_trampoline)(BattleWork*) = nullptr;
 int32_t (*g_BattleItemData_rank_up_trampoline)(EvtEntry*, bool) = nullptr;
 // statuswindow.o  8013cb24
 void (*g_statusWinDisp_trampoline)(void) = nullptr;
+// mario_party.o  80140ea4
+int32_t (*g_partyGetHp_trampoline)(int32_t) = nullptr;
 // win_item.o  80169cf0
 void (*g_itemUseDisp2_trampoline)(WinMgrEntry*) = nullptr;
 // win_item.o  80169ec0
@@ -287,6 +289,10 @@ extern const int32_t g_msgWindow_Entry_Patch_FixAllocSize = 0x800816f4;
 extern const int32_t g_seq_logoMain_Patch_AlwaysSkipIntro = 0x800872c4;
 extern const int32_t g_mot_hammer_PickHammerFieldSfx_BH = 0x8009897c;
 extern const int32_t g_mot_hammer_PickHammerFieldSfx_EH = 0x80098a18;
+extern const int32_t g_mot_stay_MarioCheckDangerIdleAnim1_BH = 0x800a6df8;
+extern const int32_t g_mot_stay_MarioCheckDangerIdleAnim2_BH = 0x800a6f3c;
+extern const int32_t g_mot_stay_MarioCheckDangerIdleAnim3_BH = 0x800a720c;
+extern const int32_t g_mot_stay_MarioCheckDangerIdleAnim4_BH = 0x800a73a8;
 extern const int32_t g_itemseq_Bound_Patch_BounceRange = 0x800aac68;
 extern const int32_t g_itemseq_GetItem_Patch_SkipTutorials = 0x800abcd8;
 extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH = 0x800adae4;
