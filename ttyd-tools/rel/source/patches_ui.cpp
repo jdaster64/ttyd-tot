@@ -221,12 +221,13 @@ namespace {
 
 
 void DrawSpGauge(float win_x, float win_y, int32_t star_power) {
-    // Cap displayed Star Power dots at 8.00.
     int32_t max_star_power = ttyd::mario_pouch::pouchGetMaxAP();
     max_star_power = Clamp(max_star_power, 0, 900);
     star_power = Clamp(star_power, 0, max_star_power);
 
+    // Slightly shift dots closer together and a bit to the left if max SP is 9.
     float spread = max_star_power <= 800 ? 32.0f : 28.0f;
+    if (max_star_power > 800) win_x -= 2.0f;
     
     int32_t full_orbs = star_power / 100;
     int32_t remainder = star_power % 100;
@@ -241,7 +242,7 @@ void DrawSpGauge(float win_x, float win_y, int32_t star_power) {
         ttyd::icondrv::iconDispGx(
             1.f, &pos, 0x10, ttyd::statuswindow::gauge_wakka[part_frame]);
     }
-    // Draw grey orbs up to the max amount of SP / 100 (rounded up, max of 8).
+    // Draw grey orbs up to the max amount of SP / 100 (rounded up).
     for (int32_t i = 0; i < (max_star_power + 99) / 100; ++i) {
         gc::vec3 pos = {
             static_cast<float>(win_x + spread * i), 
