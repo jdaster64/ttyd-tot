@@ -1085,23 +1085,39 @@ NpcSetupInfo g_NpcSetup[3] = {
 EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     int16_t* inventory = GetCharlietonInventoryPtr();
     
-    // Normal / limited stock = 5 common, 2 rare, 5 (+1 unique) badges;
-    // Smaller stock = 3 common, 1 rare, 3 (+1 unique) badges.
-    int32_t kNumItemsPerType = 5;
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_CHARLIETON_SMALLER)) {
-        kNumItemsPerType = 3;
+    // Normal stock = 5 common, 2 rare, 5 (+1 unique) badges;
+    // Smaller / Limited stock = 3 common, 1 rare, 3 (+1 unique) badges.
+    // Tiny stock = 2 common items, 2 badges, 1 rare item or unique badge.
+    int32_t common_items, rare_items, badges;
+    switch (g_Mod->state_.GetOptionValue(OPT_CHARLIETON_STOCK)) {
+        default:
+            common_items = 5;
+            rare_items = 2;
+            badges = 5;
+            break;
+        case OPTVAL_CHARLIETON_SMALLER:
+        case OPTVAL_CHARLIETON_LIMITED:
+            common_items = 3;
+            rare_items = 1;
+            badges = 3;
+            break;
+        case OPTVAL_CHARLIETON_TINY:
+            common_items = 2;
+            rare_items = 0;
+            badges = 2;
+            break;
     }
-    int32_t kTotalItems = kNumItemsPerType * 5 / 2;
+    int32_t total_items = common_items + rare_items + badges;
     
-    for (int32_t i = 0; i < kTotalItems; ++i) {
+    for (int32_t i = 0; i < total_items; ++i) {
         bool found = true;
         while (found) {
             found = false;
             int32_t item = PickRandomItem(
                 RNG_NPC_OPTIONS,
-                i < kNumItemsPerType,
-                i >= kNumItemsPerType && i < kNumItemsPerType * 3 / 2,
-                i >= kNumItemsPerType * 3 / 2,
+                i < common_items,
+                i >= common_items && i < common_items + rare_items,
+                i >= common_items + rare_items,
                 0);
             // Make sure no duplicate items exist.
             for (int32_t j = 0; j < i; ++j) {
@@ -1115,25 +1131,38 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
     }
     
     // Add a unique badge, and a (one-time purchase) Star Piece to the shop.
-    int32_t num_badges = kNumItemsPerType;
     int32_t special_badge = RewardManager::GetUniqueBadgeForShop();
     if (special_badge) {
-        inventory[kTotalItems + 0] = special_badge;
-        inventory[kTotalItems + 1] = -1;
-        ++num_badges;
+        inventory[total_items + 0] = special_badge;
+        inventory[total_items + 1] = -1;
+        ++badges;
     } else {
-        inventory[kTotalItems + 0] = -1;
+        inventory[total_items + 0] = -1;
+    }
+
+    // For Tiny mode specifically, fill the fifth slot with a rare item
+    // 50% of the time, instead of a specialty badge (if one was selected).
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_CHARLIETON_TINY)) {
+        int32_t item = PickRandomItem(RNG_NPC_OPTIONS, 0, 50, 0, 50);
+        if (item) {
+            inventory[5] = -1;
+            inventory[4] = inventory[3];
+            inventory[3] = inventory[2];
+            inventory[2] = item;
+            rare_items = 1;
+            badges = 2;
+        }
     }
     
     // Sort each category by ascending price.
     qqsort(
-        &inventory[kNumItemsPerType * 0], kNumItemsPerType, sizeof(int16_t),
+        &inventory[0], common_items, sizeof(int16_t),
         (void*)BuyPriceComparator);
     qqsort(
-        &inventory[kNumItemsPerType * 1], kNumItemsPerType / 2, sizeof(int16_t),
+        &inventory[common_items], rare_items, sizeof(int16_t),
         (void*)BuyPriceComparator);
     qqsort(
-        &inventory[kNumItemsPerType * 3 / 2], num_badges, sizeof(int16_t),
+        &inventory[common_items + rare_items], badges, sizeof(int16_t),
         (void*)BuyPriceComparator);
     
     return 2;

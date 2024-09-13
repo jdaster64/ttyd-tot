@@ -230,16 +230,29 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
 
     switch (option) {
         case OPT_DIFFICULTY:
-            return state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) ? 20 : 0;
+            return state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) ? 30 : 0;
         case OPT_NUM_CHESTS:
             switch (state.GetOption(option)) {
                 case 1:
-                    return 10;
+                    return 15;
                 case 2:
+                    return -5;
                 case 3:
                     return -10;
                 case 4:
                     return -20;
+            }
+            break;
+        case OPT_STARTER_ITEMS:
+            switch (state.GetOptionValue(option)) {
+                case OPTVAL_STARTER_ITEMS_OFF:
+                    return 5;
+                case OPTVAL_STARTER_ITEMS_STRONG:
+                    return -10;
+                case OPTVAL_STARTER_ITEMS_CUSTOM:
+                    return -30;
+                default:
+                    return 0;
             }
             break;
         case OPT_BATTLE_DROPS:
@@ -261,6 +274,8 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
             return (5 - state.GetOption(option)) * 5;
         case OPT_INVENTORY_SACK_SIZE:
             return (2 - state.GetOption(option)) * 10;
+        case OPT_AC_DIFFICULTY:
+            return (state.GetOption(option) - 3) * 5;
         case OPTNUM_ENEMY_HP:
         case OPTNUM_ENEMY_ATK: {
             int32_t value = Clamp(state.GetOption(option), 0, 200);
@@ -270,20 +285,22 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
                 return (value - 100);
             }
         }
-        case OPTNUM_SUPERGUARD_SP_COST:
-            // 0 to 20 for 0.00 to 1.00 SP, rounding up.
-            return (state.GetOption(option) + 4) / 5;
-        case OPT_STARTER_ITEMS:
-            return state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) ? -30 : 0;
+        case OPTNUM_SUPERGUARD_SP_COST: {
+            int32_t sp_cost = state.GetOption(option);
+            // 0 if disabled, or 5 plus 1 more for every 0.05 SP, rounded down.
+            return sp_cost > 0 ? 5 + sp_cost / 5 : 0;
+        }
         case OPT_AUDIENCE_RANDOM_THROWS:
             return state.GetOption(option) ? -30 : 0;
         case OPT_OBFUSCATE_ITEMS:
             return state.GetOption(option) ? 30 : 0;
         case OPT_CHARLIETON_STOCK:
             switch (state.GetOptionValue(option)) {
-                case OPTVAL_CHARLIETON_LIMITED:
                 case OPTVAL_CHARLIETON_SMALLER:
                     return 10;
+                case OPTVAL_CHARLIETON_LIMITED:
+                case OPTVAL_CHARLIETON_TINY:
+                    return 20;
             }
             break;
     }

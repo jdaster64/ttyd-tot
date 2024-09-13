@@ -2615,6 +2615,7 @@ g_TowerLobbyStrings = {
     b"tot_optr_charlie":            b"Charlieton Stock",
     b"tot_optr_charlie_5":          b"Default",
     b"tot_optr_charlie_3":          b"Smaller",
+    b"tot_optr_charlie_2":          b"Tiny",
     b"tot_optr_charlie_lim":        b"Limited",
     b"tot_optr_revive":             b"Partner Revival",
     b"tot_optr_mhp":                b"HP / Level",
