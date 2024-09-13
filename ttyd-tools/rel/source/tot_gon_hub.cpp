@@ -123,6 +123,7 @@ extern ShopItem shop_trade_list[6];
 extern ShopkeeperData shopkeeper_data;
 
 // Function declarations.
+EVT_DECLARE_USER_FUNC(evtTot_BubulbP_SetSeedName, 1)
 EVT_DECLARE_USER_FUNC(evtTot_BubulbP_MarkConversation, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetCosmeticShopMsg, 3)
 EVT_DECLARE_USER_FUNC(evtTot_GetNumCosmeticsUnlockable, 2)
@@ -423,6 +424,7 @@ EVT_BEGIN(Npc_BubulbP_Talk)
             USER_FUNC(evt_msg_continue)
             RUN_CHILD_EVT(Npc_BubulbP_NameEntry)
             USER_FUNC(evt_msg_print_insert, 0, PTR("tot_bubulb_nameset"), 0, PTR("me"), LW(0))
+            USER_FUNC(evtTot_BubulbP_SetSeedName, LW(0))
             GOTO(99)
         ELSE()
             USER_FUNC(evt_msg_print_add, 0, PTR("tot_bubulb_earlyend"))
@@ -1050,10 +1052,17 @@ const int32_t* GetEastSideInitEvt() {
     return gon_11_InitEvt;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_BubulbP_SetSeedName) {
+    const char* str = (const char*)evtGetValue(evt, evt->evtArguments[0]);
+    strcpy(g_Mod->state_.seed_name_, str);
+    g_Mod->state_.SetOption(OPT_USE_SEED_NAME, 1);
+    return 2;
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_BubulbP_MarkConversation) {
     // How many distinct conversations the player needs to have encountered
     // to unlock the "set seed" run option.
-    const int32_t kTargetNumFlags = 2;
+    const int32_t kTargetNumFlags = 3;
 
     int32_t num_cvs =
         ConversationId::BUBULB_P_CVS_END - ConversationId::BUBULB_P_CVS_START;

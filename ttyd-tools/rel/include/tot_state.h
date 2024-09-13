@@ -64,7 +64,10 @@ public:
     uint32_t    midboss_defeated_flags_[4];
     uint32_t    cosmetic_purchased_flags_[4];
     // Reserved in case similar flags are needed in the future.
-    uint32_t    reserved_flags_[24];
+    uint32_t    reserved_flags_[20];
+
+    // Bub-ulb's seed name. Resets between runs.
+    char        seed_name_[16];
 
     // Saves the current completion progress as an easily accessible integer.
     int32_t     completion_score_;
@@ -87,6 +90,10 @@ public:
 
     // Sets the current seed to a random value.
     void SelectRandomSeed();
+    // Converts the current seed name into an integer value.
+    void HashSeedName();
+    // Gets the current seed number / name as a string.
+    const char* GetSeedAsString() const;
     
     // Sets / adjusts options, play stats, achievements, etc.
     // If OPTVAL is provided for 'SetOption', value parameter is ignored.
@@ -153,12 +160,6 @@ EVT_DECLARE_USER_FUNC(evtTot_IsFinalFloor, 1)
 EVT_DECLARE_USER_FUNC(evtTot_IsMidbossFloor, 1)
 // Rest floor (no enemies, shop + NPCs only).
 EVT_DECLARE_USER_FUNC(evtTot_IsRestFloor, 1)
-
-// Returns the current seed.
-EVT_DECLARE_USER_FUNC(evtTot_GetSeed, 1)
-
-// Returns a string encoding the currently selected options.
-EVT_DECLARE_USER_FUNC(evtTot_GetEncodedOptions, 1)
 
 // Returns the current difficulty setting.
 EVT_DECLARE_USER_FUNC(evtTot_GetDifficulty, 1)
@@ -417,10 +418,11 @@ enum Options : uint32_t {
     OPTVAL_CHESTS_4             = 0x546'3'00'04,    // Not currently used.
     // Next: 0x449
     
-    // Internal / cosmetic flag options.
+    // Internal options; are not automatically reset between runs.
     OPT_RUN_STARTED             = 0x4c0'1'00'01,
     OPT_DEBUG_MODE_ENABLED      = 0x4c1'1'00'01,
     OPT_SHOP_ITEMS_CHOSEN       = 0x4c2'1'00'01,
+    OPT_USE_SEED_NAME           = 0x4c3'1'00'01,
     
     // Numeric options.
     // Global enemy HP and ATK scaling (0.05x ~ 10.00x in increments of 0.05).

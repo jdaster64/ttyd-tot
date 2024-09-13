@@ -4,13 +4,16 @@
 #include "mod.h"
 #include "tot_generate_enemy.h"
 #include "tot_gsw.h"
+#include "tot_manager_options.h"
 #include "tot_state.h"
 
+#include <ttyd/fontmgr.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/swdrv.h>
 #include <ttyd/win_main.h>
 #include <ttyd/win_root.h>
 
+#include <cinttypes>
 #include <cstdio>
 #include <cstring>
 
@@ -25,6 +28,8 @@ namespace MsgKey {
         MENU_MONOSIRI_DERUTOKORO,
         MSG_STAR_PIECE,
         SYS_NO_KEY,
+        TOT_FLOOR_SIGN,
+        TOT_LOBBY_BACKSIGN,
         TOT_MOVELOG_DESC_DYN,
     };
 }
@@ -40,8 +45,61 @@ constexpr const char* kKeyLookups[] = {
     "menu_monosiri_derutokoro",
     "msg_star_piece",
     "sys_no_key",
+    "tot_floor_sign",
+    "tot_lobby_backsign",
     "tot_movelog_desc_dyn",
 };
+
+const char* GetRunInfoSignString(bool floor, bool options) {
+    static char buf[512], temp[64];
+
+    const int32_t base_x_offset = 210;
+    int32_t y_offset = 40 - (floor ? 13 : 0) - (options ? 27 : 0);
+
+    char* ptr = buf;
+    ptr += sprintf(ptr, "<kanban>\n");
+
+    if (floor) {
+        sprintf(temp, "Floor: %" PRId32, g_Mod->state_.floor_);
+        int32_t width = ttyd::fontmgr::FontGetMessageWidth(temp);
+        int32_t x_offset = base_x_offset - width * 0.5f;
+
+        ptr += sprintf(ptr,
+            "<pos %" PRId32 " %" PRId32 ">\n"
+            "Floor: <col cc0000ff>\n"
+            "%" PRId32 "\n</col>\n", x_offset, y_offset, g_Mod->state_.floor_);
+
+        y_offset += 27;
+    }
+
+    if (options) {
+        const char* seed = g_Mod->state_.GetSeedAsString();
+        sprintf(temp, "Seed: %s", seed);
+        int32_t width = ttyd::fontmgr::FontGetMessageWidth(temp);
+        int32_t x_offset = base_x_offset - width * 0.5f;
+
+        ptr += sprintf(ptr,
+            "<pos %" PRId32 " %" PRId32 ">\n"
+            "Seed: <col 0000ccff>\n"
+            "%s\n</col>\n", x_offset, y_offset, seed);
+            
+        y_offset += 27;
+
+        const char* options = tot::OptionsManager::GetEncodedOptions();
+        sprintf(temp, "Options: %s", options);
+        width = ttyd::fontmgr::FontGetMessageWidth(temp);
+        x_offset = base_x_offset - width * 0.5f;
+
+        ptr += sprintf(ptr,
+            "<pos %" PRId32 " %" PRId32 ">\n"
+            "Options: <col 0000ccff>\n"
+            "%s\n</col>\n", x_offset, y_offset, options);
+    }
+
+    ptr += sprintf(ptr, "<k>");
+
+    return buf;
+}
 
 }
     
@@ -104,6 +162,15 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                 return ttyd::msgdrv::msgSearch("msg_star_piece_inhub");
             }
             break;
+        case MsgKey::TOT_FLOOR_SIGN: {
+            return GetRunInfoSignString(
+                /* floor = */ true,
+                /* options = */ tot::GetSWByte(tot::GSW_Tower_TutorialClears) >= 2);
+        }
+        case MsgKey::TOT_LOBBY_BACKSIGN: {
+            return GetRunInfoSignString(
+                /* floor = */ false, /* options = */ true);
+        }
         case MsgKey::TOT_MOVELOG_DESC_DYN:
             if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
                 int32_t move = menu->move_log_cursor_idx;

@@ -196,17 +196,9 @@ EVT_END()
 EVT_BEGIN(Tower_SignEvt)
     USER_FUNC(evt_npc_stop_for_event)
     USER_FUNC(evt_mario_key_onoff, 0)
-    USER_FUNC(evtTot_GetFloor, LW(0))
-    USER_FUNC(evtTot_GetSeed, LW(1))
-    USER_FUNC(evtTot_GetEncodedOptions, LW(2))
 
-    IF_SMALL((int32_t)GSW_Tower_TutorialClears, 2)
-        // For tutorial runs, only show the floor number.
-        USER_FUNC(evt_msg_print_insert, 0, PTR("tot_floor_sign_noopt"), 0, 0, LW(0), LW(1), LW(2))
-    ELSE()
-        // Afterward, show the floor number, seed, and options.
-        USER_FUNC(evt_msg_print_insert, 0, PTR("tot_floor_sign"), 0, 0, LW(0), LW(1), LW(2))
-    END_IF()
+    // Sign text (including floor number, seed, and options) is set in code.
+    USER_FUNC(evt_msg_print, 0, PTR("tot_floor_sign"), 0, 0)
 
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_npc_start_for_event)

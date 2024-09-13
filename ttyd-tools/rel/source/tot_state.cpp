@@ -258,6 +258,10 @@ void StateManager::ResetOptions() {
     SetOption(OPTVAL_DIFFICULTY_FULL);
     SetOption(OPTVAL_TIMER_NONE);
     OptionsManager::ApplyCurrentPresetOptions();
+
+    // Clear Bub-ulber's seed name.
+    seed_name_[0] = 0;
+    SetOption(OPT_USE_SEED_NAME, 0);
     
     g_HasBackupSave = false;
 }
@@ -265,6 +269,22 @@ void StateManager::ResetOptions() {
 void StateManager::SelectRandomSeed() {
     uint64_t time = gc::OSTime::OSGetTime();
     seed_ = third_party::fasthash64(&time, sizeof(time), 417) % 999'999'999 + 1;
+}
+
+void StateManager::HashSeedName() {
+    // Convert the named seed into a numeric one.
+    seed_ = third_party::fasthash64(
+        seed_name_, sizeof(seed_name_), 417) % 999'999'999 + 1;
+}
+
+const char* StateManager::GetSeedAsString() const {
+    static char buf[16];
+    if (GetOption(OPT_USE_SEED_NAME)) {
+        sprintf(buf, "\"%s\"", seed_name_);
+    } else {
+        sprintf(buf, "%09" PRId32, seed_);
+    }
+    return buf;
 }
 
 bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
@@ -700,18 +720,6 @@ EVT_DEFINE_USER_FUNC(evtTot_IsRestFloor) {
     int32_t floor = state.floor_;
     bool is_rest_floor = floor == 0 || (floor % 8 == 7);
     evtSetValue(evt, evt->evtArguments[0], is_rest_floor);
-    return 2;
-}
-
-EVT_DEFINE_USER_FUNC(evtTot_GetSeed) {
-    uint32_t seed = g_Mod->state_.seed_;
-    evtSetValue(evt, evt->evtArguments[0], seed);
-    return 2;
-}
-
-EVT_DEFINE_USER_FUNC(evtTot_GetEncodedOptions) {
-    const char* encoded_str = OptionsManager::GetEncodedOptions();
-    evtSetValue(evt, evt->evtArguments[0], PTR(encoded_str));
     return 2;
 }
 

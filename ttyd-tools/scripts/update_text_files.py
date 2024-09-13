@@ -2596,8 +2596,8 @@ g_TowerLobbyStrings = {
         
     b"tot_winsel_runoptions_header":    b"Options",
     
-    b"tot_optr_seed":               b"Seed",
-    b"tot_optr_seed_random":        b"0 (Random)",
+    b"tot_optr_seed":               b"Set Seed",
+    b"tot_optr_seed_random":        b"0 (Set on start)",
     b"tot_optr_preset":             b"Preset",
     b"tot_optr_preset_custom":      b"Custom",
     b"tot_optr_preset_default":     b"Default",
@@ -2690,8 +2690,8 @@ g_TowerLobbyStrings = {
     b"tot_optr_on":                 b"On",
     
     b"tot_opth_seed":
-        b"Seeds random events. Press X\n"
-        b"to randomize, L/R to shift 10x.",
+        b"X: Default        Y: Randomize\n"
+        b"Z: Bub-ulb name L/R: Shift 10x",
     
     b"tot_opth_preset":
         b"Whether to use custom settings\n"
@@ -2831,13 +2831,16 @@ g_TowerLobbyStrings = {
         b"<system>\n<p>\n"
         b"Use this sign to customize\n"
         b"various options for your next\n"
-        b"tower run to your liking!\n<k>\n"
-        b"<p>\nCertain options will increase\n"
+        b"tower run to your liking!\n<k>\n<p>\n"
+        b"Press left/right to change an\n"
+        b"option, X to revert it to its\n"
+        b"default, and B to back out.\n<k>\n<p>\n"
+        b"Certain options will increase\n"
         b"or decrease a run's Intensity,\n"
-        b"affecting the rewards earned.\n<k>\n"
-        b"<p>The rest are just for fun!\n"
-        b"<wait 250>Press left/right to change\n"
-        b"settings, and B to back out.\n<k>",
+        b"affecting the rewards earned.\n<k>\n<p>\n"
+        b"Shoot for 100% completion,\n"
+        b"or experiment with different\n"
+        b"options just for fun!\n<k>",
     
     b"tot_lobby_frontsign":
         b'<kanban>\n'
@@ -2858,28 +2861,6 @@ g_TowerLobbyStrings = {
 }
 
 g_TowerStrings = {
-    # Sign information.
-
-    b'tot_floor_sign':
-        b'<kanban>\n'
-        b'<pos 153 0>\n'
-        b'Floor: <col cc0000ff>\n'
-        b'%02d\n</col>\n'
-        b'<pos 0 27>\n'
-        b'Seed: <col 0000ccff>\n'
-        b'%09d\n</col>\n'
-        b'<pos 0 54>\n'
-        b'Options: <col 0000ccff>\n'
-        b'%s\n</col>\n'
-        b'<k>',
-
-    b'tot_floor_sign_noopt':
-        b'<kanban>\n'
-        b'<pos 153 27>\n'
-        b'Floor: <col cc0000ff>\n'
-        b'%02d\n</col>\n'
-        b'<k>',
-    
     # NPC tattles.
 
     b"npc_shop":

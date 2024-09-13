@@ -250,6 +250,7 @@ void DebugManager::Update() {
                     SetSWF(GSWF_CosmeticShopTutorial);
                     SetSWF(GSWF_HubShopTutorial);
                     SetSWF(GSWF_RunOptionsTutorial);
+                    SetSWF(GSWF_BubulbP_SeedUnlocked);
                     break;
                 }
                 case DEBUG_COMPLETE_LOGS: {

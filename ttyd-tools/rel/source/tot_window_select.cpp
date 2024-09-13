@@ -6,6 +6,7 @@
 #include "tot_generate_item.h"
 #include "tot_generate_reward.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
@@ -186,6 +187,8 @@ uint32_t OptionLookup(uint16_t lookup_key) {
 
 bool OptionUnlocked(const OptionMenuData& data) {
     switch (data.option) {
+        case WIN_SEED_SELECT:
+            return GetSWF(GSWF_BubulbP_SeedUnlocked);
         case OPT_NPC_CHOICE_1:
         case OPT_NPC_CHOICE_2:
         case OPT_NPC_CHOICE_3:
@@ -240,10 +243,10 @@ const char* OptionValue(uint16_t lookup_key) {
 
     switch (option) {
         case WIN_SEED_SELECT: {
-            if (state.seed_ == 0) {
+            if (!state.GetOption(OPT_USE_SEED_NAME) && state.seed_ == 0) {
                 return msgSearch(g_OptionMenuData[option_index + 1].name_msg);
             }
-            sprintf(buf, "%09" PRId32, state.seed_);
+            sprintf(buf, "%s", state.GetSeedAsString());
             break;
         }
         case WIN_STAT_RUN_AVG_BATTLE_TIME: {
@@ -361,19 +364,48 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
         uint32_t option = OptionLookup(value);
 
         if ((int32_t)option == WIN_SEED_SELECT) {
-            // Modify the selected seed 
+            // Modify the selected seed.
             uint32_t buttons = g_MarioSt->gamepad_buttons_pressed[0];
             if (buttons & ButtonId::X) {
+                // Set to 0 (will assign a seed number at run start).
+                state.seed_ = 0;
+                state.SetOption(OPT_USE_SEED_NAME, 0);
+                // Play menu back-out sound to indicate reversion to default.
+                ttyd::pmario_sound::psndSFXOn((const char*)0x2002b);
+            } else if (buttons & ButtonId::Y) {
+                // Set to random numeric value.
                 state.SelectRandomSeed();
+                state.SetOption(OPT_USE_SEED_NAME, 0);
                 // Play menu back-out sound to indicate randomization action.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x2002b);
+            } else if (buttons & ButtonId::Z) {
+                // Set to current named seed, if one exists.
+                if (state.seed_name_[0] == 0) {
+                    // No seed name available; play "failure" sound.
+                    ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                } else {
+                    state.SetOption(OPT_USE_SEED_NAME, 1);
+                    ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+                }
             } else if (buttons & ButtonId::L) {
-                state.seed_ = (state.seed_ % 100'000'000) * 10;
-                ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+                // Multiply by 10; ignore if in named seed mode.
+                if (!state.GetOption(OPT_USE_SEED_NAME)) {
+                    state.seed_ = (state.seed_ % 100'000'000) * 10;
+                    ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+                }
             } else if (buttons & ButtonId::R) {
-                state.seed_ /= 10;
-                ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+                // Divide by 10; ignore if in named seed mode.
+                if (!state.GetOption(OPT_USE_SEED_NAME)) {
+                    state.seed_ /= 10;
+                    ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+                }
             } else if (change) {
+                // If moving left/right, change to numeric mode if not already.
+                if (state.GetOption(OPT_USE_SEED_NAME)) {
+                    state.seed_ = 0;
+                    state.SetOption(OPT_USE_SEED_NAME, 0);
+                }
+
                 if (change == 1 && state.seed_ == 999'999'999) {
                     state.seed_ = 0;
                 } else if (change == -1 && state.seed_ == 0) {
@@ -382,6 +414,24 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                     state.seed_ += change;
                 }
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
+            }
+        } else if (g_MarioSt->gamepad_buttons_pressed[0] & ButtonId::X) {
+            // Try setting the option to its default, if one exists.
+            int32_t default_value = OptionsManager::GetDefaultValue(option);
+
+            if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
+                option != OPT_PRESET && option != OPT_DIFFICULTY &&
+                option != OPT_TIMER_DISPLAY) {
+                // Play "failure" sound.
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+            } else if (default_value >= 0) {
+                state.SetOption(option, default_value);
+                // Play back-out sound.
+                ttyd::pmario_sound::psndSFXOn((const char*)0x2002b);
+                // Re-enforce current preset's settings, if not custom.
+                if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM)) {
+                    OptionsManager::ApplyCurrentPresetOptions();
+                }
             }
         } else if (change) {
             // Only allow changing preset, difficulty and timer options if
@@ -1204,7 +1254,7 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     sprintf(text, "Seed: ");
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
-    sprintf(text, "%09" PRId32, g_Mod->state_.seed_);
+    sprintf(text, "%s", g_Mod->state_.GetSeedAsString());
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
 
     text_pos.x = min_x;

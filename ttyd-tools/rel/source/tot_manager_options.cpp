@@ -436,7 +436,13 @@ void OptionsManager::ResetAfterRun() {
 void OptionsManager::OnRunStart() {
     auto& state = g_Mod->state_;
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
-    if (state.seed_ == 0) state.SelectRandomSeed();
+
+    // Select random seed or convert string seed to hash if necessary.
+    if (state.GetOption(OPT_USE_SEED_NAME)) {
+        state.HashSeedName();
+    } else if (state.seed_ == 0) {
+        state.SelectRandomSeed();
+    }
 
     // Force special options for tutorial runs.
     switch (GetSWByte(GSW_Tower_TutorialClears)) {

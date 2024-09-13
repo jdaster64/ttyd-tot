@@ -228,13 +228,15 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
             break;
         }
         case AchievementId::META_ALL_OPTIONS: {
+            // Check for completion of all achievements that reward options.
             for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
                 if (g_AchievementData[i].reward_type == 
                     AchievementRewardType::OPTION) {
                     if (!state.GetOption(FLAGS_OPTION_UNLOCKED, i)) return;
                 }
             }
-            // TODO: Check for "seed set" option, if making that unlockable.
+            // Check for having unlocked the Bub-ulber 'set seed' option.
+            if (!GetSWF(GSWF_BubulbP_SeedUnlocked)) return;
             MarkCompleted(ach);
             break;
         }
