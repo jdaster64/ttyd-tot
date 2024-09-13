@@ -2582,9 +2582,17 @@ g_TowerLobbyStrings = {
         
     # Run options menu.
     
-    b"tot_intensity_desc":
+    b"tot_intensity_normal":
         b"Increase intensity for more \n"
         b"     end-of-run rewards!",
+    
+    b"tot_intensity_light":
+        b"Well, hope you have fun, \n"
+        b"          at least!",
+    
+    b"tot_intensity_heavy":
+        b"Good luck! You're going \n"
+        b"        to need it!",
         
     b"tot_winsel_runoptions_header":    b"Options",
     

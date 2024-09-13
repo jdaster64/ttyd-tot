@@ -1320,6 +1320,8 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
     uint32_t kBlack = 0x0000'00FFU;
     uint32_t kWhite = 0xFFFF'FFFFU;
 
+    int32_t total_intensity = OptionsManager::GetTotalIntensity();
+
     const float kDescXOffset = 0.32f;
     const float kDescYOffset = 0.15f;
     const float kDescXScale = 0.75f;
@@ -1333,7 +1335,14 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
 
     ttyd::fontmgr::FontDrawStart();
     {
-        const char* msg = msgSearch("tot_intensity_desc");
+        const char* msg = msgSearch("tot_intensity_normal");
+        // Special messages for setting intensity very low/high.
+        if (total_intensity <= 10) {
+            msg = msgSearch("tot_intensity_light");
+        } else if (total_intensity >= 300) {
+            msg = msgSearch("tot_intensity_heavy");
+        }
+
         int32_t length = ttyd::fontmgr::FontGetMessageWidth(msg);
         gc::vec3 text_pos = {
             entry->x + entry->width * kDescXOffset - length * 0.5f * kDescXScale,
@@ -1391,13 +1400,27 @@ void DispOptionsWindowTopBar(WinMgrEntry* entry) {
         };
         gc::vec3 text_scale = { 0.9f, 0.9f, 0.9f };
 
-        int32_t intensity = OptionsManager::GetTotalIntensity();
-        int32_t red = Clamp((intensity - 100) * 2, 0, 255);
-        int32_t blue = Clamp((100 - intensity) * 2, 0, 255);
+        int32_t red = Clamp((total_intensity - 100) * 2, 0, 255);
+        int32_t blue = Clamp((100 - total_intensity) * 2, 0, 255);
         uint32_t color = (red << 24) | (blue << 8) | 0xFF;
 
         ttyd::win_main::winFontSetR(
-            &text_pos, &text_scale, &color, "%" PRId32 "%%", intensity);
+            &text_pos, &text_scale, &color, "%" PRId32 "%%", total_intensity);
+
+        // Set window background color based on intensity.
+        uint8_t bg_r = 0xFF;
+        uint8_t bg_g = 0xFF;
+        uint8_t bg_b = 0xFF;
+        if (total_intensity < 100) {
+            bg_r = ClampMapRange(total_intensity, 20, 100, 0xC4, 0xFF);
+            bg_g = ClampMapRange(total_intensity, 20, 100, 0xEC, 0xFF);
+            bg_b = ClampMapRange(total_intensity, 20, 100, 0xF2, 0xFF);
+        } else if (total_intensity > 100) {
+            bg_r = ClampMapRange(total_intensity, 100, 200, 0xFF, 0xFF);
+            bg_g = ClampMapRange(total_intensity, 100, 200, 0xFF, 0xC8);
+            bg_b = ClampMapRange(total_intensity, 100, 200, 0xFF, 0xD4);
+        }
+        entry->desc->color = (bg_r << 24) | (bg_g << 16) | (bg_b << 8) | 0xFF;
     }
 
     // Draw icons for option paper and Mystery box for total rewards.
@@ -2058,7 +2081,7 @@ WinMgrDesc g_CustomDescs[] = {
         .y = 200,
         .width = 520,
         .height = 60,
-        .color = 0xFFC8D4FFU,
+        .color = 0xFFFFFFFFU,
         .main_func = nullptr,
         .disp_func = (void*)DispOptionsWindowTopBar,
     },

@@ -79,5 +79,12 @@ template <class T> inline T Clamp(const T& value, const T& min_value,
                                   const T& max_value) {
     return Max(Min(value, max_value), min_value);
 }
+inline double ClampMapRange(
+    double value, double i_min, double i_max, double o_min, double o_max) {
+    return o_min +
+        (Clamp(value, i_min, i_max) - i_min) 
+        / (i_max - i_min) 
+        * (o_max - o_min);
+}
 
 }
