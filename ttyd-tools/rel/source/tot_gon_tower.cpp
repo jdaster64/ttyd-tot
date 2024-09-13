@@ -1037,42 +1037,26 @@ EVT_BEGIN(Tower_FinalBossSetup)
     RETURN()
 EVT_END()
 
-// Set up the battle / enemy NPC, or other NPCs on the floor.
-EVT_BEGIN(Tower_NpcSetup)
-    USER_FUNC(evtTot_IsRestFloor, LW(0))
-    IF_EQUAL(LW(0), 1)
-        // Rest floor; open grate immediately.
-        SET(LW(15), 1)
-        RUN_EVT(Tower_OpenGrate)
-        
-        USER_FUNC(evtTot_ClearEnemyInfo)
-        
-        // Spawn one or more NPCs as well, if floor > 0.
-        USER_FUNC(evtTot_GetFloor, LW(0))
-        IF_LARGE(LW(0), 0)
-            USER_FUNC(evtTot_GetTowerNpcParams,
-                LW(0), LW(1), LW(2),  // Charlieton name, tribe name, model
-                LW(3), LW(4), LW(5),  // Secondary NPC name, tribe name, model
-                LW(6))
-            USER_FUNC(evt_npc_entry, LW(0), LW(2))
-            USER_FUNC(evt_npc_set_tribe, LW(0), LW(1))
-            IF_NOT_EQUAL(LW(3), 0)
-                USER_FUNC(evt_npc_entry, LW(3), LW(5))
-                USER_FUNC(evt_npc_set_tribe, LW(3), LW(4))
+EVT_BEGIN(Tower_WaitForChestOpen)
+    INLINE_EVT()
+        LBL(2)
+        WAIT_FRM(1)
+        IF_EQUAL((int32_t)GSW_Tower_ChestClaimed, 0)
+            IF_LARGE_EQUAL((int32_t)GSW_Tower_DisplayChestIcons, 1)
+                USER_FUNC(evtTot_DisplayChestIcons)
             END_IF()
-            USER_FUNC(evt_npc_setup, LW(6))
-            USER_FUNC(evt_npc_set_position, LW(0), 160, 0, -70)
-            USER_FUNC(evt_npc_set_ry_lr, LW(0), 0)
-            IF_NOT_EQUAL(LW(3), 0)
-                USER_FUNC(evt_npc_set_position, LW(3), 160, 0, 70)
-                USER_FUNC(evt_npc_set_ry_lr, LW(3), 0)
-            END_IF()
-
-            // Also spawn a Heart Block, statically.
-            SET(LW(15), 1)
-            RUN_EVT(Tower_SpawnHeartSaveBlock)
+            GOTO(2)
         END_IF()
-    ELSE()
+        RUN_EVT(Tower_OpenExit)
+    END_INLINE()
+
+    RETURN()
+EVT_END()
+
+// Set up NPCs (only runs on non-rest floors).
+EVT_BEGIN(Tower_EnemySetup)
+    USER_FUNC(evtTot_IsRestFloor, LW(0))
+    IF_EQUAL(LW(0), 0)
         // Regular enemy floor; spawn enemies.
         USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
         SET(LW(1), PTR(g_EnemyNpcSetup))
@@ -1114,21 +1098,52 @@ EVT_BEGIN(Tower_NpcSetup)
             SET(LW(15), 0)
             RUN_EVT(Tower_OpenGrate)
         END_INLINE()
-    END_IF()
     
-    // Wait for a chest to be opened, then unlock the exit (if necessary).
-    INLINE_EVT()
-        LBL(2)
-        WAIT_FRM(1)
-        IF_EQUAL((int32_t)GSW_Tower_ChestClaimed, 0)
-            IF_LARGE_EQUAL((int32_t)GSW_Tower_DisplayChestIcons, 1)
-                USER_FUNC(evtTot_DisplayChestIcons)
-            END_IF()
-            GOTO(2)
-        END_IF()
-        RUN_EVT(Tower_OpenExit)
-    END_INLINE()
+        // Wait for a chest to be opened, then unlock the exit (if necessary).
+        RUN_CHILD_EVT(Tower_WaitForChestOpen)
+    END_IF()
+    RETURN()
+EVT_END()
 
+// Set up NPCs (only runs on rest floors).
+EVT_BEGIN(Tower_NpcSetup)
+    USER_FUNC(evtTot_IsRestFloor, LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        // Rest floor; open grate immediately.
+        SET(LW(15), 1)
+        RUN_EVT(Tower_OpenGrate)
+        
+        USER_FUNC(evtTot_ClearEnemyInfo)
+        
+        // Spawn one or more NPCs as well, if floor > 0.
+        USER_FUNC(evtTot_GetFloor, LW(0))
+        IF_LARGE(LW(0), 0)
+            USER_FUNC(evtTot_GetTowerNpcParams,
+                LW(0), LW(1), LW(2),  // Charlieton name, tribe name, model
+                LW(3), LW(4), LW(5),  // Secondary NPC name, tribe name, model
+                LW(6))
+            USER_FUNC(evt_npc_entry, LW(0), LW(2))
+            USER_FUNC(evt_npc_set_tribe, LW(0), LW(1))
+            IF_NOT_EQUAL(LW(3), 0)
+                USER_FUNC(evt_npc_entry, LW(3), LW(5))
+                USER_FUNC(evt_npc_set_tribe, LW(3), LW(4))
+            END_IF()
+            USER_FUNC(evt_npc_setup, LW(6))
+            USER_FUNC(evt_npc_set_position, LW(0), 160, 0, -70)
+            USER_FUNC(evt_npc_set_ry_lr, LW(0), 0)
+            IF_NOT_EQUAL(LW(3), 0)
+                USER_FUNC(evt_npc_set_position, LW(3), 160, 0, 70)
+                USER_FUNC(evt_npc_set_ry_lr, LW(3), 0)
+            END_IF()
+
+            // Also spawn a Heart Block, statically.
+            SET(LW(15), 1)
+            RUN_EVT(Tower_SpawnHeartSaveBlock)
+        END_IF()
+
+        // Wait for a chest to be opened, then unlock the exit (if necessary).
+        RUN_CHILD_EVT(Tower_WaitForChestOpen)
+    END_IF()
     RETURN()
 EVT_END()
 
@@ -1192,7 +1207,8 @@ EVT_BEGIN(gon_01_InitEvt)
         IF_EQUAL(LW(0), 1)
             RUN_CHILD_EVT(PTR(&Tower_FinalBossSetup))
         ELSE()
-            // Set up chests and regular NPCs.
+            // Set up enemies, then chests, then regular NPCs.
+            RUN_CHILD_EVT(PTR(&Tower_EnemySetup))
             RUN_CHILD_EVT(PTR(&Tower_SpawnChests))
             RUN_CHILD_EVT(PTR(&Tower_NpcSetup))
         END_IF()

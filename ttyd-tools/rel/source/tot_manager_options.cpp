@@ -579,6 +579,13 @@ void OptionsManager::OnRunResumeFromFileSelect() {
         g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION] = 0;
         ObfuscateItems(true);
     }
+
+    // Correct party max HP stats.
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    for (int32_t i = 1; i <= 7; ++i) {
+        ttyd::mario_pouch::_party_max_hp_table[i * 4] 
+            = pouch.party_data[i].max_hp;
+    }
 }
 
 void OptionsManager::UpdateLevelupStats() {
