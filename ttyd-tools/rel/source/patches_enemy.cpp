@@ -209,11 +209,16 @@ void ApplyFixedPatches() {
             return unit;
         });
 
-    // Track enemy kills on deletion (unless running away).
+    // Track enemy kills on deletion.
     g_BtlUnit_Delete_trampoline = patch::hookFunction(
         ttyd::battle_unit::BtlUnit_Delete, [](BattleWorkUnit* unit) {
             int32_t idx = tot::GetCustomTattleIndex(unit->true_kind);
-            if (idx >= 0 && ttyd::seqdrv::seqGetNextSeq() == SeqIndex::kBattle) {
+
+            // Only count valid ToT enemy types, and only count enemies defeated
+            // mid-battle, or at the end of a successful battle.
+            if (idx >= 0 && (
+                ttyd::seqdrv::seqGetNextSeq() == SeqIndex::kBattle ||
+                ttyd::battle::g_BattleWork->fbat_info->wResult == 1)) {
                 if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, idx) < 9999)
                     g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_KILLS, 1, idx);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMIES_DEFEATED, 1);
