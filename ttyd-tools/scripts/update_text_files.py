@@ -3821,6 +3821,253 @@ g_PetalburgWestStrings = {
     b"tot_shopkeep_yesno":
         b"<select 0 1 0 40>\nYes\nNo",
         
+    # Bub-ulber dialogue.
+    
+    # Special dialogue.
+    
+    b"tot_bubulb_firsttalk":
+        b"Top of the morning!\n"
+        b"<wait 250>'Tis I, Bub-ulber.\n<k>\n<p>\n"
+        b"This may not come as a\n"
+        b"surprise, but I consider myself\n"
+        b"a connoisseur of seeds.\n<k>\n<p>\n"
+        b"Feel free to come by any\n"
+        b"time you want and I'll share\n"
+        b"my seeding knowledge!\n<k>",
+    
+    b"tot_bubulb_unlockseed":
+        b"<p>\nBy the by, <wait 150>it seems that\n"
+        b"you share my great interest\n"
+        b"in all things seeds!\n<k>\n<p>\n"
+        b"Why don't you come and\n"
+        b"help me name one sometime?\n<k>\n<p>\n"
+        b"You might find that you'll\n"
+        b"come to better understand\n"
+        b"them that way as well!\n<k>",
+    
+    b"tot_bubulb_seedtut":
+        b"<system>\n<p>\n"
+        b"You've unlocked the ability to\n"
+        b"set a seed for your future\n"
+        b"tower runs!\n<k>\n<p>\n"
+        b"Using a set seed will guarantee\n"
+        b"certain random aspects will\n"
+        b"always play out consistently.\n<k>\n<p>\n"
+        b"Use the run options sign to\n"
+        b"enter a number, or talk to\n"
+        b"Bub-ulber to choose a name!\n<k>",
+    
+    b"tot_bubulb_setseed":
+        b"<p>\nOh, were you interested in\n"
+        b"choosing a name for your\n"
+        b"next seed?\n<o>",
+
+    b"tot_bubulb_earlyend":
+        b"<p>\nThat's all the advice I have\n"
+        b"for now. <wait 250>Please do enjoy\n"
+        b"this most glorious day!\n<k>",
+
+    b"tot_bubulb_goodbye":
+        b"<p>\nVery well then, <wait 200>please do\n"
+        b"enjoy this most glorious day!\n<k>",
+
+    b"tot_bubulb_nameset":
+        b'"%s", eh?\n'
+        b"That sounds like a fine name!\n"
+        b"I'll be sure to use it next time.\n<k>",
+    
+    # Regular dialogue.
+    
+    b"tot_di001100_00":
+        b"Good morning to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect enemy groups?\n<k>\n<p>\n"
+        b"Each type of enemy has its\n"
+        b"own level ranging from 2-10,\n"
+        b"indicating their toughness.\n<k>\n<p>\n"
+        b"As you ascend the tower,\n"
+        b"every floor has a quota of\n"
+        b"enemy levels it's aiming for.\n<k>\n<p>\n"
+        b"Once half of this target is\n"
+        b"reached, enemies may stop\n"
+        b"being added at any time.\n<k>\n<p>\n"
+        b"This means the fight might\n"
+        b"be easier, but you'll also get\n"
+        b"fewer coins and chests!\n<k>\n<o>",
+        
+    b"tot_di001101_00":
+        b"A glorious day to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect reward types?\n<k>\n<p>\n"
+        b"Every floor in the tower has\n"
+        b"a selection of chest rewards,\n"
+        b"<wait 150>generally from one to three.\n<k>\n<p>\n"
+        b"Generally speaking, the\n"
+        b"harder the enemies on a floor,\n"
+        b"<wait 100>the more choices you'll have!\n<k>\n<p>\n"
+        b"You might not have noticed\n"
+        b"this, <wait 150>but only one stat level\n"
+        b"increase can appear at once.\n<k>\n<p>\n"
+        b"The same goes for moves;\n"
+        b"<wait 150>you'll never see a Jump and\n"
+        b"partner move together.\n<k>\n<o>",
+    
+    b"tot_di001102_00":
+        b"A fantastic day to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect partner pools?\n<k>\n<p>\n"
+        b"As the name suggests, after\n"
+        b"recruiting a certain number of\n"
+        b"partners, only they'll appear.\n<k>\n<p>\n"
+        b"Hooktail's tower has a 3-\n"
+        b"partner pool, and the others\n"
+        b"have a 4-partner pool.\n<k>\n<p>\n"
+        b"This may seem limiting, <wait 150>but\n"
+        b"it gives you more chances to\n"
+        b"give them additional moves!\n<k>\n<p>\n"
+        b"Waiting for your favorites\n"
+        b"can work too, but will probably\n"
+        b"net you fewer moves in total.\n<k>\n<o>",
+    
+    b"tot_di001103_00":
+        b"A wonderful day to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect partner moves?\n<k>\n<p>\n"
+        b"You might have noticed\n"
+        b"partners' moves have colored\n"
+        b"orbs next to their names...\n<k>\n<p>\n"
+        b"These indicate the move's\n"
+        b"rarity, with blue for Tier 1,\n"
+        b"green for 2, and red for 3.\n<k>\n<p>\n"
+        b"You won't be offered higher-\n"
+        b"rarity moves for the first\n"
+        b"additional move on a partner.\n<k>\n<p>\n"
+        b"However, the second and\n"
+        b"third moves taken will always\n"
+        b"offer a tier-2 and 3 option!\n<k>\n<p>\n"
+        b"Partners have different\n"
+        b"rarity distributions, so mind\n"
+        b"that when aiming for a move!\n<k>\n<o>",
+    
+    b"tot_di001104_00":
+        b"A cheery day to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect Special moves?\n<k>\n<p>\n"
+        b"Special Moves are offered\n"
+        b"pretty rarely from chests,\n"
+        b"signified by their Crystal Star.\n<k>\n<p>\n"
+        b"Taking one will grant you its\n"
+        b"move, and an additional unit\n"
+        b"of max Star Power, up to 9.\n<k>\n<p>\n"
+        b"Special Moves can only be\n"
+        b"offered in an order allowing\n"
+        b"them to be used at Lvl. 3.\n<k>\n<p>\n"
+        b"Because of that, if you choose\n"
+        b"not to take one, it'll appear\n"
+        b"again next time you see one!\n<k>\n<p>\n"
+        b"So if you want a chance at\n"
+        b"later Special Moves, be sure\n"
+        b"to take every one you see!\n<k>\n<o>",
+    
+    b"tot_di001105_00":
+        b"Top of the morning!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect guest NPCs?\n<k>\n<p>\n"
+        b"Every run's rest floors will\n"
+        b"have guest cameos by up to\n"
+        b"4 characters <wait 150>(3 for Hooktail).\n<k>\n<p>\n"
+        b"Generally, you'll see them all\n"
+        b"about equally, with none able\n"
+        b"to appear more than 5 times.\n<k>\n<p>\n"
+        b"However, some have a higher\n"
+        b"likelihood of showing up only\n"
+        b"a couple times, such as Lumpy.\n<k>\n<p>\n"
+        b"If you're lucky enough to\n"
+        b"see a guest you want, don't\n"
+        b"hesitate to take their deal.\n<k>\n<p>\n"
+        b"You might not get another\n"
+        b"chance, after all!\n<k>\n<o>",
+    
+    b"tot_di001106_00":
+        b"Good day to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect items' rarity?\n<k>\n<p>\n"
+        b"There are 40 types of\n"
+        b'items that are "common", and\n'
+        b'28 types that are "rare".\n<k>\n<p>\n'
+        b"Enemies are several times\n"
+        b"more likely to hold common\n"
+        b"items than rare items.\n<k>\n<p>\n"
+        b"Charlieton's shop also has\n"
+        b"only a couple of them on sale\n"
+        b"at any time.\n<k>\n<p>\n"
+        b"You know, I've heard there's\n"
+        b"a master chef that can turn\n"
+        b"common items into rare items...\n<k>\n<p>\n"
+        b"They might even be able to\n"
+        b"whip up something super-special\n"
+        b"if you have multiple rare ones!\n<k>\n<o>",
+    
+    b"tot_di001107_00":
+        b"A pleasant day to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect retries?\n<k>\n<p>\n"
+        b"If things go sour on a tower\n"
+        b"run, you can always try again\n"
+        b"from the last Save Block.\n<k>\n<p>\n"
+        b"You can also retry without\n"
+        b"reloading, <wait 150>using checkpoints\n"
+        b"saved after every boss.\n<k>\n<p>\n"
+        b"If you do either, you'll notice\n"
+        b"most things will play out the\n"
+        b"same as before the retry.\n<k>\n<p>\n"
+        b"This includes enemy groups,\n"
+        b"<wait 150>item drops, <wait 150>bonus conditions,\n"
+        b"<wait 150>and most types of rewards.\n<k>\n<p>\n"
+        b"Feel free to use this to your\n"
+        b"advantage if you're struggling\n"
+        b"with a difficult run!\n<k>\n<o>",
+    
+    b"tot_di001108_00":
+        b"A blessed day to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"seeds affect unique badges?\n<k>\n<p>\n"
+        b"Most badges can be stacked,\n"
+        b"and can appear on enemies\n"
+        b"and as bonus rewards.\n<k>\n<p>\n"
+        b"However, there are a few\n"
+        b"special badges you can only\n"
+        b"get a single copy of in a run.\n<k>\n<p>\n"
+        b"These include Double Dip,\n"
+        b"<wait 150>Spike Shield, <wait 150>Quick Change,\n"
+        b"<wait 150>Zap Tap, and a few others.\n<k>\n<p>\n"
+        b"These badges can only be\n"
+        b"obtained as chest rewards, or\n"
+        b"rarely from Charlieton's shop.\n<k>\n<p>\n"
+        b"If you run into Wonky, you can\n"
+        b"sell these like any other badge,\n"
+        b"but they won't appear again!\n<k>\n<o>",
+    
+    b"tot_di001109_00":
+        b"A fabulous day to you, sir!\n"
+        b"<wait 250>Care to learn about how\n"
+        b"broad seeds' influence is?\n<k>\n<p>\n"
+        b"You might not be surprised\n"
+        b"to find out that seeds control\n"
+        b"enemy groups or rewards...\n<k>\n<p>\n"
+        b"But did you know that seeds\n"
+        b"affect starting items on the\n"
+        b'"Random" setting as well?\n<k>\n<p>\n'
+        b"The same goes for most other\n"
+        b"sources of random items, like\n"
+        b"Ms. Mowz's Kiss Thief.\n<k>\n<p>\n"
+        b"I've heard that if you see all\n"
+        b"kinds of items and badges, you\n"
+        b"can shuffle their identities.\n<k>\n<p>\n"
+        b"I'd bet you 1,000 coins that\n"
+        b"even that shuffling process\n"
+        b"is controlled by seeds!\n<k>\n<o>",
+       
     # TODO: More Koopa dialogue, regular NPC dialogue.
 }
 

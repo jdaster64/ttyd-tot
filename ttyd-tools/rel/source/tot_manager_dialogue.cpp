@@ -1,6 +1,9 @@
 #include "tot_manager_dialogue.h"
 
 #include "evt_cmd.h"
+#include "mod.h"
+#include "tot_gsw.h"
+#include "tot_state.h"
 
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
@@ -27,11 +30,25 @@ int32_t g_ConversationStep = 0;
 }  // namespace
 
 void DialogueManager::SetConversation(int32_t id) {
+    const auto& state = g_Mod->state_;
+
     g_ConversationId = id;
     g_ConversationPtr = kDefaultConversation;
+    g_ConversationStep = 0;
 
-    // TODO: For some NPCs, pick from different conversations based on
-    // randomness, or certain conditions.
+    // For some NPCs, override the default conversation type based on
+    // pseudo-random factors like run stats, or other conditions.
+    switch (id) {
+        case ConversationId::BUBULB_P: {
+            int32_t num_cvs =
+                ConversationId::BUBULB_P_CVS_END -
+                ConversationId::BUBULB_P_CVS_START;
+            int32_t cv_id = state.GetOption(STAT_PERM_ENEMY_DAMAGE) % num_cvs;
+            g_ConversationId = ConversationId::BUBULB_P_CVS_START + cv_id;
+            SetSWByte(GSW_Hub_BubulbP_CurrentConversation, cv_id);
+            break;
+        }
+    }
 }
 
 bool DialogueManager::GetNextMessage(const char** msg, int32_t* speaker_type) {
@@ -60,8 +77,10 @@ bool DialogueManager::GetNextMessage(const char** msg, int32_t* speaker_type) {
         ++g_ConversationStep;
     }
 
-    static char lookup_buf[16];
-    sprintf(lookup_buf, "tot_di%4" PRId32 "%s", g_ConversationStep, party_str);
+    static char lookup_buf[24];
+    sprintf(lookup_buf,
+        "tot_di%06" PRId32 "_%02" PRId32 "%s",
+        g_ConversationId, g_ConversationStep, party_str);
 
     // Set the output variables.
     *msg = lookup_buf;

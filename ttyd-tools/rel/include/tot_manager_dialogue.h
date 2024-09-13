@@ -12,7 +12,9 @@ namespace ConversationId {
     enum e {
         INVALID = 0,
 
-        
+        BUBULB_P            = 1000,
+        BUBULB_P_CVS_START  = 1100,
+        BUBULB_P_CVS_END    = BUBULB_P_CVS_START + 10,  // TBD; can't exceed 30.
     };
 }
 

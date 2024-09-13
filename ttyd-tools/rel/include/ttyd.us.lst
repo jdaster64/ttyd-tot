@@ -706,6 +706,10 @@
 8006c7a0:evt_eff64
 8006d970:evt_eff
 
+// evt_paper.o
+8006e37c:evt_paper_delete
+8006e3c4:evt_paper_entry
+
 // mariost.o
 // .text
 // unused:gcResetDone
@@ -730,6 +734,23 @@
 8006ffb0:evtRunCaseEntry
 80070034:evt_run_case_evt_bero
 80070110:evt_run_case_evt
+
+// evt_img.h
+800701e8:N_evt_img_set_z
+80070264:evt_img_set_color
+80070338:evt_img_set_paper_timerate
+800703bc:evt_img_set_shadow
+80070434:evt_img_wait_animend
+800704ac:evt_img_release
+80070508:evt_img_clear_virtual_point
+80070550:evt_img_set_virtual_point
+8007064c:evt_img_onoff
+800706e8:evt_img_free_capture
+80070760:evt_img_alloc_capture
+80070a54:evt_img_set_paper_anim
+80070ae8:evt_img_set_paper
+80070b94:evt_img_set_position
+80070c34:evt_img_entry
 
 // seq_battle.o
 800736ec:battle_exit
@@ -3202,9 +3223,20 @@
 8020524c:BattleBreakSlotGetPtr
 
 // evt_window.o
+802099c4:mainwindow_opendisable
+802099e8:mainwindow_openenable
 80209a0c:evt_win_coin_wait
 80209aac:evt_win_coin_off
 80209b5c:evt_win_coin_on
+80209c44:coin_disp
+80209e40:evt_win_one_message
+80209fec:oneMessageDisp
+8020a098:evt_win_nameent_off
+8020a0bc:evt_win_nameent_name
+8020a108:evt_win_nameent_wait
+8020a13c:evt_win_nameent_on
+8020a190:evt_win_item_desttable
+8020a1cc:evt_win_item_maketable
 8020a2c4:evt_win_other_select
 8020a374:evt_win_item_select
 

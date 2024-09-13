@@ -6,6 +6,7 @@
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_manager_dialogue.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
@@ -18,12 +19,14 @@
 #include <ttyd/evt_door.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_hit.h>
+#include <ttyd/evt_img.h>
 #include <ttyd/evt_item.h>
 #include <ttyd/evt_map.h>
 #include <ttyd/evt_mario.h>
 #include <ttyd/evt_mobj.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
+#include <ttyd/evt_paper.h>
 #include <ttyd/evt_pouch.h>
 #include <ttyd/evt_seq.h>
 #include <ttyd/evt_shop.h>
@@ -53,12 +56,14 @@ using namespace ::ttyd::evt_cam;
 using namespace ::ttyd::evt_door;
 using namespace ::ttyd::evt_eff;
 using namespace ::ttyd::evt_hit;
+using namespace ::ttyd::evt_img;
 using namespace ::ttyd::evt_item;
 using namespace ::ttyd::evt_map;
 using namespace ::ttyd::evt_mario;
 using namespace ::ttyd::evt_mobj;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
+using namespace ::ttyd::evt_paper;
 using namespace ::ttyd::evt_pouch;
 using namespace ::ttyd::evt_seq;
 using namespace ::ttyd::evt_shop;
@@ -118,11 +123,24 @@ extern ShopItem shop_trade_list[6];
 extern ShopkeeperData shopkeeper_data;
 
 // Function declarations.
+EVT_DECLARE_USER_FUNC(evtTot_BubulbP_MarkConversation, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetCosmeticShopMsg, 3)
 EVT_DECLARE_USER_FUNC(evtTot_GetNumCosmeticsUnlockable, 2)
 EVT_DECLARE_USER_FUNC(evtTot_UnlockCosmetic, 2)
 EVT_DECLARE_USER_FUNC(evtTot_SelectShopItems, 0)
 EVT_DECLARE_USER_FUNC(evtTot_DeleteShopItems, 0)
+
+EVT_BEGIN(Npc_GenericMove)
+    USER_FUNC(evt_npc_get_position, PTR("me"), LW(0), LW(1), LW(2))
+    USER_FUNC(urouro_init_func, PTR("me"), LW(0), LW(2), FLOAT(100.0), FLOAT(30.0), 0)
+    USER_FUNC(urouro_main_func, PTR("me"))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Npc_GenericTalk)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, PTR("me"))
+    RETURN()
+EVT_END()
 
 // LW(15) = Cosmetic type (0 ~ 2).
 EVT_BEGIN(CosmeticShops_CommonTalkEvt)
@@ -336,15 +354,82 @@ EVT_BEGIN(CosmeticShops_InitEvt)
     RETURN()
 EVT_END()
 
-EVT_BEGIN(Npc_GenericMove)
-    USER_FUNC(evt_npc_get_position, PTR("me"), LW(0), LW(1), LW(2))
-    USER_FUNC(urouro_init_func, PTR("me"), LW(0), LW(2), FLOAT(100.0), FLOAT(30.0), 0)
-    USER_FUNC(urouro_main_func, PTR("me"))
+EVT_BEGIN(Npc_BubulbP_NameEntry)
+    USER_FUNC(evt_paper_entry, PTR("OFF_d_roll"))
+    USER_FUNC(evt_img_entry, PTR("img"))
+    USER_FUNC(evt_img_set_paper, PTR("img"), PTR("OFF_d_roll"))
+    USER_FUNC(evt_img_set_paper_anim, PTR("img"), PTR("Z_1"))
+    USER_FUNC(evt_img_alloc_capture, PTR("img"), 0, 0, 1, 0, 0, 608, 480)
+    USER_FUNC(evt_img_clear_virtual_point, PTR("img"))
+    USER_FUNC(evt_img_onoff, PTR("img"), 1)
+    WAIT_FRM(1)
+    USER_FUNC(evt_cam_letter_box_disable, 1)
+    USER_FUNC(evt_cam_letter_box_onoff, 0, 0)
+    USER_FUNC(evt_win_nameent_on, LW(0))
+    INLINE_EVT()
+        WAIT_MSEC(300)
+        USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_OFF4_NAME_ENTRY1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE()
+    USER_FUNC(evt_img_set_paper_anim, PTR("img"), PTR("A_2"))
+    USER_FUNC(evt_img_wait_animend, PTR("img"))
+    USER_FUNC(evt_win_nameent_wait)
+    USER_FUNC(evt_win_nameent_name, LW(0))
+    INLINE_EVT()
+        WAIT_MSEC(300)
+        USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_OFF4_NAME_ENTRY2"), LW(0), LW(1), LW(2), 0)
+    END_INLINE()
+    USER_FUNC(evt_img_set_paper_anim, PTR("img"), PTR("A_1"))
+    USER_FUNC(evt_img_wait_animend, PTR("img"))
+    USER_FUNC(evt_win_nameent_off)
+    USER_FUNC(evt_img_release, PTR("img"))
+    USER_FUNC(evt_paper_delete, PTR("OFF_d_roll"))
+    USER_FUNC(evt_cam_letter_box_disable, 0)
     RETURN()
 EVT_END()
 
-EVT_BEGIN(Npc_GenericTalk)
-    USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, PTR("me"))
+EVT_BEGIN(Npc_BubulbP_Talk)
+    IF_EQUAL((int32_t)GSWF_BubulbP_FirstTalk, 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_bubulb_firsttalk"), 0, PTR("me"))
+        SET((int32_t)GSWF_BubulbP_FirstTalk, 1)
+        GOTO(99)
+    END_IF()
+
+    IF_SMALL((int32_t)GSW_Tower_TutorialClears, 2)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_bubulb_firsttalk"), 0, PTR("me"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BUBULB_P)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+
+    // Check the current conversation as viewed, and see if seeding option
+    // should have just become unlocked.
+    USER_FUNC(evtTot_BubulbP_MarkConversation, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_bubulb_unlockseed"))
+        USER_FUNC(evt_msg_print, 0, PTR("tot_bubulb_seedtut"), 0, 0)
+    ELSE()
+        IF_EQUAL((int32_t)GSWF_BubulbP_SeedUnlocked, 1)
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_bubulb_setseed"))
+            USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_yesno"))
+            IF_EQUAL(LW(0), 1)
+                USER_FUNC(evt_msg_print_add, 0, PTR("tot_bubulb_goodbye"))
+                GOTO(99)
+            END_IF()
+
+            USER_FUNC(evt_msg_continue)
+            RUN_CHILD_EVT(Npc_BubulbP_NameEntry)
+            USER_FUNC(evt_msg_print_insert, 0, PTR("tot_bubulb_nameset"), 0, PTR("me"), LW(0))
+            GOTO(99)
+        ELSE()
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_bubulb_earlyend"))
+        END_IF()
+    END_IF()
+
+LBL(99)
     RETURN()
 EVT_END()
 
@@ -684,7 +769,7 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .name = g_NpcNokonokoF,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .talkEvtCode = (void*)Npc_GenericTalk,
+        .talkEvtCode = (void*)Npc_BubulbP_Talk,
     },
     {
         .name = g_NpcInnkeeper,
@@ -963,6 +1048,36 @@ const int32_t* GetWestSideInitEvt() {
 
 const int32_t* GetEastSideInitEvt() {
     return gon_11_InitEvt;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_BubulbP_MarkConversation) {
+    // How many distinct conversations the player needs to have encountered
+    // to unlock the "set seed" run option.
+    const int32_t kTargetNumFlags = 2;
+
+    int32_t num_cvs =
+        ConversationId::BUBULB_P_CVS_END - ConversationId::BUBULB_P_CVS_START;
+    int32_t prev_flags = 0;
+    for (int32_t i = 0; i < num_cvs; ++i) {
+        prev_flags += GetSWF(GSWF_BubulbPFlags + i);
+    }
+
+    // Set flag corresponding to current conversation.
+    int32_t cur_cv = GetSWByte(GSW_Hub_BubulbP_CurrentConversation);
+    SetSWF(GSWF_BubulbPFlags + cur_cv);
+
+    // Check if the number of conversations seen has newly hit the target num.
+    bool seed_just_unlocked = false;
+    int32_t cur_flags = 0;
+    for (int32_t i = 0; i < num_cvs; ++i) {
+        cur_flags += GetSWF(GSWF_BubulbPFlags + i);
+    }
+    if (cur_flags == kTargetNumFlags && prev_flags < cur_flags) {
+        SetSWF(GSWF_BubulbP_SeedUnlocked);
+        seed_just_unlocked = true;
+    }
+    evtSetValue(evt, evt->evtArguments[0], seed_just_unlocked);
+    return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_GetCosmeticShopMsg) {

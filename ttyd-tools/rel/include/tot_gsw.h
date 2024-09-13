@@ -18,6 +18,7 @@ enum GlobalWorkVars {
     GSW_Tower_TutorialClearAttempts,
     GSW_Tower_TutorialClears,
     GSW_Hub_WelcomeKoopaCutsceneState,
+    GSW_Hub_BubulbP_CurrentConversation,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),
@@ -35,6 +36,11 @@ enum GlobalWorkVars {
     GSWF_CosmeticShopTutorial,
     GSWF_RunOptionsTutorial,
     GSWF_RunSettingsCleared,
+    // Flags for unique Bub-ulber conversations seen.
+    GSWF_BubulbPFlags,
+    GSWF_BubulbPFlags_End                   = GSWF_BubulbPFlags + 30,
+    GSWF_BubulbP_FirstTalk                  = GSWF_BubulbPFlags_End,
+    GSWF_BubulbP_SeedUnlocked,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),
