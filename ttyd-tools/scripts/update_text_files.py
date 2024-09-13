@@ -2554,6 +2554,11 @@ g_GlobalStrings = {
         b"Thanks for playing this mod!\n"
         b"You've really earned this!",
         
+    # Misc.
+    
+    b"msg_nameent_3":
+        b"Choose a name for the seed!",
+        
     # Placeholder NPC dialogue (map-agnostic).
         
     b"tot_npc_generic":
