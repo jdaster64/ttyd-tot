@@ -1488,7 +1488,8 @@ void* GetMidbossAttackScript(void* original_script) {
     return (void*)MidbossEvt;
 }
 
-char g_TattleTextBuf[512];
+// Global buffer to hold the current enemy's Tattle string (in-battle or menu).
+char g_TattleTextBuf[2048];
 
 const char* GetCustomTattle() { return g_TattleTextBuf; }
 
@@ -1501,24 +1502,27 @@ const char* SetCustomTattle(
         return original_tattle_msg;
     }
     const EnemyTypeInfo& ei = kEnemyInfo[unit_type];
-    // Take the first paragraph from the original tattle 
-    // (ignore the first few characters in case there's a <p> there).
-    const char* original_tattle = ttyd::msgdrv::msgSearch(original_tattle_msg);
-    const char* p1_end_ptr = strstr(original_tattle + 4, "<p>");
-    int32_t p1_len =
-        p1_end_ptr ? p1_end_ptr - original_tattle : strlen(original_tattle);
-    strncpy(g_TattleTextBuf, original_tattle, p1_len);
+
+    // Buffer to hold base / current information.
+    char stats[256];
+    char* stats_ptr = stats;
+
+    bool is_major_boss_floor = g_Mod->state_.floor_ % 32 == 0;
     
-    // Append a paragraph with the enemy's base stats.
-    char* p2_ptr = g_TattleTextBuf + p1_len;
-    char atk_offset_buf[8];
-    sprintf(atk_offset_buf, " (%+" PRId16 ")", ei.atk_offset);
-    sprintf(p2_ptr,
-        "<p>Its base stats are:\n"
-        "Max HP: %" PRId16 ", ATK: %" PRId16 "%s,\n"
-        "DEF: %" PRId16 ", Level: %" PRId16 ".\n<k>",
-        ei.base_hp, ei.base_atk, ei.atk_offset ? atk_offset_buf : "",
-        ei.base_def, ei.level);
+    // Append a paragraph with the enemy's base stats
+    // (unless fighting one of the major bosses).
+    if (!is_major_boss_floor) {
+        char atk_offset_buf[8];
+        sprintf(atk_offset_buf, " (%+" PRId16 ")", ei.atk_offset);
+        stats_ptr += sprintf(stats_ptr,
+            "<p>\n"
+            "Its base stats are:\n"
+            "Max HP: %" PRId16 ", ATK: %" PRId16 "%s,\n"
+            "DEF: %" PRId16 ", Level: %" PRId16 ".\n"
+            "<k>\n",
+            ei.base_hp, ei.base_atk, ei.atk_offset ? atk_offset_buf : "",
+            ei.base_def, ei.level);
+    }
     
     // Append one more paragraph with the enemy's current stats
     // (using its standard attack's power as reference for ATK).
@@ -1526,12 +1530,19 @@ const char* SetCustomTattle(
     int32_t base_atk_power = ei.atk_offset + ei.atk_reference;
     if(GetEnemyStats(
         unit_type, &hp, &atk, &def, nullptr, nullptr, base_atk_power)) {
-        char* p3_ptr = g_TattleTextBuf + strlen(g_TattleTextBuf);
-        sprintf(p3_ptr,
-            "<p>Currently, its stats are:\n"
-            "Max HP: %" PRId32 ", ATK: %" PRId32 ", DEF: %" PRId32 ".\n<k>",
+        sprintf(stats_ptr,
+            "<p>\n"
+            "%s stats are:\n"
+            "Max HP: %" PRId32 ", ATK: %" PRId32 ", DEF: %" PRId32 ".\n"
+            "<k>\n",
+            is_major_boss_floor ? "Their" : "Currently, its",
             hp, atk, def);
     }
+
+    // Replace the %s
+    sprintf(
+        g_TattleTextBuf,
+        ttyd::msgdrv::msgSearch(original_tattle_msg), stats);
     
     // Return a key that looks up g_TattleTextBuf from custom_strings.
     return "custom_tattle_battle";

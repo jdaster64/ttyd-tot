@@ -2209,37 +2209,6 @@ g_GlobalStrings = {
     b"btl_un_sinnosuke":        b"H. Bob-omb",
     b"btl_un_hyper_sinnosuke":  b"Cosmic Boo",
     
-    # TODO: Shortened Tattles for all enemies - b"btl_hlp_monban", etc.
-    
-    b'btl_hlp_monban':
-        b"That's a Craw.\n"
-        b'<wait 250>\n'
-        b'These guards are pretty stoic,\n'
-        b'no-nonsense types.\n<k>\n<p>\n',
-    
-    b'btl_hlp_sinnosuke':
-        b"That's a Hyper Bob-omb.\n"
-        b'<wait 250>\n'
-        b'Massive destructive power<wait 250>, now\n'
-        b'in a trendy hot-pink package!\n<k>\n<p>\n',
-    
-    b'btl_hlp_hyper_sinnosuke':
-        b"That's a Cosmic Boo.\n"
-        b'<wait 250>\n'
-        b"A giant purple Boo spoken of only\n"
-        b"in legend, but I guess it's real!\n<k>\n<p>\n",
-    
-    b'btl_hlp_iron_sinemon':
-        b"That's an Iron Cleft.\n"
-        b'<wait 250>\n'
-        b'These guys are so tough,\n<wait 50>\n'
-        b'any hit only leaves a scratch!\n<k>\n<p>\n',
-    
-    # TODO: Menu Tattles for all enemies. - b"menu_enemy_001", etc.
-    
-    b'menu_enemy_400':
-        b"[Placeholder] Fuzzy Horde",
-    
     # Cosmetic names and descriptions.
     
     b'tot_cos0_06_g':     b'Animal FX',
@@ -2553,6 +2522,2433 @@ g_GlobalStrings = {
     b"tot_cos2_21_h":
         b"Thanks for playing this mod!\n"
         b"You've really earned this!",
+    
+    # Reworked in-battle Tattles for all enemies.
+    
+    b'btl_hlp_kuriboo':
+        b"That's a Goomba.\n"
+        b'<wait 250>\n'
+        b"Umm... <wait 100>Yeah, I'm one of those,\n"
+        b"in case you hadn't noticed.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Ahem... <wait 100>It says here: "Goombas\n'
+        b'are underlings of underlings."\n'
+        b'<dkey><wait 300></dkey>\n'
+        b'...That is totally rude!\n'
+        b'<k>\n'
+        b'%s',
+
+    b'btl_hlp_patakuri':
+        b"That's a Paragoomba.\n"
+        b'<wait 250>\n'
+        b'Basically a Goomba with\n'
+        b"wings.<wait 300> I'm jealous!\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"You can't hammer it while it's\n"
+        b'flying, but rough it up and\n'
+        b"it'll totally plummet!\n"
+        b'<k>',
+
+    b'btl_hlp_togekuri':
+        b"That's a Spiky Goomba.\n"
+        b'<wait 250>\n'
+        b'...A spiky-headed Goomba.\n'
+        b'<wait 250>\n'
+        b'What a creative name.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'The addition of the spike\n'
+        b"means you'll hurt your feet\n"
+        b'if you jump on it. <wait 100>Duh!\n'
+        b'<k>',
+
+    b'btl_hlp_hyper_kuriboo':
+        b"That's a Hyper Goomba.\n"
+        b'<wait 250>\n'
+        b"Which means...<wait 250> Umm...<wait 250> It's a\n"
+        b'hyperactive Goomba.<wait 250> Duh!\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'But if this nut goes <shake>BIZZ-ZOW\n'
+        b'</shake>\n'
+        b'and charges up, his next\n'
+        b'attack will be much stronger!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"So you'd better wipe it out\n"
+        b'between the time it charges\n'
+        b'up and the time it attacks!\n'
+        b'<k>',
+        
+    b'btl_hlp_hyper_patakuri':
+        b"That's a Hyper Paragoomba.\n"
+        b'<wait 250>\n'
+        b"It's basically just a Hyper\n"
+        b'Goomba with wings.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"After charging up, you'll be\n"
+        b'dealing with a much stronger\n'
+        b'attack next turn.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Once you damage it, it'll lose\n"
+        b'its wings and turn into a\n'
+        b'regular Hyper Goomba.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Not that THAT'S all that\n"
+        b'cool. <wait 250>Even normal Hyper\n'
+        b'Goombas are dangerous.\n'
+        b'<k>',
+
+    b'btl_hlp_hyper_togekuri':
+        b"That's a Hyper Spiky Goomba.\n"
+        b'<wait 250>\n'
+        b"It's a Hyper Goomba with a\n"
+        b'spike on its head.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'After charging up, its Attack\n'
+        b'power will more than double,\n'
+        b"<wait 200>on top of the spiky boost!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Beat it before it attacks,\n'
+        b"or you'll be in peril before\n"
+        b'you know it, seriously.\n'
+        b'<k>',
+
+    b'btl_hlp_yami_kuriboo':
+        b"That's a Gloomba.\n"
+        b'<wait 250>\n'
+        b'It likes dark, damp places.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It's stronger than a normal\n"
+        b'Goomba, so be careful.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"That's not a healthy color for\n"
+        b"a Goomba, but it doesn't\n"
+        b"mean it's sick or anything.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"So don't show any mercy!\n"
+        b'<k>',
+
+    b'btl_hlp_yami_patakuri':
+        b"That's a Paragloomba.\n"
+        b'<wait 250>\n'
+        b"It's a Gloomba with wings.\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It's like a stronger version\n"
+        b'of a Paragoomba.<wait 250> And maybe\n'
+        b"that's all there is to it.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'I wonder if living in here\n'
+        b'ever makes its wings moldy?\n'
+        b'<k>\n'
+        b'<p><dynamic 3>\n'
+        b'EEEEEEEEEEEEEEEEEYUCK!\n'
+        b'</dynamic><wait 250>\n'
+        b"It's too gross to even think\n"
+        b'about! <wait 250>Bleck!\n'
+        b'<k>',
+
+    b'btl_hlp_yami_togekuri':
+        b"That's a Spiky Gloomba.\n"
+        b'<wait 250>\n'
+        b"It's a Spiky Goomba that\n"
+        b'likes dark places.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"I'm sure you know this, but\n"
+        b'try not to jump on the spike.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"I wonder if I'd look like\n"
+        b'that if I stayed in here\n'
+        b'long enough?\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'<wait 300>\n'
+        b"...I'd rather not think about\n"
+        b'that.\n'
+        b'<k>',
+
+    b'btl_hlp_nokonoko':
+        b"That's a Koopa Troopa.\n"
+        b'<wait 250>\n'
+        b"They've been around forever!\n"
+        b'<wait 100>\n'
+        b'Gotta respect the longevity!\n'
+        b'<k>\n'
+        b"%s"
+        b'<p>\n'
+        b'Their shells are hard, but\n'
+        b'flip them over and their\n'
+        b'Defense drops to zero.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'And you know how to flip\n'
+        b'them over, right?<wait 250> Just jump\n'
+        b'on their heads!\n'
+        b'<k>',
+
+    b'btl_hlp_patapata':
+        b"That's a Koopa Paratroopa.\n"
+        b'<wait 250>\n'
+        b"Well, umm<wait 10>.<wait 10>.<wait 10>.<wait 300> It's basically\n"
+        b'a Koopa Troopa with wings.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'You can stomp on him, and\n'
+        b"he'll plunge down and become\n"
+        b'a plain Koopa Troopa.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Yeah, do that, and he's ours!\n"
+        b'<wait 250>\n'
+        b'Stomp again to flip him, and\n'
+        b'<wait 250>\n'
+        b'his arms and legs are useless!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"<dynamic 3>Oops!</dynamic><wait 100> Sorry, that's not true.\n"
+        b'<wait 300>\n'
+        b'It looks like he can still\n'
+        b'wiggle them around a bit...\n'
+        b'<k>',
+
+    b'btl_hlp_nokonoko_fighter':
+        b"That's a KP Koopa.\n"
+        b'<wait 250>\n'
+        b"It's a Koopa Troopa of a\n"
+        b'slightly different color.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Looks like its abilities are\n'
+        b'just like any Koopa...<wait 250> So he\n'
+        b'oughta be a piece of cake!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Don't go easy just because\n"
+        b'you know King K, Mario...\n'
+        b'<wait 250>\n'
+        b"That's what friends are for!\n"
+        b'<k>',
+
+    b'btl_hlp_patapata_fighter':
+        b"That's a KP Paratroopa.\n"
+        b'<wait 250>\n'
+        b"It's a Koopa Paratroopa of a\n"
+        b'different color.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Its attacks are the same as\n'
+        b'your average, garden-variety\n'
+        b'Koopa Paratroopa.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'So, just do the same thing as\n'
+        b'always: stomp on it, flip it,\n'
+        b'and drop its Defense to 0.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'My Headbonk is pretty\n'
+        b'effective against it, too.\n'
+        b'<wait 250>\n'
+        b"Come on!<wait 250> Let's get him!\n"
+        b'<k>',
+
+    b'btl_hlp_ura_noko':
+        b"That's a Shady Koopa.\n"
+        b'<wait 250>\n'
+        b"It's yet another member of\n"
+        b'the Koopa family tree.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'The difference between them\n'
+        b'and other Koopas?<wait 250> They can\n'
+        b'attack from their backs!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'And, when they flip back up,\n'
+        b'their Attack gets boosted\n'
+        b'and they go totally ape!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"...Wow!<wait 250> That's pretty tricky!\n"
+        b'<wait 250>\n'
+        b"No wonder they're called\n"
+        b'Shady Koopas, huh?\n'
+        b'<k>',
+
+    b'btl_hlp_ura_pata':
+        b"That's a Shady Paratroopa.\n"
+        b'<wait 250>\n'
+        b"It's a Shady Koopa with\n"
+        b'wings, obviously.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Unlike typical Koopas and\n'
+        b'Paratroopas, its Attack jumps\n'
+        b'when it flips up off its back.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'This also says it has a move\n'
+        b'that hits you and your ally\n'
+        b'at once. Is that <dynamic 3>possible?\n'
+        b'</dynamic>\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Uh...<wait 250> I guess the best thing\n'
+        b'to do is just beat it quickly\n'
+        b'after we flip it.\n'
+        b'<k>',
+
+
+
+    b'btl_hlp_yami_noko':
+        b"That's a Dark Koopa.\n"
+        b'<wait 250>\n'
+        b'It lives in dark places that\n'
+        b'the light never reaches.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It's a bit tougher than a\n"
+        b"regular Koopa, so you won't\n"
+        b'be able to beat it easily.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'But, it DOES have the same\n'
+        b'weakness as a regular Koopa.\n'
+        b'<wait 250>\n'
+        b"Flip it over and it's helpless.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Why do you think it needs\n'
+        b'sunglasses up here,\n'
+        b"anyway? <wait 250>What's the point?\n"
+        b'<k>',
+
+    b'btl_hlp_yami_pata':
+        b'This is a Dark Paratroopa.\n'
+        b'<wait 250>\n'
+        b'It lives in dark, damp places.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It's strong, but otherwise\n"
+        b'just like other Paratroopas.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"It's airborne, so try to\n"
+        b'ground it first.\n'
+        b'<k>',
+
+    b'btl_hlp_togenoko':
+        b"That's a Koopatrol.\n"
+        b'<wait 250>\n'
+        b'A Koopa Troopa who protects\n'
+        b'himself with spiked armor.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It attacks with its shell and\n'
+        b'with its head, then sometimes\n'
+        b'charges up for a fierce move.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Plus, if you take too long to\n'
+        b"win, it'll call reinforcements.\n"
+        b'<wait 250>\n'
+        b'Yeah, sorta gnarly, huh?\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"It's one of the worst of\n"
+        b"Bowser's guys.<wait 250> Koopa Troopas\n"
+        b'dream of being Koopatrols.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'...Hey, and by the way, what\n'
+        b"do you think Bowser's doing\n"
+        b'now, anyway? <wait 250>Eating?\n'
+        b'<k>',
+
+    b'btl_hlp_togenoko_ace':
+        b"That's a Dark Koopatrol.\n"
+        b'<wait 250>\n'
+        b'These guys just totally ooze\n'
+        b"toughness, don'tcha think?\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'After it charges up power,\n'
+        b'its next attack will be\n'
+        b'devastating. Try to survive it.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"It's almost like those red\n"
+        b'eyes are there to warn you\n'
+        b'just how tough it is...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Or maybe it just doesn't get\n"
+        b'much sleep...\n'
+        b'<k>',
+
+    b'btl_hlp_honenoko':
+        b"That's a Dull Bones.\n"
+        b'<wait 250>\n'
+        b'Sort of a skeleton thing.\n'
+        b'<wait 250>\n'
+        b'It was a Koopa Troopa...once.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'These creeps throw bones to\n'
+        b'attack.<wait 250> Oh, and they build\n'
+        b'reinforcements, too!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Their HP is pretty low, so\n'
+        b'spread attacks are effective\n'
+        b'at clearing them out.\n'
+        b'<k>',
+
+    b'btl_hlp_red_honenoko':
+        b"That's a Red Bones!\n"
+        b'<wait 250>\n'
+        b'A little TOO red, I think.<wait 250> \n'
+        b"No fashion sense, y'know?\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Unlike your average Dull\n'
+        b'Bones, even if you pound it\n'
+        b'to 0 HP and it crumbles...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'It totally might revive!\n'
+        b'<wait 100>\n'
+        b'Like a zombie!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Oh, and one more thing!<wait 250> Once\n'
+        b'its friends start to fall, it\n'
+        b'may create some more!\n'
+        b'<k>',
+
+    b'btl_hlp_karon':
+        b"That's a Dry Bones.\n"
+        b'<wait 250>\n'
+        b"It's a former Koopa whose\n"
+        b'spirit animates its bones.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'<shake>\n'
+        b"Eeeeeek! <wait 100>That's so freaky!\n"
+        b'</shake>\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'When its HP goes down to 0,\n'
+        b'it collapses into a pile, but\n'
+        b"it'll eventually rise again.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Fire and explosions will put\n'
+        b'a permanent end to it\n'
+        b'getting back up, though.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'A Dry Bones will sometimes\n'
+        b'build friends if it feels\n'
+        b"it's outnumbered.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"If you don't take them all\n"
+        b"out close together, they'll\n"
+        b'just keep coming back.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Let's wipe them out all at\n"
+        b'once, and quick!<wait 250> These things\n'
+        b'totally freak me out!\n'
+        b'<k>',
+
+    b'btl_hlp_black_karon':
+        b"That's a Dark Bones.\n"
+        b'<wait 250>\n'
+        b"It's the baddest of the\n"
+        b'Bones gang.\n'
+        b'</shake>\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'When its HP goes down to 0,\n'
+        b'it collapses into a pile, but\n'
+        b"it'll eventually rise again.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Fire and explosions will put\n'
+        b'a permanent end to it\n'
+        b'getting back up, though.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Its HP is high, so it's hard\n"
+        b'to take it down.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Like any other Bones, it\n'
+        b'sometimes builds friends if\n'
+        b'it feels outnumbered.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"It's a pretty tough enemy.\n"
+        b'<wait 250>\n'
+        b'You better take it and its\n'
+        b'buddies out all at once.\n'
+        b'<k>',
+
+    b'btl_hlp_hammer_bros':
+        b"That's a Hammer Bro.\n"
+        b'<wait 250>\n'
+        b'You know him.<wait 250> He throws\n'
+        b'hammers.<wait 250> Hence the name.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'When his HP drops and he\n'
+        b"thinks he's in trouble, he'll\n"
+        b'toss a hammer barrage.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Nothing about these guys has\n'
+        b"changed: they're tough as\n"
+        b'ever, so brace yourself!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Dang! <wait 250>This book always skips\n'
+        b'the important stuff!<wait 250> How do\n'
+        b'they carry endless hammers!\n'
+        b'<k>',
+
+    b'btl_hlp_boomerang_bros':
+        b"That's a Boomerang Bro.\n"
+        b'<wait 250>\n'
+        b'This relative of the Hammer\n'
+        b'Bros. prefers boomerangs.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'He attacks twice with his\n'
+        b'boomerangs: <wait 250>on the way out\n'
+        b'AND on the way back.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'When his HP starts getting\n'
+        b'low, he fights all the harder.\n'
+        b'<wait 250>\n'
+        b'Prepare for multiple attacks!\n'
+        b'<k>',
+
+    b'btl_hlp_fire_bros':
+        b"That's a Fire Bro.\n"
+        b'<wait 250>\n'
+        b'This relative of the Hammer\n'
+        b'Bros. spits out fire.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'If you get hit by a fireball,\n'
+        b'you might catch on fire, so\n'
+        b'guard well, OK?\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'When his HP gets low, he gets\n'
+        b'desperate and totally starts\n'
+        b'attacking like a fiend.\n'
+        b'<k>',
+
+    b'btl_hlp_jyugem':
+        b"That's a Lakitu.\n"
+        b'<wait 250>\n'
+        b"It's a member of the Koopa\n"
+        b'clan that rides on clouds.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"If you stomp on it when it's\n"
+        b"holding up a Spiny Egg, you'll\n"
+        b"take damage, so DON'T do it!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Spiny Eggs can hatch into\n'
+        b'Spinies, so beat the Lakitu\n'
+        b'before fighting the Spinies.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Aw, this book doesn't answer\n"
+        b'my real question:<wait 250> where does\n'
+        b'it keep all those Spiny Eggs?\n'
+        b'<k>',
+
+    b'btl_hlp_togezo':
+        b"That's a Spiny.\n"
+        b'<wait 250>\n'
+        b'Basically a spike-covered\n'
+        b'Koopa. <wait 250>Ugh! <wait 250>Looks <wait 100><shake>painful</shake>!\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'These things have such high\n'
+        b"Defense that you can't even\n"
+        b'hurt them when they roll up.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'So, when they go back to\n'
+        b'normal, do all the damage\n'
+        b'you can, and do it quickly!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If you flip them over, their\n'
+        b"Defense drops to 0. <wait 250>THAT'S\n"
+        b'the time to take them out.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Jumping on them is just plain\n'
+        b'stupid, but a Special Move\n'
+        b'or my Ironbonk should work.\n'
+        b'<k>',
+
+    b'btl_hlp_hyper_jyugem':
+        b"That's a Dark Lakitu.\n"
+        b'<wait 250>\n'
+        b'It rides a rain cloud.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It attacks by throwing<wait 75>.<wait 75>.<wait 75>.\n"
+        b"<wait 150><dynamic 3>pipes</dynamic> at you? <wait 250>That doesn't\n"
+        b"seem right...\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"If you jump on it when it's\n"
+        b"holding up a Spiny Egg, you'll\n"
+        b'get hurt.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'And sometimes the eggs it\n'
+        b'throws turn into Sky-Blue\n'
+        b'Spinies. <wait 250>Whoa!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If you only attack the\n'
+        b"Spinies, you'll never win,\n"
+        b'so go after the Dark Lakitu!\n'
+        b'<k>',
+
+    b'btl_hlp_hyper_togezo':
+        b"That's a Sky-Blue Spiny.\n"
+        b'<wait 250>\n'
+        b'It appeared from an egg\n'
+        b'thrown by the Dark Lakitu.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Sometimes it balls up to\n'
+        b'defend or stores energy for\n'
+        b'an attack.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If you can, beat it and any\n'
+        b'buddies it may have with a\n'
+        b'special attack.\n'
+        b'<k>',
+
+    b'btl_hlp_met':
+        b"That's a Buzzy Beetle.\n"
+        b'<wait 250>\n'
+        b"Awww...<wait 100> It's kinda cute!\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It's got pretty good Defense...\n"
+        b'<wait 250>\n'
+        b"and fire and explosions don't\n"
+        b'hurt it whatsoever.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'But, if you jump on it, you\n'
+        b'can flip it over and drop\n'
+        b'its Defense down to 0.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Then it's at our mercy!<wait 250> Ha!\n"
+        b'<wait 250>\n'
+        b"Don't hesitate!<wait 250> Jump!<wait 250> Jump!\n"
+        b'Jump jump jump!\n'
+        b'<k>',
+
+    b'btl_hlp_togemet':
+        b"That's a Spike Top.\n"
+        b'<wait 250>\n'
+        b"It's a Buzzy Beetle with a\n"
+        b'spike on its back.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Like other Buzzies, fire and\n'
+        b'explosions have absolutely no\n'
+        b'effect on it.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'But, you can flip it over to\n'
+        b'drop its Defense to 0!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"I'm sure you know this\n"
+        b'already, but try not to jump\n'
+        b'on it. <wait 250>That spike hurts.\n'
+        b'<k>',
+
+    b'btl_hlp_patamet':
+        b"That's a Parabuzzy.\n"
+        b'<wait 250>\n'
+        b'A Buzzy Beetle with wings.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Fire and explosions seem to\n'
+        b"have no effect, so don't\n"
+        b'bother, OK?\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If you flip it over, its\n'
+        b'Defense goes down to 0, so\n'
+        b'jump on it first.\n'
+        b'<k>',
+
+    b'btl_hlp_patatogemet':
+        b"That's a Spiky Parabuzzy.\n"
+        b'<wait 250>\n'
+        b"It's a Buzzy with a spike\n"
+        b'and wings.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"Fire and explosions don't\n"
+        b'work on Buzzies, in case\n'
+        b"you've forgotten.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'...And this one flies in the air\n'
+        b'AND has a spike.<wait 250> What a\n'
+        b'total pain.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"So... you'd better use an\n"
+        b'item, Special Move, or I could\n'
+        b'hit it with my Ironbonk!\n'
+        b'<k>',
+
+    b'btl_hlp_kamec':
+        b"That's a Magikoopa.\n"
+        b'<wait 250>\n'
+        b"Y'know, a Koopa wizard.\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It'll throw a load of pain our\n"
+        b'way while using magic to help\n'
+        b'its buddies.<wait 250> What a creep.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"And when there's only one of\n"
+        b'them, it splits up into multiple\n'
+        b'copies to mess with us.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Stop this thing fast or we'll\n"
+        b'be in a world of hurt!\n'
+        b'<k>',
+
+    b'btl_hlp_kamec_bunshin':
+        b"That's a Magikoopa Copy.\n"
+        b'<wait 250>\n'
+        b"Yeah, attacking it won't do\n"
+        b'any good whatsoever.\n'
+        b'<k>',
+
+    b'btl_hlp_kamec_red':
+        b"That's a Red Magikoopa.\n"
+        b'<wait 250>\n'
+        b"It's a Koopa wizard dressed\n"
+        b'in red.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Besides using offensive magic,\n'
+        b'it can also use magic to\n'
+        b'boost Attack and Defense.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'It also has slightly stronger\n'
+        b'Attack power than other\n'
+        b'types of Magikoopa.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"When it's alone, this wizard\n"
+        b'will use magic to multiply.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"The fact that you can't tell\n"
+        b'which is the real one after it\n'
+        b'multiplies is super-annoying.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'I have to say, though, that\n'
+        b'shade of red is definitely\n'
+        b'NOT its color.\n'
+        b'<k>',
+
+    b'btl_hlp_kamec_red_bunshin':
+        b"That's a Red Magikoopa Copy.\n"
+        b'<wait 250>\n'
+        b"There's no point in attacking\n"
+        b"it, since you can't hurt it.\n"
+        b'<k>',
+
+    b'btl_hlp_kamec_white':
+        b"That's a White Magikoopa.\n"
+        b'<wait 250>\n'
+        b"It's a Koopa wizard dressed\n"
+        b'in white.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It attacks with magic and\n'
+        b"can replenish its allies' HP.\n"
+        b'<wait 250>\n'
+        b'Better hit it first, huh?\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"It's also got a bit more HP than\n"
+        b'other types of Magikoopa,\n'
+        b'though. <wait 200>Ugh, how annoying!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Oh, this also says it'll use\n"
+        b'magic to make copies of itself\n'
+        b"when it's all alone.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"...Which is totally lame, 'cause\n"
+        b"then you can't tell the real\n"
+        b'deal from the copy!\n'
+        b'<k>',
+
+    b'btl_hlp_kamec_white_bunshin':
+        b"That's a White Magikoopa\n"
+        b'Copy.<wait 250> No point in attacking\n'
+        b"it, since you can't hurt it.\n"
+        b'<k>',
+
+    b'btl_hlp_kamec_green':
+        b"That's a Green Magikoopa.\n"
+        b'<wait 250>\n'
+        b"It's a Koopa wizard dressed\n"
+        b'in green.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It has magic attacks and can\n'
+        b'also magically electrify allies\n'
+        b'and make them invisible.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'It also has a bit of\n'
+        b'Defense power, unlike other\n'
+        b'types of Magikoopa.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Oh, this also says it'll use\n"
+        b'magic to make copies of itself\n'
+        b"when it's all alone.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"...Which is totally lame, 'cause\n"
+        b"then you can't tell the real\n"
+        b'deal from the copy!\n'
+        b'<k>',
+
+    b'btl_hlp_kamec_green_bunshin':
+        b"That's a Green Magikoopa\n"
+        b'Copy.<wait 250> No point in attacking\n'
+        b"it, since you can't hurt it.\n"
+        b'<k>',
+    
+    b'btl_hlp_monban':
+        b"That's a Craw.\n"
+        b'<wait 250>\n'
+        b'These guards are pretty\n'
+        b'stoic, no-nonsense types.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"You don't wanna jump on the\n"
+        b"spear it's got pointing up.\n"
+        b'<wait 250>\n'
+        b"'Cause that...<wait 250>would hurt.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'For a run-of-the-mill spear-\n'
+        b"tosser, he sure looks like he's\n"
+        b'got a POINT to make!<wait 250> Ha ha!\n'
+        b'<k>',
+
+    b'btl_hlp_dark_keeper':
+        b"That's a Dark Craw.\n"
+        b'<wait 250>\n'
+        b'Yikes.<wait 250> What a ghastly-looking\n'
+        b'spear-thrower.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'These guys have the usual\n'
+        b'attacks, throwing spears\n'
+        b'and charging into us...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'He can also charge through\n'
+        b'and hit us both! <wait 200>Watch for\n'
+        b'a jump before he attacks!\n'
+        b'<k>',
+
+    b'btl_hlp_borodo':
+        b"That's a Bandit.\n"
+        b'<wait 250>\n'
+        b'This scumbag tries to bump\n'
+        b'you and grab coins. <wait 250>Jerk!\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'If you time your guard well\n'
+        b"when he attacks, he won't be\n"
+        b'able to steal anything.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Plus, the look on a Bandit's\n"
+        b'face when you guard\n'
+        b'successfully is priceless.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If a Bandit steals coins from\n'
+        b'you, defeat him before he\n'
+        b'flees to get your coins back.\n'
+        b'<k>',
+
+    b'btl_hlp_borodo_king':
+        b"That's a Big Bandit.\n"
+        b'<wait 250>\n'
+        b'Basically, a boss among\n'
+        b'ordinary Bandits.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"Unlike other Bandits, he'll\n"
+        b'steal your items as well as\n'
+        b'your coins. <wait 250>Totally weak!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If you guard well when he\n'
+        b"charges at you, he'll blow by\n"
+        b'without stealing anything.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"If he robs you, you won't get\n"
+        b'your item back unless you\n'
+        b"beat him right then. <wait 250>He'll run!\n"
+        b'<k>',
+
+    b'btl_hlp_badge_borodo':
+        b"That's a Badge Bandit.\n"
+        b'<wait 250>\n'
+        b"He's a Bandit who'll go after\n"
+        b'your badges. <wait 250>That jerk!\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'He sometimes steals a badge\n'
+        b'when he tackles you, so use\n'
+        b'your Guard carefully.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Be sure to beat him quick\n'
+        b'if you get robbed. <wait 250>If he runs,\n'
+        b"that badge's gone for good!\n"
+        b'<k>',
+
+    b'btl_hlp_hinnya':
+        b"That's a Spinia.\n"
+        b'<wait 250>\n'
+        b'A totally weird creature\n'
+        b'made of thin, papery boards.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'It certainly looks unique.\n'
+        b'<wait 250>\n'
+        b'Nobody knows much about\n'
+        b'these creatures, actually.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Its attacks are super-swift,\n'
+        b'but it should be pretty easy.\n'
+        b'<wait 250>\n'
+        b'Just give it a "Hee-YAAA!"\n'
+        b'<k>',
+
+    b'btl_hlp_hannya':
+        b"That's a Spania.\n"
+        b'<wait 250>\n'
+        b'A Spinia with spikes on its\n'
+        b'head.<wait 250> It looks meaner, too.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'You oughta watch out for\n'
+        b'the spikes on its head, but\n'
+        b'otherwise, just whale on it.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'I gotta be honest, though,\n'
+        b'the way that thing spins\n'
+        b'makes me wanna yack.\n'
+        b'<k>',
+
+    b'btl_hlp_hennya':
+        b"That's a Spunia.\n"
+        b'<wait 250>\n'
+        b'Its body is made up of\n'
+        b'springy discs.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It may not look like much,\n'
+        b"but it's pretty tough.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"It won't come at you with\n"
+        b'anything too weird, so just\n'
+        b'hang in there, OK?\n'
+        b'<k>',
+        
+    b'btl_hlp_chorobon':
+        b"That's a Fuzzy.\n"
+        b'<wait 250>\n'
+        b'What a hyper little guy, huh?\n'
+        b'<wait 250>\n'
+        b'Cut back on the caffeine!\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Those things suck up your HP\n'
+        b'and use it to replenish their\n'
+        b"own!<wait 250> Isn't that the worst?\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"I mean, EW! <wait 250>Doesn't that just\n"
+        b'sound totally gross?\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Anyway, guard against them\n'
+        b'by pressing <icon ANM_PAD_A 0.7 -18 28 0> the\n'
+        b'MOMENT they release you.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'The timing is pretty hard to\n'
+        b'master, so, uh, practice up!\n'
+        b'<wait 250>\n'
+        b'These things really suck...HP.\n'
+        b'<k>',
+
+    b'btl_hlp_green_chorobon':
+        b"That's a Green Fuzzy.\n"
+        b'<wait 250>\n'
+        b"As you can see, it's a Fuzzy,\n"
+        b"and it's green. <wait 250>Duh!\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'This is similar to a normal\n'
+        b'Fuzzy, so it replenishes its\n'
+        b'own HP as it sucks out ours.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'<shake>\n'
+        b'EWWWWWWWWWWWWWWWW...\n'
+        b'</shake><wait 250>\n'
+        b'That is just the grossest\n'
+        b'thing ever.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"...If you don't find that idea\n"
+        b"gross, seriously, there's\n"
+        b'something wrong with you.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'The main difference between\n'
+        b'this and other Fuzzies is\n'
+        b'that this one multiplies.\n'
+        b'<k>',
+
+    b'btl_hlp_flower_chorobon':
+        b"That's a Flower Fuzzy.\n"
+        b'<wait 250>\n'
+        b'Wow, what a totally pretty\n'
+        b"Fuzzy, don'tcha think?\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'This thing attacks by boinging\n'
+        b'in and sucking out FP.\n'
+        b'<wait 250>\n'
+        b'How uncool!<wait 250> We need FP!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Once it charges up its own\n'
+        b'FP, it uses magical attacks.\n'
+        b'<wait 250>\n'
+        b'Better beat it before it does.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'<dynamic 3>Oh!</dynamic> <wait 100>I just got it!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"It's a Flower Fuzzy because it\n"
+        b'sucks your FP (Flower Points)!\n'
+        b'<wait 250>\n'
+        b'Duuuuuuh!<wait 250> Hee hee!\n'
+        b'<k>',
+
+    b'btl_hlp_sambo':
+        b"That's a Pokey.\n"
+        b'<wait 250>\n'
+        b"It's a cactus ghoul that's got\n"
+        b'nasty spines all over its body.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Look at those spines... <wait 250>Those\n'
+        b'would TOTALLY hurt.<wait 250> If you\n'
+        b"stomp on it, you'll regret it.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Pokeys attack by lobbing\n'
+        b'parts of their bodies and by\n'
+        b'charging at you...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'They can even call friends in\n'
+        b'for help, so be quick about\n'
+        b'taking them out.\n'
+        b'<k>',
+
+    b'btl_hlp_sambo_mummy':
+        b"That's a Poison Pokey.\n"
+        b'<wait 250>\n'
+        b"As you probably guessed, it's\n"
+        b'a poisonous Pokey.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'If you get poisoned, your HP\n'
+        b'will drain faster and faster,\n'
+        b"so you'll want to heal ASAP!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"I'm sure you can see this, but\n"
+        b'they have spines all over,\n'
+        b"so DON'T touch them.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'They may be smiling, but that\n'
+        b"doesn't mean they're happy\n"
+        b'to see you!\n'
+        b'<k>',
+
+    b'btl_hlp_monochrome_pakkun':
+        b"That's a Pale Piranha.\n"
+        b'<wait 250>\n'
+        b'You know about these guys.\n'
+        b'<wait 250>\n'
+        b'The famous Piranha Plants.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'This colorless subspecies\n'
+        b'is adapted to Boggly Woods.\n'
+        b'<wait 300>Seems to thrive here, though!\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'If you try to jump on them,\n'
+        b"they'll totally chomp on you.\n"
+        b'<k>',
+
+    b'btl_hlp_poison_pakkun':
+        b"That's a Putrid Piranha.\n"
+        b'<wait 250>\n'
+        b"It's a poisonous Piranha Plant.\n"
+        b'<wait 300>\n'
+        b'That color is totally sickly...\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It bites, AND it attacks with\n'
+        b'super-rank poison breath.\n'
+        b'<wait 250>Breath mint, table four!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If you get poisoned, your HP\n'
+        b'will drain faster over time,\n'
+        b"so, <wait 100>y'know, <wait 150>try not to.\n"
+        b'<k>',
+
+    b'btl_hlp_ice_pakkun':
+        b"That's a Frost Piranha.\n"
+        b'<wait 250>\n'
+        b"It's a cool customer with\n"
+        b'strong ice powers.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Its biting attack sometimes\n'
+        b'freezes us, so try to\n'
+        b'immobilize it first.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"It also has a frosty breath\n"
+        b"attack that can freeze us\n"
+        b"both at once! <wait 250>\n"
+        b"<shake>\n"
+        b"Brrrrrrrr....\n"
+        b"</shake>\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"It's weak against fire attacks,\n"
+        b'too, so use them if you can!\n'
+        b'<k>',
+
+    b'btl_hlp_pakkun_flower':
+        b"That's a Piranha Plant.\n"
+        b'<wait 250>\n'
+        b'In fact, I think this is the\n'
+        b'strongest type of them all.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It may look like a normal\n'
+        b"Piranha Plant, but don't be\n"
+        b"fooled! <wait 250>It's super-tough!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"These guys must have some\n"
+        b"Venus Fire Trap DNA, <wait 200>'cause\n"
+        b"they can spit fire as well!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'If we get beaten by a flower,\n'
+        b"we'll never hear the end of\n"
+        b'it, know what I mean?\n'
+        b'<k>',
+
+    b'btl_hlp_pansy':
+        b"That's a Crazee Dayzee.\n"
+        b'<wait 250>\n'
+        b'It may look totally cute,\n'
+        b"but it's a serious foe.\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'What you gotta worry about\n'
+        b'is its lullaby.<wait 250> That tune will\n'
+        b'totally zonk you out.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If you manage to guard well,\n'
+        b'though, you might not pass\n'
+        b'out.<wait 250> Try to learn the timing.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Oh, and when its HP runs low,\n'
+        b'it runs away, so try to KO\n'
+        b'it in one fell swoop.\n'
+        b'<k>',
+
+    b'btl_hlp_twinkling_pansy':
+        b"That's an Amazy Dayzee.\n"
+        b'<wait 250>\n'
+        b'This mystical Dayzee is like,\n'
+        b'the rarest thing ever.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Since it has such high HP\n'
+        b'and runs away really quickly,\n'
+        b"it's almost impossible to beat.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Plus, its lullaby has massive\n'
+        b"Attack power, so if we're low\n"
+        b'on HP, we need to scram.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'You gotta think hard about\n'
+        b'whether to fight or bolt.\n'
+        b'<k>',
+
+    b'btl_hlp_piders':
+        b"That's a Pider.\n"
+        b'<wait 250><dynamic 3>\n'
+        b'ICK!</dynamic><wait 250> They gross me out.\n'
+        b'<k>\n'
+        b'%s\n'
+        b'<p>\n'
+        b'Besides its normal attacks,\n'
+        b'it might spit three web-wads\n'
+        b'at you consecutively.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"You'd better have good\n"
+        b'timing if you wanna guard\n'
+        b'against its attacks.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'It also says here that the\n'
+        b"Punies can't stand Piders.\n"
+        b'<wait 250>\n'
+        b"So I'm not the only one!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Just the sight of these things\n'
+        b'makes Punies flee in terror.\n'
+        b'<wait 250>\n'
+        b'I know how they feel!\n'
+        b'<k>',
+
+    b'btl_hlp_churantalar':
+        b"That's an Arantula.\n"
+        b'<wait 250>\n'
+        b"It's a spiderlike creature\n"
+        b'that thrives in hostile places.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It'll spit web-wads at you.\n"
+        b'<wait 300>\n'
+        b'Sometimes it even attacks\n'
+        b'several times in a row.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'That coloring freaks me out.\n'
+        b'<wait 250>\n'
+        b"...I'm kinda scared of spiders.\n"
+        b'<wait 250>\n'
+        b"So let's do this quickly!!\n"
+        b'<k>',
+
+    b'btl_hlp_basabasa':
+        b"That's a Swooper.\n"
+        b'<wait 250>\n'
+        b"I bet they call it that 'cause\n"
+        b'of the way it swoops around.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'<wait 250><dynamic 3>\n'
+        b"Wow!<wait 250> That's some AWESOME\n"
+        b'naming work. <wait 250>Seriously!\n'
+        b'</dynamic><wait 250>\n'
+        b"It's <dynamic 3><wait 100>pure naming genius!!!\n"
+        b'</dynamic>\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'So,<wait 100> anyway...\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"Ground-level attacks can't\n"
+        b'reach it up there, so whale\n'
+        b'on it with Jumps and such!\n'
+        b'<k>',
+
+    b'btl_hlp_basabasa_chururu':
+        b"That's a Swoopula.\n"
+        b'<wait 250>\n'
+        b'An airborne, bloodsucking,\n'
+        b'batlike thing.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"As if losing HP wasn't bad\n"
+        b'enough, this little creep adds\n'
+        b'yours to its own!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'How totally, totally gross!\n'
+        b'<wait 250>\n'
+        b"Don't let it bite me, Mario!\n"
+        b'<k>',
+
+    b'btl_hlp_basabasa_green':
+        b"That's a Swampire.\n"
+        b'<wait 250>\n'
+        b"It's a feared health-sucker\n"
+        b'that hides in the darkness.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It sucks health from its prey\n'
+        b'to add to its own HP.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'And that...<wait 100>totally grosses me\n'
+        b"out like you wouldn't believe.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'If you let it feast on you,\n'
+        b'its HP will get really high.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Focus your attacks on it!\n'
+        b'<k>',
+
+    b'btl_hlp_monochrome_kurokumorn':
+        b"That's a Dark Puff.\n"
+        b'<wait 250>\n'
+        b"It's basically a tiny, mean\n"
+        b'thunderhead.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"Sometimes it'll charge itself\n"
+        b"with electricity. <wait 250>Don't touch\n"
+        b'it when it does! <wait 250>Yowch!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'You know what I mean, right?\n'
+        b'<shake>Brzzzzzzzzzzzzzzzzzzzzzzzzt!\n'
+        b'</shake>\n'
+        b'<wait 250>\n'
+        b'Shocking!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"After it charges itself, it'll\n"
+        b'totally zap you with lightning.\n'
+        b'<wait 250>\n'
+        b'Beat it as fast as you can.\n'
+        b'<k>',
+
+    b'btl_hlp_kurokumorn':
+        b'This is a Ruff Puff.\n'
+        b'<wait 250>\n'
+        b"Don't confuse them with\n"
+        b'Dark Puffs...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Although I don't think the\n"
+        b'world would end if you DID\n'
+        b'confuse them, but anyway...\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'They swoop at you or charge\n'
+        b'themselves with electricity\n'
+        b'before unleashing lightning.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Oh, and if you touch them\n'
+        b"while they're charged, you'll\n"
+        b'get a shock!\n'
+        b'<k>',
+
+    b'btl_hlp_bllizard':
+        b"That's an Ice Puff.\n"
+        b'<wait 250>\n'
+        b"It's a mean snow cloud that\n"
+        b'appears in cold areas.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It swoops down and uses cold\n'
+        b'breath to attack. <wait 250>Trust me,\n'
+        b"it's NOT refreshing.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'That cold breath can freeze\n'
+        b'us, so try to avoid it.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Also, if we touch it when it's\n"
+        b"storing cold energy, we'll get\n"
+        b"hurt. <wait 250>Isn't that super-weak?\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"They're vulnerable to fire,\n"
+        b"so let's try that, maybe.\n"
+        b'<k>',
+
+    b'btl_hlp_dokugassun':
+        b"That's a Poison Puff.\n"
+        b'<wait 250>\n'
+        b'Basically just a puff of\n'
+        b'poisonous air.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'These things charge you, but\n'
+        b'they also save up toxins and\n'
+        b'poison you with them. <wait 250>Scum!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Plus, you can't touch them\n"
+        b"when they're saving up toxins\n"
+        b"or you'll get hurt. <wait 250>Lame!\n"
+        b'<k>',
+
+    b'btl_hlp_teresa':
+        b"That's a Boo.\n"
+        b'<wait 250>\n'
+        b"It's everyone's favorite ghost.\n"
+        b'<wait 250>\n'
+        b'...Well, most everyone...\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It's nothing to write home\n"
+        b'about on the Attack side,\n'
+        b'but it can turn invisible.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If it turns invisible, we\n'
+        b"won't be able to hit it, so\n"
+        b'beat it while you can see it.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Boos are kinda cute, but I\n'
+        b"sure wouldn't want to meet\n"
+        b'one in a dark alley.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If I ran into one in the\n'
+        b'bathroom in the middle of\n'
+        b"the night, I'd...\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Well, never you mind what\n'
+        b"I'd do.\n"
+        b'<k>',
+        
+    b'btl_hlp_purple_teresa':
+        b"That's a Dark Boo.\n"
+        b'<wait 250>\n'
+        b'Purple just looks...<wait 250>so wrong.\n'
+        b'<wait 250>\n'
+        b'These Boos are SO creepy.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Its HP and Attack are high,\n'
+        b"but they're just like ordinary\n"
+        b'Boos otherwise.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'So, just attack it like a\n'
+        b'normal Boo.<wait 250> Get it before\n'
+        b'it turns invisible!\n'
+        b'<k>',
+
+    b'btl_hlp_bubble':
+        b"That's a Lava Bubble.\n"
+        b'<wait 250>\n'
+        b"It's a flame spirit.\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Its HP and Attack power may\n'
+        b"be different from an Ember's,\n"
+        b"but otherwise it's the same.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Since it is made of fire,\n'
+        b"try not to touch it, 'cause\n"
+        b"it'll burn you.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"Apparently it's vulnerable to\n"
+        b'explosions and ice attacks.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Oh, and if you get hit by a\n'
+        b'flame attack, you might\n'
+        b'catch fire, so guard well.\n'
+        b'<k>',
+
+    b'btl_hlp_hermos':
+        b"That's an Ember.\n"
+        b'<wait 250>\n'
+        b'Sort of a pale-blue flame\n'
+        b'spirit. <wait 250>Kind of spooky.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Of course, since this thing is\n'
+        b'a flame, touching it will hurt.\n'
+        b'<wait 250>\n'
+        b"Didn't Mama teach you that?\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"Looks like it's susceptible\n"
+        b'to ice or explosive attacks,\n'
+        b"though, so that's something.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'If you get hit by a flame\n'
+        b"attack, you'll catch fire,\n"
+        b'so try to guard well.\n'
+        b'<k>',
+
+    b'btl_hlp_phantom':
+        b"That's a Phantom Ember.\n"
+        b'<wait 250>\n'
+        b"It's an angry spirit born of\n"
+        b'hatred and confusion.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'<wait 150>\n'
+        b"So, um...<wait 150> I'm not too cool\n"
+        b'with this thing!\n'
+        b'<wait 250>\n'
+        b'<shake>\n'
+        b'B-B-B-B-Bleck...\n'
+        b'</shake>\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'If it attacks you with spirit\n'
+        b"flames, you'll catch on fire.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"Let's send this ghoul back\n"
+        b'to the grave, OK?\n'
+        b'<shake>\n'
+        b'P-P-P-P-Please...\n'
+        b'</shake>\n'
+        b'<k>',
+
+    b'btl_hlp_monochrome_sinemon':
+        b"That's a Cleft.\n"
+        b'<wait 250>\n'
+        b'A rock-head jerk with spikes\n'
+        b'on his noggin.<wait 250> What a rocker!\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"Fire doesn't hurt it, but other\n"
+        b'types of items are pretty\n'
+        b'effective, usually.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If nothing seems to work on\n'
+        b'it, you can always just run.\n'
+        b'<k>',
+
+    b'btl_hlp_hyper_sinemon':
+        b"That's a Hyper Cleft.\n"
+        b'<wait 250>\n'
+        b"It's basically a Cleft that\n"
+        b'uses charged-up moves.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'When it charges up, its\n'
+        b'attacks get real strong.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Couple its rock-hardness with\n'
+        b'its ability to charge up...\n'
+        b'<wait 100>\n'
+        b'and things get scary.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"If you're confident, you may\n"
+        b'wanna try doing Superguards\n'
+        b'to send its attacks back...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"If you can't, you'd better use\n"
+        b"some items, or you'd better\n"
+        b'hightail it out of here.\n'
+        b'<k>',
+
+    b'btl_hlp_sinemon':
+        b"That's a Moon Cleft.\n"
+        b'<wait 250>\n'
+        b"It's your basic Cleft living on\n"
+        b'the moon.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Defense is high, as usual...\n'
+        b'<wait 250>\n'
+        b"and fire attacks don't work\n"
+        b'against it.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If you can turn it over with\n'
+        b'an explosion, though, its\n'
+        b'Defense goes down to 0.\n'
+        b'<k>',
+    
+    b'btl_hlp_iron_sinemon':
+        b"That's an Iron Cleft. <wait 250>Kind of\n"
+        b"a smaller version of those\n"
+        b"hard-heads from the Glitz Pit!\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"That DEF doesn't sound too\n"
+        b"bad, but they're so tough, they\n"
+        b"only take 1 damage a hit!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"They're also immune to\n"
+        b"most elemental attacks, like\n"
+        b"fire, ice, and electricity!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"Guess we'll have to whittle\n"
+        b"them down slowly, but multi-\n"
+        b"hit attacks should help!\n"
+        b'<k>',
+
+    b'btl_hlp_togedaruma':
+        b"That's a Bristle.\n"
+        b'<wait 250>\n'
+        b'...Totally covered in spikes.\n'
+        b'<wait 250>\n'
+        b"<dynamic 3>They're so prickly!\n"
+        b'</dynamic>\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Even trying to get close\n'
+        b'enough to whack it with a\n'
+        b'hammer is dangerous!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Seriously, its spikes will\n'
+        b'totally pop out!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"So, since you can't jump on\n"
+        b'it or use your hammer...\n'
+        b'<wait 100>\n'
+        b"you'd better use an item!\n"
+        b'<k>',
+
+    b'btl_hlp_yamitogedaruma':
+        b"That's a Dark Bristle.\n"
+        b'<wait 250>\n'
+        b"It's an ancient creature made\n"
+        b'of rock.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"You can't jump on it because\n"
+        b"of its spikes, and you can't\n"
+        b'approach due to its spears.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'AND its Defense is high.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"You'd better take it out\n"
+        b'with special attacks or items.\n'
+        b'<k>',
+
+    b'btl_hlp_bomhei':
+        b"That's a Bob-omb.\n"
+        b'<wait 250>\n'
+        b'It attacks by blowing itself\n'
+        b'up. <wait 250>Yeah. <wait 250>Reeeeeeeal smart.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'A Bob-omb will get totally\n'
+        b'mad if you damage it. They\n'
+        b'have like, super-short fuses.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"When it gets mad, it'll charge\n"
+        b'and explode on its next turn.\n'
+        b'<wait 250>\n'
+        b'THAT attack...<wait 250>really hurts.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Oh, and if it's mad, it'll blow\n"
+        b"up at the slightest contact,\n"
+        b"dealing a lot of damage!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You can attack it from a\n"
+        b"distance, but it'll still charge\n"
+        b"at you in retaliation.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Your best bet is to take it\n"
+        b"out in one go, incapacitate\n"
+        b"it, or land a Superguard!\n"
+        b"<k>\n",
+    
+    b'btl_hlp_sinnosuke':
+        b"That's a Hyper Bob-omb.\n"
+        b'<wait 250>\n'
+        b'Massive destructive power,<wait 250> now\n'
+        b'in a trendy hot-pink package!\n'
+        b'<k>\n'
+        b'%s'
+        b"<p>\n"
+        b"If you can believe it, these\n"
+        b"guys are even more hot-\n"
+        b"headed than regular Bob-ombs!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"They'll ignite, and explode\n"
+        b"on you the moment they get\n"
+        b"to attack, even unprompted!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"What's worse, if you get\n"
+        b"it mad first, it'll charge its\n"
+        b"ATK power before attacking!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If you don't have ATK to\n"
+        b"take it out in one blow, you\n"
+        b"better land that Superguard!\n"
+        b"<k>",
+
+    b'btl_hlp_heavy_bom':
+        b"That's a Bulky Bob-omb.\n"
+        b'<wait 250>\n'
+        b"I think it's like other\n"
+        b"Bob-ombs...<wait 300>but it's huge!\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It's weird...<wait 250> It never attacks,\n"
+        b"but once its fuse is lit, it'll\n"
+        b'blow up on its own eventually.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"I don't mind it taking itself\n"
+        b'out of the battle, but that\n'
+        b'explosion hurts us, too!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"The more buffs you let it\n"
+        b"get, the stronger its explosion\n"
+        b"is, so watch out!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Fire and explosions light its\n'
+        b'fuse, so I guess setting it\n'
+        b'off early is one strategy...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"You can run, too, but if you're\n"
+        b'gonna fight, beat it before it\n'
+        b'goes off!\n'
+        b'<k>',
+
+    b'btl_hlp_giant_bomb':
+        b"That's a Bob-ulk.\n"
+        b'<wait 250>\n'
+        b"That's...<wait 250>easily the biggest\n"
+        b"Bob-omb I've ever seen!\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"It won't attack, but once its\n"
+        b"fuse is lit, it'll explode\n"
+        b'after a while.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Its fully powered explosion\n"
+        b"is absolutely devastating!\n"
+        b"<wait 250>Seriously, it's no joke!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Just go all out to beat it.\n'
+        b'<wait 250>\n'
+        b'Pull out all the stops.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Or you could just set it off\n'
+        b'early with fire or explosions.\n'
+        b'<wait 250>\n'
+        b'Your call.\n'
+        b'<k>',
+
+    b'btl_hlp_wanwan':
+        b"That's a Chain-Chomp.\n"
+        b'<wait 250>\n'
+        b"I'd hate to get chomped by\n"
+        b'those teeth. <wait 250>They look nasty.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Its body is hard, so most\n'
+        b"attacks won't do much.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"Plus, you can't damage it\n"
+        b'with fire and ice attacks.\n'
+        b'<wait 250>\n'
+        b'You can freeze it, though.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Luckily, it has low HP, so\n'
+        b'you could take it down with\n'
+        b'a special move or an item.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Chomp-Chomps are like, so\n'
+        b'super-pumped all the time.\n'
+        b'<wait 250>\n'
+        b"Don't they ever get tired?\n"
+        b'<k>',
+
+    b'btl_hlp_burst_wanwan':
+        b"That's a Red Chomp.\n"
+        b'<wait 250>\n'
+        b"It's a rabid, red, biting,\n"
+        b'chewing, chomping fool!\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Its attacks are so powerful,\n'
+        b'we could be in a world of\n'
+        b"hurt if we don't beat it fast!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"...Which is why it's really,\n"
+        b'REALLY lame that its\n'
+        b'Defense is so high.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Its HP is relatively low,\n"
+        b"so a strong piercing move or\n"
+        b"two might do the trick...\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Just look at that color!<wait 250> Think\n'
+        b'someone painted it after it\n'
+        b'fell asleep at a party?\n'
+        b'<k>',
+
+    b'btl_hlp_mahorn':
+        b"That's a Wizzerd.\n"
+        b'<wait 250>\n'
+        b"It's a part-machine, part-\n"
+        b'organic, centuries-old thing.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It uses magic to attack,\n'
+        b'heal, and alter your\n'
+        b'condition, so stay on guard.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Its Defense is high, but we\n'
+        b'can totally take this thing!\n'
+        b'<k>',
+
+    b'btl_hlp_super_mahorn':
+        b"That's a Dark Wizzerd.\n"
+        b'<wait 250>\n'
+        b"It's a part-machine, part-\n"
+        b'organic, centuries-old thing.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It uses magic to attack and\n'
+        b'to alter your condition,\n'
+        b'so stay on guard.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"If there's only one left,\n"
+        b"it'll multiply itself to\n"
+        b'confuse you.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'I know they look totally\n'
+        b"goofy, but they're actually\n"
+        b'pretty tough enemies.\n'
+        b'<k>',
+
+    b'btl_hlp_mahorn_custom':
+        b"That's an Elite Wizzerd.\n"
+        b'<wait 250>\n'
+        b'This is the top of the heap\n'
+        b'for half-machine organisms.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'You can probably guess this,\n'
+        b'but it uses various magic\n'
+        b'moves in battle.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"And, if it's alone, it'll create\n"
+        b'illusions of itself.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'It has no real weakness.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"So just use whatever you've\n"
+        b'got to beat it, OK?\n'
+        b'<wait 250>\n'
+        b"Let's go, Mario!!\n"
+        b'<k>',
+
+    b'btl_hlp_gundan_zako':
+        b"That's an X-Naut.\n"
+        b'<wait 250>\n'
+        b"Says here it's classified\n"
+        b'as an "enemy combatant."\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'That description stinks...\n'
+        b'<wait 250>\n'
+        b"You think it means they're\n"
+        b'just low-level foot soldiers?\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'They drink these potions\n'
+        b'that make them all big and\n'
+        b'burly...<wait 250>then they attack! \n'
+        b'<k>\n'
+        b'<p>\n'
+        b"These guys aren't all that\n"
+        b"tough, and should go down\n"
+        b"to strong spread attacks!\n"
+        b'<k>',
+
+    b'btl_hlp_gundan_zako_magician':
+        b"That's an X-Naut PhD.\n"
+        b'<wait 250>\n'
+        b'Guys like this invent all the\n'
+        b'annoying things we fight.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'The chemicals do all kinds of\n'
+        b'stuff, like making things\n'
+        b'huge or burning people.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'He may also use potions to\n'
+        b'heal himself or make himself\n'
+        b'impossible to hit.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'X-Naut PhDs are REALLY\n'
+        b'annoying,<wait 250> so take them out\n'
+        b'before they boost themselves.\n'
+        b'<k>',
+
+    b'btl_hlp_gundan_zako_elite':
+        b"That's an Elite X-Naut.\n"
+        b'<wait 250>\n'
+        b'This guy is the creme de la\n'
+        b'creme of the X-Nauts.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"He'll use regular attacks as\n"
+        b'well as boosting his power\n'
+        b'or size.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Elite X-Nauts are tough,\n'
+        b'but you just have to smack\n'
+        b'away until they go down.\n'
+        b'<k>',
+
+    b'btl_hlp_barriern':
+        b"That's a Yux.\n"
+        b'<wait 250>\n'
+        b"Says here it's a creature\n"
+        b'created in the X-Naut labs.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'According to this, attacks\n'
+        b"and items won't affect it if\n"
+        b'it has Mini-Yux around it.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'So, if any Mini-Yux appear,\n'
+        b'take those out first. <wait 250>Duh!\n'
+        b'<k>',
+
+    b'btl_hlp_barriern_petit':
+        b"That's a Mini-Yux.\n"
+        b'<wait 250>\n'
+        b'A creature made to protect\n'
+        b'a Yux, it can split into two.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'These twerps are the reason\n'
+        b"you sometimes can't do any\n"
+        b'damage to the main Yux.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"They're a pain, but you HAVE\n"
+        b'to beat them before the Yux.\n'
+        b'<wait 250>\n'
+        b"Any spread attack'll do...\n"
+        b'<k>',
+
+    b'btl_hlp_barriern_z':
+        b"That's a Z-Yux.\n"
+        b'<wait 250>\n'
+        b"It's a genetic improvement\n"
+        b'on the original Yux.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Multiple Mini-Z-Yux will\n'
+        b'appear to protect the main\n'
+        b"unit, as you'd expect.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Sometimes they also restore\n'
+        b'HP to the main unit, which\n'
+        b'really burns me up!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"It doesn't have much HP, but\n"
+        b'those barriers often protect\n'
+        b'it from attacks.\n'
+        b'<k>',
+
+    b'btl_hlp_barriern_z_petit':
+        b"That's a Mini-Z-Yux.\n"
+        b'<wait 250>\n'
+        b'It lives to protect the Z-Yux.\n'
+        b'<wait 250>\n'
+        b'There can be as many as 4.\n'
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b"If you don't clear these guys\n"
+        b"out, you'll never be able to\n"
+        b'attack the Z-Yux.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Using a multiple-strike attack\n'
+        b'to take them out all at once\n'
+        b'is a totally good idea.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'I mean, I respect them for\n'
+        b'protecting their...<wait 250>whatever,\n'
+        b'but they get NO mercy!\n'
+        b'<k>',
+
+    b'btl_hlp_barriern_custom':
+        b"That's an X-Yux.\n"
+        b"<wait 250>Strangely, supposedly it's\n"
+        b"read 'Cross'-Yux, not 'Ex'.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'Anyway, this is a new Yux\n'
+        b'designed to protect extra-\n'
+        b'important areas...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'They were designed to be\n'
+        b"unbeatable.<wait 250> They're not.\n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'It can produce two\n'
+        b'Mini-X-Yuxes at once.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'AND, it has an excellent\n'
+        b'success rate of immobilizing\n'
+        b'opponents.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'We gotta do something about\n'
+        b"that if we're gonna win.\n"
+        b'<k>',
+
+    b'btl_hlp_barriern_custom_satellite':
+        b"That's a Mini-X-Yux.\n"
+        b'<wait 250>\n'
+        b'It lives to protect the X-Yux.\n'
+        b'<wait 250>\n'
+        b'Up to 4 can guard the X-Yux.\n'
+        b'<k>\n'
+        b"%s"
+        b'<p>\n'
+        b"You can't attack the main\n"
+        b'unit until you clear these\n'
+        b'annoying pests out.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'So use multiple-strike attacks\n'
+        b'to take them out all at once!\n'
+        b'<k>',
+
+    b'btl_hlp_atomic_teresa':
+        b"That's an Atomic Boo.\n"
+        b'<wait 250>\n'
+        b"It's a giant Boo made up of\n"
+        b'a ton of smaller Boos.\n'
+        b'<k>\n'
+        b"%s"
+        b'<p>\n'
+        b'This thing will try to smoosh\n'
+        b'us. It can also split up and\n'
+        b'send hundreds of Boos at us.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'And, when we attack, we\n'
+        b'might get so scared that we\n'
+        b"get confused or can't move.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"I sure wouldn't want to see\n"
+        b'this thing standing behind me\n'
+        b'in the middle of the night...\n'
+        b'<k>\n'
+        b'<p><shake>\n'
+        b'Creeeeeepy...\n'
+        b'<k>',
+
+    b'btl_hlp_hyper_sinnosuke':
+        b"That's a Cosmic Boo.\n"
+        b'<wait 250>\n'
+        b"A distant relative of\n"
+        b"Atomic Boo.\n"
+        b"<k>\n"
+        b'<p>\n'
+        b"I've only ever heard urban\n"
+        b"legends of these things, but\n"
+        b"I guess it's real after all!\n"
+        b'<k>\n'
+        b"%s"
+        b'<p>\n'
+        b"This thing's a fair bit\n"
+        b"stronger than your garden-\n"
+        b"variety Atomic Boo...\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"AND it can use any of its\n"
+        b"attacks without taking a\n"
+        b"turn to charge! <wait 250>Yikes!\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"C'mon, Mario, let's pound\n"
+        b"this thing into atoms, <wait 200>or\n"
+        b"space dust, or whatever!\n"
+        b'<k>',
+
+    b'btl_hlp_gonbaba':
+        b"That's Hooktail! <wait 250>I thought\n"
+        b"she was gone for good, but\n"
+        b"she's one tough customer!\n"
+        b"<k>\n"
+        b"%s"
+        b"<p>\n"
+        b"She'll attack with stomps\n"
+        b"and fiery breath attacks, and\n"
+        b"maybe dirtier tricks as well!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Her flame breath only burns\n"
+        b"hotter with revenge, and can\n"
+        b"sap our ATK with Burn status!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Let's show her we're still\n"
+        b"the boss around here, Mario!\n"
+        b"<k>",
+
+    b'btl_hlp_bunbaba':
+        b"That's Gloomtail, <wait 250>Hooktail's\n"
+        b"elder brother. <wait 250>He must really\n"
+        b"<wait 250>care to come all this way!\n"
+        b"<k>\n"
+        b"%s"
+        b"<p>\n"
+        b"He'll bite or stomp you, and\n"
+        b"<wait 250>\n"
+        b"he may also attack with\n"
+        b"noxious or fiery breath.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"When his HP gets low, he may\n"
+        b"throw in some other attacks,\n"
+        b"as well. <wait 250>Wouldn't surprise me.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Especially watch out for his\n"
+        b"megabreath move, 'cause the\n"
+        b"word is, it's GNARLY!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"He also Charges up for some\n"
+        b"attacks, so you might want\n"
+        b"to dodge those.\n"
+        b"<k>",
+       
+    b'btl_hlp_zonbaba':
+        b"That's Bonetail! <wait 250>Wow, I can't\n"
+        b"imagine how that bag of bones\n"
+        b"made it all the way up here.\n"
+        b"<k>\n"
+        b"%s"
+        b"<p>\n"
+        b"Their breath attacks can\n"
+        b"inflict a ton of different\n"
+        b"status effects, so watch out!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If their HP falls far enough\n"
+        b"below yours, they might heal\n"
+        b"a bunch of HP at once!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Come on, Mario, we're this\n"
+        b"close to finishing the fight!\n"
+        b"Don't let up now!\n"
+        b"<k>",
+
+    b'btl_hlp_chorobon_gundan':
+        b"It's a Fuzzy Horde!\n"
+        b'<wait 250>\n'
+        b"Look at 'em all!<wait 250> What a mob\n"
+        b"scene!<wait 100><dynamic 3> It's crazy!</dynamic> \n"
+        b'<k>\n'
+        b'%s'
+        b'<p>\n'
+        b'Fuzzies come at you all at\n'
+        b'once and attack in order.\n'
+        b'<wait 250>\n'
+        b'Says here not to freak out!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'It also says that if you use\n'
+        b'good timing to defend, you\n'
+        b"won't take much damage.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b"I'm thinking it might just be\n"
+        b'faster to whip the ringleader,\n'
+        b"though, y'know?\n"
+        b'<k>',
+        
+    b'btl_hlp_chorobon_gundan':
+        b"It's a Fuzzy Horde!\n"
+        b"<wait 250>\n"
+        b"Look at 'em all!<wait 250> What a mob\n"
+        b"scene!<wait 100><dynamic 3> It's crazy!</dynamic> \n"
+        b"<k>\n"
+        b"%s"
+        b"<p>\n"
+        b"Fuzzies come at you all at\n"
+        b"once and attack in order.\n"
+        b"<wait 250>\n"
+        b"Says here not to freak out!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"As the horde thins out,\n"
+        b"they can attack with wildly\n"
+        b"varying timing. Stay focused!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"It'd be best if we can boost\n"
+        b"our DEF, so we take less\n"
+        b"damage on every hit.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"We could attack Gold Fuzzy,\n"
+        b"but he'll restore more HP if\n"
+        b"the horde stays healthy!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If we manage to defeat him,\n"
+        b"the horde should flee\n"
+        b"immediately, though!\n"
+        b"<k>",
+
+    b'btl_hlp_gold_chorobon':
+        b"That's Gold Fuzzy.\n"
+        b"<wait 250>\n"
+        b"Can't say I expected to run\n"
+        b"into him all the way up here!\n"
+        b"<k>\n"
+        b"%s"
+        b"<p>\n"
+        b"Honestly, I don't know\n"
+        b"what to expect from him.\n"
+        b"He was pretty weak before...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But if he could whip a dragon\n"
+        b"by himself, he must have\n"
+        b"seriously leveled up!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Whatever the case, we'd\n"
+        b"better stay on our toes!\n"
+        b"<k>",
+    
+    # TODO: Maybe menu Tattles for all enemies - b"menu_enemy_001", etc.
+    
+    b'menu_enemy_400':
+        b"[Dummy] Fuzzy Horde",
         
     # Misc.
     
