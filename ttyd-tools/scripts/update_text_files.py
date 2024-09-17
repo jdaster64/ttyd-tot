@@ -1969,7 +1969,7 @@ g_GlobalStrings = {
         b"Perform all Stylish commands on\n"
         b"15 different moves.",
     b"tot_achd_01":
-        b"Buy a total of 50 items from\n"
+        b"Buy a total of 25 items from\n"
         b"Charlieton.",
     b"tot_achd_02":
         b"Make deals with a total of\n"
@@ -1987,7 +1987,7 @@ g_GlobalStrings = {
         b"Win a total of 10,000 coins\n"
         b"from tower runs.",
     b"tot_achd_08":
-        b"Deal a total of 25,000 damage\n"
+        b"Deal a total of 15,000 damage\n"
         b"to enemies.",
     b"tot_achd_09":
         b"Clear Hooktail's tower for the\n"

@@ -1437,9 +1437,9 @@ void ApplyFixedPatches() {
                 if (damage > 99) damage = 99;
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_ENEMY_DAMAGE, damage);
                 g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_DAMAGE, damage);
-                if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_DAMAGE) >= 25000) {
+                if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_DAMAGE) >= 15000) {
                     tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::AGG_DAMAGE_25000);
+                        tot::AchievementId::AGG_DAMAGE_15000);
                 }
 
                 // Track direct damage from Infatuated attackers.

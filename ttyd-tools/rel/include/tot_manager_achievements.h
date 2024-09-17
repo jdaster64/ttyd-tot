@@ -11,14 +11,14 @@ namespace mod::tot {
 namespace AchievementId {
     enum e {
         AGG_STYLISH_15 = 0,
-        AGG_BUY_ITEMS_50,
+        AGG_BUY_ITEMS_25,
         AGG_NPC_DEALS_10,
         AGG_ALL_PARTNERS,
         AGG_USE_LV_3_MOVES_10,
         AGG_MIDBOSS_TYPES_40,
         AGG_SUPERGUARD_100,
         AGG_COINS_10000,
-        AGG_DAMAGE_25000,
+        AGG_DAMAGE_15000,
 
         RUN_HALF_FIRST,
         RUN_HALF_SPEED1,
@@ -105,7 +105,8 @@ namespace AchievementRewardType {
 struct AchievementData {
     const char* help_msg;
     const char* reward_msg;     // Falls back to CosmeticGroupData.name_msg if null.
-    int32_t reward_type;
+    int16_t grid_index;
+    int16_t reward_type;
     uint32_t reward_id;         // For option type / indexing into CosmeticGroupData.
 };
 
@@ -128,6 +129,13 @@ public:
     static bool CheckOptionUnlocked(uint32_t option);
     // Checks whether a cosmetic group is unlocked (not necessarily purchased).
     static bool CheckCosmeticGroupUnlocked(int32_t reward_type, int32_t group_id);
+
+    // Returns a pointer with a grid of achievement ids.
+    static void GetAchievementGrid(int8_t const ** arr);
+    // Returns an pointer to an array of achievement states (2 = completed, 1 = visible).
+    // If suppress_queued is true, doesn't treat queued unlocks as completed.
+    // Returns the earliest id of an achievement queued to unlock, if any.
+    static int32_t GetAchievementStates(int8_t const ** arr, bool suppress_queued = true);
 };
 
 // Marks an achievement as complete.

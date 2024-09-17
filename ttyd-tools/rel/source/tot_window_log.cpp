@@ -57,17 +57,6 @@ namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
 
-// Achievement ids corresponding to spots in the grid.
-const int8_t g_AchievementGrid[70] = {
-    69, 64, 48, 50, 49, 43, 41, 37, 17, 67,
-    60, 62, 61,  7, 18, 33, 20, 29, 16, 27,
-    26, 56, 11,  2, 34, 21,  3,  8, 15, 52,
-    44, 25, 10,  9,  4, 54, 12, 13, 14, 46,
-    24, 45, 19,  1,  0, 22,  6, 35, 39, 59,
-    28, 58, 53, 42, 32, 36, 40, 63, 30, 31,
-    66, 55, 57, 47, 38, 23,  5, 51, 65, 68,
-};
-
 enum RecordLogOptions {
     // All record-log specific options should have negative values.
     REC_EMPTY = -100000,
@@ -297,42 +286,8 @@ bool IsUnbreakable(int32_t cursor) {
     return (row <= 1 || row >= 5) && (col <= 1 || col >= 8);
 }
 
-// Gets the current display state of each cell in the achievement grid.
-// Returns the cell of the smallest achievement ready to unlock, or -1 if none.
-int32_t GetAchievementStates(int8_t* states) {
-    const auto& state = g_Mod->state_;
-    int32_t queued_unlock = -1;
-    int32_t queued_unlock_ach = -1;
-    for (int32_t i = 0; i < 70; ++i) {
-        int32_t ach = g_AchievementGrid[i];
-        states[i] = state.GetOption(FLAGS_ACHIEVEMENT, ach) ? 2 : 0;
-    }
-    for (int32_t i = 0; i < 70; ++i) {
-        int32_t ach = g_AchievementGrid[i];
-        if (GetSWF(GSWF_AchUnlockQueue + ach)) {
-            // Suppress cell from being drawn as unlocked.
-            states[i] = 0;
-            if (queued_unlock < 0 || ach < queued_unlock_ach) {
-                queued_unlock = i;
-                queued_unlock_ach = ach;
-            }
-        }
-    }
-    for (int32_t i = 0; i < 70; ++i) {
-        int32_t ach = g_AchievementGrid[i];
-        if (states[i] == 0 && ach <= AchievementId::META_ALL_ACHIEVEMENTS && (
-            (i % 10 > 0 && states[i -  1] == 2) ||
-            (i % 10 < 9 && states[i +  1] == 2) ||
-            (i / 10 > 0 && states[i - 10] == 2) ||
-            (i / 10 < 6 && states[i + 10] == 2))) {
-            states[i] = 1;
-        }
-    }
-    return queued_unlock;
-}
-
 void GetAchievementRewardDetails(
-    int32_t cursor, int32_t* icon, const char** name_msg) {
+    const int8_t* grid, int32_t cursor, int32_t* icon, const char** name_msg) {
     // Special case for selecting one of the unlocking hammers.
     if (cursor == -1) {
         if (icon) *icon = IconType::HAMMER;
@@ -340,7 +295,7 @@ void GetAchievementRewardDetails(
             ttyd::item_data::itemDataTable[ItemType::HAMMER].name;
         return;
     }
-    const auto* data =  AchievementsManager::GetData(g_AchievementGrid[cursor]);
+    const auto* data =  AchievementsManager::GetData(grid[cursor]);
     switch (data->reward_type) {
         case AchievementRewardType::OPTION:
             if (icon) *icon = IconType::VITAL_PAPER;
@@ -382,8 +337,10 @@ void GetAchievementRewardDetails(
 }
 
 void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
-    int8_t states[70];
-    GetAchievementStates(states);
+    int8_t const* grid;
+    int8_t const* states;
+    AchievementsManager::GetAchievementGrid(&grid);
+    AchievementsManager::GetAchievementStates(&states);
 
     ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
     // Draw square drop shadows.
@@ -391,7 +348,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         // Skip squares that don't have a visible shadow.
         if (i % 10 < 8 && i / 10 < 5);
         // Skip drawing corner squares if not completed.
-        if (states[i] != 2 && g_AchievementGrid[i] >= 66) continue;
+        if (states[i] != 2 && grid[i] >= 66) continue;
 
         gc::vec3 position = {
             win_x + 105.0f + 36.0f * (i % 10),
@@ -405,7 +362,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
     // Draw main square backgrounds.
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         // Skip drawing corner squares if not completed.
-        if (states[i] != 2 && g_AchievementGrid[i] >= 66) continue;
+        if (states[i] != 2 && grid[i] >= 66) continue;
 
         int32_t darker_shade = ((i ^ (i / 10)) & 1);
         int32_t success_shade = states[i] == 2 ? 13 : 0;
@@ -427,7 +384,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         // Draw icon (or its shadow).
         if (states[i]) {
             int32_t icon = 0;
-            GetAchievementRewardDetails(i, &icon, nullptr);
+            GetAchievementRewardDetails(grid, i, &icon, nullptr);
             ttyd::win_main::winIconInit();
             scale = { 0.45f, 0.45f, 0.45f };
             color = states[i] == 2 ? 0xFFFFFFFFU : 0x000000B0U;
@@ -453,7 +410,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         if (cursor_state) {
             int32_t icon = 0;
             const char* name_msg = "";
-            GetAchievementRewardDetails(cursor, &icon, &name_msg);
+            GetAchievementRewardDetails(grid, cursor, &icon, &name_msg);
 
             // Draw icon.
             ttyd::win_main::winIconInit();
@@ -1813,8 +1770,11 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
         case 16: {
             // Achievement log.
 
-            int8_t states[70];
-            if (GetAchievementStates(states) != -1) {
+            int8_t const* grid;
+            int8_t const* states;
+            AchievementsManager::GetAchievementGrid(&grid);
+            int32_t unlock_cell = AchievementsManager::GetAchievementStates(&states);
+            if (unlock_cell != -1) {
                 menu->log_menu_state = 60;
                 menu->achievement_log_unlock_timer = -60;
                 break;
@@ -1875,7 +1835,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     if (IsUnbreakable(cursor) || states[cursor] == 2) {
                         ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
                     } else {
-                        int32_t ach = g_AchievementGrid[cursor];
+                        int32_t ach = grid[cursor];
                         AchievementsManager::MarkCompleted(ach);
                         g_Mod->state_.ChangeOption(STAT_PERM_ACH_HAMMERS, -1);
                         menu->log_menu_state = 60;
@@ -1907,7 +1867,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 // Let the player know they cannot use the hammer.
                 ttyd::win_root::winMsgEntry(menu, 0, "tot_ach_unbreakable", 0);
             } else if (states[cursor] > 0) {
-                int32_t ach = g_AchievementGrid[cursor];
+                int32_t ach = grid[cursor];
                 ttyd::win_root::winMsgEntry(
                     menu, 0, AchievementsManager::GetData(ach)->help_msg, 0);
             } else {
@@ -2081,8 +2041,10 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
         case 60: {
             // Unlocking animation for achievements menu.
 
-            int8_t states[70];
-            int32_t unlock_cell = GetAchievementStates(states);
+            int8_t const* grid;
+            int8_t const* states;
+            AchievementsManager::GetAchievementGrid(&grid);
+            int32_t unlock_cell = AchievementsManager::GetAchievementStates(&states);
 
             int32_t cursor = menu->achievement_log_cursor_idx;
 
@@ -2121,7 +2083,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     break;
                 }
 
-                int32_t ach = g_AchievementGrid[unlock_cell];
+                int32_t ach = grid[unlock_cell];
                 SetSWF(GSWF_AchUnlockQueue + ach, 0);
                 menu->achievement_log_cursor_idx = unlock_cell;
                 cursor = menu->achievement_log_cursor_idx;
@@ -2158,7 +2120,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             }
 
             if (states[cursor] > 0) {
-                int32_t ach = g_AchievementGrid[cursor];
+                int32_t ach = grid[cursor];
                 ttyd::win_root::winMsgEntry(
                     menu, 0, AchievementsManager::GetData(ach)->help_msg, 0);
             } else {
