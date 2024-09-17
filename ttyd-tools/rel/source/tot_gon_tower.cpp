@@ -712,7 +712,7 @@ EVT_BEGIN(Tower_FinalBossEvent)
     RUN_EVT(bero_case_entry)
     WAIT_MSEC(1300)
 
-    // Encounter message.
+    // TODO: Non-placeholder encounter message.
     USER_FUNC(evtTot_GetDifficulty, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_HALF)

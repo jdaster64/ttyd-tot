@@ -798,6 +798,9 @@ void ApplyFixedPatches() {
         |= AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE;
     ttyd::battle_item_data::ItemWeaponData_SnowRabbit.freeze_chance = 100;
     ttyd::battle_item_data::ItemWeaponData_SnowRabbit.freeze_time = 2;
+    // Set target weighting flags to be same as basic HP items.
+    ttyd::battle_item_data::ItemWeaponData_SnowRabbit.target_weighting_flags
+        = ttyd::battle_item_data::ItemWeaponData_Kinoko.target_weighting_flags;
     // Can only be used in battle, to ensure you deal with the negative effect.
     itemDataTable[ItemType::SNOW_BUNNY].usable_locations 
         &= ~ItemUseLocation::kField;
@@ -836,6 +839,9 @@ void ApplyFixedPatches() {
     ttyd::battle_item_data::ItemWeaponData_TeaKinoko.def_change_time = 3;
     ttyd::battle_item_data::ItemWeaponData_TeaKinoko.hp_regen_strength = 0;
     ttyd::battle_item_data::ItemWeaponData_TeaKinoko.hp_regen_time = 0;
+    // Set target weighting flags to be same as basic HP items.
+    ttyd::battle_item_data::ItemWeaponData_TeaKinoko.target_weighting_flags
+        = ttyd::battle_item_data::ItemWeaponData_Kinoko.target_weighting_flags;
     // Can only be used in battle, to ensure you deal with the negative effect.
     itemDataTable[ItemType::SHROOM_BROTH].usable_locations 
         &= ~ItemUseLocation::kField;
@@ -904,7 +910,7 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_ItemEvent_LastDinner_Weapon),
         &kLastDinnerWeaponAddr, sizeof(BattleWeapon*));
 
-    // Love Pudding - Applies a random positive status to your side.
+    // Love Pudding - Applies a random positive status to your alliance.
     static BattleWeapon kLovePuddingParams;
     memcpy(&kLovePuddingParams,
            &ttyd::battle_item_data::ItemWeaponData_Kameno_Noroi,
@@ -924,7 +930,7 @@ void ApplyFixedPatches() {
         const_cast<int32_t*>(RngStatusAttackEvent);
     itemDataTable[ItemType::LOVE_PUDDING].weapon_params = &kLovePuddingParams;
 
-    // Peach Tart - Applies a random negative status to opposing side.
+    // Peach Tart - Applies a random negative status to opposing alliance.
     static BattleWeapon kPeachTartParams;
     memcpy(&kPeachTartParams, &kLovePuddingParams, sizeof(BattleWeapon));
     kPeachTartParams.item_id = ItemType::PEACH_TART;
