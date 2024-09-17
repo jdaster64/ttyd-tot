@@ -97,8 +97,10 @@ void ApplyFixedPatches() {
             if (g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) {
                 if (coins < 0 && !ttyd::mariost::g_MarioSt->bInBattle) {
                     g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_SPENT, -coins);
+                    g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_SPENT, -coins);
                 } else {
                     g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED, coins);
+                    g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED, coins);
                     tot::AchievementsManager::CheckCompleted(
                         tot::AchievementId::MISC_RUN_COINS_999);
                 }

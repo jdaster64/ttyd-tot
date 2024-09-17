@@ -1121,14 +1121,17 @@ void ApplyFixedPatches() {
             // Track coins, Star Pieces, and Shine Sprites gained.
             if (item_type == ItemType::COIN) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED);
                 tot::AchievementsManager::CheckCompleted(
                     tot::AchievementId::MISC_RUN_COINS_999);
             }
             if (item_type == ItemType::STAR_PIECE) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_STAR_PIECES);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_STAR_PIECES);
             }
             if (item_type == ItemType::SHINE_SPRITE) {
                 g_Mod->state_.ChangeOption(tot::STAT_RUN_SHINE_SPRITES);
+                g_Mod->state_.ChangeOption(tot::STAT_PERM_SHINE_SPRITES);
                 if (g_Mod->state_.GetOption(tot::STAT_RUN_SHINE_SPRITES) > 9) {
                     tot::AchievementsManager::MarkCompleted(
                         tot::AchievementId::MISC_SHINES_10);

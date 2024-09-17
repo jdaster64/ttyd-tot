@@ -285,16 +285,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         }
     }
 
-    // Update currency-based aggregate stats.
+    // Get currency earned in the current run.
     int32_t coins_earned = state.GetOption(STAT_RUN_COINS_EARNED);
-    int32_t coins_spent = state.GetOption(STAT_RUN_COINS_SPENT);
     int32_t sp_earned = state.GetOption(STAT_RUN_STAR_PIECES);
     int32_t shines_earned = state.GetOption(STAT_RUN_SHINE_SPRITES);
-
-    state.ChangeOption(STAT_PERM_COINS_EARNED, coins_earned);
-    state.ChangeOption(STAT_PERM_COINS_SPENT, coins_spent);
-    state.ChangeOption(STAT_PERM_STAR_PIECES, sp_earned);
-    state.ChangeOption(STAT_PERM_SHINE_SPRITES, shines_earned);
 
     // Apply intensity multiplier to currency earned.
     int32_t intensity = state.GetOption(STAT_RUN_INTENSITY);

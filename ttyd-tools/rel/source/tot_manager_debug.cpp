@@ -170,6 +170,7 @@ void DebugManager::Update() {
                         g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_SP, 50);
                     } else {
                         g_Mod->state_.ChangeOption(STAT_RUN_STAR_PIECES, 50);
+                        g_Mod->state_.ChangeOption(STAT_PERM_STAR_PIECES, 50);
                     }
                     break;
                 }
