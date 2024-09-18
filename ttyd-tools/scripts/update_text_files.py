@@ -3820,13 +3820,9 @@ g_GlobalStrings = {
         b"it's almost impossible to beat.\n"
         b'<k>\n'
         b'<p>\n'
-        b'Plus, its lullaby has massive\n'
-        b"Attack power, so if we're low\n"
-        b'on HP, we need to scram.\n'
-        b'<k>\n'
-        b'<p>\n'
-        b'You gotta think hard about\n'
-        b'whether to fight or bolt.\n'
+        b"Plus, it has massive ATK,\n"
+        b"so if we can't beat it quick,\n"
+        b"we'd better hope it scrams.\n"
         b'<k>',
 
     b'btl_hlp_piders':
@@ -4175,13 +4171,14 @@ g_GlobalStrings = {
         b'<k>\n'
         b'%s'
         b'<p>\n'
-        b"Fire doesn't hurt it, but other\n"
-        b'types of items are pretty\n'
-        b'effective, usually.\n'
+        b"Fire doesn't hurt it, but\n"
+        b"any other piercing attacks\n"
+        b"should be pretty effective.\n"
         b'<k>\n'
         b'<p>\n'
-        b'If nothing seems to work on\n'
-        b'it, you can always just run.\n'
+        b"You can also flip it with\n"
+        b"bomb and earthquake-style\n"
+        b"attacks to drop its DEF.\n"
         b'<k>',
 
     b'btl_hlp_hyper_sinemon':
@@ -4207,9 +4204,9 @@ g_GlobalStrings = {
         b'to send its attacks back...\n'
         b'<k>\n'
         b'<p>\n'
-        b"If you can't, you'd better use\n"
-        b"some items, or you'd better\n"
-        b'hightail it out of here.\n'
+        b"If you can't, try flipping it\n"
+        b"over, or using evasive actions\n"
+        b"like Koops' Shell Shield.\n"
         b'<k>',
 
     b'btl_hlp_sinemon':
@@ -4272,10 +4269,9 @@ g_GlobalStrings = {
         b'totally pop out!\n'
         b'<k>\n'
         b'<p>\n'
-        b"So, since you can't jump on\n"
-        b'it or use your hammer...\n'
-        b'<wait 100>\n'
-        b"you'd better use an item!\n"
+        b"You'll have to attack it\n"
+        b"from a distance, or use an\n"
+        b"item or Special Move!\n"
         b'<k>',
 
     b'btl_hlp_yamitogedaruma':
