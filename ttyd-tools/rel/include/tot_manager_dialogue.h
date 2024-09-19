@@ -37,6 +37,14 @@ namespace ConversationId {
         NPC_H               = 5000,
         NPC_H_CVS_START     = 5100,
         NPC_H_CVS_END       = NPC_H_CVS_START + 7,
+
+        // NPC I (Toad)
+        NPC_I               = 6000,
+        NPC_I_NO_CLEAR      = 6100,
+        NPC_I_FIRST_CLEAR   = 6101,
+        NPC_I_SECOND_CLEAR  = 6102,
+        NPC_I_CVS_START     = 6200,
+        NPC_I_CVS_END       = NPC_I_CVS_START + 6,
     };
 }
 

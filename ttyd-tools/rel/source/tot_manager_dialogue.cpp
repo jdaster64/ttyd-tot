@@ -103,6 +103,26 @@ void DialogueManager::SetConversation(int32_t id) {
             g_ConversationId = ConversationId::NPC_H_CVS_START + cv_id;
             break;
         }
+        case ConversationId::NPC_I: {
+            if (completed_runs < 1) {
+                g_ConversationId = ConversationId::NPC_I_NO_CLEAR;
+                break;
+            } else if (completed_runs == 1) {
+                g_ConversationId = ConversationId::NPC_I_FIRST_CLEAR;
+                break;
+            } else if (!GetSWF(GSWF_NpcI_PostTutorialChat)) {
+                g_ConversationId = ConversationId::NPC_I_SECOND_CLEAR;
+                SetSWF(GSWF_NpcI_PostTutorialChat);
+                break;
+            }
+            
+            int32_t num_cvs =
+                ConversationId::NPC_I_CVS_END -
+                ConversationId::NPC_I_CVS_START;
+            int32_t cv_id = coins_earned % num_cvs;
+            g_ConversationId = ConversationId::NPC_I_CVS_START + cv_id;
+            break;
+        }
     }
 }
 
