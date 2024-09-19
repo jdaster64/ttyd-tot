@@ -17,6 +17,11 @@ namespace ConversationId {
         BUBULB_P_CVS_START  = 1100,
         BUBULB_P_CVS_END    = BUBULB_P_CVS_START + 10,  // TBD; can't exceed 30.
 
+        // NPC B (Toad)
+        NPC_B               = 2000,
+        NPC_B_CVS_START     = 2100,
+        NPC_B_CVS_END       = NPC_B_CVS_START + 10,
+
         // NPC C (Gamer Toad)
         NPC_C               = 3000,
         NPC_C_CVS_START     = 3100,
