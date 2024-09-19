@@ -36,6 +36,16 @@ void DialogueManager::SetConversation(int32_t id) {
     g_ConversationPtr = kDefaultConversation;
     g_ConversationStep = 0;
 
+    // Used for most NPCs.
+    int32_t completed_runs =
+        state.GetOption(STAT_PERM_HALF_FINISHES) +
+        state.GetOption(STAT_PERM_FULL_FINISHES) +
+        state.GetOption(STAT_PERM_EX_FINISHES);
+
+    // Commonly-used sources of pseudo-random conversation choice.
+    int32_t damage_dealt = state.GetOption(STAT_PERM_ENEMY_DAMAGE);
+    int32_t coins_earned = state.GetOption(STAT_PERM_META_COINS_EARNED);
+
     // For some NPCs, override the default conversation type based on
     // pseudo-random factors like run stats, or other conditions.
     switch (id) {
@@ -43,9 +53,24 @@ void DialogueManager::SetConversation(int32_t id) {
             int32_t num_cvs =
                 ConversationId::BUBULB_P_CVS_END -
                 ConversationId::BUBULB_P_CVS_START;
-            int32_t cv_id = state.GetOption(STAT_PERM_ENEMY_DAMAGE) % num_cvs;
+            int32_t cv_id = damage_dealt % num_cvs;
             g_ConversationId = ConversationId::BUBULB_P_CVS_START + cv_id;
+
             SetSWByte(GSW_Hub_BubulbP_CurrentConversation, cv_id);
+            break;
+        }
+        case ConversationId::NPC_C: {
+            if (completed_runs < 1) break;
+            
+            int32_t num_cvs =
+                ConversationId::NPC_C_CVS_END -
+                ConversationId::NPC_C_CVS_START;
+            int32_t cv_id = coins_earned % num_cvs;
+            g_ConversationId = ConversationId::NPC_C_CVS_START + cv_id;
+            
+            if (completed_runs >= 5 && coins_earned % 11 == 0) {
+                g_ConversationId = ConversationId::NPC_C_CVS_SPECIAL;
+            }
             break;
         }
     }

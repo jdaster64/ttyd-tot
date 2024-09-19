@@ -180,6 +180,12 @@ bool FreshFileInit() {
 }  // namespace
     
 void ApplyFixedPatches() {
+    // For debugging utility, save pointer to mod's state right after pouch.
+    auto* state = &g_Mod->state_;
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(0x8041eb04U),
+        reinterpret_cast<void*>(&state), sizeof(void*));
+
     // Load file from new save; replaces old logic completely.
     g_stg0_00_init_trampoline = patch::hookFunction(
         ttyd::event::stg0_00_init, []() { FreshFileInit(); });

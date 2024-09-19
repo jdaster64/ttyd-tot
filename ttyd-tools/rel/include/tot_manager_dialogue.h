@@ -12,9 +12,16 @@ namespace ConversationId {
     enum e {
         INVALID = 0,
 
+        // NPC F (Pink Bub-ulb)
         BUBULB_P            = 1000,
         BUBULB_P_CVS_START  = 1100,
         BUBULB_P_CVS_END    = BUBULB_P_CVS_START + 10,  // TBD; can't exceed 30.
+
+        // NPC C (Gamer Toad)
+        NPC_C               = 3000,
+        NPC_C_CVS_START     = 3100,
+        NPC_C_CVS_END       = NPC_C_CVS_START + 6,
+        NPC_C_CVS_SPECIAL   = 3200,
     };
 }
 

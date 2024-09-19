@@ -355,6 +355,20 @@ EVT_BEGIN(CosmeticShops_InitEvt)
     RETURN()
 EVT_END()
 
+// Base event for handling 1-speaker DialogueManager-driven conversations. 
+EVT_BEGIN(Npc_ConversationDrive_Talk)
+    USER_FUNC(evtTot_SetConversation, LW(15))
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Npc_C_Talk)
+    SET(LW(15), (int32_t)ConversationId::NPC_C)
+    RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Npc_BubulbP_NameEntry)
     USER_FUNC(evt_paper_entry, PTR("OFF_d_roll"))
     USER_FUNC(evt_img_entry, PTR("img"))
@@ -759,7 +773,7 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = (void*)Npc_GenericMove,
-        .talkEvtCode = (void*)Npc_GenericTalk,
+        .talkEvtCode = (void*)Npc_C_Talk,
     },
     {
         .name = g_NpcNokonokoD,
