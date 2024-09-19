@@ -73,6 +73,16 @@ void DialogueManager::SetConversation(int32_t id) {
             }
             break;
         }
+        case ConversationId::NPC_INN: {
+            if (completed_runs < 1) break;
+            
+            int32_t num_cvs =
+                ConversationId::NPC_INN_CVS_END -
+                ConversationId::NPC_INN_CVS_START;
+            int32_t cv_id = damage_dealt % num_cvs;
+            g_ConversationId = ConversationId::NPC_INN_CVS_START + cv_id;
+            break;
+        }
     }
 }
 

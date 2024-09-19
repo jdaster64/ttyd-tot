@@ -22,6 +22,11 @@ namespace ConversationId {
         NPC_C_CVS_START     = 3100,
         NPC_C_CVS_END       = NPC_C_CVS_START + 6,
         NPC_C_CVS_SPECIAL   = 3200,
+
+        // Innkeeper
+        NPC_INN             = 4000,
+        NPC_INN_CVS_START   = 4100,
+        NPC_INN_CVS_END     = NPC_INN_CVS_START + 5,
     };
 }
 

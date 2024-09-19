@@ -6484,7 +6484,6 @@ g_PetalburgWestStrings = {
         b"I'm going to try to keep it\n"
         b"up as long as I can!\n"
         b"<k>",
-    
 
     b"tot_di003101_00":
         b"Hey, what's shaking?\n"
@@ -6511,7 +6510,6 @@ g_PetalburgWestStrings = {
         b"achievement for it! <wait 150>Probably\n"
         b"not, but you never know...\n"
         b"<k>",
-
 
     b"tot_di003102_00":
         b"What's up, man? <wait 250>I've been\n"
@@ -6587,7 +6585,6 @@ g_PetalburgWestStrings = {
         b"into more games!\n"
         b"<k>",
 
-
     b"tot_di003105_00":
         b"I've gotta say, Hades might\n"
         b"be one of my favorite games\n"
@@ -6644,6 +6641,144 @@ g_PetalburgWestStrings = {
         b"for secret fights like that\n"
         b"in other games, now!\n"
         b"<k>",
+        
+    # Innkeeper.
+    
+    b"tot_di004000_00":
+        b"Hi, Mario! <wait 250>You're looking fit\n"
+        b"now, so I imagine you won't\n"
+        b"need our services...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Actually... <wait 250>truthfully, no one's\n"
+        b"used our inn in a long time.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Since the shop overstocked\n"
+        b"on Sleepy Sheep, we've just\n"
+        b"been giving them away!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Anyway<wait 100>.<wait 100>.<wait 100>.<wait 200> if you ever need\n"
+        b"tips on how to stay healthy,\n"
+        b"feel free to ask me!\n"
+        b"<k>",
+
+    b"tot_di004100_00":
+        b"Hi, Mario! <wait 250>I hope you've been\n"
+        b"on the lookout for dangerous\n"
+        b"status conditions...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Poison status is no joke!\n"
+        b"It starts fairly weak, but its\n"
+        b"damage builds up over time.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You'll also take more damage\n"
+        b"if you get afflicted by it\n"
+        b"multiple times in a row...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If you cure it, or if it runs its\n"
+        b"course, the stacking effects\n"
+        b"will reset, thankfully!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Not that I'm recommending it,\n"
+        b"but I'll bet repeated Poison on\n"
+        b"high-HP foes is effective!\n"
+        b"<k>",
+
+    b"tot_di004101_00":
+        b"Hi, Mario! <wait 250>I hope you've been\n"
+        b"on the lookout for dangerous\n"
+        b"status conditions...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Like Burn status! If you're\n"
+        b"burned, you'll be less effective\n"
+        b"on offense AND defense.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You'll take 1 damage per\n"
+        b"turn, and your attacks will\n"
+        b"also do 1 damage less!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"At least it protects you from\n"
+        b"being frozen for a while. Still,\n"
+        b"better cure it if you can!\n"
+        b"<k>",
+
+    b"tot_di004102_00":
+        b"Hi, Mario! <wait 250>I hope you've been\n"
+        b"on the lookout for dangerous\n"
+        b"status conditions...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Getting frozen solid doesn't\n"
+        b"do much by itself, but it leaves\n"
+        b"you incredibly vulnerable!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"One hit will thaw you out\n"
+        b"immediately, but that hit will\n"
+        b"do double damage!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Be very careful around icy\n"
+        b"foes or Ice Storm items, or your\n"
+        b"HP can go just like that!\n"
+        b"<k>",
+
+    b"tot_di004103_00":
+        b"Hi, Mario! <wait 250>I hope you've been\n"
+        b"on the lookout for dangerous\n"
+        b"status conditions...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Being shrunk with Tiny status\n"
+        b"doesn't hurt, but it'll halve\n"
+        b"your attacks' damage!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Similarly, attacks from Huge\n"
+        b"foes will do 50% more damage\n"
+        b"than usual! <wait 150>Be careful!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Try to keep an eye out for\n"
+        b"ways to use Huge and Tiny\n"
+        b"status against foes instead!\n"
+        b"<k>",
+
+    b"tot_di004104_00":
+        b"Hi, Mario! <wait 250>I hope you've been\n"
+        b"on the lookout for dangerous\n"
+        b"status conditions...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Stop status is the most\n"
+        b"dangerous of all, leaving you\n"
+        b"completely helpless!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Worst of all, midboss enemies\n"
+        b"can't be Stopped at all, only\n"
+        b"inflicted with Slow instead!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If you know an enemy can\n"
+        b"inflict it, try using the Allergic\n"
+        b"status to prevent it!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Naturally, the Feeling Fine\n"
+        b"badge will work even better,\n"
+        b"if you have it.\n"
+        b"<k>",
+
 }
 
 g_PetalburgEastStrings = {
