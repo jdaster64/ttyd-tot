@@ -7023,6 +7023,208 @@ g_PetalburgWestStrings = {
 }
 
 g_PetalburgEastStrings = {
+    # Regular NPCs.
+    
+    # NPC G (Blue Bub-ulb).
+
+    # NPC H (Koopa).
+    
+    b"tot_di005000_00":
+        b"Going to face that terrible\n"
+        b"dragon again, Mario?\n"
+        b"<wait 250>Good luck, you'll need it.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I've heard some nasty\n"
+        b"enemies from all over are\n"
+        b"swarming the place.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You go on ahead, but I'll\n"
+        b"share whatever info I can\n"
+        b"find on them later.\n"
+        b"<k>",
+
+    b"tot_di005100_00":
+        b"Back in one piece, eh?\n"
+        b"<wait 250>Don't suppose you ran into\n"
+        b"any Piranha Plants, then.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I've heard they have nasty\n"
+        b"breath attacks. Noxious gas,\n"
+        b"icy wind, searing flames...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"They're firmly rooted, too,\n"
+        b"so they're not very prone\n"
+        b"to fright or gale-force wind.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Supposedly they're all pretty\n"
+        b"drowsy by nature, though,\n"
+        b"so Sleep status couldn't hurt.\n"
+        b"<k>",
+
+    b"tot_di005101_00":
+        b"Still alive to tell the tale?\n"
+        b"<wait 250>Surely you steered clear of\n"
+        b"hot-head Bob-ombs, then.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"They're a lot less prone to\n"
+        b"ineffectual blowing up than\n"
+        b"before, you know.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If you hit 'em from a distance\n"
+        b"when mad and don't outright\n"
+        b"KO 'em, they counterattack!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Same goes for if you try to\n"
+        b"light them on fire or such.\n"
+        b"<dynamic 3><wait 200>BAM!</dynamic> <wait 150>Explosion in the kisser!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Only safe way to deal with\n"
+        b"them is to KO 'em outright, or\n"
+        b"stop them with status!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Otherwise, you'd best be\n"
+        b"prepared to take the blow!\n"
+        b"<k>",
+
+    b"tot_di005102_00":
+        b"Still kicking, eh?\n"
+        b"<wait 250>Guess you avoided getting\n"
+        b"barbed by an Iron Cleft.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"These guys look like any\n"
+        b"other Cleft, but they barely\n"
+        b"flinch at any attack!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You can't flip 'em, they're\n"
+        b"immune to elements, and they\n"
+        b"only take chip damage!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You'll have to hit 'em with\n"
+        b"a bunch of weak hits, like\n"
+        b"Power Bounce or Stampede.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But make sure you've got\n"
+        b"the power to get through\n"
+        b"their natural DEF first!\n"
+        b"<k>",
+
+    b"tot_di005103_00":
+        b"Still with us, eh?\n"
+        b"<wait 250>Guess you didn't get speared\n"
+        b"by a Dark Craw, then.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Craws have their standard\n"
+        b"attacks, yes, but Dark Craws\n"
+        b"have learned a new skill.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Sometimes, they can just up\n"
+        b"and decide to ram through\n"
+        b"your whole team! The nerve!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You can see it coming if\n"
+        b"they do a little hop before\n"
+        b"charging, though. Watch out!\n"
+        b"<k>",
+
+    b"tot_di005104_00":
+        b"Alive and well, eh?\n"
+        b"<wait 250>Guess you didn't get lured in\n"
+        b"by an Amazy Dayzee.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You'll pretty rarely see them,\n"
+        b"and even when you do, they'll\n"
+        b"probably run off.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But if they don't, oh boy!\n"
+        b"I wouldn't want to be there\n"
+        b"to witness the carnage!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If you're not rolling high on\n"
+        b"ATK, you might want to keep\n"
+        b"a Fright Mask handy.\n"
+        b"<k>",
+
+    b"tot_di005105_00":
+        b"Doing fine, I see?\n"
+        b"<wait 250>Guess you didn't run afoul of\n"
+        b"the Hammer Bros. and co.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Hammer, Fire, and Boomerang\n"
+        b"Bros. all have high HP and DEF,\n"
+        b"but fairly modest ATK.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Don't let your guard down!\n"
+        b"If you get them to half HP,\n"
+        b"they'll attack like maniacs!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If you don't want a zillion\n"
+        b"attacks to the face, pay close\n"
+        b"attention to their health!\n"
+        b"<k>",
+
+    b"tot_di005106_00":
+        b"Right as rain, are we?\n"
+        b"<wait 250>Seems you haven't been hexed\n"
+        b"by a Magikoopa, then.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"The usual, blue-robed types\n"
+        b"have a variety of magical\n"
+        b"spells I'm sure you're used to.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"The rarer-colored ones are\n"
+        b"specialists, though, and only\n"
+        b"appear as supporting foes.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Red ones have higher ATK\n"
+        b"and only use Huge and DEF-\n"
+        b"buffing magic.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Green ones have DEF and\n"
+        b"use support magic, and White\n"
+        b"have more HP and can heal.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If they decide to clone, you\n"
+        b"can't tell them apart, so have\n"
+        b"a spread attack handy!\n"
+        b"<k>",
+    
+    # NPC I (Toad).
+    
+    # NPC K (Toad in east house).
+    
+    # Mayor Kroop.
+    
+    # Gatekeeper Koopa.
+    
+
     # Cosmetic shopkeepers.
 
     b"tot_shopkeep_yesno":

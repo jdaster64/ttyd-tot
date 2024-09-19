@@ -32,6 +32,11 @@ namespace ConversationId {
         NPC_INN             = 4000,
         NPC_INN_CVS_START   = 4100,
         NPC_INN_CVS_END     = NPC_INN_CVS_START + 5,
+
+        // NPC H (Koopa)
+        NPC_H               = 5000,
+        NPC_H_CVS_START     = 5100,
+        NPC_H_CVS_END       = NPC_H_CVS_START + 7,
     };
 }
 

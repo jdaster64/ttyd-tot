@@ -375,6 +375,12 @@ EVT_BEGIN(Npc_C_Talk)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Npc_H_Talk)
+    SET(LW(15), (int32_t)ConversationId::NPC_H)
+    RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Npc_Innkeeper_Talk)
     SET(LW(15), (int32_t)ConversationId::NPC_INN)
     RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
@@ -838,7 +844,7 @@ const NpcSetupInfo gon_11_npc_data[10] = {
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = (void*)Npc_GenericMove,
-        .talkEvtCode = (void*)Npc_GenericTalk,
+        .talkEvtCode = (void*)Npc_H_Talk,
     },
     {
         .name = g_NpcNokonokoI,

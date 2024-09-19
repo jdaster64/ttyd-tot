@@ -93,6 +93,16 @@ void DialogueManager::SetConversation(int32_t id) {
             g_ConversationId = ConversationId::NPC_INN_CVS_START + cv_id;
             break;
         }
+        case ConversationId::NPC_H: {
+            if (completed_runs < 1) break;
+            
+            int32_t num_cvs =
+                ConversationId::NPC_H_CVS_END -
+                ConversationId::NPC_H_CVS_START;
+            int32_t cv_id = coins_earned % num_cvs;
+            g_ConversationId = ConversationId::NPC_H_CVS_START + cv_id;
+            break;
+        }
     }
 }
 
