@@ -5730,7 +5730,7 @@ g_TowerStrings = {
     b"tot_zess_nomoretocook":
         b"Well, I've done all I can do.\n"
         b"<wait 200>Enjoy the fruit of my culinary\n"
-        b"magic, Contact-Lens Killer!\n<k>\n<p>\n"
+        b"magic, Contact Crusher!\n<k>\n<p>\n"
         b"Okay, admittedly that one\n"
         b"was a bit on the nose...\n<k>",
         
@@ -7425,11 +7425,239 @@ g_PetalburgEastStrings = {
         b"<k>",
     
     # NPC K (Toad in east house).
+
+    b"tot_di007000_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>Lovely day today, isn't it?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Ever since your exploits at\n"
+        b"Hooktail Castle, I've been\n"
+        b"keeping up with your moves!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You and your partners have\n"
+        b"really mastered the art of\n"
+        b"combat, and with such style!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Come back any time and we\n"
+        b"can chat about whatever\n"
+        b"fancy moves you want!\n"
+        b"<k>",
+
+    b"tot_di007100_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>Lovely out today, isn't it?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I've noticed you've perfected\n"
+        b"your Spring Jump move\n"
+        b"recently!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"What a breathtaking \n"
+        b"three-hit combo, and with\n"
+        b"added zip, to boot!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"<dynamic 3>Boom</dynamic><wait 125>\n"
+        b"-<dynamic 3>bang</dynamic><wait 125>\n"
+        b"-<dynamic 3>POW!</dynamic> \n"
+        b"<wait 250>That's really showing your\n"
+        b"enemies what for!\n"
+        b"<k>",
+
+    b"tot_di007101_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>Wonderful day, isn't it?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I've noticed you're putting\n"
+        b"a bit more <dynamic 3>oomph</dynamic> into your\n"
+        b"Ultra Hammer these days!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"That extra <dynamic 3>WHACK</dynamic> when the\n"
+        b"enemy lands just looks so\n"
+        b"satisfying!\n"
+        b"<k>",
+
+    b"tot_di007102_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>Beautiful out, isn't it?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Your supplemental jump and\n"
+        b"hammer moves are putting in\n"
+        b"a lot more work now!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Power Jump inflicting Soft\n"
+        b"and Power Smash piercing DEF\n"
+        b"really help pack a punch!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Shrink Smash and Ice Smash\n"
+        b"are devastating to unlucky\n"
+        b"foes' offense and defense!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Even old Tornado Jump's\n"
+        b"shining with its ground-bound\n"
+        b"tornadoes and Dizzy status!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You really know how to put\n"
+        b"the hurt on enemies with style!\n"
+        b"<k>",
+
+    b"tot_di007103_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>I've been scoping out your\n"
+        b"partners' moves as well!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Speaking of, Goombella's\n"
+        b"really ingenious for coming up\n"
+        b"with that Scope Out move!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Being able to land a move\n"
+        b"on a dodgy enemy's a real boon,\n"
+        b"let alone guarantee status!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Her invulnerable Ironbonk is\n"
+        b"also super! Can't complain about\n"
+        b"a move that ignores hazards!\n"
+        b"<k>",
+
+    b"tot_di007104_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>It seems dear Koops has proven\n"
+        b"himself to be quite strong!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"He makes his shell-tossing\n"
+        b"moves look as quick and easy\n"
+        b"as ever...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And he's proven to make\n"
+        b"good use of that hard shell\n"
+        b"with Withdraw!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And Bulk Up, boosting ATK\n"
+        b"and DEF with his raw courage!\n"
+        b"He should be quite proud.\n"
+        b"<k>",
+
+    b"tot_di007105_00":
+        b"Oh, hi there! <wait 250>My, Flurrie's\n"
+        b"really been channeling her\n"
+        b"elemental prowess lately!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Ice and electric storms that\n"
+        b"cover the whole field?\n"
+        b"What awesome power!\n"
+        b"<k>",
+
+    b"tot_di007106_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>That Yoshi's really mastered\n"
+        b"the art of egg-tossing!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Specializing into the more\n"
+        b"damaging Egg Barrage or more\n"
+        b"debilitating Mini-Egg is genius!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I'll bet both moves could\n"
+        b"help make a single tough foe\n"
+        b"a lot less threatening!\n"
+        b"<k>",
+
+    b"tot_di007107_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>That sweet Vivian is as\n"
+        b"charming as ever!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Her fire powers dropping\n"
+        b"enemies' ATK has got to be\n"
+        b"vital for defense, I imagine.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Neutralize preventing status\n"
+        b"on any fighter's got to have\n"
+        b"interesting uses, as well!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But nothing compares to\n"
+        b"just winning an enemy over\n"
+        b"with Infatuate, no doubt!\n"
+        b"<k>",
+
+    b"tot_di007108_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>Admiral Bobbery's as explosive\n"
+        b"a personality as ever!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"His Bob-ombast looks even\n"
+        b"stronger than ever at its\n"
+        b"maximum power!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"To say nothing of the utter,\n"
+        b"reckless destruction of a fully\n"
+        b"charged Megaton Bomb!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I should hope he knows how\n"
+        b"to utilize it without disregard\n"
+        b"to both of your safety!\n"
+        b"<k>",
+
+    b"tot_di007109_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>Looks like Ms. Mowz is as\n"
+        b"crafty as ever!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"She's really perfected that\n"
+        b"Tease move, confusing enemies\n"
+        b"instead of just dizzying them.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And making enemies likelier\n"
+        b"to act in confusion at higher\n"
+        b"levels? How fiendish!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You could probably let a\n"
+        b"group of foes take each other\n"
+        b"down with that move alone!\n"
+        b"<k>",
     
     # Mayor Kroop.
     
     # Gatekeeper Koopa.
     
+    b"tot_di012000_00":
+        b"With the dragons causing\n"
+        b"a ruckus, I can't let anyone\n"
+        b"enter the town this way.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You're not missing much, at\n"
+        b"any rate. <wait 250>The fortress's been\n"
+        b"empty for some time.\n"
+        b"<k>",
 
     # Cosmetic shopkeepers.
 

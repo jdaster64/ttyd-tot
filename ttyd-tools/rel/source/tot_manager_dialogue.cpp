@@ -123,6 +123,33 @@ void DialogueManager::SetConversation(int32_t id) {
             g_ConversationId = ConversationId::NPC_I_CVS_START + cv_id;
             break;
         }
+        case ConversationId::NPC_K: {
+            if (completed_runs < 1 || !GetSWF(GSWF_NpcK_FirstTimeChat)) {
+                SetSWF(GSWF_NpcK_FirstTimeChat);
+                break;
+            }
+
+            int32_t ids[10] = { ConversationId::NPC_K_BADGE_MOVES };
+            int32_t num_cvs = 1;
+
+            if (state.GetOption(STAT_PERM_MOVE_LOG, MoveType::JUMP_SPRING) 
+                && MoveLogFlags::UNLOCKED_LV_1) {
+                ids[num_cvs++] = ConversationId::NPC_K_SPRING_JUMP;
+            }
+            if (state.GetOption(STAT_PERM_MOVE_LOG, MoveType::HAMMER_ULTRA) 
+                && MoveLogFlags::UNLOCKED_LV_1) {
+                ids[num_cvs++] = ConversationId::NPC_K_ULTRA_HAMMER;
+            }
+            for (int32_t i = 1; i <= 7; ++i) {
+                if (state.GetOption(STAT_PERM_PARTNERS_OBTAINED) & (1 << i)) {
+                    ids[num_cvs++] = ConversationId::NPC_K_PARTNER_1 + i - 1;
+                }
+            }
+
+            int32_t cv_id = coins_earned % num_cvs;
+            g_ConversationId = ids[cv_id];
+            break;
+        }
     }
 }
 

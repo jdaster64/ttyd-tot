@@ -387,8 +387,20 @@ EVT_BEGIN(Npc_I_Talk)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Npc_K_Talk)
+    SET(LW(15), (int32_t)ConversationId::NPC_K)
+    RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Npc_Innkeeper_Talk)
     SET(LW(15), (int32_t)ConversationId::NPC_INN)
+    RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Npc_Gatekeeper_Talk)
+    SET(LW(15), (int32_t)ConversationId::NPC_GATEKEEPER)
     RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
     RETURN()
 EVT_END()
@@ -530,11 +542,6 @@ EVT_END()
 EVT_BEGIN(Gatekeeper_InitEvt)
     // Location when standing out of the way (should never be the case):
     // USER_FUNC(evt_npc_set_position, PTR("me"), 370, 0, -76)
-    RETURN()
-EVT_END()
-
-EVT_BEGIN(Gatekeeper_TalkEvt)
-    USER_FUNC(evt_msg_print, 0, PTR("tot_npc_generic"), 0, PTR("me"))
     RETURN()
 EVT_END()
 
@@ -863,7 +870,7 @@ const NpcSetupInfo gon_11_npc_data[10] = {
         .name = g_NpcNokonokoK,
         .flags = 0,
         .initEvtCode = npc_init_evt,
-        .talkEvtCode = (void*)Npc_GenericTalk,
+        .talkEvtCode = (void*)Npc_K_Talk,
     },
     {
         .name = g_NpcMayorKroop,
@@ -875,7 +882,7 @@ const NpcSetupInfo gon_11_npc_data[10] = {
         .name = g_NpcGatekeeper,
         .flags = 0x4000'0600,
         .initEvtCode = (void*)Gatekeeper_InitEvt,
-        .talkEvtCode = (void*)Gatekeeper_TalkEvt,
+        .talkEvtCode = (void*)Npc_Gatekeeper_Talk,
     },
     {
         // Leave disabled permanently.
