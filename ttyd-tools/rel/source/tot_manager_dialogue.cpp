@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_state.h"
 
 #include <ttyd/evtmgr.h>
@@ -80,6 +81,63 @@ void DialogueManager::SetConversation(int32_t id) {
             
             if (completed_runs >= 5 && coins_earned % 11 == 0) {
                 g_ConversationId = ConversationId::NPC_C_CVS_SPECIAL;
+            }
+            break;
+        }
+        case ConversationId::NPC_D: {
+            if (completed_runs < 1 || !GetSWF(GSWF_NpcD_FirstTimeChat)) {
+                SetSWF(GSWF_NpcD_FirstTimeChat);
+                break;
+            }
+
+            int8_t const* grid;
+            int8_t const* states;
+            AchievementsManager::GetAchievementGrid(&grid);
+            AchievementsManager::GetAchievementStates(&states, false);
+
+            int8_t ids[AchievementId::MAX_ACHIEVEMENT + 1];
+            int32_t num_cvs = 0;
+            int32_t num_achievements = 0;
+
+            for (int32_t i = 0; i < 70; ++i) {
+                if (grid[i] >= AchievementId::SECRET_COINS) continue;
+
+                if (states[i] == 2) {
+                    ++num_achievements;
+                } else if (states[i] == 1) {
+                    // Achievement visible but not completed; if there is
+                    // a dialogue option for it, add it to the possibility list.
+                    switch (grid[i]) {
+                        case AchievementId::RUN_NPC_DEALS_7:
+                        case AchievementId::RUN_NO_JUMP_HAMMER:
+                        case AchievementId::RUN_ALL_MOVES_MAXED:
+                        case AchievementId::RUN_ALL_CONDITIONS_MET:
+                        case AchievementId::RUN_ALL_FLOORS_3_TURN:
+                        case AchievementId::RUN_NO_DAMAGE:
+                        case AchievementId::RUN_HIGH_INTENSITY:
+                        case AchievementId::RUN_ZERO_STAT_1:
+                        case AchievementId::RUN_ZERO_STAT_2:
+                        case AchievementId::MISC_TRADE_OFF_BOSS:
+                        case AchievementId::MISC_SUPERGUARD_BITE:
+                        case AchievementId::MISC_SHINES_10:
+                        case AchievementId::MISC_RUN_COINS_999:
+                        case AchievementId::META_ALL_OPTIONS:
+                        case AchievementId::META_ITEM_LOG_BASIC:
+                            ids[num_cvs++] = grid[i];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            if (num_achievements == AchievementId::SECRET_COINS) {
+                g_ConversationId = ConversationId::NPC_D_ALL_DONE;
+            } else if (num_cvs < 1) {
+                g_ConversationId = ConversationId::NPC_D_NONE_ACTIVE;
+            } else {
+                int32_t cv_id = coins_earned % num_cvs;
+                g_ConversationId = ConversationId::NPC_D_CVS_BASE + ids[cv_id];
             }
             break;
         }

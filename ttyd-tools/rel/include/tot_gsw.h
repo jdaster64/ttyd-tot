@@ -41,6 +41,8 @@ enum GlobalWorkVars {
     GSWF_BubulbPFlags_End                   = GSWF_BubulbPFlags + 30,
     GSWF_BubulbP_FirstTalk                  = GSWF_BubulbPFlags_End,
     GSWF_BubulbP_SeedUnlocked,
+    // Flag for having chatted with NPC D for the first time.
+    GSWF_NpcD_FirstTimeChat,
     // Flag for having chatted with NPC I post-tutorial clears.
     GSWF_NpcI_PostTutorialChat,
     // Flag for having chatted with NPC K for the first time.

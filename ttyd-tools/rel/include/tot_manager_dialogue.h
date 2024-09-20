@@ -66,6 +66,12 @@ namespace ConversationId {
         NPC_KROOP_CVS_START = 8200,
         NPC_KROOP_CVS_END   = NPC_KROOP_CVS_START + 4,
 
+        // NPC D (Koopa in house east of shop)
+        NPC_D               = 9000,
+        NPC_D_CVS_BASE      = 9100,
+        NPC_D_NONE_ACTIVE   = 9300,
+        NPC_D_ALL_DONE      = 9301,
+
         // NPC - East Petalburg gatekeeper
         NPC_GATEKEEPER      = 12000,
     };
