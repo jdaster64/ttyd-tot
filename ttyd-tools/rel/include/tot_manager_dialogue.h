@@ -59,6 +59,13 @@ namespace ConversationId {
         NPC_K_PARTNER_6,
         NPC_K_PARTNER_7,
 
+        // Mayor Kroop
+        NPC_KROOP           = 8000,
+        NPC_KROOP_TUT_1     = 8100,
+        NPC_KROOP_TUT_2     = 8101,
+        NPC_KROOP_CVS_START = 8200,
+        NPC_KROOP_CVS_END   = NPC_KROOP_CVS_START + 4,
+
         // NPC - East Petalburg gatekeeper
         NPC_GATEKEEPER      = 12000,
     };

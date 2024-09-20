@@ -393,6 +393,12 @@ EVT_BEGIN(Npc_K_Talk)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Npc_MayorKroop_Talk)
+    SET(LW(15), (int32_t)ConversationId::NPC_KROOP)
+    RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Npc_Innkeeper_Talk)
     SET(LW(15), (int32_t)ConversationId::NPC_INN)
     RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
@@ -876,7 +882,7 @@ const NpcSetupInfo gon_11_npc_data[10] = {
         .name = g_NpcMayorKroop,
         .flags = 0x4000'0600,
         .initEvtCode = npc_init_evt,
-        .talkEvtCode = (void*)Npc_GenericTalk,
+        .talkEvtCode = (void*)Npc_MayorKroop_Talk,
     },
     {
         .name = g_NpcGatekeeper,

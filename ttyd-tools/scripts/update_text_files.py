@@ -17,8 +17,12 @@ FLAGS.DefineString("in_msg_dir", "")
 FLAGS.DefineString("out_msg_dir", "")
 
 g_GlobalStrings = {
-    # Generic placeholder string.
+    # Generic dummy string.
     b"tot_msg_dummy":       b"Placeholder",
+        
+    # Generic dummy NPC dialogue.
+    b"tot_npc_generic":
+        b"[Placeholder] I'm interactable.\n<k>",
     
     # Item & badge names.
     b"in_cake":                 b"Strawberry Cake",
@@ -1218,15 +1222,6 @@ g_GlobalStrings = {
     # File select text.
     
     b"tot_file_completion":       b"Completion",
-    
-    # TODO: Move this and other Gold Fuzzy dialogue to the final boss map.
-    
-    b"tot_gfz_call_horde":
-        b"Meee-OOOF!<wait 250> Hey!<wait 250> Ow!\n"
-        b"<wait 250>\nYou chumps are tougher than\n"
-        b"you look...\n<k>\n<p>\n"
-        b"But I'm not through yet!\n<wait 250>\n"
-        b"Everyone! GET 'EM!!!\n<k>",
         
     # Generic Map text.
     
@@ -4946,22 +4941,13 @@ g_GlobalStrings = {
     b'menu_enemy_400':
         b"[Dummy] Fuzzy Horde",
         
-    # Misc.
+    # Misc. strings.
     
     b"msg_nameent_3":
         b"Choose a name for the seed!",
-        
-    # Placeholder NPC dialogue (map-agnostic).
-        
-    b"tot_npc_generic":
-        b"[Placeholder] I'm interactable.\n<k>",
 }
 
 g_TowerLobbyStrings = {
-    # Area tattle. (TODO: Write final script)
-    
-    b"msg_kuri_map":
-        b"Placeholder area tattle \xd0\n<k>",
         
     # General lobby text.
     
@@ -6084,38 +6070,18 @@ g_TowerBossFloorStrings = {
     # Bonetail fake death (unused).
     b"tot_dragon02_90":
         b"[Placeholder] Dead?",
+    
+    # Gold Fuzzy mid-fight dialogue.
+    
+    b"tot_gfz_call_horde":
+        b"Meee-OOOF!<wait 250> Hey!<wait 250> Ow!\n"
+        b"<wait 250>\nYou chumps are tougher than\n"
+        b"you look...\n<k>\n<p>\n"
+        b"But I'm not through yet!\n<wait 250>\n"
+        b"Everyone! GET 'EM!!!\n<k>",
 }
 
 g_PetalburgWestStrings = {
-
-    # "First visit" cutscene.
-    
-    b"tot_town_firstvisit_00":
-        b"Oh, Mario! <wait 100>You got here\n"
-        b"just in time! <wait 200>I suppose you're\n"
-        b"aware that dragon's back!?\n<k>",
-    
-    b"tot_town_firstvisit_01":
-        b"Oh, it's terrible! It seems\n"
-        b"the castle's been fortified\n"
-        b"considerably since last time.\n<k>\n<p>\n"
-        b"Tons of rooms, <wait 100>overrun with\n"
-        b"all sorts of enemies, <wait 200>and\n"
-        b"who knows what else?\n<k>\n<p>\n"
-        b"I don't know what she's\n"
-        b"planning, <wait 150>but something's\n"
-        b"gotta be done about it!\n<k>",
-    
-    b"tot_town_firstvisit_02":
-        b"I'm glad to hear you say\n"
-        b"that, Mario. <wait 150>We all owe you\n"
-        b"an eternal debt already!\n<k>\n<p>\n"
-        b"I know there's not much we\n"
-        b"can do to help right now, <wait 150>but\n"
-        b"we're behind you all the way!\n<k>\n<p>\n"
-        b"Please do come on back if you\n"
-        b"run into trouble! <wait 200>Rest assured,\n"
-        b"we'll keep this town safe.\n<k>",
 
     # Shopkeeper dialogue.
 
@@ -6199,7 +6165,42 @@ g_PetalburgWestStrings = {
     b"tot_shopkeep_yesno":
         b"<select 0 1 0 40>\nYes\nNo",
         
-    # Bub-ulber dialogue.
+    # NPC A (Koopa near west entrance) dialogue.
+
+    # "First visit" cutscene.
+    
+    b"tot_town_firstvisit_00":
+        b"Oh, Mario! <wait 100>You got here\n"
+        b"just in time! <wait 200>I suppose you're\n"
+        b"aware that dragon's back!?\n<k>",
+    
+    b"tot_town_firstvisit_01":
+        b"Oh, it's terrible! It seems\n"
+        b"the castle's been fortified\n"
+        b"considerably since last time.\n<k>\n<p>\n"
+        b"Tons of rooms, <wait 100>overrun with\n"
+        b"all sorts of enemies, <wait 200>and\n"
+        b"who knows what else?\n<k>\n<p>\n"
+        b"I don't know what she's\n"
+        b"planning, <wait 150>but something's\n"
+        b"gotta be done about it!\n<k>",
+    
+    b"tot_town_firstvisit_02":
+        b"I'm glad to hear you say\n"
+        b"that, Mario. <wait 150>We all owe you\n"
+        b"an eternal debt already!\n<k>\n<p>\n"
+        b"I know there's not much we\n"
+        b"can do to help right now, <wait 150>but\n"
+        b"we're behind you all the way!\n<k>\n<p>\n"
+        b"Please do come on back if you\n"
+        b"run into trouble! <wait 200>Rest assured,\n"
+        b"we'll keep this town safe.\n<k>",
+        
+    # TODO: other NPC A cutscenes.
+    
+    # TODO: NPC A general comments on previous run.
+        
+    # NPC F (Bub-ulber) dialogue.
     
     # Special dialogue.
     
@@ -6445,10 +6446,8 @@ g_PetalburgWestStrings = {
         b"I'd bet you 1,000 coins that\n"
         b"even that shuffling process\n"
         b"is controlled by seeds!\n<k>\n<o>",
-       
-    # TODO: More Koopa dialogue, regular NPC dialogue.
     
-    # NPC C - Gamer Toad
+    # NPC C - Little Toad
     
     b"tot_di003000_00":
         b"Hey, man, what's up?\n"
@@ -7019,13 +7018,15 @@ g_PetalburgWestStrings = {
         b"It straight-up gives you some\n"
         b"SP at the start of a fight!\n"
         b"<k>",
+        
+    # TODO: NPC D (Poster Koopa).
 
 }
 
 g_PetalburgEastStrings = {
     # Regular NPCs.
     
-    # NPC G (Blue Bub-ulb).
+    # TODO: NPC G (Blue Bub-ulb).
 
     # NPC H (Koopa).
     
@@ -7645,6 +7646,168 @@ g_PetalburgEastStrings = {
         b"<k>",
     
     # Mayor Kroop.
+    
+    b"tot_di008100_00":
+        b"Hmph? <wait 250>Who izzat?\n"
+        b"<wait 250>Oh, it's just you, Murphy.\n"
+        b"<wait 250>How kind of you to drop by!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Word is that no-goodnik\n"
+        b"dragon's up to something, and\n"
+        b"yer fixin' to tell it what for!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, that's mighty nice\n"
+        b"of you, Murphy! <wait 250>I'd go an' help\n"
+        b"too, if I could...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But alas, <wait 100>my fightin' days are\n"
+        b"long gone. <wait 250>Heck, <wait 100>I can barely\n"
+        b"drag this old shell outta bed!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I tell you, it means the world\n"
+        b"that you'd check up on an old\n"
+        b"coot like me. <shake>*Sniff...*</shake> \n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I'll be rootin' for you, Murphy.\n"
+        b"And I'll be here any time to\n"
+        b"chat about the good ol' days.\n"
+        b"<k>",
+
+    b"tot_di008101_00":
+        b"Oh, hello, Murphy. <wait 250>Whuzzat?\n"
+        b"<wait 250>You say all that dragon\n"
+        b"wanted was a challenge?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And you say you're doing\n"
+        b"this for a reward and not\n"
+        b"just to humor 'em?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well I gotta say, Murphy,\n"
+        b"I thought better of you!\n"
+        b"<wait 250>Treasure, <wait 150>well, I never...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Ah, well, I guess the youth\n"
+        b"of today can't afford to be\n"
+        b"noble for noble's sake...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Why, I could regale you with\n"
+        b"countless yarns of daring-do\n"
+        b"from back in my salad years.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And for nothing but the thrill\n"
+        b"of it! <wait 200>Yessir-ee... <wait 300>you come on\n"
+        b"back, Murphy, and you'll see!\n"
+        b"<k>",
+
+    b"tot_di008200_00":
+        b"Back in my day, I was as\n"
+        b"hale as ever! I could've run\n"
+        b"circles around any hooligans!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But I didn't think it fair to\n"
+        b"come at those whippersnappers\n"
+        b"with everything I had!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I didn't need all that fancy\n"
+        b"FP and BP stuff, so I just set\n"
+        b"it all aside! <wait 250>Yessir...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Sure, the fights were intense,\n"
+        b"but a fight well fought is its\n"
+        b"own reward, I say!\n"
+        b"<k>",
+
+    b"tot_di008201_00":
+        b"Back in the old days, Murphy,\n"
+        b"I got in scraps with some <dynamic 3>REAL</dynamic> \n"
+        b"bad baddies, you see?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"They could dish out and take\n"
+        b"twice as many licks as any\n"
+        b"upstarts you see nowadays!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And I relished the challenge!\n"
+        b"<wait 250>Not for a reward, mind you,\n"
+        b"<wait 200>but just for the sake of it!\n"
+        b"<k>",
+
+    b"tot_di008202_00":
+        b"You young'uns have got it\n"
+        b"real easy these days, y'know,\n"
+        b"with all these fancy shops!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Back in my day, I took what\n"
+        b"I could carry on my own shell\n"
+        b"and my own two legs!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And if, <wait 250>mind you,<wait 100> <dynamic 3>if</dynamic>\n"
+        b"<wait 350> I had the\n"
+        b"fortune of finding a shopkeeper,\n"
+        b"he was traveling just as light!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You ought to try and learn\n"
+        b"to be content with what you\n"
+        b"got, Murphy!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Spurn those super-stocked\n"
+        b"shopkeepers' shelves, <wait 250>slough off\n"
+        b"those Strange Sacks...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And for Peach's sake, don't\n"
+        b"go in carrying your whole house\n"
+        b"with you!\n"
+        b"<k>",
+
+    b"tot_di008203_00":
+        b"You know, Murphy, you young\n"
+        b"folk are spoiled for choice\n"
+        b"these days!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"When I was explorin' back in\n"
+        b"my halcyon days, I was living\n"
+        b"off the land!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Sometimes the only choice I\n"
+        b"had was to press on or head\n"
+        b"back, tail between my legs!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And by the stars, press on,\n"
+        b"I did! Taking my licks as they\n"
+        b"came all the way!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You oughtta learn to live\n"
+        b"with the choices you're\n"
+        b"presented with, Murphy!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And just to build character,\n"
+        b"not because it gets you some\n"
+        b"special achievement!\n"
+        b"<k>",
     
     # Gatekeeper Koopa.
     
