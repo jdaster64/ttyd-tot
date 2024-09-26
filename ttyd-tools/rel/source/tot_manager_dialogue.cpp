@@ -65,14 +65,16 @@ void DialogueManager::SetConversation(int32_t id) {
     // For some NPCs, override the default conversation type based on
     // pseudo-random factors like run stats, or other conditions.
     switch (id) {
-        case ConversationId::BUBULB_P: {
-            int32_t num_cvs =
-                ConversationId::BUBULB_P_CVS_END -
-                ConversationId::BUBULB_P_CVS_START;
-            int32_t cv_id = damage_dealt % num_cvs;
-            g_ConversationId = ConversationId::BUBULB_P_CVS_START + cv_id;
-
-            SetSWByte(GSW_Hub_BubulbP_CurrentConversation, cv_id);
+        case ConversationId::NPC_A: {
+            // TODO: Add special responses after winning / losing a run.
+            break;
+        }
+        case ConversationId::NPC_A_FIRST_VISIT:
+        case ConversationId::NPC_A_FIRST_CLEAR:
+        case ConversationId::NPC_A_SECOND_CLEAR: {
+            // Special-occasion cutscenes always have three dialogue boxes.
+            static int8_t NpcA_CutsceneConversation[] =  { 0, 0, 0, -1 };
+            g_ConversationPtr = NpcA_CutsceneConversation;
             break;
         }
         case ConversationId::NPC_B: {
@@ -154,6 +156,16 @@ void DialogueManager::SetConversation(int32_t id) {
                 int32_t cv_id = coins_earned % num_cvs;
                 g_ConversationId = ConversationId::NPC_D_CVS_BASE + ids[cv_id];
             }
+            break;
+        }
+        case ConversationId::NPC_F: {
+            int32_t num_cvs =
+                ConversationId::NPC_F_CVS_END -
+                ConversationId::NPC_F_CVS_START;
+            int32_t cv_id = damage_dealt % num_cvs;
+            g_ConversationId = ConversationId::NPC_F_CVS_START + cv_id;
+
+            SetSWByte(GSW_NpcF_CurrentConversation, cv_id);
             break;
         }
         case ConversationId::NPC_INN: {
@@ -377,6 +389,11 @@ EVT_DEFINE_USER_FUNC(evtTot_GetNextMessage) {
     evtSetValue(evt, evt->evtArguments[0], PTR(msg));
     evtSetValue(evt, evt->evtArguments[1], speaker_type);
 
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_HasConversationQueued) {
+    evtSetValue(evt, evt->evtArguments[0], g_ConversationContinueId != 0);
     return 2;
 }
 

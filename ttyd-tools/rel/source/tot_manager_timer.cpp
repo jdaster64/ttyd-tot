@@ -125,6 +125,11 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     auto& state = g_Mod->state_;
     int32_t igt_centis = DurationTicksToCentiseconds(state.current_total_igt_);
 
+    // Flags for special conversations with Koopa on return.
+    bool is_first_ex_clear = false;
+    bool is_new_time_record = false;
+    bool is_new_intensity_record = false;
+
     switch (state.GetOptionValue(OPT_DIFFICULTY)) {
         case OPTVAL_DIFFICULTY_HALF:
             state.ChangeOption(STAT_PERM_HALF_FINISHES);
@@ -136,8 +141,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 40 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_SPEED2);
                 }
-                if (igt_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME))
+                if (igt_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME)) {
                     state.SetOption(STAT_PERM_HALF_BEST_TIME, igt_centis);
+                    is_new_time_record = true;
+                }
             }
             break;
         case OPTVAL_DIFFICULTY_FULL:
@@ -150,8 +157,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 90 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_SPEED2);
                 }
-                if (igt_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME))
+                if (igt_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME)) {
                     state.SetOption(STAT_PERM_FULL_BEST_TIME, igt_centis);
+                    is_new_time_record = true;
+                }
             }
             break;
         case OPTVAL_DIFFICULTY_FULL_EX:
@@ -164,9 +173,13 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 140 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_EX_SPEED2);
                 }
-                if (igt_centis < state.GetOption(STAT_PERM_EX_BEST_TIME))
+                if (igt_centis < state.GetOption(STAT_PERM_EX_BEST_TIME)) {
                     state.SetOption(STAT_PERM_EX_BEST_TIME, igt_centis);
+                    is_new_time_record = true;
+                }
             }
+            if (state.GetOption(STAT_PERM_EX_FINISHES) == 1)
+                is_first_ex_clear = true;
             break;
         default:
             break;
@@ -313,12 +326,23 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     // Update highest intensity cleared.
     if (intensity > state.GetOption(STAT_PERM_MAX_INTENSITY)) {
         state.SetOption(STAT_PERM_MAX_INTENSITY, intensity);
+        is_new_intensity_record = true;
     }
 
     // Update number of 'tutorial' tower run clears.
     int32_t tut_clears = GetSWByte(GSW_Tower_TutorialClears);
     if (tut_clears < 2) {
         SetSWByte(GSW_Tower_TutorialClears, ++tut_clears);
+        // Queue a special cutscene with Koopa.
+        SetSWByte(GSW_NpcA_SpecialConversation, tut_clears + 1);
+    } else if (is_first_ex_clear) {
+        SetSWByte(GSW_NpcA_SpecialConversation, 4);
+    } else if (is_new_time_record) {
+        SetSWByte(GSW_NpcA_SpecialConversation, 5);
+    } else if (is_new_intensity_record) {
+        SetSWByte(GSW_NpcA_SpecialConversation, 6);
+    } else {
+        SetSWByte(GSW_NpcA_SpecialConversation, 0);
     }
 
     // Reshuffle the hub item shop.

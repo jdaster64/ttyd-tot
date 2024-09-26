@@ -188,7 +188,7 @@ uint32_t OptionLookup(uint16_t lookup_key) {
 bool OptionUnlocked(const OptionMenuData& data) {
     switch (data.option) {
         case WIN_SEED_SELECT:
-            return GetSWF(GSWF_BubulbP_SeedUnlocked);
+            return GetSWF(GSWF_NpcF_SeedUnlocked);
         case OPT_NPC_CHOICE_1:
         case OPT_NPC_CHOICE_2:
         case OPT_NPC_CHOICE_3:

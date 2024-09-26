@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_custom_rel.h"
 #include "tot_gon_tower_npcs.h"
+#include "tot_gsw.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
@@ -273,6 +274,8 @@ EVT_BEGIN(Opening_TriggerHooktailEvt)
     END_INLINE()
 
     WAIT_FRM(15)
+    // Set up special conversation event for first visit to Petalburg.
+    SET((int32_t)GSW_NpcA_SpecialConversation, 1)
     // Load player into Petalburg west map.
     USER_FUNC(evt_snd_bgmoff, 513)
     USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)

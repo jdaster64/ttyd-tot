@@ -363,6 +363,21 @@ EVT_BEGIN(Npc_ConversationDrive_Talk)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Npc_A_Talk)
+    // Print initial dialogue.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_A)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+    // If dialogue has a programmatic ending attached, also display it.
+    USER_FUNC(evtTot_HasConversationQueued, LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_A)
+        USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+        USER_FUNC(evt_msg_print_add, 0, LW(0))
+    END_IF()
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Npc_B_Talk)
     SET(LW(15), (int32_t)ConversationId::NPC_B)
     RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
@@ -386,8 +401,9 @@ EVT_BEGIN(Npc_G_Talk)
     USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G)
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
     USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
-    // If dialogue was about a specific reward, add on the predetermined ending.
-    IF_STR_LARGE_EQUAL(LW(0), PTR("tot_di010200_00"))
+    // If dialogue has a programmatic ending attached, also display it.
+    USER_FUNC(evtTot_HasConversationQueued, LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
         USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G)
         USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
         USER_FUNC(evt_msg_print_add, 0, LW(0))
@@ -467,9 +483,9 @@ EVT_BEGIN(Npc_BubulbP_NameEntry)
 EVT_END()
 
 EVT_BEGIN(Npc_BubulbP_Talk)
-    IF_EQUAL((int32_t)GSWF_BubulbP_FirstTalk, 0)
+    IF_EQUAL((int32_t)GSWF_NpcF_FirstTalk, 0)
         USER_FUNC(evt_msg_print, 0, PTR("tot_bubulb_firsttalk"), 0, PTR("me"))
-        SET((int32_t)GSWF_BubulbP_FirstTalk, 1)
+        SET((int32_t)GSWF_NpcF_FirstTalk, 1)
         GOTO(99)
     END_IF()
 
@@ -478,7 +494,7 @@ EVT_BEGIN(Npc_BubulbP_Talk)
         GOTO(99)
     END_IF()
 
-    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BUBULB_P)
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_F)
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
     USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
 
@@ -489,7 +505,7 @@ EVT_BEGIN(Npc_BubulbP_Talk)
         USER_FUNC(evt_msg_print_add, 0, PTR("tot_bubulb_unlockseed"))
         USER_FUNC(evt_msg_print, 0, PTR("tot_bubulb_seedtut"), 0, 0)
     ELSE()
-        IF_EQUAL((int32_t)GSWF_BubulbP_SeedUnlocked, 1)
+        IF_EQUAL((int32_t)GSWF_NpcF_SeedUnlocked, 1)
             USER_FUNC(evt_msg_print_add, 0, PTR("tot_bubulb_setseed"))
             USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_yesno"))
             IF_EQUAL(LW(0), 1)
@@ -554,8 +570,8 @@ EVT_END()
 
 EVT_BEGIN(Villager_A_InitEvt)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR("me"), 1536)
-    // Don't set the NPC's position when doing the opening cutscene.
-    IF_LARGE((int32_t)GSW_Hub_WelcomeKoopaCutsceneState, 0)
+    // Don't set NPC A's initial position if he's involved in a cutscene.
+    IF_EQUAL((int32_t)GSW_NpcA_SpecialConversation, 0)
         USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
     END_IF()
     RETURN()
@@ -571,25 +587,40 @@ EVT_BEGIN(Gatekeeper_InitEvt)
     RETURN()
 EVT_END()
 
-EVT_BEGIN(FirstVisit_Evt)
+EVT_BEGIN(SpecialOpening_Evt)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_snd_bgm_scope, 0, 1)
     USER_FUNC(evt_mario_set_pos, -545, 0, 0)
     USER_FUNC(evt_npc_set_position, PTR(g_NpcNokonokoA), -250, 0, 65)
-    USER_FUNC(evt_cam3d_evt_set, 730, 617, 915, 245, 93, 144, 0, 11)
-    USER_FUNC(evt_seq_wait, 2)
-    INLINE_EVT()
-        USER_FUNC(evt_cam3d_evt_set, FLOAT(-450.0), FLOAT(400.0), FLOAT(840.0), FLOAT(-300.0), FLOAT(165.0), FLOAT(255.0), 6000, 13)
-        WAIT_MSEC(8500)
+
+    IF_EQUAL((int32_t)GSW_NpcA_SpecialConversation, 1)
+        // On first visit.
+        USER_FUNC(evt_cam3d_evt_set, 730, 617, 915, 245, 93, 144, 0, 11)
+        USER_FUNC(evt_seq_wait, 2)
+        INLINE_EVT()
+            USER_FUNC(evt_cam3d_evt_set, FLOAT(-450.0), FLOAT(400.0), FLOAT(840.0), FLOAT(-300.0), FLOAT(165.0), FLOAT(255.0), 6000, 13)
+            WAIT_MSEC(8500)
+            USER_FUNC(evt_cam3d_evt_set, FLOAT(-380.0), FLOAT(90.0), FLOAT(352.0), FLOAT(-380.0), FLOAT(35.0), FLOAT(47.0), 0, 13)
+        END_INLINE()
+        WAIT_MSEC(6000)
+        USER_FUNC(evt_mario_mov_pos2, -400, 65, FLOAT(120.0))
+        WAIT_MSEC(500)
+        USER_FUNC(evt_npc_move_position, PTR(g_NpcNokonokoA), -350, 65, 0, FLOAT(60.0), 0)
+        WAIT_MSEC(50)
+    ELSE()
+        // After first + second clears.
         USER_FUNC(evt_cam3d_evt_set, FLOAT(-380.0), FLOAT(90.0), FLOAT(352.0), FLOAT(-380.0), FLOAT(35.0), FLOAT(47.0), 0, 13)
-    END_INLINE()
-    WAIT_MSEC(6000)
-    USER_FUNC(evt_mario_mov_pos2, -400, 65, FLOAT(120.0))
-    WAIT_MSEC(500)
-    USER_FUNC(evt_npc_move_position, PTR(g_NpcNokonokoA), -350, 65, 0, FLOAT(60.0), 0)
-    WAIT_MSEC(50)
+        USER_FUNC(evt_seq_wait, 2)
+        WAIT_MSEC(500)
+        USER_FUNC(evt_mario_mov_pos2, -400, 65, FLOAT(120.0))
+        WAIT_MSEC(50)
+        USER_FUNC(evt_npc_move_position, PTR(g_NpcNokonokoA), -350, 65, 0, FLOAT(60.0), 0)
+        WAIT_MSEC(50)
+    END_IF()
+    
     USER_FUNC(evt_set_dir_to_target, PTR(g_NpcNokonokoA), PTR("mario"))
-    USER_FUNC(evt_msg_print, 0, PTR("tot_town_firstvisit_00"), 0, PTR(g_NpcNokonokoA))
+    USER_FUNC(evtTot_GetNextMessage, LW(14), LW(15))
+    USER_FUNC(evt_msg_print, 0, LW(14), 0, PTR(g_NpcNokonokoA))
     USER_FUNC(evt_mario_get_motion, LW(0))
     INLINE_EVT()
         USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -598,7 +629,8 @@ EVT_BEGIN(FirstVisit_Evt)
     USER_FUNC(evt_mario_set_pose, PTR("M_I_2"))
     WAIT_MSEC(1600)
     USER_FUNC(evt_mario_set_motion, LW(0))
-    USER_FUNC(evt_msg_print, 0, PTR("tot_town_firstvisit_01"), 0, PTR(g_NpcNokonokoA))
+    USER_FUNC(evtTot_GetNextMessage, LW(14), LW(15))
+    USER_FUNC(evt_msg_print, 0, LW(14), 0, PTR(g_NpcNokonokoA))
     WAIT_MSEC(100)
     INLINE_EVT()
         USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -608,13 +640,15 @@ EVT_BEGIN(FirstVisit_Evt)
     WAIT_MSEC(2000)
     USER_FUNC(evt_mario_set_motion, LW(0))
     WAIT_MSEC(250)
-    USER_FUNC(evt_msg_print, 0, PTR("tot_town_firstvisit_02"), 0, PTR(g_NpcNokonokoA))
+    USER_FUNC(evtTot_GetNextMessage, LW(14), LW(15))
+    USER_FUNC(evt_msg_print, 0, LW(14), 0, PTR(g_NpcNokonokoA))
     USER_FUNC(evt_cam3d_evt_off, 500, 4)
     USER_FUNC(evt_snd_bgmon_f, 768, PTR("BGM_STG1_NOK1"), 2000)
     USER_FUNC(evt_mario_key_onoff, 1)
     USER_FUNC(evt_snd_bgm_scope, 0, 0)
 
-    ADD((int32_t)GSW_Hub_WelcomeKoopaCutsceneState, 1)
+    // Clear "special conversation" flag.
+    SET((int32_t)GSW_NpcA_SpecialConversation, 0)
 
     RETURN()
 EVT_END()
@@ -629,13 +663,26 @@ EVT_BEGIN(gon_10_InitEvt)
     USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG1_NOK1"))
     USER_FUNC(evt_npc_setup, PTR(&gon_10_npc_data))
 
-    IF_LARGE((int32_t)GSW_Hub_WelcomeKoopaCutsceneState, 0)
-        RUN_CHILD_EVT(evt_bero_info_run)
-    ELSE()
-        // Run overview cutscene the first time you enter the town.
-        RUN_EVT(bero_case_entry)
-        RUN_EVT(FirstVisit_Evt)
-    END_IF()
+    // Handle special cutscenes on first visit, after first and second clears.
+    SWITCH((int32_t)GSW_NpcA_SpecialConversation)
+        CASE_EQUAL(1)
+            RUN_EVT(bero_case_entry)
+            USER_FUNC(
+                evtTot_SetConversation, (int32_t)ConversationId::NPC_A_FIRST_VISIT)
+            RUN_EVT(SpecialOpening_Evt)
+        CASE_EQUAL(2)
+            RUN_EVT(bero_case_entry)
+            USER_FUNC(
+                evtTot_SetConversation, (int32_t)ConversationId::NPC_A_FIRST_CLEAR)
+            RUN_EVT(SpecialOpening_Evt)
+        CASE_EQUAL(3)
+            RUN_EVT(bero_case_entry)
+            USER_FUNC(
+                evtTot_SetConversation, (int32_t)ConversationId::NPC_A_SECOND_CLEAR)
+            RUN_EVT(SpecialOpening_Evt)
+        CASE_ETC()
+            RUN_CHILD_EVT(evt_bero_info_run)
+    END_SWITCH()
 
     USER_FUNC(evt_map_playanim, PTR("S_kawa"), 1, 0)
 
@@ -816,7 +863,7 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .flags = 0,
         .initEvtCode = (void*)Villager_A_InitEvt,
         .regularEvtCode = (void*)Villager_A_MoveEvt,
-        .talkEvtCode = (void*)Npc_GenericTalk,
+        .talkEvtCode = (void*)Npc_A_Talk,
     },
     {
         .name = g_NpcNokonokoB,
@@ -1136,24 +1183,24 @@ EVT_DEFINE_USER_FUNC(evtTot_BubulbP_MarkConversation) {
     const int32_t kTargetNumFlags = 3;
 
     int32_t num_cvs =
-        ConversationId::BUBULB_P_CVS_END - ConversationId::BUBULB_P_CVS_START;
+        ConversationId::NPC_F_CVS_END - ConversationId::NPC_F_CVS_START;
     int32_t prev_flags = 0;
     for (int32_t i = 0; i < num_cvs; ++i) {
-        prev_flags += GetSWF(GSWF_BubulbPFlags + i);
+        prev_flags += GetSWF(GSWF_NpcF_Flags + i);
     }
 
     // Set flag corresponding to current conversation.
-    int32_t cur_cv = GetSWByte(GSW_Hub_BubulbP_CurrentConversation);
-    SetSWF(GSWF_BubulbPFlags + cur_cv);
+    int32_t cur_cv = GetSWByte(GSW_NpcF_CurrentConversation);
+    SetSWF(GSWF_NpcF_Flags + cur_cv);
 
     // Check if the number of conversations seen has newly hit the target num.
     bool seed_just_unlocked = false;
     int32_t cur_flags = 0;
     for (int32_t i = 0; i < num_cvs; ++i) {
-        cur_flags += GetSWF(GSWF_BubulbPFlags + i);
+        cur_flags += GetSWF(GSWF_NpcF_Flags + i);
     }
     if (cur_flags == kTargetNumFlags && prev_flags < cur_flags) {
-        SetSWF(GSWF_BubulbP_SeedUnlocked);
+        SetSWF(GSWF_NpcF_SeedUnlocked);
         seed_just_unlocked = true;
     }
     evtSetValue(evt, evt->evtArguments[0], seed_just_unlocked);

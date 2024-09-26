@@ -13,9 +13,9 @@ namespace ConversationId {
         INVALID = 0,
 
         // NPC F (Pink Bub-ulb)
-        BUBULB_P            = 1000,
-        BUBULB_P_CVS_START  = 1100,
-        BUBULB_P_CVS_END    = BUBULB_P_CVS_START + 10,  // TBD; can't exceed 30.
+        NPC_F               = 1000,
+        NPC_F_CVS_START     = 1100,
+        NPC_F_CVS_END       = NPC_F_CVS_START + 10,  // TBD; can't exceed 30.
 
         // NPC B (Toad on west side)
         NPC_B               = 2000,
@@ -83,6 +83,26 @@ namespace ConversationId {
         NPC_G_ENDING_MED,
         NPC_G_ENDING_HIGH,
 
+        // NPC A - West Petalburg Koopa.
+        NPC_A               = 11000,
+        NPC_A_FIRST_VISIT   = 11100,
+        NPC_A_FIRST_CLEAR   = 11200,
+        NPC_A_SECOND_CLEAR  = 11300,
+        NPC_A_L             = 11400,
+        NPC_A_L_HOOK,
+        NPC_A_L_GLOOM,
+        NPC_A_L_BONE,
+        NPC_A_L_SECRET,
+        NPC_A_L_BOMB,
+        NPC_A_L_ENEMY_START = 11410,
+        NPC_A_L_ENEMY_END   = NPC_A_L_ENEMY_START + 3,
+        NPC_A_L_RESP_START  = 11420,
+        NPC_A_L_RESP_END    = NPC_A_L_RESP_START + 6,
+        NPC_A_W             = 11430,
+        NPC_A_W_EXDIFF,
+        NPC_A_W_TIME,
+        NPC_A_W_INTENSITY,
+
         // NPC - East Petalburg gatekeeper
         NPC_GATEKEEPER      = 12000,
         NPC_GATEKEEPER_POST = 12001,
@@ -111,5 +131,8 @@ EVT_DECLARE_USER_FUNC(evtTot_SetConversation, 1)
 
 // Wrapper to GetNextMessage.
 EVT_DECLARE_USER_FUNC(evtTot_GetNextMessage, 2)
+
+// Returns whether or not there is another conversation queued for afterward.
+EVT_DECLARE_USER_FUNC(evtTot_HasConversationQueued, 1)
  
 }

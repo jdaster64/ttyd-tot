@@ -5891,6 +5891,8 @@ g_Tower4Strings = {
 g_TowerBossFloorStrings = {
     # Field dialogue.
     
+    # TODO: Finalize all field and battle dialogue for final bosses.
+    
     b"tot_field_dragon00_00":
         b"[Placeholder] Encounter<k>",
     
@@ -6169,12 +6171,12 @@ g_PetalburgWestStrings = {
 
     # "First visit" cutscene.
     
-    b"tot_town_firstvisit_00":
+    b"tot_di011100_00":
         b"Oh, Mario! <wait 100>You got here\n"
         b"just in time! <wait 200>I suppose you're\n"
         b"aware that dragon's back!?\n<k>",
     
-    b"tot_town_firstvisit_01":
+    b"tot_di011100_01":
         b"Oh, it's terrible! It seems\n"
         b"the castle's been fortified\n"
         b"considerably since last time.\n<k>\n<p>\n"
@@ -6185,7 +6187,7 @@ g_PetalburgWestStrings = {
         b"planning, <wait 150>but something's\n"
         b"gotta be done about it!\n<k>",
     
-    b"tot_town_firstvisit_02":
+    b"tot_di011100_02":
         b"I'm glad to hear you say\n"
         b"that, Mario. <wait 150>We all owe you\n"
         b"an eternal debt already!\n<k>\n<p>\n"
@@ -6196,9 +6198,281 @@ g_PetalburgWestStrings = {
         b"run into trouble! <wait 200>Rest assured,\n"
         b"we'll keep this town safe.\n<k>",
         
-    # TODO: other NPC A cutscenes.
+    # Post-first run and second run cutscenes.
     
-    # TODO: NPC A general comments on previous run.
+    b"tot_di011200_00":
+        b"Oh, hi! <wait 150>Glad to see you're\n"
+        b"still doing well, Mario. <wait 250>How did\n"
+        b"things go at the castle?\n"
+        b"<k>",
+
+    b"tot_di011200_01":
+        b"<dynamic 3>What?</dynamic> <wait 250>You're saying you beat\n"
+        b"Hooktail, <wait 150>but her elder brother\n"
+        b"is coming to avenge her?\n"
+        b"<k>",
+
+    b"tot_di011200_02":
+        b"I see... <wait 250>So all they want is\n"
+        b"a challenge, and they're not\n"
+        b"up to anything sinister?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, that's a great relief.\n"
+        b"<wait 250>We knew we could count on\n"
+        b"you to pull through, Mario!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Still, Hooktail's no pushover.\n"
+        b"<wait 250>If her brother's even tougher,\n"
+        b"you'd better be prepared!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Good news is, I heard the\n"
+        b"shop's just been re-opened!\n"
+        b"<wait 250>Why don't you pop on by?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If you need anything else,\n"
+        b"try asking around town. <wait 250>I'm sure\n"
+        b"lots of folks will have advice!\n"
+        b"<k>",
+
+    b"tot_di011300_00":
+        b"Oh, welcome back, Mario!\n"
+        b"<wait 250>I suppose things went all right\n"
+        b"again this time?\n"
+        b"<k>",
+
+    b"tot_di011300_01":
+        b"You've defeated both\n"
+        b"Hooktail and Gloomtail, eh?\n"
+        b"<wait 250>That's wonderful to hear!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I imagine they're the hardy\n"
+        b"sorts, though. <wait 250>They'll be ready\n"
+        b"to scrap again anytime!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If it's not too much to ask,\n"
+        b"<wait 200>could you keep challenging them\n"
+        b"whenever you have the time?\n"
+        b"<k>",
+
+    b"tot_di011300_02":
+        b"Ah, I knew I could count on\n"
+        b"you, Mario. <wait 250>I'm sure everyone'll\n"
+        b"greatly appreciate it.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"By the way, it seems some\n"
+        b"traveling vendors just moved in\n"
+        b"while you were away...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"They're over in the square\n"
+        b"to the east, and have some\n"
+        b"fancy trinkets for sale.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"They only accept a special\n"
+        b"sort of currency that I don't\n"
+        b"imagine most folks here have.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b'Some sort of "star bits", or\n'
+        b"something like that. <wait 250>Perhaps\n"
+        b"you've come across them?\n"
+        b"<k>",
+    
+    # Default message, and general comments on previous run.
+
+    b"tot_di011000_00":   
+        b"Keep up the good work,\n"
+        b"Mario! <wait 250>We know you can do it!\n"
+        b"<k>",
+
+    b"tot_di011400_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Ah, not so well? <wait 200>Well, that's\n"
+        b"a shame...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Better luck next time!\n"
+        b"<k>",
+
+    b"tot_di011401_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Ah, so you were defeated by\n"
+        b"Hooktail, eh?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, at least you made it\n"
+        b"there, and lost fair and square.\n"
+        b"<wait 250>Better luck next time!\n"
+        b"<k>",
+
+    b"tot_di011402_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Ah, met your match against\n"
+        b"Gloomtail, you say?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, he's certainly tough,\n"
+        b"I imagine. <wait 250>But you've beaten\n"
+        b"him before, so don't give up!\n"
+        b"<k>",
+
+    b"tot_di011403_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Beaten by... Bonetail, is it?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I can't say I've heard that\n"
+        b"name. <wait 250>Definitely sounds like\n"
+        b"a formidable foe, though.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Good thing you got to work\n"
+        b"up to fighting it by fighting\n"
+        b"the others first, right?\n"
+        b"<k>",
+
+    b"tot_di011404_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Mobbed by a Gold Fuzzy,\n"
+        b"you say? Fascinating...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I thought things had seemed\n"
+        b"awfully quiet at Shhwonk\n"
+        b"Fortress these days...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, I'm sure you'll find out\n"
+        b"how to lick them yet, Mario!\n"
+        b"<wait 250>Go get 'em!\n"
+        b"<k>",
+
+    b"tot_di011405_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Yikes, ended up on the wrong\n"
+        b"end of Bobbery's explosives?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Man, those things can be\n"
+        b"dangerous, I get it. <wait 250>Maybe try\n"
+        b"to be more careful next time!\n"
+        b"<k>",
+
+    b"tot_di011410_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Your last run got cut short\n"
+        b"by <AN> %s, eh?\n"
+        b"<k>\n"
+        b"<o>",
+
+    b"tot_di011411_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>You don't say? KO'd by <AN>\n"
+        b"%s...\n"
+        b"<k>\n"
+        b"<o>",
+
+    b"tot_di011412_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>I see, <wait 200>you were done in by <AN>\n"
+        b"%s...\n"
+        b"<k>\n"
+        b"<o>",
+
+    b"tot_di011420_00":
+        b"<p>\n"
+        b"Yikes, that's gotta be\n"
+        b"embarrassing.\n"
+        b"<wait 250>Well, better luck next time!\n"
+        b"<k>",
+
+    b"tot_di011421_00":
+        b"<p>\n"
+        b"Hey man, I get it. <wait 250>We all\n"
+        b"have our off days, y'know?\n"
+        b"<wait 250>Well, better luck next time!\n"
+        b"<k>",
+
+    b"tot_di011422_00":
+        b"<p>\n"
+        b"Wow, that's rough. <wait 250>Who'd have\n"
+        b"thought they'd be so tough...\n"
+        b"<wait 250>Well, better luck next time!\n"
+        b"<k>",
+
+    b"tot_di011423_00":
+        b"<p>\n"
+        b"Understandable, they can\n"
+        b"be pretty tough customers.\n"
+        b"<wait 250>Well, better luck next time!\n"
+        b"<k>",
+
+    b"tot_di011424_00":
+        b"<p>\n"
+        b"Oof, that's rough. <wait 250>Those guys\n"
+        b"are no joke, I imagine.\n"
+        b"<wait 250>Well, better luck next time!\n"
+        b"<k>",
+
+    b"tot_di011425_00":
+        b"<p>\n"
+        b"Yow, I wouldn't want to have\n"
+        b"to face those either.\n"
+        b"<wait 250>Well, better luck next time!\n"
+        b"<k>",
+
+    b"tot_di011430_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Finished another run? That's\n"
+        b"good to hear...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Keep up the good work,\n"
+        b"Mario! <wait 250>We know you can do it!\n"
+        b"<k>",
+
+    b"tot_di011431_00":
+        b"Wow, Mario! I heard you\n"
+        b"took on the dragons' extra-\n"
+        b"difficult tower challenge!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"That must have been a\n"
+        b"really tough feat! <wait 250>You should\n"
+        b"feel quite accomplished.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Keep up the good work,\n"
+        b"Mario! <wait 250>We know you can do it!\n"
+        b"<k>",
+
+    b"tot_di011432_00":
+        b"Wow, back already, Mario?\n"
+        b"<wait 250>That's got to be the fastest\n"
+        b"run you've done yet!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Keep up the good work,\n"
+        b"Mario! <wait 250>We know you can do it!\n"
+        b"<k>",
+
+    b"tot_di011433_00":
+        b"Hey, Mario! <wait 250>It seems you're\n"
+        b"really ramping up the intensity\n"
+        b"of these challenges!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Keep up the good work,\n"
+        b"Mario! <wait 250>We know you can do it!\n"
+        b"<k>",
         
     # NPC F (Bub-ulber) dialogue.
     

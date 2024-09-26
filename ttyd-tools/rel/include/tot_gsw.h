@@ -17,8 +17,8 @@ enum GlobalWorkVars {
     GSW_Battle_AtomicBoo_BreathGuardCount,
     GSW_Tower_TutorialClearAttempts,
     GSW_Tower_TutorialClears,
-    GSW_Hub_WelcomeKoopaCutsceneState,
-    GSW_Hub_BubulbP_CurrentConversation,
+    GSW_NpcA_SpecialConversation,
+    GSW_NpcF_CurrentConversation,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),
@@ -37,10 +37,10 @@ enum GlobalWorkVars {
     GSWF_RunOptionsTutorial,
     GSWF_RunSettingsCleared,
     // Flags for unique Bub-ulber conversations seen.
-    GSWF_BubulbPFlags,
-    GSWF_BubulbPFlags_End                   = GSWF_BubulbPFlags + 30,
-    GSWF_BubulbP_FirstTalk                  = GSWF_BubulbPFlags_End,
-    GSWF_BubulbP_SeedUnlocked,
+    GSWF_NpcF_Flags,
+    GSWF_NpcF_Flags_End                     = GSWF_NpcF_Flags + 30,
+    GSWF_NpcF_FirstTalk                     = GSWF_NpcF_Flags_End,
+    GSWF_NpcF_SeedUnlocked,
     // Flag for having chatted with NPC D for the first time.
     GSWF_NpcD_FirstTimeChat,
     // Flag for having chatted with NPC G post-tutorial clears.

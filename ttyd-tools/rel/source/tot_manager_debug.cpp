@@ -247,11 +247,10 @@ void DebugManager::Update() {
                 case DEBUG_COMPLETE_TUTORIAL: {
                     SetSWByte(GSW_Tower_TutorialClearAttempts, 3);
                     SetSWByte(GSW_Tower_TutorialClears, 2);
-                    SetSWByte(GSW_Hub_WelcomeKoopaCutsceneState, 1);
                     SetSWF(GSWF_CosmeticShopTutorial);
                     SetSWF(GSWF_HubShopTutorial);
                     SetSWF(GSWF_RunOptionsTutorial);
-                    SetSWF(GSWF_BubulbP_SeedUnlocked);
+                    SetSWF(GSWF_NpcF_SeedUnlocked);
                     break;
                 }
                 case DEBUG_COMPLETE_LOGS: {

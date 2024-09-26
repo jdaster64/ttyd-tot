@@ -236,7 +236,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
                 }
             }
             // Check for having unlocked the Bub-ulber 'set seed' option.
-            if (!GetSWF(GSWF_BubulbP_SeedUnlocked)) return;
+            if (!GetSWF(GSWF_NpcF_SeedUnlocked)) return;
             MarkCompleted(ach);
             break;
         }
