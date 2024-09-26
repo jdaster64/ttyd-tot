@@ -81,17 +81,6 @@ enum RewardType {
     REWARD_SPECIAL_MOVE     = -10,
     REWARD_COINS            = -11,
 
-    // Used only for tracking number of given reward encountered / taken.
-    REWARD_TRACKING_HP_UP   = -12,
-    REWARD_TRACKING_FP_UP   = -13,
-    REWARD_TRACKING_BP_UP   = -14,
-    REWARD_TRACKING_HP_UP_P = -15,
-    REWARD_TRACKING_INV_UP  = -16,
-    REWARD_TRACKING_SHINE   = -17,
-    REWARD_TRACKING_STAR_PIECE = -18,
-    REWARD_TRACKING_UNIQUE_BADGE = -19,
-    REWARD_TRACKING_OTHER_BADGE = -20,
-
     // No longer used.
     REWARD_FULL_HEAL        = -21,
     
@@ -470,49 +459,63 @@ void DisplayIcons(CameraId camera, void* user_data) {
 
 // Updates play stat for number of times a reward type appeared / was taken.
 void TrackChestReward(int32_t reward_type, int32_t collected) {
-    // Convert individual items to their tracking ids.
+    // Convert reward ids or individual items to their tracking ids.
+    int32_t track_id = -1;
     switch (reward_type) {
-        case REWARD_HP_UP:
-            reward_type = REWARD_TRACKING_HP_UP;
-            break;
+        case REWARD_GOOMBELLA:
+            track_id = RewardStatId::MOVE_GOOMBELLA;        break;
+        case REWARD_KOOPS:
+            track_id = RewardStatId::MOVE_KOOPS;            break;
+        case REWARD_FLURRIE:
+            track_id = RewardStatId::MOVE_FLURRIE;          break;
+        case REWARD_YOSHI:
+            track_id = RewardStatId::MOVE_YOSHI;            break;
+        case REWARD_VIVIAN:
+            track_id = RewardStatId::MOVE_VIVIAN;           break;
+        case REWARD_BOBBERY:
+            track_id = RewardStatId::MOVE_BOBBERY;          break;
+        case REWARD_MOWZ:
+            track_id = RewardStatId::MOVE_MOWZ;             break;
+        case REWARD_JUMP:
+            track_id = RewardStatId::MOVE_JUMP;             break;
+        case REWARD_HAMMER:
+            track_id = RewardStatId::MOVE_HAMMER;           break;
+        case REWARD_SPECIAL_MOVE:
+            track_id = RewardStatId::MOVE_SPECIAL;          break;
         case REWARD_FP_UP:
-            reward_type = REWARD_TRACKING_FP_UP;
-            break;
+            track_id = RewardStatId::STAT_FP;               break;
         case REWARD_BP_UP:
-            reward_type = REWARD_TRACKING_BP_UP;
-            break;
+            track_id = RewardStatId::STAT_BP;               break;
         case REWARD_HP_UP_P:
-            reward_type = REWARD_TRACKING_HP_UP_P;
-            break;
+            track_id = RewardStatId::STAT_HP_P;             break;
         case REWARD_INV_UP:
-            reward_type = REWARD_TRACKING_INV_UP;
-            break;
-        case REWARD_SHINE_SPRITE:
-            reward_type = REWARD_TRACKING_SHINE;
-            break;
+            track_id = RewardStatId::STAT_INVENTORY;        break;
+        case REWARD_COINS:
+            track_id = RewardStatId::MISC_COINS;            break;
         case REWARD_STAR_PIECE:
-            reward_type = REWARD_TRACKING_STAR_PIECE;
-            break;
+            track_id = RewardStatId::MISC_STAR_PIECE;       break;
+        case REWARD_SHINE_SPRITE:
+            track_id = RewardStatId::MISC_SHINE_SPRITE;     break;
     }
 
-    if (reward_type < 0) {
-        // Do nothing.
+    // Convert non-individual items to their tracking ids.
+    if (track_id >= 0 || reward_type < 0) {
+        // Not an item id, or tracking id already set.
     } else if (reward_type >= ItemType::DIAMOND_STAR && 
                reward_type <= ItemType::CRYSTAL_STAR) {
-        reward_type = REWARD_SPECIAL_MOVE;
+        track_id = RewardStatId::MOVE_SPECIAL;
     } else if (GetUniqueBadgeObtainedIndex(reward_type) >= 0) {
-        reward_type = REWARD_TRACKING_UNIQUE_BADGE;
+        track_id = RewardStatId::MISC_BADGE_UNIQUE;
     } else {
-        reward_type = REWARD_TRACKING_OTHER_BADGE;
+        track_id = RewardStatId::MISC_BADGE_OTHER;
     }
 
-    // Convert to positive, 0 indexed value.
-    reward_type = -reward_type + 1;
-
-    if (collected) {
-        g_Mod->state_.ChangeOption(STAT_PERM_REWARDS_TAKEN, 1, reward_type);
-    } else {
-        g_Mod->state_.ChangeOption(STAT_PERM_REWARDS_OFFERED, 1, reward_type);
+    if (track_id >= 0) {
+        if (collected) {
+            g_Mod->state_.ChangeOption(STAT_PERM_REWARDS_TAKEN, 1, track_id);
+        } else {
+            g_Mod->state_.ChangeOption(STAT_PERM_REWARDS_OFFERED, 1, track_id);
+        }
     }
 }
 

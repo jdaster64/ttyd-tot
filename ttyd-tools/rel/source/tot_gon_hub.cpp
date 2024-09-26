@@ -381,6 +381,20 @@ EVT_BEGIN(Npc_D_Talk)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Npc_G_Talk)
+    // Print initial dialogue.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+    // If dialogue was about a specific reward, add on the predetermined ending.
+    IF_STR_LARGE_EQUAL(LW(0), PTR("tot_di010200_00"))
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G)
+        USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+        USER_FUNC(evt_msg_print_add, 0, LW(0))
+    END_IF()
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Npc_H_Talk)
     SET(LW(15), (int32_t)ConversationId::NPC_H)
     RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
@@ -862,7 +876,7 @@ const NpcSetupInfo gon_11_npc_data[10] = {
         .flags = 0,
         .initEvtCode = npc_init_evt,
         .regularEvtCode = (void*)Npc_GenericMove,
-        .talkEvtCode = (void*)Npc_GenericTalk,
+        .talkEvtCode = (void*)Npc_G_Talk,
     },
     {
         .name = g_NpcNokonokoH,

@@ -8,6 +8,36 @@
 
 namespace mod::tot {
 
+// Used to track what types of rewards were presented / chosen.
+namespace RewardStatId {
+    enum e {
+        MOVE_GOOMBELLA = 0,
+        MOVE_KOOPS,
+        MOVE_FLURRIE,
+        MOVE_YOSHI,
+        MOVE_VIVIAN,
+        MOVE_BOBBERY,
+        MOVE_MOWZ,
+        MOVE_JUMP,
+        MOVE_HAMMER,
+        MOVE_SPECIAL,
+
+        STAT_HP,
+        STAT_HP_P,
+        STAT_FP,
+        STAT_BP,
+        STAT_INVENTORY,
+
+        MISC_COINS,
+        MISC_STAR_PIECE,
+        MISC_SHINE_SPRITE,
+        MISC_BADGE_UNIQUE,
+        MISC_BADGE_OTHER,
+
+        MAX_REWARD_STAT,
+    };
+}
+
 class RewardManager {
 public:
     // Change item data for items used as placeholders for rewards.

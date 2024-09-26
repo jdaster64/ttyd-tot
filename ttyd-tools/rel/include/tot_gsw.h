@@ -43,12 +43,16 @@ enum GlobalWorkVars {
     GSWF_BubulbP_SeedUnlocked,
     // Flag for having chatted with NPC D for the first time.
     GSWF_NpcD_FirstTimeChat,
+    // Flag for having chatted with NPC G post-tutorial clears.
+    GSWF_NpcG_PostTutorialChat,
     // Flag for having chatted with NPC I post-tutorial clears.
     GSWF_NpcI_PostTutorialChat,
     // Flag for having chatted with NPC K for the first time.
     GSWF_NpcK_FirstTimeChat,
     // Flag for having chatted with Mayor Kroop post-tutorial clears.
     GSWF_MayorKroop_PostTutorialChat,
+    // Flag for having chatted with the gatekeeper for the first time.
+    GSWF_Gatekeeper_FirstTimeChat,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

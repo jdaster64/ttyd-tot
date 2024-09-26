@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_generate_reward.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_state.h"
@@ -9,6 +10,7 @@
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/mario_party.h>
+#include <ttyd/system.h>
 
 #include <cinttypes>
 #include <cstdio>
@@ -17,6 +19,15 @@
 namespace mod::tot {
 
 namespace {
+
+// For storing / sorting frequency of taking a particular reward type.
+struct NpcGStats {
+    int16_t reward_type;
+    int16_t reward_rate_taken;
+};
+int32_t comp_NpcGStats(NpcGStats* lhs, NpcGStats* rhs) {
+    return lhs->reward_rate_taken - rhs->reward_rate_taken;
+}
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
@@ -27,6 +38,10 @@ int8_t kDefaultConversation[] = { 0, -1 };
 int32_t g_ConversationId = 0;
 int8_t* g_ConversationPtr = nullptr;
 int32_t g_ConversationStep = 0;
+
+// Used to indicate where the next conversation should pick up, for
+// conversations with programmatic beginnings / endings like NPC G's.
+int32_t g_ConversationContinueId = 0;
 
 }  // namespace
 
@@ -151,6 +166,77 @@ void DialogueManager::SetConversation(int32_t id) {
             g_ConversationId = ConversationId::NPC_INN_CVS_START + cv_id;
             break;
         }
+        case ConversationId::NPC_G: {
+            if (completed_runs < 1) {
+                g_ConversationId = ConversationId::NPC_G_NO_CLEAR;
+                break;
+            } else if (!GetSWF(GSWF_NpcG_PostTutorialChat)) {
+                g_ConversationId = ConversationId::NPC_G_FIRST_CLEAR;
+                SetSWF(GSWF_NpcG_PostTutorialChat);
+                break;
+            } else if (g_ConversationContinueId) {
+                // Add predetermined ending to previous conversation.
+                g_ConversationId = g_ConversationContinueId;
+                g_ConversationContinueId = 0;
+                break;
+            }
+
+            NpcGStats stats[RewardStatId::MAX_REWARD_STAT];
+            int32_t num_stats = 0;
+
+            for (int32_t i = 0; i < RewardStatId::MAX_REWARD_STAT; ++i) {
+                switch (i) {
+                    case RewardStatId::MOVE_FLURRIE:
+                    case RewardStatId::MOVE_YOSHI:
+                    case RewardStatId::MOVE_VIVIAN:
+                    case RewardStatId::MOVE_BOBBERY:
+                        if (completed_runs < 2) break;
+                        // Intentional fallthrough.
+                    default: {
+                        // Calculate how often this reward was taken.
+                        int32_t num_offered =
+                            state.GetOption(STAT_PERM_REWARDS_OFFERED, i);
+                        int32_t num_taken =
+                            state.GetOption(STAT_PERM_REWARDS_TAKEN, i);
+
+                        stats[num_stats].reward_type = i;
+                        stats[num_stats].reward_rate_taken =
+                            num_offered ? num_taken * 10000LL / num_offered : 0;
+                        ++num_stats;
+                            
+                        break;
+                    }
+                }
+            }
+
+            // Pick conversation.
+            int32_t cv_id = damage_dealt % num_stats;
+            int32_t reward_type = stats[cv_id].reward_type;
+            g_ConversationId = ConversationId::NPC_G_REWARD_START + reward_type;
+
+            // Sort reward types by frequency taken, and find index.
+            ttyd::system::qqsort(
+                stats, num_stats, sizeof(NpcGStats), (void*)comp_NpcGStats);
+            int32_t index = 0;
+            for (; stats[index].reward_type != reward_type; ++index);
+            
+            // Set which ending the conversation should use based on how
+            // frequently you've picked a particular type of reward.
+            if (stats[index].reward_rate_taken < 500) {
+                // If taken < 5% of the time:
+                g_ConversationContinueId = ConversationId::NPC_G_ENDING_NONE;
+            } else if (stats[index].reward_rate_taken > 7500 || num_stats - index <= 3) {
+                // If taken > 75% of the time, or in top three types taken:
+                g_ConversationContinueId = ConversationId::NPC_G_ENDING_HIGH;
+            } else if (stats[index].reward_rate_taken < 2000 || index < 8) {
+                // If taken < 20% of the time, or in bottom 40% of types:
+                g_ConversationContinueId = ConversationId::NPC_G_ENDING_LOW;
+            } else {
+                g_ConversationContinueId = ConversationId::NPC_G_ENDING_MED;
+            }
+
+            break;
+        }
         case ConversationId::NPC_H: {
             if (completed_runs < 1) break;
             
@@ -223,6 +309,14 @@ void DialogueManager::SetConversation(int32_t id) {
                 ConversationId::NPC_KROOP_CVS_START;
             int32_t cv_id = coins_earned % num_cvs;
             g_ConversationId = ConversationId::NPC_KROOP_CVS_START + cv_id;
+            break;
+        }
+        case ConversationId::NPC_GATEKEEPER: {
+            if (completed_runs < 1 || !GetSWF(GSWF_Gatekeeper_FirstTimeChat)) {
+                SetSWF(GSWF_Gatekeeper_FirstTimeChat);
+                break;
+            }
+            g_ConversationId = ConversationId::NPC_GATEKEEPER_POST;
             break;
         }
     }

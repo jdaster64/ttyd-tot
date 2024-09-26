@@ -72,8 +72,20 @@ namespace ConversationId {
         NPC_D_NONE_ACTIVE   = 9300,
         NPC_D_ALL_DONE      = 9301,
 
+        // NPC G (Blue Bub-ulb)
+        NPC_G               = 10000,
+        NPC_G_NO_CLEAR      = 10100,
+        NPC_G_FIRST_CLEAR   = 10101,
+        NPC_G_REWARD_START  = 10200,
+        NPC_G_REWARD_END    = NPC_G_REWARD_START + 20,
+        NPC_G_ENDING_NONE   = 10300,
+        NPC_G_ENDING_LOW,
+        NPC_G_ENDING_MED,
+        NPC_G_ENDING_HIGH,
+
         // NPC - East Petalburg gatekeeper
         NPC_GATEKEEPER      = 12000,
+        NPC_GATEKEEPER_POST = 12001,
     };
 }
 
