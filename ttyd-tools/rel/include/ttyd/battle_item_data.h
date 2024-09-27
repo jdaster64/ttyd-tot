@@ -18,7 +18,7 @@ extern "C" {
 // BattleItemData_get_throw_first_pos
 // BattleItemData_naniga_okorukana_check
 // BattleItemData_hpfp_change_declare_2
-// BattleItemData_hpfp_change_declare_1
+EVT_DECLARE_USER_FUNC(BattleItemData_hpfp_change_declare_1, 1)
 EVT_DECLARE_USER_FUNC(BattleItemData_rank_up, 1)
 // BattleItemData_cam_rot
 // BattleItemData_sampling_random_target

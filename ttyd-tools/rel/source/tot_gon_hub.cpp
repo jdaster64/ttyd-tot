@@ -12,6 +12,7 @@
 #include "tot_window_select.h"
 
 #include <ttyd/battle_event_cmd.h>
+#include <ttyd/battle_monosiri.h>
 #include <ttyd/database.h>
 #include <ttyd/evt_bero.h>
 #include <ttyd/evt_cam.h>
@@ -38,6 +39,7 @@
 #include <ttyd/hitdrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
+#include <ttyd/msgdrv.h>
 #include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/system.h>
@@ -123,6 +125,7 @@ extern ShopItem shop_trade_list[6];
 extern ShopkeeperData shopkeeper_data;
 
 // Function declarations.
+EVT_DECLARE_USER_FUNC(evtTot_NpcA_GetDefeatedByFoeName, 1)
 EVT_DECLARE_USER_FUNC(evtTot_BubulbP_SetSeedName, 1)
 EVT_DECLARE_USER_FUNC(evtTot_BubulbP_MarkConversation, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetCosmeticShopMsg, 3)
@@ -364,10 +367,11 @@ EVT_BEGIN(Npc_ConversationDrive_Talk)
 EVT_END()
 
 EVT_BEGIN(Npc_A_Talk)
-    // Print initial dialogue.
+    // Print initial dialogue, inserting string parameter if needed.
     USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_A)
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
-    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+    USER_FUNC(evtTot_NpcA_GetDefeatedByFoeName, LW(2))
+    USER_FUNC(evt_msg_print_insert, 0, LW(0), 0, PTR("me"), LW(2))
     // If dialogue has a programmatic ending attached, also display it.
     USER_FUNC(evtTot_HasConversationQueued, LW(0))
     IF_NOT_EQUAL(LW(0), 0)
@@ -570,9 +574,12 @@ EVT_END()
 
 EVT_BEGIN(Villager_A_InitEvt)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR("me"), 1536)
-    // Don't set NPC A's initial position if he's involved in a cutscene.
-    IF_EQUAL((int32_t)GSW_NpcA_SpecialConversation, 0)
-        USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
+    SWITCH((int32_t)GSW_NpcA_SpecialConversation)
+        CASE_BETWEEN(1, 3)
+            // Special opening cutscene, do nothing.
+        CASE_ETC()
+            // Only set NPC A's initial position if not a special cutscene.
+            USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
     END_IF()
     RETURN()
 EVT_END()
@@ -1168,6 +1175,34 @@ const int32_t* GetWestSideInitEvt() {
 
 const int32_t* GetEastSideInitEvt() {
     return gon_11_InitEvt;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_NpcA_GetDefeatedByFoeName) {
+    static char buf[32];
+    buf[0] = 0;
+    int32_t attacker = g_Mod->state_.GetOption(STAT_PERM_LAST_ATTACKER);
+    if (attacker > 0) {
+        const char* name_lookup =
+            ttyd::battle_monosiri::battleGetUnitMonosiriPtr(attacker)->unit_name;
+        if (name_lookup) {
+            const char* name = ttyd::msgdrv::msgSearch(name_lookup);
+            switch (name[0]) {
+                case 'A':
+                case 'E':
+                case 'I':
+                case 'O':
+                case 'U':
+                case 'X':   // X-Naut, X-Yux, etc.
+                    sprintf(buf, "%s %s", "an", name);
+                    break;
+                default:
+                    sprintf(buf, "%s %s", "a", name);
+                    break;
+            }
+        }
+    }
+    evtSetValue(evt, evt->evtArguments[0], PTR(buf));
+    return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_BubulbP_SetSeedName) {

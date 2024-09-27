@@ -69,6 +69,7 @@ extern uint32_t (*g_pouchGetItem_trampoline)(int32_t);
 extern int32_t (*g_btlevtcmd_GetItemRecoverParam_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_flower_suitoru_point_trampoline)(EvtEntry*, bool);
 extern int32_t (*g__get_heart_suitoru_point_trampoline)(EvtEntry*, bool);
+extern int32_t (*g_BattleItemData_hpfp_change_declare_1_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_BattleItemData_rank_up_trampoline)(EvtEntry*, bool);
 // Patch addresses.
 extern const int32_t g_itemMain_CheckItemFreeze_BH;
@@ -902,6 +903,14 @@ void ApplyFixedPatches() {
         0x01100070;
     ttyd::battle_item_data::ItemWeaponData_LastDinner.target_class_flags = 
         0x01100070;
+    // Clear the "last Mario attacker" play stat when Point Swap is used,
+    // so a self-destruct doesn't get falsely attributed to an enemy.
+    g_BattleItemData_hpfp_change_declare_1_trampoline = patch::hookFunction(
+        ttyd::battle_item_data::BattleItemData_hpfp_change_declare_1,
+        [](EvtEntry* evt, bool isFirstCall) {
+            g_Mod->state_.SetOption(tot::STAT_PERM_LAST_ATTACKER, 0);
+            return g_BattleItemData_hpfp_change_declare_1_trampoline(evt, isFirstCall);
+        });
         
     // Make Trial Stew's event use the correct weapon params.
     BattleWeapon* kLastDinnerWeaponAddr = 

@@ -2,11 +2,13 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_generate_enemy.h"
 #include "tot_generate_reward.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_state.h"
 
+#include <ttyd/battle_database_common.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/mario_party.h>
@@ -31,6 +33,8 @@ int32_t comp_NpcGStats(NpcGStats* lhs, NpcGStats* rhs) {
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
+
+namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 
 // Default conversation type: single text box from a speaker.
 int8_t kDefaultConversation[] = { 0, -1 };
@@ -66,7 +70,100 @@ void DialogueManager::SetConversation(int32_t id) {
     // pseudo-random factors like run stats, or other conditions.
     switch (id) {
         case ConversationId::NPC_A: {
-            // TODO: Add special responses after winning / losing a run.
+            if (g_ConversationContinueId) {
+                // Add predetermined ending to previous conversation.
+                g_ConversationId = g_ConversationContinueId;
+                g_ConversationContinueId = 0;
+                break;
+            }
+
+            int32_t cv_type = GetSWByte(GSW_NpcA_SpecialConversation);
+            switch (cv_type) {
+                case 10:
+                    // Generic win message.
+                    g_ConversationId = ConversationId::NPC_A_W;
+                    break;
+                case 11:
+                    // First EX difficulty clear.
+                    g_ConversationId = ConversationId::NPC_A_W_EXDIFF;
+                    break;
+                case 12:
+                    // New personal best run time.
+                    g_ConversationId = ConversationId::NPC_A_W_TIME;
+                    break;
+                case 13:
+                    // New personal intensity record cleared.
+                    g_ConversationId = ConversationId::NPC_A_W_INTENSITY;
+                    break;
+                case 20: {
+                    // Generic loss message.
+                    g_ConversationId = ConversationId::NPC_A_L;
+
+                    int32_t attacker = state.GetOption(STAT_PERM_LAST_ATTACKER);
+                    switch (attacker) {
+                        case BattleUnitType::HOOKTAIL:
+                            g_ConversationId = ConversationId::NPC_A_L_HOOK;
+                            break;
+                        case BattleUnitType::GLOOMTAIL:
+                            g_ConversationId = ConversationId::NPC_A_L_GLOOM;
+                            break;
+                        case BattleUnitType::BONETAIL:
+                            g_ConversationId = ConversationId::NPC_A_L_BONE;
+                            break;
+                        case BattleUnitType::GOLD_FUZZY:
+                        case BattleUnitType::FUZZY_HORDE:
+                            g_ConversationId = ConversationId::NPC_A_L_SECRET;
+                            break;
+                        case BattleUnitType::BOMB_SQUAD_BOMB:
+                            g_ConversationId = ConversationId::NPC_A_L_BOMB;
+                            break;
+                        case 0:
+                        case BattleUnitType::SYSTEM:
+                        case BattleUnitType::MARIO:
+                        case BattleUnitType::GOOMBELLA:
+                        case BattleUnitType::KOOPS:
+                        case BattleUnitType::FLURRIE:
+                        case BattleUnitType::YOSHI:
+                        case BattleUnitType::VIVIAN:
+                        case BattleUnitType::BOBBERY:
+                        case BattleUnitType::MS_MOWZ:
+                            break;
+                        default: {
+                            // Loss to a regular enemy, pick message at random.
+                            int32_t num_cvs =
+                                ConversationId::NPC_A_L_ENEMY_END -
+                                ConversationId::NPC_A_L_ENEMY_START;
+                            int32_t cv_id = ttyd::system::irand(num_cvs);
+                            g_ConversationId =
+                                ConversationId::NPC_A_L_ENEMY_START + cv_id;
+
+                            // Pick a response with an appropriate level of
+                            // sympathy based on how tough the enemy was.
+                            int32_t level;
+                            GetEnemyStats(attacker,
+                                nullptr, nullptr, nullptr, nullptr, &level);
+                            
+                            int32_t num_endings =
+                                ConversationId::NPC_A_L_RESP_END -
+                                ConversationId::NPC_A_L_RESP_START;
+                            level = (level + ttyd::system::irand(5) - 2) / 2;
+                            if (level >= num_endings) level = num_endings - 1;
+                            // Cue response for after this conversation ends.
+                            g_ConversationContinueId =
+                                ConversationId::NPC_A_L_RESP_START + level;
+
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            // Clear special conversation flag.
+            SetSWByte(GSW_NpcA_SpecialConversation, 0);
+
             break;
         }
         case ConversationId::NPC_A_FIRST_VISIT:

@@ -573,6 +573,8 @@ void OptionsManager::OnRunStart() {
 
     // Set flag to indicate settings should be cleared on next lobby/hub load.
     SetSWF(GSWF_RunSettingsCleared, 0);
+    // Clear state of Koopa's "run results" conversation.
+    SetSWByte(GSW_NpcA_SpecialConversation, 0);
     
     // Start timers and mark run as started.
     state.SetOption(OPT_RUN_STARTED, 1);

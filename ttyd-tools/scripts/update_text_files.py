@@ -6305,7 +6305,7 @@ g_PetalburgWestStrings = {
     b"tot_di011401_00":
         b"How's it going, Mario?\n"
         b"<wait 250>Ah, so you were defeated by\n"
-        b"Hooktail, eh?\n"
+        b"ol' Hooktail, eh?\n"
         b"<k>\n"
         b"<p>\n"
         b"Well, at least you made it\n"
@@ -6335,13 +6335,13 @@ g_PetalburgWestStrings = {
         b"<k>\n"
         b"<p>\n"
         b"Good thing you got to work\n"
-        b"up to fighting it by fighting\n"
-        b"the others first, right?\n"
+        b"up to fighting it by beating\n"
+        b"its siblings first, right?\n"
         b"<k>",
 
     b"tot_di011404_00":
         b"How's it going, Mario?\n"
-        b"<wait 250>Mobbed by a Gold Fuzzy,\n"
+        b"<wait 250>Mobbed by %s,\n"
         b"you say? Fascinating...\n"
         b"<k>\n"
         b"<p>\n"
@@ -6368,21 +6368,21 @@ g_PetalburgWestStrings = {
 
     b"tot_di011410_00":
         b"How's it going, Mario?\n"
-        b"<wait 250>Your last run got cut short\n"
-        b"by <AN> %s, eh?\n"
+        b"<wait 300>Your last run got cut short\n"
+        b"by %s, eh?\n"
         b"<k>\n"
         b"<o>",
 
     b"tot_di011411_00":
         b"How's it going, Mario?\n"
-        b"<wait 250>You don't say? KO'd by <AN>\n"
+        b"<wait 300>You don't say? <wait 150>KO'd by\n"
         b"%s...\n"
         b"<k>\n"
         b"<o>",
 
     b"tot_di011412_00":
         b"How's it going, Mario?\n"
-        b"<wait 250>I see, <wait 200>you were done in by <AN>\n"
+        b"<wait 250>I see, <wait 200>you were done in by\n"
         b"%s...\n"
         b"<k>\n"
         b"<o>",
@@ -6390,7 +6390,7 @@ g_PetalburgWestStrings = {
     b"tot_di011420_00":
         b"<p>\n"
         b"Yikes, that's gotta be\n"
-        b"embarrassing.\n"
+        b"embarrassing for you.\n"
         b"<wait 250>Well, better luck next time!\n"
         b"<k>",
 

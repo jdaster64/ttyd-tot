@@ -1423,6 +1423,9 @@ void ApplyFixedPatches() {
             int32_t unit_idx, BattleWorkUnit* target, BattleWorkUnitPart* part,
             int32_t damage, int32_t fp_damage, uint32_t unk0, 
             uint32_t damage_pattern, uint32_t unk1) {
+
+            auto* battleWork = ttyd::battle::g_BattleWork;
+
             // Save original damage so elemental healing still works.
             const int32_t original_damage = damage;
             // Track damage taken, if target is player/enemy and damage > 0.
@@ -1443,7 +1446,6 @@ void ApplyFixedPatches() {
                 }
 
                 // Track direct damage from Infatuated attackers.
-                auto* battleWork = ttyd::battle::g_BattleWork;
                 if (unit_idx >= 0 && 
                     battleWork->battle_units[unit_idx]->alliance == 0 &&
                     battleWork->battle_units[unit_idx]->true_kind 
@@ -1460,6 +1462,22 @@ void ApplyFixedPatches() {
                     tot::SetSWF(tot::GSWF_Battle_Hooktail_BiteReactionSeen);
                 }
             }
+
+            // If Mario is damaged, store the unit type that's hitting him.
+            if (target->current_kind == BattleUnitType::MARIO) {
+                int32_t attacker_type = 0;
+                if (unit_idx >= 0) {
+                    auto* unit = battleWork->battle_units[unit_idx];
+                    if (unit &&
+                        unit->current_kind != BattleUnitType::MARIO &&
+                        unit->current_kind != BattleUnitType::SYSTEM) {
+                        attacker_type = unit->current_kind;
+                    }
+                }
+                g_Mod->state_.SetOption(
+                    tot::STAT_PERM_LAST_ATTACKER, attacker_type);
+            }
+
             // Run normal damage logic.
             g_BattleDamageDirect_trampoline(
                 unit_idx, target, part, original_damage, fp_damage, 

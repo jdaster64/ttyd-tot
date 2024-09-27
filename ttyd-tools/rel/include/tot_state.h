@@ -538,7 +538,8 @@ enum Options : uint32_t {
     STAT_PERM_MAX_INTENSITY     = 0x2b3'2'01'03,
     STAT_PERM_REWARDS_OFFERED   = 0x2b5'3'00'18,
     STAT_PERM_REWARDS_TAKEN     = 0x2fd'3'00'18,
-    // Next: 0x345
+    STAT_PERM_LAST_ATTACKER     = 0x345'1'00'00,
+    // Next: 0x346
 };
 
 }  // namespace mod::tot

@@ -175,6 +175,8 @@ BattleWorkUnit* (*g_BtlUnit_Entry_trampoline)(BattleUnitSetup*) = nullptr;
 // battle_unit_event.o  80129994
 bool (*g_BattleCheckEndUnitInitEvent_trampoline)(BattleWork*) = nullptr;
 // battle_item_data.o  8012eaf4
+int32_t (*g_BattleItemData_hpfp_change_declare_1_trampoline)(EvtEntry*, bool) = nullptr;
+// battle_item_data.o  8012eaf4
 int32_t (*g_BattleItemData_rank_up_trampoline)(EvtEntry*, bool) = nullptr;
 // statuswindow.o  8013cb24
 void (*g_statusWinDisp_trampoline)(void) = nullptr;

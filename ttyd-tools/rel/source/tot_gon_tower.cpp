@@ -536,6 +536,8 @@ EVT_BEGIN(Tower_RunGameOverScript)
         USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
         USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("w_bero"))
     ELSE()
+        // Clear Koopa's "run results" conversation to generic loss.
+        SET((int32_t)GSW_NpcA_SpecialConversation, 20)
         // Reload into lobby.
         USER_FUNC(evtTot_SetPreviousPartner, 0)
         USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)

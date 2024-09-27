@@ -336,13 +336,14 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         // Queue a special cutscene with Koopa.
         SetSWByte(GSW_NpcA_SpecialConversation, tut_clears + 1);
     } else if (is_first_ex_clear) {
-        SetSWByte(GSW_NpcA_SpecialConversation, 4);
+        SetSWByte(GSW_NpcA_SpecialConversation, 11);
     } else if (is_new_time_record) {
-        SetSWByte(GSW_NpcA_SpecialConversation, 5);
+        SetSWByte(GSW_NpcA_SpecialConversation, 12);
     } else if (is_new_intensity_record) {
-        SetSWByte(GSW_NpcA_SpecialConversation, 6);
+        SetSWByte(GSW_NpcA_SpecialConversation, 13);
     } else {
-        SetSWByte(GSW_NpcA_SpecialConversation, 0);
+        // Set state of Koopa's "run results" conversation to generic win.
+        SetSWByte(GSW_NpcA_SpecialConversation, 10);
     }
 
     // Reshuffle the hub item shop.
