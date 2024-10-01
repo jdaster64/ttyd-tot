@@ -83,9 +83,16 @@ extern const int32_t g_seq_mapChangeMain_OnMapUnload_BH;
 extern const int32_t g_seq_mapChangeMain_OnMapUnload_EH;
 extern const int32_t g_titleMain_Patch_NeverPlayDemo;
 extern const int32_t g_seq_logoMain_Patch_AlwaysSkipIntro;
+extern const int32_t g_create_main_Patch_SaveFileGameName;
+extern const int32_t g_read_all_main_Patch_SaveFileGameName;
+extern const int32_t g_cardWriteHeader_Patch_SaveFileGameName;
+extern const int32_t g_write_main_Patch_SaveFileGameName;
+extern const int32_t g_cardInit_Patch_SaveFileGameName;
+extern const int32_t g_cardBufReset_Patch_SaveFileGameName;
 extern const int32_t g_cardWrite_SaveSlotData_BH;
 extern const int32_t g_cardWrite_SaveSlotData_EH;
 extern const int32_t g_cardmgr_Patch_SaveFileName;
+extern const int32_t g_cardmgr_Patch_SaveFileGameName;
 
 // All for just changing the hardcoded size of the save data; sigh.
 extern const int32_t g_read_all_main_Patch_savesize_1;
@@ -217,6 +224,32 @@ void ApplyFixedPatches() {
     mod::patch::writePatch(
         reinterpret_cast<void*>(g_cardmgr_Patch_SaveFileName),
         kSaveFileName, sizeof(kSaveFileName));
+
+    // Change displayed name of game in memory card entry.
+    const char kGameName[] = "Tower of Trials";
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_cardmgr_Patch_SaveFileGameName),
+        kGameName, sizeof(kGameName));
+
+    // Move address referenced for writing game name back 4 bytes.
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_create_main_Patch_SaveFileGameName),
+        0x389f1e10  /* addi r4, r31, 0x1e10 */);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_read_all_main_Patch_SaveFileGameName),
+        0x389f1e10  /* addi r4, r31, 0x1e10 */);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_cardWriteHeader_Patch_SaveFileGameName),
+        0x389f1e10  /* addi r4, r31, 0x1e10 */);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_write_main_Patch_SaveFileGameName),
+        0x389f1e10  /* addi r4, r31, 0x1e10 */);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_cardInit_Patch_SaveFileGameName),
+        0x389d1e10  /* addi r4, r29, 0x1e10 */);
+    mod::patch::writePatch(
+        reinterpret_cast<void*>(g_cardBufReset_Patch_SaveFileGameName),
+        0x389d1e10  /* addi r4, r29, 0x1e10 */);
     
     g_OSLink_trampoline = patch::hookFunction(
         gc::OSLink::OSLink, [](OSModuleInfo* new_module, void* bss) {

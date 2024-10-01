@@ -300,6 +300,15 @@ extern const int32_t g_itemseq_GetItem_Patch_SkipTutorials = 0x800abcd8;
 extern const int32_t g_itemEntry_CheckDeleteFieldItem_BH = 0x800adae4;
 extern const int32_t g_itemMain_CheckItemFreeze_BH = 0x800ae0bc;
 
+// A handful of patches to slightly change where to read game name from
+// when creating memory card data.
+extern const int32_t g_create_main_Patch_SaveFileGameName = 0x800af3bc;
+extern const int32_t g_read_all_main_Patch_SaveFileGameName = 0x800afd30;
+extern const int32_t g_cardWriteHeader_Patch_SaveFileGameName = 0x800b1210;
+extern const int32_t g_write_main_Patch_SaveFileGameName = 0x800b16a4;
+extern const int32_t g_cardInit_Patch_SaveFileGameName = 0x800b2d60;
+extern const int32_t g_cardBufReset_Patch_SaveFileGameName = 0x800b30e8;
+
 // A ridiculous amount of patches to just override original expected save size.
 // checksum verification:
 extern const int32_t g_read_all_main_Patch_savesize_1 = 0x800aff34;
@@ -511,6 +520,7 @@ extern const int32_t g_battle_status_icon_SkipIconForPermanentStatus_CH1 = 0x802
 extern const int32_t g_crashHandler_Patch_LoopForever1 = 0x8025e4a4;
 extern const int32_t g_crashHandler_Patch_LoopForever2 = 0x8025e4a8;
 extern const int32_t g_cardmgr_Patch_SaveFileName = 0x802cb0e0;
+extern const int32_t g_cardmgr_Patch_SaveFileGameName = 0x802cb0f0;
 extern const int32_t g_ac_monosiri_target_WhiteReticleScale = 0x80301250;
 extern const int32_t g_ac_monosiri_target_GreyReticleScale = 0x80301280;
 extern const int32_t g_ac_monosiri_target_ReticleZoomSpeed = 0x80428610;
