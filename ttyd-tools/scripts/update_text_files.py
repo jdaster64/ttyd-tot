@@ -2162,7 +2162,7 @@ g_GlobalStrings = {
         b"single tower run.",
     b"tot_achd_67":
         b"Deal 1,000 or more damage with\n"
-        b"Infatuated foes in a default run.",
+        b"Infatuated foes in a tower run.",
     b"tot_achd_68":
         b"Finish a run with all of Mario's\n"
         b"stats at a maximum of 1.\n"

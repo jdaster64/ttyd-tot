@@ -252,6 +252,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     if (state.GetOption(STAT_RUN_PLAYER_DAMAGE) == 654) {
         AchievementsManager::MarkCompleted(AchievementId::SECRET_DAMAGE);
     }
+    
+    if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 1000) {
+        AchievementsManager::MarkCompleted(AchievementId::SECRET_INFATUATE);
+    }
 
     if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
         if (state.GetOption(STAT_RUN_ITEMS_USED) == 0) {
@@ -268,9 +272,6 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         }
         if (state.GetOption(STAT_RUN_MOST_TURNS_RECORD) <= 3) {
             AchievementsManager::MarkCompleted(AchievementId::RUN_ALL_FLOORS_3_TURN);
-        }
-        if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 1000) {
-            AchievementsManager::MarkCompleted(AchievementId::SECRET_INFATUATE);
         }
     }
 
