@@ -9,6 +9,7 @@
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
+#include "tot_manager_dialogue.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
@@ -714,16 +715,16 @@ EVT_BEGIN(Tower_FinalBossEvent)
     RUN_EVT(bero_case_entry)
     WAIT_MSEC(1300)
 
-    // TODO: Non-placeholder encounter message.
+    // Print encounter message.
     USER_FUNC(evtTot_GetDifficulty, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_HALF)
-            USER_FUNC(evt_msg_print, 0, PTR("tot_field_dragon00_00"), 0, 0)
-        CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_FULL)
-            USER_FUNC(evt_msg_print, 0, PTR("tot_field_dragon01_00"), 0, 0)
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::HOOK_F1)
         CASE_ETC()
-            USER_FUNC(evt_msg_print, 0, PTR("tot_field_dragon02_00"), 0, 0)
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::GLOOM_F1)
     END_SWITCH()
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, 0)
 
     USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
@@ -880,8 +881,10 @@ EVT_BEGIN(Tower_GoldFuzzyBossEvent)
     RUN_EVT(bero_case_entry)
     WAIT_MSEC(1300)
 
-    // TODO: Non-placeholder encounter message.
-    USER_FUNC(evt_msg_print, 0, PTR("tot_field_dragon00_00"), 0, 0)
+    // Print dragon already-felled message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::HOOK_F3)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, 0)
 
     USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
@@ -893,11 +896,15 @@ EVT_BEGIN(Tower_GoldFuzzyBossEvent)
     USER_FUNC(evt_mario_set_dir_npc, PTR(kPitNpcName))
     USER_FUNC(evt_party_set_dir_npc, 0, PTR(kPitNpcName))
 
-    // TODO: Hone camera location, add dialogue, have Fuzzy jump toward Mario.
+    // Pan camera over.
     RUN_EVT_ID(Tower_GoldFuzzyIdleSfx, LW(15))
     USER_FUNC(evt_cam3d_evt_set, 0, 75, 230, 0, 25, -70, 250, 11)
     WAIT_MSEC(500)
-    USER_FUNC(evt_msg_print, 0, PTR("tot_field_gfz_00"), 0, PTR(kPitNpcName))
+    // Print Gold Fuzzy message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::SBOSS_F1)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitNpcName))
+
     DELETE_EVT(LW(15))
     BROTHER_EVT()
         // Slow camera pan.
@@ -957,8 +964,12 @@ EVT_BEGIN(Tower_GoldFuzzyBossEvent)
     SET(LW(13), PTR(kPitNpcName))
     USER_FUNC(evt_npc_set_position, LW(13), 0, 5, 0)
     USER_FUNC(evt_npc_set_anim, LW(13), PTR("CBN_Y_1"))
-    // TODO: Add death text?
-    WAIT_MSEC(1000)
+    WAIT_MSEC(550)
+    // Print Gold Fuzzy death message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::SBOSS_F3)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitNpcName))
+    WAIT_MSEC(300)
     USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
     USER_FUNC(evt_eff, 
         0, PTR("kemuri_test"), 4, LW(0), LW(1), LW(2), 

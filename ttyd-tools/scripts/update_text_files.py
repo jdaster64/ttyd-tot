@@ -5889,67 +5889,128 @@ g_Tower4Strings = {
 }
 
 g_TowerBossFloorStrings = {
-    # Field dialogue.
+    # TODO: Finalize all boss dialogue.
+
+    # Boss field dialogue.
     
-    # TODO: Finalize all field and battle dialogue for final bosses.
+    # Hooktail before battle.
+    b"tot_di030100_00":
+        b"<boss>\n"
+        b"Ah, <wait 250>the mustachioed one has\n"
+        b"finally returned!\n"
+        b"<k>",
+    # + variants for later visits...
+    b"tot_di030110_00":
+        b"<boss>\n"
+        b"Back again for more, are we?\n"
+        b"<k>",
     
-    b"tot_field_dragon00_00":
-        b"[Placeholder] Encounter<k>",
-    
-    b"tot_field_dragon01_00":
-        b"[Placeholder] Encounter<k>",
-    
-    b"tot_field_dragon02_00":
-        b"[Placeholder] Encounter<k>",
+    # Gloomtail before battle.
+    b"tot_di040100_00":
+        b"<boss>\n"
+        b"<dynamic 3>Halt!</dynamic> <wait 250>Who dares approach?\n"
+        b"<k>",
+    # + variants for later visits...
+    b"tot_di040110_00":
+        b"<boss>\n"
+        b"Oho, you challenge me again?\n"
+        b"<k>",
         
-    b"tot_field_gfz_00":
-        b"[Placeholder] Encounter<k>",
+    # Dragon before battle with Gold Fuzzy.
+    b"tot_di030300_00":
+        b"<boss>\n"
+        b"Oog...\n"
+        b"<k>",
+        
+    # Gold Fuzzy before battle.
+    b"tot_di060100_00":
+        b"<wave>Meeeeeeeeeeeork!</wave> \n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Yooooou! <wait 250>You thought you\n"
+        b"were so <dynamic 3>slick</dynamic>, beating us up\n"
+        b"at the fortress before!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, there's strength in\n"
+        b"numbers, bucko! <wait 250>And we're\n"
+        b"stronger than ever before!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Get ready for a world of\n"
+        b"hurt, buddy! <wait 250>It's go time!\n"
+        b"<k>",
+    # + variants for later visits...
+    b"tot_di060110_00":
+        b"You! <wait 250>You're back again for\n"
+        b"more punishment, eh?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, last time was a fluke,\n"
+        b"believe me! <wait 200>No way we lose to\n"
+        b"your type again!\n"
+        b"<k>",
+        
+    # Gold Fuzzy after battle.
+    b"tot_di060300_00":
+        b"Gack!\n"
+        b"<k>",
+        
     
-    # Dragon fight dialogue.
+    # Boss battle dialogue.
     
     # Hooktail battle entry.
-    b"tot_dragon00_00":
+    b"tot_di031000_00":
+        b"<boss>\n"
         b"[Placeholder] Battle entry<k>",
     
     # Hooktail low health.
-    b"tot_dragon00_10":
+    b"tot_di031100_00":
+        b"<boss>\n"
         b"[Placeholder] Low health<k>",
     
     # Hooktail phase 2 start.
-    b"tot_dragon00_20":
+    b"tot_di031200_00":
+        b"<boss>\n"
         b"[Placeholder] Phase 2<k>",
     
-    # Hooktail phase 3 start (unused).
-    b"tot_dragon00_30":
-        b"[Placeholder] Phase 3<k>",
-    
-    # Hooktail megabreath (unused).
-    b"tot_dragon00_40":
-        b"[Placeholder] Megabreath!<k>",
-    
-    # Hooktail healing (unused).
-    b"tot_dragon00_50":
-        b"[Placeholder] Healing!<k>",
-    
     # Hooktail bite reaction.
-    b"tot_dragon00_60":
+    b"tot_di031600_00":
+        b"<boss>\n"
         b"[Placeholder] Bite gloating<k>",
     
     # Hooktail partner bite reaction.
-    b"tot_dragon00_70":
+    b"tot_di031700_00":
         b"[Placeholder]\n"
         b"You can Superguard that btw<k>",
     
     # Hooktail death.
-    b"tot_dragon00_80":
+    b"tot_di031800_00":
         b"[Placeholder] Dead<k>",
     
-    # Hooktail fake death (unused).
-    b"tot_dragon00_90":
-        b"[Placeholder] Dead?",
-    
     # Gloomtail battle entry.
-    b"tot_dragon01_00":
+    b"tot_di041000_00":
+        b"<boss>\n"
+        b"<dynamic 3>You!</dynamic> <wait 250>You mortals dared to\n"
+        b"make a mockery of my dear\n"
+        b"sister, once again!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And yet I'm to understand\n"
+        b"this was a fair challenge,\n"
+        b"<wait 250>and of her own choosing...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Be that as it might, daring to\n"
+        b"challenge me as well was quite\n"
+        b"foolish, I assure you.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I shall use every ounce of my\n"
+        b"power to fell you this time!\n"
+        b"<k>",
+    # + variants for later visits...
+    b"tot_di041100_00":
         b"<boss>\n"
         b"So you've come this far to\n"
         b"challenge me again, mortals?\n"
@@ -5962,13 +6023,13 @@ g_TowerBossFloorStrings = {
         b"<k>",
     
     # Gloomtail low health.
-    b"tot_dragon01_10":
+    b"tot_di041100_00":
         b"<boss>\n"
         b"Mmmmph...<wait 250> How can this be...\n"
         b"<k>",
     
     # Gloomtail phase 2 start.
-    b"tot_dragon01_20":
+    b"tot_di041200_00":
         b"<boss>\n"
         b"GWAAAAH HA HA HA HA!\n"
         b"<wait 250>\n"
@@ -5981,7 +6042,7 @@ g_TowerBossFloorStrings = {
         b"<k>",
     
     # Gloomtail phase 3 start.
-    b"tot_dragon01_30":
+    b"tot_di041300_00":
         b"<boss>\n"
         b"Gwuhhh...\n"
         b"<k>\n"
@@ -6000,7 +6061,7 @@ g_TowerBossFloorStrings = {
         b"<k>",
     
     # Gloomtail megabreath.
-    b"tot_dragon01_40":
+    b"tot_di041400_00":
         b"<boss>\n"
         b"<dynamic 3>\n"
         b"<scale 2>\n"
@@ -6008,74 +6069,46 @@ g_TowerBossFloorStrings = {
         b"MEGABREATH!\n"
         b"<k>",
     
-    # Gloomtail healing (unused).
-    b"tot_dragon01_50":
-        b"Placeholder text 1-50<k>",
-    
-    # Gloomtail bite reaction (unused).
-    b"tot_dragon01_60":
-        b"Placeholder text 1-60<k>",
-    
-    # Gloomtail partner bite reaction (unused).
-    b"tot_dragon01_70":
-        b"Placeholder text 1-70<k>",
-    
     # Gloomtail death.
-    b"tot_dragon01_80":
+    b"tot_di041800_00":
         b"<boss>\n"
         b"No... <wait 250>No...<wait 250> It can't be true!\n"
         b"<k>",
     
     # Gloomtail fake death.
-    b"tot_dragon01_90":
+    b"tot_di041900_00":
         b"<boss>\n"
-        b"[Placeholder]\n"
-        b"No... <wait 250>No...<wait 250> It can't be true!\n"
+        b"Curses! <wait 250>No... <wait 250>I can't have been\n"
+        b"undone, yet again!\n"
         b"<k>",
     
     # Bonetail battle entry.
-    b"tot_dragon02_00":
+    b"tot_di051000_00":
+        b"<boss>\n"
         b"[Placeholder] Battle entry<k>",
     
     # Bonetail low health.
-    b"tot_dragon02_10":
+    b"tot_di051100_00":
+        b"<boss>\n"
         b"[Placeholder] Low health<k>",
     
     # Bonetail phase 2 start.
-    b"tot_dragon02_20":
+    b"tot_di051200_00":
+        b"<boss>\n"
         b"[Placeholder] Phase 2<k>",
     
-    # Bonetail phase 3 start (unused).
-    b"tot_dragon02_30":
-        b"[Placeholder] Phase 3<k>",
-    
-    # Bonetail megabreath (unused).
-    b"tot_dragon02_40":
-        b"[Placeholder] Megabreath!<k>",
-    
     # Bonetail healing.
-    b"tot_dragon02_50":
+    b"tot_di051500_00":
+        b"<boss>\n"
         b"[Placeholder] Healing!<k>",
     
-    # Bonetail bite reaction (unused).
-    b"tot_dragon02_60":
-        b"[Placeholder] Bite<k>",
-    
-    # Bonetail partner bite reaction (unused).
-    b"tot_dragon02_70":
-        b"[Placeholder] Reaction<k>",
-    
     # Bonetail death.
-    b"tot_dragon02_80":
+    b"tot_di051800_00":
+        b"<boss>\n"
         b"[Placeholder] Dead<k>",
     
-    # Bonetail fake death (unused).
-    b"tot_dragon02_90":
-        b"[Placeholder] Dead?",
-    
     # Gold Fuzzy mid-fight dialogue.
-    
-    b"tot_gfz_call_horde":
+    b"tot_di061000_00":
         b"Meee-OOOF!<wait 250> Hey!<wait 250> Ow!\n"
         b"<wait 250>\nYou chumps are tougher than\n"
         b"you look...\n<k>\n<p>\n"

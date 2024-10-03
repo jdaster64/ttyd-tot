@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gsw.h"
+#include "tot_manager_dialogue.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -100,18 +101,18 @@ namespace BreathType {
 }
 
 // Determines what dialogue tree to use for a particular situation.
-namespace ConversationType {
+namespace DragonConversationType {
     enum e {
-        BATTLE_ENTRY = 0,
-        LOW_HEALTH = 10,
-        PHASE_2_START = 20,
-        PHASE_3_START = 30,
-        MEGABREATH = 40,
-        HEAL = 50,
-        BITE_REACTION = 60,
-        BITE_REACTION_PARTNER = 70,
-        DEATH = 80,
-        FAKE_DEATH = 90,
+        BATTLE_ENTRY    = ConversationId::GLOOM_ENTRY   - ConversationId::GLOOM,
+        LOW_HEALTH      = ConversationId::GLOOM_LOW_HP  - ConversationId::GLOOM,
+        PHASE_2_START   = ConversationId::GLOOM_P2      - ConversationId::GLOOM,
+        PHASE_3_START   = ConversationId::GLOOM_P3      - ConversationId::GLOOM,
+        MEGABREATH      = ConversationId::GLOOM_MEGA    - ConversationId::GLOOM,
+        HEAL            = ConversationId::GLOOM_HEAL    - ConversationId::GLOOM,
+        BITE_AFTER_1    = ConversationId::GLOOM_BITE1   - ConversationId::GLOOM,
+        BITE_AFTER_2    = ConversationId::GLOOM_BITE2   - ConversationId::GLOOM,
+        DEATH           = ConversationId::GLOOM_DEATH   - ConversationId::GLOOM,
+        FAKE_DEATH      = ConversationId::GLOOM_FAKEOUT - ConversationId::GLOOM,
     };
 }
 
@@ -122,7 +123,6 @@ EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetPhaseHpThresholds, 4)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetAttackWeights, 10)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetBreathWeights, 9)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_SetupConversation, 2)
-EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetNextDialogue, 2)
 
 extern BattleUnitSetup unitBonetail_spawnSetup;
 
@@ -489,17 +489,17 @@ BattleWeapon unitDragon_weaponRecover = {
 EVT_BEGIN(unitDragon_conversation_event)
     USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
     USER_FUNC(evtTot_Dragon_SetupConversation, LW(1), LW(0))
-    USER_FUNC(evtTot_Dragon_GetNextDialogue, LW(14), LW(15))
+    USER_FUNC(evtTot_GetNextMessage, LW(14), LW(15))
     
     DO(0)
-        IF_EQUAL(LW(14), 1)
-            USER_FUNC(evt_msg_print, 2, LW(15), 0, -2)
+        IF_EQUAL(LW(15), 0)
+            USER_FUNC(evt_msg_print, 2, LW(14), 0, -2)
         ELSE()
-            USER_FUNC(evt_msg_print_battle_party, LW(15))
+            USER_FUNC(evt_msg_print_battle_party, LW(14))
         END_IF()
             
-        USER_FUNC(evtTot_Dragon_GetNextDialogue, LW(14), LW(15))
-        IF_EQUAL(LW(14), -1)
+        USER_FUNC(evtTot_GetNextMessage, LW(14), LW(15))
+        IF_EQUAL(LW(15), -1)
             DO_BREAK()
         END_IF()
             
@@ -620,14 +620,14 @@ EVT_BEGIN(unitDragon_bite_reaction_event)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
     USER_FUNC(evt_btl_camera_set_zoom, 0, 200)
 
-    SET(LW(0), (int32_t)ConversationType::BITE_REACTION)
+    SET(LW(0), (int32_t)DragonConversationType::BITE_AFTER_1)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
 
     USER_FUNC(evt_btl_camera_set_mode, 1, 3)
     USER_FUNC(evt_btl_camera_set_moveto, 1, -115, 50, 200, -115, -30, -670, 1, 0)
     WAIT_MSEC(500)
-    SET(LW(0), (int32_t)ConversationType::BITE_REACTION_PARTNER)
+    SET(LW(0), (int32_t)DragonConversationType::BITE_AFTER_2)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
     
@@ -815,7 +815,7 @@ LBL(99)
 EVT_END()
 
 EVT_BEGIN(unitDragon_megabreath_event)
-    SET(LW(0), (int32_t)ConversationType::MEGABREATH)
+    SET(LW(0), (int32_t)DragonConversationType::MEGABREATH)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
     
@@ -984,7 +984,7 @@ EVT_BEGIN(unitDragon_charge_event)
 EVT_END()
 
 EVT_BEGIN(unitDragon_recover_event)
-    SET(LW(0), (int32_t)ConversationType::HEAL)
+    SET(LW(0), (int32_t)DragonConversationType::HEAL)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
     
@@ -1119,7 +1119,7 @@ EVT_BEGIN(unitDragon_phase_event)
     IF_SMALL_EQUAL(LW(0), LW(4))
         IF_SMALL(LW(2), (int32_t)DragonAiState::PHASE_3_1)
             USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_AiState, (int32_t)DragonAiState::PHASE_3_1)
-            SET(LW(0), (int32_t)ConversationType::PHASE_3_START)
+            SET(LW(0), (int32_t)DragonConversationType::PHASE_3_START)
             RUN_CHILD_EVT(unitDragon_conversation_event)
             GOTO(99)
         END_IF()
@@ -1128,7 +1128,7 @@ EVT_BEGIN(unitDragon_phase_event)
     IF_SMALL_EQUAL(LW(0), LW(3))
         IF_SMALL(LW(2), (int32_t)DragonAiState::PHASE_2_1)
             USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_AiState, (int32_t)DragonAiState::PHASE_2_1)
-            SET(LW(0), (int32_t)ConversationType::PHASE_2_START)
+            SET(LW(0), (int32_t)DragonConversationType::PHASE_2_START)
             RUN_CHILD_EVT(unitDragon_conversation_event)
             GOTO(99)
         END_IF()
@@ -1142,7 +1142,7 @@ EVT_BEGIN(unitDragon_phase_event)
         USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_LowHealthMsg, LW(2))
         IF_NOT_EQUAL(LW(2), 1)
             USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitDragon_pose_table_weak))
-            SET(LW(0), (int32_t)ConversationType::LOW_HEALTH)
+            SET(LW(0), (int32_t)DragonConversationType::LOW_HEALTH)
             RUN_CHILD_EVT(unitDragon_conversation_event)
             USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_LowHealthMsg, 1)
         END_IF()
@@ -1219,7 +1219,7 @@ EVT_BEGIN(unitDragon_battle_entry_sub_event)
     WAIT_MSEC(1000)
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_T_3"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_S_3"))
-    SET(LW(0), (int32_t)ConversationType::BATTLE_ENTRY)
+    SET(LW(0), (int32_t)DragonConversationType::BATTLE_ENTRY)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
     // Trigger music in case it faded out in earlier phase.
@@ -1375,7 +1375,7 @@ EVT_BEGIN(unitDragon_fake_dead_event)
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_X_1"))
 
-    SET(LW(0), (int32_t)ConversationType::FAKE_DEATH)
+    SET(LW(0), (int32_t)DragonConversationType::FAKE_DEATH)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
 
@@ -1444,7 +1444,7 @@ EVT_BEGIN(unitDragon_dead_event)
     WAIT_MSEC(1500)
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("GNB_X_1"))
     USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("GNB_X_1"))
-    SET(LW(0), (int32_t)ConversationType::DEATH)
+    SET(LW(0), (int32_t)DragonConversationType::DEATH)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_DragonType, LW(1))
     RUN_CHILD_EVT(unitDragon_conversation_event)
     
@@ -2081,38 +2081,20 @@ EVT_DEFINE_USER_FUNC(evtTot_Dragon_GetBreathWeights) {
     return 2;
 }
 
-struct DialogueEntry {
-    int32_t speaker;    // 1 for dragon, 2 for partners
-    char msg[16];
-};
-DialogueEntry g_DialogueList[16];
-int32_t g_DialoguePos = 0;
-
 // arg0 = dragon, arg1 = conversation type
 EVT_DEFINE_USER_FUNC(evtTot_Dragon_SetupConversation) {
-    int32_t dragon_type = evtGetValue(evt, evt->evtArguments[0]);
-    int32_t conversation_type = evtGetValue(evt, evt->evtArguments[1]);
-    
-    // For now, assume every message is a single dragon dialogue box.
-    // TODO: Support partner messages when dialogue is finalized.
-    g_DialogueList[0].speaker = 1;
-    sprintf(
-        g_DialogueList[0].msg, "tot_dragon%02" PRId32 "_%02" PRId32,
-        dragon_type, conversation_type);
-    
-    g_DialogueList[1].speaker = -1;
-    g_DialoguePos = 0;
-    
-    return 2;
-}
+    // DragonConversationType independent of actor (e.g. battle entry, low HP)
+    int32_t conversation_id = evtGetValue(evt, evt->evtArguments[1]);
 
-// out arg0 = speaker, arg1 = message id
-EVT_DEFINE_USER_FUNC(evtTot_Dragon_GetNextDialogue) {
-    evtSetValue(
-        evt, evt->evtArguments[0], g_DialogueList[g_DialoguePos].speaker);
-    evtSetValue(
-        evt, evt->evtArguments[1], PTR(g_DialogueList[g_DialoguePos].msg));
-    ++g_DialoguePos;
+    // Add base value corresponding to the particular dragon type.
+    switch (evtGetValue(evt, evt->evtArguments[0])) {
+        case 0: conversation_id += ConversationId::HOOK;    break;
+        case 1: conversation_id += ConversationId::GLOOM;   break;
+        case 2: conversation_id += ConversationId::BONE;    break;
+    }
+
+    DialogueManager::SetConversation(conversation_id);
+
     return 2;
 }
 

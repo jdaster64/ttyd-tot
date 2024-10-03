@@ -457,6 +457,9 @@ bool DialogueManager::GetNextMessage(const char** msg, int32_t* speaker_type) {
         ++g_ConversationStep;
     }
 
+    // Don't add party string to end unless partner is currently speaking.
+    if (*g_ConversationPtr != SpeakerType::PARTNER) party_str = "";
+
     static char lookup_buf[24];
     sprintf(lookup_buf,
         "tot_di%06" PRId32 "_%02" PRId32 "%s",

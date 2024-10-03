@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_manager_dialogue.h"
 #include "tot_state.h"
 
 #include <gc/mtx.h>
@@ -763,7 +764,10 @@ EVT_BEGIN(unitGoldFuzzy_call_horde_event)
     USER_FUNC(evt_btl_camera_set_moveto, 1, 120, 40, 200, 120, -10, -500, 30, 0)
     WAIT_FRM(60)
     USER_FUNC(btlevtcmd_reset_move_color_lv_all)
-    USER_FUNC(evt_msg_print, 2, PTR("tot_gfz_call_horde"), 0, -2)
+    // Print phase 2 dialogue.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::SBOSS_PHASE2)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
     USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
     USER_FUNC(evt_btl_camera_set_mode, 1, 0)
     USER_FUNC(evt_btl_camera_set_prilimit, 0)
