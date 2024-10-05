@@ -123,6 +123,8 @@ EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetPhaseHpThresholds, 4)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetAttackWeights, 10)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetBreathWeights, 9)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_SetupConversation, 2)
+EVT_DECLARE_USER_FUNC(evtTot_CheckPartnerActionable, 1)
+EVT_DECLARE_USER_FUNC(evtTot_CureNegativeStatus, 1)
 
 extern BattleUnitSetup unitBonetail_spawnSetup;
 
@@ -1324,8 +1326,43 @@ EVT_BEGIN(unitDragon_damage_sub_event)
 EVT_END()
 
 EVT_BEGIN(unitDragon_fake_victory_event)
-    // TODO: Cure negative status ailments other than death?
     USER_FUNC(btlevtcmd_GetUnitId, -4, LW(14))
+
+    // Cure all negative statuses, including reviving partner to 1 HP.
+    USER_FUNC(evtTot_CureNegativeStatus, LW(13))
+    // Play HP restoration effect, if reviving partner.
+    IF_FLAG(LW(13), 1)
+        USER_FUNC(btlevtcmd_GetPos, -4, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_GetHeight, -4, LW(3))
+        ADD(LW(1), LW(3))
+        USER_FUNC(evt_eff, PTR(""), PTR("recovery"), 0, LW(0), LW(1), LW(2), 1, 0, 0, 0, 0, 0, 0, 0)
+    END_IF()
+    // Run wakeup event, if Koops was previously flipped.
+    IF_FLAG(LW(13), 2)
+        USER_FUNC(btlevtcmd_RunDataEventChild, -4, 2)
+    END_IF()
+
+    // Run end-Veil event, if applicable.
+    USER_FUNC(
+        btlevtcmd_CheckAttribute, -3, 
+        (int32_t)ttyd::battle_unit::BattleUnitAttribute_Flags::VEILED, LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(btlevtcmd_RunDataEventChild, -4, 3)
+    END_IF()
+
+    // Open Shell Shield, if applicable.
+    USER_FUNC(btlevtcmd_GetGuardKouraId, -3, LW(0))
+    IF_NOT_EQUAL(LW(0), -1)
+        USER_FUNC(btlevtcmd_RunDataEventChild, LW(0), 59)
+        USER_FUNC(btlevtcmd_SetUnitWork, LW(0), 2, 0)
+    END_IF()
+
+    // Set both characters to idle animation.
+    USER_FUNC(btlevtcmd_AnimeChangePoseType, -3, 1, 69)
+    IF_NOT_EQUAL(LW(14), -1)
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, 1, 69)
+    END_IF()
+
     USER_FUNC(evt_btl_camera_set_mode, 0, 0x11)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
     WAIT_MSEC(1000)
@@ -1342,10 +1379,7 @@ EVT_BEGIN(unitDragon_fake_victory_event)
     USER_FUNC(evt_eff_fukidashi, 2, PTR(""), 0, 0, 0, LW(0), LW(1), LW(2), 50, 0, 60)
 
     IF_NOT_EQUAL(LW(14), -1)
-        USER_FUNC(btlevtcmd_CheckActStatus, -4, LW(0))
-        IF_EQUAL(LW(0), 1)
-            USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, 1, 69)
-        END_IF()
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, -4, 1, 69)
     END_IF()
     USER_FUNC(evt_snd_sfxon, PTR("SFX_ITEM_QUAKE1"), LW(13))
     USER_FUNC(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
@@ -1358,7 +1392,8 @@ EVT_BEGIN(unitDragon_fake_victory_event)
     USER_FUNC(btlevtcmd_SetUnitWork, LW(10), UW_FakeDeathPlayed, 1)
     WAIT_MSEC(100)
     USER_FUNC(btlevtcmd_RunDataEventChild, LW(10), 100)
-    // Reset turn, if desired - USER_FUNC(btlevtcmd_reset_turn)
+    // Move to next turn.
+    USER_FUNC(btlevtcmd_reset_turn)
     // Kill Gloomtail actor.
     USER_FUNC(btlevtcmd_KillUnit, -2, 0)
     RETURN()
@@ -2095,6 +2130,66 @@ EVT_DEFINE_USER_FUNC(evtTot_Dragon_SetupConversation) {
     }
 
     DialogueManager::SetConversation(conversation_id);
+
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_CheckPartnerActionable) {
+    bool result = false;
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t unit_idx = ttyd::battle_sub::BattleTransID(evt, -4);
+    if (unit_idx > -1) {
+        if (auto* battle_unit = battleWork->battle_units[unit_idx];
+            battle_unit && ttyd::battle_unit::BtlUnit_CanActStatus(battle_unit))
+            result = true;
+    }
+    evtSetValue(evt, evt->evtArguments[0], result);
+
+    return 2;
+}
+
+uint32_t _CureNegativeStatus(int32_t unit_idx) {
+    uint32_t flags = 0;
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    if (unit_idx > -1 && battleWork->battle_units[unit_idx]) {
+        auto* unit = battleWork->battle_units[unit_idx];
+
+        if (unit->current_hp == 0) {
+            unit->current_hp = 1;
+            flags |= 1;
+        }
+        if (unit->current_kind == BattleUnitType::KOOPS &&
+            (unit->flipped_turns > 0 || flags != 0)) {
+            unit->flipped_turns = 1;    // will be reduced to 0 by wakeup event
+            flags |= 2;
+        }
+
+        for (int32_t type = 0; type < StatusEffectType::STATUS_MAX; ++type) {
+            switch (type) {
+                case StatusEffectType::SLEEP:
+                case StatusEffectType::STOP:
+                case StatusEffectType::DIZZY:
+                case StatusEffectType::CONFUSE:
+                case StatusEffectType::POISON:
+                case StatusEffectType::BURN:
+                case StatusEffectType::FREEZE:
+                case StatusEffectType::TINY:
+                case StatusEffectType::ATTACK_DOWN:
+                case StatusEffectType::DEFENSE_DOWN:
+                case StatusEffectType::SLOW:
+                case StatusEffectType::OHKO:
+                    ttyd::battle_unit::BtlUnit_SetStatus(unit, type, 0, 0);
+                    break;
+            }
+        }
+    }
+    return flags;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_CureNegativeStatus) {
+    _CureNegativeStatus(ttyd::battle_sub::BattleTransID(evt, -3));
+    auto flags = _CureNegativeStatus(ttyd::battle_sub::BattleTransID(evt, -4));
+    evtSetValue(evt, evt->evtArguments[0], flags);
 
     return 2;
 }
