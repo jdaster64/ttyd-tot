@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <cstring>
 
-namespace mod::patch {
+namespace mod {
 
 void clear_DC_IC_Cache(void *ptr, uint32_t size)
 {

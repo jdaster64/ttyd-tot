@@ -616,8 +616,7 @@ EVT_BEGIN(unitPiranha_breath_attack_event)
                 // Reverse effect if facing right.
                 USER_FUNC(btlevtcmd_GetFaceDirection, -2, LW(4))
                 IF_EQUAL(LW(4), 1)
-                    USER_FUNC(
-                        infinite_pit::battle::evtTot_SetGonbabaBreathDir, 1)
+                    USER_FUNC(patch::battle::evtTot_SetGonbabaBreathDir, 1)
                 END_IF()
 
                 // Fire effect.
@@ -628,7 +627,7 @@ EVT_BEGIN(unitPiranha_breath_attack_event)
 
                 // Set effect to left-facing by default, after attack.
                 WAIT_FRM(100)
-                USER_FUNC(infinite_pit::battle::evtTot_SetGonbabaBreathDir, 0)
+                USER_FUNC(patch::battle::evtTot_SetGonbabaBreathDir, 0)
         END_SWITCH()
     END_BROTHER()
 
@@ -1142,4 +1141,4 @@ EVT_DEFINE_USER_FUNC(evtTot_PiranhaSpawnPoisonEffect) {
     return 2;
 }
 
-}
+}  // namespace mod::tot::custom

@@ -68,10 +68,10 @@ EVT_BEGIN(Lobby_FrontSignEvt)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_normalize)
 
-    IF_EQUAL((int32_t)tot::GSWF_RunOptionsTutorial, 0)
+    IF_EQUAL((int32_t)GSWF_RunOptionsTutorial, 0)
         USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_opttutorial"), 0, 0)
         // Explanation complete.
-        SET((int32_t)tot::GSWF_RunOptionsTutorial, 1)
+        SET((int32_t)GSWF_RunOptionsTutorial, 1)
         GOTO(99)
     END_IF()
 

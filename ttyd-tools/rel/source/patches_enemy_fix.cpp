@@ -36,7 +36,7 @@ extern "C" {
     void BranchBackDispEnemyHeldItem();    
     
     int32_t sumWeaponTargetRandomWeights(int32_t* weights) {
-        return mod::infinite_pit::enemy_fix::
+        return mod::tot::patch::enemy_fix::
             SumWeaponTargetRandomWeights(weights);
     }
     
@@ -68,7 +68,7 @@ extern "C" {
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
 
@@ -196,20 +196,20 @@ bool CheckIfPlayerDefeated() {
 
 void ApplyFixedPatches() {
     // Disallows audience from throwing items at Infatuated enemies.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudienceDetectTargetPlayer_CheckPlayer_BH),
         reinterpret_cast<void*>(g_BattleAudienceDetectTargetPlayer_CheckPlayer_EH),
         reinterpret_cast<void*>(StartAudienceCheckPlayerTarget),
         reinterpret_cast<void*>(BranchBackAudienceCheckPlayerTarget));
 
     // Hooks drawing held item code, skipping it if any clone enemies exist.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_btlDispMain_DrawNormalHeldItem_BH),
         reinterpret_cast<void*>(StartDispEnemyHeldItem),
         reinterpret_cast<void*>(BranchBackDispEnemyHeldItem));
 
     // Sums weapon targets' random weights, ensuring that each weight is > 0.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleChoiceSamplingEnemy_SumRandWeights_BH),
         reinterpret_cast<void*>(g_BattleChoiceSamplingEnemy_SumRandWeights_EH),
         reinterpret_cast<void*>(StartSampleRandomTarget),
@@ -217,7 +217,7 @@ void ApplyFixedPatches() {
         
     // Force friendly enemies to never call for backup, and certain enemies
     // to stop calling for backup after turn 5.
-    g_btlevtcmd_CheckSpace_trampoline = patch::hookFunction(
+    g_btlevtcmd_CheckSpace_trampoline = mod::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_CheckSpace,
         [](EvtEntry* evt, bool isFirstCall) {
             auto* battleWork = ttyd::battle::g_BattleWork;
@@ -273,13 +273,13 @@ void ApplyFixedPatches() {
     const uint32_t kCheckSpaceAllianceCheckOps[] = {
         0x80030008, (0x2c000000 | BattleUnitType::BONETAIL), 0x418100d0
     };
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_CheckSpace_Patch_CheckEnemyTypes),
         kCheckSpaceAllianceCheckOps, sizeof(kCheckSpaceAllianceCheckOps));
         
     // Add additional check for player's side losing battle that doesn't
     // take Infatuated enemies into account.
-    g_BattleCheckConcluded_trampoline = patch::hookFunction(
+    g_BattleCheckConcluded_trampoline = mod::hookFunction(
         ttyd::battle_seq::BattleCheckConcluded, [](BattleWork* battleWork) {
             uint32_t result = g_BattleCheckConcluded_trampoline(battleWork);
             if (!result) result = CheckIfPlayerDefeated();
@@ -290,7 +290,7 @@ void ApplyFixedPatches() {
 
     // Boo and Dark Boo should not try to use team-invis attack when Infatuated.
     // (They already don't try to use it in Confusion)
-    g_unitBoo_teresa_check_trans_trampoline = patch::hookFunction(
+    g_unitBoo_teresa_check_trans_trampoline = mod::hookFunction(
         unitBoo_teresa_check_trans, [](EvtEntry* evt, bool isFirstCall) {
             // Check for Infatuation first.
             auto* battleWork = ttyd::battle::g_BattleWork;
@@ -303,7 +303,7 @@ void ApplyFixedPatches() {
             // Run original logic.
             return g_unitBoo_teresa_check_trans_trampoline(evt, isFirstCall);
         });
-    g_unitDarkBoo_teresa_check_trans_trampoline = patch::hookFunction(
+    g_unitDarkBoo_teresa_check_trans_trampoline = mod::hookFunction(
         unitDarkBoo_teresa_check_trans, [](EvtEntry* evt, bool isFirstCall) {
             // Check for Infatuation first.
             auto* battleWork = ttyd::battle::g_BattleWork;
@@ -400,86 +400,86 @@ void ApplyFixedPatches() {
     
     // Patch Gale Force coins / EXP out for enemies that had special logic
     // for handling it in the original game (mostly cloning enemies).
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_DarkWizzerd_GaleForceDeath_PatchLoc),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_EliteWizzerd_GaleForceDeath_PatchLoc),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_Magikoopa_GaleForceDeath_PatchLoc),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_RedMagikoopa_GaleForceDeath_PatchLoc),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_WhiteMagikoopa_GaleForceDeath_PatchLoc),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_GreenMagikoopa_GaleForceDeath_PatchLoc),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_Pider_GaleForceDeath_PatchLoc),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_Arantula_GaleForceDeath_PatchLoc),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
         
     // Patch cloning Wizzerds' / Magikoopas' remaining enemies checks
     // to consider all enemy actors, regardless of alliance.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_DarkWizzerd_CheckNumEnemies_PatchLoc),
         reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_EliteWizzerd_CheckNumEnemies_PatchLoc),
         reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_Magikoopa_CheckNumEnemies_PatchLoc),
         reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_RedMagikoopa_CheckNumEnemies_PatchLoc),
         reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_WhiteMagikoopa_CheckNumEnemies_PatchLoc),
         reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_GreenMagikoopa_CheckNumEnemies_PatchLoc),
         reinterpret_cast<uint32_t>(CheckNumEnemiesRemaining));
         
     // Patch over Bandits' confusion check for whether to steal.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_Bandit_CheckConfusion_PatchLoc),
         reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_BigBandit_CheckConfusion_PatchLoc),
         reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_BadgeBandit_CheckConfusion_PatchLoc),
         reinterpret_cast<uint32_t>(CheckConfusedOrInfatuated));
             
     // Patch over Hammer, Boomerang, and Fire Bros.' low-HP checks.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_HammerBros_CheckHp_PatchLoc),
         HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_BoomerangBros_CheckHp_PatchLoc),
         HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_FireBros_CheckHp_PatchLoc),
         HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
         
     // Fix branch labels for attacks that softlock if there are no valid targets.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_Koopatrol_NormalAttackReturnLbl_PatchLoc), 98);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_DarkKoopatrol_NormalAttackReturnLbl_PatchLoc), 98);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_XNaut_NormalAttackReturnLbl_PatchLoc), 98);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_XNaut_JumpAttackReturnLbl_PatchLoc), 98);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_EliteXNaut_NormalAttackReturnLbl_PatchLoc), 98);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(evt_EliteXNaut_JumpAttackReturnLbl_PatchLoc), 98);
             
     // Make all varieties of Yux able to be hit by grounded attacks,
@@ -508,4 +508,4 @@ int32_t SumWeaponTargetRandomWeights(int32_t* weights) {
 }
 
 }  // namespace enemy_fix
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

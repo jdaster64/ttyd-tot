@@ -279,7 +279,7 @@ void DrawItemInventorySize(WinPauseMenu* menu, float win_x, float win_y) {
     ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "/");
     
     int32_t current_items = ttyd::mario_pouch::pouchGetHaveItemCnt();
-    int32_t max_items = mod::infinite_pit::item::GetItemInventorySize();
+    int32_t max_items = patch::item::GetItemInventorySize();
     
     // Draw current and max inventory numbers.
     const char* temp_current_items = ttyd::win_mario::winZenkakuStr(current_items);
@@ -1094,8 +1094,8 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                 int32_t hp = item_data.hp_restored;
                 int32_t fp = item_data.fp_restored;
                 if (menu->use_item_type == ItemType::CAKE) {
-                    hp += mod::infinite_pit::item::GetBonusCakeRestoration();
-                    fp += mod::infinite_pit::item::GetBonusCakeRestoration();
+                    hp += patch::item::GetBonusCakeRestoration();
+                    fp += patch::item::GetBonusCakeRestoration();
                 }
 
                 if (menu->use_item_menu_cursor_idx < 1) {
@@ -1392,7 +1392,7 @@ void ItemMenuDisp(
 
     // Draw item inventory size if in regular item inventory.
     // Don't display if not in the middle of a run.
-    if (!g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) return;
+    if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) return;
     // Only display if on the regular item inventory screen.
     if (menu->item_submenu_id != 0) return;
     DrawItemInventorySize(menu, win_x, win_y);

@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit::options {
+namespace mod::tot::patch::options {
 
 // Apply patches to core game systems, such as save file I/O, file and module
 // loading, and string message lookup.

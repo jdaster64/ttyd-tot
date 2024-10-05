@@ -99,40 +99,40 @@ extern "C" {
         return mod::g_Mod->state_.GetOption(mod::tot::OPT_AC_DIFFICULTY);
     }        
     void signalPlayerInitiatedPartySwitch(ttyd::battle_unit::BattleWorkUnit* unit) {
-        mod::infinite_pit::battle::SignalPlayerInitiatedPartySwitch();
+        mod::tot::patch::battle::SignalPlayerInitiatedPartySwitch();
     }
     void setTargetAudienceCount() {
-        mod::infinite_pit::battle::SetTargetAudienceAmount();
+        mod::tot::patch::battle::SetTargetAudienceAmount();
     }
     double applySpRegenMultiplier(double base_regen) {
-        return mod::infinite_pit::battle::ApplySpRegenMultiplier(base_regen);
+        return mod::tot::patch::battle::ApplySpRegenMultiplier(base_regen);
     }
     void calculateCounterDamage(
         ttyd::battle_damage::CounterattackWork* cw,
         ttyd::battle_unit::BattleWorkUnit* attacker,
         ttyd::battle_unit::BattleWorkUnit* target,
         ttyd::battle_unit::BattleWorkUnitPart* part, int32_t damage_dealt) {
-        mod::infinite_pit::battle::CalculateCounterDamage(
+        mod::tot::patch::battle::CalculateCounterDamage(
             cw, attacker, target, part, damage_dealt);
     }
     void toggleOffScopedStatus(
         ttyd::battle_unit::BattleWorkUnit* attacker,
         ttyd::battle_unit::BattleWorkUnit* target,
         ttyd::battle_database_common::BattleWeapon* weapon) {
-        mod::infinite_pit::battle::ToggleScopedStatus(attacker, target, weapon);
+        mod::tot::patch::battle::ToggleScopedStatus(attacker, target, weapon);
     }
     void commandHandleSideSelection() {
-        mod::infinite_pit::battle::HandleSideSelection();
+        mod::tot::patch::battle::HandleSideSelection();
     }
     bool checkOnSelectedSide(int32_t target_idx) {
-        return mod::infinite_pit::battle::CheckOnSelectedSide(target_idx);
+        return mod::tot::patch::battle::CheckOnSelectedSide(target_idx);
     }
     bool checkPlayAttackFx(uint32_t flags, gc::vec3* position) {
-        return mod::infinite_pit::battle::CheckPlayAttackFx(flags, position);
+        return mod::tot::patch::battle::CheckPlayAttackFx(flags, position);
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
 
@@ -380,20 +380,20 @@ void GetStatusParams(
     switch (weapon->item_id) {
         case ItemType::SLEEPY_STOMP:
             if (status_type == StatusEffectType::SLEEP) {
-                turns += tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::JUMP_SLEEPY_STOMP) * 2 - 2;
+                turns += MoveManager::GetSelectedLevel(
+                    MoveType::JUMP_SLEEPY_STOMP) * 2 - 2;
             }
             break;
         case ItemType::HEAD_RATTLE:
             if (status_type == StatusEffectType::TINY) {
-                turns += tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::HAMMER_SHRINK_SMASH) * 1 - 1;
+                turns += MoveManager::GetSelectedLevel(
+                    MoveType::HAMMER_SHRINK_SMASH) * 1 - 1;
             }
             break;
         case ItemType::ICE_SMASH:
             if (status_type == StatusEffectType::FREEZE) {
-                turns += tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::HAMMER_ICE_SMASH) * 1 - 1;
+                turns += MoveManager::GetSelectedLevel(
+                    MoveType::HAMMER_ICE_SMASH) * 1 - 1;
             }
             break;
         case ItemType::TORNADO_JUMP:
@@ -409,8 +409,8 @@ void GetStatusParams(
         case ItemType::CHARGE:
         case ItemType::CHARGE_P:
             if (status_type == StatusEffectType::CHARGE) {
-                strength += tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::BADGE_MOVE_CHARGE +
+                strength += MoveManager::GetSelectedLevel(
+                    MoveType::BADGE_MOVE_CHARGE +
                     (attacker->current_kind == BattleUnitType::MARIO ? 0 : 1))
                      - 1;
             }
@@ -418,8 +418,8 @@ void GetStatusParams(
         case ItemType::TOT_TOUGHEN_UP:
         case ItemType::TOT_TOUGHEN_UP_P:
             if (status_type == StatusEffectType::DEFENSE_UP) {
-                strength += tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::BADGE_MOVE_SUPER_CHARGE +
+                strength += MoveManager::GetSelectedLevel(
+                    MoveType::BADGE_MOVE_SUPER_CHARGE +
                     (attacker->current_kind == BattleUnitType::MARIO ? 0 : 1))
                      - 1;
             }
@@ -431,7 +431,7 @@ void GetStatusParams(
         if (!weapon->item_id &&
             attacker->current_kind <= BattleUnitType::BONETAIL) {
             int32_t altered_charge;
-            tot::GetEnemyStats(
+            GetEnemyStats(
                 attacker->current_kind, nullptr, &altered_charge,
                 nullptr, nullptr, nullptr, strength);
             strength = altered_charge;
@@ -571,10 +571,10 @@ uint32_t GetStatusDamageFromWeapon(
                 // Use unk_136 as "proc rate" for Confusion.
                 if (damage_result && type == StatusEffectType::CONFUSE) {
                     target->unk_136 = 50;
-                    if (weapon->pad_ae == tot::MoveType::MOWZ_TEASE) {
+                    if (weapon->pad_ae == MoveType::MOWZ_TEASE) {
                         target->unk_136 = 
-                            30 + 20 * tot::MoveManager::GetSelectedLevel(
-                                tot::MoveType::MOWZ_TEASE);
+                            30 + 20 * MoveManager::GetSelectedLevel(
+                                MoveType::MOWZ_TEASE);
                     }
                 }
 
@@ -741,7 +741,7 @@ int32_t CalculateAtkImpl(
     // Modify enemy ATK based on current scaling.
     if (enemy_scale) {
         int32_t altered_atk = atk;
-        tot::GetEnemyStats(
+        GetEnemyStats(
             attacker->current_kind, nullptr, &altered_atk, nullptr, 
             nullptr, nullptr, atk);
         atk = Clamp(altered_atk, 1, 99);
@@ -834,7 +834,7 @@ int32_t CalculateDefImpl(
     // Modify enemy DEF based on current scaling.
     if (target->current_kind <= BattleUnitType::BONETAIL && def > 0 && def < 99) {
         int32_t altered_def = def;
-        tot::GetEnemyStats(
+        GetEnemyStats(
             target->current_kind, nullptr, nullptr, &altered_def, 
             nullptr, nullptr);
         def = Clamp(altered_def, 1, 99);
@@ -1029,7 +1029,7 @@ int32_t CalculateBaseDamage(
     }
 
     if (freeze_broken && damage >= 20) {
-        tot::AchievementsManager::MarkCompleted(tot::AchievementId::MISC_FROZEN_20);
+        AchievementsManager::MarkCompleted(AchievementId::MISC_FROZEN_20);
     }
     
     return damage;
@@ -1067,7 +1067,7 @@ int32_t CalculateBaseFpDamage(
         if (attacker->current_kind <= BattleUnitType::BONETAIL
             && !weapon->item_id && result > 0) {
             int32_t altered_atk = result;
-            tot::GetEnemyStats(
+            GetEnemyStats(
                 attacker->current_kind, nullptr, &altered_atk, nullptr,
                 nullptr, nullptr, result);
             result = Clamp(altered_atk, 1, 99);
@@ -1237,7 +1237,7 @@ void ReorderAndFilterWeaponTargets() {
 
 void ApplyFixedPatches() {
     // Override Action Command difficulty with fixed option.
-    g_BattleActionCommandSetDifficulty_trampoline = patch::hookFunction(
+    g_BattleActionCommandSetDifficulty_trampoline = mod::hookFunction(
         ttyd::battle_ac::BattleActionCommandSetDifficulty,
         [](BattleWork* battleWork, BattleWorkUnit* unit, int32_t base) {
             // Replace original logic entirely.
@@ -1246,29 +1246,29 @@ void ApplyFixedPatches() {
             battleWork->ac_manager_work.ac_difficulty = difficulty;
         });
     // Override Action Command difficulty for guards.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleActionCommandCheckDefence_GetDifficulty_BH),
         reinterpret_cast<void*>(g_BattleActionCommandCheckDefence_GetDifficulty_EH),
         reinterpret_cast<void*>(StartGetGuardDifficulty),
         reinterpret_cast<void*>(BranchBackGetGuardDifficulty));
     
     // Handle Superguard cost option.
-    g_BattleActionCommandCheckDefence_trampoline = patch::hookFunction(
+    g_BattleActionCommandCheckDefence_trampoline = mod::hookFunction(
         ttyd::battle_ac::BattleActionCommandCheckDefence,
         [](BattleWorkUnit* unit, BattleWeapon* weapon) {
             // Run normal logic if option turned off.
             const int32_t sp_cost =
-                g_Mod->state_.GetOption(tot::OPTNUM_SUPERGUARD_SP_COST);
+                g_Mod->state_.GetOption(OPTNUM_SUPERGUARD_SP_COST);
             if (sp_cost <= 0) {
                 const int32_t defense_result =
                     g_BattleActionCommandCheckDefence_trampoline(unit, weapon);
                 if (defense_result == 5) {
                     // Successful Superguard, track in play stats.
-                    g_Mod->state_.ChangeOption(tot::STAT_RUN_SUPERGUARDS);
-                    g_Mod->state_.ChangeOption(tot::STAT_PERM_SUPERGUARDS);
-                    if (g_Mod->state_.GetOption(tot::STAT_PERM_SUPERGUARDS) >= 100)
-                        tot::AchievementsManager::MarkCompleted(
-                            tot::AchievementId::AGG_SUPERGUARD_100);
+                    g_Mod->state_.ChangeOption(STAT_RUN_SUPERGUARDS);
+                    g_Mod->state_.ChangeOption(STAT_PERM_SUPERGUARDS);
+                    if (g_Mod->state_.GetOption(STAT_PERM_SUPERGUARDS) >= 100)
+                        AchievementsManager::MarkCompleted(
+                            AchievementId::AGG_SUPERGUARD_100);
                 }
                 return defense_result;
             }
@@ -1288,11 +1288,11 @@ void ApplyFixedPatches() {
             if (defense_result == 5) {
                 // Successful Superguard, subtract SP and track in play stats.
                 ttyd::mario_pouch::pouchAddAP(-sp_cost);
-                g_Mod->state_.ChangeOption(tot::STAT_RUN_SUPERGUARDS);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_SUPERGUARDS);
-                if (g_Mod->state_.GetOption(tot::STAT_PERM_SUPERGUARDS) >= 100)
-                    tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::AGG_SUPERGUARD_100);
+                g_Mod->state_.ChangeOption(STAT_RUN_SUPERGUARDS);
+                g_Mod->state_.ChangeOption(STAT_PERM_SUPERGUARDS);
+                if (g_Mod->state_.GetOption(STAT_PERM_SUPERGUARDS) >= 100)
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::AGG_SUPERGUARD_100);
             }
             if (restore_superguard_frames) {
                 memcpy(ttyd::battle_ac::superguard_frames, superguard_frames, 7);
@@ -1301,7 +1301,7 @@ void ApplyFixedPatches() {
         });
 
     // Run additional logic at start of BattleCheckDamage.
-    g_BattleCheckDamage_trampoline = patch::hookFunction(
+    g_BattleCheckDamage_trampoline = mod::hookFunction(
         ttyd::battle_damage::BattleCheckDamage, [](
             BattleWorkUnit* attacker, BattleWorkUnit* target, 
             BattleWorkUnitPart* part, BattleWeapon* weapon, 
@@ -1323,7 +1323,7 @@ void ApplyFixedPatches() {
             });
     
     // Replacing several core damage / status infliction functions.
-    g_BattlePreCheckDamage_trampoline = patch::hookFunction(
+    g_BattlePreCheckDamage_trampoline = mod::hookFunction(
         ttyd::battle_damage::BattlePreCheckDamage, [](
             BattleWorkUnit* attacker, BattleWorkUnit* target, 
             BattleWorkUnitPart* part, BattleWeapon* weapon, 
@@ -1332,7 +1332,7 @@ void ApplyFixedPatches() {
                 return PreCheckDamage(
                     attacker, target, part, weapon, extra_params);
             });
-    g_BattleSetStatusDamageFromWeapon_trampoline = patch::hookFunction(
+    g_BattleSetStatusDamageFromWeapon_trampoline = mod::hookFunction(
         ttyd::battle_damage::BattleSetStatusDamageFromWeapon, [](
             BattleWorkUnit* attacker, BattleWorkUnit* target, 
             BattleWorkUnitPart* part, BattleWeapon* weapon, 
@@ -1341,13 +1341,13 @@ void ApplyFixedPatches() {
                 return GetStatusDamageFromWeapon(
                     attacker, target, part, weapon, extra_params);
             });
-    g_BtlUnit_CheckRecoveryStatus_trampoline = patch::hookFunction(
+    g_BtlUnit_CheckRecoveryStatus_trampoline = mod::hookFunction(
         ttyd::battle_unit::BtlUnit_CheckRecoveryStatus, [](
             BattleWorkUnit* unit, int8_t status_type) {
                 // Replaces vanilla logic completely.
                 return StatusEffectTick(unit, status_type);
             });
-    g_BattleCalculateDamage_trampoline = patch::hookFunction(
+    g_BattleCalculateDamage_trampoline = mod::hookFunction(
         ttyd::battle_damage::BattleCalculateDamage, [](
             BattleWorkUnit* attacker, BattleWorkUnit* target,
             BattleWorkUnitPart* target_part, BattleWeapon* weapon,
@@ -1362,7 +1362,7 @@ void ApplyFixedPatches() {
             }
             
             // Randomize damage dealt, if option enabled.
-            int32_t damage_scale = g_Mod->state_.GetOption(tot::OPT_RANDOM_DAMAGE);
+            int32_t damage_scale = g_Mod->state_.GetOption(OPT_RANDOM_DAMAGE);
             if (damage_scale != 0) {
                 // Generate a number from -25 to 25 in increments of 5.
                 int32_t scale = (ttyd::system::irand(11) - 5) * 5;
@@ -1374,7 +1374,7 @@ void ApplyFixedPatches() {
             
             return damage;
         });
-    g_BattleCalculateFpDamage_trampoline = patch::hookFunction(
+    g_BattleCalculateFpDamage_trampoline = mod::hookFunction(
         ttyd::battle_damage::BattleCalculateFpDamage, [](
             BattleWorkUnit* attacker, BattleWorkUnit* target,
             BattleWorkUnitPart* target_part, BattleWeapon* weapon,
@@ -1384,7 +1384,7 @@ void ApplyFixedPatches() {
                 attacker, target, target_part, weapon, unk0, unk1);
             
             // Randomize damage dealt, if option enabled.
-            int32_t damage_scale = g_Mod->state_.GetOption(tot::OPT_RANDOM_DAMAGE);
+            int32_t damage_scale = g_Mod->state_.GetOption(OPT_RANDOM_DAMAGE);
             if (damage_scale != 0) {
                 // Generate a number from -25 to 25 in increments of 5.
                 int32_t scale = (ttyd::system::irand(11) - 5) * 5;
@@ -1400,25 +1400,25 @@ void ApplyFixedPatches() {
     // Replace damage calculation for counters to make Payback, Hold Fast
     // and Return Postage deal 1x damage, and make Bob-omb counters
     // deal the same damage that the explosion normally would have.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleCheckDamage_CalculateCounterDamage_BH),
         reinterpret_cast<void*>(g_BattleCheckDamage_CalculateCounterDamage_EH),
         reinterpret_cast<void*>(StartCalculateCounterDamage),
         reinterpret_cast<void*>(BranchBackCalculateCounterDamage));
         
     // Skip explosion KO logic for regular / Hyper Bob-ombs.
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(g_BattleCheckDamage_CheckExplosiveKO_BH),
         reinterpret_cast<void*>(StartCheckExplosiveKO));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(BranchBackCheckExplosiveKO),
         reinterpret_cast<void*>(g_BattleCheckDamage_CheckExplosiveKO_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchCheckExplosiveKO),
         reinterpret_cast<void*>(g_BattleCheckDamage_CheckExplosiveKO_CH1));
             
     // Track damage taken.
-    g_BattleDamageDirect_trampoline = mod::patch::hookFunction(
+    g_BattleDamageDirect_trampoline = mod::hookFunction(
         ttyd::battle_damage::BattleDamageDirect, [](
             int32_t unit_idx, BattleWorkUnit* target, BattleWorkUnitPart* part,
             int32_t damage, int32_t fp_damage, uint32_t unk0, 
@@ -1433,16 +1433,16 @@ void ApplyFixedPatches() {
                 target->current_kind >= BattleUnitType::GOOMBELLA) {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
-                g_Mod->state_.ChangeOption(tot::STAT_RUN_PLAYER_DAMAGE, damage);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_PLAYER_DAMAGE, damage);
+                g_Mod->state_.ChangeOption(STAT_RUN_PLAYER_DAMAGE, damage);
+                g_Mod->state_.ChangeOption(STAT_PERM_PLAYER_DAMAGE, damage);
             } else if (target->current_kind <= BattleUnitType::BONETAIL) {
                 if (damage < 0) damage = 0;
                 if (damage > 99) damage = 99;
-                g_Mod->state_.ChangeOption(tot::STAT_RUN_ENEMY_DAMAGE, damage);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_DAMAGE, damage);
-                if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_DAMAGE) >= 15000) {
-                    tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::AGG_DAMAGE_15000);
+                g_Mod->state_.ChangeOption(STAT_RUN_ENEMY_DAMAGE, damage);
+                g_Mod->state_.ChangeOption(STAT_PERM_ENEMY_DAMAGE, damage);
+                if (g_Mod->state_.GetOption(STAT_PERM_ENEMY_DAMAGE) >= 15000) {
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::AGG_DAMAGE_15000);
                 }
 
                 // Track direct damage from Infatuated attackers.
@@ -1451,15 +1451,14 @@ void ApplyFixedPatches() {
                     battleWork->battle_units[unit_idx]->true_kind 
                         <= BattleUnitType::BONETAIL) {
                     g_Mod->state_.ChangeOption(
-                        tot::STAT_RUN_INFATUATE_DAMAGE, damage);
+                        STAT_RUN_INFATUATE_DAMAGE, damage);
                 }
 
                 // Check for Superguarded dragon bites.
                 if (unit_idx == -5 && unk0 == 0x137 &&
-                    target->last_attacker_weapon == &tot::custom::unitDragon_weaponBite) {
-                    tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::MISC_SUPERGUARD_BITE);
-                    tot::SetSWF(tot::GSWF_Battle_Hooktail_BiteReactionSeen);
+                    target->last_attacker_weapon == &custom::unitDragon_weaponBite) {
+                    AchievementsManager::MarkCompleted(AchievementId::MISC_SUPERGUARD_BITE);
+                    SetSWF(GSWF_Battle_Hooktail_BiteReactionSeen);
                 }
             }
 
@@ -1474,8 +1473,7 @@ void ApplyFixedPatches() {
                         attacker_type = unit->current_kind;
                     }
                 }
-                g_Mod->state_.SetOption(
-                    tot::STAT_PERM_LAST_ATTACKER, attacker_type);
+                g_Mod->state_.SetOption(STAT_PERM_LAST_ATTACKER, attacker_type);
             }
 
             // Run normal damage logic.
@@ -1485,56 +1483,56 @@ void ApplyFixedPatches() {
         });
 
     // Attack FX changes.
-    g_BattleCheckPikkyoro_trampoline = mod::patch::hookFunction(
+    g_BattleCheckPikkyoro_trampoline = mod::hookFunction(
         ttyd::battle_damage::BattleCheckPikkyoro, [](
             BattleWeapon* weapon, uint32_t* flags) {
             // Completely replace existing logic to pick a sound.
             if (!(weapon->special_property_flags & 
                 AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND)) return;
             
-            if (int32_t id = tot::CosmeticsManager::PickActiveFX(); id > 0) {
+            if (int32_t id = CosmeticsManager::PickActiveFX(); id > 0) {
                 *flags |= id * 0x100'0000;
             }
         });
     // Replace BattleDamageDirect logic that reads flags for picked sound.
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(g_BattleDamageDirect_CheckPlayAttackFX_BH),
         reinterpret_cast<void*>(StartCheckPlayAttackFX));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(BranchBackCheckPlayAttackFX),
         reinterpret_cast<void*>(g_BattleDamageDirect_CheckPlayAttackFX_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchCheckPlayAttackFX),
         reinterpret_cast<void*>(g_BattleDamageDirect_CheckPlayAttackFX_CH1));
 
     // Add support for Snow Whirled-like variant of button pressing AC.
     // Override choosing buttons:
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_battleAcMain_ButtonDown_ChooseButtons_BH),
         reinterpret_cast<void*>(StartButtonDownChooseButtons),
         reinterpret_cast<void*>(BranchBackButtonDownChooseButtons));
     // Don't end attack early on wrong button.
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(g_battleAcMain_ButtonDown_WrongButton_BH),
         reinterpret_cast<void*>(StartButtonDownWrongButton));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(BranchBackButtonDownWrongButton),
         reinterpret_cast<void*>(g_battleAcMain_ButtonDown_WrongButton_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchButtonDownWrongButton),
         reinterpret_cast<void*>(g_battleAcMain_ButtonDown_WrongButton_CH1));
     // Reset buttons instead of ending attack when completed:
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(g_battleAcMain_ButtonDown_CheckComplete_BH),
         reinterpret_cast<void*>(StartButtonDownCheckComplete));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(BranchBackButtonDownCheckComplete),
         reinterpret_cast<void*>(g_battleAcMain_ButtonDown_CheckComplete_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchButtonDownCheckComplete),
         reinterpret_cast<void*>(g_battleAcMain_ButtonDown_CheckComplete_CH1));
     // Override what the 'success' criteria for the move is.
-    g_battleAcMain_ButtonDown_trampoline = patch::hookFunction(
+    g_battleAcMain_ButtonDown_trampoline = mod::hookFunction(
         ttyd::ac_button_down::battleAcMain_ButtonDown,
         [](BattleWork* battleWork) {
             // Run original code.
@@ -1550,34 +1548,34 @@ void ApplyFixedPatches() {
             
     // Add support for "permanent statuses" (turn count >= 100):
     // Skip drawing status icon if 100 or over:
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(
             g_battle_status_icon_SkipIconForPermanentStatus_BH),
         reinterpret_cast<void*>(StartStatusIconDisplay));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(BranchBackStatusIconDisplay),
         reinterpret_cast<void*>(
             g_battle_status_icon_SkipIconForPermanentStatus_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchStatusIconDisplay),
         reinterpret_cast<void*>(
             g_battle_status_icon_SkipIconForPermanentStatus_CH1));
     
     // Toggle off Scoped status, and force freeze-break anytime a Frozen enemy
     // is hit by a non-Ice attack.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleCheckDamage_AlwaysFreezeBreak_BH),
         reinterpret_cast<void*>(StartToggleScopedAndCheckFreezeBreak),
         reinterpret_cast<void*>(BranchBackToggleScopedAndCheckFreezeBreak));
             
     // Track the total damage dealt by Poison status.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_btlseqTurn_TrackPoisonDamage_BH),
         reinterpret_cast<void*>(StartTrackPoisonDamage),
         reinterpret_cast<void*>(BranchBackTrackPoisonDamage));
             
     // Skip drawing Huge / Tiny status arrows when inflicted.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_BattleSetStatusDamage_Patch_SkipHugeTinyArrows),
         0x2c19000cU /* cmpwi r25, 12 */);
 
@@ -1606,7 +1604,7 @@ void ApplyFixedPatches() {
     }
 
     // Make midbosses regain their Huge status when KOed with a Life Shroom.
-    g_BtlUnit_ClearStatus_trampoline = patch::hookFunction(
+    g_BtlUnit_ClearStatus_trampoline = mod::hookFunction(
         ttyd::battle_unit::BtlUnit_ClearStatus, [](BattleWorkUnit* unit) {
             // Run original logic.
             g_BtlUnit_ClearStatus_trampoline(unit);
@@ -1622,20 +1620,20 @@ void ApplyFixedPatches() {
     // of Simplifiers / Unsimplifiers to be more symmetric.
     const int8_t kGuardFrames[] =     { 12, 10, 9, 8, 7, 6, 5, 0 };
     const int8_t kSuperguardFrames[]  = { 5, 4, 4, 3, 2, 2, 1, 0 };
-    mod::patch::writePatch(
+    mod::writePatch(
         ttyd::battle_ac::guard_frames, kGuardFrames, sizeof(kGuardFrames));
-    mod::patch::writePatch(
+    mod::writePatch(
         ttyd::battle_ac::superguard_frames, kSuperguardFrames, 
         sizeof(kSuperguardFrames));
         
     // Override the default target audience size.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudience_SetTargetAmount_BH),
         reinterpret_cast<void*>(StartSetTargetAudienceCount),
         reinterpret_cast<void*>(BranchBackSetTargetAudienceCount));
 
     // Replace the logic for applying attack SP / Bingo card bonuses.
-    g_BattleAudience_ApRecoveryBuild_trampoline = patch::hookFunction(
+    g_BattleAudience_ApRecoveryBuild_trampoline = mod::hookFunction(
         ttyd::battle_audience::BattleAudience_ApRecoveryBuild,
         [](SpBonusInfo* bonus_info) {
             // Replaces vanilla logic completely.
@@ -1643,19 +1641,19 @@ void ApplyFixedPatches() {
         });
         
     // Disable stored EXP at all levels.
-    g_BattleStoreExp_trampoline = patch::hookFunction(
+    g_BattleStoreExp_trampoline = mod::hookFunction(
         ttyd::battle::BattleStoreExp, [](BattleWork* work, int32_t exp){});
     // Disable EXP gain, including pity EXP point, at all levels.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlseqEnd_Patch_CheckDisableExpLevel),
         0x2c000000U /* cmpwi r0, (level) 0 */);
     // Have coin gfx pop out of enemies instead of EXP when defeated.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_effStarPointDisp_Patch_SetIconId),
         0x38a00193U /* li r5, IconType::COIN */);
         
     // Equipping new badges.
-    g__EquipItem_trampoline = patch::hookFunction(
+    g__EquipItem_trampoline = mod::hookFunction(
         ttyd::battle::_EquipItem, 
         [](BattleWorkUnit* unit, uint32_t flags, int32_t item) {
             // Mario or enemies:
@@ -1699,12 +1697,12 @@ void ApplyFixedPatches() {
         });
             
     // Disable Super Charge / Toughen Up as menu option.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g__btlcmd_MakeOperationTable_Patch_NoSuperCharge),
         0x480000b8U /* unconditional branch */);
 
     // Track first use of moves at every level.
-    g__btlcmd_SetAttackEvent_trampoline = patch::hookFunction(
+    g__btlcmd_SetAttackEvent_trampoline = mod::hookFunction(
         ttyd::battle_seq_command::_btlcmd_SetAttackEvent,
         [](BattleWorkUnit* unit, BattleWorkCommand* command_work) {
             // Run vanilla logic.
@@ -1721,7 +1719,7 @@ void ApplyFixedPatches() {
                         command_work, command_work->current_cursor_type, &cursor);
                     const int32_t move_type = 
                         command_work->weapon_table[cursor->abs_position].index;
-                    tot::MoveManager::LogMoveUse(move_type);
+                    MoveManager::LogMoveUse(move_type);
                     break;
                 }
                 case 2: {
@@ -1734,8 +1732,8 @@ void ApplyFixedPatches() {
                     if (item_type == ItemType::TRADE_OFF &&
                         ttyd::battle::g_BattleWork->turn_count <= 1 &&
                         g_Mod->state_.IsFinalBossFloor()) {
-                        tot::AchievementsManager::MarkCompleted(
-                            tot::AchievementId::MISC_TRADE_OFF_BOSS);
+                        AchievementsManager::MarkCompleted(
+                            AchievementId::MISC_TRADE_OFF_BOSS);
                     }
                     break;
                 }
@@ -1744,12 +1742,12 @@ void ApplyFixedPatches() {
         
     // Quick Change FP cost:
     // Signal that party switch was initiated by the player.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g__btlcmd_SetAttackEvent_SwitchPartnerCost_BH),
         reinterpret_cast<void*>(StartSpendFpOnSwitchPartner),
         reinterpret_cast<void*>(BranchBackSpendFpOnSwitchPartner));
     // Pay and increment cost when actual party switch action begins.
-    g_btlevtcmd_ChangeParty_trampoline = patch::hookFunction(
+    g_btlevtcmd_ChangeParty_trampoline = mod::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_ChangeParty,
         [](EvtEntry* evt, bool isFirstCall) {
             if (ttyd::mario_pouch::pouchEquipCheckBadge(ItemType::QUICK_CHANGE))
@@ -1759,25 +1757,25 @@ void ApplyFixedPatches() {
         });
 
     // Set rate of confusion proc dynamically.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_btlSeqAct_SetConfuseProcRate_BH),
         reinterpret_cast<void*>(StartSetConfuseProcRate),
         reinterpret_cast<void*>(BranchBackSetConfuseProcRate));
         
     // Run additional logic on confusion proc.
-    g_BattleSetConfuseAct_trampoline = patch::hookFunction(
+    g_BattleSetConfuseAct_trampoline = mod::hookFunction(
         ttyd::battle_seq_command::BattleSetConfuseAct,
         [](BattleWork* battleWork, BattleWorkUnit* unit){
             // Cancel Quick Change signal.
             g_PartySwitchPlayerInitiated = false;
             // Reset move levels to avoid using higher-level moves in Confusion.
-            tot::MoveManager::ResetSelectedLevels();
+            MoveManager::ResetSelectedLevels();
             // Run vanilla logic.
             return g_BattleSetConfuseAct_trampoline(battleWork, unit);
         });
 
     // Display battle messages (add support for printing text directly).
-    g_btlevtcmd_AnnounceMessage_trampoline = patch::hookFunction(
+    g_btlevtcmd_AnnounceMessage_trampoline = mod::hookFunction(
         ttyd::battle_message::btlevtcmd_AnnounceMessage,
         [](EvtEntry* evt, bool isFirstCall) {
             // Run original logic.
@@ -1796,26 +1794,26 @@ void ApplyFixedPatches() {
 
     // Handle target selection for moves that can select between sides.
     // Player input to switch sides:
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleCommandInput_HandleSelectSide_BH),
         reinterpret_cast<void*>(StartCommandHandleSideSelection),
         reinterpret_cast<void*>(BranchBackCommandHandleSideSelection));
     // Drawing cursors only over selected side:
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(
             g_BattleCommandDisplay_HandleSelectSide_BH),
         reinterpret_cast<void*>(StartCommandDisplaySideSelection));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(BranchBackCommandDisplaySideSelection),
         reinterpret_cast<void*>(
             g_BattleCommandDisplay_HandleSelectSide_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchCommandDisplaySideSelection),
         reinterpret_cast<void*>(
             g_BattleCommandDisplay_HandleSelectSide_CH1));
     // Filters targets w.r.t. side selecting attacks, and changes targeting
     // order for multitargets so the user hits themselves after other targets.
-    g_btlevtcmd_GetSelectEnemy_trampoline = patch::hookFunction(
+    g_btlevtcmd_GetSelectEnemy_trampoline = mod::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_GetSelectEnemy,
         [](EvtEntry* evt, bool isFirstCall) {
             ReorderAndFilterWeaponTargets();
@@ -1823,7 +1821,7 @@ void ApplyFixedPatches() {
         });
 
     // Reverse direction of fire particles from Hooktail, etc. breath.
-    g_init_breath_trampoline = patch::hookFunction(
+    g_init_breath_trampoline = mod::hookFunction(
         ttyd::eff_gonbaba_breath::init_breath,
         [](EffGonbabaBreathWork* work, int32_t unk0, int32_t type) {
             // Run original logic.
@@ -1911,7 +1909,7 @@ int32_t GetCurrentEnemyAtk(BattleWorkUnit* unit, int32_t reference_atk) {
     bool should_scale = true;
     if (reference_atk < 0) {
         int32_t atk, def;
-        tot::GetTattleDisplayStats(unit->current_kind, &atk, &def);
+        GetTattleDisplayStats(unit->current_kind, &atk, &def);
         reference_atk = atk;
         should_scale = false;
     }
@@ -1978,8 +1976,8 @@ bool CheckOnSelectedSide(int32_t target_idx) {
 
 bool CheckPlayAttackFx(uint32_t flags, gc::vec3* position) {
     const int32_t id = (flags & 0x1f00'0000) / 0x100'0000;
-    const char* fx_name = mod::tot::CosmeticsManager::GetSoundFromFXGroup(id);
-    const auto* data = mod::tot::CosmeticsManager::GetAttackFxData(id);
+    const char* fx_name = CosmeticsManager::GetSoundFromFXGroup(id);
+    const auto* data = CosmeticsManager::GetAttackFxData(id);
     if (!fx_name) return false;
 
     int32_t sfx_id = ttyd::pmario_sound::psndSFXOn_3D(fx_name, position);
@@ -2056,4 +2054,4 @@ EVT_DEFINE_USER_FUNC(evtTot_SetGonbabaBreathDir) {
 }
 
 }  // namespace battle
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

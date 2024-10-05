@@ -1543,7 +1543,7 @@ const char* SetCustomTattle(
         g_TattleTextBuf,
         ttyd::msgdrv::msgSearch(original_tattle_msg), stats);
     
-    // Return a key that looks up g_TattleTextBuf from custom_strings.
+    // Return a key that looks up g_TattleTextBuf from StringsManager.
     return "custom_tattle_battle";
 }
 
@@ -1564,7 +1564,7 @@ const char* SetCustomMenuTattle(int32_t unit_type) {
             ei.base_def, ei.level);
     }
     
-    // Return a key that looks up g_TattleTextBuf from custom_strings.
+    // Return a key that looks up g_TattleTextBuf from StringsManager.
     return "custom_tattle_menu";
 }
 

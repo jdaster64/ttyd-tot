@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit::enemy_fix {
+namespace mod::tot::patch::enemy_fix {
 
 // Apply patches for various fixes to issues with enemies in battle.
 void ApplyFixedPatches();

@@ -146,7 +146,7 @@ EVT_DEFINE_USER_FUNC(evtTot_InfatuateChangeAlliance) {
                 kNoStatusMsg, sizeof(kNoStatusMsg));
                 
             // Queue a custom message instead.
-            mod::infinite_pit::battle::QueueCustomStatusMessage(
+            patch::battle::QueueCustomStatusMessage(
                 unit, "tot_ptr5_infatuate_effect_msg");
         }
     }

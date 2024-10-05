@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit::costume {
+namespace mod::tot::patch::costume {
 
 // Apply patches for various fixes to issues with enemies in battle.
 void ApplyFixedPatches();

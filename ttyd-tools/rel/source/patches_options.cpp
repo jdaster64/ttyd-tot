@@ -58,11 +58,11 @@ extern "C" {
     void BranchBackEnableIncrementingBingoCheck();
     
     int32_t getAudienceItem(int32_t item_type) {
-        return mod::infinite_pit::options::GetRandomAudienceItem(item_type);
+        return mod::tot::patch::options::GetRandomAudienceItem(item_type);
     }
     uint32_t audienceFixItemSpaceCheck(
         uint32_t empty_item_slots, uint32_t item_type) {
-        return mod::infinite_pit::options::FixAudienceItemSpaceCheck(
+        return mod::tot::patch::options::FixAudienceItemSpaceCheck(
             empty_item_slots, item_type);
     }
     ttyd::battle_database_common::BattleUnitKind* setPinchThreshold(
@@ -73,7 +73,7 @@ extern "C" {
             ttyd::battle_database_common::BattleUnitType::BONETAIL) {
             max_hp = base_max_hp;
         }
-        mod::infinite_pit::options::SetPinchThreshold(kind, max_hp, peril);
+        mod::tot::patch::options::SetPinchThreshold(kind, max_hp, peril);
         return kind;
     }
     bool checkStarPowersEnabled() {
@@ -82,7 +82,7 @@ extern "C" {
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
 
@@ -126,7 +126,7 @@ namespace options {
 
 void ApplyFixedPatches() {
     // Change the chances of weapon-induced stage effects based on options.
-    g_btlevtcmd_WeaponAftereffect_trampoline = patch::hookFunction(
+    g_btlevtcmd_WeaponAftereffect_trampoline = mod::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_WeaponAftereffect,
         [](EvtEntry* evt, bool isFirstCall) {
             // Make sure the stage jet type is initialized, if possible.
@@ -143,20 +143,20 @@ void ApplyFixedPatches() {
             
             // Get the percentage to scale original chances by.
             int32_t scale = 100;
-            switch (g_Mod->state_.GetOptionValue(tot::OPT_STAGE_HAZARDS)) {
-                case tot::OPTVAL_STAGE_HAZARDS_HIGH: {
+            switch (g_Mod->state_.GetOptionValue(OPT_STAGE_HAZARDS)) {
+                case OPTVAL_STAGE_HAZARDS_HIGH: {
                     scale = 250;
                     break;
                 }
-                case tot::OPTVAL_STAGE_HAZARDS_LOW: {
+                case OPTVAL_STAGE_HAZARDS_LOW: {
                     scale = 50;
                     break;
                 }
-                case tot::OPTVAL_STAGE_HAZARDS_OFF: {
+                case OPTVAL_STAGE_HAZARDS_OFF: {
                     scale = 0;
                     break;
                 }
-                case tot::OPTVAL_STAGE_HAZARDS_NO_FOG: {
+                case OPTVAL_STAGE_HAZARDS_NO_FOG: {
                     // If stage jets are uninitialized or fog-type jets,
                     // make them unable to fire.
                     if (battleWork->stage_hazard_work.current_stage_jet_type
@@ -198,106 +198,106 @@ void ApplyFixedPatches() {
         
     // Guarantee that 1 item can be thrown every turn if randomized audience
     // items are enabled.
-    g_BattleAudienceSetThrowItemMax_trampoline = mod::patch::hookFunction(
+    g_BattleAudienceSetThrowItemMax_trampoline = mod::hookFunction(
         ttyd::battle_audience::BattleAudienceSetThrowItemMax, [](){
             g_BattleAudienceSetThrowItemMax_trampoline();
-            if (g_Mod->state_.GetOption(tot::OPT_AUDIENCE_RANDOM_THROWS)) {
+            if (g_Mod->state_.GetOption(OPT_AUDIENCE_RANDOM_THROWS)) {
                 auto& audience_work = ttyd::battle::g_BattleWork->audience_work;
                 audience_work.max_items_this_turn = 1;
             }
         });
         
     // Override the default Danger / Peril threshold checks for all actors.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BtlUnit_CheckPinchStatus_DangerThreshold_BH),
         reinterpret_cast<void*>(StartSetDangerThreshold),
         reinterpret_cast<void*>(BranchBackSetDangerThreshold));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BtlUnit_CheckPinchStatus_PerilThreshold_BH),
         reinterpret_cast<void*>(StartSetPerilThreshold),
         reinterpret_cast<void*>(BranchBackSetPerilThreshold));
 
     // Fix visual indicators of Mario Danger / Peril.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_DrawMenuMarioPinchMark_CheckThreshold_BH),
         reinterpret_cast<void*>(StartCheckMarioPinchDisp),
         reinterpret_cast<void*>(BranchBackCheckMarioPinchDisp));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_DrawMenuMarioPinchMark_Patch_CheckResult1),
         0x7c032000U /* cmpw r3, r4 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_DrawMenuMarioPinchMark_Patch_CheckResult2),
         0x4181005cU /* bgt- 0x5c */);
         
     // Fix visual indicators of partners' Danger / Peril.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_DrawMenuPartyPinchMark_CheckThreshold_BH),
         reinterpret_cast<void*>(StartCheckPartnerPinchDisp),
         reinterpret_cast<void*>(BranchBackCheckPartnerPinchDisp));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_DrawMenuPartyPinchMark_Patch_CheckResult1),
         0x7c032000U /* cmpw r3, r4 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_DrawMenuPartyPinchMark_Patch_CheckResult2),
         0x4181005cU /* bgt- 0x5c */);
         
     // Enable Star Power features always, if the option is set.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g__btlcmd_MakeOperationTable_AppealAlways_BH),
         reinterpret_cast<void*>(StartEnableAppealCheck),
         reinterpret_cast<void*>(BranchBackEnableAppealCheck));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudienceAddAudienceNum_EnableAlways_BH),
         reinterpret_cast<void*>(StartAddAudienceCheck),
         reinterpret_cast<void*>(BranchBackAddAudienceCheck));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudience_Disp_EnableAlways_BH),
         reinterpret_cast<void*>(StartDisplayAudienceCheck),
         reinterpret_cast<void*>(BranchBackDisplayAudienceCheck));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudience_End_SaveAmountAlways_BH),
         reinterpret_cast<void*>(StartSaveAudienceCountCheck),
         reinterpret_cast<void*>(BranchBackSaveAudienceCountCheck));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudienceSettingAudience_EnableAlways_BH),
         reinterpret_cast<void*>(StartSetInitialAudienceCheck),
         reinterpret_cast<void*>(BranchBackSetInitialAudienceCheck));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g__object_fall_attack_AudienceEnableAlways_BH),
         reinterpret_cast<void*>(StartObjectFallOnAudienceCheck),
         reinterpret_cast<void*>(BranchBackObjectFallOnAudienceCheck));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudienceAddPuni_EnableAlways_BH),
         reinterpret_cast<void*>(StartAddPuniToAudienceCheck),
         reinterpret_cast<void*>(BranchBackAddPuniToAudienceCheck));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleBreakSlot_PointInc_EnableAlways_BH),
         reinterpret_cast<void*>(StartEnableIncrementingBingoCheck),
         reinterpret_cast<void*>(BranchBackEnableIncrementingBingoCheck));
         
     // Enable random audience items.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudienceItemOn_RandomItem_BH),
         reinterpret_cast<void*>(StartAudienceItem),
         reinterpret_cast<void*>(BranchBackAudienceItem));
     // Make sure the right inventory is checked for getting items from audience.
     // Extend the range to check all item types:
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             g_BattleAudienceItemCtrlProcess_Patch_CheckItemValidRange),
         0x2c000153U /* cmpwi r0, 0x153 */);
     // Handle bad items and badges:
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleAudienceItemCtrlProcess_CheckSpace_BH),
         reinterpret_cast<void*>(StartAudienceItemSpaceFix),
         reinterpret_cast<void*>(BranchBackAudienceItemSpaceFix));
     
     // Apply patch to give the player infinite BP, if enabled.
-    g_pouchReviseMarioParam_trampoline = mod::patch::hookFunction(
+    g_pouchReviseMarioParam_trampoline = mod::hookFunction(
         ttyd::mario_pouch::pouchReviseMarioParam, [](){
             g_pouchReviseMarioParam_trampoline();
-            if (g_Mod->state_.CheckOptionValue(tot::OPTVAL_INFINITE_BP) &&
-                g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) {
+            if (g_Mod->state_.CheckOptionValue(OPTVAL_INFINITE_BP) &&
+                g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
                 ttyd::mario_pouch::pouchGetPtr()->total_bp = 99;
                 ttyd::mario_pouch::pouchGetPtr()->unallocated_bp = 99;
             }
@@ -324,11 +324,11 @@ void SetPinchThreshold(BattleUnitKind* kind, int32_t max_hp, bool peril) {
 }
 
 int32_t GetRandomAudienceItem(int32_t item_type) {
-    if (g_Mod->state_.GetOption(tot::OPT_AUDIENCE_RANDOM_THROWS)) {
-        item_type = PickRandomItem(tot::RNG_AUDIENCE_ITEM, 25, 5, 5, 15);
+    if (g_Mod->state_.GetOption(OPT_AUDIENCE_RANDOM_THROWS)) {
+        item_type = PickRandomItem(RNG_AUDIENCE_ITEM, 25, 5, 5, 15);
         if (item_type <= 0) {
             // Pick a coin, heart, flower, or random bad item if "none" selected.
-            switch (g_Mod->state_.Rand(10, tot::RNG_AUDIENCE_ITEM)) {
+            switch (g_Mod->state_.Rand(10, RNG_AUDIENCE_ITEM)) {
                 case 0:  return ItemType::AUDIENCE_CAN;
                 case 1:  return ItemType::AUDIENCE_ROCK;
                 case 2:  return ItemType::AUDIENCE_BONE;
@@ -358,4 +358,4 @@ uint32_t FixAudienceItemSpaceCheck(uint32_t empty_item_slots, uint32_t item_type
 }
 
 }  // namespace options
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

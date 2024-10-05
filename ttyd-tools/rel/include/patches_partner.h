@@ -11,7 +11,7 @@ namespace ttyd::battle_unit {
 struct BattleWorkUnit;
 }
 
-namespace mod::infinite_pit::partner {
+namespace mod::tot::patch::partner {
 
 // Apply patches related to partner balance changes, etc.
 void ApplyFixedPatches();

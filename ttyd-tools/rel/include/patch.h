@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace mod::patch {
+namespace mod {
 
 void clear_DC_IC_Cache(void *ptr, uint32_t size);
 void writeStandardBranches(void *address, void functionStart(), void functionBranchBack());

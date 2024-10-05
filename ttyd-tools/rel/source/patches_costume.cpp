@@ -38,7 +38,7 @@ extern "C" {
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 // Function hooks.
 extern void (*g_pouchSetPartyColor_trampoline)(int32_t, int32_t);
@@ -77,24 +77,24 @@ namespace costume {
 
 void ApplyFixedPatches() {
     // Replace filename to load when loading Mario or Yoshi's default model.
-    g__fileAlloc_trampoline = patch::hookFunction(
+    g__fileAlloc_trampoline = mod::hookFunction(
         ttyd::filemgr::_fileAlloc, [](const char* filename, uint32_t unk0) {
             // Replace Mario's models.
-            auto* mario_data = tot::CosmeticsManager::GetMarioCostumeData(0);
+            auto* mario_data = CosmeticsManager::GetMarioCostumeData(0);
             for (int32_t i = 0; i < 4; ++i) {
                 if (!strcmp(filename, mario_data->models[i])) {
-                    int32_t color = tot::GetSWByte(tot::GSW_MarioCostume);
+                    int32_t color = GetSWByte(GSW_MarioCostume);
                     filename =
-                        tot::CosmeticsManager::GetMarioCostumeData(color)->models[i];
+                        CosmeticsManager::GetMarioCostumeData(color)->models[i];
                 }
             }
             // Replace Yoshi's models.
-            auto* yoshi_data = tot::CosmeticsManager::GetYoshiCostumeData(0);
+            auto* yoshi_data = CosmeticsManager::GetYoshiCostumeData(0);
             for (int32_t i = 0; i < 3; ++i) {
                 if (!strcmp(filename, yoshi_data->models[i])) {
                     int32_t color = ttyd::mario_pouch::pouchGetPartyColor(4);
                     filename =
-                        tot::CosmeticsManager::GetYoshiCostumeData(color)->models[i];
+                        CosmeticsManager::GetYoshiCostumeData(color)->models[i];
                 }
             }
 
@@ -103,16 +103,16 @@ void ApplyFixedPatches() {
         });
 
     // Use 5 bits for Yoshi color instead of 3 to allow for more costumes.
-    g_pouchSetPartyColor_trampoline = patch::hookFunction(
+    g_pouchSetPartyColor_trampoline = mod::hookFunction(
         ttyd::mario_pouch::pouchSetPartyColor, [](int32_t party, int32_t color) {
             auto& data = ttyd::mario_pouch::pouchGetPtr()->party_data[party];
             data.flags = (data.flags & 0x7ff) | (color << 11);
         });
-    g_pouchGetPartyColor_trampoline = patch::hookFunction(
+    g_pouchGetPartyColor_trampoline = mod::hookFunction(
         ttyd::mario_pouch::pouchGetPartyColor, [](int32_t party) {
             auto& data = ttyd::mario_pouch::pouchGetPtr()->party_data[party];
-            int32_t max_color = tot::CosmeticsManager::GetCosmeticCount(
-                tot::CosmeticType::YOSHI_COSTUME) - 1;
+            int32_t max_color = CosmeticsManager::GetCosmeticCount(
+                CosmeticType::YOSHI_COSTUME) - 1;
             int32_t color = Clamp(data.flags >> 11, 0, max_color);
             return color;
         });
@@ -120,63 +120,63 @@ void ApplyFixedPatches() {
     // Replace L/W emblem checks and Yoshi color checks that lead to
     // animPoseEntries with li r3, 0, making them all load the default costume.
     const uint32_t li_r3_0 = 0x38600000;    // li r3, 0
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_marioMain_Patch_CheckEmblem1), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_marioMain_Patch_CheckEmblem2), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_marioSetCharMode_Patch_CheckEmblem1), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_marioSetCharMode_Patch_CheckEmblem2), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g__mario_super_emblem_anim_set_Patch_CheckEmblem1), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g__mario_super_emblem_anim_set_Patch_CheckEmblem2), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_mario_change_Patch_CheckEmblem1), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_mario_change_Patch_CheckEmblem2), li_r3_0);    
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partySetFamicomMode_Patch_YoshiColor1), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partySetFamicomMode_Patch_YoshiColor2), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyReInit_Patch_YoshiColor), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyEntry2Pos_Patch_YoshiColor), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyEntry2Hello_Patch_YoshiColor), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyEntry2_Patch_YoshiColor), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyEntryMain_Patch_YoshiColor), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_winPartyInit_Patch_YoshiColor), li_r3_0);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_yoshi_original_color_anim_set_Patch_YoshiColor), li_r3_0);
 
     // Replace logic that changes the color of Yoshi's icons.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g__battleGetPartyIcon_YoshiIcon_BH),
         reinterpret_cast<void*>(g__battleGetPartyIcon_YoshiIcon_EH),
         reinterpret_cast<void*>(StartBattleGetPartyIconYoshi),
         reinterpret_cast<void*>(BranchBackBattleGetPartyIconYoshi));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_winPartyInit_YoshiIcon_BH),
         reinterpret_cast<void*>(g_winPartyInit_YoshiIcon_EH),
         reinterpret_cast<void*>(StartWinPartyInitYoshiIcon),
         reinterpret_cast<void*>(BranchBackWinPartyInitYoshiIcon));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_evt_unitwin_disp_func_YoshiIcon_BH),
         reinterpret_cast<void*>(g_evt_unitwin_disp_func_YoshiIcon_EH),
         reinterpret_cast<void*>(StartUnitWinDispYoshiIcon),
         reinterpret_cast<void*>(BranchBackUnitWinDispYoshiIcon));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_select_disp_party_YoshiIcon_BH),
         reinterpret_cast<void*>(g_select_disp_party_YoshiIcon_EH),
         reinterpret_cast<void*>(StartSelectDispPartyYoshiIcon),
         reinterpret_cast<void*>(BranchBackSelectDispPartyYoshiIcon));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_sac_genki_disp_3D_YoshiHeartIcon_BH),
         reinterpret_cast<void*>(g_sac_genki_disp_3D_YoshiHeartIcon_EH),
         reinterpret_cast<void*>(StartSweetTreatYoshiIcon),
@@ -195,4 +195,4 @@ void ApplyFixedPatches() {
 }
 
 }  // namespace costume
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

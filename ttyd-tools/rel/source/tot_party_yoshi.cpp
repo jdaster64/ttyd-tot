@@ -106,8 +106,7 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckSwallowMidbossAchievement) {
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
     
     if (unit && unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
-        tot::AchievementsManager::MarkCompleted(
-            tot::AchievementId::MISC_SHRUNK_OHKO);
+        AchievementsManager::MarkCompleted(AchievementId::MISC_SHRUNK_OHKO);
     }
     return 2;
 }

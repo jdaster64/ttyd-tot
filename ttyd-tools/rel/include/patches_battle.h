@@ -25,7 +25,7 @@ struct BattleWorkUnitPart;
 
 }
 
-namespace mod::infinite_pit::battle {
+namespace mod::tot::patch::battle {
 
 // Apply patches to various battle features.
 void ApplyFixedPatches();

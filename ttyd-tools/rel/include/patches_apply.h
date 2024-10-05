@@ -16,7 +16,7 @@
 #include "patches_stats.h"
 #include "patches_ui.h"
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 // Applies all patches that only need to be applied once at initialization.
 inline void ApplyAllFixedPatches() {

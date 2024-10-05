@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit::core {
+namespace mod::tot::patch::core {
 
 // Apply patches to core game systems, such as save file I/O, file and module
 // loading, and string message lookup.

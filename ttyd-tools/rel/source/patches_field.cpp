@@ -82,7 +82,7 @@ extern "C" {
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 // Function hooks.
 extern int32_t (*g_partyGetHp_trampoline)(int32_t);
@@ -136,7 +136,7 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializeShopSign) {
 
     int32_t shelf_items[5];
     for (int32_t i = 0; i < 5; ++i) {
-        shelf_items[i] = state.GetOption(tot::STAT_PERM_SHOP_ITEMS, i);
+        shelf_items[i] = state.GetOption(STAT_PERM_SHOP_ITEMS, i);
     }
 
     g_NumShopSignItems = 0;
@@ -144,8 +144,8 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializeShopSign) {
         // Skip invalid, non-encountered, or already purchased items.
         if (ttyd::item_data::itemDataTable[id + ItemType::THUNDER_BOLT]
                 .type_sort_order < 0 ||
-            !state.GetOption(tot::FLAGS_ITEM_ENCOUNTERED, id) ||
-            state.GetOption(tot::FLAGS_ITEM_PURCHASED, id)) {
+            !state.GetOption(FLAGS_ITEM_ENCOUNTERED, id) ||
+            state.GetOption(FLAGS_ITEM_PURCHASED, id)) {
             continue;
         }
         // Skip items that are already on display on the shelf.
@@ -162,7 +162,7 @@ EVT_DEFINE_USER_FUNC(evtTot_InitializeShopSign) {
     // Sort items + badges by combined type sort order.
     ttyd::system::qqsort(
         g_ShopSignItems, g_NumShopSignItems, sizeof(int16_t),
-        (void*)tot::TypeSortOrderComparator);
+        (void*)TypeSortOrderComparator);
 
     evtSetValue(evt, evt->evtArguments[0], g_NumShopSignItems);
 
@@ -185,7 +185,7 @@ EVT_DEFINE_USER_FUNC(evtTot_AfterBuyingShopItem) {
 
     // Mark normal items as permanently purchased.
     if (item_id >= ItemType::THUNDER_BOLT) {
-        g_Mod->state_.SetOption(tot::FLAGS_ITEM_PURCHASED, item_id - 0x80);
+        g_Mod->state_.SetOption(FLAGS_ITEM_PURCHASED, item_id - 0x80);
 
     }
 
@@ -194,7 +194,7 @@ EVT_DEFINE_USER_FUNC(evtTot_AfterBuyingShopItem) {
         if (on_shelf) work->item_flags[work->buy_item_idx] |= 1;
     } else {
         ttyd::mario_pouch::pouchAddStarPiece(1);
-        g_Mod->state_.ChangeOption(tot::STAT_PERM_CURRENT_SP, 1);
+        g_Mod->state_.ChangeOption(STAT_PERM_CURRENT_SP, 1);
     }
     
     return 2;
@@ -202,7 +202,7 @@ EVT_DEFINE_USER_FUNC(evtTot_AfterBuyingShopItem) {
 
 EVT_BEGIN(HammerBroInit_WrapperEvt)
     RUN_CHILD_EVT(ttyd::npc_event::hbross_init_event)
-    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(0))
+    USER_FUNC(evtTot_IsMidbossFloor, LW(0))
     IF_EQUAL(LW(0), 1)
         USER_FUNC(evt_npc_set_scale, PTR("slave_0"), 2, 2, 2)
     END_IF()
@@ -211,7 +211,7 @@ EVT_END()
 
 EVT_BEGIN(DryBonesInit_WrapperEvt)
     RUN_CHILD_EVT(ttyd::npc_event::karon_init_event)
-    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(0))
+    USER_FUNC(evtTot_IsMidbossFloor, LW(0))
     IF_EQUAL(LW(0), 1)
         USER_FUNC(evt_npc_set_scale, PTR("slave_0"), 2, 2, 2)
     END_IF()
@@ -220,7 +220,7 @@ EVT_END()
 
 EVT_BEGIN(WizzerdInit_WrapperEvt)
     RUN_CHILD_EVT(ttyd::npc_event::mahoon_init_event)
-    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(0))
+    USER_FUNC(evtTot_IsMidbossFloor, LW(0))
     IF_EQUAL(LW(0), 1)
         USER_FUNC(evt_npc_set_scale, PTR("slave_0"), 2, 2, 2)
         USER_FUNC(evt_npc_set_scale, PTR("slave_1"), 2, 2, 2)
@@ -235,7 +235,7 @@ EVT_BEGIN(WizzerdHandsIdle_Evt)
     USER_FUNC(evt_npc_get_dir, PTR("me"), LW(12))
 
     // Scale to 1x if non-midboss, or 2x if midboss.
-    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(13))
+    USER_FUNC(evtTot_IsMidbossFloor, LW(13))
     ADD(LW(13), 1)
 
     SET(LW(14), 0)
@@ -278,7 +278,7 @@ EVT_PATCH_END()
 static_assert(sizeof(WizzerdHandsIdle_Evt) == 0x1a0);
 
 EVT_BEGIN(XNautPhdProjectilePosition_Evt)
-    USER_FUNC(tot::evtTot_IsMidbossFloor, LW(4))
+    USER_FUNC(evtTot_IsMidbossFloor, LW(4))
     ADD(LW(4), 1)
     USER_FUNC(evt_npc_set_scale, PTR("slave_0"), LW(4), LW(4), LW(4))
     MUL(LW(4), 25)
@@ -297,11 +297,11 @@ EVT_PATCH_END()
 static_assert(sizeof(XNautPhdProjectilePosition_Hook) == 0x24);
 
 EVT_BEGIN(ItemShop_GoodbyeEvt)
-    USER_FUNC(tot::evtTot_CheckCompletedAchievement,
-        tot::AchievementId::META_ITEMS_BADGES_ALL, EVT_NULLPTR)
+    USER_FUNC(evtTot_CheckCompletedAchievement,
+        AchievementId::META_ITEMS_BADGES_ALL, EVT_NULLPTR)
 
-    USER_FUNC(tot::evtTot_CheckCompletedAchievement,
-        tot::AchievementId::META_ITEMS_BADGES_10, LW(1))
+    USER_FUNC(evtTot_CheckCompletedAchievement,
+        AchievementId::META_ITEMS_BADGES_10, LW(1))
 
     // After meeting the 10 items + badges achievement, give selector items.
     IF_SMALL(LW(1), 1)
@@ -319,14 +319,14 @@ EVT_BEGIN(ItemShop_GoodbyeEvt)
     USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_30"))
 
     IF_EQUAL(LW(1), 0)
-        USER_FUNC(tot::evtTot_GetUniqueItemName, LW(0))
+        USER_FUNC(evtTot_GetUniqueItemName, LW(0))
         USER_FUNC(
             evt_item_entry, LW(0), (int32_t)ItemType::TOT_KEY_ITEM_SELECTOR,
             FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
         USER_FUNC(evt_item_get_item, LW(0))
     END_IF()
     IF_EQUAL(LW(2), 0)
-        USER_FUNC(tot::evtTot_GetUniqueItemName, LW(0))
+        USER_FUNC(evtTot_GetUniqueItemName, LW(0))
         USER_FUNC(
             evt_item_entry, LW(0), (int32_t)ItemType::TOT_KEY_BADGE_SELECTOR,
             FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
@@ -369,7 +369,7 @@ EVT_BEGIN(ShopBuyEvt)
         RETURN()
     END_IF()
     USER_FUNC(set_buy_item_id, LW(12))
-    USER_FUNC(tot::evtTot_SpendPermanentCurrency, 0, LW(13))
+    USER_FUNC(evtTot_SpendPermanentCurrency, 0, LW(13))
     MUL(LW(13), -1)
     USER_FUNC(evt_pouch_add_coin, LW(13))
     USER_FUNC(evt_win_coin_wait, LW(8))
@@ -396,7 +396,7 @@ EVT_BEGIN(ShopSignEvt)
     USER_FUNC(shopper_name, LW(9))
 
     // Check for tutorial dialogue.
-    IF_EQUAL((int32_t)tot::GSWF_HubShopTutorial, 0)
+    IF_EQUAL((int32_t)GSWF_HubShopTutorial, 0)
         // Turn to face each other.
         USER_FUNC(evt_mario_set_dir_npc, LW(9))
         USER_FUNC(evt_set_dir_to_target, LW(9), PTR("mario"))
@@ -411,7 +411,7 @@ LBL(10)
         USER_FUNC(evt_msg_print_add, 0, PTR("tot_shopkeep_11"))
 
         // Explanation complete.
-        SET((int32_t)tot::GSWF_HubShopTutorial, 1)
+        SET((int32_t)GSWF_HubShopTutorial, 1)
         GOTO(99)
     END_IF()
 
@@ -455,7 +455,7 @@ LBL(10)
         USER_FUNC(evt_win_coin_off, LW(8))
         GOTO(99)
     END_IF()
-    USER_FUNC(tot::evtTot_SpendPermanentCurrency, 0, LW(3))
+    USER_FUNC(evtTot_SpendPermanentCurrency, 0, LW(3))
     MUL(LW(3), -1)
     USER_FUNC(evt_pouch_add_coin, LW(3))
     USER_FUNC(evt_win_coin_wait, LW(8))
@@ -479,25 +479,25 @@ EVT_END()
 
 void ApplyFixedPatches() {
     // Apply patches to make Mario's idle animation match Danger threshold.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_mot_stay_MarioCheckDangerIdleAnim1_BH),
         reinterpret_cast<void*>(StartFieldDangerIdleCheck1),
         reinterpret_cast<void*>(BranchBackFieldDangerIdleCheck1));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_mot_stay_MarioCheckDangerIdleAnim2_BH),
         reinterpret_cast<void*>(StartFieldDangerIdleCheck2),
         reinterpret_cast<void*>(BranchBackFieldDangerIdleCheck2));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_mot_stay_MarioCheckDangerIdleAnim3_BH),
         reinterpret_cast<void*>(StartFieldDangerIdleCheck3),
         reinterpret_cast<void*>(BranchBackFieldDangerIdleCheck3));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_mot_stay_MarioCheckDangerIdleAnim4_BH),
         reinterpret_cast<void*>(StartFieldDangerIdleCheck4),
         reinterpret_cast<void*>(BranchBackFieldDangerIdleCheck4));
     
     // Override the function that checks for party Danger animation on field.
-    g_partyGetHp_trampoline = patch::hookFunction(
+    g_partyGetHp_trampoline = mod::hookFunction(
         ttyd::mario_party::partyGetHp, [](int32_t party_idx) {
             // Replace logic; this is only ever used in field animation context,
             // so we can just return what the game 'thinks' are Danger values.
@@ -517,39 +517,39 @@ void ApplyFixedPatches() {
         });
 
     // Replaces logic for picking a FX to play on hammering in the field.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_mot_hammer_PickHammerFieldSfx_BH),
         reinterpret_cast<void*>(g_mot_hammer_PickHammerFieldSfx_EH),
         reinterpret_cast<void*>(StartPlayFieldHammerFX),
         reinterpret_cast<void*>(BranchBackPlayFieldHammerFX));
 
     // Disable damage after falling into water.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_mot_damage_Patch_DisableFallDamage),
         0x38600000U /* li r3, 0 */);
 
     // Add support for midboss scale to Wizzerd field AI.
     ttyd::npc_data::npc_ai_type_table[NpcAiType::WIZZERD].initEvtCode = 
         const_cast<int32_t*>(WizzerdInit_WrapperEvt);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_move_event) + 0x28),
         WizzerdHandsIdle_Evt, sizeof(WizzerdHandsIdle_Evt));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_find_event) + 0x14),
         WizzerdHandsIdle_Evt, sizeof(WizzerdHandsIdle_Evt));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_lost_event) + 0x14),
         WizzerdHandsIdle_Evt, sizeof(WizzerdHandsIdle_Evt));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             reinterpret_cast<uintptr_t>(ttyd::npc_event::mahoon_return_event) + 0x14),
         WizzerdHandsIdle_Evt, sizeof(WizzerdHandsIdle_Evt));
 
     // Add support for midboss scale to X-Naut PhD's projectiles.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_zakowiz_find_event_Patch_ProjectileScaleHook),
         XNautPhdProjectilePosition_Hook,
         sizeof(XNautPhdProjectilePosition_Hook));
@@ -590,15 +590,15 @@ void ApplyFixedPatches() {
     tribe_descs[288].modelName = "c_atmic_trs_p";
 
     // Replace shop buy_evt and evt_shoplist.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(ttyd::evt_shop::buy_evt),
         ShopBuyEvt_Hook, sizeof(ShopBuyEvt_Hook));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(ttyd::evt_shop::evt_shoplist),
         ShopSignEvt_Hook, sizeof(ShopSignEvt_Hook));
     
     // Disable special shopkeeper talk event, since shop only allows buying.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_evt_shop_setup_Patch_DisableShopperTalkEvt),
         0x60000000 /* nop */);
 }
@@ -608,4 +608,4 @@ int16_t* GetShopBackOrderItems() {
 }
 
 }  // namespace field
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

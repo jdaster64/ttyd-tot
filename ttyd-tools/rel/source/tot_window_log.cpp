@@ -1253,7 +1253,7 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
 
     int32_t num_tattles = 0;
     for (int32_t i = 1; i < 0xd8; ++i) {
-        int32_t custom_tattle_idx = tot::GetCustomTattleIndex(i);
+        int32_t custom_tattle_idx = GetCustomTattleIndex(i);
         if (custom_tattle_idx >= 0 &&
             custom_tattle_idx <= menu->tattle_log_total_count) {
             menu->tattle_logs[num_tattles].order = 

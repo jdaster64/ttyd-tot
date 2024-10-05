@@ -319,7 +319,7 @@ EVT_BEGIN(unitBobOmb_attack_event_spark)
             
             // Apply Charge status directly.
             USER_FUNC(
-                tot::evtTot_GetEnemyStats, 
+                evtTot_GetEnemyStats, 
                 (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB,
                 EVT_NULLPTR, LW(5), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR,
                 (int32_t)unitBobOmb_weaponBomb.damage_function_params[0])

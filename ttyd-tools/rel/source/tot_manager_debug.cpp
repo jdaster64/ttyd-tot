@@ -159,7 +159,7 @@ void DebugManager::Update() {
                     state.bp_level_ = 99;
                     state.hp_p_level_ = 99;
                     state.max_inventory_ = 99;
-                    tot::OptionsManager::UpdateLevelupStats();
+                    OptionsManager::UpdateLevelupStats();
                     break;
                 }
                 case DEBUG_ADD_CURRENCY: {
@@ -176,10 +176,10 @@ void DebugManager::Update() {
                 }
                 case DEBUG_UNLOCK_ALL_MOVES: {
                     // Unlock all moves and move levels.
-                    for (int32_t i = 0; i < tot::MoveType::MOVE_TYPE_MAX; ++i) {
-                        tot::MoveManager::UpgradeMove(i);
-                        tot::MoveManager::UpgradeMove(i);
-                        tot::MoveManager::UpgradeMove(i);
+                    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+                        MoveManager::UpgradeMove(i);
+                        MoveManager::UpgradeMove(i);
+                        MoveManager::UpgradeMove(i);
                     }
                     break;
                 }
@@ -256,7 +256,7 @@ void DebugManager::Update() {
                 case DEBUG_COMPLETE_LOGS: {
                     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
                         // Set Tattle flags for only enemies in Infinite Pit.
-                        if (tot::GetCustomTattleIndex(i) > 0) {
+                        if (GetCustomTattleIndex(i) > 0) {
                             ttyd::swdrv::swSet(0x117a + i);
                         }
                     }
@@ -336,7 +336,7 @@ void DebugManager::Update() {
             if (g_CursorPos == 0) {
                 // If valid for the front, fill the first 3 slots with the type.
                 // (Bosses only fill the first slot and wipe all others).
-                if (tot::IsEligibleFrontEnemy(enemy_type)) {
+                if (IsEligibleFrontEnemy(enemy_type)) {
                     int32_t num_enemies = 3;
                     switch (enemy_type) {
                         case BattleUnitType::GOLD_FUZZY:
@@ -354,7 +354,7 @@ void DebugManager::Update() {
                 }
             } else {
                 // If valid, change the currently selected slot only.
-                if (tot::IsEligibleLoadoutEnemy(enemy_type) || enemy_type == -1) {
+                if (IsEligibleLoadoutEnemy(enemy_type) || enemy_type == -1) {
                     bool valid_back_enemy = true;
                     switch (enemy_type) {
                         case BattleUnitType::GOLD_FUZZY:
@@ -439,11 +439,11 @@ void DebugManager::Update() {
         if (buttons & ButtonId::L) dir *= 8;
 
         int32_t max_floor = 64;
-        switch (g_Mod->state_.GetOptionValue(tot::OPT_DIFFICULTY)) {
-            case tot::OPTVAL_DIFFICULTY_TUTORIAL:
+        switch (g_Mod->state_.GetOptionValue(OPT_DIFFICULTY)) {
+            case OPTVAL_DIFFICULTY_TUTORIAL:
                 max_floor = 8;
                 break;
-            case tot::OPTVAL_DIFFICULTY_HALF:
+            case OPTVAL_DIFFICULTY_HALF:
                 max_floor = 32;
                 break;
         }

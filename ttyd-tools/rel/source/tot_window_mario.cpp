@@ -225,7 +225,7 @@ int32_t MarioMenuMain(WinPauseMenu* menu) {
             // Get max number of selectable moves.
             int32_t num_selections = 0;
             for (int32_t i = 0; i < 8; ++i) {
-                if (tot::MoveManager::GetUnlockedLevel(starting_move + i) > 0) {
+                if (MoveManager::GetUnlockedLevel(starting_move + i) > 0) {
                     ++num_selections;
                 }
             }

@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit::mario_move {
+namespace mod::tot::patch::mario_move {
 
 // Apply patches related to Mario's moves and move selection in battle.
 void ApplyFixedPatches();

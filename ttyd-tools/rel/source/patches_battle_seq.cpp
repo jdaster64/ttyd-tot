@@ -84,13 +84,13 @@ extern "C" {
     }
 
     void checkGradualSpRecovery() {
-        mod::infinite_pit::battle_seq::CheckGradualSpRegenEffect();
+        mod::tot::patch::battle_seq::CheckGradualSpRegenEffect();
     }
     
     int32_t calculateCoinDrops(
         ttyd::npcdrv::FbatBattleInformation* battleInfo,
         ttyd::npcdrv::NpcEntry* npc) {
-        return mod::infinite_pit::battle_seq::CalculateCoinDrops(battleInfo, npc);
+        return mod::tot::patch::battle_seq::CalculateCoinDrops(battleInfo, npc);
     }
 
     int32_t checkLetBanditEscape() {
@@ -98,7 +98,7 @@ extern "C" {
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
 
@@ -204,7 +204,7 @@ void CopyChildBattleInfo(bool to_child) {
             src = npc;
             dest = npc->master;
         }
-        mod::patch::writePatch(
+        mod::writePatch(
             &dest->battleInfo, &src->battleInfo, sizeof(NpcBattleInfo));
     }
 }
@@ -218,21 +218,21 @@ void CheckBattleCondition() {
     // Track the number of turns spent / number of run aways at fight's end.
     auto& state = g_Mod->state_;
     state.ChangeOption(
-        tot::STAT_RUN_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
+        STAT_RUN_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
     state.ChangeOption(
-        tot::STAT_PERM_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
+        STAT_PERM_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
     state.ChangeOption(
-        tot::STAT_RUN_MOST_TURNS_CURRENT, ttyd::battle::g_BattleWork->turn_count);
-    if (state.GetOption(tot::STAT_RUN_MOST_TURNS_CURRENT) >
-        state.GetOption(tot::STAT_RUN_MOST_TURNS_RECORD)) {
+        STAT_RUN_MOST_TURNS_CURRENT, ttyd::battle::g_BattleWork->turn_count);
+    if (state.GetOption(STAT_RUN_MOST_TURNS_CURRENT) >
+        state.GetOption(STAT_RUN_MOST_TURNS_RECORD)) {
         // Update max turn count record.
-        state.SetOption(tot::STAT_RUN_MOST_TURNS_RECORD,
-            state.GetOption(tot::STAT_RUN_MOST_TURNS_CURRENT));
-        state.SetOption(tot::STAT_RUN_MOST_TURNS_FLOOR, state.floor_);
+        state.SetOption(STAT_RUN_MOST_TURNS_RECORD,
+            state.GetOption(STAT_RUN_MOST_TURNS_CURRENT));
+        state.SetOption(STAT_RUN_MOST_TURNS_FLOOR, state.floor_);
     }
     if (fbat_info->wResult != 1) {
-        state.ChangeOption(tot::STAT_RUN_TIMES_RAN_AWAY);
-        state.ChangeOption(tot::STAT_PERM_TIMES_RAN_AWAY);
+        state.ChangeOption(STAT_RUN_TIMES_RAN_AWAY);
+        state.ChangeOption(STAT_PERM_TIMES_RAN_AWAY);
     }
     
     // Did not win the fight (e.g. ran away).
@@ -240,13 +240,12 @@ void CheckBattleCondition() {
 
     for (int32_t i = 0; i < 8; ++i) {
         if (npc_info->wStolenItems[i] != 0) {
-            if (state.CheckOptionValue(tot::OPTVAL_BANDIT_FORCE_REFIGHT)) {
+            if (state.CheckOptionValue(OPTVAL_BANDIT_FORCE_REFIGHT)) {
                 // Did not win the fight (an enemy still has a stolen item).
                 return;
             }
             // If no forced refights, achievement for getting away.
-            tot::AchievementsManager::MarkCompleted(
-                tot::AchievementId::MISC_BANDIT_STEAL);
+            AchievementsManager::MarkCompleted(AchievementId::MISC_BANDIT_STEAL);
             break;
         }
     }
@@ -254,7 +253,7 @@ void CheckBattleCondition() {
     // If condition is a success and rule is not 0, add a bonus item.
     if (fbat_info->wBtlActRecCondition && fbat_info->wRuleKeepResult == 6) {
         int32_t item_reward = 0;
-        if (state.CheckOptionValue(tot::OPTVAL_DROP_HELD_FROM_BONUS)) {
+        if (state.CheckOptionValue(OPTVAL_DROP_HELD_FROM_BONUS)) {
             // If using "drop gated by bonus" option, use the held item that
             // would otherwise normally drop instead of the random item.
             // (If that item was stolen, the player receives nothing.)
@@ -270,13 +269,13 @@ void CheckBattleCondition() {
             }
         }
         // Increment the count of successful challenges.
-        state.ChangeOption(tot::STAT_RUN_CONDITIONS_MET);
-        state.ChangeOption(tot::STAT_PERM_CONDITIONS_MET);
+        state.ChangeOption(STAT_RUN_CONDITIONS_MET);
+        state.ChangeOption(STAT_PERM_CONDITIONS_MET);
     }
     
     // If battle reward mode is "drop all held", award items other than the
     // natural drop ones until there are no "recovered items" slots left.
-    if (state.CheckOptionValue(tot::OPTVAL_DROP_ALL_HELD)) {
+    if (state.CheckOptionValue(OPTVAL_DROP_ALL_HELD)) {
         for (int32_t i = 0; i < 8; ++i) {
             const int32_t held_item = npc_info->wHeldItems[i];
             // If there is a held item, and this isn't the natural drop...
@@ -295,7 +294,7 @@ void CheckBattleCondition() {
 // Displays text associated with the battle condition.
 void DisplayBattleCondition() {
     char buf[128];
-    tot::GetBattleConditionString(buf);
+    GetBattleConditionString(buf);
     DrawCenteredTextWindow(
         buf, 0, 60, 0xFFu, false, 0x000000FFu, 0.75f, 0xFFFFFFE5u, 15, 10);
 }
@@ -342,11 +341,11 @@ void GetDropMaterials(FbatBattleInformation* fbat_info) {
         }
     }
     
-    switch (g_Mod->state_.GetOptionValue(tot::OPT_BATTLE_DROPS)) {
+    switch (g_Mod->state_.GetOptionValue(OPT_BATTLE_DROPS)) {
         // If using default battle drop behavior, select the item drop based on
         // the previously determined enemy held item index.
-        case tot::OPTVAL_DROP_STANDARD:
-        case tot::OPTVAL_DROP_ALL_HELD: {
+        case OPTVAL_DROP_STANDARD:
+        case OPTVAL_DROP_ALL_HELD: {
             battle_info->wItemDropped = 
                 battle_info->wHeldItems[party_setup->held_item_weight];
             break;
@@ -357,13 +356,13 @@ void GetDropMaterials(FbatBattleInformation* fbat_info) {
 }
     
 void ApplyFixedPatches() {
-    g_seq_battleInit_trampoline = patch::hookFunction(
+    g_seq_battleInit_trampoline = mod::hookFunction(
         ttyd::seq_battle::seq_battleInit, []() {
             // Copy information from parent npc before battle, if applicable.
             CopyChildBattleInfo(/* to_child = */ true);
             // Init badge move levels and reset selected move levels.
-            tot::MoveManager::InitBadgeMoveLevels();
-            tot::MoveManager::ResetSelectedLevels();
+            MoveManager::InitBadgeMoveLevels();
+            MoveManager::ResetSelectedLevels();
             // Force enemy ATK/DEF tattles to display at start of encounter.
             partner::RefreshExtraTattleStats();
             // Reset cost of Quick Change switches.
@@ -379,7 +378,7 @@ void ApplyFixedPatches() {
             g_seq_battleInit_trampoline();
         });
 
-    g_fbatBattleMode_trampoline = patch::hookFunction(
+    g_fbatBattleMode_trampoline = mod::hookFunction(
         ttyd::npcdrv::fbatBattleMode, []() {
             bool post_battle_state = ttyd::npcdrv::fbatGetPointer()->state == 4;
             g_fbatBattleMode_trampoline();
@@ -388,46 +387,46 @@ void ApplyFixedPatches() {
         });
 
     // Enlarge size of BattleWorkUnit struct to add ToT-relevant fields.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_BtlUnit_Entry_Patch_BattleWorkUnitAlloc),
         0x38600b50U /* li r3, 0xb34 -> 0xb50 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_BtlUnit_Entry_Patch_BattleWorkUnitMemset),
         0x38a00b50U /* li r5, 0xb34 -> 0xb50 */);
 
-    g_Btl_UnitSetup_trampoline = patch::hookFunction(
+    g_Btl_UnitSetup_trampoline = mod::hookFunction(
         ttyd::battle::Btl_UnitSetup, [](BattleWork* battleWork) {
             // Run original logic.
             g_Btl_UnitSetup_trampoline(battleWork);
             // Set "badge equipped" flags based on new key item flags.
-            if (tot::GetSWF(tot::GSWF_PeekabooEnabled)) {
+            if (GetSWF(GSWF_PeekabooEnabled)) {
                 battleWork->badge_equipped_flags |= 2;
             }
-            if (tot::GetSWF(tot::GSWF_TimingTutorEnabled)) {
+            if (GetSWF(GSWF_TimingTutorEnabled)) {
                 battleWork->badge_equipped_flags |= 4;
             }
         });
         
-    g_BtlActRec_JudgeRuleKeep_trampoline = patch::hookFunction(
+    g_BtlActRec_JudgeRuleKeep_trampoline = mod::hookFunction(
         ttyd::battle_actrecord::BtlActRec_JudgeRuleKeep, []() {
             g_BtlActRec_JudgeRuleKeep_trampoline();
             // Handle item drops from conditions / "all held drops" mode.
             CheckBattleCondition();
         });
         
-    g__rule_disp_trampoline = patch::hookFunction(
+    g__rule_disp_trampoline = mod::hookFunction(
         ttyd::battle_seq::_rule_disp, []() {
             // Replaces the original logic completely.
             DisplayBattleCondition();
         });
         
-    g__GetFirstAttackWeapon_trampoline = patch::hookFunction(
+    g__GetFirstAttackWeapon_trampoline = mod::hookFunction(
         ttyd::battle_seq::_GetFirstAttackWeapon, [](int32_t attack_type) {
             // Replaces the original logic completely.
             return tot::party_mario::GetFirstAttackWeapon(attack_type);
         });
         
-    g__btlcmd_MakeSelectWeaponTable_trampoline = patch::hookFunction(
+    g__btlcmd_MakeSelectWeaponTable_trampoline = mod::hookFunction(
         ttyd::battle_seq_command::_btlcmd_MakeSelectWeaponTable, [](
             BattleWork* battleWork, int32_t table_type) {
             // Replaces the original logic completely.
@@ -436,7 +435,7 @@ void ApplyFixedPatches() {
         });
         
     // Hook to disable moves under special circumstances.
-    g__btlcmd_UpdateSelectWeaponTable_trampoline = patch::hookFunction(
+    g__btlcmd_UpdateSelectWeaponTable_trampoline = mod::hookFunction(
         ttyd::battle_seq_command::_btlcmd_UpdateSelectWeaponTable, [](
             BattleWork* battleWork, int32_t table_type) {
             // Run original logic.
@@ -451,7 +450,7 @@ void ApplyFixedPatches() {
                 auto& weapon = battleWork->command_work.weapon_table[i];
                 if (!weapon.weapon || weapon.item_id) continue;
                 switch (weapon.index) {
-                    case tot::MoveType::VIVIAN_INFATUATE: {
+                    case MoveType::VIVIAN_INFATUATE: {
                         // Disable if there is already an Infatuated enemy.
                         bool disable = false;
                         for (int32_t i = 0; i < 64; ++i) {
@@ -468,7 +467,7 @@ void ApplyFixedPatches() {
                         }
                         break;
                     }
-                    case tot::MoveType::BOBBERY_MEGATON_BOMB: {
+                    case MoveType::BOBBERY_MEGATON_BOMB: {
                         // Disable if there is already an active Megaton Bomb.
                         bool disable = false;
                         for (int32_t i = 0; i < 64; ++i) {
@@ -491,7 +490,7 @@ void ApplyFixedPatches() {
         });
         
     // Handle additional "can't select move" message types.
-    g_BattleSeqCmd_get_msg_trampoline = patch::hookFunction(
+    g_BattleSeqCmd_get_msg_trampoline = mod::hookFunction(
         ttyd::battle_seq_command::BattleSeqCmd_get_msg,
         [](EvtEntry* evt, bool isFirstCall) {
             // Check for new message types.
@@ -510,15 +509,15 @@ void ApplyFixedPatches() {
             return g_BattleSeqCmd_get_msg_trampoline(evt, isFirstCall);
         });
     
-    g_BattleCommandInit_trampoline = patch::hookFunction(
+    g_BattleCommandInit_trampoline = mod::hookFunction(
         ttyd::battle_seq_command::BattleCommandInit, [](BattleWork* battleWork) {
             // Reset selected move levels before every player action.
-            tot::MoveManager::ResetSelectedLevels();
+            MoveManager::ResetSelectedLevels();
             // Run original logic.
             g_BattleCommandInit_trampoline(battleWork);
         });
         
-    g_BattleInformationSetDropMaterial_trampoline = patch::hookFunction(
+    g_BattleInformationSetDropMaterial_trampoline = mod::hookFunction(
         ttyd::battle_information::BattleInformationSetDropMaterial,
         [](FbatBattleInformation* fbat_info) {
             // Replaces the original logic completely.
@@ -526,7 +525,7 @@ void ApplyFixedPatches() {
         });
         
     // Make Mario's jump/hammer menus always show the full weapon sub-menu.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_btlSeqMove_FixMarioSingleMoveCheck_BH),
         reinterpret_cast<void*>(g_btlSeqMove_FixMarioSingleMoveCheck_EH),
         reinterpret_cast<void*>(StartFixMarioSingleMoveCheck),
@@ -535,73 +534,73 @@ void ApplyFixedPatches() {
     // Make defeating a group of enemies still holding stolen items always make
     // you have temporary intangibility, even if you recovered some of them, to
     // prevent projectiles from first-striking you again if you recover items.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_fbatBattleMode_GivePlayerInvuln_BH),
         reinterpret_cast<void*>(g_fbatBattleMode_GivePlayerInvuln_EH),
         reinterpret_cast<void*>(StartGivePlayerInvuln),
         reinterpret_cast<void*>(BranchBackGivePlayerInvuln));
 
     // Disable forced re-fights with enemies w/ stolen items, if option enabled.
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(g_fbatBattleMode_SkipStolenCheck_BH),
         reinterpret_cast<void*>(StartSkipBanditEscapedCheck));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(BranchBackSkipBanditEscapedCheck),
         reinterpret_cast<void*>(g_fbatBattleMode_SkipStolenCheck_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ConditionalBranchBackSkipBanditEscapedCheck),
         reinterpret_cast<void*>(g_fbatBattleMode_SkipStolenCheck_CH1));
 
     // Disable dropping coins after running away from a battle.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_marioMain_Patch_SkipRunawayCoinDrop),
         0x60000000U /* nop */);
 
     // Check for battle conditions at the start of processing the battle end,
     // not the end; this way level-up heals don't factor into "final HP".
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_btlseqEnd_JudgeRuleEarly_BH),
         reinterpret_cast<void*>(StartBtlSeqEndJudgeRule),
         reinterpret_cast<void*>(BranchBackBtlSeqEndJudgeRule));
     // Remove the original check for battle conditions at the end of battle.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlseqEnd_Patch_RemoveJudgeRule), 
         0x60000000U /* nop */);
 
     // Make the battle condition message display longer (5s instead of 2s),
     // and only be dismissable by the B button, rather than A or B.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlseqTurn_Patch_RuleDispShowLonger), 
         0x3800012cU /* li r0, 300 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlseqTurn_Patch_RuleDispDismissOnlyWithB), 
         0x38600200U /* li r3, 0x200 (B button) */);
         
     // Override logic to calculate coin drops to fix the original's overflow,
     // as well as dividing the result by 2 and capping to 100.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_fbatBattleMode_CalculateCoinDrops_BH),
         reinterpret_cast<void*>(g_fbatBattleMode_CalculateCoinDrops_EH),
         reinterpret_cast<void*>(StartCalculateCoinDrops),
         reinterpret_cast<void*>(BranchBackCalculateCoinDrops));
         
     // Support multiple demonimations of coins dropping at the end of a fight.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_enemy_common_dead_event_SpawnCoinsHook),
         SpawnCoinsEvtHook, sizeof(SpawnCoinsEvtHook));
     // Allow big coins to be overridden by other items on the field.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_itemEntry_CheckDeleteFieldItem_BH),
         reinterpret_cast<void*>(StartCheckDeleteFieldItem),
         reinterpret_cast<void*>(BranchBackCheckDeleteFieldItem));     
     // Make bigger coins bounce the same distance as regular coins, not
     // vanilla Piantas (which have the range of hearts, flowers, or items).
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_itemseq_Bound_Patch_BounceRange),
         0x2c00007b /* cmpwi r0,0x7b (heart, not Pianta) */);
     
     // Handle per-turn SP recovery.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_btlseqTurn_SpGradualRecoveryProc_BH),
         reinterpret_cast<void*>(StartCheckGradualSpRecovery),
         reinterpret_cast<void*>(BranchBackCheckGradualSpRecovery));
@@ -625,7 +624,7 @@ int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
         // If Grubba's conditions are active, double or nothing, based on
         // whether the condition was met.
         int32_t grubba_floor =
-            g_Mod->state_.GetOption(tot::STAT_RUN_NPC_GRUBBA_FLOOR);
+            g_Mod->state_.GetOption(STAT_RUN_NPC_GRUBBA_FLOOR);
         if (grubba_floor && g_Mod->state_.floor_ - grubba_floor < 8) {
             if (battleInfo->wRuleKeepResult == 6) {
                 result *= 2;
@@ -639,8 +638,7 @@ int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
     for (int32_t i = 1; i <= 7; ++i) {
         const auto& data = ttyd::mario_pouch::pouchGetPtr()->party_data[i];
         if ((data.flags & 1) && data.current_hp == 0) {
-            tot::AchievementsManager::MarkCompleted(
-                tot::AchievementId::MISC_FAINTED_PARTNER);
+            AchievementsManager::MarkCompleted(AchievementId::MISC_FAINTED_PARTNER);
         }
     }
 
@@ -672,4 +670,4 @@ void CheckGradualSpRegenEffect() {
 }
 
 }  // namespace battle_seq
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

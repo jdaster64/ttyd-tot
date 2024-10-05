@@ -48,7 +48,7 @@ void Mod::Init() {
 	g_Mod = this;
 	
     // Hook the game's main function, so Update runs exactly once per frame.
-	marioStMain_trampoline_ = patch::hookFunction(
+	marioStMain_trampoline_ = mod::hookFunction(
         ttyd::mariost::marioStMain, [](){
             // Call the mod's update and draw functions, then run game code.
             g_Mod->Update();
@@ -58,10 +58,10 @@ void Mod::Init() {
 
 	// Initialize typesetting early (to display mod information on title screen)
 	ttyd::fontmgr::fontmgrTexSetup();
-	patch::hookFunction(ttyd::fontmgr::fontmgrTexSetup, [](){});
+	mod::hookFunction(ttyd::fontmgr::fontmgrTexSetup, [](){});
     
     // Hook / patch other functions with custom logic.
-    infinite_pit::ApplyAllFixedPatches();
+    tot::patch::ApplyAllFixedPatches();
 }
 
 void Mod::Update() {

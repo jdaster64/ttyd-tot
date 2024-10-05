@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit::field {
+namespace mod::tot::patch::field {
 
 // Apply patches to field-related events in the Pit.
 void ApplyFixedPatches();

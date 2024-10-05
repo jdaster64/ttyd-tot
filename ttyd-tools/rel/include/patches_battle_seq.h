@@ -7,7 +7,7 @@ struct FbatBattleInformation;
 struct NpcEntry;
 }
 
-namespace mod::infinite_pit::battle_seq {
+namespace mod::tot::patch::battle_seq {
 
 // Apply patches to core battle flow (start + end sequences, ...)
 void ApplyFixedPatches();

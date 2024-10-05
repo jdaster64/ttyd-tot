@@ -96,11 +96,11 @@ EVT_DEFINE_USER_FUNC(evtTot_SetPendulumAcParams) {
 
     const int32_t move_type = evtGetValue(evt, evt->evtArguments[0]);
     if (move_type == MoveType::KOOPS_SHELL_SHIELD) {
-        mod::patch::writePatch(
+        mod::writePatch(
             ttyd::ac_pendulum_crane_timing::pendulumCrane_hp_tbl,
             g_ShellShieldGaugeParams, sizeof(g_ShellShieldGaugeParams));
     } else {
-        mod::patch::writePatch(
+        mod::writePatch(
             ttyd::ac_pendulum_crane_timing::pendulumCrane_hp_tbl,
             g_WithdrawGaugeParams, sizeof(g_WithdrawGaugeParams));
     }

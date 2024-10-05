@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit::item {
+namespace mod::tot::patch::item {
 
 // Apply patches related to item balance, etc.
 void ApplyFixedPatches();

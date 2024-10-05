@@ -88,30 +88,30 @@ extern "C" {
     void dispFileSelectProgress(
         ttyd::seq_load::SeqLoadWinDataEntry* win, int32_t file, 
         int32_t file_hovered) {
-        mod::infinite_pit::ui::DisplayFileSelectProgress(win, file, file_hovered);
+        mod::tot::patch::ui::DisplayFileSelectProgress(win, file, file_hovered);
     }
   
     void dispUpdownNumberIcons(
         int32_t number, void* tex_obj, gc::mtx34* icon_mtx, gc::mtx34* view_mtx,
         uint32_t unk0) {
-        mod::infinite_pit::ui::DisplayUpDownNumberIcons(
+        mod::tot::patch::ui::DisplayUpDownNumberIcons(
             number, tex_obj, icon_mtx, view_mtx, unk0);
     }
 
     int32_t getIconForBadgeOrItemLogEntry(
         ttyd::win_root::WinPauseMenu* menu, bool item_log, int32_t index) {
-        return mod::infinite_pit::ui::GetIconForBadgeOrItemLogEntry(
+        return mod::tot::patch::ui::GetIconForBadgeOrItemLogEntry(
             menu, item_log, index);
     }
 
     void partyMenuSetupPartnerDescAndMoveCount(ttyd::win_root::WinPauseMenu* menu) {
-        mod::infinite_pit::ui::PartyMenuSetupPartnerDescAndMoveCount(menu);
+        mod::tot::patch::ui::PartyMenuSetupPartnerDescAndMoveCount(menu);
     }
     void partyMenuSetMoveDescAndCursorPos(ttyd::win_root::WinPauseMenu* menu) {
-        mod::infinite_pit::ui::PartyMenuSetMoveDescAndCursorPos(menu);
+        mod::tot::patch::ui::PartyMenuSetMoveDescAndCursorPos(menu);
     }
     void partyMenuDispStats(ttyd::win_root::WinPauseMenu* menu) {
-        mod::infinite_pit::ui::PartyMenuDispStats(menu);
+        mod::tot::patch::ui::PartyMenuDispStats(menu);
     }
 
     bool checkHideTopBarInWindow(ttyd::winmgr::WinMgrSelectEntry* sel_entry) {
@@ -127,7 +127,7 @@ extern "C" {
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
 
@@ -280,7 +280,7 @@ void DrawStatusWindow() {
         blink = (work->stat_blink_timer % 16) <= 5;
     }
 
-    bool in_hub = !g_Mod->state_.GetOption(tot::OPT_RUN_STARTED);
+    bool in_hub = !g_Mod->state_.GetOption(OPT_RUN_STARTED);
     bool in_battle = ttyd::mariost::g_MarioSt->bInBattle;
 
     if (!in_hub) {
@@ -362,7 +362,7 @@ void DrawStatusWindow() {
         if (work->last_party_member == 4) {
             int32_t color = ttyd::mario_pouch::pouchGetPartyColor(4);
             party_icon_id =
-                tot::CosmeticsManager::GetYoshiCostumeData(color)->icon_hud;
+                CosmeticsManager::GetYoshiCostumeData(color)->icon_hud;
         }
         ttyd::statuswindow::partysDt[1].icon_id = party_icon_id;
       
@@ -420,19 +420,19 @@ void DrawStatusWindow() {
 }   // namespace
     
 void ApplyFixedPatches() {
-    g_statusWinDisp_trampoline = patch::hookFunction(
+    g_statusWinDisp_trampoline = mod::hookFunction(
         ttyd::statuswindow::statusWinDisp, []() {
             // Replaces the original logic completely.
             DrawStatusWindow();
         });
 
     // Remove status bar coin cap.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_valueUpdate_Patch_DisableCoinCap),
         0x4800000cU  /* unconditional branch over cap code */);
         
     // Fix rank string shown in the menu.
-    g_BattleGetRankNameLabel_trampoline = patch::hookFunction(
+    g_BattleGetRankNameLabel_trampoline = mod::hookFunction(
         ttyd::battle_seq_end::BattleGetRankNameLabel,
         [](int32_t level) {
             int32_t rank = ttyd::mario_pouch::pouchGetPtr()->rank;
@@ -442,12 +442,12 @@ void ApplyFixedPatches() {
 
     // Apply patches to loadDraw code to show completion percentage and current
     // run progress (if applicable) instead of level on the file select screen.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_loadDraw_DrawLevelString_BH),
         reinterpret_cast<void*>(g_loadDraw_DrawLevelString_EH),
         reinterpret_cast<void*>(StartDrawFileLevelString),
         reinterpret_cast<void*>(BranchBackDrawFileLevelString));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_loadDraw_DrawCrystalStars_BH),
         reinterpret_cast<void*>(g_loadDraw_DrawCrystalStars_EH),
         reinterpret_cast<void*>(StartDrawFileCrystalStars),
@@ -455,21 +455,21 @@ void ApplyFixedPatches() {
         
     // Apply patch to effUpdownDisp code to display the correct number
     // when Charging / +ATK/DEF-ing by more than 9 points.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_effUpdownDisp_TwoDigitSupport_BH),
         reinterpret_cast<void*>(g_effUpdownDisp_TwoDigitSupport_EH),
         reinterpret_cast<void*>(StartDispUpdownNumberIcons),
         reinterpret_cast<void*>(BranchBackDispUpdownNumberIcons));
         
     // Make item name in battle menu based on item data rather than weapon data.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             g__btlcmd_MakeSelectWeaponTable_Patch_GetNameFromItem),
         0x807b0004U /* lwz r3, 0x4 (r27) */);
         
     // Apply patch to Party menu code to print the party member's description
     // and update the number of options in their moves dialog.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_winPartyMain_RotatePartnersHook_BH),
         reinterpret_cast<void*>(g_winPartyMain_RotatePartnersHook_EH),
         reinterpret_cast<void*>(StartPartySetPartnerDescAndMoveCount),
@@ -477,62 +477,62 @@ void ApplyFixedPatches() {
         
     // Apply patch to Party menu code to override the description and
     // XY cursor position for the moves window, given the current index.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_winPartyMain_OverrideMoveTextCursor_BH),
         reinterpret_cast<void*>(g_winPartyMain_OverrideMoveTextCursor_EH),
         reinterpret_cast<void*>(StartPartyOverrideMoveTextAndCursorPos),
         reinterpret_cast<void*>(BranchBackPartyOverrideMoveTextAndCursorPos));
         
     // Completely replace code to draw Party menu stats (HP and moves window).
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_winPartyDisp_StatsHook1_BH),
         reinterpret_cast<void*>(g_winPartyDisp_StatsHook1_EH),
         reinterpret_cast<void*>(StartPartyDispHook1),
         reinterpret_cast<void*>(BranchBackPartyDispHook1));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_winPartyDisp_StatsHook2_BH),
         reinterpret_cast<void*>(g_winPartyDisp_StatsHook2_EH),
         reinterpret_cast<void*>(StartPartyDispHook2),
         reinterpret_cast<void*>(BranchBackPartyDispHook2));
 
     // Replace most win_mario functions with custom logic.
-    g_winMarioInit_trampoline = patch::hookFunction(
+    g_winMarioInit_trampoline = mod::hookFunction(
         ttyd::win_mario::winMarioInit, [](WinPauseMenu* menu) {
             tot::win::MarioMenuInit(menu);
         });
-    g_winMarioInit2_trampoline = patch::hookFunction(
+    g_winMarioInit2_trampoline = mod::hookFunction(
         ttyd::win_mario::winMarioInit2, [](WinPauseMenu* menu) {
             tot::win::MarioMenuInit2(menu);
         });
-    g_winMarioMain_trampoline = patch::hookFunction(
+    g_winMarioMain_trampoline = mod::hookFunction(
         ttyd::win_mario::winMarioMain, [](WinPauseMenu* menu) {
             return tot::win::MarioMenuMain(menu);
         });
-    g_winMarioDisp_trampoline = patch::hookFunction(
+    g_winMarioDisp_trampoline = mod::hookFunction(
         ttyd::win_mario::winMarioDisp, [](
             CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
             tot::win::MarioMenuDisp(camera, menu, tab_number);
         });
 
     // Replace most win_item functions with custom logic.
-    g_winItemMain_trampoline = patch::hookFunction(
+    g_winItemMain_trampoline = mod::hookFunction(
         ttyd::win_item::winItemMain, [](WinPauseMenu* menu) {
             return tot::win::ItemMenuMain(menu);
         });
-    g_winItemMain2_trampoline = patch::hookFunction(
+    g_winItemMain2_trampoline = mod::hookFunction(
         ttyd::win_item::winItemMain2, [](WinPauseMenu* menu) {
             tot::win::ItemMenuMain2(menu);
         });
-    g_winItemDisp_trampoline = patch::hookFunction(
+    g_winItemDisp_trampoline = mod::hookFunction(
         ttyd::win_item::winItemDisp, [](
             CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
             tot::win::ItemMenuDisp(camera, menu, tab_number);
         });
-    g_itemUseDisp_trampoline = patch::hookFunction(
+    g_itemUseDisp_trampoline = mod::hookFunction(
         ttyd::win_item::itemUseDisp, [](WinMgrEntry* menu) {
             tot::win::ItemSubdialogMain1(menu);
         });
-    g_itemUseDisp2_trampoline = patch::hookFunction(
+    g_itemUseDisp2_trampoline = mod::hookFunction(
         ttyd::win_item::itemUseDisp2, [](WinMgrEntry* menu) {
             tot::win::ItemSubdialogMain2(menu);
         });
@@ -541,32 +541,32 @@ void ApplyFixedPatches() {
     ttyd::win_item::menu_skip_list[6] = ItemType::MAILBOX_SP;
 
     // Patch out call to winMailGx.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_winRootDisp_Patch_SkipMailGx),
         0x60000000U  /* nop */);
 
     // Replace all basic win_log functions with custom logic.
-    g_winLogInit_trampoline = patch::hookFunction(
+    g_winLogInit_trampoline = mod::hookFunction(
         ttyd::win_log::winLogInit, [](WinPauseMenu* menu) {
             tot::win::LogMenuInit(menu);
         });
-    g_winLogInit2_trampoline = patch::hookFunction(
+    g_winLogInit2_trampoline = mod::hookFunction(
         ttyd::win_log::winLogInit2, [](WinPauseMenu* menu) {
             tot::win::LogMenuInit2(menu);
         });
-    g_winLogExit_trampoline = patch::hookFunction(
+    g_winLogExit_trampoline = mod::hookFunction(
         ttyd::win_log::winLogExit, [](WinPauseMenu* menu) {
             tot::win::LogMenuExit(menu);
         });
-    g_winLogMain_trampoline = patch::hookFunction(
+    g_winLogMain_trampoline = mod::hookFunction(
         ttyd::win_log::winLogMain, [](WinPauseMenu* menu) {
             return tot::win::LogMenuMain(menu);
         });
-    g_winLogMain2_trampoline = patch::hookFunction(
+    g_winLogMain2_trampoline = mod::hookFunction(
         ttyd::win_log::winLogMain2, [](WinPauseMenu* menu) {
             tot::win::LogMenuMain2(menu);
         });
-    g_winLogDisp_trampoline = patch::hookFunction(
+    g_winLogDisp_trampoline = mod::hookFunction(
         ttyd::win_log::winLogDisp, [](
             CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
             tot::win::LogMenuDisp(camera, menu, tab_number);
@@ -579,9 +579,9 @@ void ApplyFixedPatches() {
     int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
     uint8_t custom_tattle_order[kNumEnemyTypes];
     for (int32_t i = 0; i <= kNumEnemyTypes; ++i) {
-        custom_tattle_order[i] = tot::GetCustomTattleIndex(i);
+        custom_tattle_order[i] = GetCustomTattleIndex(i);
     }
-    mod::patch::writePatch(
+    mod::writePatch(
         ttyd::win_root::enemy_monoshiri_sort_table,
         custom_tattle_order, sizeof(custom_tattle_order));
     
@@ -607,41 +607,41 @@ void ApplyFixedPatches() {
 
     // winHakoGX (Item / Badge log box drawing function) patches:
     // References new WinPauseMenu field locations in initialization. 
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_winHakoGX_SetInitialFields_BH),
         reinterpret_cast<void*>(g_winHakoGX_SetInitialFields_EH),
         reinterpret_cast<void*>(StartHakoGxInitializeFields),
         reinterpret_cast<void*>(BranchBackHakoGxInitializeFields));
     // Handles checking whether to draw a "not obtained" box.
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(g_winHakoGX_CheckDrawNoItemBox_BH),
         reinterpret_cast<void*>(StartHakoGxCheckDrawNoItemBox));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ReturnHakoGxCheckDrawNoItemBoxNoItemCase),
         reinterpret_cast<void*>(g_winHakoGX_CheckDrawNoItemBox_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ReturnHakoGxCheckDrawNoItemBoxItemCase),
         reinterpret_cast<void*>(g_winHakoGX_CheckDrawNoItemBox_CH1));
     // Handles checking whether to draw an item icon (opposite of above).
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(g_winHakoGX_CheckDrawItemIcon_BH),
         reinterpret_cast<void*>(StartHakoGxCheckDrawItemIcon));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ReturnHakoGxCheckDrawItemIconNoItemCase),
         reinterpret_cast<void*>(g_winHakoGX_CheckDrawItemIcon_EH));
-    mod::patch::writeBranch(
+    mod::writeBranch(
         reinterpret_cast<void*>(ReturnHakoGxCheckDrawItemIconItemCase),
         reinterpret_cast<void*>(g_winHakoGX_CheckDrawItemIcon_CH1));
     // Patch out the logic to draw a single background box on the last page.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_winHakoGX_Patch_SkipSingleBox),
         0x48000a1cU  /* unconditional branch to 0x80159144 */);
 
     // Disable check for unloading Mario animPose on map.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_winBadge_mario_change_Patch_SkipMapAnim1),
         0x3860ffffU  /* li r3, -1 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_winBadge_mario_change_Patch_SkipMapAnim2),
         0x3860ffffU  /* li r3, -1 */);
         
@@ -652,15 +652,15 @@ void ApplyFixedPatches() {
         (0x3c60'0000U | (new_select_desc_tbl >> 16));
     uint32_t new_select_desc_tbl_lo16 =
         (0x6065'0000U | (new_select_desc_tbl & 0xffff));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_winMgrSelectEntry_Patch_SelectDescTblHi16),
         new_select_desc_tbl_hi16  /* lis r3, ptr_hi16 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_winMgrSelectEntry_Patch_SelectDescTblLo16),
         new_select_desc_tbl_lo16  /* ori r5, r3, ptr_lo16 */);
         
     // Run custom code after vanilla winMgrSelectEntry / Other for custom menus.
-    g_winMgrSelectEntry_trampoline = patch::hookFunction(
+    g_winMgrSelectEntry_trampoline = mod::hookFunction(
         ttyd::winmgr::winMgrSelectEntry, [](
             int32_t type, int32_t new_item, int32_t cancellable) {
             if (type >= tot::window_select::MenuType::CUSTOM_START) {
@@ -668,7 +668,7 @@ void ApplyFixedPatches() {
             }
             return g_winMgrSelectEntry_trampoline(type, new_item, cancellable);
         });
-    g_winMgrSelectOther_trampoline = patch::hookFunction(
+    g_winMgrSelectOther_trampoline = mod::hookFunction(
         ttyd::winmgr::winMgrSelectOther, [](
             WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
             if (sel_entry->type >= tot::window_select::MenuType::CUSTOM_START) {
@@ -680,13 +680,13 @@ void ApplyFixedPatches() {
         
     // Force the top bar closed instead of open for certain selection windows,
     // e.g. run options.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_select_main_CheckHideTopBar_BH),
         reinterpret_cast<void*>(StartHideTopBarInSomeWindows),
         reinterpret_cast<void*>(BranchBackHideTopBarInSomeWindows));
 
     // For currency popup windows, hide the "X" if the amount is over 999.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_coin_disp_SkipXForHighCurrency_BH),
         reinterpret_cast<void*>(StartSkipDrawingXIfCurrencyHigh),
         reinterpret_cast<void*>(BranchBackSkipDrawingXIfCurrencyHigh));
@@ -695,12 +695,12 @@ void ApplyFixedPatches() {
 void DisplayFileSelectProgress(
     ttyd::seq_load::SeqLoadWinDataEntry* win, int32_t file, int32_t file_hovered) {
     // Load data from currently_pointed save file.
-    const auto* raw_save_data = (tot::TotSaveSlot*)(
+    const auto* raw_save_data = (TotSaveSlot*)(
         (uintptr_t)ttyd::cardmgr::cardGetFilePtr() + file * 0x4000 + 0x2000);
-    const tot::StateManager& state = raw_save_data->data.tot_state;
+    const StateManager& state = raw_save_data->data.tot_state;
     int32_t flags = state.floor_ / 8;
     int32_t max_flags =
-        state.GetOption(tot::OPT_RUN_STARTED) ? state.GetNumFloors() / 8 - 1 : 0;
+        state.GetOption(OPT_RUN_STARTED) ? state.GetNumFloors() / 8 - 1 : 0;
     float completion_pct = state.completion_score_ * 0.01f;
     if (completion_pct < 0.5f) completion_pct = 0;
 
@@ -819,16 +819,16 @@ void DisplayUpDownNumberIcons(
 bool CheckOpenMarioMoveMenu(WinPauseMenu* menu) {
     int32_t starting_move = -1;
     switch (menu->mario_menu_state) {
-        case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
-        case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
-        case 12:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
+        case 3:     starting_move = MoveType::JUMP_BASE;       break;
+        case 2:     starting_move = MoveType::HAMMER_BASE;     break;
+        case 12:    starting_move = MoveType::SP_SWEET_TREAT;  break;
     }
     if (starting_move < 0) return false;
     
     // Update the maximum number of selections.
     int32_t num_selections = 0;
     for (int32_t i = 0; i < 8; ++i) {
-        if (tot::MoveManager::GetUnlockedLevel(starting_move + i) > 0) {
+        if (MoveManager::GetUnlockedLevel(starting_move + i) > 0) {
             ++num_selections;
         }
     }
@@ -857,20 +857,20 @@ void MarioMoveMenuDisp(WinPauseMenu* menu) {
         
     int32_t starting_move;
     switch (menu->mario_menu_state) {
-        case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
-        case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
-        default:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
+        case 3:     starting_move = MoveType::JUMP_BASE;       break;
+        case 2:     starting_move = MoveType::HAMMER_BASE;     break;
+        default:    starting_move = MoveType::SP_SWEET_TREAT;  break;
     }
     
     for (int32_t i = 0; i < 8; ++i) {
         int32_t move = starting_move + i;
         // Get maximum level of attack; if not unlocked, skip.
-        const int32_t max_level = tot::MoveManager::GetUnlockedLevel(move);
+        const int32_t max_level = MoveManager::GetUnlockedLevel(move);
         if (max_level < 1) continue;
         
         // Print attack name.
         const char* name = ttyd::msgdrv::msgSearch(
-            tot::MoveManager::GetMoveData(move)->name_msg);
+            MoveManager::GetMoveData(move)->name_msg);
         ttyd::win_main::winFontSetWidth(
             &sac_name_position, &sac_name_scale, &sac_color, 180.0, name);
         
@@ -895,17 +895,17 @@ void MarioMoveMenuDisp(WinPauseMenu* menu) {
 void MarioMoveMenuMsgEntry(WinPauseMenu* menu) {
     int32_t starting_move;
     switch (menu->mario_menu_state) {
-        case 3:     starting_move = tot::MoveType::JUMP_BASE;       break;
-        case 2:     starting_move = tot::MoveType::HAMMER_BASE;     break;
-        default:    starting_move = tot::MoveType::SP_SWEET_TREAT;  break;
+        case 3:     starting_move = MoveType::JUMP_BASE;       break;
+        case 2:     starting_move = MoveType::HAMMER_BASE;     break;
+        default:    starting_move = MoveType::SP_SWEET_TREAT;  break;
     }
     int32_t current_pos = -1;
     for (int32_t i = 0; i < 8; ++i) {
         int32_t move = starting_move + i;
-        if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
+        if (MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
         if (current_pos == menu->mario_move_cursor_idx) {
             ttyd::win_root::winMsgEntry(
-                menu, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
+                menu, 0, MoveManager::GetMoveData(move)->desc_msg, 0);
             return;
         }
     }
@@ -919,18 +919,18 @@ void PartyMenuSetupPartnerDescAndMoveCount(WinPauseMenu* menu) {
     // Calculate number of unlocked moves.
     int32_t starting_move;
     switch (party_id) {
-        case 1:     starting_move = tot::MoveType::GOOMBELLA_BASE;  break;
-        case 2:     starting_move = tot::MoveType::KOOPS_BASE;      break;
-        case 3:     starting_move = tot::MoveType::BOBBERY_BASE;    break;
-        case 4:     starting_move = tot::MoveType::YOSHI_BASE;      break;
-        case 5:     starting_move = tot::MoveType::FLURRIE_BASE;    break;
-        case 6:     starting_move = tot::MoveType::VIVIAN_BASE;     break;
-        default:    starting_move = tot::MoveType::MOWZ_BASE;       break;
+        case 1:     starting_move = MoveType::GOOMBELLA_BASE;  break;
+        case 2:     starting_move = MoveType::KOOPS_BASE;      break;
+        case 3:     starting_move = MoveType::BOBBERY_BASE;    break;
+        case 4:     starting_move = MoveType::YOSHI_BASE;      break;
+        case 5:     starting_move = MoveType::FLURRIE_BASE;    break;
+        case 6:     starting_move = MoveType::VIVIAN_BASE;     break;
+        default:    starting_move = MoveType::MOWZ_BASE;       break;
     }
     int32_t num_moves = 0;
     for (int32_t i = 0; i < 6; ++i) {
         int32_t move = starting_move + i;
-        if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++num_moves;
+        if (MoveManager::GetUnlockedLevel(move) > 0) ++num_moves;
     }
     menu->party_moves_count = num_moves;
     
@@ -952,21 +952,21 @@ void PartyMenuSetMoveDescAndCursorPos(WinPauseMenu* menu) {
     // Set move description.
     int32_t starting_move;
     switch (party_id) {
-        case 1:     starting_move = tot::MoveType::GOOMBELLA_BASE;  break;
-        case 2:     starting_move = tot::MoveType::KOOPS_BASE;      break;
-        case 3:     starting_move = tot::MoveType::BOBBERY_BASE;    break;
-        case 4:     starting_move = tot::MoveType::YOSHI_BASE;      break;
-        case 5:     starting_move = tot::MoveType::FLURRIE_BASE;    break;
-        case 6:     starting_move = tot::MoveType::VIVIAN_BASE;     break;
-        default:    starting_move = tot::MoveType::MOWZ_BASE;       break;
+        case 1:     starting_move = MoveType::GOOMBELLA_BASE;  break;
+        case 2:     starting_move = MoveType::KOOPS_BASE;      break;
+        case 3:     starting_move = MoveType::BOBBERY_BASE;    break;
+        case 4:     starting_move = MoveType::YOSHI_BASE;      break;
+        case 5:     starting_move = MoveType::FLURRIE_BASE;    break;
+        case 6:     starting_move = MoveType::VIVIAN_BASE;     break;
+        default:    starting_move = MoveType::MOWZ_BASE;       break;
     }
     int32_t current_pos = -1;
     for (int32_t i = 0; i < 6; ++i) {
         int32_t move = starting_move + i;
-        if (tot::MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
+        if (MoveManager::GetUnlockedLevel(move) > 0) ++current_pos;
         if (current_pos == cursor_pos) {
             ttyd::win_root::winMsgEntry(
-                menu, 0, tot::MoveManager::GetMoveData(move)->desc_msg, 0);
+                menu, 0, MoveManager::GetMoveData(move)->desc_msg, 0);
             return;
         }
     }
@@ -1108,23 +1108,23 @@ void PartyMenuDispStats(WinPauseMenu* menu) {
     // Draw rows of table.
     int32_t starting_move;
     switch (party_id) {
-        case 1:     starting_move = tot::MoveType::GOOMBELLA_BASE;  break;
-        case 2:     starting_move = tot::MoveType::KOOPS_BASE;      break;
-        case 3:     starting_move = tot::MoveType::BOBBERY_BASE;    break;
-        case 4:     starting_move = tot::MoveType::YOSHI_BASE;      break;
-        case 5:     starting_move = tot::MoveType::FLURRIE_BASE;    break;
-        case 6:     starting_move = tot::MoveType::VIVIAN_BASE;     break;
-        default:    starting_move = tot::MoveType::MOWZ_BASE;       break;
+        case 1:     starting_move = MoveType::GOOMBELLA_BASE;  break;
+        case 2:     starting_move = MoveType::KOOPS_BASE;      break;
+        case 3:     starting_move = MoveType::BOBBERY_BASE;    break;
+        case 4:     starting_move = MoveType::YOSHI_BASE;      break;
+        case 5:     starting_move = MoveType::FLURRIE_BASE;    break;
+        case 6:     starting_move = MoveType::VIVIAN_BASE;     break;
+        default:    starting_move = MoveType::MOWZ_BASE;       break;
     }
     float y_offset = 0.0f;
     for (int32_t i = 0; i < 6; ++i) {
         int32_t move = starting_move + i;
         
         // Skip moves that aren't unlocked.
-        int32_t level = tot::MoveManager::GetUnlockedLevel(move);
+        int32_t level = MoveManager::GetUnlockedLevel(move);
         if (level < 1) continue;
         
-        auto* move_data = tot::MoveManager::GetMoveData(move);
+        auto* move_data = MoveManager::GetMoveData(move);
         const char* move_name = msgSearch(move_data->name_msg);
         int32_t max_level = move_data->max_level;
         
@@ -1162,9 +1162,9 @@ int32_t GetIconForBadgeOrItemLogEntry(
     WinPauseMenu* menu, bool item_log, int32_t index) {
     const int32_t item_type = item_log
         ? menu->recipe_log_ids[index] : menu->badge_log_ids[index];
-    return g_Mod->state_.GetOption(tot::FLAGS_ITEM_ENCOUNTERED, item_type)
+    return g_Mod->state_.GetOption(FLAGS_ITEM_ENCOUNTERED, item_type)
         ? ttyd::item_data::itemDataTable[item_type + 0x80].icon_id : -1;
 }
 
 }  // namespace ui
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

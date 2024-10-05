@@ -24,7 +24,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
 
@@ -108,7 +108,7 @@ void AlterUnitKindParams(BattleUnitKind* unit) {
     if (unit->unit_type > BattleUnitType::BONETAIL) return;
     
     int32_t hp, level, coinlvl;
-    if (!tot::GetEnemyStats(
+    if (!GetEnemyStats(
         unit->unit_type, &hp, nullptr, nullptr, &level, &coinlvl)) return;
     unit->max_hp = hp;
     
@@ -201,7 +201,7 @@ void* EnemyUseAdditionalItemsCheck(BattleWorkUnit* unit) {
 void ApplyFixedPatches() {
     // Alter unit kind params in accordance with scaled stats, and apply
     // increased stats for midbosses.
-    g_BtlUnit_Entry_trampoline = patch::hookFunction(
+    g_BtlUnit_Entry_trampoline = mod::hookFunction(
         ttyd::battle_unit::BtlUnit_Entry, [](BattleUnitSetup* unit_setup) {
             AlterUnitKindParams(unit_setup->unit_kind_params);
             BattleWorkUnit* unit = g_BtlUnit_Entry_trampoline(unit_setup);
@@ -210,65 +210,64 @@ void ApplyFixedPatches() {
         });
 
     // Track enemy kills on deletion.
-    g_BtlUnit_Delete_trampoline = patch::hookFunction(
+    g_BtlUnit_Delete_trampoline = mod::hookFunction(
         ttyd::battle_unit::BtlUnit_Delete, [](BattleWorkUnit* unit) {
-            int32_t idx = tot::GetCustomTattleIndex(unit->true_kind);
+            int32_t idx = GetCustomTattleIndex(unit->true_kind);
 
             // Only count valid ToT enemy types, and only count enemies defeated
             // mid-battle, or at the end of a successful battle.
             if (idx >= 0 && (
                 ttyd::seqdrv::seqGetNextSeq() == SeqIndex::kBattle ||
                 ttyd::battle::g_BattleWork->fbat_info->wResult == 1)) {
-                if (g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, idx) < 9999)
-                    g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMY_KILLS, 1, idx);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_ENEMIES_DEFEATED, 1);
+                if (g_Mod->state_.GetOption(STAT_PERM_ENEMY_KILLS, idx) < 9999)
+                    g_Mod->state_.ChangeOption(STAT_PERM_ENEMY_KILLS, 1, idx);
+                g_Mod->state_.ChangeOption(STAT_PERM_ENEMIES_DEFEATED, 1);
 
                 // If a midboss, check off its flag and check if 50 diff met.
                 if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
-                    g_Mod->state_.SetOption(tot::FLAGS_MIDBOSS_DEFEATED, idx);
+                    g_Mod->state_.SetOption(FLAGS_MIDBOSS_DEFEATED, idx);
 
                     int32_t num_midbosses_defeated = 0;
                     for (int32_t i = 0; i < 128; ++i) {
-                        if (g_Mod->state_.GetOption(
-                            tot::FLAGS_MIDBOSS_DEFEATED, i)) {
+                        if (g_Mod->state_.GetOption(FLAGS_MIDBOSS_DEFEATED, i)) {
                             ++num_midbosses_defeated;
                         }
                     }
                     if (num_midbosses_defeated >= 40) {
-                        tot::AchievementsManager::MarkCompleted(
-                            tot::AchievementId::AGG_MIDBOSS_TYPES_40);
+                        AchievementsManager::MarkCompleted(
+                            AchievementId::AGG_MIDBOSS_TYPES_40);
                     }
                 }
 
                 if (unit->poison_damage >= 50) {
-                    tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::MISC_POISON_50);
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::MISC_POISON_50);
                 }
 
                 if (unit->true_kind == BattleUnitType::GOLD_FUZZY) {
-                    tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::META_SECRET_BOSS);
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::META_SECRET_BOSS);
                 }
             }
             // Run original logic.
             return g_BtlUnit_Delete_trampoline(unit);
         });
         
-    g_btlevtcmd_ConsumeItem_trampoline = patch::hookFunction(
+    g_btlevtcmd_ConsumeItem_trampoline = mod::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_ConsumeItem,
         [](EvtEntry* evt, bool isFirstCall) {
             EnemyConsumeItem(evt);
             return g_btlevtcmd_ConsumeItem_trampoline(evt, isFirstCall);
         });
         
-    g_btlevtcmd_GetConsumeItem_trampoline = patch::hookFunction(
+    g_btlevtcmd_GetConsumeItem_trampoline = mod::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_GetConsumeItem,
         [](EvtEntry* evt, bool isFirstCall) {
             if (GetEnemyConsumeItem(evt)) return 2;
             return g_btlevtcmd_GetConsumeItem_trampoline(evt, isFirstCall);
         });
         
-    g_BattleEnemyUseItemCheck_trampoline = patch::hookFunction(
+    g_BattleEnemyUseItemCheck_trampoline = mod::hookFunction(
         ttyd::battle_enemy_item::BattleEnemyUseItemCheck,
         [](BattleWorkUnit* unit) {
             void* evt_code = g_BattleEnemyUseItemCheck_trampoline(unit);
@@ -279,12 +278,12 @@ void ApplyFixedPatches() {
         });
         
     // Disable the check for enemies only holding certain types of items.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_BtlUnit_EnemyItemCanUseCheck_Patch_SkipCheck),
         0x60000000U /* nop */);
         
     // Assign midbosses a wrapper attack script.
-    g_btlevtcmd_SetEventAttack_trampoline = patch::hookFunction(
+    g_btlevtcmd_SetEventAttack_trampoline = mod::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_SetEventAttack,
         [](EvtEntry* evt, bool isFirstCall) {
             auto* battleWork = ttyd::battle::g_BattleWork;
@@ -293,7 +292,7 @@ void ApplyFixedPatches() {
             auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
             void* script = (void*)evt->evtArguments[1];
             if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
-                script = tot::GetMidbossAttackScript(script);
+                script = GetMidbossAttackScript(script);
             }
             unit->attack_evt_code = script;
             unit->battle_menu_state = 0;
@@ -301,7 +300,7 @@ void ApplyFixedPatches() {
         });
     
     // Hook 'init events finished' check to clear midboss weakness attributes.
-    g_BattleCheckEndUnitInitEvent_trampoline = patch::hookFunction(
+    g_BattleCheckEndUnitInitEvent_trampoline = mod::hookFunction(
         ttyd::battle_unit_event::BattleCheckEndUnitInitEvent,
         [](BattleWork* battleWork) {
             bool result = g_BattleCheckEndUnitInitEvent_trampoline(battleWork);
@@ -312,7 +311,7 @@ void ApplyFixedPatches() {
         });
     
     // Override the number of coins earned from an enemy.
-    g_BtlUnit_GetCoin_trampoline = patch::hookFunction(
+    g_BtlUnit_GetCoin_trampoline = mod::hookFunction(
         ttyd::battle_unit::BtlUnit_GetCoin, [](BattleWorkUnit* unit) {
             int32_t coins = g_BtlUnit_GetCoin_trampoline(unit);
             // 5x coin multiplier for midbosses.
@@ -324,4 +323,4 @@ void ApplyFixedPatches() {
 }
 
 }  // namespace enemy
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

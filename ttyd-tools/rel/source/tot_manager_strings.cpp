@@ -1,4 +1,4 @@
-#include "custom_strings.h"
+#include "tot_manager_strings.h"
 
 #include "common_functions.h"
 #include "mod.h"
@@ -17,7 +17,7 @@
 #include <cstdio>
 #include <cstring>
 
-namespace mod::infinite_pit {
+namespace mod::tot {
 
 // Enum representing indices of various strings in kKeyLookups.
 namespace MsgKey {
@@ -85,7 +85,7 @@ const char* GetRunInfoSignString(bool floor, bool options) {
             
         y_offset += 27;
 
-        const char* options = tot::OptionsManager::GetEncodedOptions();
+        const char* options = OptionsManager::GetEncodedOptions();
         sprintf(temp, "Options: %s", options);
         width = ttyd::fontmgr::FontGetMessageWidth(temp);
         x_offset = base_x_offset - width * 0.5f;
@@ -108,7 +108,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
     if (strstr(msg_key, "menu_enemy_")) {
         if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
             int32_t id = menu->tattle_logs[menu->tattle_log_cursor_idx].id;
-            msg_key = tot::SetCustomMenuTattle(id);
+            msg_key = SetCustomMenuTattle(id);
         }
     }
     
@@ -139,7 +139,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
     switch (idx) {
         case MsgKey::CUSTOM_TATTLE_BATTLE:
         case MsgKey::CUSTOM_TATTLE_MENU:
-            return tot::GetCustomTattle();
+            return GetCustomTattle();
         case MsgKey::CUSTOM_TATTLE_KILLCOUNT: {
             // Print the number of this enemy defeated.
             static char buf[24];
@@ -148,7 +148,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                 char* ptr = buf;
                 ptr += sprintf(buf, "Times Defeated: ");
                 ptr += IntegerToFmtString(
-                    g_Mod->state_.GetOption(tot::STAT_PERM_ENEMY_KILLS, idx), ptr);
+                    g_Mod->state_.GetOption(STAT_PERM_ENEMY_KILLS, idx), ptr);
                 return buf;
             }
             break;
@@ -158,14 +158,14 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
             return "";
         case MsgKey::MSG_STAR_PIECE:
             // Different descriptions in hub and during a run.
-            if (!g_Mod->state_.GetOption(tot::OPT_RUN_STARTED)) {
+            if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
                 return ttyd::msgdrv::msgSearch("msg_star_piece_inhub");
             }
             break;
         case MsgKey::TOT_FLOOR_SIGN: {
             return GetRunInfoSignString(
                 /* floor = */ true,
-                /* options = */ tot::GetSWByte(tot::GSW_Tower_TutorialClears) >= 2);
+                /* options = */ GetSWByte(GSW_Tower_TutorialClears) >= 2);
         }
         case MsgKey::TOT_LOBBY_BACKSIGN: {
             return GetRunInfoSignString(
@@ -174,12 +174,12 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::TOT_MOVELOG_DESC_DYN:
             if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
                 int32_t move = menu->move_log_cursor_idx;
-                return tot::MoveManager::GetLogDescription(move);
+                return MoveManager::GetLogDescription(move);
             }
             break;
         case MsgKey::SYS_NO_KEY:
             // Swap out "it's locked" message with more descriptive strings.
-            if (GetSWByte(tot::GSW_Tower_DisplayChestIcons)) {
+            if (GetSWByte(GSW_Tower_DisplayChestIcons)) {
                 return ttyd::msgdrv::msgSearch("tot_lock_claimchest");
             } else {
                 return ttyd::msgdrv::msgSearch("tot_lock_defeatenemies");

@@ -54,12 +54,12 @@ extern "C" {
     void dispTattleStats(
         gc::mtx34* matrix, int32_t number, int32_t is_small, uint32_t* color,
         ttyd::battle_unit::BattleWorkUnit* unit) {
-        mod::infinite_pit::partner::DisplayTattleStats(
+        mod::tot::patch::partner::DisplayTattleStats(
             matrix, number, is_small, color, unit);
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
     
@@ -191,7 +191,7 @@ void ApplyFixedPatches() {
     g_ShowAtkDefThisFloor = true;
     
     // Tattle returns a custom message based on the enemy's stats.
-    g_btlevtcmd_get_monosiri_msg_no_trampoline = mod::patch::hookFunction(
+    g_btlevtcmd_get_monosiri_msg_no_trampoline = mod::hookFunction(
         ttyd::unit_party_christine::btlevtcmd_get_monosiri_msg_no,
         [](EvtEntry* evt, bool isFirstCall) {
             auto* battleWork = ttyd::battle::g_BattleWork;
@@ -205,33 +205,33 @@ void ApplyFixedPatches() {
                 reinterpret_cast<const char*>(
                     evtGetValue(evt, evt->evtArguments[2]));
             // Build a custom tattle, if the enemy has stats to pull from.
-            tattle_msg = tot::SetCustomTattle(unit, tattle_msg);
+            tattle_msg = SetCustomTattle(unit, tattle_msg);
             evtSetValue(evt, evt->evtArguments[2], PTR(tattle_msg));
             return 2;
         });
 
     // Calls a custom function to display ATK / DEF under HP if a unit has
     // previously been Tattled (and if it's currently the player's turn to act).
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_BattleDrawEnemyHP_DrawEnemyHPText_BH),
         reinterpret_cast<void*>(StartDispTattleStats),
         reinterpret_cast<void*>(BranchBackDispTattleStats));
         
     // Replace Koops' init and phase scripts to handle Withdraw status.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyNokotarou_Patch_InitWaitPhase),
         KoopsInitWaitPhaseHook, sizeof(KoopsInitWaitPhaseHook));
         
     // Set HP thresholds for different Shell Shield disrepair animation states:
     // - On initialization (pose_tbl_reset)
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_koura_pose_tbl_reset_Patch_HeavyDmg), 1);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_koura_pose_tbl_reset_Patch_LightDmg), 2);
     // - On damage (damage_core)
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_koura_damage_core_Patch_HeavyDmg), 1);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_koura_damage_core_Patch_LightDmg), 2);
 
     // Change the strength of Gale Force / Blizzard's resistance to be
@@ -239,24 +239,24 @@ void ApplyFixedPatches() {
     float kGaleForceResistanceArr[] = {
         0.30f, 0.34f, 0.37f, 0.40f, 0.42f, 0.435f, 0.45f
     };
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_ac_air_gauge_FlurrieGaleForceResistance),
         kGaleForceResistanceArr, sizeof(kGaleForceResistanceArr));
 
     // Change the strength of Lip Lock's power to scale down less harshly at
     // higher difficulties and up less hilariously at lower ones.
     int32_t kLipLockPowerArr[] = { 124, 116, 108, 100, 92, 84, 76 };
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_ac_power_gauge_lv2_LipLockPower),
         kLipLockPowerArr, sizeof(kLipLockPowerArr));
     
     
     // Disable getting coins and experience from a successful Gale Force.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_subsetevt_blow_dead_Patch_GetRewards),
         GaleForceKillPatch, sizeof(GaleForceKillPatch));
     // Remove the (Mario - enemy level) adjustment to Gale Force's chance.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_BattleSetStatusDamage_Patch_GaleLevelFactor),
         0x60000000U /* nop */);
         
@@ -270,93 +270,93 @@ void ApplyFixedPatches() {
         k_TargetVar3Offset = k_TargetVar1Offset + k_MaxBombs * 8;
     constexpr const int8_t
         k_SfxIdOffset = k_TargetVar1Offset + k_MaxBombs * 12;
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_numBombs), 
         &k_MaxBombs, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar2_1),
         &k_TargetVar2Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar2_2),
         &k_TargetVar2Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar3_1),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar3_2),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar3_3),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_dispAfterimage_Patch_targetVar3_4),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_numBombs),
         &k_MaxBombs, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_1),
         &k_TargetVar2Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_2),
         &k_TargetVar2Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_3),
         &k_TargetVar2Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_4),
         &k_TargetVar2Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_5),
         &k_TargetVar2Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar2_6),
         &k_TargetVar2Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_1),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_2),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_3),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_4),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_targetVar3_5),
         &k_TargetVar3Offset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_sfxId_1),
         &k_SfxIdOffset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_sfxId_2),
         &k_SfxIdOffset, sizeof(int8_t));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_acShot_main_Patch_sfxId_3),
         &k_SfxIdOffset, sizeof(int8_t));
         
     // TOT: Replace party member weapon selection functions.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyChristine_makeTechMenuFuncPtr),
         reinterpret_cast<int32_t>(tot::party_goombella::MakeSelectWeaponTable));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyNokotarou_makeTechMenuFuncPtr),
         reinterpret_cast<int32_t>(tot::party_koops::MakeSelectWeaponTable));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyClauda_makeTechMenuFuncPtr),
         reinterpret_cast<int32_t>(tot::party_flurrie::MakeSelectWeaponTable));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyYoshi_makeTechMenuFuncPtr),
         reinterpret_cast<int32_t>(tot::party_yoshi::MakeSelectWeaponTable));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyVivian_makeTechMenuFuncPtr),
         reinterpret_cast<int32_t>(tot::party_vivian::MakeSelectWeaponTable));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partySanders_makeTechMenuFuncPtr),
         reinterpret_cast<int32_t>(tot::party_bobbery::MakeSelectWeaponTable));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_partyChuchurina_makeTechMenuFuncPtr),
         reinterpret_cast<int32_t>(tot::party_mowz::MakeSelectWeaponTable));
     
@@ -389,7 +389,7 @@ void DisplayTattleStats(
         (ttyd::swdrv::swGet(0x117a + unit->true_kind) ||
         ttyd::swdrv::swGet(0x117a + unit->current_kind));
     // If option is enabled, default to it being on (can toggle with Z).
-    if (tot::GetSWF(tot::GSWF_SuperPeekabooEnabled)) {
+    if (GetSWF(GSWF_SuperPeekabooEnabled)) {
         show_atk_def = true;
     }
     // Hide ATK / DEF outside player action phase (or if hidden for this floor).
@@ -402,7 +402,7 @@ void DisplayTattleStats(
         int32_t atk, def;
         
         // If the enemy's ATK and DEF can't be fetched, just draw HP normally.
-        if (!tot::GetTattleDisplayStats(unit->current_kind, &atk, &def)) {
+        if (!GetTattleDisplayStats(unit->current_kind, &atk, &def)) {
             ttyd::icondrv::iconNumberDispGx(matrix, number, is_small, color);
             return;
         }
@@ -440,4 +440,4 @@ void RefreshExtraTattleStats() {
 }
 
 }  // namespace partner
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

@@ -531,11 +531,11 @@ void StateManager::IncrementFloor(int32_t change) {
     TimerFloorUpdate();
     
     int32_t max_floor = 64;
-    switch (GetOptionValue(tot::OPT_DIFFICULTY)) {
-        case tot::OPTVAL_DIFFICULTY_TUTORIAL:
+    switch (GetOptionValue(OPT_DIFFICULTY)) {
+        case OPTVAL_DIFFICULTY_TUTORIAL:
             max_floor = 8;
             break;
-        case tot::OPTVAL_DIFFICULTY_HALF:
+        case OPTVAL_DIFFICULTY_HALF:
             max_floor = 32;
             break;
     }

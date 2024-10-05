@@ -27,13 +27,13 @@
 #include <ttyd/msgdrv.h>
 #include <ttyd/unit_party_christine.h>
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 extern const int32_t g_ac_monosiri_target_WhiteReticleScale;
 extern const int32_t g_ac_monosiri_target_GreyReticleScale;
 extern const int32_t g_ac_monosiri_target_ReticleZoomSpeed;
 
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch
 
 namespace mod::tot::party_goombella {
 
@@ -118,24 +118,24 @@ EVT_DEFINE_USER_FUNC(evtTot_SetReticleParams) {
     
     int32_t move_type = evtGetValue(evt, evt->evtArguments[0]);
     if (move_type == MoveType::GOOMBELLA_TATTLE) {
-        mod::patch::writePatch(
-            (void*)mod::infinite_pit::g_ac_monosiri_target_WhiteReticleScale,
+        mod::writePatch(
+            (void*)mod::tot::patch::g_ac_monosiri_target_WhiteReticleScale,
             &k_TattleScale, sizeof(k_TattleScale));
-        mod::patch::writePatch(
-            (void*)mod::infinite_pit::g_ac_monosiri_target_GreyReticleScale,
+        mod::writePatch(
+            (void*)mod::tot::patch::g_ac_monosiri_target_GreyReticleScale,
             &k_TattleScale, sizeof(k_TattleScale));
-        mod::patch::writePatch(
-            (void*)mod::infinite_pit::g_ac_monosiri_target_ReticleZoomSpeed,
+        mod::writePatch(
+            (void*)mod::tot::patch::g_ac_monosiri_target_ReticleZoomSpeed,
             &k_TattleZoomSpeed, sizeof(float));
     } else {  // Scope Out
-        mod::patch::writePatch(
-            (void*)mod::infinite_pit::g_ac_monosiri_target_WhiteReticleScale,
+        mod::writePatch(
+            (void*)mod::tot::patch::g_ac_monosiri_target_WhiteReticleScale,
             &k_ScopeOutScale, sizeof(k_ScopeOutScale));
-        mod::patch::writePatch(
-            (void*)mod::infinite_pit::g_ac_monosiri_target_GreyReticleScale,
+        mod::writePatch(
+            (void*)mod::tot::patch::g_ac_monosiri_target_GreyReticleScale,
             &k_ScopeOutScale, sizeof(k_ScopeOutScale));
-        mod::patch::writePatch(
-            (void*)mod::infinite_pit::g_ac_monosiri_target_ReticleZoomSpeed,
+        mod::writePatch(
+            (void*)mod::tot::patch::g_ac_monosiri_target_ReticleZoomSpeed,
             &k_ScopeOutZoomSpeed, sizeof(float));
     }
     return 2;
@@ -1077,13 +1077,13 @@ EVT_BEGIN(customAttack_ScopeOut)
         USER_FUNC(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
         USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::GOOMBELLA_SCOPE_OUT, LW(15))
         IF_EQUAL(LW(15), 1)
-            USER_FUNC(infinite_pit::battle::evtTot_ApplyCustomStatus,
+            USER_FUNC(tot::patch::battle::evtTot_ApplyCustomStatus,
                 LW(3), LW(4), ttyd::battle_unit::BattleUnitStatus_Flags::SCOPED,
                 /* splash colors */ 0xdcdcdc, 0x605000,
                 PTR("SFX_CONDITION_COUNTER1"), 
                 PTR("tot_ptr1_scope_out_effect_msg1"))
         ELSE()
-            USER_FUNC(infinite_pit::battle::evtTot_ApplyCustomStatus,
+            USER_FUNC(tot::patch::battle::evtTot_ApplyCustomStatus,
                 LW(3), LW(4), ttyd::battle_unit::BattleUnitStatus_Flags::SCOPED_PLUS,
                 /* splash colors */ 0xdcdcdc, 0x605000,
                 PTR("SFX_CONDITION_COUNTER1"), 

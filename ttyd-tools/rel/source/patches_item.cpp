@@ -35,7 +35,7 @@
 #include <cstdint>
 #include <cstring>
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
 
@@ -119,7 +119,7 @@ extern "C" {
     }
     
     int32_t getTotItemInventorySize() {
-        return mod::infinite_pit::item::GetItemInventorySize();
+        return mod::tot::patch::item::GetItemInventorySize();
     }
 }
 
@@ -234,7 +234,7 @@ EVT_BEGIN(MeteorMealAttackEvent)
             USER_FUNC(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
             USER_FUNC(evt_eff, PTR(""), PTR("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
             USER_FUNC(evtTot_StoreGradualStarPower)
-            USER_FUNC(infinite_pit::battle::evtTot_ApplyCustomStatus,
+            USER_FUNC(patch::battle::evtTot_ApplyCustomStatus,
                 LW(10), LW(11), 0,
                 /* splash colors */ 0xccf4ff, 0xffa0ff,
                 PTR("SFX_CONDITION_REST_HP_SLOW1"), 
@@ -347,7 +347,7 @@ EVT_DEFINE_USER_FUNC(evtTot_RecoverStarPower) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_StoreGradualStarPower) {
-    mod::infinite_pit::battle_seq::StoreGradualSpRegenEffect();
+    patch::battle_seq::StoreGradualSpRegenEffect();
     return 2;
 }
 
@@ -554,7 +554,7 @@ void ApplyFixedPatches() {
     }
     
     // Patch data for TOT reward items.
-    tot::RewardManager::PatchRewardItemData();
+    RewardManager::PatchRewardItemData();
     
     // Change icon for blue coins.
     itemDataTable[ItemType::PIANTA].icon_id = IconType::TOT_COIN_BLUE;
@@ -683,11 +683,11 @@ void ApplyFixedPatches() {
     ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka.atk_change_time     = 9;
     ttyd::battle_item_data::ItemWeaponData_Teki_Kyouka.atk_change_strength = 3;
     // Patch in evt code to actually apply the item's newly granted status.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_ItemEvent_Teki_Kyouka_ApplyStatusHook),
         TradeOffPatch, sizeof(TradeOffPatch));
     // Change "rank up" code to increase coins instead of level.
-    g_BattleItemData_rank_up_trampoline = patch::hookFunction(
+    g_BattleItemData_rank_up_trampoline = mod::hookFunction(
         ttyd::battle_item_data::BattleItemData_rank_up,
         [](EvtEntry* evt, bool isFirstCall) {
             //  Replace original logic.
@@ -718,7 +718,7 @@ void ApplyFixedPatches() {
     // Strawberry Cake now restores a random amount of HP/FP (5,5 base).
     SetItemRestoration(ItemType::CAKE, 5, 5);
     // Run extra logic to increase the HP and FP restored at random.
-    g_btlevtcmd_GetItemRecoverParam_trampoline = patch::hookFunction(
+    g_btlevtcmd_GetItemRecoverParam_trampoline = mod::hookFunction(
         ttyd::battle_event_cmd::btlevtcmd_GetItemRecoverParam,
         [](EvtEntry* evt, bool isFirstCall) {
             g_btlevtcmd_GetItemRecoverParam_trampoline(evt, isFirstCall);
@@ -874,7 +874,7 @@ void ApplyFixedPatches() {
     ttyd::battle_item_data::ItemWeaponData_PoisonKinoko.target_weighting_flags =
         0x80001023;
     // Make Poison Mushrooms poison & halve HP 67% of the time instead of 80%.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_ItemEvent_Poison_Kinoko_PoisonChance), 67);
     // Add a wrapper to attack event that makes Fuzzy Horde unaffected.
     ttyd::battle_item_data::ItemWeaponData_PoisonKinoko.attack_evt_code =
@@ -905,17 +905,17 @@ void ApplyFixedPatches() {
         0x01100070;
     // Clear the "last Mario attacker" play stat when Point Swap is used,
     // so a self-destruct doesn't get falsely attributed to an enemy.
-    g_BattleItemData_hpfp_change_declare_1_trampoline = patch::hookFunction(
+    g_BattleItemData_hpfp_change_declare_1_trampoline = mod::hookFunction(
         ttyd::battle_item_data::BattleItemData_hpfp_change_declare_1,
         [](EvtEntry* evt, bool isFirstCall) {
-            g_Mod->state_.SetOption(tot::STAT_PERM_LAST_ATTACKER, 0);
+            g_Mod->state_.SetOption(STAT_PERM_LAST_ATTACKER, 0);
             return g_BattleItemData_hpfp_change_declare_1_trampoline(evt, isFirstCall);
         });
         
     // Make Trial Stew's event use the correct weapon params.
     BattleWeapon* kLastDinnerWeaponAddr = 
         &ttyd::battle_item_data::ItemWeaponData_LastDinner;
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_ItemEvent_LastDinner_Weapon),
         &kLastDinnerWeaponAddr, sizeof(BattleWeapon*));
 
@@ -1014,62 +1014,62 @@ void ApplyFixedPatches() {
     ttyd::battle_mario::badgeWeapon_ChargeP.base_fp_cost = 2;
     
     // For testing purposes, Bump Attack ignores level check.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_fbatBattleMode_Patch_BumpAttackLevel),
         0x60000000U /* nop */);
         
     // Super Appeal (P) give +0.50 SP per copy instead of +0.25.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_BattleAudience_Case_Appeal_Patch_AppealSp),
         0x1c000032U /* mulli r0, r0, 50 */);
         
     // Happy badges are guaranteed to proc on even turns only.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_btlseqTurn_HappyHeartProc_BH),
         reinterpret_cast<void*>(g_btlseqTurn_HappyHeartProc_EH),
         reinterpret_cast<void*>(StartHappyHeartProc),
         reinterpret_cast<void*>(BranchBackHappyHeartProc));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_btlseqTurn_HappyFlowerProc_BH),
         reinterpret_cast<void*>(g_btlseqTurn_HappyFlowerProc_EH),
         reinterpret_cast<void*>(StartHappyFlowerProc),
         reinterpret_cast<void*>(BranchBackHappyFlowerProc));
         
     // Pity Flower (P) guarantees 1 FP recovery on each damaging hit.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_BattleDamageDirect_Patch_PityFlowerChance),
         0x2c030064U /* cmpwi r3, 100 */);
         
     // Refund grants 100% of sell price, plus 20% per additional badge.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_ConsumeItem_Patch_RefundPer),
         0x1ca00014U /* mulli r5, r0, 20 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_ConsumeItemReserve_Patch_RefundPer),
         0x1ca00014U /* mulli r5, r0, 20 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_ConsumeItem_Patch_RefundBase),
         0x38a50050U /* addi r5, r5, 80 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_ConsumeItemReserve_Patch_RefundBase),
         0x38a50050U /* addi r5, r5, 80 */);
     
     // Replace HP/FP Drain logic; counts the number of intended damaging hits
     // and restores 1 HP per badge if there were any (or 1 per hit, to a max
     // of 5, if the PM64-style option is enabled).
-    g__get_heart_suitoru_point_trampoline = patch::hookFunction(
+    g__get_heart_suitoru_point_trampoline = mod::hookFunction(
         ttyd::battle_event_default::_get_heart_suitoru_point,
         [](EvtEntry* evt, bool isFirstCall) {
             return GetDrainRestoration(evt, /* hp_drain = */ true);
         });
-    g__get_flower_suitoru_point_trampoline = patch::hookFunction(
+    g__get_flower_suitoru_point_trampoline = mod::hookFunction(
         ttyd::battle_event_default::_get_flower_suitoru_point,
         [](EvtEntry* evt, bool isFirstCall) {
             return GetDrainRestoration(evt, /* hp_drain = */ false);
         });
     // Disable the instruction that normally adds to damage dealt, since that
     // field is now used as a boolean for "has attacked with a damaging move".
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_BattleDamageDirect_Patch_AddTotalDamage),
         0x60000000U /* nop */);
 
@@ -1086,83 +1086,80 @@ void ApplyFixedPatches() {
         const_cast<int32_t*>(CookingItemAttackEvent);
         
     // Set max inventory size based on number of sack upgrades claimed in ToT.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_pouchGetItem_CheckMaxInv_BH),
         reinterpret_cast<void*>(StartGetItemMax),
         reinterpret_cast<void*>(BranchBackGetItemMax));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_pouchRemoveItem_CheckMaxInv_BH),
         reinterpret_cast<void*>(StartRemoveItemMax),
         reinterpret_cast<void*>(BranchBackRemoveItemMax));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_pouchRemoveItemIndex_CheckMaxInv_BH),
         reinterpret_cast<void*>(StartRemoveItemIndexMax),
         reinterpret_cast<void*>(BranchBackRemoveItemIndexMax));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_pouchGetEmptyHaveItemCnt_CheckMaxInv_BH),
         reinterpret_cast<void*>(StartGetEmptyItemSlotsMax),
         reinterpret_cast<void*>(BranchBackGetEmptyItemSlotsMax));
         
     // Override item pickup script for special items that spawn as item drops.
-    g_itemEntry_trampoline = mod::patch::hookFunction(
+    g_itemEntry_trampoline = mod::hookFunction(
         ttyd::itemdrv::itemEntry,
         [](const char* name, int32_t item, float x, float y, float z,
            uint32_t mode, int32_t collection_gswf, void* pickup_script) {
             if (item == ItemType::STAR_PIECE && !pickup_script) {
-                pickup_script = tot::RewardManager::GetStarPieceItemDropEvt();
+                pickup_script = RewardManager::GetStarPieceItemDropEvt();
             }
             if (item == ItemType::SHINE_SPRITE && !pickup_script) {
-                pickup_script = tot::RewardManager::GetShineSpriteItemDropEvt();
+                pickup_script = RewardManager::GetShineSpriteItemDropEvt();
             }
             return g_itemEntry_trampoline(
                 name, item, x, y, z, mode, collection_gswf, pickup_script);
         });
     
     // Override item-get logic for special items.
-    g_pouchGetItem_trampoline = mod::patch::hookFunction(
+    g_pouchGetItem_trampoline = mod::hookFunction(
         ttyd::mario_pouch::pouchGetItem, [](int32_t item_type) {            
             // Handle items with special effects in ToT.
-            if (tot::RewardManager::HandleRewardItemPickup(item_type)) 
+            if (RewardManager::HandleRewardItemPickup(item_type)) 
                 return 1U;
             
             uint32_t return_value = g_pouchGetItem_trampoline(item_type);
             
             // Track coins, Star Pieces, and Shine Sprites gained.
             if (item_type == ItemType::COIN) {
-                g_Mod->state_.ChangeOption(tot::STAT_RUN_COINS_EARNED);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_COINS_EARNED);
-                tot::AchievementsManager::CheckCompleted(
-                    tot::AchievementId::MISC_RUN_COINS_999);
+                g_Mod->state_.ChangeOption(STAT_RUN_COINS_EARNED);
+                g_Mod->state_.ChangeOption(STAT_PERM_COINS_EARNED);
+                AchievementsManager::CheckCompleted(
+                    AchievementId::MISC_RUN_COINS_999);
             }
             if (item_type == ItemType::STAR_PIECE) {
-                g_Mod->state_.ChangeOption(tot::STAT_RUN_STAR_PIECES);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_STAR_PIECES);
+                g_Mod->state_.ChangeOption(STAT_RUN_STAR_PIECES);
+                g_Mod->state_.ChangeOption(STAT_PERM_STAR_PIECES);
             }
             if (item_type == ItemType::SHINE_SPRITE) {
-                g_Mod->state_.ChangeOption(tot::STAT_RUN_SHINE_SPRITES);
-                g_Mod->state_.ChangeOption(tot::STAT_PERM_SHINE_SPRITES);
-                if (g_Mod->state_.GetOption(tot::STAT_RUN_SHINE_SPRITES) > 9) {
-                    tot::AchievementsManager::MarkCompleted(
-                        tot::AchievementId::MISC_SHINES_10);
+                g_Mod->state_.ChangeOption(STAT_RUN_SHINE_SPRITES);
+                g_Mod->state_.ChangeOption(STAT_PERM_SHINE_SPRITES);
+                if (g_Mod->state_.GetOption(STAT_RUN_SHINE_SPRITES) > 9) {
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::MISC_SHINES_10);
                 }
             }
 
             // Mark unique items as being collected.
             if (return_value) {
-                tot::RewardManager::MarkUniqueItemCollected(item_type);
+                RewardManager::MarkUniqueItemCollected(item_type);
             }
 
             // Mark regular items / badges as being encountered.
             if (return_value && item_type >= ItemType::THUNDER_BOLT) {
-                g_Mod->state_.SetOption(tot::FLAGS_ITEM_ENCOUNTERED, item_type - 0x80);
+                g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, item_type - 0x80);
 
                 // Check for Item / Badge log completion.
-                tot::AchievementsManager::CheckCompleted(
-                    tot::AchievementId::META_ITEM_LOG_BASIC);
-                tot::AchievementsManager::CheckCompleted(
-                    tot::AchievementId::META_ITEM_LOG_ALL);
-                tot::AchievementsManager::CheckCompleted(
-                    tot::AchievementId::META_BADGE_LOG_ALL);
+                AchievementsManager::CheckCompleted(AchievementId::META_ITEM_LOG_BASIC);
+                AchievementsManager::CheckCompleted(AchievementId::META_ITEM_LOG_ALL);
+                AchievementsManager::CheckCompleted(AchievementId::META_BADGE_LOG_ALL);
             }
 
             // If getting a key item, sort by type + check for all collected.
@@ -1170,8 +1167,7 @@ void ApplyFixedPatches() {
                 item_type < ItemType::TOT_KEY_ITEM_MAX) {
                 // Sort key items by type.
                 ttyd::mario_pouch::pouchSortItem(3);
-                tot::AchievementsManager::CheckCompleted(
-                    tot::AchievementId::META_ALL_KEY_ITEMS);
+                AchievementsManager::CheckCompleted(AchievementId::META_ALL_KEY_ITEMS);
             }
             
             return return_value;
@@ -1179,7 +1175,7 @@ void ApplyFixedPatches() {
 
     // Add additional check for items not despawning while a Star Piece
     // or Shine Sprite is being collected on the field.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_itemMain_CheckItemFreeze_BH),
         reinterpret_cast<void*>(StartCheckItemFreeze),
         reinterpret_cast<void*>(BranchBackCheckItemFreeze));
@@ -1202,4 +1198,4 @@ EVT_DEFINE_USER_FUNC(evtTot_FreezeFieldItemTimers) {
 }
 
 }  // namespace item
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

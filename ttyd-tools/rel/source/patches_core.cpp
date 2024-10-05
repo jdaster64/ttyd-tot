@@ -2,7 +2,6 @@
 
 #include "common_functions.h"
 #include "common_types.h"
-#include "custom_strings.h"
 #include "mod.h"
 #include "patch.h"
 #include "patches_apply.h"
@@ -10,6 +9,7 @@
 #include "patches_options.h"
 #include "tot_manager_options.h"
 #include "tot_manager_progress.h"
+#include "tot_manager_strings.h"
 #include "tot_gsw.h"
 #include "tot_state.h"
 
@@ -47,15 +47,15 @@ extern "C" {
     void StartSaveSlotData();
     void BranchBackSaveSlotData();
     
-    int32_t mapLoad() { return mod::infinite_pit::core::LoadMap(); }
-    void onMapUnload() { mod::infinite_pit::core::OnMapUnloaded(); }
+    int32_t mapLoad() { return mod::tot::patch::core::LoadMap(); }
+    void onMapUnload() { mod::tot::patch::core::OnMapUnloaded(); }
 
     void saveSlotData(mod::tot::TotSaveSlot* slot_data) {
         mod::g_Mod->state_.Save(slot_data);
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
     
 namespace {
 
@@ -134,7 +134,7 @@ void OnModuleLoaded(OSModuleInfo* module) {
     if (module_id == ModuleId::JON) g_PitModulePtr = module_ptr;
     
     // Regardless of module loaded, reset Merlee curses if enabled.
-    if (g_Mod->state_.GetOption(tot::OPT_MERLEE_CURSE)) {
+    if (g_Mod->state_.GetOption(OPT_MERLEE_CURSE)) {
         PouchData& pouch = *ttyd::mario_pouch::pouchGetPtr();
         // If the player somehow managed to run out of curses, reset completely.
         if (pouch.merlee_curse_uses_remaining < 1) {
@@ -176,10 +176,10 @@ bool FreshFileInit() {
     
     // Initialize Tower of Trials-specific state & pouch stuff.
     g_Mod->state_.Init();
-    tot::OptionsManager::ResetAfterRun();
+    OptionsManager::ResetAfterRun();
 
     // Turn background music on, by default.
-    tot::SetSWF(tot::GSWF_BgmEnabled);
+    SetSWF(GSWF_BgmEnabled);
 
     return true;
 }
@@ -189,31 +189,31 @@ bool FreshFileInit() {
 void ApplyFixedPatches() {
     // For debugging utility, save pointer to mod's state right after pouch.
     auto* state = &g_Mod->state_;
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(0x8041eb04U),
         reinterpret_cast<void*>(&state), sizeof(void*));
 
     // Load file from new save; replaces old logic completely.
-    g_stg0_00_init_trampoline = patch::hookFunction(
+    g_stg0_00_init_trampoline = mod::hookFunction(
         ttyd::event::stg0_00_init, []() { FreshFileInit(); });
         
     // Load file from existing save; replaces old logic completely.
-    g_cardCopy2Main_trampoline = patch::hookFunction(
+    g_cardCopy2Main_trampoline = mod::hookFunction(
         ttyd::cardmgr::cardCopy2Main, [](int32_t save_file_number) {
-            auto* save_data = reinterpret_cast<tot::TotSaveSlot*>(
+            auto* save_data = reinterpret_cast<TotSaveSlot*>(
                 *(uintptr_t*)((uintptr_t)ttyd::cardmgr::g_CardmgrWork + 0xa8)
-                + save_file_number * sizeof(tot::TotSaveSlot) + 0x2000);
+                + save_file_number * sizeof(TotSaveSlot) + 0x2000);
 
             if (!g_Mod->state_.Load(save_data)) {
                 g_CueGameOver = true;
             } else {
                 // Apply options specific to loading run in-progress.
-                tot::OptionsManager::OnRunResumeFromFileSelect();
+                OptionsManager::OnRunResumeFromFileSelect();
             }
         });
     
     // Replace logic to save data to save slot.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_cardWrite_SaveSlotData_BH),
         reinterpret_cast<void*>(g_cardWrite_SaveSlotData_EH),
         reinterpret_cast<void*>(StartSaveSlotData),
@@ -221,37 +221,37 @@ void ApplyFixedPatches() {
 
     // Change name of save file to be distinct from vanilla TTYD's.
     const char kSaveFileName[] = "tot_save_file";
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_cardmgr_Patch_SaveFileName),
         kSaveFileName, sizeof(kSaveFileName));
 
     // Change displayed name of game in memory card entry.
     const char kGameName[] = "Tower of Trials";
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_cardmgr_Patch_SaveFileGameName),
         kGameName, sizeof(kGameName));
 
     // Move address referenced for writing game name back 4 bytes.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_create_main_Patch_SaveFileGameName),
         0x389f1e10  /* addi r4, r31, 0x1e10 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_read_all_main_Patch_SaveFileGameName),
         0x389f1e10  /* addi r4, r31, 0x1e10 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_cardWriteHeader_Patch_SaveFileGameName),
         0x389f1e10  /* addi r4, r31, 0x1e10 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_write_main_Patch_SaveFileGameName),
         0x389f1e10  /* addi r4, r31, 0x1e10 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_cardInit_Patch_SaveFileGameName),
         0x389d1e10  /* addi r4, r29, 0x1e10 */);
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_cardBufReset_Patch_SaveFileGameName),
         0x389d1e10  /* addi r4, r29, 0x1e10 */);
     
-    g_OSLink_trampoline = patch::hookFunction(
+    g_OSLink_trampoline = mod::hookFunction(
         gc::OSLink::OSLink, [](OSModuleInfo* new_module, void* bss) {
             bool result = g_OSLink_trampoline(new_module, bss);
             if (new_module != nullptr && result) {
@@ -260,7 +260,7 @@ void ApplyFixedPatches() {
             return result;
         });
     
-    g_seqSetSeq_trampoline = patch::hookFunction(
+    g_seqSetSeq_trampoline = mod::hookFunction(
         ttyd::seqdrv::seqSetSeq, 
         [](SeqIndex seq, const char* mapName, const char* beroName) {
             // Check for failed file load.
@@ -279,7 +279,7 @@ void ApplyFixedPatches() {
             g_seqSetSeq_trampoline(seq, mapName, beroName);
         });
         
-    g_msgSearch_trampoline = patch::hookFunction(
+    g_msgSearch_trampoline = mod::hookFunction(
         ttyd::msgdrv::msgSearch, [](const char* msg_key) {
             const char* replacement = StringsManager::LookupReplacement(msg_key);
             if (replacement) return replacement;
@@ -287,13 +287,13 @@ void ApplyFixedPatches() {
         });
     
     // Don't play BGM tunes if the BGM option is currently toggled off.
-    g_psndBGMOn_f_d_trampoline = patch::hookFunction(
+    g_psndBGMOn_f_d_trampoline = mod::hookFunction(
         ttyd::pmario_sound::psndBGMOn_f_d, [](
             uint32_t unk0, const char* name, uint32_t fadein_time,
             uint16_t unk1) {
             // Only disable background music after loading a save file.
             if (!strcmp(GetCurrentArea(), "gon") &&
-                !tot::GetSWF(tot::GSWF_BgmEnabled)) {
+                !GetSWF(GSWF_BgmEnabled)) {
                 return 0U;
             }
             return g_psndBGMOn_f_d_trampoline(unk0, name, fadein_time, unk1);
@@ -301,23 +301,23 @@ void ApplyFixedPatches() {
     
     // Apply patches to seq_mapChangeMain code to run additional logic when
     // loading or unloading a map.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_seq_mapChangeMain_MapLoad_BH),
         reinterpret_cast<void*>(g_seq_mapChangeMain_MapLoad_EH),
         reinterpret_cast<void*>(StartMapLoad),
         reinterpret_cast<void*>(BranchBackMapLoad));
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_seq_mapChangeMain_OnMapUnload_BH),
         reinterpret_cast<void*>(g_seq_mapChangeMain_OnMapUnload_EH),
         reinterpret_cast<void*>(StartOnMapUnload),
         reinterpret_cast<void*>(BranchBackOnMapUnload));
         
     // Patch to skip demo without pressing A/Start.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_seq_logoMain_Patch_AlwaysSkipIntro),
         0x60000000U /* nop */);
     // Patch to never autoplay demo, rather than waiting ~19 seconds.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_titleMain_Patch_NeverPlayDemo),
         0x480001f0 /* unconditional branch 0x1f0 */);
 
@@ -340,7 +340,7 @@ void ApplyFixedPatches() {
     };
     for (int32_t i = 0; i < 12; ++i) {
         const int16_t value = 0x3800;
-        mod::patch::writePatch(
+        mod::writePatch(
             reinterpret_cast<void*>(save_data_size_addresses[i] + 2),
             &value, sizeof(int16_t));
     }
@@ -358,7 +358,7 @@ void ApplyFixedPatches() {
     };
     for (int32_t i = 0; i < 9; ++i) {
         const int16_t value = 0x3800 >> 4;
-        mod::patch::writePatch(
+        mod::writePatch(
             reinterpret_cast<void*>(save_data_size_by_10_addresses[i] + 2),
             &value, sizeof(int16_t));
     }
@@ -385,8 +385,8 @@ int32_t LoadMap() {
             ttyd::seq_mapchange::NextBero);
 
         // Update the completion percentage every time a map is loaded.
-        tot::ProgressManager::RefreshCache();
-        tot::ProgressManager::GetOverallProgression();
+        ProgressManager::RefreshCache();
+        ProgressManager::GetOverallProgression();
 
         return 2;
     }
@@ -446,4 +446,4 @@ void OnMapUnloaded() {
 }
 
 }  // namespace core
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

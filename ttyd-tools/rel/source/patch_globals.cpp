@@ -15,7 +15,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
     
 namespace {
 

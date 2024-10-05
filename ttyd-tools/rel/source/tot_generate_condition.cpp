@@ -177,7 +177,7 @@ void SetBattleCondition(ttyd::npcdrv::NpcBattleInfo* npc_info, bool enable) {
         case MARIO_FINAL_HP_LESS:
             // Override Danger / Peril thresholds with correct value,
             // based on whether the "%-based" setting is enabled.
-            param = 1 + infinite_pit::options::GetPinchThresholdForMaxHp(
+            param = 1 + tot::patch::options::GetPinchThresholdForMaxHp(
                 ttyd::mario_pouch::pouchGetMaxHP(), /* peril? */ param == 2);
             break;
         case MARIO_FINAL_HP_MORE:

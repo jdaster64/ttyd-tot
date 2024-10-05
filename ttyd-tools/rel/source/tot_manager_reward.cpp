@@ -444,7 +444,7 @@ int32_t GetIcon(ChestData* chest) {
 
 void DisplayIcons(CameraId camera, void* user_data) {
     // Ideally this would fade, but alpha doesn't seem supported for this cam.
-    int32_t value = GetSWByte(tot::GSW_Tower_DisplayChestIcons);
+    int32_t value = GetSWByte(GSW_Tower_DisplayChestIcons);
     if (g_ChestDrawAlpha < 0xff && value == 1) g_ChestDrawAlpha = 0xff;
     if (g_ChestDrawAlpha > 0 && value != 1) g_ChestDrawAlpha = 0;
     
@@ -544,20 +544,20 @@ EVT_END()
 
 // Pickup script for Star Pieces (base).
 EVT_BEGIN(Reward_StarPieceBaseEvt)
-    USER_FUNC(infinite_pit::item::evtTot_FreezeFieldItemTimers, 1)
+    USER_FUNC(patch::item::evtTot_FreezeFieldItemTimers, 1)
     USER_FUNC(evtTot_SelectMoves, 1, 0, LW(0), LW(1), LW(2))
     IF_LARGE(LW(0), 0)
         USER_FUNC(evtTot_UpgradeMove, LW(1))
         USER_FUNC(
             evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
     END_IF()
-    USER_FUNC(infinite_pit::item::evtTot_FreezeFieldItemTimers, 0)
+    USER_FUNC(patch::item::evtTot_FreezeFieldItemTimers, 0)
     RETURN()
 EVT_END()
 
 // Pickup script for Shine Sprites (base).
 EVT_BEGIN(Reward_ShineSpriteBaseEvt)
-    USER_FUNC(infinite_pit::item::evtTot_FreezeFieldItemTimers, 1)
+    USER_FUNC(patch::item::evtTot_FreezeFieldItemTimers, 1)
     USER_FUNC(evtTot_SelectMoves, 1, 0, LW(0), LW(1), LW(2))
     IF_LARGE(LW(0), 0)
         // Open menu to select a move.
@@ -568,7 +568,7 @@ EVT_BEGIN(Reward_ShineSpriteBaseEvt)
         USER_FUNC(
             evt_msg_print_insert, 0, PTR("tot_reward_upgrademove"), 0, 0, LW(2))
     END_IF()
-    USER_FUNC(infinite_pit::item::evtTot_FreezeFieldItemTimers, 0)
+    USER_FUNC(patch::item::evtTot_FreezeFieldItemTimers, 0)
     RETURN()
 EVT_END()
 

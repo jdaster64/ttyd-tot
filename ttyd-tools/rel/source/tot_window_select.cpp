@@ -2366,7 +2366,7 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
             // Read inventory from elsewhere.
             int16_t* inventory;
             if (type == MenuType::HUB_ITEM_SHOP) {
-                inventory = infinite_pit::field::GetShopBackOrderItems();
+                inventory = tot::patch::field::GetShopBackOrderItems();
             } else {
                 inventory = GetCharlietonInventoryPtr();
             }

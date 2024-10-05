@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace mod::infinite_pit::enemy {
+namespace mod::tot::patch::enemy {
 
 // Apply patches dealing with enemy stats and behaviors in battle.
 void ApplyFixedPatches();

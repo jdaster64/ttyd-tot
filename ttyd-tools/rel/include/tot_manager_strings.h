@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mod::infinite_pit {
+namespace mod::tot {
 
 class StringsManager {
 public:

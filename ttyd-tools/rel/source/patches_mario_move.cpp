@@ -50,20 +50,20 @@ extern "C" {
     void BranchBackArtAttackCalculateDamage();
     
     void sweetTreatSetupTargets() {
-        mod::infinite_pit::mario_move::SweetTreatSetUpTargets();
+        mod::tot::patch::mario_move::SweetTreatSetUpTargets();
     }
     void sweetTreatBlinkNumbers() {
-        mod::infinite_pit::mario_move::SweetTreatBlinkNumbers();
+        mod::tot::patch::mario_move::SweetTreatBlinkNumbers();
     }
     int32_t getEarthTremorNumberOfBars() {
-        return mod::infinite_pit::mario_move::GetEarthTremorNumberOfBars();
+        return mod::tot::patch::mario_move::GetEarthTremorNumberOfBars();
     }
     int32_t getArtAttackPower(int32_t circled_percent) {
-        return mod::infinite_pit::mario_move::GetArtAttackPower(circled_percent);
+        return mod::tot::patch::mario_move::GetArtAttackPower(circled_percent);
     }
 }
 
-namespace mod::infinite_pit {
+namespace mod::tot::patch {
 
 namespace {
 
@@ -132,9 +132,9 @@ static_assert(sizeof(DeclareStarPowerPatch) == 0x10);
 // and Flower Savers if necessary.
 int32_t GetWeaponCost(BattleWorkUnit* unit, BattleWeapon* weapon) {
     int32_t cost = weapon->base_fp_cost;
-    if (int32_t type = tot::MoveManager::GetMoveTypeFromBadge(weapon->item_id); 
+    if (int32_t type = MoveManager::GetMoveTypeFromBadge(weapon->item_id); 
         type != -1) {
-        cost *= tot::MoveManager::GetSelectedLevel(type);
+        cost *= MoveManager::GetSelectedLevel(type);
     }
     if (cost > 0) {
         cost -= unit->badges_equipped.flower_saver;
@@ -186,22 +186,22 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
             }
             
             int32_t move_type = 
-                tot::MoveManager::GetMoveTypeFromBadge(weapon->item_id);
+                MoveManager::GetMoveTypeFromBadge(weapon->item_id);
             if (move_type == -1) continue;
             
             // If current selection, and L/R pressed, change power level.
             if (i == cursor->abs_position) {
                 if (left_press &&
-                    tot::MoveManager::ChangeSelectedLevel(move_type, -1)) {
+                    MoveManager::ChangeSelectedLevel(move_type, -1)) {
                     ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                 } else if (
                     right_press &&
-                    tot::MoveManager::ChangeSelectedLevel(move_type, 1)) {
+                    MoveManager::ChangeSelectedLevel(move_type, 1)) {
                     ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                 }
                 
                 // Overwrite default text based on current power level.
-                if (tot::MoveManager::GetCurrentSelectionString(
+                if (MoveManager::GetCurrentSelectionString(
                     move_type, g_MoveBadgeTextBuffer)) {
                     strats[i].name = g_MoveBadgeTextBuffer;
                 }
@@ -239,16 +239,16 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 // If current selection, and L/R pressed, change power level.
                 if (i == cursor->abs_position) {
                     if (left_press && 
-                        tot::MoveManager::ChangeSelectedLevel(move_type, -1)) {
+                        MoveManager::ChangeSelectedLevel(move_type, -1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     } else if (
                         right_press &&
-                        tot::MoveManager::ChangeSelectedLevel(move_type, 1)) {
+                        MoveManager::ChangeSelectedLevel(move_type, 1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     }
                     
                     // Overwrite default text based on current power level.
-                    if (tot::MoveManager::GetCurrentSelectionString(
+                    if (MoveManager::GetCurrentSelectionString(
                         move_type, g_MoveBadgeTextBuffer)) {
                         weapons[i].name = g_MoveBadgeTextBuffer;
                     }
@@ -257,9 +257,9 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 }
                 
                 // Update actual SP cost.
-                int32_t idx = move_type - tot::MoveType::SP_SWEET_TREAT;
-                int8_t new_cost = tot::MoveManager::GetMoveCost(move_type);
-                mod::patch::writePatch(
+                int32_t idx = move_type - MoveType::SP_SWEET_TREAT;
+                int8_t new_cost = MoveManager::GetMoveCost(move_type);
+                mod::writePatch(
                     &ttyd::battle_mario::superActionTable[idx]->base_sp_cost,
                     &new_cost, sizeof(new_cost));
             } else if (weapons[i].icon != IconType::DO_NOTHING) {
@@ -267,16 +267,16 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 // If current selection, and L/R pressed, change power level.
                 if (i == cursor->abs_position) {
                     if (left_press && 
-                        tot::MoveManager::ChangeSelectedLevel(move_type, -1)) {
+                        MoveManager::ChangeSelectedLevel(move_type, -1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     } else if (
                         right_press && 
-                        tot::MoveManager::ChangeSelectedLevel(move_type, 1)) {
+                        MoveManager::ChangeSelectedLevel(move_type, 1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
                     }
                     
                     // Overwrite default text based on current power level.
-                    if (tot::MoveManager::GetCurrentSelectionString(
+                    if (MoveManager::GetCurrentSelectionString(
                         move_type, g_MoveBadgeTextBuffer)) {
                         weapons[i].name = g_MoveBadgeTextBuffer;
                     }
@@ -285,16 +285,16 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 }
                 
                 // Update single / multi-target for Vivian's extra moves.
-                if (move_type == tot::MoveType::VIVIAN_CURSE ||
-                    move_type == tot::MoveType::VIVIAN_NEUTRALIZE) {
+                if (move_type == MoveType::VIVIAN_CURSE ||
+                    move_type == MoveType::VIVIAN_NEUTRALIZE) {
                     int32_t move_level = 
-                        tot::MoveManager::GetSelectedLevel(move_type);
+                        MoveManager::GetSelectedLevel(move_type);
                     if (move_level == 1) {
                         weapons[i].weapon->target_class_flags &=
                             ~AttackTargetClass_Flags::MULTIPLE_TARGET;
                         weapons[i].weapon->target_class_flags |=
                             AttackTargetClass_Flags::SINGLE_TARGET;
-                        if (move_type == tot::MoveType::VIVIAN_NEUTRALIZE) {
+                        if (move_type == MoveType::VIVIAN_NEUTRALIZE) {
                             weapons[i].weapon->target_class_flags &=
                                 ~AttackTargetClass_Flags::SELECT_SIDE;
                         }
@@ -303,7 +303,7 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                             ~AttackTargetClass_Flags::SINGLE_TARGET;
                         weapons[i].weapon->target_class_flags |=
                             AttackTargetClass_Flags::MULTIPLE_TARGET;
-                        if (move_type == tot::MoveType::VIVIAN_NEUTRALIZE) {
+                        if (move_type == MoveType::VIVIAN_NEUTRALIZE) {
                             weapons[i].weapon->target_class_flags |=
                                 AttackTargetClass_Flags::SELECT_SIDE;
                         }
@@ -311,8 +311,8 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 }
                 
                 // Update actual FP cost.
-                int8_t new_cost = tot::MoveManager::GetMoveCost(move_type);
-                mod::patch::writePatch(
+                int8_t new_cost = MoveManager::GetMoveCost(move_type);
+                mod::writePatch(
                     &weapon->base_fp_cost, &new_cost, sizeof(new_cost));
             }
         }
@@ -417,57 +417,57 @@ EVT_DEFINE_USER_FUNC(SetSweetFeastWeapon) {
 }  // namespace
     
 void ApplyFixedPatches() {
-    g_BtlUnit_GetWeaponCost_trampoline = patch::hookFunction(
+    g_BtlUnit_GetWeaponCost_trampoline = mod::hookFunction(
         ttyd::battle_unit::BtlUnit_GetWeaponCost,
         [](BattleWorkUnit* unit, BattleWeapon* weapon) {
             // Replaces existing logic.
             return GetWeaponCost(unit, weapon);
         });
 
-    g_DrawOperationWin_trampoline = patch::hookFunction(
+    g_DrawOperationWin_trampoline = mod::hookFunction(
         ttyd::battle_menu_disp::DrawOperationWin, []() {
             CheckForSelectingWeaponLevel(/* is_strategies_menu = */ true);
             g_DrawOperationWin_trampoline();
         });
         
-    g_DrawWeaponWin_trampoline = patch::hookFunction(
+    g_DrawWeaponWin_trampoline = mod::hookFunction(
         ttyd::battle_menu_disp::DrawWeaponWin, []() {
             CheckForSelectingWeaponLevel(/* is_strategies_menu = */ false);
             g_DrawWeaponWin_trampoline();
         });
             
     // Change "involved" weapons for Super/Ultra Hammer and Yoshi's Gulp.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             g_subsetevt_shot_damage_Patch_SuperInvolvedWeapon),
         reinterpret_cast<uint32_t>(
             &tot::party_mario::customWeapon_SuperHammerRecoil));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             g_subsetevt_shot_damage_Patch_UltraInvolvedWeapon),
         reinterpret_cast<uint32_t>(
             &tot::party_mario::customWeapon_UltraHammerRecoil));
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(
             g_subsetevt_swallow_shot_damage_Patch_InvolvedWeapon),
         reinterpret_cast<uint32_t>(
             &tot::party_yoshi::customWeapon_YoshiGulp_Recoil));
     
     // Change the Sweet Treat/Feast target type counts based on level.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_sac_genki_main_base_SetupTargets_BH),
         reinterpret_cast<void*>(g_sac_genki_main_base_SetupTargets_EH),
         reinterpret_cast<void*>(StartSweetTreatSetupTargets),
         reinterpret_cast<void*>(BranchBackSweetTreatSetupTargets));
     // Change the displayed numbers for Feast to 1/5 the target value.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_sac_genki_main_base_BlinkNumbers_BH),
         reinterpret_cast<void*>(g_sac_genki_main_base_BlinkNumbers_EH),
         reinterpret_cast<void*>(StartSweetTreatBlinkNumbers),
         reinterpret_cast<void*>(BranchBackSweetTreatBlinkNumbers));
     
     // Hook the Sweet Treat/Feast results function to return the right values.
-    g_sac_genki_get_score_trampoline = patch::hookFunction(
+    g_sac_genki_get_score_trampoline = mod::hookFunction(
         ttyd::sac_genki::get_score, [](EvtEntry* evt, bool isFirstCall) {
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
             int32_t is_feast = *reinterpret_cast<int32_t*>(sac_work_addr + 0xc);
@@ -482,31 +482,30 @@ void ApplyFixedPatches() {
         });
 
     // Patch Sweet Treat common event to apply Regen status for Feast.
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_genki_evt_common_Patch_SweetTreatFeastResult),
         SweetTreatFeastResultEvtHook, sizeof(SweetTreatFeastResultEvtHook));
 
     // Change the number of action command bars to fill for Earth Tremor.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_sac_deka_main_base_GetNumberOfBars_BH),
         reinterpret_cast<void*>(StartEarthTremorNumberOfBars),
         reinterpret_cast<void*>(BranchBackEarthTremorNumberOfBars));
 
     // Change the attack power for Earth Tremor to "level + bars full".
-    g_weaponGetPower_Deka_trampoline = patch::hookFunction(
+    g_weaponGetPower_Deka_trampoline = mod::hookFunction(
         ttyd::sac_deka::weaponGetPower_Deka, [](
             BattleWorkUnit*, BattleWeapon*,
             BattleWorkUnit*, BattleWorkUnitPart*) {
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
             int32_t bars_full = *reinterpret_cast<int32_t*>(sac_work_addr + 0x44);
             return static_cast<uint32_t>(
-                tot::MoveManager::GetSelectedLevel(
-                    tot::MoveType::SP_EARTH_TREMOR)
+                MoveManager::GetSelectedLevel(MoveType::SP_EARTH_TREMOR)
                 + bars_full);
         });
         
     // Change Clock Out's turn count based on power level.
-    g_bakuGameDecideWeapon_trampoline = patch::hookFunction(
+    g_bakuGameDecideWeapon_trampoline = mod::hookFunction(
         ttyd::sac_bakugame::bakuGameDecideWeapon,
         [](EvtEntry* evt, bool isFirstCall) {
             // Call vanilla logic.
@@ -518,27 +517,23 @@ void ApplyFixedPatches() {
             // Modify turn count (-1 for level 1, +1 for level 3; min 1 turn).
             if (weapon.stop_chance) {
                 weapon.stop_time += (
-                    tot::MoveManager::GetSelectedLevel(
-                        tot::MoveType::SP_CLOCK_OUT)
-                    - 2);
+                    MoveManager::GetSelectedLevel(MoveType::SP_CLOCK_OUT) - 2);
                 if (weapon.stop_time < 1) weapon.stop_time = 1;
             }
             return 2;
         });
 
     // Change the rate at which Power Lift's gauges fill based on level.
-    g_main_muki_trampoline = patch::hookFunction(
+    g_main_muki_trampoline = mod::hookFunction(
         ttyd::sac_muki::main_muki, [](EvtEntry* evt, bool isFirstCall) {
             // Change the amount of power gained per arrow hit on startup.
             if (isFirstCall) {
                 float arrow_power = 0.16667;
-                switch (
-                    tot::MoveManager::GetSelectedLevel(
-                        tot::MoveType::SP_POWER_LIFT)) {
+                switch (MoveManager::GetSelectedLevel(MoveType::SP_POWER_LIFT)) {
                     case 2: arrow_power = 0.20001; break;
                     case 3: arrow_power = 0.25001; break;
                 }
-                mod::patch::writePatch(
+                mod::writePatch(
                     &ttyd::sac_muki::_sac_muki_power_per_arrow,
                     &arrow_power, sizeof(float));
             }
@@ -547,18 +542,18 @@ void ApplyFixedPatches() {
         });
 
     // Change the damage dealt by Art Attack to 2/3/4 max based on level.
-    mod::patch::writeBranchPair(
+    mod::writeBranchPair(
         reinterpret_cast<void*>(g_scissor_damage_sub_ArtAttackDamage_BH),
         reinterpret_cast<void*>(g_scissor_damage_sub_ArtAttackDamage_EH),
         reinterpret_cast<void*>(StartArtAttackCalculateDamage),
         reinterpret_cast<void*>(BranchBackArtAttackCalculateDamage));
     // Make Art Attack not ignore enemies with "Gulp immunity".
-    mod::patch::writePatch(
+    mod::writePatch(
         reinterpret_cast<void*>(g_scissor_damage_Patch_ArtAttackCheckImmunity),
             0x2c000002U  /* cmpwi r0, 0x2 - check normal immunity again */);
 
     // Change Showstopper's OHKO rate based on power level.
-    g_sac_suki_set_weapon_trampoline = patch::hookFunction(
+    g_sac_suki_set_weapon_trampoline = mod::hookFunction(
         ttyd::sac_suki::sac_suki_set_weapon,
         [](EvtEntry* evt, bool isFirstCall) {
             // Call vanilla logic.
@@ -568,8 +563,7 @@ void ApplyFixedPatches() {
             BattleWeapon& weapon = 
                 *reinterpret_cast<BattleWeapon*>(sac_work_addr + 0x284);
             int32_t bars_full = evtGetValue(evt, evt->evtArguments[0]) - 1;
-            switch (tot::MoveManager::GetSelectedLevel(
-                tot::MoveType::SP_SHOWSTOPPER)) {
+            switch (MoveManager::GetSelectedLevel(MoveType::SP_SHOWSTOPPER)) {
                 case 1: weapon.ohko_chance = 30 + bars_full * 7;  break;
                 case 2: weapon.ohko_chance = 45 + bars_full * 9;  break;
                 case 3: weapon.ohko_chance = 60 + bars_full * 11; break;
@@ -578,14 +572,14 @@ void ApplyFixedPatches() {
         });
     
     // Change attack power of Supernova to 2/4/6x # of bars, based on level.
-    g_weaponGetPower_ZubaStar_trampoline = patch::hookFunction(
+    g_weaponGetPower_ZubaStar_trampoline = mod::hookFunction(
         ttyd::sac_zubastar::weaponGetPower_ZubaStar, [](
             BattleWorkUnit*, BattleWeapon*, 
             BattleWorkUnit*, BattleWorkUnitPart*) {
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
             int32_t level = *reinterpret_cast<int32_t*>(sac_work_addr + 0x10);
-            int32_t multiplier = 2 * tot::MoveManager::GetSelectedLevel(
-                tot::MoveType::SP_SUPERNOVA);
+            int32_t multiplier = 2 * MoveManager::GetSelectedLevel(
+                MoveType::SP_SUPERNOVA);
             return static_cast<uint32_t>(level * multiplier);
         });
 }
@@ -613,12 +607,10 @@ void SweetTreatSetUpTargets() {
     int32_t start_idx;
     if (is_feast) {
         start_idx = kNumTargetTypes * (
-            tot::MoveManager::GetSelectedLevel(tot::MoveType::SP_SWEET_FEAST) 
-            + 2);
+            MoveManager::GetSelectedLevel(MoveType::SP_SWEET_FEAST) + 2);
     } else {
         start_idx = kNumTargetTypes * (
-            tot::MoveManager::GetSelectedLevel(tot::MoveType::SP_SWEET_TREAT) 
-            - 1);
+            MoveManager::GetSelectedLevel(MoveType::SP_SWEET_TREAT) - 1);
     }
     
     // Determine whether Mario's partner is dead or nonexistent.
@@ -680,16 +672,15 @@ void SweetTreatBlinkNumbers() {
 
 int32_t GetEarthTremorNumberOfBars() {
     // The level 1 and 2 versions have shorter minigames, at 3 and 4 bars.
-    return tot::MoveManager::GetSelectedLevel(tot::MoveType::SP_EARTH_TREMOR)
-        + 2;
+    return MoveManager::GetSelectedLevel(MoveType::SP_EARTH_TREMOR) + 2;
 }
 
 int32_t GetArtAttackPower(int32_t circled_percent) {
     // Like vanilla, circling 90% or more = full damage;
     // the damage dealt is up to 2, 3, or 4 based on the level.
-    return (tot::MoveManager::GetSelectedLevel(tot::MoveType::SP_ART_ATTACK) 
-        + 1) * circled_percent / 90;
+    return (MoveManager::GetSelectedLevel(MoveType::SP_ART_ATTACK)  + 1)
+        * circled_percent / 90;
 }
 
 }  // namespace mario_move
-}  // namespace mod::infinite_pit
+}  // namespace mod::tot::patch

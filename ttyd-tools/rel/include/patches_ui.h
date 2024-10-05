@@ -7,7 +7,7 @@
 namespace ttyd::seq_load { struct SeqLoadWinDataEntry; }
 namespace ttyd::win_root { struct WinPauseMenu; }
 
-namespace mod::infinite_pit::ui {
+namespace mod::tot::patch::ui {
 
 // Apply patches to the HUD, pause menu, etc.
 void ApplyFixedPatches();
