@@ -6116,7 +6116,7 @@ g_TowerBossFloorStrings = {
         b"power to fell you this time!\n"
         b"<k>",
     # + variants for later visits...
-    b"tot_di041110_00":
+    b"tot_di041010_00":
         b"<boss>\n"
         b"So you've come this far to\n"
         b"challenge me again, mortals?\n"

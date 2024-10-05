@@ -123,7 +123,6 @@ EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetPhaseHpThresholds, 4)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetAttackWeights, 10)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_GetBreathWeights, 9)
 EVT_DECLARE_USER_FUNC(evtTot_Dragon_SetupConversation, 2)
-EVT_DECLARE_USER_FUNC(evtTot_CheckPartnerActionable, 1)
 EVT_DECLARE_USER_FUNC(evtTot_CureNegativeStatus, 1)
 
 extern BattleUnitSetup unitBonetail_spawnSetup;
@@ -497,8 +496,14 @@ EVT_BEGIN(unitDragon_conversation_event)
         IF_EQUAL(LW(15), 0)
             USER_FUNC(evt_msg_print, 2, LW(14), 0, -2)
         ELSE()
-            // TODO: Check for partner existing / being active.
-            USER_FUNC(evt_msg_print_battle_party, LW(14))
+            // If partner is present / active, print their message.
+            USER_FUNC(btlevtcmd_GetUnitId, -4, LW(15))
+            IF_NOT_EQUAL(LW(15), -1)
+                USER_FUNC(btlevtcmd_CheckActStatus, -4, LW(15))
+                IF_EQUAL(LW(15), 1)
+                    USER_FUNC(evt_msg_print_battle_party, LW(14))
+                END_IF()
+            END_IF()
         END_IF()
             
         USER_FUNC(evtTot_GetNextMessage, LW(14), LW(15))
@@ -1157,9 +1162,13 @@ LBL(90)
     IF_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF()
-    // Skip event if partners are disabled.
+    // Skip event if partner is not present, or is unable to act.
     USER_FUNC(btlevtcmd_GetUnitId, -4, LW(0))
     IF_EQUAL(LW(0), -1)
+        GOTO(99)
+    END_IF()
+    USER_FUNC(btlevtcmd_CheckActStatus, -4, LW(0))
+    IF_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF()
     IF_EQUAL((int32_t)GSWF_Battle_Hooktail_BiteReactionSeen, 0)
@@ -1176,7 +1185,6 @@ LBL(99)
     RETURN()
 EVT_END()
 
-// TODO: Add better support for partner being downed (for fakeout entry).
 EVT_BEGIN(unitDragon_battle_entry_sub_event)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("GNB_F_3"))
     WAIT_FRM(1)
@@ -2130,20 +2138,6 @@ EVT_DEFINE_USER_FUNC(evtTot_Dragon_SetupConversation) {
     }
 
     DialogueManager::SetConversation(conversation_id);
-
-    return 2;
-}
-
-EVT_DEFINE_USER_FUNC(evtTot_CheckPartnerActionable) {
-    bool result = false;
-    auto* battleWork = ttyd::battle::g_BattleWork;
-    int32_t unit_idx = ttyd::battle_sub::BattleTransID(evt, -4);
-    if (unit_idx > -1) {
-        if (auto* battle_unit = battleWork->battle_units[unit_idx];
-            battle_unit && ttyd::battle_unit::BtlUnit_CanActStatus(battle_unit))
-            result = true;
-    }
-    evtSetValue(evt, evt->evtArguments[0], result);
 
     return 2;
 }

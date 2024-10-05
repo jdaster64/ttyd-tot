@@ -713,7 +713,7 @@ EVT_BEGIN(Tower_FinalBossEvent)
     END_INLINE()
     USER_FUNC(evt_mario_mov_pos2, -450, 0, FLOAT(120.0))
     RUN_EVT(bero_case_entry)
-    WAIT_MSEC(1300)
+    WAIT_MSEC(1100)
 
     // Print encounter message.
     USER_FUNC(evtTot_GetDifficulty, LW(0))
