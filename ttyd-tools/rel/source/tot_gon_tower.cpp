@@ -4,12 +4,12 @@
 #include "mod.h"
 #include "tot_generate_enemy.h"
 #include "tot_generate_item.h"
-#include "tot_generate_reward.h"
 #include "tot_gon.h"
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_dialogue.h"
+#include "tot_manager_reward.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
@@ -252,7 +252,7 @@ EVT_BEGIN(Tower_ChestEvt_Core)
     USER_FUNC(evtTot_ToggleIGT, 0)
     SWITCH(LW(13))
         CASE_SMALL_EQUAL(-1)
-            // Run special event from tot_generate_reward, then null it out
+            // Run special event assigned in RewardManager, then null it out
             // to have this function return control of Mario.
             RUN_CHILD_EVT(LW(14))
             SET(LW(14), 0)

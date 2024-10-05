@@ -4,13 +4,13 @@
 #include "mod.h"
 #include "patches_field.h"
 #include "tot_generate_item.h"
-#include "tot_generate_reward.h"
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
+#include "tot_manager_reward.h"
 #include "tot_manager_timer.h"
 #include "tot_state.h"
 
@@ -2475,7 +2475,7 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
         }
         case MenuType::MOVE_UNLOCK:
         case MenuType::MOVE_UPGRADE: {
-            // Read moves from tot_generate_reward.
+            // Read selected moves from RewardManager.
             int32_t num_moves;
             int32_t* moves = RewardManager::GetSelectedMoves(&num_moves);
             sel_entry->num_rows = num_moves;

@@ -3,10 +3,10 @@
 #include "common_functions.h"
 #include "mod.h"
 #include "tot_generate_item.h"
-#include "tot_generate_reward.h"
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_manager_reward.h"
 #include "tot_state.h"
 
 #include <ttyd/item_data.h>

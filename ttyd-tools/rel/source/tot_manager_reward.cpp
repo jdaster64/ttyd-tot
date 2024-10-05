@@ -1,4 +1,4 @@
-#include "tot_generate_reward.h"
+#include "tot_manager_reward.h"
 
 #include "common_functions.h"
 #include "evt_cmd.h"

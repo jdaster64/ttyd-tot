@@ -8,10 +8,10 @@
 #include "patches_battle.h"
 #include "patches_partner.h"
 #include "tot_generate_condition.h"
-#include "tot_generate_reward.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
+#include "tot_manager_reward.h"
 #include "tot_party_mario.h"
 
 #include <ttyd/battle.h>

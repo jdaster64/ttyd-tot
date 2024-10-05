@@ -1220,7 +1220,6 @@ bool GetEnemyStats(
         base_def_pct = 100;
 
         // For Gold Fuzzy / Fuzzy Horde, scale stats by difficulty.
-        // TODO: Stats should probably be a little lower across the board?
         if (unit_type == BattleUnitType::GOLD_FUZZY ||
             unit_type == BattleUnitType::FUZZY_HORDE) {
             switch (state.GetOptionValue(OPT_DIFFICULTY)) {

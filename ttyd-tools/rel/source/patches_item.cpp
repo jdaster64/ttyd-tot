@@ -6,8 +6,8 @@
 #include "patches_battle.h"
 #include "patches_battle_seq.h"
 #include "tot_generate_item.h"
-#include "tot_generate_reward.h"
 #include "tot_manager_achievements.h"
+#include "tot_manager_reward.h"
 #include "tot_state.h"
 
 #include <ttyd/battle.h>

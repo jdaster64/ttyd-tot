@@ -3,9 +3,9 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_generate_enemy.h"
-#include "tot_generate_reward.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
+#include "tot_manager_reward.h"
 #include "tot_state.h"
 
 #include <ttyd/battle_database_common.h>

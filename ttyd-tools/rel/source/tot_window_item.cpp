@@ -5,9 +5,9 @@
 #include "mod.h"
 #include "patches_item.h"
 #include "tot_generate_item.h"
-#include "tot_generate_reward.h"
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_manager_reward.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
