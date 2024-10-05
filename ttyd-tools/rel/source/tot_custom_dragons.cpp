@@ -495,6 +495,7 @@ EVT_BEGIN(unitDragon_conversation_event)
         IF_EQUAL(LW(15), 0)
             USER_FUNC(evt_msg_print, 2, LW(14), 0, -2)
         ELSE()
+            // TODO: Check for partner existing / being active.
             USER_FUNC(evt_msg_print_battle_party, LW(14))
         END_IF()
             

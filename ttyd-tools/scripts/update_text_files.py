@@ -5889,15 +5889,14 @@ g_Tower4Strings = {
 }
 
 g_TowerBossFloorStrings = {
-    # TODO: Finalize all boss dialogue.
 
     # Boss field dialogue.
     
     # Hooktail before battle.
     b"tot_di030100_00":
         b"<boss>\n"
-        b"Ah, <wait 250>the mustachioed one has\n"
-        b"finally returned!\n"
+        b"Ah, <wait 250>so the mustachioed one\n"
+        b"finally returns!\n"
         b"<k>",
     # + variants for later visits...
     b"tot_di030110_00":
@@ -5962,31 +5961,138 @@ g_TowerBossFloorStrings = {
     # Hooktail battle entry.
     b"tot_di031000_00":
         b"<boss>\n"
-        b"[Placeholder] Battle entry<k>",
+        b"So, Mustache, you've returned\n"
+        b"at last! <wait 250>I expected you might\n"
+        b"try to do as much...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I reckoned that if the threat\n"
+        b"of this tower wouldn't draw you,\n"
+        b"<wait 250>the allure of treasure would!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You might not have fully bested\n"
+        b"me before, <wait 200>but I recognize that\n"
+        b"I still sold you quite short.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Despite my prior tricks, we\n"
+        b"dragons do try to be honorable\n"
+        b"sorts, <wait 250>so how about this...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I and my brother will remain\n"
+        b"posted in this tower, open to\n"
+        b"your challenge anytime.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"In exchange, we shall fight you\n"
+        b"tooth and nail. <wait 250>I assure you, we'll\n"
+        b"not fall as easily as before!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Now then, mustachioed one,\n"
+        b"<wait 250>we fight!\n"
+        b"<k>",
+    # + variants for later visits...
+    b"tot_di031010_00":
+        b"<boss>\n"
+        b"So, you've returned again!\n"
+        b"<wait 250>Let's not waste any time, then.\n"
+        b"<wait 250>Have at you!\n"
+        b"<k>",
     
     # Hooktail low health.
     b"tot_di031100_00":
         b"<boss>\n"
-        b"[Placeholder] Low health<k>",
+        b"Ugggh... <wait 250>You still put up quite\n"
+        b"a fight, indeed...\n"
+        b"<k>",
     
     # Hooktail phase 2 start.
     b"tot_di031200_00":
         b"<boss>\n"
-        b"[Placeholder] Phase 2<k>",
+        b"You may put up quite a fight,\n"
+        b"<wait 200>but I'm not through yet!\n"
+        b"<wait 250>Take this, little morsels!\n"
+        b"<k>",
     
-    # Hooktail bite reaction.
+    # Hooktail - cutscene after first time bite lands.
     b"tot_di031600_00":
         b"<boss>\n"
-        b"[Placeholder] Bite gloating<k>",
+        b"Gwa-HA! <wait 250>How do you like that,\n"
+        b"you puny pugilists? <wait 250>You're no\n"
+        b"match for brute strength!\n"
+        b"<k>",
     
-    # Hooktail partner bite reaction.
-    b"tot_di031700_00":
-        b"[Placeholder]\n"
-        b"You can Superguard that btw<k>",
+    # Hooktail - partner bite reactions.
+    b"tot_di031700_00_kur":
+        b"You big bully! <wait 250>Ooh, I'm boiling...\n"
+        b"<wait 300>Next time she tries that, sock\n"
+        b"her in the face, <wait 200>got it?\n"
+        b"<k>",
+    b"tot_di031700_00_nok":
+        b"Man, she's really going on...\n"
+        b"<wait 300>I bet we could probably hit her\n"
+        b"back if she tries it again!\n"
+        b"<k>",
+    b"tot_di031700_00_win":
+        b'Hmph, "brute" is the word;\n'
+        b"<wait 250>that much we agree on.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Next time that blowhard\n"
+        b"comes at us, dear, let's strike,\n"
+        b"<wait 200>and still that brute's tongue!\n"
+        b"<k>",
+    b"tot_di031700_00_yos":
+        b"Man,<wait 150> oh,<wait 150> <dynamic 3>MAN</dynamic>, can she talk!\n"
+        b"<wait 250>What a bag of wind!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Y'know, Gonzales, <wait 200>I'll bet if we\n"
+        b"tried to counter her next time,\n"
+        b"she won't see it coming!\n"
+        b"<k>",
+    b"tot_di031700_00_viv":
+        b"Oh dear, <wait 250>that's pretty rude\n"
+        b"of her, wouldn't you say, Mario?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Come on, Mario, I won't stand\n"
+        b"for her bullying! Punch her the\n"
+        b"next time she tries that!\n"
+        b"<k>",
+    b"tot_di031700_00_bom":
+        b"I say, chap, that's rather\n"
+        b"unsporting of her, eh wot?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Such a blabbering mouth\n"
+        b"deserves a sharp comeback,\n"
+        b"wouldn't you say?\n"
+        b"<k>",
+    b"tot_di031700_00_chu":
+        b"Oh, dearie, we really ought\n"
+        b"to have seen that coming...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Let's keep on our toes\n"
+        b"next time, and hit her right\n"
+        b"in the kisser!\n"
+        b"<k>",
     
     # Hooktail death.
     b"tot_di031800_00":
-        b"[Placeholder] Dead<k>",
+        b"<boss>\n"
+        b"Nooo....! <wait 250>Gloomtail, <wait 150>brother,\n"
+        b"<wait 250>you must avenge me again!\n"
+        b"<k>",
+    # + variants for later visits...
+    b"tot_di031810_00":
+        b"<boss>\n"
+        b"Nooo....! <wait 250>Urp... <wait 150>bested again...\n"
+        b"<k>",
     
     # Gloomtail battle entry.
     b"tot_di041000_00":
@@ -6010,7 +6116,7 @@ g_TowerBossFloorStrings = {
         b"power to fell you this time!\n"
         b"<k>",
     # + variants for later visits...
-    b"tot_di041100_00":
+    b"tot_di041110_00":
         b"<boss>\n"
         b"So you've come this far to\n"
         b"challenge me again, mortals?\n"
@@ -6033,8 +6139,8 @@ g_TowerBossFloorStrings = {
         b"<boss>\n"
         b"GWAAAAH HA HA HA HA!\n"
         b"<wait 250>\n"
-        b"You are tough meat, my little\n"
-        b"tasty morsels!\n"
+        b"You are as tough as ever, my\n"
+        b"little tasty morsels!\n"
         b"<k>\n"
         b"<p>\n"
         b"But how will you fare\n"
@@ -6047,13 +6153,9 @@ g_TowerBossFloorStrings = {
         b"Gwuhhh...\n"
         b"<k>\n"
         b"<p>\n"
-        b"You are not the easy prey\n"
-        b"you appear to be...\n"
-        b"<k>\n"
-        b"<p>\n"
-        b"I would never be able to show\n"
-        b"my face again if I was bested\n"
-        b"again by you whelps...\n"
+        b"You whelps are still proving\n"
+        b"more troublesome than I had\n"
+        b"anticipated...\n"
         b"<k>\n"
         b"<p>\n"
         b"...So I will show you the true\n"
@@ -6068,11 +6170,44 @@ g_TowerBossFloorStrings = {
         b"<pos 15 10>\n"
         b"MEGABREATH!\n"
         b"<k>",
+    # + alternates with very low chance of appearing...
+    b"tot_di041410_00":
+        b"<boss>\n"
+        b"<scale 0.5>MEGABREATH---!<wait 400> \n"
+        b"<scale 1>Gack... <wait 250>Sorry... <wait 250>my voice is gone\n"
+        b"today, it seems...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"<scale 0.5>Ahem...<wait 350> \n"
+        b"<dynamic 3>\n"
+        b"<scale 2>\n"
+        b"<pos 15 10>\n"
+        b"MEGABREATH!\n"
+        b"<k>",
+    b"tot_di041411_00":
+        b"<boss>\n"
+        b"<scale 2>GIGABREATH!\n"
+        b"<pos 0 62>\n"
+        b"<wait 250>\n"
+        b"<scale 0.5>Mmm... perhaps a bit too much?\n"
+        b"<k>",
+    b"tot_di041412_00":
+        b"<boss>\n"
+        b"<scale 2>MEGA-GEOFF!\n"
+        b"<pos 0 62>\n"
+        b"<wait 250>\n"
+        b"<scale 0.5>Wait, that's not quite right...\n"
+        b"<k>",
     
     # Gloomtail death.
     b"tot_di041800_00":
         b"<boss>\n"
         b"No... <wait 250>No...<wait 250> It can't be true!\n"
+        b"<k>",
+    # + variants for later visits...
+    b"tot_di041810_00":
+        b"<boss>\n"
+        b"Ugh...<wait 250> ngh... <wait 350>Well met, <wait 200>mustache!\n"
         b"<k>",
     
     # Gloomtail fake death.
@@ -6082,30 +6217,128 @@ g_TowerBossFloorStrings = {
         b"undone, yet again!\n"
         b"<k>",
     
-    # Bonetail battle entry.
+    # Bonetail battle entry + partner reactions.
     b"tot_di051000_00":
-        b"<boss>\n"
-        b"[Placeholder] Battle entry<k>",
+        b"<majo>\n"
+        b"<col ffffffff>\n"
+        b"<shake>\n"
+        b"\n"
+        b"AROOOOOOOOOOOOO!</shake>\n"
+        b"<k>",
+    b"tot_di051000_01_kur":
+        b"Jeepers! <wait 250>It's that hunk of\n"
+        b"bones from the Pit! <wait 250>How'd it\n"
+        b"even GET up here?\n"
+        b"<k>",
+    b"tot_di051000_01_nok":
+        b"Yikes! <wait 250>Did they lug that all\n"
+        b"the way up HERE, or did it get\n"
+        b"here on its own? <wait 350>Spooky...\n"
+        b"<k>",
+    b"tot_di051000_01_win":
+        b"My word! <wait 250>I can't imagine how\n"
+        b"THIS lumbering mass of bones\n"
+        b"made it up here...\n"
+        b"<k>",
+    b"tot_di051000_01_yos":
+        b"Yow! <wait 250>I knew that bag of bones\n"
+        b"was one tough customer, but\n"
+        b"making the trip up HERE?\n"
+        b"<k>",
+    b"tot_di051000_01_viv":
+        b"Oh dear! <wait 250>Did they drag this\n"
+        b"poor thing up here? <wait 250>Unless it \n"
+        b"made it on its own... <wait 250>my!\n"
+        b"<k>",
+    b"tot_di051000_01_bom":
+        b"Well, this is rather a surprise,\n"
+        b"I do say... <wait 250>How in blazes did this\n"
+        b"make the journey up here...!?\n"
+        b"<k>",
+    b"tot_di051000_01_chu":
+        b"My, how fascinating! <wait 250>I suppose\n"
+        b"it goes to show you can't count\n"
+        b"anyone out easily...\n"
+        b"<k>",
+    # + alternate, with no partner commentary...
+    b"tot_di051010_00":
+        b"<majo>\n"
+        b"<col ffffffff>\n"
+        b"<shake>\n"
+        b"\n"
+        b"AROOOOOOOOOOOOO!</shake>\n"
+        b"<k>",
     
     # Bonetail low health.
     b"tot_di051100_00":
-        b"<boss>\n"
-        b"[Placeholder] Low health<k>",
+        b"<majo>\n"
+        b"<col ffffffff>\n"
+        b"<shake>\n"
+        b"\n"
+        b"A<wait 100>rooo<wait 100>ooo<wait 100>.......</shake>\n"
+        b"<k>",
+    b"tot_di051100_01_kur":
+        b"Mario, look! I think we've worn\n"
+        b"them down... <wait 250>just a bit more, and\n"
+        b"they oughtta be finished!\n"
+        b"<k>",
+    b"tot_di051100_01_nok":
+        b"Boy, that thing's looking pretty\n"
+        b"shabby, I think. <wait 250>C'mon, Mario, let's\n"
+        b"keep it up just a bit longer!\n"
+        b"<k>",
+    b"tot_di051100_01_win":
+        b"That poor beast looks quite\n"
+        b"worn out, dear. Let's hurry it up\n"
+        b"and give them some rest!\n"
+        b"<k>",
+    b"tot_di051100_01_yos":
+        b"Come on, Gonzales, we've got\n"
+        b"'em on the ropes! <wait 250>We can't\n"
+        b"give up now!\n"
+        b"<k>",
+    b"tot_di051100_01_viv":
+        b"It seems that they're getting\n"
+        b"quite tired... <wait 250>Don't give up now,\n"
+        b"Mario!\n"
+        b"<k>",
+    b"tot_di051100_01_bom":
+        b"Come on, old boy! <wait 250>We're this\n"
+        b"close to bringing this fell beast\n"
+        b"to its knees!\n"
+        b"<k>",
+    b"tot_di051100_01_chu":
+        b"It appears we're wearing them\n"
+        b"down, dearie. <wait 250>Let's keep it up,\n"
+        b"and dispose of them quickly!\n"
+        b"<k>",
     
     # Bonetail phase 2 start.
     b"tot_di051200_00":
-        b"<boss>\n"
-        b"[Placeholder] Phase 2<k>",
+        b"<majo>\n"
+        b"<col ffffffff>\n"
+        b"<shake>\n"
+        b"\n"
+        b"AROOOOOOOOOOOOO!</shake>\n"
+        b"<k>",
     
     # Bonetail healing.
     b"tot_di051500_00":
-        b"<boss>\n"
-        b"[Placeholder] Healing!<k>",
+        b"<majo>\n"
+        b"<col ffffffff>\n"
+        b"<shake>\n"
+        b"\n"
+        b"AROOOOOOOOOOOOO!</shake>\n"
+        b"<k>",
     
     # Bonetail death.
     b"tot_di051800_00":
-        b"<boss>\n"
-        b"[Placeholder] Dead<k>",
+        b"<majo>\n"
+        b"<col ffffffff>\n"
+        b"<shake>\n"
+        b"\n"
+        b"A<wait 100>rooo<wait 100>rooo<wait 100>............<wait 100>rooooo......\n"
+        b"<k>",
     
     # Gold Fuzzy mid-fight dialogue.
     b"tot_di061000_00":

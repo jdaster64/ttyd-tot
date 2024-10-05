@@ -39,6 +39,9 @@ namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 // Default conversation type: single text box from a speaker.
 int8_t kDefaultConversation[] = { 0, -1 };
 
+int8_t kActorPartnerDialogue[] = { 0, 1, -1 };
+int8_t kPartnerConversation[] = { 1, -1 };
+
 int32_t g_ConversationId = 0;
 int8_t* g_ConversationPtr = nullptr;
 int32_t g_ConversationStep = 0;
@@ -50,7 +53,7 @@ int32_t g_ConversationContinueId = 0;
 }  // namespace
 
 void DialogueManager::SetConversation(int32_t id) {
-    const auto& state = g_Mod->state_;
+    auto& state = g_Mod->state_;
 
     g_ConversationId = id;
     g_ConversationPtr = kDefaultConversation;
@@ -428,6 +431,55 @@ void DialogueManager::SetConversation(int32_t id) {
             g_ConversationId = ConversationId::NPC_GATEKEEPER_POST;
             break;
         }
+        case ConversationId::HOOK_F1:
+        case ConversationId::HOOK_ENTRY:
+        case ConversationId::HOOK_DEATH: {
+            // Swap for different conversation after first successful clear.
+            if (state.GetOption(STAT_PERM_HALF_FINISHES) >= 1) {
+                g_ConversationId += 10;
+            }
+            break;
+        }
+        case ConversationId::GLOOM_F1:
+        case ConversationId::GLOOM_ENTRY:
+        case ConversationId::GLOOM_DEATH: {
+            // Swap for different conversation after first successful clear.
+            if (state.GetOption(STAT_PERM_FULL_FINISHES) >= 1) {
+                g_ConversationId += 10;
+            }
+            break;
+        }
+        case ConversationId::BONE_ENTRY: {
+            // Swap for different conversation after first successful clear.
+            // (only the initial one has a partner reaction).
+            if (state.GetOption(STAT_PERM_EX_FINISHES) >= 1) {
+                g_ConversationId += 10;
+            } else {
+                g_ConversationPtr = kActorPartnerDialogue;
+            }
+            break;
+        }
+        case ConversationId::HOOK_BITE2: {
+            // Dialogue is always just the partner.
+            g_ConversationPtr = kPartnerConversation;
+            break;
+        }
+        case ConversationId::BONE_LOW_HP: {
+            // Dialogue is always Bonetail, then the partner reacting.
+            g_ConversationPtr = kActorPartnerDialogue;
+            break;
+        }
+        case ConversationId::GLOOM_MEGA: {
+            if (state.GetOption(STAT_PERM_FULL_FINISHES) >= 1) {
+                // Small random chance of an alternate Megabreath message.
+                const int32_t num_cvs =
+                    ConversationId::GLOOM_MEGA_END -
+                    ConversationId::GLOOM_MEGA_START;
+                if (int32_t cv_id = state.Rand(100); cv_id < num_cvs)
+                    g_ConversationId = ConversationId::GLOOM_MEGA_START + cv_id;
+            }
+            break;
+        }
     }
 }
 
@@ -457,8 +509,9 @@ bool DialogueManager::GetNextMessage(const char** msg, int32_t* speaker_type) {
         ++g_ConversationStep;
     }
 
-    // Don't add party string to end unless partner is currently speaking.
-    if (*g_ConversationPtr != SpeakerType::PARTNER) party_str = "";
+    // Don't add party string to end unless partner is speaking, on the field.
+    if (*g_ConversationPtr != SpeakerType::PARTNER || 
+        ttyd::mariost::g_MarioSt->bInBattle) party_str = "";
 
     static char lookup_buf[24];
     sprintf(lookup_buf,
