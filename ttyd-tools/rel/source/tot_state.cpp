@@ -371,10 +371,10 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
                     1, 10, 100, 1000, 10'000, 100'000, 1'000'000, 10'000'000,
                     100'000'000, 1'000'000'000
                 };
-                if (value >= powers_of_10[b]) value = powers_of_10[b] - 1;
+                if (value >= powers_of_10[y]) value = powers_of_10[y] - 1;
                 if (a & 0x10) {
                     // Signed, clamp min at -max.
-                    if (value <= -powers_of_10[b]) value = -(powers_of_10[b] - 1);
+                    if (value <= -powers_of_10[y]) value = -(powers_of_10[y] - 1);
                 } else {
                     // Unsigned, clamp min at 0.
                     if (value < 0) value = 0;

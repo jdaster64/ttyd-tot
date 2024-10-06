@@ -1852,7 +1852,7 @@ g_GlobalStrings = {
     
     b"tot_recn_playtime":           b"Total Play Time",
     b"tot_recn_completion_pct":     b"Completion %",
-    b"tot_recn_achievement_pct":    b"Achievement Log",
+    b"tot_recn_achievement_pct":    b"Achievements",
     b"tot_recn_item_pct":           b"Items Log",
     b"tot_recn_badge_pct":          b"Badge Log",
     b"tot_recn_tattle_pct":         b"Tattle Log",

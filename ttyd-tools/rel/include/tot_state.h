@@ -474,15 +474,17 @@ enum Options : uint32_t {
 
     // Stats used for a single run.
     // Currently unlocked + selected move levels.
-    STAT_RUN_MOVE_LV_UNLOCKED     = 0x000'0'01'60,
-    STAT_RUN_MOVE_LV_SELECTED     = 0x018'0'01'60,
+    STAT_RUN_MOVE_LV_UNLOCKED   = 0x000'0'01'60,
+    STAT_RUN_MOVE_LV_SELECTED   = 0x018'0'01'60,
     // Tracking for unique badges collected.
     STAT_RUN_UNIQUE_BADGE_FLAGS = 0x030'0'01'0a,
     // Tracking for midbosses and npcs spawned / used.
     STAT_RUN_MIDBOSSES_USED     = 0x034'0'01'10,
     STAT_RUN_NPCS_SELECTED      = 0x038'0'11'10,
     STAT_RUN_NPCS_DEALT_WITH    = 0x03c'0'01'10,
+    // Current run's intensity rating.
     STAT_RUN_INTENSITY          = 0x040'3'00'00,
+    // Other per-run stats.
     STAT_RUN_TURNS_SPENT        = 0x041'6'00'00,
     STAT_RUN_MOST_TURNS_RECORD  = 0x042'4'00'00,
     STAT_RUN_MOST_TURNS_CURRENT = 0x043'4'00'00,
