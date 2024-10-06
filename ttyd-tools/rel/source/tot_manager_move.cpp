@@ -165,8 +165,8 @@ void MoveManager::Init() {
                 LogMoveUnlock(i, 1);
                 break;
         }
-        g_Mod->state_.level_unlocked_[i] = default_level;
-        g_Mod->state_.level_selected_[i] = default_level;
+        g_Mod->state_.SetOption(STAT_RUN_MOVE_LV_UNLOCKED, default_level, i);
+        g_Mod->state_.SetOption(STAT_RUN_MOVE_LV_SELECTED, default_level, i);
     }
     // Set Mario pouch stuff.
     auto& pouch = *::ttyd::mario_pouch::pouchGetPtr();
@@ -197,25 +197,29 @@ int32_t MoveManager::GetUnlockedLevel(int32_t move_type) {
     if (move_type >= MoveType::BADGE_MOVE_BASE) {
         return g_MaxBadgeMoveLevels[move_type - MoveType::BADGE_MOVE_BASE];
     }
-    return g_Mod->state_.level_unlocked_[move_type];
+    return g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move_type);
 }
 
 int32_t MoveManager::GetSelectedLevel(int32_t move_type) {
     if (move_type >= MoveType::BADGE_MOVE_BASE) {
         return g_CurBadgeMoveLevels[move_type - MoveType::BADGE_MOVE_BASE];
     }
-    return g_Mod->state_.level_selected_[move_type];
+    return g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_SELECTED, move_type);
 }
 
 int32_t MoveManager::GetMoveCost(int32_t move_type) {
     return g_MoveData[move_type].move_cost[
-        g_Mod->state_.level_selected_[move_type]-1];
+        g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_SELECTED, move_type) - 1];
 }
 
 bool MoveManager::UpgradeMove(int32_t move_type) {
-    auto& level = g_Mod->state_.level_unlocked_[move_type];
+    // Increment the move level, if it's not at its max.
+    int32_t level = g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move_type);
     if (level >= g_MoveData[move_type].max_level) return false;
-    if (++level == 1) {
+    g_Mod->state_.SetOption(STAT_RUN_MOVE_LV_UNLOCKED, ++level, move_type);
+    
+    // If newly unlocked...
+    if (level == 1) {
         auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
         switch (move_type) {
             // Unlock field moves for Spin/Spring Jump + Super/Ultra Hammer.
@@ -247,7 +251,7 @@ bool MoveManager::UpgradeMove(int32_t move_type) {
                 pouch.max_sp += 100;
                 break;
         }
-        g_Mod->state_.level_selected_[move_type] = 1;
+        g_Mod->state_.SetOption(STAT_RUN_MOVE_LV_SELECTED, 1, move_type);
     }
     LogMoveUnlock(move_type, level);
     return true;
@@ -268,22 +272,24 @@ bool MoveManager::ChangeSelectedLevel(int32_t move_type, int32_t change) {
         return new_level != old_level;
     }
 
-    int32_t old_level = g_Mod->state_.level_selected_[move_type];
-    int32_t max_level = g_Mod->state_.level_unlocked_[move_type];
+    int32_t old_level =
+        g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_SELECTED, move_type);
+    int32_t max_level =
+        g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move_type);
     int32_t new_level = old_level + change;
     
     if (new_level < 1) new_level = 1;
     if (new_level > max_level) new_level = max_level;
     
-    g_Mod->state_.level_selected_[move_type] = new_level;
+    g_Mod->state_.SetOption(STAT_RUN_MOVE_LV_SELECTED, new_level, move_type);
     return new_level != old_level;
 }
 
 void MoveManager::ResetSelectedLevels() {
     // Set all unlocked moves' selected level to 1.
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
-        if (g_Mod->state_.level_unlocked_[i])
-            g_Mod->state_.level_selected_[i] = 1;
+        if (g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, i))
+            g_Mod->state_.SetOption(STAT_RUN_MOVE_LV_SELECTED, 1, i);
     }
     // Set all badge moves' selected level to 1.
     int32_t num_badge_moves =
@@ -294,17 +300,18 @@ void MoveManager::ResetSelectedLevels() {
 }
 
 bool MoveManager::IsUnlockable(int32_t move_type) {
-    if (g_Mod->state_.level_unlocked_[move_type] != 0) return false;
+    if (g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move_type) != 0)
+        return false;
     // Spring Jump / Ultra Hammer require unlocking Spin/Super as precursor.
     if (g_MoveData[move_type].move_tier == 4 &&
-        g_Mod->state_.level_unlocked_[move_type - 1] == 0) return false;
+        g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move_type - 1) == 0)
+        return false;
     return true;
 }
 
 bool MoveManager::IsUpgradable(int32_t move_type) {
-    if (g_Mod->state_.level_unlocked_[move_type] == 0 ||
-        g_Mod->state_.level_unlocked_[move_type] >= 
-        g_MoveData[move_type].max_level) return false;
+    int32_t level = g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move_type);
+    if (level == 0 || level >= g_MoveData[move_type].max_level) return false;
     if (g_MoveData[move_type].partner_id > 0 &&
         !(ttyd::mario_pouch::pouchGetPtr()->party_data[
             g_MoveData[move_type].partner_id

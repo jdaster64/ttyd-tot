@@ -580,7 +580,7 @@ EVT_BEGIN(Villager_A_InitEvt)
         CASE_ETC()
             // Only set NPC A's initial position if not a special cutscene.
             USER_FUNC(evt_npc_set_position, PTR("me"), -350, 0, 65)
-    END_IF()
+    END_SWITCH()
     RETURN()
 EVT_END()
 

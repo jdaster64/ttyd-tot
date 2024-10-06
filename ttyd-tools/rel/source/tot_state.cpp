@@ -33,8 +33,8 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace ItemType = ::ttyd::item_data::ItemType;
 
-const int32_t kEarliestSupportedVersion = 3;
-const int32_t kCurrentVersion = 3;
+const int32_t kEarliestSupportedVersion = 10;
+const int32_t kCurrentVersion = 10;
 
 // Holds backup save data (updated on floor 0 and after every boss floor).
 TotSaveSlot g_BackupSave;
@@ -69,9 +69,12 @@ void StateManager::Init() {
 
     ResetOptions();
 
-    // Only enable debug options with a specific save file name.
+    // Enable race-ready and debug modes with specific file names.
+    if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "RaceMode")) {
+        SetOption(OPTVAL_RACE_MODE_ENABLED);
+    }
     if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "xyzzy")) {
-        SetOption(OPT_DEBUG_MODE_ENABLED, 1);
+        SetOption(OPTVAL_DEBUG_MODE_ENABLED);
     }
 }
 
@@ -251,7 +254,7 @@ void StateManager::ResetOptions() {
     memset(option_flags_, 0, sizeof(uint32_t) * 6);
     memset(option_bytes_, 0, sizeof(option_bytes_));
     // Reset per-run play stats.
-    memset(play_stats_, 0, 0x100);
+    memset(play_stats_, 0, 0x100 * 4);
 
     // Set options to their default values.
     SetOption(OPTVAL_PRESET_DEFAULT);
@@ -358,30 +361,32 @@ bool StateManager::SetOption(uint32_t option, int32_t value, int32_t index) {
         }
         // Play stats.
         default: {
-            uint8_t* ptr = play_stats_ + x;
-            // Capped, not an array.
-            if (a & 1) {
-                // Clamp number to b digits long.
-                if (b < 1 || b > 9) return false;
+            uint8_t* ptr = play_stats_ + (x * 4);
+            // Value is 4 bytes long, unless A flags 0x3 are set to 1, 2, or 3.
+            int32_t val_bytes = (a & 3) ? (a & 3) : 4;
+            // Cap value to Y digits long, if applicable.
+            if (y > 0) {
+                if (y > 9) y = 9;
                 static const constexpr int32_t powers_of_10[] = {
                     1, 10, 100, 1000, 10'000, 100'000, 1'000'000, 10'000'000,
                     100'000'000, 1'000'000'000
                 };
                 if (value >= powers_of_10[b]) value = powers_of_10[b] - 1;
-                if (a & 2) {
+                if (a & 0x10) {
                     // Signed, clamp min at -max.
                     if (value <= -powers_of_10[b]) value = -(powers_of_10[b] - 1);
                 } else {
                     // Unsigned, clamp min at 0.
                     if (value < 0) value = 0;
                 }
-            } else if (b > 1) {
-                // Index into array of values.
+            }
+            // Array, index into values.
+            if (b > 1) {
                 if (index < 0 || index >= b) return false;
-                ptr += (index * y);
+                ptr += (index * val_bytes);
             }
             uint32_t uint_val = static_cast<uint32_t>(value);
-            for (int32_t i = y - 1; i >= 0; --i) {
+            for (int32_t i = val_bytes - 1; i >= 0; --i) {
                 ptr[i] = uint_val & 0xff;
                 uint_val >>= 8;
             }
@@ -461,7 +466,7 @@ int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
             break;
         }
         default: {
-            byte_ptr = play_stats_ + x;
+            byte_ptr = play_stats_ + (x * 4);
             break;
         }
     }
@@ -472,19 +477,21 @@ int32_t StateManager::GetOption(uint32_t option, int32_t index) const {
     } else if (t == TYPE_OPTNUM) {
         return *byte_ptr * a;
     } else {
+        // Play stats.
+        // Values are 4 bytes long, unless A flags 0x3 are set to 1, 2, or 3.
+        int32_t val_bytes = (a & 3) ? (a & 3) : 4;
         // Index into array, if STAT_x option is an array.
-        if (!(a & 1) && b > 1) {
+        if (b > 1) {
             // Value is out of range for array.
             if (index < 0 || index >= b) return -1;
-            byte_ptr += (index * y);
+            byte_ptr += (index * val_bytes);
         }
-        // Treat all numbers as unsigned by default.
+        // Treat values as unsigned, unless A flag 0x10 is set.
         uint32_t uint_val = 0;
-        // Treat number as signed if A has flag 0x2 set.
-        if (a & 2) {
+        if (a & 0x10) {
             uint_val = (*byte_ptr & 0x80) ? ~0 : 0;
         }
-        for (int32_t i = 0; i < y; ++i) {
+        for (int32_t i = 0; i < val_bytes; ++i) {
             uint_val = (uint_val << 8) + *byte_ptr++;
         }
         return static_cast<int32_t>(uint_val);
@@ -634,28 +641,6 @@ void StateManager::TimerFloorUpdate() {
 
 void StateManager::ToggleIGT(bool toggle) {
     igt_active_ = toggle;
-}
-
-// Clear play stats, timers, etc. from current run.
-void StateManager::ClearRunStats() {
-    igt_active_ = false;
-    
-    run_start_time_rta_ = 0;
-    last_floor_rta_ = 0;
-    last_floor_total_igt_ = 0;
-    last_floor_total_battle_igt_ = 0;
-    current_total_igt_ = 0;
-    
-    for (int32_t i = 0; i < 129; ++i) {
-        splits_rta_[i] = 0;
-        splits_igt_[i] = 0;
-        splits_battle_igt_[i] = 0;
-    }
-    
-    // Only clear per-run play stats.
-    for (int32_t i = 0; i < 0x100; ++i) {
-        play_stats_[i] = 0;
-    }
 }
 
 // Fetches a random value from the desired sequence (using the RngSequence

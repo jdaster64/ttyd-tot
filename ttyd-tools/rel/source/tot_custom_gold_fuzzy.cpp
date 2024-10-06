@@ -1728,7 +1728,7 @@ void chorogun_ext_disp(CameraId camera, void* user_data) {
 
 void DebugDispChorogunCount(CameraId camera, void* user_data) {
     // Only display in debug mode.
-    if (!g_Mod->state_.GetOption(OPT_DEBUG_MODE_ENABLED)) return;
+    if (!g_Mod->state_.CheckOptionValue(OPTVAL_DEBUG_MODE_ENABLED)) return;
 
     int32_t live_num = 0;
     for (int32_t i = 0; i < ttyd::extdrv::extGetPoseNum(); ++i) {

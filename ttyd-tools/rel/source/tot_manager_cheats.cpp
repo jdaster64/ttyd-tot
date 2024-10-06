@@ -33,7 +33,7 @@ uint32_t secretCode_BumpAttack      = 043652131;
 
 void CheatsManager::Update() {
     // Ignore all cheat codes if not using a debug-enabled file.
-    if (!g_Mod->state_.GetOption(OPT_DEBUG_MODE_ENABLED)) return;
+    if (!g_Mod->state_.CheckOptionValue(OPTVAL_DEBUG_MODE_ENABLED)) return;
 
     // Process cheat codes.
     static uint32_t code_history = 0;

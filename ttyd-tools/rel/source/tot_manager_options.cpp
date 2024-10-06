@@ -320,7 +320,10 @@ int32_t OptionsManager::GetTotalIntensity() {
 
 const char* OptionsManager::GetEncodedOptions() {
     static char encoding_str[24] = { 0 };
-    int8_t encoding_bytes[24] = { (int8_t)g_Mod->state_.version_, 99 };
+    int8_t encoding_bytes[24];
+    // Start with version encoding, then period as separator from main encoding.
+    encoding_bytes[0] = g_Mod->state_.version_ - 10;
+    encoding_bytes[1] = 99;
     int32_t encoded_bit_count = 12;
 
     // If a preset is selected, use its name instead.

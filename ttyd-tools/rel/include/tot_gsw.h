@@ -14,11 +14,11 @@ enum GlobalWorkVars {
     GSW_Tower_ChestClaimed,
     GSW_Tower_DisplayChestIcons,
     GSW_Tower_ContinuingFromGameOver,
-    GSW_Battle_AtomicBoo_BreathGuardCount,
     GSW_Tower_TutorialClearAttempts,
     GSW_Tower_TutorialClears,
     GSW_NpcA_SpecialConversation,
     GSW_NpcF_CurrentConversation,
+    GSW_Battle_AtomicBoo_BreathGuardCount,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),
@@ -29,20 +29,21 @@ enum GlobalWorkVars {
     GSWF_Chest_2,
     GSWF_Chest_3,
     GSWF_Lock,
+    GSWF_RunSettingsCleared,
     GSWF_Lobby_InConfirm,
     GSWF_Lobby_Confirmed,
-    GSWF_Battle_Hooktail_BiteReactionSeen,
+    // Tutorial flags.
     GSWF_HubShopTutorial,
     GSWF_CosmeticShopTutorial,
     GSWF_RunOptionsTutorial,
-    GSWF_RunSettingsCleared,
+    GSWF_Battle_Hooktail_BiteReactionSeen,
+    // Flag for having chatted with NPC D for the first time.
+    GSWF_NpcD_FirstTimeChat,
     // Flags for unique Bub-ulber conversations seen.
     GSWF_NpcF_Flags,
     GSWF_NpcF_Flags_End                     = GSWF_NpcF_Flags + 30,
     GSWF_NpcF_FirstTalk                     = GSWF_NpcF_Flags_End,
     GSWF_NpcF_SeedUnlocked,
-    // Flag for having chatted with NPC D for the first time.
-    GSWF_NpcD_FirstTimeChat,
     // Flag for having chatted with NPC G post-tutorial clears.
     GSWF_NpcG_PostTutorialChat,
     // Flag for having chatted with NPC I post-tutorial clears.
@@ -69,9 +70,9 @@ enum GlobalWorkVars {
     GSWF_MarioColors_End                    = GSWF_MarioColors + 30,
     // Used for queueing animations for achievement unlocking.
     GSWF_AchWinQueue                        = GSWF_MarioColors_End,
-    GSWF_AchWinQueue_End                    = GSWF_AchWinQueue + 70,
+    GSWF_AchWinQueue_End                    = GSWF_AchWinQueue + 128,
     GSWF_AchUnlockQueue                     = GSWF_AchWinQueue_End,
-    GSWF_AchUnlockQueue_End                 = GSWF_AchUnlockQueue + 70,
+    GSWF_AchUnlockQueue_End                 = GSWF_AchUnlockQueue + 128,
 };
 
 // Wrappers to ttyd::swdrv functions that handle base conversion.

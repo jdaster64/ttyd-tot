@@ -17,13 +17,16 @@ struct TotSaveSlot;
     
 class StateManager {
 public:
-    // State revision; will eventually be used for versioning.
+    // StateManager data format revision; used for versioning.
+    // Offset: g_Mod->state_ + 0x0000
     uint8_t     version_;
     
-    // Whether in-game run timer is currently active.
+    // Whether the in-game run timer is currently active.
+    // Offset: g_Mod->state_ + 0x0001
     uint8_t     igt_active_;
     
-    // Used by RewardManager to track character stats in a run.
+    // Used to track character stats in a run.
+    // Offset: g_Mod->state_ + 0x0002
     int16_t     hp_level_;
     int16_t     fp_level_;
     int16_t     bp_level_;
@@ -31,50 +34,55 @@ public:
     int16_t     max_inventory_;
     
     // Used to track tower progression.
+    // Offset: g_Mod->state_ + 0x000c
     int32_t     floor_;
+
+    // Saves the current completion progress as an easily accessible integer.
+    // Offset: g_Mod->state_ + 0x0010
+    int32_t     completion_score_;
     
-    // Used by MoveManager to track unlocked / selected levels of moves in a run.
-    int8_t      level_unlocked_[MoveType::MOVE_TYPE_MAX];
-    int8_t      level_selected_[MoveType::MOVE_TYPE_MAX];
-    
-    // Options / saved data.
-    uint32_t    option_flags_[8];   // Last 8 bytes reserved for cosmetics.
-    uint8_t     option_bytes_[64];
-    
-    // RNG information.
-    uint32_t    seed_;
-    uint16_t    rng_states_[56];
-    
+    // Timer-related information.
+    // Offset: g_Mod->state_ + 0x0014
+    // Split timers for floors (# of centiseconds).
+    uint32_t    splits_rta_[129];
+    uint32_t    splits_igt_[129];
+    uint32_t    splits_battle_igt_[129];
     // In-game and real-time timers.
     uint64_t    run_start_time_rta_;
     uint64_t    last_floor_rta_;
     uint64_t    last_floor_total_igt_;
     uint64_t    last_floor_total_battle_igt_;
     uint64_t    current_total_igt_;
-    // Split timers for floors (# of centiseconds).
-    uint32_t    splits_rta_[129];
-    uint32_t    splits_igt_[129];
-    uint32_t    splits_battle_igt_[129];
+    uint64_t    unused_timer_;    // Reserved for potential future use.
     
-    // Permanent tracking data.
-    uint32_t    achievement_flags_[4];
-    uint32_t    option_unlocked_flags_[4];
+    // RNG information.
+    // Offset: g_Mod->state_ + 0x0650
+    uint32_t    seed_;
+    // Bub-ulb's seed name. Resets between runs.
+    char        seed_name_[12];
+    uint16_t    rng_states_[56];
+    
+    // Options data.
+    // Offset: g_Mod->state_ + 0x06d0
+    uint32_t    option_flags_[8];   // Last 8 bytes reserved for cosmetics.
+    uint8_t     option_bytes_[64];
+    
+    // Permanent tracking bitfields.
+    // Offset: g_Mod->state_ + 0x0730
     uint32_t    item_encountered_flags_[8];
     uint32_t    item_purchased_flags_[8];
-    uint32_t    midboss_defeated_flags_[4];
+    uint32_t    achievement_flags_[4];
+    uint32_t    option_unlocked_flags_[4];
     uint32_t    cosmetic_purchased_flags_[4];
+    uint32_t    midboss_defeated_flags_[4];
     // Reserved in case similar flags are needed in the future.
     uint32_t    reserved_flags_[20];
-
-    // Bub-ulb's seed name. Resets between runs.
-    char        seed_name_[16];
-
-    // Saves the current completion progress as an easily accessible integer.
-    int32_t     completion_score_;
     
-    // Saves various stats for current runs and all-time.
-    // Currently, the first 0x100 bytes are used for current-run stats.
-    uint8_t     play_stats_[1024];
+    // Various play stats, pertaining to current run / all time.
+    // Offset: g_Mod->state_ + 0x0800
+    // The first 0x100 * 4 bytes are used for stats for the current run,
+    // including the currently available + selected move levels.
+    uint8_t     play_stats_[0x400 * 4];
 
     // Initializes basic fields the first time a file is created.
     void Init();
@@ -130,9 +138,6 @@ public:
     void TimerFloorUpdate();
     void ToggleIGT(bool toggle);
     
-    // Clear play stats, timers, etc. from current run.
-    void ClearRunStats();
-    
     // Fetches a random value from the desired sequence (using the RngSequence
     // enum), returning a value in the range [0, range). If `sequence` is not
     // a valid enum value, returns a random value using ttyd::system::irand().
@@ -143,7 +148,7 @@ public:
     static void GetOptionParts(
         uint32_t v, int32_t* t, int32_t* x, int32_t* y, int32_t* a, int32_t* b);
 };
-static_assert(sizeof(StateManager) == 0xc80);
+static_assert(sizeof(StateManager) == 0x1800);
 
 // Standard evt wrappers to call certain functions / access fields.
 
@@ -183,11 +188,11 @@ struct TotSaveData {
     // Tower of Trials save data.
     mod::tot::StateManager tot_state;   // 0x1fd8
 };
-static_assert(sizeof(TotSaveData) == 0x2c58);
+static_assert(sizeof(TotSaveData) == 0x37d8);
 
 struct TotSaveSlot {
     TotSaveData data;                       // 0x0000
-    uint8_t     reserved[0x3800-0x2c58];    // 0x2c58
+    uint8_t     reserved[0x3800-0x37d8];    // 0x37d8
     uint8_t     padding[0x3ff0-0x3800];     // 0x3800
     
     char        version[4];                 // 0x3ff0
@@ -289,140 +294,164 @@ enum OptionsType {
 //          W = A: item_purchased_flags_
 //          W = B: midboss_defeated_flags_
 //          W = C: cosmetic_purchased_flags_
-//  - STAT_x:   Play stats value:   (0x XXX Y ZZ VV);
-//      Represents play_stats_ bytes [XXX, XXX+Y) (in the range 0x000 ~ 0x400).
-//          If ZZ & 1: Value is capped to values of up to VV (1-9) digits.
-//                     Otherwise, value is uncapped, and if VV > 1,
-//                     value is actually an array of VVx Y-byte values.
-//          If ZZ & 2: Value(s) should be interpreted as signed.
+//  - STAT_x:   Play stats value:   (0x XXX Y AA BB) with XXX < 0x400;
+//      Represents a range of bytes in play_stats_, from index 0xXXX * 4 onward.
+//          If Y > 0, Cap value(s) to Y digits in length.
+//          If AA & 1, 2, 3, value(s) are 1-3 bytes long instead of default 4.
+//          If AA & 0x10, value should be interpreted as signed.
+//          If BB > 1, Value is actually an array of BB values.
 //  - Other options (0xD0000000+) : reserved for future / other uses.
 //
 // Intentionally placed in global namespace for convenience.
 enum Options : uint32_t {
     // Flag-based options.
-    // Select a set of settings all at once.
-    OPT_PRESET                  = 0x400'2'00'01,
-    OPTVAL_PRESET_CUSTOM        = 0x500'2'00'00,
-    OPTVAL_PRESET_DEFAULT       = 0x500'2'00'01,
-    // Reserved: OPTVAL_PRESET_RACE, possibly another?
+    // Select a set of settings all at once, or choose a custom set.
+    OPT_PRESET                  = 0x400'3'00'01,
+    OPTVAL_PRESET_CUSTOM        = 0x500'3'00'00,
+    OPTVAL_PRESET_DEFAULT       = 0x500'3'00'01,
+    // Reserved: Space for extra presets.
+
     // Tower difficulty.
-    OPT_DIFFICULTY              = 0x402'2'01'03,
-    OPTVAL_DIFFICULTY_TUTORIAL  = 0x502'2'00'00,
-    OPTVAL_DIFFICULTY_HALF      = 0x502'2'00'01,
-    OPTVAL_DIFFICULTY_FULL      = 0x502'2'00'02,
-    OPTVAL_DIFFICULTY_FULL_EX   = 0x502'2'00'03,
-    // Starting partner choice, or no partners.
-    OPT_PARTNER                 = 0x404'4'00'07,
-    OPTVAL_PARTNER_RANDOM       = 0x504'4'00'00,
-    OPTVAL_PARTNER_GOOMBELLA    = 0x504'4'00'01,
-    OPTVAL_PARTNER_KOOPS        = 0x504'4'00'02,
-    OPTVAL_PARTNER_FLURRIE      = 0x504'4'00'03,
-    OPTVAL_PARTNER_YOSHI        = 0x504'4'00'04,
-    OPTVAL_PARTNER_VIVIAN       = 0x504'4'00'05,
-    OPTVAL_PARTNER_BOBBERY      = 0x504'4'00'06,
-    OPTVAL_PARTNER_MOWZ         = 0x504'4'00'07,
-    OPTVAL_PARTNER_NONE         = 0x504'4'00'08,    // Not currently used.
-    // Starting item set.
-    OPT_STARTER_ITEMS           = 0x408'3'00'04,
-    OPTVAL_STARTER_ITEMS_OFF    = 0x508'3'00'00,
-    OPTVAL_STARTER_ITEMS_BASIC  = 0x508'3'00'01,
-    OPTVAL_STARTER_ITEMS_STRONG = 0x508'3'00'02,
-    OPTVAL_STARTER_ITEMS_RANDOM = 0x508'3'00'03,
-    OPTVAL_STARTER_ITEMS_CUSTOM = 0x508'3'00'04,
+    OPT_DIFFICULTY              = 0x403'2'01'03,
+    OPTVAL_DIFFICULTY_TUTORIAL  = 0x503'2'00'00,    // Not used.
+    OPTVAL_DIFFICULTY_HALF      = 0x503'2'00'01,
+    OPTVAL_DIFFICULTY_FULL      = 0x503'2'00'02,
+    OPTVAL_DIFFICULTY_FULL_EX   = 0x503'2'00'03,
+
+    // Enable timer display.
+    OPT_TIMER_DISPLAY           = 0x405'3'00'02,
+    OPTVAL_TIMER_NONE           = 0x505'3'00'00,
+    OPTVAL_TIMER_IGT            = 0x505'3'00'01,
+    OPTVAL_TIMER_RTA            = 0x505'3'00'02,
+    // Reserved: Space for extra timer options (countdown timer...?)
+
+    // Determines how many chests appear per floor.
+    OPT_NUM_CHESTS              = 0x408'3'00'03,
+    OPTVAL_CHESTS_DEFAULT       = 0x508'3'00'00,
+    OPTVAL_CHESTS_1             = 0x508'3'00'01,
+    OPTVAL_CHESTS_2             = 0x508'3'00'02,
+    OPTVAL_CHESTS_3             = 0x508'3'00'03,
+    OPTVAL_CHESTS_4             = 0x508'3'00'04,    // Not currently used.
+    
     // How enemies hold / drop items, and whether there are battle conditions.
     OPT_BATTLE_DROPS            = 0x40b'2'00'03,
     OPTVAL_DROP_STANDARD        = 0x50b'2'00'00,   // one drop + bonus chance
     OPTVAL_DROP_HELD_FROM_BONUS = 0x50b'2'00'01,   // held drop from bonus
     OPTVAL_DROP_NO_HELD_W_BONUS = 0x50b'2'00'02,   // no held, only bonus
     OPTVAL_DROP_ALL_HELD        = 0x50b'2'00'03,   // all drop + bonus chance
-    // Enable timer display.
-    OPT_TIMER_DISPLAY           = 0x40d'3'00'02,
-    OPTVAL_TIMER_NONE           = 0x50d'3'00'00,
-    OPTVAL_TIMER_IGT            = 0x50d'3'00'01,
-    OPTVAL_TIMER_RTA            = 0x50d'3'00'02,
-    // Reserved: left space for possible countdown timer options.
-    // Whether to enable Merlee curses (not currently supported).
-    OPT_MERLEE_CURSE            = 0x410'1'00'01,
-    // Whether to have the audience throw random items.
-    OPT_AUDIENCE_RANDOM_THROWS  = 0x411'1'00'01,
-    OPTVAL_AUDIENCE_THROWS_OFF  = 0x511'1'00'00,
-    OPTVAL_AUDIENCE_THROWS_ON   = 0x511'1'00'01,
-    // Whether to enable variance on all sources of variable damage.
-    OPT_RANDOM_DAMAGE           = 0x412'2'00'02,
-    OPTVAL_RANDOM_DAMAGE_NONE   = 0x512'2'00'00,
-    OPTVAL_RANDOM_DAMAGE_25     = 0x512'2'00'01,
-    OPTVAL_RANDOM_DAMAGE_50     = 0x512'2'00'02,
-    // Changes to stage hazard rates (not currently supported).
-    OPT_STAGE_HAZARDS           = 0x414'3'00'04,
-    OPTVAL_STAGE_HAZARDS_NORMAL = 0x514'3'00'00,
-    OPTVAL_STAGE_HAZARDS_HIGH   = 0x514'3'00'01,
-    OPTVAL_STAGE_HAZARDS_LOW    = 0x514'3'00'02,
-    OPTVAL_STAGE_HAZARDS_NO_FOG = 0x514'3'00'03,
-    OPTVAL_STAGE_HAZARDS_OFF    = 0x514'3'00'04,
-    // Whether to shuffle the appearance and description of items.
-    OPT_OBFUSCATE_ITEMS         = 0x417'1'00'01,
-    OPTVAL_OBFUSCATE_ITEMS_OFF  = 0x517'1'00'00,
-    OPTVAL_OBFUSCATE_ITEMS_ON   = 0x517'1'00'01,
+
+    // Starting item set.
+    OPT_STARTER_ITEMS           = 0x40d'3'00'04,
+    OPTVAL_STARTER_ITEMS_OFF    = 0x50d'3'00'00,
+    OPTVAL_STARTER_ITEMS_BASIC  = 0x50d'3'00'01,
+    OPTVAL_STARTER_ITEMS_STRONG = 0x50d'3'00'02,
+    OPTVAL_STARTER_ITEMS_RANDOM = 0x50d'3'00'03,
+    OPTVAL_STARTER_ITEMS_CUSTOM = 0x50d'3'00'04,
+
+    // Starting partner choice, or no partners.
+    OPT_PARTNER                 = 0x410'4'00'07,
+    OPTVAL_PARTNER_RANDOM       = 0x510'4'00'00,
+    OPTVAL_PARTNER_GOOMBELLA    = 0x510'4'00'01,
+    OPTVAL_PARTNER_KOOPS        = 0x510'4'00'02,
+    OPTVAL_PARTNER_FLURRIE      = 0x510'4'00'03,
+    OPTVAL_PARTNER_YOSHI        = 0x510'4'00'04,
+    OPTVAL_PARTNER_VIVIAN       = 0x510'4'00'05,
+    OPTVAL_PARTNER_BOBBERY      = 0x510'4'00'06,
+    OPTVAL_PARTNER_MOWZ         = 0x510'4'00'07,
+    OPTVAL_PARTNER_NONE         = 0x510'4'00'08,    // Not currently used.
+
+    // Maximum number of partners Mario can have at once (0 to 7).
+    // If set to 0, "floor 0" will have a jump, hammer or Special Move.
+    OPT_MAX_PARTNERS            = 0x414'3'00'07,
+    OPTVAL_NO_PARTNERS          = 0x514'3'00'00,
+
     // Whether to auto-revive partners after finishing a battle.
-    OPT_REVIVE_PARTNERS         = 0x418'1'00'01,
-    OPTVAL_REVIVE_PARTNERS_OFF  = 0x518'1'00'00,
-    OPTVAL_REVIVE_PARTNERS_ON   = 0x518'1'00'01,
-    // Whether Charlieton should have smaller or limited stock.
-    OPT_CHARLIETON_STOCK        = 0x419'2'00'03,
-    OPTVAL_CHARLIETON_NORMAL    = 0x519'2'00'00,
-    OPTVAL_CHARLIETON_SMALLER   = 0x519'2'00'01,
-    OPTVAL_CHARLIETON_TINY      = 0x519'2'00'02,
-    OPTVAL_CHARLIETON_LIMITED   = 0x519'2'00'03,
-    // Whether to force the player to refight Bandits with stolen items.
-    OPT_BANDIT_ESCAPE           = 0x41b'1'00'01,
-    OPTVAL_BANDIT_NO_REFIGHT    = 0x51b'1'00'00,
-    OPTVAL_BANDIT_FORCE_REFIGHT = 0x51b'1'00'01,
+    OPT_REVIVE_PARTNERS         = 0x417'1'00'01,
+    OPTVAL_REVIVE_PARTNERS_OFF  = 0x517'1'00'00,
+    OPTVAL_REVIVE_PARTNERS_ON   = 0x517'1'00'01,
+
     // Stat increase per upgrade (0-10); at 0, you only ever have 1 point.
-    // BP increase of "11" treats BP as infinite.
-    OPT_MARIO_HP                = 0x41c'4'00'0a,
-    OPT_PARTNER_HP              = 0x420'4'00'0a,
-    OPT_MARIO_FP                = 0x424'4'00'0a,
-    OPT_MARIO_BP                = 0x428'4'00'0b,
-    OPTVAL_INFINITE_BP          = 0x528'4'00'0b,
+    // Setting BP increase to "11" treats BP as infinite.
+    OPT_MARIO_HP                = 0x418'4'00'0a,
+    OPT_MARIO_FP                = 0x41c'4'00'0a,
+    OPT_MARIO_BP                = 0x420'4'00'0b,
+    OPTVAL_INFINITE_BP          = 0x520'4'00'0b,
+    OPT_PARTNER_HP              = 0x424'4'00'0a,
     // Increase per Strange Sack (0-3); base inventory is always 6.
-    OPT_INVENTORY_SACK_SIZE     = 0x42c'2'00'03,
-    // Select which NPCs appear in a run, either specific ones, random or none.
-    OPT_NPC_CHOICE_1            = 0x42e'4'00'09,
-    OPT_NPC_CHOICE_2            = 0x432'4'00'09,
-    OPT_NPC_CHOICE_3            = 0x436'4'00'09,
-    OPT_NPC_CHOICE_4            = 0x43a'4'00'09,
-    // Determines whether the secret boss will appear (not currently supported).
-    OPT_SECRET_BOSS             = 0x43e'2'00'02,
-    OPTVAL_SECRET_BOSS_RANDOM   = 0x53e'2'00'00,
-    OPTVAL_SECRET_BOSS_OFF      = 0x53e'2'00'01,
-    OPTVAL_SECRET_BOSS_ON       = 0x53e'2'00'02,
-    // Determines the maximum number of partners Mario can have in a run,
-    // from 1-7 (default of 4).
-    OPT_MAX_PARTNERS            = 0x440'3'00'07,
-    OPTVAL_NO_PARTNERS          = 0x540'3'00'00,
+    OPT_INVENTORY_SACK_SIZE     = 0x428'2'00'03,
+
     // Determines the difficulty of Action Commands.
-    OPT_AC_DIFFICULTY           = 0x443'3'00'06,
-    OPTVAL_AC_3_SIMP            = 0x543'3'00'00,
-    OPTVAL_AC_2_SIMP            = 0x543'3'00'01,
-    OPTVAL_AC_1_SIMP            = 0x543'3'00'02,
-    OPTVAL_AC_DEFAULT           = 0x543'3'00'03,
-    OPTVAL_AC_1_UNSIMP          = 0x543'3'00'04,
-    OPTVAL_AC_2_UNSIMP          = 0x543'3'00'05,
-    OPTVAL_AC_3_UNSIMP          = 0x543'3'00'06,
-    // Determines how many chests appear per floor.
-    OPT_NUM_CHESTS              = 0x446'3'00'03,
-    OPTVAL_CHESTS_DEFAULT       = 0x546'3'00'00,
-    OPTVAL_CHESTS_1             = 0x546'3'00'01,
-    OPTVAL_CHESTS_2             = 0x546'3'00'02,
-    OPTVAL_CHESTS_3             = 0x546'3'00'03,
-    OPTVAL_CHESTS_4             = 0x546'3'00'04,    // Not currently used.
-    // Next: 0x449
+    OPT_AC_DIFFICULTY           = 0x42a'3'00'06,
+    OPTVAL_AC_3_SIMP            = 0x52a'3'00'00,
+    OPTVAL_AC_2_SIMP            = 0x52a'3'00'01,
+    OPTVAL_AC_1_SIMP            = 0x52a'3'00'02,
+    OPTVAL_AC_DEFAULT           = 0x52a'3'00'03,
+    OPTVAL_AC_1_UNSIMP          = 0x52a'3'00'04,
+    OPTVAL_AC_2_UNSIMP          = 0x52a'3'00'05,
+    OPTVAL_AC_3_UNSIMP          = 0x52a'3'00'06,
+
+    // Whether to enable variance on all sources of variable damage.
+    OPT_RANDOM_DAMAGE           = 0x42d'2'00'02,
+    OPTVAL_RANDOM_DAMAGE_NONE   = 0x52d'2'00'00,
+    OPTVAL_RANDOM_DAMAGE_25     = 0x52d'2'00'01,
+    OPTVAL_RANDOM_DAMAGE_50     = 0x52d'2'00'02,
+
+    // Whether to have the audience throw random items.
+    OPT_AUDIENCE_RANDOM_THROWS  = 0x42f'1'00'01,
+    OPTVAL_AUDIENCE_THROWS_OFF  = 0x52f'1'00'00,
+    OPTVAL_AUDIENCE_THROWS_ON   = 0x52f'1'00'01,
+
+    // Whether to shuffle the appearance and description of items.
+    OPT_OBFUSCATE_ITEMS         = 0x430'1'00'01,
+    OPTVAL_OBFUSCATE_ITEMS_OFF  = 0x530'1'00'00,
+    OPTVAL_OBFUSCATE_ITEMS_ON   = 0x530'1'00'01,
+
+    // Whether to force the player to refight Bandits with stolen items.
+    OPT_BANDIT_ESCAPE           = 0x431'1'00'01,
+    OPTVAL_BANDIT_NO_REFIGHT    = 0x531'1'00'00,
+    OPTVAL_BANDIT_FORCE_REFIGHT = 0x531'1'00'01,
+
+    // Whether Charlieton should have smaller or limited stock.
+    OPT_CHARLIETON_STOCK        = 0x432'2'00'03,
+    OPTVAL_CHARLIETON_NORMAL    = 0x532'2'00'00,
+    OPTVAL_CHARLIETON_SMALLER   = 0x532'2'00'01,
+    OPTVAL_CHARLIETON_TINY      = 0x532'2'00'02,
+    OPTVAL_CHARLIETON_LIMITED   = 0x532'2'00'03,
+
+    // Select which NPCs appear in a run, either specific ones, random or none.
+    OPT_NPC_CHOICE_1            = 0x434'4'00'09,
+    OPT_NPC_CHOICE_2            = 0x438'4'00'09,
+    OPT_NPC_CHOICE_3            = 0x43c'4'00'09,
+    OPT_NPC_CHOICE_4            = 0x440'4'00'09,
+
+    // Determines whether the secret boss will appear.
+    OPT_SECRET_BOSS             = 0x444'2'00'02,
+    OPTVAL_SECRET_BOSS_RANDOM   = 0x544'2'00'00,
+    OPTVAL_SECRET_BOSS_OFF      = 0x544'2'00'01,
+    OPTVAL_SECRET_BOSS_ON       = 0x544'2'00'02,
+
+    // Whether to enable Merlee curses (not supported).
+    OPT_MERLEE_CURSE            = 0x446'1'00'01,
+
+    // Changes to stage hazard rates (not supported).
+    OPT_STAGE_HAZARDS           = 0x447'3'00'04,
+    OPTVAL_STAGE_HAZARDS_NORMAL = 0x547'3'00'00,
+    OPTVAL_STAGE_HAZARDS_HIGH   = 0x547'3'00'01,
+    OPTVAL_STAGE_HAZARDS_LOW    = 0x547'3'00'02,
+    OPTVAL_STAGE_HAZARDS_NO_FOG = 0x547'3'00'03,
+    OPTVAL_STAGE_HAZARDS_OFF    = 0x547'3'00'04,
+    // Next: 0x44a
     
     // Internal options; are not automatically reset between runs.
     OPT_RUN_STARTED             = 0x4c0'1'00'01,
-    OPT_DEBUG_MODE_ENABLED      = 0x4c1'1'00'01,
+    OPT_USE_SEED_NAME           = 0x4c1'1'00'01,
     OPT_SHOP_ITEMS_CHOSEN       = 0x4c2'1'00'01,
-    OPT_USE_SEED_NAME           = 0x4c3'1'00'01,
+    // Special modes for a save file based on its name.
+    OPT_SPECIAL_FILE_MODE       = 0x4c3'3'00'03,
+    OPTVAL_DEBUG_MODE_ENABLED   = 0x5c3'3'00'01,
+    OPTVAL_RACE_MODE_ENABLED    = 0x5c3'3'00'02,
+    OPTVAL_100_MODE_ENABLED     = 0x5c3'3'00'03,
+    // Next: 0x4c6
     
     // Numeric options.
     // Global enemy HP and ATK scaling (0.05x ~ 10.00x in increments of 0.05).
@@ -443,103 +472,114 @@ enum Options : uint32_t {
     
     // Play stats.
 
-    // Stats reset per run.
-    STAT_RUN_TURNS_SPENT        = 0x000'3'01'06,
-    STAT_RUN_MOST_TURNS_RECORD  = 0x003'2'01'04,
-    STAT_RUN_MOST_TURNS_CURRENT = 0x005'2'01'04,
-    STAT_RUN_MOST_TURNS_FLOOR   = 0x007'1'00'00,
-    STAT_RUN_TIMES_RAN_AWAY     = 0x008'2'01'04,
-    STAT_RUN_ENEMY_DAMAGE       = 0x00a'3'01'06,
-    STAT_RUN_PLAYER_DAMAGE      = 0x00d'3'01'06,
-    STAT_RUN_ITEMS_USED         = 0x010'2'01'04,
-    STAT_RUN_STAR_PIECES        = 0x012'2'01'03,
-    STAT_RUN_SHINE_SPRITES      = 0x014'2'01'03,
-    STAT_RUN_COINS_EARNED       = 0x016'3'01'06,
-    STAT_RUN_COINS_SPENT        = 0x019'3'01'06,
-    STAT_RUN_FP_SPENT           = 0x01c'3'01'06,
-    STAT_RUN_SP_SPENT           = 0x01f'3'01'06,
-    STAT_RUN_SUPERGUARDS        = 0x022'3'01'06,
-    STAT_RUN_NPCS_SELECTED      = 0x025'1'02'08,
-    STAT_RUN_NPCS_DEALT_WITH    = 0x02d'1'00'08,
-    STAT_RUN_NPC_SP_PURCHASED   = 0x035'1'01'03,
-    STAT_RUN_NPC_DAZZLE_FLOOR   = 0x036'1'01'03,
-    STAT_RUN_NPC_GRUBBA_FLOOR   = 0x037'1'01'03,
-    STAT_RUN_NPC_DOOPLISS_FLOOR = 0x038'1'01'03,
-    STAT_RUN_NPC_LUMPY_FLOOR    = 0x039'1'01'03,
-    STAT_RUN_NPC_MOVER_FLOOR    = 0x03a'1'01'03,
-    STAT_RUN_NPC_LUMPY_COINS    = 0x03b'2'01'03,
-    STAT_RUN_NPC_ITEMS_SOLD     = 0x03d'2'01'04,
-    STAT_RUN_NPC_BADGES_SOLD    = 0x03f'2'01'04,
-    STAT_RUN_NPC_LEVELS_SOLD    = 0x041'2'01'04,
-    STAT_RUN_CONDITIONS_MET     = 0x043'1'00'00,
-    STAT_RUN_CONDITIONS_TOTAL   = 0x044'1'00'00,
-    STAT_RUN_UNIQUE_BADGE_FLAGS = 0x045'1'00'0a,
-    STAT_RUN_MIDBOSSES_USED     = 0x04f'1'00'07,
-    STAT_RUN_CONTINUES          = 0x056'2'01'03,
-    STAT_RUN_ITEMS_BOUGHT       = 0x058'1'01'03,
+    // Stats used for a single run.
+    // Currently unlocked + selected move levels.
+    STAT_RUN_MOVE_LV_UNLOCKED     = 0x000'0'01'60,
+    STAT_RUN_MOVE_LV_SELECTED     = 0x018'0'01'60,
+    // Tracking for unique badges collected.
+    STAT_RUN_UNIQUE_BADGE_FLAGS = 0x030'0'01'0a,
+    // Tracking for midbosses and npcs spawned / used.
+    STAT_RUN_MIDBOSSES_USED     = 0x034'0'01'10,
+    STAT_RUN_NPCS_SELECTED      = 0x038'0'11'10,
+    STAT_RUN_NPCS_DEALT_WITH    = 0x03c'0'01'10,
+    STAT_RUN_INTENSITY          = 0x040'3'00'00,
+    STAT_RUN_TURNS_SPENT        = 0x041'6'00'00,
+    STAT_RUN_MOST_TURNS_RECORD  = 0x042'4'00'00,
+    STAT_RUN_MOST_TURNS_CURRENT = 0x043'4'00'00,
+    STAT_RUN_MOST_TURNS_FLOOR   = 0x044'0'00'00,
+    STAT_RUN_TIMES_RAN_AWAY     = 0x045'4'00'00,
+    STAT_RUN_CONTINUES          = 0x046'4'00'00,
+    STAT_RUN_CONDITIONS_MET     = 0x047'0'00'00,
+    STAT_RUN_CONDITIONS_TOTAL   = 0x048'0'00'00,
+    STAT_RUN_ENEMY_DAMAGE       = 0x049'7'00'00,
+    STAT_RUN_PLAYER_DAMAGE      = 0x04a'7'00'00,
+    STAT_RUN_STAR_PIECES        = 0x04b'3'00'00,
+    STAT_RUN_SHINE_SPRITES      = 0x04c'3'00'00,
+    STAT_RUN_COINS_EARNED       = 0x04d'6'00'00,
+    STAT_RUN_COINS_SPENT        = 0x04e'6'00'00,
+    STAT_RUN_ITEMS_BOUGHT       = 0x04f'3'00'00,
+    STAT_RUN_ITEMS_USED         = 0x050'3'00'00,
+    STAT_RUN_FP_SPENT           = 0x051'6'00'00,
+    STAT_RUN_SP_SPENT           = 0x052'6'00'00,
+    STAT_RUN_SUPERGUARDS        = 0x053'6'00'00,
+    STAT_RUN_NPC_DAZZLE_FLOOR   = 0x054'3'00'00,
+    STAT_RUN_NPC_GRUBBA_FLOOR   = 0x055'3'00'00,
+    STAT_RUN_NPC_DOOPLISS_FLOOR = 0x056'3'00'00,
+    STAT_RUN_NPC_LUMPY_FLOOR    = 0x057'3'00'00,
+    STAT_RUN_NPC_MOVER_FLOOR    = 0x058'3'00'00,
+    STAT_RUN_NPC_LUMPY_COINS    = 0x059'3'00'00,
+    STAT_RUN_NPC_SP_PURCHASED   = 0x05a'3'00'00,
+    STAT_RUN_NPC_ITEMS_SOLD     = 0x05b'4'00'00,
+    STAT_RUN_NPC_BADGES_SOLD    = 0x05c'4'00'00,
+    STAT_RUN_NPC_LEVELS_SOLD    = 0x05d'4'00'00,
     // Only used for achievement tracking.
-    STAT_RUN_JUMPS_HAMMERS_USED = 0x059'1'01'02,
-    STAT_RUN_BADGES_EQUIPPED    = 0x05a'1'01'02,
-    STAT_RUN_INFATUATE_DAMAGE   = 0x05b'2'01'04,
-    // Tracks the current run's intensity level.
-    STAT_RUN_INTENSITY          = 0x05d'2'01'03,
-    // Next: 0x05f
+    STAT_RUN_JUMPS_HAMMERS_USED = 0x05e'4'00'00,
+    STAT_RUN_BADGES_EQUIPPED    = 0x05f'4'00'00,
+    STAT_RUN_INFATUATE_DAMAGE   = 0x060'6'00'00,
+    // Next: 0x061
 
     // Stats that persist across runs.
-    STAT_PERM_ENEMY_KILLS       = 0x100'2'00'70,
-    STAT_PERM_MOVE_LOG          = 0x1e0'1'00'42,
-    STAT_PERM_PARTNERS_OBTAINED = 0x222'1'00'00,
-    STAT_PERM_HALF_ATTEMPTS     = 0x223'2'01'04,
-    STAT_PERM_HALF_FINISHES     = 0x225'2'01'04,
-    STAT_PERM_FULL_ATTEMPTS     = 0x227'2'01'04,
-    STAT_PERM_FULL_FINISHES     = 0x229'2'01'04,
-    STAT_PERM_EX_ATTEMPTS       = 0x22b'2'01'04,
-    STAT_PERM_EX_FINISHES       = 0x22d'2'01'04,
-    STAT_PERM_HALF_BEST_TIME    = 0x22f'4'01'09,
-    STAT_PERM_FULL_BEST_TIME    = 0x233'4'01'09,
-    STAT_PERM_EX_BEST_TIME      = 0x237'4'01'09,
-    STAT_PERM_CONTINUES         = 0x23b'2'01'04,
-    STAT_PERM_FLOORS            = 0x23d'3'01'07,
-    STAT_PERM_TURNS_SPENT       = 0x240'3'01'07,
-    STAT_PERM_TIMES_RAN_AWAY    = 0x243'2'01'04,
-    STAT_PERM_ENEMIES_DEFEATED  = 0x245'3'01'07,
-    STAT_PERM_ENEMY_DAMAGE      = 0x248'4'01'09,
-    STAT_PERM_PLAYER_DAMAGE     = 0x24c'4'01'09,
-    STAT_PERM_COINS_EARNED      = 0x250'4'01'09,
-    STAT_PERM_COINS_SPENT       = 0x254'4'01'09,
-    STAT_PERM_FP_SPENT          = 0x258'4'01'09,
-    STAT_PERM_SP_SPENT          = 0x25c'4'01'09,
-    STAT_PERM_SUPERGUARDS       = 0x260'4'01'09,
-    STAT_PERM_CONDITIONS_MET    = 0x264'4'01'09,
-    STAT_PERM_CONDITIONS_TOTAL  = 0x268'4'01'09,
-    STAT_PERM_STAR_PIECES       = 0x26c'3'01'07,
-    STAT_PERM_SHINE_SPRITES     = 0x26f'3'01'07,
-    STAT_PERM_ITEMS_USED        = 0x272'3'01'07,
-    STAT_PERM_ITEMS_BOUGHT      = 0x275'3'01'07,
-    STAT_PERM_NPC_WONKY_TRADES  = 0x278'3'01'07,
-    STAT_PERM_NPC_DAZZLE_TRADES = 0x27b'3'01'07,
-    STAT_PERM_NPC_RIPPO_TRADES  = 0x27e'3'01'07,
-    STAT_PERM_NPC_LUMPY_TRADES  = 0x281'3'01'07,
-    STAT_PERM_NPC_GRUBBA_DEAL   = 0x284'3'01'07,
-    STAT_PERM_NPC_DOOPLISS_DEAL = 0x287'3'01'07,
-    STAT_PERM_NPC_MOVER_TRADES  = 0x28a'3'01'07,
-    STAT_PERM_NPC_ZESS_COOKS    = 0x28d'3'01'07,
-    STAT_PERM_NPC_DEALS_TOTAL   = 0x290'3'01'07,
-    STAT_PERM_ACH_HAMMERS       = 0x293'1'01'01,
-    STAT_PERM_CURRENT_COINS     = 0x294'2'01'04,
-    STAT_PERM_CURRENT_SP        = 0x296'2'01'04,
-    STAT_PERM_SHOP_ITEMS        = 0x298'1'00'05,
-    STAT_PERM_ITEM_LOADOUT      = 0x29d'1'00'06,
-    STAT_PERM_ITEM_LOAD_SIZE    = 0x2a3'1'01'01,
-    STAT_PERM_BADGE_LOADOUT     = 0x2a4'1'00'06,
-    STAT_PERM_BADGE_LOAD_SIZE   = 0x2aa'1'01'01,
-    STAT_PERM_META_COINS_EARNED = 0x2ab'4'01'09,
-    STAT_PERM_META_SP_EARNED    = 0x2af'4'01'09,
-    STAT_PERM_MAX_INTENSITY     = 0x2b3'2'01'03,
-    STAT_PERM_REWARDS_OFFERED   = 0x2b5'3'00'18,
-    STAT_PERM_REWARDS_TAKEN     = 0x2fd'3'00'18,
-    STAT_PERM_LAST_ATTACKER     = 0x345'1'00'00,
-    // Next: 0x346
+    // Bitfields / arrays for permanent progression. 
+    STAT_PERM_ENEMY_KILLS       = 0x100'4'02'80,
+    STAT_PERM_MOVE_LOG          = 0x140'0'01'60,
+    STAT_PERM_REWARDS_OFFERED   = 0x158'7'03'20,
+    STAT_PERM_REWARDS_TAKEN     = 0x170'7'03'20,
+    STAT_PERM_PARTNERS_OBTAINED = 0x188'0'00'00,
+    // Last enemy that attacked the player; only used for NPC chatter.
+    STAT_PERM_LAST_ATTACKER     = 0x189'0'00'00,
+    // Permanent currencies (coins, Star Pieces, achievement hammers).
+    STAT_PERM_CURRENT_COINS     = 0x18a'4'00'00,
+    STAT_PERM_CURRENT_SP        = 0x18b'4'00'00,
+    STAT_PERM_ACH_HAMMERS       = 0x18c'1'00'00,
+    // Custom item/badge loadouts.
+    STAT_PERM_ITEM_LOADOUT      = 0x18d'0'01'06,
+    STAT_PERM_ITEM_LOAD_SIZE    = 0x18f'1'00'00,
+    STAT_PERM_BADGE_LOADOUT     = 0x190'0'01'06,
+    STAT_PERM_BADGE_LOAD_SIZE   = 0x192'1'00'00,
+    // Hub shop items.
+    STAT_PERM_SHOP_ITEMS        = 0x193'0'01'05,
+    // Meta-progression stats.
+    STAT_PERM_META_COINS_EARNED = 0x195'9'00'00,
+    STAT_PERM_META_SP_EARNED    = 0x196'9'00'00,
+    // Run stats.
+    STAT_PERM_HALF_ATTEMPTS     = 0x197'5'00'00,
+    STAT_PERM_HALF_FINISHES     = 0x198'5'00'00,
+    STAT_PERM_FULL_ATTEMPTS     = 0x199'5'00'00,
+    STAT_PERM_FULL_FINISHES     = 0x19a'5'00'00,
+    STAT_PERM_EX_ATTEMPTS       = 0x19b'5'00'00,
+    STAT_PERM_EX_FINISHES       = 0x19c'5'00'00,
+    STAT_PERM_HALF_BEST_TIME    = 0x19d'9'00'00,
+    STAT_PERM_FULL_BEST_TIME    = 0x19e'9'00'00,
+    STAT_PERM_EX_BEST_TIME      = 0x19f'9'00'00,
+    STAT_PERM_CONTINUES         = 0x1a0'5'00'00,
+    STAT_PERM_MAX_INTENSITY     = 0x1a1'3'00'00,
+    STAT_PERM_CONDITIONS_MET    = 0x1a2'7'00'00,
+    STAT_PERM_CONDITIONS_TOTAL  = 0x1a3'7'00'00,
+    STAT_PERM_FLOORS            = 0x1a4'9'00'00,
+    STAT_PERM_TURNS_SPENT       = 0x1a5'9'00'00,
+    STAT_PERM_TIMES_RAN_AWAY    = 0x1a6'5'00'00,
+    STAT_PERM_ENEMIES_DEFEATED  = 0x1a7'9'00'00,
+    STAT_PERM_ENEMY_DAMAGE      = 0x1a8'9'00'00,
+    STAT_PERM_PLAYER_DAMAGE     = 0x1a9'9'00'00,
+    STAT_PERM_COINS_EARNED      = 0x1aa'9'00'00,
+    STAT_PERM_COINS_SPENT       = 0x1ab'9'00'00,
+    STAT_PERM_ITEMS_BOUGHT      = 0x1ac'9'00'00,
+    STAT_PERM_ITEMS_USED        = 0x1ad'9'00'00,
+    STAT_PERM_FP_SPENT          = 0x1ae'9'00'00,
+    STAT_PERM_SP_SPENT          = 0x1af'9'00'00,
+    STAT_PERM_SUPERGUARDS       = 0x1b0'9'00'00,
+    STAT_PERM_STAR_PIECES       = 0x1b1'9'00'00,
+    STAT_PERM_SHINE_SPRITES     = 0x1b2'9'00'00,
+    STAT_PERM_NPC_WONKY_TRADES  = 0x1b3'7'00'00,
+    STAT_PERM_NPC_DAZZLE_TRADES = 0x1b4'7'00'00,
+    STAT_PERM_NPC_RIPPO_TRADES  = 0x1b5'7'00'00,
+    STAT_PERM_NPC_LUMPY_TRADES  = 0x1b6'7'00'00,
+    STAT_PERM_NPC_GRUBBA_DEAL   = 0x1b7'7'00'00,
+    STAT_PERM_NPC_DOOPLISS_DEAL = 0x1b8'7'00'00,
+    STAT_PERM_NPC_MOVER_TRADES  = 0x1b9'7'00'00,
+    STAT_PERM_NPC_ZESS_COOKS    = 0x1ba'7'00'00,
+    STAT_PERM_NPC_DEALS_TOTAL   = 0x1bb'9'00'00,
+    // Next: 0x1bc
 };
 
 }  // namespace mod::tot
