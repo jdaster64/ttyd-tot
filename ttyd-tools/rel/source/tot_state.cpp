@@ -237,9 +237,6 @@ TotSaveSlot* StateManager::GetBackupSave() const {
 }
 
 void StateManager::ResetOptions() {
-    // Pick a random seed, and reset all RNG states to the start.
-    SelectRandomSeed();
-    for (int32_t i = 0; i < RNG_SEQUENCE_MAX; ++i) rng_states_[i] = 0;
     
     // Set floor to 0 (starting floor that only gives a partner).
     floor_ = 0;
@@ -256,15 +253,20 @@ void StateManager::ResetOptions() {
     // Reset per-run play stats.
     memset(play_stats_, 0, 0x100 * 4);
 
-    // Set options to their default values.
+    // Set all options to their default values.
     SetOption(OPTVAL_PRESET_DEFAULT);
     SetOption(OPTVAL_DIFFICULTY_FULL);
-    SetOption(OPTVAL_TIMER_NONE);
+    SetOption(
+        CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)
+        ? OPTVAL_TIMER_RTA : OPTVAL_TIMER_NONE);
     OptionsManager::ApplyCurrentPresetOptions();
 
-    // Clear Bub-ulber's seed name.
+    // Clear seed information, and reset all RNG states.
+    seed_ = 0;
     seed_name_[0] = 0;
+    SetOption(OPT_UNSEEDED_RUN, 0);
     SetOption(OPT_USE_SEED_NAME, 0);
+    for (int32_t i = 0; i < RNG_SEQUENCE_MAX; ++i) rng_states_[i] = 0;
     
     g_HasBackupSave = false;
 }

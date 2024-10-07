@@ -444,14 +444,16 @@ enum Options : uint32_t {
     
     // Internal options; are not automatically reset between runs.
     OPT_RUN_STARTED             = 0x4c0'1'00'01,
-    OPT_USE_SEED_NAME           = 0x4c1'1'00'01,
-    OPT_SHOP_ITEMS_CHOSEN       = 0x4c2'1'00'01,
     // Special modes for a save file based on its name.
-    OPT_SPECIAL_FILE_MODE       = 0x4c3'3'00'03,
-    OPTVAL_DEBUG_MODE_ENABLED   = 0x5c3'3'00'01,
-    OPTVAL_RACE_MODE_ENABLED    = 0x5c3'3'00'02,
-    OPTVAL_100_MODE_ENABLED     = 0x5c3'3'00'03,
-    // Next: 0x4c6
+    OPT_SPECIAL_FILE_MODE       = 0x4c1'3'00'03,
+    OPTVAL_DEBUG_MODE_ENABLED   = 0x5c1'3'00'01,
+    OPTVAL_RACE_MODE_ENABLED    = 0x5c1'3'00'02,
+    OPTVAL_100_MODE_ENABLED     = 0x5c1'3'00'03,
+    // Other options.
+    OPT_UNSEEDED_RUN            = 0x4c4'1'00'01,
+    OPT_USE_SEED_NAME           = 0x4c5'1'00'01,
+    OPT_SHOP_ITEMS_CHOSEN       = 0x4c6'1'00'01,
+    // Next: 0x4c7
     
     // Numeric options.
     // Global enemy HP and ATK scaling (0.05x ~ 10.00x in increments of 0.05).

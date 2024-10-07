@@ -445,6 +445,7 @@ void OptionsManager::OnRunStart() {
         state.HashSeedName();
     } else if (state.seed_ == 0) {
         state.SelectRandomSeed();
+        state.SetOption(OPT_UNSEEDED_RUN, 1);
     }
 
     // Force special options for tutorial runs.

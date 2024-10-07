@@ -4980,7 +4980,7 @@ g_TowerLobbyStrings = {
     b"tot_winsel_runoptions_header":    b"Options",
     
     b"tot_optr_seed":               b"Set Seed",
-    b"tot_optr_seed_random":        b"0 (Set on start)",
+    b"tot_optr_seed_random":        b"Random on start",
     b"tot_optr_preset":             b"Preset",
     b"tot_optr_preset_custom":      b"Custom",
     b"tot_optr_preset_default":     b"Default",
