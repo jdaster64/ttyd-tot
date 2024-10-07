@@ -869,7 +869,7 @@ EVT_BEGIN(unitGoldFuzzy_magic_attack_event)
     USER_FUNC(btlevtcmd_AttackDeclareAll, -2)
     USER_FUNC(btlevtcmd_WaitGuardMove)
     USER_FUNC(btlevtcmd_PayWeaponCost, -2, PTR(&unitGoldFuzzy_weaponMagic))
-    SET(LW(0), -3)
+    SET(LW(0), -4)
     USER_FUNC(btlevtcmd_RecoverFp, -2, 1, LW(0))
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_JumpSetting, -2, 0, 0, FLOAT(0.1))
@@ -1315,8 +1315,8 @@ EVT_BEGIN(unitGoldFuzzy_attack_event)
 
     // If horde is spawned, use Flower Fuzzy moveset.
     USER_FUNC(btlevtcmd_GetFp, -2, LW(1))
-    IF_LARGE_EQUAL(LW(1), 3)
-        // If current FP >= 3, FP x 10% chance to use magic attack.
+    IF_LARGE_EQUAL(LW(1), 4)
+        // If current FP >= 4, FP x 10% chance to use magic attack.
         USER_FUNC(evt_sub_random, 9, LW(0))
         IF_SMALL(LW(0), LW(1))
             RUN_CHILD_EVT(&unitGoldFuzzy_magic_attack_event)

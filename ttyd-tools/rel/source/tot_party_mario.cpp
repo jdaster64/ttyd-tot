@@ -4821,7 +4821,7 @@ BattleWeapon customWeapon_UltraHammerFinisher = {
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
-    .damage_pattern = 0x13,
+    .damage_pattern = 0,
     .weapon_ac_level = 3,
     .unk_6f = 2,
     .ac_help_msg = nullptr,
