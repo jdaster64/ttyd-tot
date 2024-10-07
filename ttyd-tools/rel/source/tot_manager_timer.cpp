@@ -124,12 +124,20 @@ EVT_DEFINE_USER_FUNC(evtTot_ToggleIGT) {
 EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     auto& state = g_Mod->state_;
     int32_t igt_centis = DurationTicksToCentiseconds(state.current_total_igt_);
+    int32_t rta_centis = DurationTicksToCentiseconds(
+        state.last_floor_rta_ - state.run_start_time_rta_);
+    int32_t records_centis = state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)
+        ? rta_centis : igt_centis;
 
     // Flags for special conversations with Koopa on return.
     bool is_first_ex_clear = false;
     bool is_new_time_record = false;
     bool is_new_intensity_record = false;
 
+    // Track:
+    // - First clears of each difficulty
+    // - Achievement target times met (if options are default)
+    // - New records (IGT, or RTA for race mode; if default options + unseeded)
     switch (state.GetOptionValue(OPT_DIFFICULTY)) {
         case OPTVAL_DIFFICULTY_HALF:
             state.ChangeOption(STAT_PERM_HALF_FINISHES);
@@ -141,7 +149,8 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 40 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_SPEED2);
                 }
-                if (igt_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME)) {
+                if (records_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME) &&
+                    state.GetOption(OPT_UNSEEDED_RUN)) {
                     state.SetOption(STAT_PERM_HALF_BEST_TIME, igt_centis);
                     is_new_time_record = true;
                 }
@@ -157,7 +166,8 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 90 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_SPEED2);
                 }
-                if (igt_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME)) {
+                if (records_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME) &&
+                    state.GetOption(OPT_UNSEEDED_RUN)) {
                     state.SetOption(STAT_PERM_FULL_BEST_TIME, igt_centis);
                     is_new_time_record = true;
                 }
@@ -173,7 +183,8 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (igt_centis < 140 * 6000) {
                     AchievementsManager::MarkCompleted(AchievementId::RUN_EX_SPEED2);
                 }
-                if (igt_centis < state.GetOption(STAT_PERM_EX_BEST_TIME)) {
+                if (records_centis < state.GetOption(STAT_PERM_EX_BEST_TIME) &&
+                    state.GetOption(OPT_UNSEEDED_RUN)) {
                     state.SetOption(STAT_PERM_EX_BEST_TIME, igt_centis);
                     is_new_time_record = true;
                 }

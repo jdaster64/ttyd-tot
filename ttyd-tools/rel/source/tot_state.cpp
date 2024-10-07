@@ -69,9 +69,12 @@ void StateManager::Init() {
 
     ResetOptions();
 
-    // Enable race-ready and debug modes with specific file names.
+    // Enable special file modes, if specific file names are entered.
     if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "RaceMode")) {
         SetOption(OPTVAL_RACE_MODE_ENABLED);
+    }
+    if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "YCNOTGBY")) {
+        SetOption(OPTVAL_100_MODE_ENABLED);
     }
     if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "xyzzy")) {
         SetOption(OPTVAL_DEBUG_MODE_ENABLED);

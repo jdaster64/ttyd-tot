@@ -78,6 +78,7 @@ enum RecordLogOptions {
     REC_TOTAL_ATTEMPTS,
     REC_TOTAL_FINISHES,
     REC_UNIQUE_MIDBOSSES,
+    REC_BEST_TIMES,
 };
 
 struct RecordLogEntry {
@@ -127,7 +128,7 @@ const RecordLogEntry kRecordLogEntries[] = {
     { STAT_PERM_FULL_FINISHES, "tot_recn_full_wins", "tot_rech_wins" },
     { STAT_PERM_EX_FINISHES, "tot_recn_ex_wins", "tot_rech_wins" },
     { STAT_PERM_MAX_INTENSITY, "tot_recn_intensity", "tot_rech_wins" },
-    { REC_EMPTY, "tot_recn_times", "tot_rech_wins" },
+    { REC_BEST_TIMES, "tot_recn_times", "tot_rech_wins" },
     { STAT_PERM_HALF_BEST_TIME, "tot_recn_half_time", "tot_rech_wins" },
     { STAT_PERM_FULL_BEST_TIME, "tot_recn_full_time", "tot_rech_wins" },
     { STAT_PERM_EX_BEST_TIME, "tot_recn_ex_time", "tot_rech_wins" },
@@ -823,8 +824,7 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
         {
             gc::vec3 position = { win_x + 30.0f, pos_y, 0.0f };
             gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
-            uint32_t color = 
-                record.option == REC_EMPTY ? 0x403030FFU : 0x000000FFU;
+            uint32_t color = 0x000000FFU;
             const char* name =
                 record.name_msg ? msgSearch(record.name_msg) : "";
 
@@ -880,6 +880,17 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     if (cur < 1) name = "???";
                     break;
                 }
+                case REC_EMPTY: {
+                    color = 0x403030FFU;
+                    break;
+                }
+                case REC_BEST_TIMES: {
+                    color = 0x403030FFU;
+                    if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)) {
+                        name = msgSearch("tot_recn_times_rta");
+                    }
+                    break;
+                }
             }
 
             ttyd::win_main::winFontSet(&position, &scale, &color, name);
@@ -887,9 +898,12 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
 
         // Draw entry's value text.
         if (record.option != REC_EMPTY) {
+            gc::vec3 position = { win_x + 250.0f, pos_y, 0.0f };
+            gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
+            uint32_t color = 0x000000FFU;
+
             static char buf[64];
             buf[0] = '\0';
-
             char* ptr = buf;
             switch (record.option) {
                 case REC_PLAY_TIME: {
@@ -1059,6 +1073,15 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                         state.GetOption(STAT_PERM_EX_ATTEMPTS), ptr);
                     break;
                 }
+                case REC_BEST_TIMES: {
+                    sprintf(ptr, msgSearch("tot_recn_times2"));
+                    color = 0x403030FFU;
+                    scale.x = 0.50;
+                    scale.y = 0.50;
+                    position.x -= 5;
+                    position.y -= 5;
+                    break;
+                }
                 case STAT_PERM_HALF_BEST_TIME:
                 case STAT_PERM_FULL_BEST_TIME:
                 case STAT_PERM_EX_BEST_TIME: {
@@ -1105,9 +1128,6 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                 }
             }
 
-            gc::vec3 position = { win_x + 250.0f, pos_y, 0.0f };
-            gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
-            uint32_t color = 0x000000FFU;
             ttyd::win_main::winFontSet(&position, &scale, &color, buf);
         }
     }

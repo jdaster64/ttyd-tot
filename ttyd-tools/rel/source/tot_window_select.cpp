@@ -90,20 +90,20 @@ OptionMenuData g_OptionMenuData[] = {
     { STAT_RUN_SP_SPENT, "tot_optr_spspent", nullptr, 15, false, true },
     { STAT_RUN_SUPERGUARDS, "tot_optr_superguards", nullptr, 16, false, true },
     { STAT_RUN_CONDITIONS_MET, "tot_optr_conditionsmet", nullptr, 17, false, true },
-    { OPT_PRESET, "tot_optr_preset", "tot_opth_preset", 90, true, false },
-    { OPTVAL_PRESET_CUSTOM, "tot_optr_preset_custom", nullptr, 91, false, false },
-    { OPTVAL_PRESET_DEFAULT, "tot_optr_preset_default", nullptr, 92, false, false },
-    { WIN_SEED_SELECT, "tot_optr_seed", "tot_opth_seed", 100, true, false },
-    { WIN_SEED_RANDOM, "tot_optr_seed_random", nullptr, 101, false, false },
-    { OPT_DIFFICULTY, "tot_optr_difficulty", "tot_opth_difficulty", 118, true, false },
-    { OPTVAL_DIFFICULTY_TUTORIAL, "tot_optr_diff_tutorial", nullptr, 119, false, false },
-    { OPTVAL_DIFFICULTY_HALF, "tot_optr_diff_half", nullptr, 120, false, false },
-    { OPTVAL_DIFFICULTY_FULL, "tot_optr_diff_full", nullptr, 121, false, false },
-    { OPTVAL_DIFFICULTY_FULL_EX, "tot_optr_diff_ex", nullptr, 122, false, false },
-    { OPT_TIMER_DISPLAY, "tot_optr_timertype", "tot_opth_timertype", 123, true, false },
-    { OPTVAL_TIMER_NONE, "tot_optr_timer_none", nullptr, 124, false, false },
-    { OPTVAL_TIMER_IGT, "tot_optr_timer_igt", nullptr, 125, false, false },
-    { OPTVAL_TIMER_RTA, "tot_optr_timer_rta", nullptr, 126, false, false },
+    { WIN_SEED_SELECT, "tot_optr_seed", "tot_opth_seed", 70, true, false },
+    { WIN_SEED_RANDOM, "tot_optr_seed_random", nullptr, 71, false, false },
+    { OPT_TIMER_DISPLAY, "tot_optr_timertype", "tot_opth_timertype", 80, true, false },
+    { OPTVAL_TIMER_NONE, "tot_optr_timer_none", nullptr, 81, false, false },
+    { OPTVAL_TIMER_IGT, "tot_optr_timer_igt", nullptr, 82, false, false },
+    { OPTVAL_TIMER_RTA, "tot_optr_timer_rta", nullptr, 83, false, false },
+    { OPT_DIFFICULTY, "tot_optr_difficulty", "tot_opth_difficulty", 90, true, false },
+    { OPTVAL_DIFFICULTY_TUTORIAL, "tot_optr_diff_tutorial", nullptr, 91, false, false },
+    { OPTVAL_DIFFICULTY_HALF, "tot_optr_diff_half", nullptr, 92, false, false },
+    { OPTVAL_DIFFICULTY_FULL, "tot_optr_diff_full", nullptr, 93, false, false },
+    { OPTVAL_DIFFICULTY_FULL_EX, "tot_optr_diff_ex", nullptr, 94, false, false },
+    { OPT_PRESET, "tot_optr_preset", "tot_opth_preset", 100, true, false },
+    { OPTVAL_PRESET_CUSTOM, "tot_optr_preset_custom", nullptr, 101, false, false },
+    { OPTVAL_PRESET_DEFAULT, "tot_optr_preset_default", nullptr, 102, false, false },
     { OPT_NUM_CHESTS, "tot_optr_chests", "tot_opth_chests", 130, true, false },
     { OPTVAL_CHESTS_DEFAULT, "tot_optr_chests_default", nullptr, 131, false, false },
     { OPT_BATTLE_DROPS, "tot_optr_drops", "tot_opth_drops", 140, true, false },
@@ -1239,7 +1239,7 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
         WinMgrEntry_Flags::IN_FADE) != 0) return;
 
     uint32_t kBlack = 0x0000'00FFU;
-    uint32_t kBlue  = 0x0000'C0FFU;
+    uint32_t kAccent = 0x0000'C0FFU;
     const float min_x = entry->x + 12.f;
     const float max_x = entry->x + entry->width - 12.f;
     const float top_y = entry->y - 10.f;
@@ -1255,7 +1255,7 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     sprintf(text, "%s", g_Mod->state_.GetSeedAsString());
-    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kAccent, text);
 
     text_pos.x = min_x;
     text_pos.y += space_y;
@@ -1274,7 +1274,7 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
             sprintf(text, "EX, %" PRId32 "%%", intensity);
             break;
     }
-    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kAccent, text);
 
     text_pos.x = min_x;
     text_pos.y += space_y;
@@ -1282,14 +1282,14 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     sprintf(text, OptionsManager::GetEncodedOptions());
-    ttyd::win_main::winFontSetWidth(&text_pos, &text_scale, &kBlue, 270.f, text);
+    ttyd::win_main::winFontSetWidth(&text_pos, &text_scale, &kAccent, 270.f, text);
 
     text_pos.x = max_x;
     text_pos.y = top_y;
     DurationCentisToFmtString(
         TimerManager::GetCurrentRunTotalTimeCentis(), text);
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
-    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kAccent, text);
     switch (g_Mod->state_.GetOptionValue(OPT_TIMER_DISPLAY)) {
         case OPTVAL_TIMER_RTA:
             sprintf(text, "RTA Time: ");
@@ -1306,7 +1306,7 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     DurationCentisToFmtString(
         TimerManager::GetCurrentRunTotalBattleTimeCentis(), text);
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
-    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kAccent, text);
     sprintf(text, "In-Battle: ");
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
@@ -1315,10 +1315,26 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     text_pos.y += space_y;
     sprintf(text, "%" PRId32, g_Mod->state_.GetOption(STAT_RUN_CONTINUES));
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
-    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlue, text);
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kAccent, text);
     sprintf(text, "Continues: ");
     text_pos.x -= ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
+
+    // Change color based on file mode.
+    switch (g_Mod->state_.GetOptionValue(OPT_SPECIAL_FILE_MODE)) {
+        case OPTVAL_RACE_MODE_ENABLED:
+            entry->desc->color = 0xFFC8D4FFU;
+            break;
+        case OPTVAL_100_MODE_ENABLED:
+            entry->desc->color = 0xA3FCB9FFU;
+            break;
+        case OPTVAL_DEBUG_MODE_ENABLED:
+            entry->desc->color = 0xD6B7FFFFU;
+            break;
+        default:
+            entry->desc->color = 0xC4ECF2FFU;
+            break;
+    }
 }
 
 void DispResultsWindowBottomBar(WinMgrEntry* entry) {

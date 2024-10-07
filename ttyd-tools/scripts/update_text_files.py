@@ -1871,6 +1871,8 @@ g_GlobalStrings = {
     b"tot_recn_ex_wins":            b"EX Difficulty",
     b"tot_recn_intensity":          b"Max Intensity",
     b"tot_recn_times":              b"Best Times (IGT)",
+    b"tot_recn_times_rta":          b"Best Times (RTA)",
+    b"tot_recn_times2":             b"*unseeded, default opts.",
     b"tot_recn_half_time":          b"Hooktail",
     b"tot_recn_full_time":          b"Gloomtail",
     b"tot_recn_ex_time":            b"EX Difficulty",
@@ -1914,7 +1916,7 @@ g_GlobalStrings = {
         b"various vendors in Petalburg.",
     b"tot_rech_wins":
         b"How many runs were completed,\n"
-        b"and fastest default clear times.",
+        b"and best unseeded clear times.",
     b"tot_rech_runstats":
         b"Various stats for your current\n"
         b"attempted tower run.",
@@ -4981,7 +4983,7 @@ g_TowerLobbyStrings = {
     
     b"tot_optr_seed":               b"Set Seed",
     b"tot_optr_seed_random":        b"Random on start",
-    b"tot_optr_preset":             b"Preset",
+    b"tot_optr_preset":             b"Option Preset",
     b"tot_optr_preset_custom":      b"Custom",
     b"tot_optr_preset_default":     b"Default",
     b"tot_optr_difficulty":         b"Tower Type",
