@@ -435,7 +435,7 @@ void DialogueManager::SetConversation(int32_t id) {
         case ConversationId::HOOK_ENTRY:
         case ConversationId::HOOK_DEATH: {
             // Swap for different conversation after first successful clear.
-            if (state.GetOption(STAT_PERM_HALF_FINISHES) >= 1) {
+            if (GetSWF(GSWF_Hooktail_FirstTimeChat)) {
                 g_ConversationId += 10;
             }
             break;
@@ -444,7 +444,7 @@ void DialogueManager::SetConversation(int32_t id) {
         case ConversationId::GLOOM_ENTRY:
         case ConversationId::GLOOM_DEATH: {
             // Swap for different conversation after first successful clear.
-            if (state.GetOption(STAT_PERM_FULL_FINISHES) >= 1) {
+            if (GetSWF(GSWF_Gloomtail_FirstTimeChat)) {
                 g_ConversationId += 10;
             }
             break;
@@ -452,7 +452,7 @@ void DialogueManager::SetConversation(int32_t id) {
         case ConversationId::BONE_ENTRY: {
             // Swap for different conversation after first successful clear.
             // (only the initial one has a partner reaction).
-            if (state.GetOption(STAT_PERM_EX_FINISHES) >= 1) {
+            if (GetSWF(GSWF_Bonetail_FirstTimeChat)) {
                 g_ConversationId += 10;
             } else {
                 g_ConversationPtr = kActorPartnerDialogue;
@@ -470,7 +470,7 @@ void DialogueManager::SetConversation(int32_t id) {
             break;
         }
         case ConversationId::GLOOM_MEGA: {
-            if (state.GetOption(STAT_PERM_FULL_FINISHES) >= 1) {
+            if (GetSWF(GSWF_Gloomtail_FirstTimeChat)) {
                 // Small random chance of an alternate Megabreath message.
                 const int32_t num_cvs =
                     ConversationId::GLOOM_MEGA_END -

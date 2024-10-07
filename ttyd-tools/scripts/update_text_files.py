@@ -1221,6 +1221,8 @@ g_GlobalStrings = {
     
     # File select text.
     
+    b"tot_filemode_race":         b"Race Mode",
+    b"tot_filemode_100":          b"100% Mode",
     b"tot_file_completion":       b"Completion",
         
     # Generic Map text.

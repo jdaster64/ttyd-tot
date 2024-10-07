@@ -141,6 +141,7 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     switch (state.GetOptionValue(OPT_DIFFICULTY)) {
         case OPTVAL_DIFFICULTY_HALF:
             state.ChangeOption(STAT_PERM_HALF_FINISHES);
+            SetSWF(GSWF_Hooktail_FirstTimeChat);
             AchievementsManager::MarkCompleted(AchievementId::RUN_HALF_FIRST);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
                 if (igt_centis < 60 * 6000) {
@@ -151,13 +152,14 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 }
                 if (records_centis < state.GetOption(STAT_PERM_HALF_BEST_TIME) &&
                     state.GetOption(OPT_UNSEEDED_RUN)) {
-                    state.SetOption(STAT_PERM_HALF_BEST_TIME, igt_centis);
+                    state.SetOption(STAT_PERM_HALF_BEST_TIME, records_centis);
                     is_new_time_record = true;
                 }
             }
             break;
         case OPTVAL_DIFFICULTY_FULL:
             state.ChangeOption(STAT_PERM_FULL_FINISHES);
+            SetSWF(GSWF_Gloomtail_FirstTimeChat);
             AchievementsManager::MarkCompleted(AchievementId::RUN_FULL_FIRST);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
                 if (igt_centis < 120 * 6000) {
@@ -168,13 +170,14 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 }
                 if (records_centis < state.GetOption(STAT_PERM_FULL_BEST_TIME) &&
                     state.GetOption(OPT_UNSEEDED_RUN)) {
-                    state.SetOption(STAT_PERM_FULL_BEST_TIME, igt_centis);
+                    state.SetOption(STAT_PERM_FULL_BEST_TIME, records_centis);
                     is_new_time_record = true;
                 }
             }
             break;
         case OPTVAL_DIFFICULTY_FULL_EX:
             state.ChangeOption(STAT_PERM_EX_FINISHES);
+            SetSWF(GSWF_Bonetail_FirstTimeChat);
             if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
                 AchievementsManager::MarkCompleted(AchievementId::RUN_EX_FIRST);
                 if (igt_centis < 180 * 6000) {
@@ -185,7 +188,7 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 }
                 if (records_centis < state.GetOption(STAT_PERM_EX_BEST_TIME) &&
                     state.GetOption(OPT_UNSEEDED_RUN)) {
-                    state.SetOption(STAT_PERM_EX_BEST_TIME, igt_centis);
+                    state.SetOption(STAT_PERM_EX_BEST_TIME, records_centis);
                     is_new_time_record = true;
                 }
             }

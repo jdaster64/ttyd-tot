@@ -192,6 +192,8 @@ void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
 void (*g_winItemMain2_trampoline)(WinPauseMenu*) = nullptr;
 // win_item.o  8016c030
 int32_t (*g_winItemMain_trampoline)(WinPauseMenu*) = nullptr;
+// win_item.o  8016d43c
+void (*g_winItemInit_trampoline)(WinPauseMenu*) = nullptr;
 // win_item.o  8016d7c4
 void (*g_winMarioDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
 // win_item.o  80170488

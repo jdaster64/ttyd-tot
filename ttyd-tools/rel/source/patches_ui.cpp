@@ -157,6 +157,7 @@ extern void (*g_itemUseDisp_trampoline)(WinMgrEntry*);
 extern void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
 extern void (*g_winItemMain2_trampoline)(WinPauseMenu*);
 extern int32_t (*g_winItemMain_trampoline)(WinPauseMenu*);
+extern void (*g_winItemInit_trampoline)(WinPauseMenu*);
 extern void (*g_winMarioDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
 extern int32_t (*g_winMarioMain_trampoline)(WinPauseMenu*);
 extern void (*g_winMarioInit2_trampoline)(WinPauseMenu*);
@@ -537,6 +538,16 @@ void ApplyFixedPatches() {
             tot::win::ItemSubdialogMain2(menu);
         });
 
+    // Initialize win_item to open to Key Items when not in a run.
+    g_winItemInit_trampoline = mod::hookFunction(
+        ttyd::win_item::winItemInit, [](WinPauseMenu* menu) {
+            // Run original code.
+            g_winItemInit_trampoline(menu);
+
+            if (!g_Mod->state_.GetOption(OPT_RUN_STARTED))
+                menu->item_submenu_id = 1;
+        });
+
     // Add Mailbox SP to Key Items menu skip list (in place of Boat curse).
     ttyd::win_item::menu_skip_list[6] = ItemType::MAILBOX_SP;
 
@@ -706,10 +717,21 @@ void DisplayFileSelectProgress(
 
     ttyd::fontmgr::FontDrawStart();
     
-    // Print completion percentage in place of level.
+    // Print completion percentage / file mode name in place of level.
     char text[64];
-    sprintf(
-        text, "%s %.1f%%", msgSearch("tot_file_completion"), completion_pct);
+    switch (state.GetOptionValue(OPT_SPECIAL_FILE_MODE)) {
+        case OPTVAL_RACE_MODE_ENABLED:
+            sprintf(text, msgSearch("tot_filemode_race"));
+            break;
+        case OPTVAL_100_MODE_ENABLED:
+            sprintf(text, msgSearch("tot_filemode_100"));
+            break;
+        default:
+            sprintf(
+                text, "%s %.1f%%", 
+                msgSearch("tot_file_completion"), completion_pct);
+            break;
+    }
     
     int16_t width = ttyd::fontmgr::FontGetMessageWidth(text);
     if (width > 200.0f) {

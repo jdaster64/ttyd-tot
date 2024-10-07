@@ -164,6 +164,13 @@ void OptionsManager::ApplyCurrentPresetOptions() {
 
 int32_t OptionsManager::GetDefaultValue(uint32_t option) {
     int32_t value = -1;
+
+    // Race mode has different defaults.
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)) {
+        if (option == OPT_TIMER_DISPLAY) return OPTVAL_TIMER_RTA & 0xff;
+        if (option == OPT_SECRET_BOSS) return OPTVAL_SECRET_BOSS_OFF & 0xff;
+    }
+
     switch (option) {
         case OPT_MAX_PARTNERS:
             if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_HALF))

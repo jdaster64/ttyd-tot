@@ -114,6 +114,15 @@ bool AchievementsManager::CheckCosmeticGroupUnlocked(
     int32_t reward_type, int32_t group_id) {
     // Special case for cosmetics that are always available for purchase.
     if (group_id == 0) return true;
+
+    // Treat most cosmetic groups as unlocked in race mode.
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)) {
+        switch (reward_type) {
+            case AchievementRewardType::ATTACK_FX:      return true;
+            case AchievementRewardType::MARIO_COSTUME:  return group_id <= 21;
+            case AchievementRewardType::YOSHI_COSTUME:  return group_id <= 17;
+        }
+    }
         
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         if (g_AchievementData[i].reward_type == reward_type &&
@@ -125,6 +134,14 @@ bool AchievementsManager::CheckCosmeticGroupUnlocked(
 }
 
 bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
+    // Always treat options as unlocked on special files.
+    switch (g_Mod->state_.GetOptionValue(OPT_SPECIAL_FILE_MODE)) {
+        case OPTVAL_RACE_MODE_ENABLED:
+            return option != OPT_SECRET_BOSS;
+        case OPTVAL_100_MODE_ENABLED:
+            return true;
+    }
+
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         if (g_AchievementData[i].reward_type == AchievementRewardType::OPTION &&
             g_AchievementData[i].reward_id == option) {
@@ -136,6 +153,15 @@ bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
 }
 
 void AchievementsManager::MarkCompleted(int32_t ach) {
+    // Disable unlocking achievements on special files.
+    switch (g_Mod->state_.GetOptionValue(OPT_SPECIAL_FILE_MODE)) {
+        case OPTVAL_RACE_MODE_ENABLED:
+            return;
+        case OPTVAL_100_MODE_ENABLED:
+            if (ach > AchievementId::META_ALL_ACHIEVEMENTS)
+                return;
+    }
+
     if (!g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach)) {
         g_Mod->state_.SetOption(FLAGS_ACHIEVEMENT, ach);
 

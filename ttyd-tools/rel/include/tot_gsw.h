@@ -54,6 +54,10 @@ enum GlobalWorkVars {
     GSWF_MayorKroop_PostTutorialChat,
     // Flag for having chatted with the gatekeeper for the first time.
     GSWF_Gatekeeper_FirstTimeChat,
+    // Conversation flags for beating bosses for the first time.
+    GSWF_Hooktail_FirstTimeChat,
+    GSWF_Gloomtail_FirstTimeChat,
+    GSWF_Bonetail_FirstTimeChat,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

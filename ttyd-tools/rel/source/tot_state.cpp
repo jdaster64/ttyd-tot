@@ -6,6 +6,7 @@
 #include "mod.h"
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
+#include "tot_manager_debug.h"
 #include "tot_manager_options.h"
 #include "tot_manager_progress.h"
 
@@ -72,9 +73,11 @@ void StateManager::Init() {
     // Enable special file modes, if specific file names are entered.
     if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "RaceMode")) {
         SetOption(OPTVAL_RACE_MODE_ENABLED);
+        DebugManager::SpecialFileSetup();
     }
     if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "YCNOTGBY")) {
         SetOption(OPTVAL_100_MODE_ENABLED);
+        DebugManager::SpecialFileSetup();
     }
     if (!strcmp(ttyd::mariost::g_MarioSt->saveFileName, "xyzzy")) {
         SetOption(OPTVAL_DEBUG_MODE_ENABLED);

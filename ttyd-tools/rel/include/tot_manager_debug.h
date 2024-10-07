@@ -15,6 +15,8 @@ public:
     static void ChangeMode();
     // Returns the set of enemies to use for debugging.
     static int32_t* GetEnemies();
+    // Sets up certain options when starting a file in Race / 100% mode.
+    static void SpecialFileSetup();
 };
  
 }

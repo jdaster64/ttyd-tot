@@ -119,6 +119,68 @@ void UpdateMainMenuPos(int32_t change) {
     }
 }
 
+void _CompleteAllLogs(int32_t max_tattle_index = 102) {
+    for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
+        // Set Tattle flags for only enemies in ToT, and up through max index.
+        if (int32_t custom_index = GetCustomTattleIndex(i);
+            custom_index > 0 && custom_index <= max_tattle_index) {
+            ttyd::swdrv::swSet(0x117a + i);
+        }
+    }
+    for (int32_t i = 0; i < 256; ++i) {
+        // Set all "item obtained" flags in state manager.
+        g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, i);
+    }
+    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+        // Set all "move unlocked / used / Stylish" flags.
+        g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, 0xff, i);
+    }
+    // Set all partners as having been obtained once.
+    g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
+}
+
+void _CompleteTutorialFlags() {
+    SetSWByte(GSW_Tower_TutorialClearAttempts, 3);
+    SetSWByte(GSW_Tower_TutorialClears, 2);
+    SetSWF(GSWF_CosmeticShopTutorial);
+    SetSWF(GSWF_HubShopTutorial);
+    SetSWF(GSWF_RunOptionsTutorial);
+    SetSWF(GSWF_NpcF_SeedUnlocked);
+}
+
+void _PurchaseAllCosmetics() {
+    for (int32_t i = 0; i < 96; ++i) {
+        if (i % 32 == 0) continue;
+        g_Mod->state_.SetOption(FLAGS_COSMETIC_PURCHASED, i);
+    }
+}
+
+void _PurchaseAllItems() {
+    for (int32_t i = 0; i < 256; ++i) {
+        g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, i);
+        g_Mod->state_.SetOption(FLAGS_ITEM_PURCHASED, i);
+    }
+}
+
+void _UnlockAchievements(int32_t max_achievement) {
+    for (int32_t i = 0; i <= max_achievement; ++i) {
+        AchievementsManager::MarkCompleted(i);
+    }
+}
+
+void _UnlockAllKeyItems() {
+    for (int32_t i = ItemType::TOT_KEY_PEEKABOO;
+            i < ItemType::TOT_KEY_ITEM_MAX; ++i) {
+        if (!ttyd::mario_pouch::pouchCheckItem(i)) {
+            ttyd::mario_pouch::pouchGetItem(i);
+        }
+        SetSWF(GSWF_PeekabooEnabled);
+        SetSWF(GSWF_SuperPeekabooEnabled);
+        SetSWF(GSWF_TimingTutorEnabled);
+        SetSWF(GSWF_BgmEnabled);
+    }
+}
+
 }
 
 void DebugManager::Update() {
@@ -195,30 +257,15 @@ void DebugManager::Update() {
                     break;
                 }
                 case DEBUG_PURCHASE_ALL_ITEMS: {
-                    for (int32_t i = 0; i < 256; ++i) {
-                        g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, i);
-                        g_Mod->state_.SetOption(FLAGS_ITEM_PURCHASED, i);
-                    }
+                    _PurchaseAllItems();
                     break;
                 }
                 case DEBUG_PURCHASE_ALL_COSMETICS: {
-                    for (int32_t i = 0; i < 96; ++i) {
-                        if (i % 32 == 0) continue;
-                        g_Mod->state_.SetOption(FLAGS_COSMETIC_PURCHASED, i);
-                    }
+                    _PurchaseAllCosmetics();
                     break;
                 }
                 case DEBUG_UNLOCK_ALL_KEY_ITEMS: {
-                    for (int32_t i = ItemType::TOT_KEY_PEEKABOO;
-                         i < ItemType::TOT_KEY_ITEM_MAX; ++i) {
-                        if (!ttyd::mario_pouch::pouchCheckItem(i)) {
-                            ttyd::mario_pouch::pouchGetItem(i);
-                        }
-                        SetSWF(GSWF_PeekabooEnabled);
-                        SetSWF(GSWF_SuperPeekabooEnabled);
-                        SetSWF(GSWF_TimingTutorEnabled);
-                        SetSWF(GSWF_BgmEnabled);
-                    }
+                    _UnlockAllKeyItems();
                     break;
                 }
                 case DEBUG_UNLOCK_ALL_BADGES: {
@@ -245,31 +292,11 @@ void DebugManager::Update() {
                     break;
                 }
                 case DEBUG_COMPLETE_TUTORIAL: {
-                    SetSWByte(GSW_Tower_TutorialClearAttempts, 3);
-                    SetSWByte(GSW_Tower_TutorialClears, 2);
-                    SetSWF(GSWF_CosmeticShopTutorial);
-                    SetSWF(GSWF_HubShopTutorial);
-                    SetSWF(GSWF_RunOptionsTutorial);
-                    SetSWF(GSWF_NpcF_SeedUnlocked);
+                    _CompleteTutorialFlags();
                     break;
                 }
                 case DEBUG_COMPLETE_LOGS: {
-                    for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
-                        // Set Tattle flags for only enemies in Infinite Pit.
-                        if (GetCustomTattleIndex(i) > 0) {
-                            ttyd::swdrv::swSet(0x117a + i);
-                        }
-                    }
-                    for (int32_t i = 0; i < 256; ++i) {
-                        // Set all "item obtained" flags in state manager.
-                        g_Mod->state_.SetOption(FLAGS_ITEM_ENCOUNTERED, i);
-                    }
-                    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
-                        // Set all "move unlocked / used / Stylish" flags.
-                        g_Mod->state_.SetOption(STAT_PERM_MOVE_LOG, 0xff, i);
-                    }
-                    // Set all partners as having been obtained once.
-                    g_Mod->state_.SetOption(STAT_PERM_PARTNERS_OBTAINED, 0xfe);
+                    _CompleteAllLogs();
                     break;
                 }
                 case DEBUG_COMPLETE_ACHIEVEMENTS: {
@@ -278,9 +305,7 @@ void DebugManager::Update() {
                         // Also mark off secret achievements if L is held.
                         max_achievement = AchievementId::MAX_ACHIEVEMENT - 1;
                     }
-                    for (int32_t i = 0; i <= max_achievement; ++i) {
-                        AchievementsManager::MarkCompleted(i);
-                    }
+                    _UnlockAchievements(max_achievement);
                     break;
                 }
             }
@@ -564,6 +589,32 @@ void DebugManager::ChangeMode() {
 int32_t* DebugManager::GetEnemies() {
     if (g_DebugMode && g_DebugEnemies[0] >= 0) return g_DebugEnemies;
     return nullptr;
+}
+
+void DebugManager::SpecialFileSetup() {
+    switch (g_Mod->state_.GetOptionValue(OPT_SPECIAL_FILE_MODE)) {
+        case OPTVAL_RACE_MODE_ENABLED:
+            _CompleteAllLogs(100);
+            _CompleteTutorialFlags();
+            _PurchaseAllItems();
+            _PurchaseAllCosmetics();
+            _UnlockAllKeyItems();
+            SetSWF(GSWF_Hooktail_FirstTimeChat);
+            SetSWF(GSWF_Gloomtail_FirstTimeChat);
+            SetSWF(GSWF_Bonetail_FirstTimeChat);
+            break;
+        case OPTVAL_100_MODE_ENABLED:
+            _CompleteAllLogs();
+            _CompleteTutorialFlags();
+            _PurchaseAllItems();
+            _PurchaseAllCosmetics();
+            _UnlockAchievements(AchievementId::META_ALL_ACHIEVEMENTS);
+            _UnlockAllKeyItems();
+            SetSWF(GSWF_Hooktail_FirstTimeChat);
+            SetSWF(GSWF_Gloomtail_FirstTimeChat);
+            SetSWF(GSWF_Bonetail_FirstTimeChat);
+            break;
+    }
 }
 
 }

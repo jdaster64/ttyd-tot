@@ -21,7 +21,7 @@ void winItemMain2(ttyd::win_root::WinPauseMenu* menu);
 int32_t winItemMain(ttyd::win_root::WinPauseMenu* menu);
 // winItemExit
 // winItemInit2
-// winItemInit
+void winItemInit(ttyd::win_root::WinPauseMenu* menu);
 // winMakeSkipList
 
 // List of items that are not displayed in Key Items menu.
