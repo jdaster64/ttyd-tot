@@ -64,6 +64,11 @@ void DialogueManager::SetConversation(int32_t id) {
         state.GetOption(STAT_PERM_HALF_FINISHES) +
         state.GetOption(STAT_PERM_FULL_FINISHES) +
         state.GetOption(STAT_PERM_EX_FINISHES);
+    // If using a special filename mode, treat it like a post-tutorial state,
+    // but don't allow the secret boss hint to be mentioned.
+    if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) ||
+        state.CheckOptionValue(OPTVAL_100_MODE_ENABLED))
+        completed_runs = 4;
 
     // Commonly-used sources of pseudo-random conversation choice.
     int32_t damage_dealt = state.GetOption(STAT_PERM_ENEMY_DAMAGE);
@@ -269,7 +274,10 @@ void DialogueManager::SetConversation(int32_t id) {
             break;
         }
         case ConversationId::NPC_INN: {
-            if (completed_runs < 1) break;
+            if (completed_runs < 1 || !GetSWF(GSWF_Innkeeper_FirstTimeChat)) {
+                SetSWF(GSWF_Innkeeper_FirstTimeChat);
+                break;
+            }
             
             int32_t num_cvs =
                 ConversationId::NPC_INN_CVS_END -

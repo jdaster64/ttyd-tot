@@ -58,6 +58,8 @@ enum GlobalWorkVars {
     GSWF_Hooktail_FirstTimeChat,
     GSWF_Gloomtail_FirstTimeChat,
     GSWF_Bonetail_FirstTimeChat,
+    // Flag for having chatted with the innkeeper for the first time.
+    GSWF_Innkeeper_FirstTimeChat,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

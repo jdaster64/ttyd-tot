@@ -828,58 +828,66 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
             const char* name =
                 record.name_msg ? msgSearch(record.name_msg) : "";
 
-            // Hide some descriptions until certain progression thresholds.
-            switch (record.option) {
-                case STAT_PERM_FULL_FINISHES:
-                case STAT_PERM_FULL_BEST_TIME:
-                    if (state.GetOption(STAT_PERM_FULL_ATTEMPTS) < 1)
-                        name = "???";
-                    break;
-                case STAT_PERM_EX_FINISHES:
-                case STAT_PERM_EX_BEST_TIME:
-                    if (state.GetOption(STAT_PERM_FULL_FINISHES) < 1)
-                        name = "???";
-                    break;
-                case STAT_PERM_MAX_INTENSITY:
-                    if (!GetSWF(GSWF_RunOptionsTutorial)) 
-                        name = "???";
-                    break;
-                case STAT_RUN_NPCS_DEALT_WITH:
-                    if (state.GetOption(STAT_PERM_NPC_DEALS_TOTAL) < 1) {
-                        name = msgSearch("tot_recn_unkdeals");
+            // Hide some descriptions until certain progression thresholds,
+            // unless using special filename modes.
+            if (!state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) &&
+                !state.CheckOptionValue(OPTVAL_100_MODE_ENABLED)) {
+                switch (record.option) {
+                    case STAT_PERM_FULL_FINISHES:
+                    case STAT_PERM_FULL_BEST_TIME:
+                        if (state.GetOption(STAT_PERM_FULL_ATTEMPTS) < 1)
+                            name = "???";
+                        break;
+                    case STAT_PERM_EX_FINISHES:
+                    case STAT_PERM_EX_BEST_TIME:
+                        if (state.GetOption(STAT_PERM_FULL_FINISHES) < 1)
+                            name = "???";
+                        break;
+                    case STAT_PERM_MAX_INTENSITY:
+                        if (!GetSWF(GSWF_RunOptionsTutorial)) 
+                            name = "???";
+                        break;
+                    case STAT_RUN_NPCS_DEALT_WITH:
+                        if (state.GetOption(STAT_PERM_NPC_DEALS_TOTAL) < 1) {
+                            name = msgSearch("tot_recn_unkdeals");
+                        }
+                        break;
+                    case STAT_PERM_NPC_DEALS_TOTAL:
+                    case STAT_PERM_NPC_WONKY_TRADES:
+                    case STAT_PERM_NPC_DAZZLE_TRADES:
+                    case STAT_PERM_NPC_RIPPO_TRADES:
+                    case STAT_PERM_NPC_LUMPY_TRADES:
+                    case STAT_PERM_NPC_GRUBBA_DEAL:
+                    case STAT_PERM_NPC_DOOPLISS_DEAL:
+                    case STAT_PERM_NPC_MOVER_TRADES:
+                    case STAT_PERM_NPC_ZESS_COOKS:
+                        if (state.GetOption(record.option) < 1) {
+                            name = msgSearch("tot_recn_unkdeals");
+                        }
+                        break;
+                    case REC_HUB_ATTACK_FX: {
+                        int32_t cur, tot;
+                        ProgressManager::GetHubAttackFXProgress(&cur, &tot);
+                        if (cur < 1) name = "???";
+                        break;
                     }
-                    break;
-                case STAT_PERM_NPC_DEALS_TOTAL:
-                case STAT_PERM_NPC_WONKY_TRADES:
-                case STAT_PERM_NPC_DAZZLE_TRADES:
-                case STAT_PERM_NPC_RIPPO_TRADES:
-                case STAT_PERM_NPC_LUMPY_TRADES:
-                case STAT_PERM_NPC_GRUBBA_DEAL:
-                case STAT_PERM_NPC_DOOPLISS_DEAL:
-                case STAT_PERM_NPC_MOVER_TRADES:
-                case STAT_PERM_NPC_ZESS_COOKS:
-                    if (state.GetOption(record.option) < 1) {
-                        name = msgSearch("tot_recn_unkdeals");
+                    case REC_HUB_MARIO_SKINS: {
+                        int32_t cur, tot;
+                        ProgressManager::GetHubMarioCostumeProgress(&cur, &tot);
+                        if (cur < 1) name = "???";
+                        break;
                     }
-                    break;
-                case REC_HUB_ATTACK_FX: {
-                    int32_t cur, tot;
-                    ProgressManager::GetHubAttackFXProgress(&cur, &tot);
-                    if (cur < 1) name = "???";
-                    break;
+                    case REC_HUB_YOSHI_SKINS: {
+                        int32_t cur, tot;
+                        ProgressManager::GetHubYoshiCostumeProgress(&cur, &tot);
+                        if (cur < 1) name = "???";
+                        break;
+                    }
                 }
-                case REC_HUB_MARIO_SKINS: {
-                    int32_t cur, tot;
-                    ProgressManager::GetHubMarioCostumeProgress(&cur, &tot);
-                    if (cur < 1) name = "???";
-                    break;
-                }
-                case REC_HUB_YOSHI_SKINS: {
-                    int32_t cur, tot;
-                    ProgressManager::GetHubYoshiCostumeProgress(&cur, &tot);
-                    if (cur < 1) name = "???";
-                    break;
-                }
+            }
+
+            // Handle special coloring for section headers.
+            switch (record.option) {    
                 case REC_EMPTY: {
                     color = 0x403030FFU;
                     break;

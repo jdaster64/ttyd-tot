@@ -116,6 +116,10 @@ EVT_BEGIN(Opening_CutsceneFirstEvt)
     //     WAIT_MSEC(600)
     // WHILE()
 
+    // Disable pipe loading zone.
+    SET(LW(0), PTR("dokan_2"))
+    RUN_CHILD_EVT(bero_case_switch_off)
+
     WAIT_MSEC(500)
     USER_FUNC(evt_msg_print, 0, PTR("stg1_hei_00"), 0, PTR("party"))
     USER_FUNC(evt_mario_set_dir, 90, 300, 0)
