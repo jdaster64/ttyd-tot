@@ -1382,10 +1382,10 @@ g_GlobalStrings = {
         b"\nLv. 1: Deals 2+2 damage and\n"
         b"3-turn Sleep for 2 FP.",
     b"tot_movelog_d072":
-        b"\nLv. 1: Deals 2+2 damage and\n"
+        b"\nLv. 2: Deals 2+2 damage and\n"
         b"5-turn Sleep for 4 FP.",
     b"tot_movelog_d073":
-        b"\nLv. 1: Deals 2+2 damage and\n"
+        b"\nLv. 3: Deals 2+2 damage and\n"
         b"7-turn Sleep for 6 FP.",
     b"tot_movelog_d081":
         b"\nLv. 1: Deals 4 damage, and\n"
