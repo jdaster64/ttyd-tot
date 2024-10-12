@@ -72,7 +72,7 @@ const MoveData g_MoveData[] = {
     { { 3, 5, 7 }, 3, 2, 1, IconType::PARTNER_MOVE_2, "btl_wn_pkr_lv2", nullptr, "msg_pkr_renzoku_zutsuki", "msg_ac_zutsuki", "tot_upg_damage", },
     { { 4, 4, 4 }, 1, 3, 1, IconType::PARTNER_MOVE_3, "btl_wn_pkr_lv3", nullptr, "msg_pkr_nage_kiss", "msg_ac_kiss", "tot_upg_none", },
     { { 0, 2, 4 }, 3, 0, 2, IconType::PARTNER_MOVE_0, "btl_wn_pnk_normal", nullptr, "msg_pnk_normal_attack", "msg_ac_hammer", "tot_upg_damage", },
-    { { 3, 4, 6 }, 3, 1, 2, IconType::PARTNER_MOVE_1, "btl_wn_pnk_lv1", nullptr, "msg_pnk_syubibin_koura", "msg_ac_koura_shubibin", "tot_upg_damage", },
+    { { 2, 3, 5 }, 3, 1, 2, IconType::PARTNER_MOVE_1, "btl_wn_pnk_lv1", nullptr, "msg_pnk_syubibin_koura", "msg_ac_koura_shubibin", "tot_upg_damage", },
     { { 2, 2, 2 }, 1, 1, 2, IconType::PARTNER_MOVE_1, "tot_ptr2_withdraw", nullptr, "tot_ptr2_withdraw_desc", "msg_ac_koura_no_mamori", "tot_upg_none", },
     { { 4, 6, 8 }, 3, 2, 2, IconType::PARTNER_MOVE_2, "btl_wn_pnk_lv2", nullptr, "msg_pnk_koura_no_mamori", "msg_ac_koura_no_mamori", "tot_upg_shellsh", },
     { { 3, 6, 9 }, 3, 2, 2, IconType::PARTNER_MOVE_2, "tot_ptr2_bulkup", nullptr, "tot_ptr2_bulkup_desc", "msg_ac_bom_counter", "tot_upg_statuseffect", },

@@ -967,6 +967,9 @@ int32_t CalculateBaseDamage(
     
     damage += target->badges_equipped.p_up_d_down;
     if (damage > 0) {
+        if (sp & AttackSpecialProperty_Flags::TOT_INCREASING_BY_TARGET) {
+            damage += attacker->hits_dealt_this_attack;
+        }
         if (sp & AttackSpecialProperty_Flags::DIMINISHING_BY_HIT) {
             damage -= target->hp_damaging_hits_dealt;
         }

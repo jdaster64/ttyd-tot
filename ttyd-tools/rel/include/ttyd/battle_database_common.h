@@ -366,6 +366,9 @@ namespace AttackSpecialProperty_Flags {
         USABLE_IF_CONFUSED      = 0x10000U,
         UNGUARDABLE             = 0x20000U,
         UNKNOWN_0x40000         = 0x40000U,
+
+        // Custom for ToT; deals more damage on successive hits.
+        TOT_INCREASING_BY_TARGET = 0x100'0000U,
     };
 }
 

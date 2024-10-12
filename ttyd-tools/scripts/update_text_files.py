@@ -1040,6 +1040,10 @@ g_GlobalStrings = {
         b"Raise an ally's Attack and\n"
         b"Defense power for a while.",
         
+    b"msg_pnk_koura_tsuranuki":
+        b"Drill through grounded enemies,\n"
+        b"dealing more damage per hit.",
+        
     b"msg_pwd_kumogakure":
         b"Envelop the party in a fog,\n"
         b"causing foes to sometimes miss.",
@@ -1593,13 +1597,13 @@ g_GlobalStrings = {
         b"for 4 FP.",
     b"tot_movelog_d421":
         b"\nLv. 1: Deals 2 damage to\n"
-        b"grounded foes for 3 FP.",
+        b"grounded foes for 2 FP.",
     b"tot_movelog_d422":
         b"\nLv. 2: Deals 3 damage to\n"
-        b"grounded foes for 4 FP.",
+        b"grounded foes for 3 FP.",
     b"tot_movelog_d423":
         b"\nLv. 3: Deals 5 damage to\n"
-        b"grounded foes for 6 FP.",
+        b"grounded foes for 5 FP.",
     b"tot_movelog_d431":
         b"\nCosts 2 FP to use.",
     b"tot_movelog_d441":
@@ -1621,14 +1625,14 @@ g_GlobalStrings = {
         b"\nLv. 3: Gives +4 ATK and DEF\n"
         b"for up to four turns for 9 FP.",
     b"tot_movelog_d461":
-        b"\nLv. 1: Deals 4 piercing damage\n"
-        b"to grounded foes for 5 FP.",
+        b"\nLv. 1: Deals 4 (and increasing)\n"
+        b"DEF-piercing damage for 5 FP.",
     b"tot_movelog_d462":
-        b"\nLv. 2: Deals 6 piercing damage\n"
-        b"to grounded foes for 7 FP.",
+        b"\nLv. 2: Deals 6 (and increasing)\n"
+        b"DEF-piercing damage for 7 FP.",
     b"tot_movelog_d463":
-        b"\nLv. 3: Deals 8 piercing damage\n"
-        b"to grounded foes for 9 FP.",
+        b"\nLv. 3: Deals 8 (and increasing)\n"
+        b"DEF-piercing damage for 9 FP.",
     # Flurrie moves.
     b"tot_movelog_d511":
         b"\nLv. 1: Deals 3 damage\n"

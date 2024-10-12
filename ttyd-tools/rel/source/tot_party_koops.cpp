@@ -1762,7 +1762,8 @@ BattleWeapon customWeapon_KoopsShellSlam = {
         AttackSpecialProperty_Flags::UNGUARDABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
-        AttackSpecialProperty_Flags::ALL_BUFFABLE,
+        AttackSpecialProperty_Flags::ALL_BUFFABLE |
+        AttackSpecialProperty_Flags::TOT_INCREASING_BY_TARGET,
     .counter_resistance_flags =
         AttackCounterResistance_Flags::ALL &
         ~AttackCounterResistance_Flags::PAYBACK,
