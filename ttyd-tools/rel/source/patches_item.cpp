@@ -1040,19 +1040,19 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleDamageDirect_Patch_PityFlowerChance),
         0x2c030064U /* cmpwi r3, 100 */);
         
-    // Refund grants 100% of sell price, plus 20% per additional badge.
+    // Refund grants 100% of sell price, plus 25% per additional badge.
     mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_ConsumeItem_Patch_RefundPer),
-        0x1ca00014U /* mulli r5, r0, 20 */);
+        0x1ca00019U /* mulli r5, r0, 25 */);
     mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_ConsumeItemReserve_Patch_RefundPer),
-        0x1ca00014U /* mulli r5, r0, 20 */);
+        0x1ca00019U /* mulli r5, r0, 25 */);
     mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_ConsumeItem_Patch_RefundBase),
-        0x38a50050U /* addi r5, r5, 80 */);
+        0x38a5004bU /* addi r5, r5, 75 */);
     mod::writePatch(
         reinterpret_cast<void*>(g_btlevtcmd_ConsumeItemReserve_Patch_RefundBase),
-        0x38a50050U /* addi r5, r5, 80 */);
+        0x38a5004bU /* addi r5, r5, 75 */);
     
     // Replace HP/FP Drain logic; counts the number of intended damaging hits
     // and restores 1 HP per badge if there were any (or 1 per hit, to a max

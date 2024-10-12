@@ -560,13 +560,13 @@ void ApplyFixedPatches() {
             g_sac_suki_set_weapon_trampoline(evt, isFirstCall);
             
             intptr_t sac_work_addr = reinterpret_cast<intptr_t>(GetSacWorkPtr());
-            BattleWeapon& weapon = 
+            BattleWeapon& weapon =
                 *reinterpret_cast<BattleWeapon*>(sac_work_addr + 0x284);
             int32_t bars_full = evtGetValue(evt, evt->evtArguments[0]) - 1;
             switch (MoveManager::GetSelectedLevel(MoveType::SP_SHOWSTOPPER)) {
-                case 1: weapon.ohko_chance = 30 + bars_full * 7;  break;
-                case 2: weapon.ohko_chance = 45 + bars_full * 9;  break;
-                case 3: weapon.ohko_chance = 60 + bars_full * 11; break;
+                case 1: weapon.ohko_chance = 30 + bars_full * 10;   break;
+                case 2: weapon.ohko_chance = 50 + bars_full * 10;   break;
+                case 3: weapon.ohko_chance = 75 + bars_full * 10;   break;
             }
             return 2;
         });

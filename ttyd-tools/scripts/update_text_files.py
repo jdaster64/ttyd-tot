@@ -1526,13 +1526,13 @@ g_GlobalStrings = {
         b"FP for 5 turns, for 5 SP.",
     b"tot_movelog_d271":
         b"\nLv. 1: Instantly defeat foes\n"
-        b"with a 65% base rate for 2 SP.",
+        b"with a 80% base rate for 3 SP.",
     b"tot_movelog_d272":
         b"\nLv. 2: Instantly defeat foes\n"
-        b"with a 90% base rate for 4 SP.",
+        b"with a 100% base rate for 4 SP.",
     b"tot_movelog_d273":
         b"\nLv. 3: Instantly defeat foes\n"
-        b"with a 115% base rate for 5 SP.",
+        b"with a 125% base rate for 5 SP.",
     b"tot_movelog_d281":
         b"\nLv. 1: Deal up to 10 damage\n"
         b"to all foes for 4 SP.",
@@ -1557,13 +1557,13 @@ g_GlobalStrings = {
         b"for all enemies of a given type.",
     b"tot_movelog_d331":
         b"\nLv. 1: Deals 2+2 DEF-piercing\n"
-        b"damage for 2 FP.",
+        b"damage for 3 FP.",
     b"tot_movelog_d332":
         b"\nLv. 2: Deals 3+3 DEF-piercing\n"
         b"damage for 4 FP.",
     b"tot_movelog_d333":
         b"\nLv. 3: Deals 4+4 DEF-piercing\n"
-        b"damage for 6 FP.",
+        b"damage for 5 FP.",
     b"tot_movelog_d341":
         b"\nLv. 1: Ensures the next attack\n"
         b"against the target will land.",
