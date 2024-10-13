@@ -1053,8 +1053,8 @@ g_GlobalStrings = {
         b"blast of icy wind.",
         
     b"tot_ptr3_thunder_desc":
-        b"Strike all enemies with\n"
-        b"powerful bolts of lightning!",
+        b"Charge up a storm, releasing\n"
+        b"powerful lightning after!",
         
     b"tot_ptr4_egg_desc":
         b"Throw a volley of eggs at\n"
@@ -1098,7 +1098,7 @@ g_GlobalStrings = {
         
     b"msg_pch_madowaseru":
         b"Tease enemies with some sly\n"
-        b"moves, confusing them.",
+        b"moves, heavily confusing them.",
         
     b"tot_ptr7_embargo_desc":
         b"Distract foes and scatter\n"
@@ -1139,6 +1139,7 @@ g_GlobalStrings = {
     b"tot_ms_6_abb":        b"Sweet F.",
     b"tot_ms_7_abb":        b"Showst.",
     
+    b"tot_ptr3_thund_abb":  b"T. Storm",
     b"tot_ptr4_norm_abb":   b"Ground P.",
     b"tot_ptr4_spit_abb":   b"Lickety Sp.",
     b"tot_ptr4_egg_abb":    b"Egg Barr.",
@@ -1345,7 +1346,7 @@ g_GlobalStrings = {
         b"for 4 FP.",
     b"tot_movelog_d023":
         b"\nLv. 3: Deals 4+8 damage\n"
-        b"for 7 FP.",
+        b"for 6 FP.",
     b"tot_movelog_d031":
         b"\nLv. 1: Deals 2+2+4 damage\n"
         b"for 4 FP.",
@@ -1354,7 +1355,7 @@ g_GlobalStrings = {
         b"for 6 FP.",
     b"tot_movelog_d033":
         b"\nLv. 3: Deals 4+4+8 damage\n"
-        b"for 9 FP.",
+        b"for 8 FP.",
     b"tot_movelog_d041":
         b"\nLv. 1: Deals 6 damage and\n"
         b"3-turn -3 DEF for 2 FP.",
@@ -1371,8 +1372,8 @@ g_GlobalStrings = {
         b"\nLv. 2: Deals 3 damage to\n"
         b"each enemy for 4 FP.",
     b"tot_movelog_d053":
-        b"\nLv. 3: Deals 4 damage to\n"
-        b"each enemy for 6 FP.",
+        b"\nLv. 3: Deals 5 damage to\n"
+        b"each enemy for 5 FP.",
     b"tot_movelog_d061":
         b"\nLv. 1: Deals 1 damage per\n"
         b"hit, diminishing, for 3 FP.",
@@ -1396,10 +1397,10 @@ g_GlobalStrings = {
         b"2 to all others for 3 FP.",
     b"tot_movelog_d082":
         b"\nLv. 2: Deals 6 damage, and\n"
-        b"3 to all others for 5 FP.",
+        b"3 to all others for 4 FP.",
     b"tot_movelog_d083":
         b"\nLv. 3: Deals 8 damage, and\n"
-        b"4 to all others for 7 FP.",
+        b"4 to all others for 5 FP.",
     # Hammer moves.
     b"tot_movelog_d111":
         b"\n\nLv. 1: Deals 4 damage\n"
@@ -1412,13 +1413,13 @@ g_GlobalStrings = {
         b"for 4 FP.",
     b"tot_movelog_d121":
         b"\nLv. 1: Deals 4 damage, and\n"
-        b"2 to foes behind for 2 FP.",
+        b"2 to foes behind for 3 FP.",
     b"tot_movelog_d122":
         b"\nLv. 2: Deals 6 damage, and\n"
         b"3 to foes behind for 4 FP.",
     b"tot_movelog_d123":
         b"\nLv. 3: Deals 8 damage, and\n"
-        b"4 to foes behind for 6 FP.",
+        b"4 to foes behind for 5 FP.",
     b"tot_movelog_d131":
         b"\nLv. 1: Deals 4+4 damage, and\n"
         b"2 to foes behind for 4 FP.",
@@ -1427,7 +1428,7 @@ g_GlobalStrings = {
         b"3 to foes behind for 6 FP.",
     b"tot_movelog_d133":
         b"\nLv. 3: Deals 8+8 damage, and\n"
-        b"4 to foes behind for 9 FP.",
+        b"4 to foes behind for 8 FP.",
     b"tot_movelog_d141":
         b"\nLv. 1: Deals 6 DEF-piercing\n"
         b"damage for 2 FP.",
@@ -1603,7 +1604,7 @@ g_GlobalStrings = {
         b"grounded foes for 3 FP.",
     b"tot_movelog_d423":
         b"\nLv. 3: Deals 5 damage to\n"
-        b"grounded foes for 5 FP.",
+        b"grounded foes for 4 FP.",
     b"tot_movelog_d431":
         b"\nCosts 2 FP to use.",
     b"tot_movelog_d441":
@@ -1651,10 +1652,10 @@ g_GlobalStrings = {
         b"enemy for 3 FP.",
     b"tot_movelog_d532":
         b"\nLv. 2: Drains 6 HP from an\n"
-        b"enemy for 5 FP.",
+        b"enemy for 4 FP.",
     b"tot_movelog_d533":
         b"\nLv. 3: Drains 8 HP from an\n"
-        b"enemy for 7 FP.",
+        b"enemy for 5 FP.",
     b"tot_movelog_d541":
         b"\nApplies up to 4 turns of Dodgy\n"
         b"on Mario and Flurrie for 4 FP.",
@@ -1668,8 +1669,11 @@ g_GlobalStrings = {
         b"\nLv. 3: Deals 5 piercing damage\n"
         b"and 3-turn Freeze for 9 FP.",
     b"tot_movelog_d561":
-        b"\nDeals up to 10 piercing damage\n"
-        b"on all foes for 9 FP.",
+        b"\nLv. 1: Deals 1 damage per cycle\n"
+        b"to a single enemy, for 4 FP.",
+    b"tot_movelog_d562":
+        b"\nLv. 2: Deals 1 damage per cycle\n"
+        b"to all enemies, for 9 FP.",
     # Yoshi moves.
     b"tot_movelog_d611":
         b"\nLv. 1: Hits up to 4 times for\n"
@@ -1682,13 +1686,13 @@ g_GlobalStrings = {
         b"diminishing damage for 4 FP.",
     b"tot_movelog_d621":
         b"\nLv. 1: Deals 4 damage, and\n"
-        b"2 to foes behind for 2 FP.",
+        b"2 to foes behind for 3 FP.",
     b"tot_movelog_d622":
         b"\nLv. 2: Deals 6 damage, and\n"
         b"3 to foes behind for 4 FP.",
     b"tot_movelog_d623":
         b"\nLv. 3: Deals 8 damage, and\n"
-        b"4 to foes behind for 6 FP.",
+        b"4 to foes behind for 5 FP.",
     b"tot_movelog_d631":
         b"\nLv. 1: Toss up to 3 eggs\n"
         b"for 2 damage for 3 FP.",
@@ -1712,13 +1716,13 @@ g_GlobalStrings = {
         b"for 3-turn Shrink for 5 FP.",
     b"tot_movelog_d661":
         b"\nLv. 1: Hits up to 4 times for\n"
-        b"diminishing damage for 4 FP.",
+        b"diminishing damage for 5 FP.",
     b"tot_movelog_d662":
         b"\nLv. 2: Hits up to 5 times for\n"
         b"diminishing damage for 6 FP.",
     b"tot_movelog_d663":
         b"\nLv. 3: Hits up to 6 times for\n"
-        b"diminishing damage for 8 FP.",
+        b"diminishing damage for 7 FP.",
     # Vivian moves.
     b"tot_movelog_d711":
         b"\nLv. 1: Deals 3 damage and\n"
@@ -1783,13 +1787,13 @@ g_GlobalStrings = {
         b"for up to 4 turns, for 4 FP.",
     b"tot_movelog_d841":
         b"\nLv. 1: Throw two bombs, which\n"
-        b"inflict 5-Turn Poison, for 3 FP.",
+        b"inflict 5-Turn Poison, for 2 FP.",
     b"tot_movelog_d842":
         b"\nLv. 2: Throw three bombs, which\n"
-        b"inflict 5-Turn Poison, for 5 FP.",
+        b"inflict 5-Turn Poison, for 4 FP.",
     b"tot_movelog_d843":
         b"\nLv. 3: Throw four bombs, which\n"
-        b"inflict 5-Turn Poison, for 7 FP.",
+        b"inflict 5-Turn Poison, for 6 FP.",
     b"tot_movelog_d851":
         b"\nLv. 1: Deals 5 damage to all\n"
         b"enemies for 6 FP.",
@@ -1817,13 +1821,13 @@ g_GlobalStrings = {
         b"hazards, except lit Bob-ombs.",
     b"tot_movelog_d931":
         b"\nLv. 1: 1-turn Confuse, with a\n"
-        b"failed act rate of 50% for 2 FP.",
+        b"failed act rate of 60% for 2 FP.",
     b"tot_movelog_d932":
         b"\nLv. 2: 1-turn Confuse, with a\n"
-        b"failed act rate of 70% for 4 FP.",
+        b"failed act rate of 75% for 4 FP.",
     b"tot_movelog_d933":
         b"\nLv. 3: 1-turn Confuse, with a\n"
-        b"failed act rate of 90% for 7 FP.",
+        b"failed act rate of 90% for 6 FP.",
     b"tot_movelog_d941":
         b"\nCosts 2 FP to use.",
     b"tot_movelog_d951":

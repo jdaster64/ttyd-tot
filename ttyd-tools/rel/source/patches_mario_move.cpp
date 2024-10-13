@@ -284,8 +284,10 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                     weapons[i].name = ttyd::msgdrv::msgSearch(weapon->name);
                 }
                 
-                // Update single / multi-target for Vivian's extra moves.
-                if (move_type == MoveType::VIVIAN_CURSE ||
+                // Update single / multi-target flags for appropriate moves,
+                // based on the currently selected level.
+                if (move_type == MoveType::FLURRIE_THUNDER_STORM || 
+                    move_type == MoveType::VIVIAN_CURSE ||
                     move_type == MoveType::VIVIAN_NEUTRALIZE) {
                     int32_t move_level = 
                         MoveManager::GetSelectedLevel(move_type);

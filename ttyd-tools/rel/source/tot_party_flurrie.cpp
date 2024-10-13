@@ -406,7 +406,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_BREATH2"), EVT_NULLPTR, 0, LW(14))
             BROTHER_EVT_ID(LW(15))
                 SET(LW(14), -1)
-                LBL(5)
+LBL(5)
                 USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(0))
                 WAIT_FRM(1)
                 GOTO(5)
@@ -464,7 +464,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         USER_FUNC(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
         
         BROTHER_EVT_ID(LW(15))
-            LBL(6)
+LBL(6)
             USER_FUNC(evt_batstage_set_stg_dark, 80, 35, 0)
             WAIT_FRM(35)
             USER_FUNC(evt_batstage_set_stg_dark, 20, 35, 0)
@@ -472,11 +472,30 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             GOTO(6)
         END_BROTHER()
     END_IF()
+
+    // Determine whether enemies should shake.
+
+    // If level 1 Thunder Storm, run logic for selected target only,
+    // and don't re-sample targets.
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieThunderStorm))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::FLURRIE_THUNDER_STORM, LW(0))
+        IF_EQUAL(LW(0), 1)
+            // Determine whether enemy should shake.
+            USER_FUNC(evtTot_CheckEnemyShake, LW(3), LW(12), LW(0))
+            IF_LARGE_EQUAL(LW(0), 1)
+                USER_FUNC(btlevtcmd_DamageDirect, LW(3), LW(4), 0, 0, 3, 1)
+            END_IF()
+            // Skip past multi-target logic.
+            GOTO(9)
+        END_IF()
+    END_IF()
     
+    // Otherwise, run for all enemies.
+    // Re-sample enemies to start from first enemy...
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    LBL(8)
+LBL(8)
     IF_NOT_EQUAL(LW(3), -1)
         // Determine whether enemies should shake.
         USER_FUNC(evtTot_CheckEnemyShake, LW(3), LW(12), LW(0))
@@ -486,7 +505,12 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         GOTO(8)
     END_IF()
-    
+    // Re-sample enemies again to start from first enemy...
+    USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+
+LBL(9)
     USER_FUNC(btlevtcmd_StartAC, 1)
     USER_FUNC(btlevtcmd_ResultAC)
     
@@ -502,7 +526,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     
     USER_FUNC(btlevtcmd_SetRotate, -2, 0, 0, 0)
     USER_FUNC(btlevtcmd_StopAC)
-    SET(LW(11), 99)    
+    SET(LW(11), 99)
     
     // Make weapon structs / set AC prize level based on AC output params.
     USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
@@ -540,12 +564,9 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieThunderStorm))
         USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_A4_3"))
     END_IF()
-    
-    USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+
     SET(LW(10), 0)
-    LBL(10)
+LBL(10)
     
     // Thunderbolt effect.
     IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieThunderStorm))
@@ -611,21 +632,30 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
         USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
     END_IF()
-    LBL(50)
+
+    // End attack early if single-target version of Thunder Storm.
+    IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieThunderStorm))
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::FLURRIE_THUNDER_STORM, LW(0))
+        IF_EQUAL(LW(0), 1)
+            GOTO(90)
+        END_IF()
+    END_IF()
+
+LBL(50)
     WAIT_MSEC(300)
-    LBL(51)
+LBL(51)
     SUB(LW(11), 1)
     IF_LARGE_EQUAL(LW(11), 1)
-        LBL(52)
+LBL(52)
         USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         IF_NOT_EQUAL(LW(3), -1)
             ADD(LW(10), 1)
             GOTO(10)
         END_IF()
     END_IF()
-    LBL(80)
+LBL(80)
     // Got rid of wait here so new attacks end a bit earlier.
-    LBL(90)
+LBL(90)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
     
@@ -648,7 +678,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PWD_Y_1"))
     WAIT_MSEC(1000)
-    LBL(99)
+LBL(99)
     USER_FUNC(evt_audience_ap_recovery)
     USER_FUNC(btlevtcmd_InviteApInfoReport)
     USER_FUNC(btlevtcmd_ResetFaceDirection, -2)

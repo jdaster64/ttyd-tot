@@ -568,12 +568,14 @@ uint32_t GetStatusDamageFromWeapon(
                     ttyd::battle_disp::btlDispPoseAnime(part);
                 }
 
-                // Use unk_136 as "proc rate" for Confusion.
+                // Use unk_136 as "proc rate" for failed actions from Confusion.
                 if (damage_result && type == StatusEffectType::CONFUSE) {
+                    // By default, 50/50.
                     target->unk_136 = 50;
                     if (weapon->pad_ae == MoveType::MOWZ_TEASE) {
+                        // 60 / 75 / 90% failed action chance, based on level.
                         target->unk_136 = 
-                            30 + 20 * MoveManager::GetSelectedLevel(
+                            45 + 15 * MoveManager::GetSelectedLevel(
                                 MoveType::MOWZ_TEASE);
                     }
                 }
