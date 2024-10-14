@@ -1400,7 +1400,7 @@ g_GlobalStrings = {
         b"3 to all others for 4 FP.",
     b"tot_movelog_d083":
         b"\nLv. 3: Deals 8 damage, and\n"
-        b"4 to all others for 5 FP.",
+        b"5 to all others for 6 FP.",
     # Hammer moves.
     b"tot_movelog_d111":
         b"\n\nLv. 1: Deals 4 damage\n"
@@ -1413,13 +1413,13 @@ g_GlobalStrings = {
         b"for 4 FP.",
     b"tot_movelog_d121":
         b"\nLv. 1: Deals 4 damage, and\n"
-        b"2 to foes behind for 3 FP.",
+        b"2 to foes behind for 2 FP.",
     b"tot_movelog_d122":
         b"\nLv. 2: Deals 6 damage, and\n"
-        b"3 to foes behind for 4 FP.",
+        b"3 to foes behind for 3 FP.",
     b"tot_movelog_d123":
         b"\nLv. 3: Deals 8 damage, and\n"
-        b"4 to foes behind for 5 FP.",
+        b"5 to foes behind for 5 FP.",
     b"tot_movelog_d131":
         b"\nLv. 1: Deals 4+4 damage, and\n"
         b"2 to foes behind for 4 FP.",
@@ -1428,7 +1428,7 @@ g_GlobalStrings = {
         b"3 to foes behind for 6 FP.",
     b"tot_movelog_d133":
         b"\nLv. 3: Deals 8+8 damage, and\n"
-        b"4 to foes behind for 8 FP.",
+        b"5 to foes behind for 8 FP.",
     b"tot_movelog_d141":
         b"\nLv. 1: Deals 6 DEF-piercing\n"
         b"damage for 2 FP.",
@@ -1686,13 +1686,13 @@ g_GlobalStrings = {
         b"diminishing damage for 4 FP.",
     b"tot_movelog_d621":
         b"\nLv. 1: Deals 4 damage, and\n"
-        b"2 to foes behind for 3 FP.",
+        b"2 to foes behind for 2 FP.",
     b"tot_movelog_d622":
         b"\nLv. 2: Deals 6 damage, and\n"
-        b"3 to foes behind for 4 FP.",
+        b"4 to foes behind for 4 FP.",
     b"tot_movelog_d623":
         b"\nLv. 3: Deals 8 damage, and\n"
-        b"4 to foes behind for 5 FP.",
+        b"6 to foes behind for 6 FP.",
     b"tot_movelog_d631":
         b"\nLv. 1: Toss up to 3 eggs\n"
         b"for 2 damage for 3 FP.",
@@ -1832,13 +1832,13 @@ g_GlobalStrings = {
         b"\nCosts 2 FP to use.",
     b"tot_movelog_d951":
         b"\nLv. 1: Deals 3 piercing damage\n"
-        b"and 50% 1-turn Dizzy for 4 FP.",
+        b"and 33% 1-turn Dizzy for 4 FP.",
     b"tot_movelog_d952":
         b"\nLv. 2: Deals 4 piercing damage\n"
-        b"and 50% 1-turn Dizzy for 5 FP.",
+        b"and 66% 1-turn Dizzy for 5 FP.",
     b"tot_movelog_d953":
         b"\nLv. 3: Deals 5 piercing damage\n"
-        b"and 50% 1-turn Dizzy for 6 FP.",
+        b"and 100% 1-turn Dizzy for 6 FP.",
     b"tot_movelog_d961":
         b"\nLv. 1: Heal up to 5 HP for\n"
         b"both Mario and Mowz for 4 FP.",

@@ -143,8 +143,10 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeTeaseWeapon) {
     } else {  // Smoke Bomb
         int32_t success_level = 1 + (move_level + 2) * ac_result / 100;
         weapon->damage_function_params[0] = success_level;
-        weapon->dizzy_chance = 20 * success_level;
         weapon->dizzy_time = 1;
+        // 33%, 66%, 100% base rate max at level 1, 2, 3.
+        weapon->dizzy_chance =
+            100 * (success_level > 2 ? success_level - 2 : 0) / 3;
     }
     
     return 2;
