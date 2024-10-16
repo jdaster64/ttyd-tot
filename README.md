@@ -27,7 +27,7 @@ and support is not guaranteed with other mods, custom textures, etc.**
 
 After verifying you have a working copy of the game, simply run the appropriate
 patcher executable for your platform from the
-["Releases" page](https://github.com/jdaster64/ttyd-tower-of-trials/releases),
+["Releases" page](https://github.com/jdaster64/ttyd-tot/releases),
 provide it the unmodified TTYD .iso image, and it will generate a patched copy.
 
 ### Known Issues
