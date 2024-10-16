@@ -1,7 +1,7 @@
 ### Tower of Trials (v1.00 r27) by Jdaster64
 
 ### Overview
-Tower of Trials is a Roguelike mod of Paper Mario: TTYD by Jdaster64.
+**Tower of Trials** is a Rogue-like mod of Paper Mario: TTYD by Jdaster64.
 In it, Mario storms the newly-renovated Hooktail Castle, fighting through a 
 battery of enemy encounters and building up an arsenal of party members,
 moves, badges and other rewards!  Once you've finished a run, you can spend
