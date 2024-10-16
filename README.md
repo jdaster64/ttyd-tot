@@ -56,5 +56,5 @@ provide it the unmodified TTYD .iso image, and it will generate a patched copy.
 
 ### Special Thanks
 *   Fatguy703, Gibstack, Kappy and others for pre-release playtesting.
-*   Kaze Emanuar and the F3 editing time for the F3 trailer feature.
+*   Kaze Emanuar and the F3 editing team for the F3 trailer feature.
 
