@@ -19,7 +19,7 @@ for information on some of my other Mario RPG mods.
 
 ### Setup
 Before attempting to install the mod, make sure you have **an unmodified image
-of the North American (U) version of TTYD**
+of the North American (U) version of TTYD** for the GameCube
 (md5 of **db9a997a617ee03bbc32336d6945ec02**).
 
 **Tower of Trials _will not work_ on any other version of the game,
