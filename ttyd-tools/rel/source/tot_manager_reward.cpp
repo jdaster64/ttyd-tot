@@ -807,7 +807,7 @@ void SelectChestContents() {
     auto& state = g_Mod->state_;
     
     // Weights for different types of moves (Jump, Hammer, Special, partner).
-    int32_t kMoveWeights[] = { 17, 17, 12, 52 };
+    int32_t kMoveWeights[] = { 17, 17, 14, 52 };
     // Weights for different types of stat upgrades (HP, FP, BP, HP P, inv.).
     int32_t kStatWeights[] = { 20, 20, 20, 15, 10 };
     // Weights for different types of other rewards

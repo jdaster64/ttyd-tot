@@ -233,9 +233,9 @@ void ApplyFixedPatches() {
                             ++num_midbosses_defeated;
                         }
                     }
-                    if (num_midbosses_defeated >= 40) {
+                    if (num_midbosses_defeated >= 30) {
                         AchievementsManager::MarkCompleted(
-                            AchievementId::AGG_MIDBOSS_TYPES_40);
+                            AchievementId::AGG_MIDBOSS_TYPES_30);
                     }
                 }
 

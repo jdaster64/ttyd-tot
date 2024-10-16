@@ -1986,7 +1986,7 @@ g_GlobalStrings = {
     b"tot_achd_04":
         b"Use 10 different Lvl. 3 moves.",
     b"tot_achd_05":
-        b"Defeat 40 different types of\n"
+        b"Defeat 30 different types of\n"
         b"midbosses.",
     b"tot_achd_06":
         b"Superguard 100 attacks in total.",
