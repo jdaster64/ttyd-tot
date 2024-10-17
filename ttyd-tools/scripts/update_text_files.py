@@ -23,6 +23,17 @@ g_GlobalStrings = {
     # Generic dummy NPC dialogue.
     b"tot_npc_generic":
         b"[Placeholder] I'm interactable.\n<k>",
+        
+    # File creation string.
+    b"msg_mcard_make_data":
+        b'<system>\n'
+        b'<p>\n'
+        b'<scaleX 0.9>\n'
+        b'The Memory Card in Slot A does not\n'
+        b'have a save file for Tower of Trials.\n'
+        b'Create a Save File now?\n'
+        b'</scale>\n'
+        b'<o>',
     
     # Item & badge names.
     b"in_cake":                 b"Strawberry Cake",
