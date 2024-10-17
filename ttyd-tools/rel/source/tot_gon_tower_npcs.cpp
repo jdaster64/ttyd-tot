@@ -1251,9 +1251,9 @@ EVT_DEFINE_USER_FUNC(evtTot_GetDazzleCost) {
 
 EVT_DEFINE_USER_FUNC(evtTot_GetMoverCost) {
     if (evtGetValue(evt, evt->evtArguments[0]) == 0) {
-        evtSetValue(evt, evt->evtArguments[1], 125 * GetBuyPriceScale() / 100);
+        evtSetValue(evt, evt->evtArguments[1], 100 * GetBuyPriceScale() / 100);
     } else {
-        evtSetValue(evt, evt->evtArguments[1], 250 * GetBuyPriceScale() / 100);
+        evtSetValue(evt, evt->evtArguments[1], 200 * GetBuyPriceScale() / 100);
     }
     return 2;
 }

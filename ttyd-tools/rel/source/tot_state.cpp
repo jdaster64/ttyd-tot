@@ -283,15 +283,31 @@ void StateManager::SelectRandomSeed() {
 }
 
 void StateManager::HashSeedName() {
-    // Convert the named seed into a numeric one.
-    seed_ = third_party::fasthash64(
-        seed_name_, sizeof(seed_name_), 417) % 999'999'999 + 1;
+    int32_t number = 0;
+    for (const char* ptr = seed_name_; *ptr; ++ptr) {
+        // Check to see if seed name is fully numeric and non-zero.
+        if (*ptr >= '0' && *ptr <= '9') {
+            number = number * 10 + (*ptr - '0');
+        } else {
+            number = 0;
+            break;
+        }
+    }
+    if (number) {
+        seed_ = number;
+    } else {
+        // Hash the seed name into a numeric seed.
+        seed_ = third_party::fasthash64(
+            seed_name_, sizeof(seed_name_), 417) % 999'999'999 + 1;
+    }
 }
 
 const char* StateManager::GetSeedAsString() const {
     static char buf[16];
     if (GetOption(OPT_USE_SEED_NAME)) {
         sprintf(buf, "\"%s\"", seed_name_);
+    } else if (seed_ == 0) {
+        sprintf(buf, "Random on start");
     } else {
         sprintf(buf, "%09" PRId32, seed_);
     }
