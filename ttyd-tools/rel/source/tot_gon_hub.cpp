@@ -1284,7 +1284,7 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectShopItems) {
             id += ItemType::THUNDER_BOLT;
             shop_buy_list[i].item_id = id;
             shop_buy_list[i].buy_price = 
-                ttyd::item_data::itemDataTable[id].buy_price * 2;
+                ttyd::item_data::itemDataTable[id].buy_price * 140 / 100;
         }
     }
 

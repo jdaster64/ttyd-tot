@@ -789,7 +789,7 @@ void DispMainWindow(WinMgrEntry* entry) {
                             GetBuyPriceScale() / 100;
                         break;
                     case MenuType::HUB_ITEM_SHOP:
-                        value = itemDataTable[row.value].buy_price * 3;
+                        value = itemDataTable[row.value].buy_price * 2;
                         break;
                     case MenuType::COSMETICS_SHOP_ATTACK_FX:
                         value = CosmeticsManager::GetAttackFxData(row.value)->price;
@@ -2584,7 +2584,7 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
         case MenuType::HUB_ITEM_SHOP:
             evt->lwData[1] = value;
             evt->lwData[2] = PTR(msgSearch(itemDataTable[value].name));
-            evt->lwData[3] = itemDataTable[value].buy_price * 3;
+            evt->lwData[3] = itemDataTable[value].buy_price * 2;
             break;
         case MenuType::TOT_CHARLIETON_SHOP:
             evt->lwData[1] = value;
