@@ -67,7 +67,7 @@ namespace AchievementId {
         META_COSMETICS_5,
         META_ALL_OPTIONS,
         META_ALL_KEY_ITEMS,
-        META_ITEMS_BADGES_10,
+        META_ITEMS_BADGES_5,
         META_ITEMS_BADGES_ALL,
         META_ITEM_LOG_BASIC,
         META_ITEM_LOG_ALL,

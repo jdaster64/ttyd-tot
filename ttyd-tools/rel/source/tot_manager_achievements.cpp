@@ -274,21 +274,21 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
             MarkCompleted(ach);
             break;
         }
-        case AchievementId::META_ITEMS_BADGES_10: {
+        case AchievementId::META_ITEMS_BADGES_5: {
             int32_t num_items = 0;
             for (int32_t i = ItemType::THUNDER_BOLT; i < ItemType::POWER_JUMP; ++i) {
                 if (state.GetOption(FLAGS_ITEM_PURCHASED, i - ItemType::THUNDER_BOLT) &&
                     ttyd::item_data::itemDataTable[i].type_sort_order >= 0)
                     ++num_items;
             }
-            if (num_items < 10) return;
+            if (num_items < 5) return;
             int32_t num_badges = 0;
             for (int32_t i = ItemType::POWER_JUMP; i < ItemType::MAX_ITEM_TYPE; ++i) {
                 if (state.GetOption(FLAGS_ITEM_PURCHASED, i - ItemType::THUNDER_BOLT) &&
                     ttyd::item_data::itemDataTable[i].type_sort_order >= 0)
                     ++num_badges;
             }
-            if (num_badges < 10) return;
+            if (num_badges < 5) return;
             MarkCompleted(ach);
             break;
         }

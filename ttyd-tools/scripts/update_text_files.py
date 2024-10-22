@@ -131,6 +131,14 @@ g_GlobalStrings = {
         
     # Normal item descriptions.
     
+    b"msg_jiwajiwa_kinoko":
+        b"Replenishes 5 HP per turn\n"
+        b"for the next 3 turns.",
+    
+    b"msg_jiwajiwa_syrup":
+        b"Replenishes 5 FP per turn\n"
+        b"for the next 3 turns.",
+    
     b"msg_kaminari_gorogoro":
         b"Strikes a single enemy with\n"
         b"lightning, dealing 5 damage.",
@@ -2151,7 +2159,7 @@ g_GlobalStrings = {
     b"tot_achd_53":
         b"Obtain all Key Items.",
     b"tot_achd_54":
-        b"Purchase 10 items and 10 badges\n"
+        b"Purchase 5 items and 5 badges\n"
         b"from the Petalburg shop.",
     b"tot_achd_55":
         b"Purchase all items and badges\n"

@@ -301,7 +301,7 @@ EVT_BEGIN(ItemShop_GoodbyeEvt)
         AchievementId::META_ITEMS_BADGES_ALL, EVT_NULLPTR)
 
     USER_FUNC(evtTot_CheckCompletedAchievement,
-        AchievementId::META_ITEMS_BADGES_10, LW(1))
+        AchievementId::META_ITEMS_BADGES_5, LW(1))
 
     // After meeting the 10 items + badges achievement, give selector items.
     IF_SMALL(LW(1), 1)
