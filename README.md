@@ -28,7 +28,11 @@ and support is not guaranteed with other mods, custom textures, etc.**
 After verifying you have a working copy of the game, simply run the appropriate
 patcher executable for your platform from the
 ["Releases" page](https://github.com/jdaster64/ttyd-tot/releases),
-provide it the unmodified TTYD .iso image, and it will generate a patched copy.
+provide it the unmodified TTYD .iso image, and it will generate a patched copy
+of the game, which you can simply run, without any loader codes or such.
+
+Tower of Trials uses a separate save data file from the original TTYD, so make
+sure whatever memory card you're using has space for an additional 17 blocks.
 
 ### Known Issues
 *   No major issues known at the moment.
