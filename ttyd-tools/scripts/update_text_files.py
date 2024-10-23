@@ -1264,17 +1264,38 @@ g_GlobalStrings = {
     b"tot_quitearly":
         b"<system>\n<p>\n"
         b"Do you really want to end this\n"
-        b"run early and return to the\n"
-        b"lobby?\n<o>",
+        b"run and return to the lobby?\n"
+        b"Doing so will forfeit all winnings.\n<o>",
     
     b"tot_gameover":
         b"<system>\n<p>\n"
         b"Do you want to continue from\n"
         b"after the last boss, or give up\n"
         b"and return to the lobby?\n<o>",
+    
+    b"tot_gameover_repeat":
+        b"<p>\n"
+        b"Do you want to continue from\n"
+        b"after the last boss, or give up\n"
+        b"and return to the lobby?\n<o>",
+    
+    b"tot_gameover_continueconf":
+        b"<p>\n"
+        b"Continuing this run will revert\n"
+        b"your stats, items, & progress on\n"
+        b"achievements. Are you sure?\n<o>",
+    
+    b"tot_gameover_giveupconf":
+        b"<p>\n"
+        b"Giving up will retain overall\n"
+        b"progression status, but you will\n"
+        b"forfeit all winnings. Are you sure?\n<o>",
         
     b"tot_gameover_opt":
         b"<select 0 1 0 40>\nContinue\nGive Up",
+        
+    b"tot_gameover_conf":
+        b"<select 0 1 0 40>\nYes\nNo",
         
     # Pause menu stuff.
     
@@ -2113,8 +2134,10 @@ g_GlobalStrings = {
         b"Defeat a Shrunk midboss with\n"
         b"Gale Force or Gulp.",
     b"tot_achd_38":
-        b"Get at least a GREAT rating on\n"
-        b"Flurrie's Thunder Storm.",
+        b"Get at least a GREAT rating\n"
+        b"on Flurrie's Thunder Storm.\n"
+        b"(Or equivalent rating, if using\n"
+        b"non-default AC difficulty).",
     b"tot_achd_39":
         b"Take a hit from a fully charged\n"
         b"Megaton Bomb.",

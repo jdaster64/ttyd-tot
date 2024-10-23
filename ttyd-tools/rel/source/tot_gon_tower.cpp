@@ -521,11 +521,25 @@ EVT_BEGIN(Tower_RunGameOverScript)
     
     USER_FUNC(evtTot_ClearBattleResult)
     USER_FUNC(evt_msg_print, 0, PTR("tot_gameover"), 0, PTR("me"))
+LBL(10)
     USER_FUNC(evt_msg_select, 0, PTR("tot_gameover_opt"))
+    SET(LW(1), LW(0))
+    // Confirm that the player is okay with losing progress either way.
+    IF_EQUAL(LW(0), 0)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_gameover_continueconf"))
+    ELSE()
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_gameover_giveupconf"))
+    END_IF()
+    USER_FUNC(evt_msg_select, 0, PTR("tot_gameover_conf"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_gameover_repeat"))
+        GOTO(10)
+    END_IF()
+
     // Despawn partner.
     USER_FUNC(evt_mario_goodbye_party, 0)
     // Chose "continue" option.
-    IF_EQUAL(LW(0), 0)
+    IF_EQUAL(LW(1), 0)
         USER_FUNC(evtTot_LoadBackupSaveData)
         // Resets floor-based stats without making saves, etc.
         USER_FUNC(evtTot_IncrementFloor, 0)
