@@ -1388,13 +1388,13 @@ g_GlobalStrings = {
         b"\nLv. 3: Deals 4+8 damage\n"
         b"for 6 FP.",
     b"tot_movelog_d031":
-        b"\nLv. 1: Deals 2+2+4 damage\n"
+        b"\nLv. 1: Deals 4+2+4 damage\n"
         b"for 4 FP.",
     b"tot_movelog_d032":
-        b"\nLv. 2: Deals 3+3+6 damage\n"
+        b"\nLv. 2: Deals 6+3+6 damage\n"
         b"for 6 FP.",
     b"tot_movelog_d033":
-        b"\nLv. 3: Deals 4+4+8 damage\n"
+        b"\nLv. 3: Deals 8+4+8 damage\n"
         b"for 8 FP.",
     b"tot_movelog_d041":
         b"\nLv. 1: Deals 6 damage and\n"
