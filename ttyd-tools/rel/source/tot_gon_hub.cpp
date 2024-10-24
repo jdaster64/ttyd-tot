@@ -216,7 +216,7 @@ LBL(11)
 
     // Check for completing meta cosmetic purchasing achievement.
     USER_FUNC(evtTot_CheckCompletedAchievement,
-        AchievementId::META_COSMETICS_5, EVT_NULLPTR)
+        AchievementId::META_COSMETICS_5, EVT_NULLPTR, EVT_NULLPTR)
 
     // Check for cosmetic's corresponding key item, and give it if missing.
     USER_FUNC(evt_pouch_check_item, LW(11), LW(0))

@@ -298,16 +298,16 @@ static_assert(sizeof(XNautPhdProjectilePosition_Hook) == 0x24);
 
 EVT_BEGIN(ItemShop_GoodbyeEvt)
     USER_FUNC(evtTot_CheckCompletedAchievement,
-        AchievementId::META_ITEMS_BADGES_ALL, EVT_NULLPTR)
+        AchievementId::META_ITEMS_BADGES_ALL, EVT_NULLPTR, EVT_NULLPTR)
 
     USER_FUNC(evtTot_CheckCompletedAchievement,
-        AchievementId::META_ITEMS_BADGES_5, LW(1))
+        AchievementId::META_ITEMS_BADGES_5, LW(1), EVT_NULLPTR)
 
-    // After meeting the 10 items + badges achievement, give selector items.
+    // After meeting the 5 items + badges achievement, give selector items.
     IF_SMALL(LW(1), 1)
         GOTO(80)
     END_IF()
-    // Skip cutscene if both key items already obtained (via debug).
+    // Skip cutscene if key items were already obtained.
     USER_FUNC(evt_pouch_check_item, (int32_t)ItemType::TOT_KEY_ITEM_SELECTOR, LW(1))
     USER_FUNC(evt_pouch_check_item, (int32_t)ItemType::TOT_KEY_BADGE_SELECTOR, LW(2))
     IF_EQUAL(LW(1), 1)

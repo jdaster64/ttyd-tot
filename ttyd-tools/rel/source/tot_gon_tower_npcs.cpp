@@ -573,7 +573,7 @@ LBL(0)
 
     USER_FUNC(evtTot_DowngradeStat, LW(1))
     USER_FUNC(evtTot_CheckCompletedAchievement,
-        AchievementId::MISC_CHET_RIPPO_SELL_ALL, EVT_NULLPTR)
+        AchievementId::MISC_CHET_RIPPO_SELL_ALL, EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(evt_msg_continue)
     USER_FUNC(evtTot_GetUniqueItemName, LW(0))
     USER_FUNC(evt_item_entry, LW(0), ItemType::SHINE_SPRITE, FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)

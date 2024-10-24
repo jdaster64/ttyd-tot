@@ -455,9 +455,10 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckCompletedAchievement) {
     int32_t ach = evtGetValue(evt, evt->evtArguments[0]);
     bool prev_completed = g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach);
     AchievementsManager::CheckCompleted(ach);
-    bool new_completed = 
-        !prev_completed && g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach);
-    evtSetValue(evt, evt->evtArguments[1], new_completed);
+    bool completed = g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach);
+    bool newly_completed = completed && !prev_completed;
+    evtSetValue(evt, evt->evtArguments[1], completed);
+    evtSetValue(evt, evt->evtArguments[2], newly_completed);
     return 2;
 }
  
