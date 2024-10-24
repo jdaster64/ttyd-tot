@@ -559,6 +559,12 @@ void OptionsManager::OnRunStart() {
     // Assign Yoshi a random color.
     CosmeticsManager::PickYoshiColor();
 
+    // Run item obfuscation, if enabled.
+    if (g_Mod->state_.GetOption(OPT_OBFUSCATE_ITEMS)) {
+        g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION] = 0;
+        ObfuscateItems(true);
+    }
+
     OnRunResumeFromFileSelect();
 
     switch (state.GetOptionValue(OPT_DIFFICULTY)) {
@@ -593,8 +599,9 @@ void OptionsManager::OnRunStart() {
 }
 
 void OptionsManager::OnRunResumeFromFileSelect() {
-    // Redo item obfuscation, if enabled.
-    if (g_Mod->state_.GetOption(OPT_OBFUSCATE_ITEMS)) {
+    // Redo item obfuscation, if enabled and reloading during a run.
+    if (g_Mod->state_.GetOption(OPT_RUN_STARTED) &&
+        g_Mod->state_.GetOption(OPT_OBFUSCATE_ITEMS)) {
         g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION] = 0;
         ObfuscateItems(true);
     }

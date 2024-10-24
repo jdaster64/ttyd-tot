@@ -572,6 +572,18 @@ LBL(99)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Shop_OutsideSignEvt)
+    USER_FUNC(evt_npc_stop_for_event)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mario_normalize)
+    
+    USER_FUNC(evt_msg_print, 0, PTR("tot_shop_signtut"), 0, 0)
+
+    USER_FUNC(evt_mario_key_onoff, 1)
+    USER_FUNC(evt_npc_start_for_event)
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Villager_A_InitEvt)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR("me"), 1536)
     SWITCH((int32_t)GSW_NpcA_SpecialConversation)
@@ -704,6 +716,12 @@ EVT_BEGIN(gon_10_InitEvt)
         SET(LW(0), PTR(&gon_10_door_data[1]))
         RUN_CHILD_EVT(evt_door_setup)
 
+        // Add sign explaining shop's purpose.
+        USER_FUNC(
+            evt_mobj_signboard, PTR("board"), 13, 70, -273,
+            PTR(&Shop_OutsideSignEvt), LSWF(0))
+
+        // Populate shop's items.
         USER_FUNC(evtTot_SelectShopItems)
         USER_FUNC(evt_shop_setup, PTR(&shop_obj_list), PTR(&shop_buy_list), PTR(&shopkeeper_data), PTR(&shop_trade_list))
         USER_FUNC(evtTot_DeleteShopItems)

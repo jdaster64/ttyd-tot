@@ -102,6 +102,7 @@ NpcSetupInfo g_EnemyNpcSetup[3];
 
 // USER_FUNC Declarations.
 EVT_DECLARE_USER_FUNC(evtTot_ClearBattleResult, 0)
+EVT_DECLARE_USER_FUNC(evtTot_GetContinueDestinationMap, 1)
 EVT_DECLARE_USER_FUNC(evtTot_HasBackupSave, 1)
 EVT_DECLARE_USER_FUNC(evtTot_LoadBackupSaveData, 0)
 EVT_DECLARE_USER_FUNC(evtTot_MakeKeyTable, 3)
@@ -541,6 +542,7 @@ LBL(10)
     // Chose "continue" option.
     IF_EQUAL(LW(1), 0)
         USER_FUNC(evtTot_LoadBackupSaveData)
+        USER_FUNC(evtTot_GetContinueDestinationMap, LW(1))
         // Resets floor-based stats without making saves, etc.
         USER_FUNC(evtTot_IncrementFloor, 0)
         // Set flag to spawn player in room ready to go to the next floor.
@@ -549,7 +551,7 @@ LBL(10)
         SET((int32_t)GSW_Tower_ContinuingFromGameOver, 1)
         SET((int32_t)GSW_Tower_ChestClaimed, 0)
         USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
-        USER_FUNC(evt_bero_mapchange, PTR("gon_01"), PTR("w_bero"))
+        USER_FUNC(evt_bero_mapchange, LW(1), PTR("w_bero"))
     ELSE()
         // Clear Koopa's "run results" conversation to generic loss.
         SET((int32_t)GSW_NpcA_SpecialConversation, 20)
@@ -1426,6 +1428,15 @@ EVT_DEFINE_USER_FUNC(evtTot_WaitNpcAnimFrame) {
         return evt->lwData[15] != loop_cnt ? 2 : 0;
     }
     return cur_frame >= frame ? 2 : 0;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetContinueDestinationMap) {
+    static const char* kMaps[] = {
+        "gon_01", "gon_02", "gon_03", "gon_04"
+    };
+    int32_t map_index = (g_Mod->state_.floor_ - 1) / 16;
+    evtSetValue(evt, evt->evtArguments[0], PTR(kMaps[map_index]));
+    return 2;
 }
 
 // Dynamically change the destination of the exit pipe.

@@ -71,8 +71,8 @@ g_GlobalStrings = {
         b'up your moves at random.',
         
     b"msg_star_piece_inhub":
-        b"A glittering trinket that might\n"
-        b"be of value to some merchants.",
+        b"A glittering trinket, used to\n"
+        b"trade with traveling merchants.",
         
     b"msg_custom_super_boots":
         b"A stronger pair of boots.",
@@ -6035,8 +6035,8 @@ g_TowerBossFloorStrings = {
         b"sorts, <wait 250>so how about this...\n"
         b"<k>\n"
         b"<p>\n"
-        b"I shall remain sequestered in\n"
-        b"this tower, as long as you\n"
+        b"I shall remain here at the top\n"
+        b"of my tower, as long as you\n"
         b"continue to challenge me.\n"
         b"<k>\n"
         b"<p>\n"
@@ -6453,23 +6453,45 @@ g_PetalburgWestStrings = {
         b"give you a quick run-down.\n<k>\n<o>",
         
     b"tot_shopkeep_tut_body":
-        b"<p>\nIf you've come across an item\n"
+        b"<p>\n"
+        b"If you've come across an item\n"
         b"or badge in the tower, you\n"
-        b"might see it on the shelf here.\n<k>\n"
-        b"<p>\nIf something catches your eye,\n"
+        b"might see it on the shelf here.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If something catches your eye,\n"
         b"just walk up to it and I can\n"
-        b"sell it for a top-notch price!\n<k>\n"
-        b"<p>\nItems don't have any use here\n"
-        b"in town, but you can select\n"
-        b"a few to bring into the tower.\n<k>\n"
-        b"<p>\nFinally, if there's an item you\n"
+        b"sell it for a top-notch price!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If there's another item you\n"
         b"know you've seen before, but\n"
-        b"it isn't on display right now,\n<k>\n"
-        b"<p>\nread that sign back there to\n"
+        b"it isn't on display right now,\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"read that sign back there to\n"
         b"get it on back-order. It'll cost\n"
-        b"you a bit extra, though!\n<k>\n"
-        b"<p>\nWant me to run that all\n"
-        b"by you again?\n<o>",
+        b"you a bit extra, though!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Oh, one more thing; the items\n"
+        b"and badges you buy here can't\n"
+        b"be used here in town...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But if you buy enough of each,\n"
+        b"I'll give you a special reward\n"
+        b"to view your collection!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You can also use it to select\n"
+        b"a few to bring into the tower\n"
+        b"on your next run!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Want me to run that all\n"
+        b"by you again?\n"
+        b"<o>",
 
     b"tot_shopkeep_tutrepeat":
         b"<select 1 1 0 40>\nJust once more!\nNope, I'm good!",
@@ -6486,6 +6508,24 @@ g_PetalburgWestStrings = {
 
     b"tot_shopkeep_yesno":
         b"<select 0 1 0 40>\nYes\nNo",
+        
+    # Sign outside of shop.
+    b"tot_shop_signtut":
+        b"<kanban>\n"
+        b"Welcome to Niff T.'s Shop,\n"
+        b"your one-shop stop for all kinds\n"
+        b"of useful items and badges!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Buy items and badges here to\n"
+        b"add them to your permanent\n"
+        b"collection!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Buy 5 each of items and badges,\n"
+        b"and you'll be able to pick some\n"
+        b"to bring into the tower!\n"
+        b"<k>",
         
     # NPC A (Koopa near west entrance) dialogue.
 
@@ -7163,9 +7203,9 @@ g_PetalburgWestStrings = {
         b"story mode is awesome!\n"
         b"<k>\n"
         b"<p>\n"
-        b"It's kind of a Rogue-like\n"
+        b"It's kind of a Rogue-like deal\n"
         b"where you climb up a tower\n"
-        b"and fight a bunch...\n"
+        b"and fight a bunch of guys...\n"
         b"<k>\n"
         b"<p>\n"
         b"Then you get to pick a\n"
