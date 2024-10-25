@@ -233,8 +233,12 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
 
     int32_t conditions_met = state.GetOption(STAT_RUN_CONDITIONS_MET);
     int32_t conditions_total = state.GetOption(STAT_RUN_CONDITIONS_TOTAL);
-    if (conditions_met > 0 && conditions_met == conditions_total) {
+    if (conditions_met >= 10 && conditions_met == conditions_total) {
         AchievementsManager::MarkCompleted(AchievementId::RUN_ALL_CONDITIONS_MET);
+    }
+
+    if (state.GetOption(STAT_RUN_TRADE_OFF_ON_BOSS)) {
+        AchievementsManager::MarkCompleted(AchievementId::MISC_TRADE_OFF_BOSS);
     }
 
     bool all_moves_maxed = true;

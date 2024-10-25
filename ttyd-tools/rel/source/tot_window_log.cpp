@@ -2128,12 +2128,11 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                         ++menu->achievement_log_total_count;
                     }
                 }
+                
+                // Award reward for achievement (options, key items, hammers).
+                AchievementsManager::UnlockReward(ach);
 
                 // Update number of hammers if necessary.
-                if (AchievementsManager::GetData(ach)->reward_type ==
-                    AchievementRewardType::HAMMER) {
-                    g_Mod->state_.ChangeOption(STAT_PERM_ACH_HAMMERS, 1);
-                }
                 menu->achievement_log_hammers =
                     g_Mod->state_.GetOption(STAT_PERM_ACH_HAMMERS);
                 

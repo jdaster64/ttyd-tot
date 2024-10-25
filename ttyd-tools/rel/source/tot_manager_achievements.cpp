@@ -12,6 +12,8 @@
 #include <ttyd/mario_pouch.h>
 #include <ttyd/pmario_sound.h>
 #include <ttyd/swdrv.h>
+#include <ttyd/win_main.h>
+#include <ttyd/win_root.h>
 
 namespace mod::tot {
 
@@ -171,44 +173,62 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
 
         // TODO: Move sound effect to the window popup, if creating one.
         ttyd::pmario_sound::psndSFXOn("SFX_MOBJ_BLOCK_POWER_SHINE1");
-
-        // For options, automatically unlock their reward (no purchase needed).
-        switch (g_AchievementData[ach].reward_type) {
-            case AchievementRewardType::OPTION: {
-                g_Mod->state_.SetOption(FLAGS_OPTION_UNLOCKED, ach);
-                // Check to see if all extra options are unlocked.
-                CheckCompleted(AchievementId::META_ALL_OPTIONS);
-                break;
-            }
-            case AchievementRewardType::KEY_ITEM: {
-                int32_t item = g_AchievementData[ach].reward_id;
-                // Award item and enable corresponding 'activated' flag.
-                if (!ttyd::mario_pouch::pouchCheckItem(item)) {
-                    ttyd::mario_pouch::pouchGetItem(item);
-                    switch (item) {
-                        case ItemType::TOT_KEY_PEEKABOO:
-                            SetSWF(GSWF_PeekabooEnabled);
-                            break;
-                        case ItemType::TOT_KEY_SUPER_PEEKABOO:
-                            SetSWF(GSWF_PeekabooEnabled);
-                            SetSWF(GSWF_SuperPeekabooEnabled);
-                            break;
-                        case ItemType::TOT_KEY_TIMING_TUTOR:
-                            SetSWF(GSWF_TimingTutorEnabled);
-                            break;
-                        case ItemType::TOT_KEY_BGM_TOGGLE:
-                            SetSWF(GSWF_BgmEnabled);
-                            break;
-                    }
-                }
-                break;
-            }
-        }
     }
 
     if (!g_Mod->state_.GetOption(
         FLAGS_ACHIEVEMENT, AchievementId::META_ALL_ACHIEVEMENTS)) {
         CheckCompleted(AchievementId::META_ALL_ACHIEVEMENTS);
+    }
+}
+
+void AchievementsManager::UnlockReward(int32_t ach) {
+    switch (g_AchievementData[ach].reward_type) {
+        case AchievementRewardType::OPTION: {
+            g_Mod->state_.SetOption(FLAGS_OPTION_UNLOCKED, ach);
+            // Check to see if all extra options are unlocked.
+            CheckCompleted(AchievementId::META_ALL_OPTIONS);
+            break;
+        }
+        case AchievementRewardType::KEY_ITEM: {
+            int32_t item = g_AchievementData[ach].reward_id;
+            if (!ttyd::mario_pouch::pouchCheckItem(item)) {
+                // Award item and enable corresponding 'activated' flag.
+                ttyd::mario_pouch::pouchGetItem(item);
+                switch (item) {
+                    case ItemType::TOT_KEY_PEEKABOO:
+                        SetSWF(GSWF_PeekabooEnabled);
+                        break;
+                    case ItemType::TOT_KEY_SUPER_PEEKABOO:
+                        SetSWF(GSWF_PeekabooEnabled);
+                        SetSWF(GSWF_SuperPeekabooEnabled);
+                        break;
+                    case ItemType::TOT_KEY_TIMING_TUTOR:
+                        SetSWF(GSWF_TimingTutorEnabled);
+                        break;
+                    case ItemType::TOT_KEY_BGM_TOGGLE:
+                        SetSWF(GSWF_BgmEnabled);
+                        break;
+                }
+                auto* menu = ttyd::win_main::winGetPtr();
+                if (menu) {
+                    // Refresh Important items display to show new item.
+                    int32_t key_items_count = 0;
+                    for (int32_t item = ItemType::TOT_KEY_PEEKABOO;
+                        item < ItemType::TOT_KEY_ITEM_MAX; ++item) {
+                        if (ttyd::mario_pouch::pouchCheckItem(item)) {
+                            menu->key_items[key_items_count++] = item;
+                        }
+                    }
+                    menu->key_items_count = key_items_count;
+                    menu->items_cursor_idx[1] = 0;
+                }
+            }
+            break;
+        }
+        case AchievementRewardType::HAMMER: {
+            g_Mod->state_.ChangeOption(STAT_PERM_ACH_HAMMERS, 1);
+            break;
+        }
     }
 }
 

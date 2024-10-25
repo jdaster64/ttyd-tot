@@ -1257,6 +1257,10 @@ EVT_DEFINE_USER_FUNC(evtTot_BubulbP_MarkConversation) {
         seed_just_unlocked = true;
     }
     evtSetValue(evt, evt->evtArguments[0], seed_just_unlocked);
+    
+    // See if the "all options" achievement has been met.
+    AchievementsManager::CheckCompleted(AchievementId::META_ALL_OPTIONS);
+
     return 2;
 }
 

@@ -5,6 +5,7 @@
 #include "mod.h"
 #include "patch.h"
 #include "patches_mario_move.h"
+#include "patches_options.h"
 #include "tot_custom_rel.h"
 #include "tot_generate_enemy.h"
 #include "tot_gsw.h"
@@ -645,8 +646,9 @@ bool CheckEvasionBadges(BattleWorkUnit* unit) {
             hit_chance *= 0.75f;
         }
         // Will not activate if the actor is at 1/1 (max) HP.
-        if (unit->current_hp <= unit->unit_kind_params->danger_hp &&
-            unit->current_hp < unit->max_hp) {
+        if (unit->current_hp < unit->max_hp &&
+            unit->current_hp <= options::GetPinchThresholdForMaxHp(
+                unit->max_hp, /* peril = */ false)) {
             for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
                 hit_chance *= 0.67f;
             }
@@ -661,8 +663,9 @@ bool CheckEvasionBadges(BattleWorkUnit* unit) {
             if (ttyd::system::irand(100) < 25) return true;
         }
         // Will not activate if the actor is at 1/1 (max) HP.
-        if (unit->current_hp <= unit->unit_kind_params->danger_hp &&
-            unit->current_hp < unit->max_hp) {
+        if (unit->current_hp < unit->max_hp &&
+            unit->current_hp <= options::GetPinchThresholdForMaxHp(
+                unit->max_hp, /* peril = */ false)) {
             for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
                 if (ttyd::system::irand(100) < 33) return true;
             }
@@ -762,12 +765,14 @@ int32_t CalculateAtkImpl(
         
         // Danger / Peril badges (weaker than in original).
         // Will not activate if the actor is at 1/1 (max) HP.
-        if (attacker->current_hp <= attacker->unit_kind_params->danger_hp &&
-            attacker->current_hp < attacker->max_hp) {
+        if (attacker->current_hp < attacker->max_hp &&
+            attacker->current_hp <= options::GetPinchThresholdForMaxHp(
+                attacker->max_hp, /* peril = */ false)) {
             atk += 1 * attacker->badges_equipped.power_rush;
         }
-        if (attacker->current_hp <= attacker->unit_kind_params->peril_hp &&
-            attacker->current_hp < attacker->max_hp) {
+        if (attacker->current_hp < attacker->max_hp &&
+            attacker->current_hp <= options::GetPinchThresholdForMaxHp(
+                attacker->max_hp, /* peril = */ true)) {
             atk += 3 * attacker->badges_equipped.mega_rush;
         }
         if (ice_power_bonus) {
@@ -925,10 +930,10 @@ int32_t CalculateBaseDamage(
             auto& audience_work = battleWork->audience_work;
             int32_t current_audience = audience_work.current_audience_count_int;
                 
-            // Regen 0.10 SP per damage, up to 0.01x the current audience count;
-            // increased by 50% per Pity Star (P) equipped.
-            int32_t sp_regen = Min(atk * 10, current_audience);
-            sp_regen = sp_regen * (target->badges_equipped.simplifier + 2) / 2;
+            // Regen 10% of a unit SP per damage, up to 1% per audience member
+            // (100 max); then increase the result by 0.25x per Pity Star (P).
+            int32_t sp_regen = Min(atk * 10, Min(current_audience, 100));
+            sp_regen = sp_regen * (target->badges_equipped.simplifier + 4) / 4;
             
             audience_work.impending_star_power += sp_regen;
         }
@@ -992,8 +997,9 @@ int32_t CalculateBaseDamage(
     
     int32_t last_stands = target->badges_equipped.last_stand;
     // Will not activate if the actor is at 1/1 (max) HP.
-    if (target->current_hp <= target->unit_kind_params->danger_hp &&
-        target->current_hp < target->max_hp &&
+    if (target->current_hp < target->max_hp &&
+        target->current_hp <= options::GetPinchThresholdForMaxHp(
+            target->max_hp, /* peril = */ false) &&
         last_stands > 0) {
         damage = (damage + last_stands) / (last_stands + 1);
     }
@@ -1737,8 +1743,8 @@ void ApplyFixedPatches() {
                     if (item_type == ItemType::TRADE_OFF &&
                         ttyd::battle::g_BattleWork->turn_count <= 1 &&
                         g_Mod->state_.IsFinalBossFloor()) {
-                        AchievementsManager::MarkCompleted(
-                            AchievementId::MISC_TRADE_OFF_BOSS);
+                        // Track that a Trade Off was used on the first turn.
+                        g_Mod->state_.ChangeOption(STAT_RUN_TRADE_OFF_ON_BOSS);
                     }
                     break;
                 }

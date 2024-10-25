@@ -243,9 +243,17 @@ void DialogueManager::SetConversation(int32_t id) {
                         case AchievementId::MISC_SUPERGUARD_BITE:
                         case AchievementId::MISC_SHINES_10:
                         case AchievementId::MISC_RUN_COINS_999:
-                        case AchievementId::META_ALL_OPTIONS:
-                        case AchievementId::META_ITEM_LOG_BASIC:
                             ids[num_cvs++] = grid[i];
+                            break;
+                        case AchievementId::META_ITEM_LOG_BASIC:
+                            // Only hint after Zess T. isn't a spoiler.
+                            if (completed_runs >= 3)
+                                ids[num_cvs++] = grid[i];
+                            break;
+                        case AchievementId::META_ALL_OPTIONS:
+                            // Only hint if seeding option isn't unlocked.
+                            if (!GetSWF(GSWF_NpcF_SeedUnlocked))
+                                ids[num_cvs++] = grid[i];
                             break;
                         default:
                             break;

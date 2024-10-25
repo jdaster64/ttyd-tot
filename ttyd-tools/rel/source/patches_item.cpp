@@ -479,7 +479,7 @@ void ApplyFixedPatches() {
         // Badges.
         0xb8a88dbb, 0xdd9d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,
         0xbbbebeeb, 0xaaaacdfc, 0xcaacccca, 0xd00edd7c, 0x0000000d,
-        0x0a770007, 0xbdee0000, 0x00000bbb,
+        0x0a770007, 0xddee0000, 0x00000bbd,
     };
     // Prices corresponding to the price tiers in the above array.
     static const constexpr uint8_t kPrices[] = {
@@ -754,7 +754,10 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::MYSTIC_EGG].weapon_params = &kMysticEggParams;
     // Can only be used in battle.
     itemDataTable[ItemType::MYSTIC_EGG].usable_locations &= ~ItemUseLocation::kField;
-        
+
+    // Reduce Sleepy Sheep turn count to 3, to reduce frustration AND cheese.
+    ttyd::battle_item_data::ItemWeaponData_Nemure_Yoikoyo.sleep_time = 3;
+
     // Hot Sauce charges by +3.
     ttyd::battle_item_data::ItemWeaponData_RedKararing.charge_strength = 3;
         
@@ -830,12 +833,12 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::FIRE_POP].usable_locations 
         &= ~ItemUseLocation::kField;
 
-    // Shroom Broth drops ATK and DEF by 1 for 3 turns, has no HP-regen.
+    // Shroom Broth drops ATK and DEF by 2 for 3 turns, has no HP-regen.
     SetItemRestoration(ItemType::SHROOM_BROTH, 20, 20);
-    ttyd::battle_item_data::ItemWeaponData_TeaKinoko.atk_change_strength = -1;
+    ttyd::battle_item_data::ItemWeaponData_TeaKinoko.atk_change_strength = -2;
     ttyd::battle_item_data::ItemWeaponData_TeaKinoko.atk_change_chance = 100;
     ttyd::battle_item_data::ItemWeaponData_TeaKinoko.atk_change_time = 3;
-    ttyd::battle_item_data::ItemWeaponData_TeaKinoko.def_change_strength = -1;
+    ttyd::battle_item_data::ItemWeaponData_TeaKinoko.def_change_strength = -2;
     ttyd::battle_item_data::ItemWeaponData_TeaKinoko.def_change_chance = 100;
     ttyd::battle_item_data::ItemWeaponData_TeaKinoko.def_change_time = 3;
     ttyd::battle_item_data::ItemWeaponData_TeaKinoko.hp_regen_strength = 0;
@@ -977,7 +980,7 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_PERFECT_POWER_P].name = "in_perfect_power_p";
     itemDataTable[ItemType::TOT_PERFECT_POWER_P].description = "msg_perfect_power_p";
     itemDataTable[ItemType::TOT_PERFECT_POWER_P].menu_description = "msg_perfect_power_p";
-    // Pity Star (P): gives +50% extra Star Power from taking hits from enemies.
+    // Pity Star (P): gives extra Star Power from taking hits from enemies.
     itemDataTable[ItemType::TOT_PITY_STAR].icon_id = IconType::PITY_STAR;
     itemDataTable[ItemType::TOT_PITY_STAR].name = "in_pity_star";
     itemDataTable[ItemType::TOT_PITY_STAR].description = "msg_pity_star";

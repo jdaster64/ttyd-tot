@@ -1701,13 +1701,13 @@ g_GlobalStrings = {
         b"on Mario and Flurrie for 4 FP.",
     b"tot_movelog_d551":
         b"\nLv. 1: Deals 3 piercing damage\n"
-        b"and 1-turn Freeze for 5 FP.",
+        b"and 70%, 1t Freeze for 5 FP.",
     b"tot_movelog_d552":
         b"\nLv. 2: Deals 4 piercing damage\n"
-        b"and 2-turn Freeze for 7 FP.",
+        b"and 85%, 2t Freeze for 7 FP.",
     b"tot_movelog_d553":
         b"\nLv. 3: Deals 5 piercing damage\n"
-        b"and 3-turn Freeze for 9 FP.",
+        b"and 100%, 3t Freeze for 9 FP.",
     b"tot_movelog_d561":
         b"\nLv. 1: Deals 1 damage per cycle\n"
         b"to a single enemy, for 4 FP.",
@@ -2087,8 +2087,8 @@ g_GlobalStrings = {
         b"Finish a run with no moves able\n"
         b"to be upgraded further.",
     b"tot_achd_26":
-        b"Finish a run without failing a\n"
-        b"bonus condition.",
+        b"Finish a run with all bonus\n"
+        b"conditions met (10 at minimum).",
     b"tot_achd_27":
         b"Finish a default run, spending\n"
         b"3 or fewer turns on each floor.\n"
@@ -2128,8 +2128,8 @@ g_GlobalStrings = {
         b"Break an enemy's Frozen status\n"
         b"with a hit dealing 20+ damage.",
     b"tot_achd_36":
-        b"Deal 50 damage to a single foe\n"
-        b"using Poison status.",
+        b"Deal a total of 50 damage to\n"
+        b"one foe using Poison status.",
     b"tot_achd_37":
         b"Defeat a Shrunk midboss with\n"
         b"Gale Force or Gulp.",
@@ -2142,8 +2142,8 @@ g_GlobalStrings = {
         b"Take a hit from a fully charged\n"
         b"Megaton Bomb.",
     b"tot_achd_40":
-        b"Use a Trade Off item on turn 1\n"
-        b"against the final boss.",
+        b"Defeat the final boss after\n"
+        b"using a Trade Off on turn 1.",
     b"tot_achd_41":
         b"Superguard one of the dragons'\n"
         b"bite attack.",
@@ -4386,8 +4386,8 @@ g_GlobalStrings = {
         b'%s'
         b"<p>\n"
         b"If you can believe it, these\n"
-        b"guys are even more hot-\n"
-        b"headed than regular Bob-ombs!\n"
+        b"guys are even more hot-headed\n"
+        b"than regular Bob-ombs!\n"
         b"<k>\n"
         b"<p>\n"
         b"They'll ignite, and explode\n"
@@ -5119,7 +5119,7 @@ g_TowerLobbyStrings = {
     b"tot_optr_audthrows_on":       b"Random Items",
     b"tot_optr_itemshuffle":        b"Obfuscated Items",
     b"tot_optr_secretboss":         b"Secret Boss",
-    b"tot_optr_secretboss_random":  b"Randomly Appears",
+    b"tot_optr_secretboss_random":  b"Rarely Appears",
     b"tot_optr_secretboss_off":     b"Never Appears",
     b"tot_optr_secretboss_on":      b"Always Appears",
     

@@ -122,6 +122,8 @@ public:
 
     // Marks off an achievement.
     static void MarkCompleted(int32_t ach);
+    // Grants the corresponding option / key item when animation plays.
+    static void UnlockReward(int32_t ach);
     // Checks whether an achievement should be newly met, and marks it if so.
     static void CheckCompleted(int32_t ach);
 
