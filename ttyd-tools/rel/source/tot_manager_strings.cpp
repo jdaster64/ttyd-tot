@@ -7,6 +7,8 @@
 #include "tot_manager_options.h"
 #include "tot_state.h"
 
+#include <ttyd/battle.h>
+#include <ttyd/battle_unit.h>
 #include <ttyd/fontmgr.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/swdrv.h>
@@ -143,7 +145,29 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
         case MsgKey::CUSTOM_TATTLE_KILLCOUNT: {
             // Print the number of this enemy defeated.
             static char buf[24];
-            if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
+            buf[0] = '\0';
+            if (ttyd::mariost::g_MarioSt->bInBattle) {
+                // In battle, read from Goombella's unit work.
+                const auto* partner_unit = 
+                    ttyd::battle::BattleGetPartyPtr(ttyd::battle::g_BattleWork);
+                if (partner_unit) {
+                    const auto* tattle_work = 
+                        (const ttyd::win_root::WinLogTattleMenuWork*)
+                            partner_unit->unit_work[1];
+                    if (tattle_work) {
+                        int32_t idx = GetCustomTattleIndex(tattle_work->enemy_id);
+                        if (idx >= 1 && idx <= 102) {
+                            char* ptr = buf;
+                            ptr += sprintf(buf, "Times Defeated: ");
+                            ptr += IntegerToFmtString(
+                                g_Mod->state_.GetOption(
+                                    STAT_PERM_ENEMY_KILLS, idx), ptr);
+                        }
+                    }
+                }
+                return buf;
+            } else if (auto* menu = ttyd::win_main::winGetPtr(); menu) {
+                // Otherwise, read from currently selected Tattle log entry.
                 int32_t idx = menu->tattle_logs[menu->tattle_log_cursor_idx].order;
                 char* ptr = buf;
                 ptr += sprintf(buf, "Times Defeated: ");
