@@ -14,7 +14,8 @@ namespace mod::tot {
 
 namespace {
 
-constexpr const char* kTitleInfo = "v1.06 r33" "\n" "2024-10-25";
+constexpr const char* kVersion = "v1.07";
+constexpr const char* kTitleInfo = "v1.07 r34" "\n" "2024-10-26";
     
 }
 
@@ -33,6 +34,10 @@ void TitleScreenManager::Draw() {
                 0x000000E5u, 8, 8);
         }
     }
+}
+
+const char* TitleScreenManager::GetVersionString() {
+    return kVersion;
 }
 
 }

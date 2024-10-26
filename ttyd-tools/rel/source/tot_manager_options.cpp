@@ -7,10 +7,15 @@
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_reward.h"
+#include "tot_manager_title.h"
 #include "tot_state.h"
 
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
+
+#include <cinttypes>
+#include <cstdio>
+#include <cstring>
 
 namespace mod::tot {
     
@@ -333,10 +338,13 @@ const char* OptionsManager::GetEncodedOptions() {
     encoding_bytes[1] = 99;
     int32_t encoded_bit_count = 12;
 
-    // If a preset is selected, use its name instead.
+    // If a preset is selected, use its name + the current version instead.
     switch (g_Mod->state_.GetOptionValue(OPT_PRESET)) {
         case OPTVAL_PRESET_DEFAULT:
-            return "Default";
+            sprintf(
+                encoding_str, "Default (%s)", 
+                TitleScreenManager::GetVersionString());
+            return encoding_str;
     }
 
     EncodeOption(encoding_bytes, encoded_bit_count, OPT_NUM_CHESTS);

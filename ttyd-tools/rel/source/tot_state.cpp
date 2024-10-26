@@ -170,6 +170,9 @@ bool StateManager::Load(TotSaveSlot* save) {
         if (floor_ > 0) ChangeOption(STAT_PERM_FLOORS, -1);
     }
     
+    // Make sure partner HP is kept consistent.
+    OptionsManager::UpdateLevelupStats();
+    
     return true;
 }
 

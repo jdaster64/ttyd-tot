@@ -1238,8 +1238,10 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     if ((winmgr_work->entries[sel_entry->entry_indices[1]].flags & 
         WinMgrEntry_Flags::IN_FADE) != 0) return;
 
-    uint32_t kBlack = 0x0000'00FFU;
-    uint32_t kAccent = 0x0000'C0FFU;
+    uint32_t kBlack     = 0x0000'00FFU;
+    uint32_t kAccent    = 0x0000'C0FFU;
+    uint32_t kRed       = 0xCC00'00FFU;
+
     const float min_x = entry->x + 12.f;
     const float max_x = entry->x + entry->width - 12.f;
     const float top_y = entry->y - 10.f;
@@ -1255,7 +1257,9 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     sprintf(text, "%s", g_Mod->state_.GetSeedAsString());
-    ttyd::win_main::winFontSet(&text_pos, &text_scale, &kAccent, text);
+    uint32_t* seed_color =
+        g_Mod->state_.GetOption(OPT_UNSEEDED_RUN) ? &kAccent : &kRed;
+    ttyd::win_main::winFontSet(&text_pos, &text_scale, seed_color, text);
 
     text_pos.x = min_x;
     text_pos.y += space_y;
