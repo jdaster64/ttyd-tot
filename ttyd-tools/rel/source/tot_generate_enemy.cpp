@@ -673,12 +673,12 @@ void SelectEnemies() {
                         state.GetOption(STAT_PERM_FULL_FINISHES) +
                         state.GetOption(STAT_PERM_EX_FINISHES);
 
-                    // Don't allow the alternate boss before 5 total clears.
-                    if (total_clears < 5) break;
+                    // Don't allow the alternate boss before 7 total clears.
+                    if (total_clears < 7) break;
 
-                    // If secret boss not beaten in over 10 total clears,
+                    // If secret boss not beaten in over 14 total clears,
                     // double the chance of it appearing.
-                    if (total_clears > 10) boss_chance = 40;
+                    if (total_clears > 14) boss_chance = 40;
                 }
 
                 if (static_cast<int32_t>(state.Rand(100, RNG_ALTERNATE_BOSS)) 

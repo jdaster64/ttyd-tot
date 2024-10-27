@@ -1167,7 +1167,9 @@ BattleWeapon customWeapon_VivianNeutralize = {
     .weapon_ac_level = 3,
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_mahou_no_kona",
-    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::CANNOT_MISS,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |

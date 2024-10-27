@@ -124,6 +124,12 @@ EVT_DEFINE_USER_FUNC(evtTot_ConfiscateItem) {
     int32_t item = unit->held_item;
     unit->held_item = 0;
     evtSetValue(evt, evt->evtArguments[1], item);
+
+    // Reset badge effects.
+    if (item >= ItemType::POWER_JUMP && item < ItemType::MAX_ITEM_TYPE &&
+        unit->current_kind < BattleUnitType::BONETAIL) {
+        ttyd::battle::BtlUnit_EquipItem(unit, 1, 0);
+    }
     
     return 2;
 }

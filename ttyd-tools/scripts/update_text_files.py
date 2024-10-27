@@ -1939,7 +1939,7 @@ g_GlobalStrings = {
     b"tot_recn_fpspent":            b"FP Spent",
     b"tot_recn_spspent":            b"SP Spent",
     b"tot_recn_superguards":        b"Superguards",
-    b"tot_recn_conditions":         b"Conditions Met",
+    b"tot_recn_conditions":         b"Bonus Conditions",
     b"tot_recn_mcoinsearned":       b"Coins Won",
     b"tot_recn_mspearned":          b"Star Pcs. Won",
     b"tot_recn_rcoinsearned":       b"Coins Collected",
@@ -2004,7 +2004,7 @@ g_GlobalStrings = {
     b"tot_optr_fpspent":            b"FP Spent",
     b"tot_optr_spspent":            b"SP Spent",
     b"tot_optr_superguards":        b"Superguards",
-    b"tot_optr_conditionsmet":      b"Conditions Met",
+    b"tot_optr_conditionsmet":      b"Bonus Conditions",
     b"tot_optr_npcsmet":            b"NPC Deals Taken",
     b"tot_optr_itemsbought":        b"Items Bought",
     b"tot_optr_continues":          b"Continues",
@@ -2155,7 +2155,9 @@ g_GlobalStrings = {
         b"for 100 or more coins.",
     b"tot_achd_44":
         b"Exchange all your levels in all\n"
-        b"stats with Chet Rippo.",
+        b"stats with Chet Rippo.\n"
+        b"All stats should max out at 1;\n"
+        b"infinite BP cannot be used.",
     b"tot_achd_45":
         b"Double your coins with Lumpy\n"
         b"twice or more in a single run.",

@@ -1,4 +1,4 @@
-### Tower of Trials (v1.07 r34) by Jdaster64
+### Tower of Trials (v1.08 r35) by Jdaster64
 
 ### Overview
 **Tower of Trials** is a Rogue-like mod of Paper Mario: TTYD by Jdaster64.
