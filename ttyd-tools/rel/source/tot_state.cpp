@@ -264,11 +264,8 @@ void StateManager::ResetOptions() {
 
     // Set all options to their default values.
     SetOption(OPTVAL_PRESET_DEFAULT);
-    SetOption(OPTVAL_DIFFICULTY_FULL);
-    SetOption(
-        CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)
-        ? OPTVAL_TIMER_RTA : OPTVAL_TIMER_NONE);
-    OptionsManager::ApplyCurrentPresetOptions();
+    SetOption(OPTVAL_DIFFICULTY_HALF);
+    OptionsManager::ApplyCurrentPresetOptions(true);
 
     // Clear seed information, and reset all RNG states.
     seed_ = 0;

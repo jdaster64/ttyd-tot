@@ -155,12 +155,28 @@ void SetBaseStats() {
     
 }
 
-void OptionsManager::ApplyCurrentPresetOptions() {
+void OptionsManager::ApplyCurrentPresetOptions(bool first_time) {
     switch (g_Mod->state_.GetOptionValue(OPT_PRESET)) {
-        case OPTVAL_PRESET_DEFAULT: {
+        case OPTVAL_PRESET_DEFAULT:
+        case OPTVAL_PRESET_RTA_RACE: {
             for (const auto& data : g_OptionMetadata) {
                 if (!data.check_for_default) continue;
                 g_Mod->state_.SetOption(data.option, GetDefaultValue(data.option));
+            }
+            if (first_time) {
+                g_Mod->state_.SetOption(
+                    OPT_TIMER_DISPLAY, GetDefaultValue(OPT_TIMER_DISPLAY));
+            }
+            break;
+        }
+        case OPTVAL_PRESET_CUSTOM: {
+            if (first_time) {
+                for (const auto& data : g_OptionMetadata) {
+                    if (!data.check_for_default) continue;
+                    g_Mod->state_.SetOption(data.option, GetDefaultValue(data.option));
+                }
+                g_Mod->state_.SetOption(
+                    OPT_TIMER_DISPLAY, GetDefaultValue(OPT_TIMER_DISPLAY));
             }
             break;
         }
@@ -170,10 +186,19 @@ void OptionsManager::ApplyCurrentPresetOptions() {
 int32_t OptionsManager::GetDefaultValue(uint32_t option) {
     int32_t value = -1;
 
-    // Race mode has different defaults.
-    if (g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)) {
-        if (option == OPT_TIMER_DISPLAY) return OPTVAL_TIMER_RTA & 0xff;
-        if (option == OPT_SECRET_BOSS) return OPTVAL_SECRET_BOSS_OFF & 0xff;
+    // Race settings / Race mode has different defaults.
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) ||
+        g_Mod->state_.CheckOptionValue(OPTVAL_PRESET_RTA_RACE)) {
+        if (option == OPT_TIMER_DISPLAY)
+            return OPTVAL_TIMER_RTA & 0xff;
+        if (option == OPT_SECRET_BOSS)
+            return OPTVAL_SECRET_BOSS_OFF & 0xff;
+        if (option == OPT_STARTER_ITEMS)
+            return OPTVAL_STARTER_ITEMS_RANDOM & 0xff;
+    } else {
+        if (option == OPT_TIMER_DISPLAY) {
+            return OPTVAL_TIMER_NONE & 0xff;
+        }
     }
 
     switch (option) {
@@ -341,8 +366,19 @@ const char* OptionsManager::GetEncodedOptions() {
     // If a preset is selected, use its name + the current version instead.
     switch (g_Mod->state_.GetOptionValue(OPT_PRESET)) {
         case OPTVAL_PRESET_DEFAULT:
+            if (g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)) {
+                sprintf(
+                    encoding_str, "RTA Race (%s)",
+                    TitleScreenManager::GetVersionString());
+            } else {
+                sprintf(
+                    encoding_str, "Default (%s)",
+                    TitleScreenManager::GetVersionString());
+            }
+            return encoding_str;
+        case OPTVAL_PRESET_RTA_RACE:
             sprintf(
-                encoding_str, "Default (%s)", 
+                encoding_str, "RTA Race (%s)",
                 TitleScreenManager::GetVersionString());
             return encoding_str;
     }

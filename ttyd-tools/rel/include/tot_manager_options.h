@@ -11,7 +11,9 @@ namespace mod::tot {
 class OptionsManager {
 public:
     // Applies the currently selected preset's run options, if not CUSTOM.
-    static void ApplyCurrentPresetOptions();
+    // If 'first_time' is set, enforces default timer type, and sets DEFAULT
+    // settings when changing to CUSTOM as well.
+    static void ApplyCurrentPresetOptions(bool first_time = false);
     
     // Returns the default value for a given option, or -1 if there is none.
     static int32_t GetDefaultValue(uint32_t option);

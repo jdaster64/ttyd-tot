@@ -104,6 +104,7 @@ OptionMenuData g_OptionMenuData[] = {
     { OPT_PRESET, "tot_optr_preset", "tot_opth_preset", 100, true, false },
     { OPTVAL_PRESET_CUSTOM, "tot_optr_preset_custom", nullptr, 101, false, false },
     { OPTVAL_PRESET_DEFAULT, "tot_optr_preset_default", nullptr, 102, false, false },
+    { OPTVAL_PRESET_RTA_RACE, "tot_optr_preset_rtarace", nullptr, 103, false, false },
     { OPT_NUM_CHESTS, "tot_optr_chests", "tot_opth_chests", 130, true, false },
     { OPTVAL_CHESTS_DEFAULT, "tot_optr_chests_default", nullptr, 131, false, false },
     { OPT_BATTLE_DROPS, "tot_optr_drops", "tot_opth_drops", 140, true, false },
@@ -434,7 +435,7 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                 }
             }
         } else if (change) {
-            // Only allow changing preset, difficulty and timer options if
+            // Allow changing only preset, difficulty and timer options if
             // a non-custom preset is selected.
             if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
                 option != OPT_PRESET && option != OPT_DIFFICULTY &&
@@ -447,6 +448,12 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
 
                 // Special handling for particular options.
                 switch (option) {
+                    case OPT_PRESET:
+                        // "RTA Race" option set is redundant for race mode.
+                        if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) &&
+                            state.CheckOptionValue(OPTVAL_PRESET_RTA_RACE))
+                            state.NextOption(option, change);
+                        break;
                     case OPT_DIFFICULTY:
                         // Set NPC choice 4 to None / Random by default when
                         // swapping difficulties.
@@ -502,9 +509,11 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                 }
                 // Play selection sound.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
-                // Re-enforce current preset's settings, if not custom.
-                if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM)) {
-                    OptionsManager::ApplyCurrentPresetOptions();
+                // Enforce / re-enforce current preset's settings.
+                if (option == OPT_PRESET) {
+                    OptionsManager::ApplyCurrentPresetOptions(true);
+                } else if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM)) {
+                    OptionsManager::ApplyCurrentPresetOptions(false);
                 }
             }
         }

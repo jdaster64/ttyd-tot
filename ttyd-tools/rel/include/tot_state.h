@@ -306,9 +306,10 @@ enum OptionsType {
 enum Options : uint32_t {
     // Flag-based options.
     // Select a set of settings all at once, or choose a custom set.
-    OPT_PRESET                  = 0x400'3'00'01,
+    OPT_PRESET                  = 0x400'3'00'02,
     OPTVAL_PRESET_CUSTOM        = 0x500'3'00'00,
     OPTVAL_PRESET_DEFAULT       = 0x500'3'00'01,
+    OPTVAL_PRESET_RTA_RACE      = 0x500'3'00'02,
     // Reserved: Space for extra presets.
 
     // Tower difficulty.

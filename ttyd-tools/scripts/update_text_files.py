@@ -5040,6 +5040,7 @@ g_TowerLobbyStrings = {
     b"tot_optr_preset":             b"Option Preset",
     b"tot_optr_preset_custom":      b"Custom",
     b"tot_optr_preset_default":     b"Default",
+    b"tot_optr_preset_rtarace":     b"RTA Race",
     b"tot_optr_difficulty":         b"Tower Type",
     b"tot_optr_diff_half":          b"Hooktail (32f)",
     b"tot_optr_diff_full":          b"Gloomtail (64f)",
