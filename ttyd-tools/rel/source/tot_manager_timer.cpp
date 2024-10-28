@@ -156,6 +156,13 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                     is_new_time_record = true;
                 }
             }
+            if (state.CheckOptionValue(OPTVAL_PRESET_RTA_RACE)) {
+                if (rta_centis < state.GetOption(STAT_PERM_HALF_BEST_RTA) &&
+                    state.GetOption(OPT_UNSEEDED_RUN)) {
+                    state.SetOption(STAT_PERM_HALF_BEST_RTA, rta_centis);
+                    is_new_time_record = true;
+                }
+            }
             break;
         case OPTVAL_DIFFICULTY_FULL:
             state.ChangeOption(STAT_PERM_FULL_FINISHES);
@@ -174,6 +181,13 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                     is_new_time_record = true;
                 }
             }
+            if (state.CheckOptionValue(OPTVAL_PRESET_RTA_RACE)) {
+                if (rta_centis < state.GetOption(STAT_PERM_FULL_BEST_RTA) &&
+                    state.GetOption(OPT_UNSEEDED_RUN)) {
+                    state.SetOption(STAT_PERM_FULL_BEST_RTA, rta_centis);
+                    is_new_time_record = true;
+                }
+            }
             break;
         case OPTVAL_DIFFICULTY_FULL_EX:
             state.ChangeOption(STAT_PERM_EX_FINISHES);
@@ -189,6 +203,13 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
                 if (records_centis < state.GetOption(STAT_PERM_EX_BEST_TIME) &&
                     state.GetOption(OPT_UNSEEDED_RUN)) {
                     state.SetOption(STAT_PERM_EX_BEST_TIME, records_centis);
+                    is_new_time_record = true;
+                }
+            }
+            if (state.CheckOptionValue(OPTVAL_PRESET_RTA_RACE)) {
+                if (rta_centis < state.GetOption(STAT_PERM_EX_BEST_RTA) &&
+                    state.GetOption(OPT_UNSEEDED_RUN)) {
+                    state.SetOption(STAT_PERM_EX_BEST_RTA, rta_centis);
                     is_new_time_record = true;
                 }
             }

@@ -1922,7 +1922,8 @@ g_GlobalStrings = {
     b"tot_recn_intensity":          b"Max Intensity",
     b"tot_recn_times":              b"Best Times (IGT)",
     b"tot_recn_times_rta":          b"Best Times (RTA)",
-    b"tot_recn_times2":             b"*unseeded, default opts.",
+    b"tot_recn_times2":             b"*unseeded, Default rules",
+    b"tot_recn_times2_rta":         b"*unseeded, RTA Race rules",
     b"tot_recn_half_time":          b"Hooktail",
     b"tot_recn_full_time":          b"Gloomtail",
     b"tot_recn_ex_time":            b"EX Difficulty",
@@ -1967,6 +1968,15 @@ g_GlobalStrings = {
     b"tot_rech_wins":
         b"How many runs were completed,\n"
         b"and best unseeded clear times.",
+    b"tot_rech_besttime":
+        b"How many runs were completed,\n"
+        b"and best unseeded clear times.",
+    b"tot_rech_besttime_igt":
+        b"Best times with Default rules.\n"
+        b"(Toggle rulesets with <icon PAD_Y 0.5 1 2 6>.)",
+    b"tot_rech_besttime_rta":
+        b"Best times with RTA Race rules.\n"
+        b"(Toggle rulesets with <icon PAD_Y 0.5 1 2 6>.)",
     b"tot_rech_runstats":
         b"Various stats for your current\n"
         b"attempted tower run.",

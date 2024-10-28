@@ -212,7 +212,7 @@ const char* OptionName(uint16_t lookup_key) {
 }
 
 const char* OptionValue(uint16_t lookup_key) {
-    static char buf[32];
+    static char buf[64];
     // Set to empty string every invocation, by default.
     buf[0] = 0;
 
@@ -226,6 +226,14 @@ const char* OptionValue(uint16_t lookup_key) {
             break;
         }
         ++option_index;
+    }
+
+    // Specific exception: treat "Default" like RTA Race ruleset in Race Mode.
+    if (option == OPT_PRESET) {
+        if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) &&
+            state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
+            return msgSearch("tot_optr_preset_rtarace");
+        }
     }
 
     // For run options, get the string representation instead, if applicable.

@@ -259,7 +259,8 @@ struct WinPauseMenu {
     int32_t     achievement_log_unlock_timer;               // 0x1014
     float       achievement_log_cam_shake_offset;           // 0x1018
     // Reserved space.
-    int8_t      unused_0x101c[0x14];                        // 0x101c
+    int8_t      records_log_timer_mode;                     // 0x101c
+    int8_t      unused_0x101c[0x13];                        // 0x101d
     // "Tattle Log"
     int8_t      unk_0x1030[16];                             // 0x1030
     int32_t     tattle_log_total_count;                     // 0x1040

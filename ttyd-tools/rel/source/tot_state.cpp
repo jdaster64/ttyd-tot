@@ -64,9 +64,14 @@ void StateManager::Init() {
     version_ = kCurrentVersion;
 
     // Initialize best run times to maximum time.
+    // Default options
     SetOption(STAT_PERM_HALF_BEST_TIME, 100 * 60 * 60 * 100 - 1);
     SetOption(STAT_PERM_FULL_BEST_TIME, 100 * 60 * 60 * 100 - 1);
     SetOption(STAT_PERM_EX_BEST_TIME,   100 * 60 * 60 * 100 - 1);
+    // RTA Race / speedrun options
+    SetOption(STAT_PERM_HALF_BEST_RTA,  100 * 60 * 60 * 100 - 1);
+    SetOption(STAT_PERM_FULL_BEST_RTA,  100 * 60 * 60 * 100 - 1);
+    SetOption(STAT_PERM_EX_BEST_RTA,    100 * 60 * 60 * 100 - 1);
 
     ResetOptions();
 
@@ -172,6 +177,13 @@ bool StateManager::Load(TotSaveSlot* save) {
     
     // Make sure partner HP is kept consistent.
     OptionsManager::UpdateLevelupStats();
+
+    // Version compatibility: fill in missing best RTA times from pre-v1.10.
+    if (GetOption(STAT_PERM_HALF_BEST_RTA) == 0) {
+        SetOption(STAT_PERM_HALF_BEST_RTA,  100 * 60 * 60 * 100 - 1);
+        SetOption(STAT_PERM_FULL_BEST_RTA,  100 * 60 * 60 * 100 - 1);
+        SetOption(STAT_PERM_EX_BEST_RTA,    100 * 60 * 60 * 100 - 1);
+    }
     
     return true;
 }

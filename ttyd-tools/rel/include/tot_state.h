@@ -588,7 +588,11 @@ enum Options : uint32_t {
     STAT_PERM_NPC_MOVER_TRADES  = 0x1b9'7'00'00,
     STAT_PERM_NPC_ZESS_COOKS    = 0x1ba'7'00'00,
     STAT_PERM_NPC_DEALS_TOTAL   = 0x1bb'9'00'00,
-    // Next: 0x1bc
+    // Added in v1.10; Race preset best times.
+    STAT_PERM_HALF_BEST_RTA     = 0x1bc'9'00'00,
+    STAT_PERM_FULL_BEST_RTA     = 0x1bd'9'00'00,
+    STAT_PERM_EX_BEST_RTA       = 0x1be'9'00'00,
+    // Next: 0x1bf
 };
 
 }  // namespace mod::tot

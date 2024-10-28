@@ -128,10 +128,10 @@ const RecordLogEntry kRecordLogEntries[] = {
     { STAT_PERM_FULL_FINISHES, "tot_recn_full_wins", "tot_rech_wins" },
     { STAT_PERM_EX_FINISHES, "tot_recn_ex_wins", "tot_rech_wins" },
     { STAT_PERM_MAX_INTENSITY, "tot_recn_intensity", "tot_rech_wins" },
-    { REC_BEST_TIMES, "tot_recn_times", "tot_rech_wins" },
-    { STAT_PERM_HALF_BEST_TIME, "tot_recn_half_time", "tot_rech_wins" },
-    { STAT_PERM_FULL_BEST_TIME, "tot_recn_full_time", "tot_rech_wins" },
-    { STAT_PERM_EX_BEST_TIME, "tot_recn_ex_time", "tot_rech_wins" },
+    { REC_BEST_TIMES, "tot_recn_times", "tot_rech_besttime" },
+    { STAT_PERM_HALF_BEST_TIME, "tot_recn_half_time", "tot_rech_besttime" },
+    { STAT_PERM_FULL_BEST_TIME, "tot_recn_full_time", "tot_rech_besttime" },
+    { STAT_PERM_EX_BEST_TIME, "tot_recn_ex_time", "tot_rech_besttime" },
     { REC_EMPTY, "tot_recn_aggstats_1", "tot_rech_aggstats" },
     { REC_TOTAL_ATTEMPTS, "tot_recn_attempts", "tot_rech_aggstats" },
     { REC_TOTAL_FINISHES, "tot_recn_clears", "tot_rech_aggstats" },
@@ -894,7 +894,8 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                 }
                 case REC_BEST_TIMES: {
                     color = 0x403030FFU;
-                    if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)) {
+                    if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) ||
+                        menu->records_log_timer_mode == 1) {
                         name = msgSearch("tot_recn_times_rta");
                     }
                     break;
@@ -1082,7 +1083,12 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     break;
                 }
                 case REC_BEST_TIMES: {
-                    sprintf(ptr, msgSearch("tot_recn_times2"));
+                    if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) ||
+                        menu->records_log_timer_mode) {
+                        sprintf(ptr, msgSearch("tot_recn_times2_rta"));
+                    } else {
+                        sprintf(ptr, msgSearch("tot_recn_times2"));
+                    }
                     color = 0x403030FFU;
                     scale.x = 0.50;
                     scale.y = 0.50;
@@ -1090,11 +1096,22 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     position.y -= 5;
                     break;
                 }
-                case STAT_PERM_HALF_BEST_TIME:
-                case STAT_PERM_FULL_BEST_TIME:
+                case STAT_PERM_HALF_BEST_TIME: {
+                    uint32_t option = menu->records_log_timer_mode
+                        ? STAT_PERM_HALF_BEST_RTA : record.option;
+                    ptr += DurationCentisToFmtString(state.GetOption(option), ptr);
+                    break;
+                }
+                case STAT_PERM_FULL_BEST_TIME: {
+                    uint32_t option = menu->records_log_timer_mode
+                        ? STAT_PERM_FULL_BEST_RTA : record.option;
+                    ptr += DurationCentisToFmtString(state.GetOption(option), ptr);
+                    break;
+                }
                 case STAT_PERM_EX_BEST_TIME: {
-                    ptr += DurationCentisToFmtString(
-                        state.GetOption(record.option), ptr);
+                    uint32_t option = menu->records_log_timer_mode
+                        ? STAT_PERM_EX_BEST_RTA : record.option;
+                    ptr += DurationCentisToFmtString(state.GetOption(option), ptr);
                     break;
                 }
                 case STAT_PERM_CONDITIONS_MET: {
@@ -1313,6 +1330,7 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
     // Records log has current run stats first, if currently in a run.
     menu->records_log_cursor_idx =
         g_Mod->state_.GetOption(OPT_RUN_STARTED) ? 1 : 19;
+    menu->records_log_timer_mode = 0;
 
     menu->achievement_log_cursor_idx = 33;
     menu->achievement_log_completed_count = 0;
@@ -1927,6 +1945,15 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 }
                 menu->log_submenu_info[menu->log_submenu_cursor_idx].state = 20;
                 menu->log_menu_state = 0;
+            } else if (menu->buttons_pressed & ButtonId::Y) {
+                if (!g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) &&
+                    GetSWF(GSWF_RunOptionsTutorial) &&
+                    menu->records_log_cursor_idx >= 36 &&
+                    menu->records_log_cursor_idx < 45) {
+                    // Swap between showing best IGT and RTA times.
+                    ttyd::pmario_sound::psndSFXOn((char *)0x20012);
+                    menu->records_log_timer_mode ^= 1;
+                }
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
                 while (true) {
                     if (--menu->records_log_cursor_idx < min_entry) {
@@ -1970,8 +1997,16 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             }
 
             // Set window description based on hovered option.
-            ttyd::win_root::winMsgEntry(
-                menu, 0, kRecordLogEntries[menu->records_log_cursor_idx].desc_msg, 0);
+            const char* desc_msg = 
+                kRecordLogEntries[menu->records_log_cursor_idx].desc_msg;
+            // For best clear times, describe how to toggle between rulesets.
+            if (!strcmp(desc_msg, "tot_rech_besttime") &&
+                !g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) &&
+                GetSWF(GSWF_RunOptionsTutorial)) {
+                desc_msg = menu->records_log_timer_mode ?
+                    "tot_rech_besttime_rta" : "tot_rech_besttime_igt";
+            }
+            ttyd::win_root::winMsgEntry(menu, 0, desc_msg, 0);
 
             // Set cursor position based on selected entry.
             menu->main_cursor_target_x = -180.0f;
