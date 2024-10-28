@@ -1324,13 +1324,17 @@ EVT_DEFINE_USER_FUNC(evtTot_GetRecipeOptionsString) {
         }
     }
 
-    // Point Swap recipe - require a Point Swap in the inventory.
+    // Point Swap recipe - require a Point Swap + swappable item in inventory.
+    bool point_swap = false;
+    bool swappable = false;
     for (int32_t i = 0; i < 20; ++i) {
-        if (pouch.items[i] == ItemType::POINT_SWAP) {
-            g_RecipeModes[num_options++] = RecipeMode::POINT_SWAP;
-            p_buf += sprintf(p_buf, "\nPoint Swap recipe (free)");
-            break;
-        }
+        if (pouch.items[i] == ItemType::POINT_SWAP) point_swap = true;
+        if (g_RecipeInfo[pouch.items[i] - ItemType::GOLD_BAR].swap_recipe 
+            != ItemType::INVALID_ITEM) swappable = true;
+    }
+    if (point_swap && swappable) {
+        g_RecipeModes[num_options++] = RecipeMode::POINT_SWAP;
+        p_buf += sprintf(p_buf, "\nPoint Swap recipe (free)");
     }
 
     evtSetValue(evt, evt->evtArguments[0], PTR(buf));
