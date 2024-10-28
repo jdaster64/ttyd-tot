@@ -3133,6 +3133,7 @@
 80199098:evt_env_blur_on
 
 // battle_audience.o
+8019eb3c:BattleAudience_SetPresentItemType
 801a1d0c:BattleAudience_ApRecoveryBuild
 801a20d8:BattleAudience_GetPPAudienceNumKind
 801a5a0c:BattleAudienceSetThrowItemMax

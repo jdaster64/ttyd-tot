@@ -329,17 +329,20 @@ int32_t GetRandomAudienceItem(int32_t item_type) {
         if (item_type <= 0) {
             // Pick a coin, heart, flower, or random bad item if "none" selected.
             switch (g_Mod->state_.Rand(10, RNG_AUDIENCE_ITEM)) {
-                case 0:  return ItemType::AUDIENCE_CAN;
-                case 1:  return ItemType::AUDIENCE_ROCK;
-                case 2:  return ItemType::AUDIENCE_BONE;
-                case 3:  return ItemType::AUDIENCE_HAMMER;
+                case 0:  item_type = ItemType::AUDIENCE_CAN;    break;
+                case 1:  item_type = ItemType::AUDIENCE_ROCK;   break;
+                case 2:  item_type = ItemType::AUDIENCE_BONE;   break;
+                case 3:  item_type = ItemType::AUDIENCE_HAMMER; break;
                 case 4:  
-                case 5:  return ItemType::HEART_PICKUP;
+                case 5:  item_type = ItemType::HEART_PICKUP;    break;
                 case 6:
-                case 7:  return ItemType::FLOWER_PICKUP;
-                default: return ItemType::COIN;
+                case 7:  item_type = ItemType::FLOWER_PICKUP;   break;
+                default: item_type = ItemType::COIN;            break;
             }
         }
+        // Set to 0 for helpful, 1 for harmful, since badges normally are unset.
+        ttyd::battle_audience::BattleAudience_SetPresentItemType(
+            item_type >= 0xec && item_type <= 0xef);
     }
     return item_type;
 }

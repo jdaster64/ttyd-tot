@@ -11,7 +11,7 @@ namespace ttyd::battle_audience {
 extern "C" {
 
 // BattleAudience_GetPresentItemType
-// BattleAudience_SetPresentItemType
+void BattleAudience_SetPresentItemType(int32_t harmful_item);
 // BattleAudience_GetPresentTargetUnitId
 // BattleAudience_SetPresentTargetUnitId
 // BattleAudience_GetPresentItemNo
