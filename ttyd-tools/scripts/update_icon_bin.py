@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 import bindatastore as bd  # jdalib
-import flags  # jdalib
+import flags               # jdalib
 
 FLAGS = flags.Flags()
 

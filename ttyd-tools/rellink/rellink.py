@@ -29,7 +29,7 @@ struct.pack_into('>L', file_data, 0x28, 0)  # import offset
 struct.pack_into('>L', file_data, 0x2C, 0)  # import count
 
 sections = []  # [list of [offset, size]]
-imports = []  # [list of [id, offset]]
+imports = []   # [list of [id, offset]]
 
 for i in range(section_count):
     cur_offset = section_info_offset + 8 * i

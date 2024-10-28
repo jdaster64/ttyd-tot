@@ -54,25 +54,25 @@ padding_buffer = ctypes.create_string_buffer(padding_length)
 
 # Create header
 header_buffer = ctypes.create_string_buffer(0x40)
-struct.pack_into('4s', header_buffer, 0x00, sys.argv[7].encode())  # game code
-struct.pack_into('>H', header_buffer, 0x04, 0x3031)  # maker code
-struct.pack_into('>B', header_buffer, 0x06, 0xFF)  # unused
-struct.pack_into('>B', header_buffer, 0x07, 2)  # banner flags (RGB5A3)
+struct.pack_into('4s', header_buffer, 0x00, sys.argv[7].encode())   # game code
+struct.pack_into('>H', header_buffer, 0x04, 0x3031)                 # maker code
+struct.pack_into('>B', header_buffer, 0x06, 0xFF)                   # unused
+struct.pack_into('>B', header_buffer, 0x07, 2)                      # banner flags (RGB5A3)
 struct.pack_into('32s', header_buffer, 0x08, sys.argv[2].encode())  # filename
 struct.pack_into(
     '>L', header_buffer, 0x28, int((
         datetime.now(timezone.utc) - datetime(2000, 1, 1, tzinfo=timezone.utc)
     ).total_seconds()),
 )  # modified time
-struct.pack_into('>L', header_buffer, 0x2C, 0)  # image offset
-struct.pack_into('>H', header_buffer, 0x30, 2)  # icon format
-struct.pack_into('>H', header_buffer, 0x32, 3)  # animation speed (1 icon for 12 frames)
-struct.pack_into('>B', header_buffer, 0x34, 4)  # permissions
-struct.pack_into('>B', header_buffer, 0x35, 0)  # copy counter
-struct.pack_into('>H', header_buffer, 0x36, 0)  # first block number
+struct.pack_into('>L', header_buffer, 0x2C, 0)            # image offset
+struct.pack_into('>H', header_buffer, 0x30, 2)            # icon format
+struct.pack_into('>H', header_buffer, 0x32, 3)            # animation speed (1 icon for 12 frames)
+struct.pack_into('>B', header_buffer, 0x34, 4)            # permissions
+struct.pack_into('>B', header_buffer, 0x35, 0)            # copy counter
+struct.pack_into('>H', header_buffer, 0x36, 0)            # first block number
 struct.pack_into('>H', header_buffer, 0x38, block_count)  # block count
-struct.pack_into('>H', header_buffer, 0x3A, 0xFF)  # unused
-struct.pack_into('>L', header_buffer, 0x3C, 0x2000)  # comment address
+struct.pack_into('>H', header_buffer, 0x3A, 0xFF)         # unused
+struct.pack_into('>L', header_buffer, 0x3C, 0x2000)       # comment address
 
 
 input_path = Path(input_filename)
