@@ -101,6 +101,7 @@ NpcSetupInfo g_EnemyNpcSetup[3];
 }  // namespace
 
 // USER_FUNC Declarations.
+EVT_DECLARE_USER_FUNC(evtTot_AwardWinnings, 0)
 EVT_DECLARE_USER_FUNC(evtTot_ClearBattleResult, 0)
 EVT_DECLARE_USER_FUNC(evtTot_GetContinueDestinationMap, 1)
 EVT_DECLARE_USER_FUNC(evtTot_HasBackupSave, 1)
@@ -610,6 +611,9 @@ LBL(20)
         (uint32_t)window_select::MenuType::RUN_RESULTS_REWARD)
 
 LBL(99)
+    // Add the awarded coins and Star Pieces to the hub currency totals. 
+    USER_FUNC(evtTot_AwardWinnings)
+
     WAIT_MSEC(500)
     // Despawn partner.
     USER_FUNC(evt_mario_goodbye_party, 0)
@@ -1355,6 +1359,15 @@ const int32_t* GetTowerInitEvt() {
 
 void UpdateDestinationMap() {
     ttyd::evtmgr::evtEntry(const_cast<int32_t*>(Tower_UpdateDestinationEvt), 0, 0);
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_AwardWinnings) {
+    auto& state = g_Mod->state_;
+    state.ChangeOption(
+        STAT_PERM_CURRENT_COINS, state.GetOption(STAT_RUN_META_COINS_EARNED));
+    state.ChangeOption(
+        STAT_PERM_CURRENT_SP, state.GetOption(STAT_RUN_META_SP_EARNED));
+    return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_HasBackupSave) {

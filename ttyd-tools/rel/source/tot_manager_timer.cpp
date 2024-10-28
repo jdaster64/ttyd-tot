@@ -328,6 +328,8 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     int32_t meta_sp_earned =
         ((sp_earned + shines_earned * 3) * intensity + 99) / 100;
 
+    state.SetOption(STAT_RUN_META_COINS_EARNED, meta_coins_earned);
+    state.SetOption(STAT_RUN_META_SP_EARNED, meta_sp_earned);
     state.ChangeOption(STAT_PERM_META_COINS_EARNED, meta_coins_earned);
     state.ChangeOption(STAT_PERM_META_SP_EARNED, meta_sp_earned);
 
@@ -337,10 +339,6 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     if (intensity >= 200) {
         AchievementsManager::MarkCompleted(AchievementId::RUN_HIGH_INTENSITY);
     }
-
-    // Update amount of meta-currency available in the hub.
-    state.ChangeOption(STAT_PERM_CURRENT_COINS, meta_coins_earned);
-    state.ChangeOption(STAT_PERM_CURRENT_SP, meta_sp_earned);
 
     // Update highest intensity cleared.
     if (intensity > state.GetOption(STAT_PERM_MAX_INTENSITY)) {

@@ -6524,7 +6524,7 @@ g_PetalburgWestStrings = {
         b"collection!\n"
         b"<k>\n"
         b"<p>\n"
-        b"Buy 5 each of items and badges,\n"
+        b"Buy 5 items and 5 badges,\n"
         b"and you'll be able to pick some\n"
         b"to bring into the tower!\n"
         b"<k>",

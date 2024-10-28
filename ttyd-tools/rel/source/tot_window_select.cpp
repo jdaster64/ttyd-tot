@@ -1538,12 +1538,8 @@ void MainRewardsResults(WinMgrEntry* entry) {
     const auto& state = g_Mod->state_;
     bool check_coin_sound = false;
 
-    int32_t intensity = state.GetOption(STAT_RUN_INTENSITY);
-    g_RewardsEarnedValues[0] = 
-        (state.GetOption(STAT_RUN_COINS_EARNED) * intensity + 99) / 100;
-    g_RewardsEarnedValues[1] = 
-        ((state.GetOption(STAT_RUN_STAR_PIECES) 
-        + state.GetOption(STAT_RUN_SHINE_SPRITES) * 3) * intensity + 99) / 100;
+    g_RewardsEarnedValues[0] = state.GetOption(STAT_RUN_META_COINS_EARNED);
+    g_RewardsEarnedValues[1] = state.GetOption(STAT_RUN_META_SP_EARNED);
 
     switch (g_RewardsWinState) {
         case RewardsWinState::START:
@@ -2059,10 +2055,10 @@ void DispRewardsWindow(WinMgrEntry* entry, int32_t currency_type) {
 
     int32_t value = state.GetOption(
         currency_type == 0 ? STAT_PERM_CURRENT_COINS : STAT_PERM_CURRENT_SP);
-    value -= g_RewardsEarnedValues[currency_type];
-    // Add currency earned as it's counting up.
+    // Add currency earned as it's counting up, capping at 9999.
     if (g_RewardsWinState >= count_state) {
         value += g_RewardsTempValues[currency_type];
+        if (value > 9999) value = 9999;
     }
 
     gc::mtx34 mtx1, mtx2;

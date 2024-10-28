@@ -521,7 +521,10 @@ enum Options : uint32_t {
     STAT_RUN_BADGES_EQUIPPED    = 0x05f'4'00'00,
     STAT_RUN_INFATUATE_DAMAGE   = 0x060'6'00'00,
     STAT_RUN_TRADE_OFF_ON_BOSS  = 0x061'1'00'00,
-    // Next: 0x062
+    // Used as temporary storage for run rewards.
+    STAT_RUN_META_COINS_EARNED  = 0x062'7'00'00,
+    STAT_RUN_META_SP_EARNED     = 0x063'7'00'00,
+    // Next: 0x064
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 
