@@ -1159,6 +1159,7 @@ void DispWindow2(WinMgrEntry* entry) {
 }
 
 void DispSelectionHelp(WinMgrEntry* entry) {
+    const auto& state = g_Mod->state_;
     auto* sel_entry = (WinMgrSelectEntry*)entry->param;
     if ((winmgr_work->entries[sel_entry->entry_indices[2]].flags &
         WinMgrEntry_Flags::IN_FADE) == 0) {
@@ -1190,22 +1191,22 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                 help_msg = msgSearch("tot_desc_chet_adjustnone");
                 switch (value) {
                     case 1:
-                        if (g_Mod->state_.hp_level_ > 0) {
+                        if (state.hp_level_ > 0) {
                             help_msg = msgSearch("tot_desc_chet_adjusthp");
                         }
                         break;
                     case 2:
-                        if (g_Mod->state_.hp_p_level_ > 0) {
+                        if (state.hp_p_level_ > 0) {
                             help_msg = msgSearch("tot_desc_chet_adjustphp");
                         }
                         break;
                     case 3:
-                        if (g_Mod->state_.fp_level_ > 0) {
+                        if (state.fp_level_ > 0) {
                             help_msg = msgSearch("tot_desc_chet_adjustfp");
                         }
                         break;
                     case 4:
-                        if (g_Mod->state_.bp_level_ > 0) {
+                        if (state.bp_level_ > 0) {
                             help_msg = msgSearch("tot_desc_chet_adjustbp");
                         }
                         break;
@@ -1230,9 +1231,23 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                             case OPT_NPC_CHOICE_4: {
                                 const char* help;
                                 tot::gon::GetNpcMsgs(
-                                    g_Mod->state_.GetOption(data.option),
-                                    nullptr, &help);
+                                    state.GetOption(data.option), nullptr, &help);
                                 help_msg = msgSearch(help);
+                                break;
+                            }
+                            case OPT_PRESET: {
+                                if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) &&
+                                    state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
+                                    help_msg = msgSearch("tot_opth_preset_racedefault");
+                                } else if (
+                                    state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
+                                    help_msg = msgSearch("tot_opth_preset_default");
+                                } else if (
+                                    state.CheckOptionValue(OPTVAL_PRESET_RTA_RACE)) {
+                                    help_msg = msgSearch("tot_opth_preset_rtarace");
+                                } else {
+                                    help_msg = msgSearch("tot_opth_preset_custom");
+                                }
                                 break;
                             }
                             default:

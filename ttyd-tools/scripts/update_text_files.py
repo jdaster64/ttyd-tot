@@ -5147,6 +5147,22 @@ g_TowerLobbyStrings = {
         b"Whether to use custom settings\n"
         b"or a predetermined setup.",
     
+    b"tot_opth_preset_default":
+        b"Default run settings; required\n"
+        b"for some achievements.",
+    
+    b"tot_opth_preset_rtarace":
+        b"Settings for real-time races.\n"
+        b'(Not "default" achievements.)',
+    
+    b"tot_opth_preset_custom":
+        b"Select a custom set of run\n"
+        b"settings, to your preference.",
+    
+    b"tot_opth_preset_racedefault":
+        b"Settings for real-time races\n"
+        b"and leaderboard submissions.",
+    
     b"tot_opth_difficulty":
         b"Determines how many floors\n"
         b"tall the tower will be.",
