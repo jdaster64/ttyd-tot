@@ -518,7 +518,9 @@ void OptionsManager::OnRunStart() {
             break;
         case 1:
             state.SetOption(OPTVAL_PRESET_CUSTOM);
-            // Gloomtail's tower (already default).
+            // Gloomtail's tower.
+            state.SetOption(OPTVAL_DIFFICULTY_FULL);
+            state.SetOption(OPT_MAX_PARTNERS, 4);
             // Force the first four NPC types to ease the player into mechanics.
             state.SetOption(OPT_NPC_CHOICE_1, 0);
             state.SetOption(OPT_NPC_CHOICE_2, 1);

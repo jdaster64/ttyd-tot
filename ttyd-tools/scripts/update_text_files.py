@@ -2446,7 +2446,7 @@ g_GlobalStrings = {
         b"Unquestionably iconic!",
     b"tot_cos1_02_h":
         b"Garb of housekeepers, exorcists,\n"
-        b"and detectives' assisants?",
+        b"and detectives' assistants?",
     b"tot_cos1_03_h":
         b"The real Wario's getup could\n"
         b"never be this affordable.",
