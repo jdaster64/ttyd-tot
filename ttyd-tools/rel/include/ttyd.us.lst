@@ -3134,6 +3134,8 @@
 
 // battle_audience.o
 8019eb3c:BattleAudience_SetPresentItemType
+8019f670:BattleAudience_Case_ActionCommandBad
+801a1520:BattleAudienceAddPhaseEvtList
 801a1d0c:BattleAudience_ApRecoveryBuild
 801a20d8:BattleAudience_GetPPAudienceNumKind
 801a5a0c:BattleAudienceSetThrowItemMax

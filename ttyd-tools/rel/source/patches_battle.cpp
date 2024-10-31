@@ -192,6 +192,7 @@ extern void (*g__btlcmd_SetAttackEvent_trampoline)(BattleWorkUnit*, BattleWorkCo
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
 extern void (*g_BtlUnit_ClearStatus_trampoline)(BattleWorkUnit*);
+extern void (*g_BattleAudience_Case_ActionCommandBad_trampoline)(BattleWeapon*);
 extern void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*);
 extern int32_t (*g_btlevtcmd_AnnounceMessage_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
@@ -1649,6 +1650,21 @@ void ApplyFixedPatches() {
         [](SpBonusInfo* bonus_info) {
             // Replaces vanilla logic completely.
             ApplyAttackSuccessBonuses(bonus_info);
+        });
+
+    // Add replacement for vanilla logic about Hammer Bros. throwing hammer if
+    // Mario misses a Hammer attack's Action Command.
+    g_BattleAudience_Case_ActionCommandBad_trampoline = mod::hookFunction(
+        ttyd::battle_audience::BattleAudience_Case_ActionCommandBad,
+        [](BattleWeapon* weapon) {
+            // Call original logic.
+            g_BattleAudience_Case_ActionCommandBad_trampoline(weapon);
+            // Check for whether the attack was a Hammer, and queue event if so.
+            if (weapon->damage_function == (void*)GetWeaponPowerFromSelectedLevel &&
+                weapon->damage_function_params[7] >= MoveType::HAMMER_BASE &&
+                weapon->damage_function_params[7] <= MoveType::HAMMER_BASE + 7) {
+                ttyd::battle_audience::BattleAudienceAddPhaseEvtList(7);
+            }
         });
         
     // Disable stored EXP at all levels.

@@ -176,7 +176,7 @@ bool StateManager::Load(TotSaveSlot* save) {
     }
     
     // Make sure partner HP is kept consistent.
-    OptionsManager::UpdateLevelupStats();
+    OptionsManager::OnRunResumeFromAutoSave();
 
     // Version compatibility: fill in missing best RTA times from pre-v1.10.
     if (GetOption(STAT_PERM_HALF_BEST_RTA) == 0) {

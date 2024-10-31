@@ -2074,8 +2074,8 @@ g_GlobalStrings = {
         b"Clear an EX-difficulty run in\n"
         b"2:20:00 with default settings.",
     b"tot_achd_18":
-        b"Finish a run, making deals with\n"
-        b"NPCs on 7 or more rest floors.",
+        b"Finish a run, dealing with guest\n"
+        b"NPCs on 7 different shop floors.",
     b"tot_achd_19":
         b"Finish a run with maximum\n"
         b"Action Command difficulty.",
@@ -5236,8 +5236,8 @@ g_TowerLobbyStrings = {
         b"fight where a Bandit ran away.",
         
     b"tot_opth_npc_generic":
-        b"Choose which NPCs can appear\n"
-        b"on rest floors.",
+        b"Choose which guest NPCs might\n"
+        b"appear on shop floors.",
         
     b"tot_opth_npc_wonky":
         b"He'll buy unwanted items or\n"
@@ -6499,8 +6499,8 @@ g_PetalburgWestStrings = {
         b"<k>\n"
         b"<p>\n"
         b"read that sign back there to\n"
-        b"get it on back-order. It'll cost\n"
-        b"you a bit extra, though!\n"
+        b"browse our full catalog. It'll\n"
+        b"cost you a bit extra, though!\n"
         b"<k>\n"
         b"<p>\n"
         b"Oh, one more thing; the items\n"
@@ -6527,13 +6527,13 @@ g_PetalburgWestStrings = {
 
     b"tot_shopkeep_nobackorder":
         b"I'm afraid there's nothing\n"
-        b"ready for back-order right now.\n<wait 300>\n"
+        b"else available right now.\n<wait 300>\n"
         b"Feel free to browse, though!\n<k>",
 
     b"tot_shopkeep_generic":
         b"Welcome! Feel free to browse\n"
         b"the items on display, or put in\n"
-        b"a back-order from the sign.\n<k>",
+        b"an order from the sign.\n<k>",
 
     b"tot_shopkeep_yesno":
         b"<select 0 1 0 40>\nYes\nNo",
@@ -7015,7 +7015,7 @@ g_PetalburgWestStrings = {
         b"Top of the morning!\n"
         b"<wait 250>Care to learn about how\n"
         b"seeds affect guest NPCs?\n<k>\n<p>\n"
-        b"Every run's rest floors will\n"
+        b"Every run's shop floors will\n"
         b"have guest cameos by up to\n"
         b"4 characters <wait 150>(3 for Hooktail).\n<k>\n<p>\n"
         b"Generally, you'll see them all\n"
@@ -7717,8 +7717,8 @@ g_PetalburgWestStrings = {
 
     b"tot_di009118_00":
         b"Oh, it's you again. <wait 250>You say\n"
-        b"you want to make deals with\n"
-        b"7 NPCs in one tower run?\n"
+        b"you want to deal with 7 guest\n"
+        b"NPCs in one tower run?\n"
         b"<k>\n"
         b"<p>\n"
         b"That sounds pretty doable...\n"

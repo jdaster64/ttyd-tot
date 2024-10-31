@@ -644,6 +644,15 @@ void OptionsManager::OnRunStart() {
     state.TimerStart();
 }
 
+void OptionsManager::OnRunResumeFromAutoSave() {
+    // Correct party max HP stats.
+    auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    for (int32_t i = 1; i <= 7; ++i) {
+        ttyd::mario_pouch::_party_max_hp_table[i * 4] 
+            = pouch.party_data[i].max_hp;
+    }
+}
+
 void OptionsManager::OnRunResumeFromFileSelect() {
     // Redo item obfuscation, if enabled and reloading during a run.
     if (g_Mod->state_.GetOption(OPT_RUN_STARTED) &&

@@ -39,7 +39,9 @@ public:
     static void ResetAfterRun();
     // Sets up options, stats, etc. on run start.
     static void OnRunStart();
-    // Sets up options when loading a file with a run already in progress.
+    // Sets up internal data when continuing a run from an auto-save.
+    static void OnRunResumeFromAutoSave();
+    // Sets up internal data when continuing a run from a hard save.
     static void OnRunResumeFromFileSelect();
 
     // Updates HP, FP, and BP according to current fields in tot_state.

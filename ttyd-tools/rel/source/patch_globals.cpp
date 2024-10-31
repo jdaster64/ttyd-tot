@@ -224,6 +224,8 @@ int32_t (*g_btlevtcmd_get_monosiri_msg_no_trampoline)(EvtEntry*, bool) = nullptr
 void (*g_BtlActRec_JudgeRuleKeep_trampoline)(void) = nullptr;
 // battle_actrecord.o  8018f990
 void (*g_BtlActRec_AddCount_trampoline)(uint8_t*) = nullptr;
+// battle_audience.o  8019f670
+void (*g_BattleAudience_Case_ActionCommandBad_trampoline)(BattleWeapon*) = nullptr;
 // battle_audience.o  801a1d0c
 void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*) = nullptr;
 // battle_audience.o  801a5a0c

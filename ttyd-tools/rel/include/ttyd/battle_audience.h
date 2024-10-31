@@ -5,6 +5,9 @@
 namespace ttyd::battle {
 struct SpBonusInfo;
 }
+namespace ttyd::battle_database_common {
+struct BattleWeapon;
+}
 
 namespace ttyd::battle_audience {
 
@@ -42,7 +45,8 @@ void BattleAudience_SetPresentItemType(int32_t harmful_item);
 // BattleAudience_Case_AcrobatGood
 // BattleAudience_Case_GuardBad
 // BattleAudience_Case_GuardGood
-// BattleAudience_Case_ActionCommandBad
+void BattleAudience_Case_ActionCommandBad(
+    ttyd::battle_database_common::BattleWeapon* weapon);
 // BattleAudience_Case_ActionCommandGood
 // BattleAudience_Case_KillEnemy
 // BattleAudienceNoiseMain
@@ -83,7 +87,7 @@ void BattleAudience_SetPresentItemType(int32_t harmful_item);
 // BattleAudienceJoySACLecture
 // BattleAudienceJoy
 // BattleAudienceCheer
-// BattleAudienceAddPhaseEvtList
+void BattleAudienceAddPhaseEvtList(int32_t phase_evt_type);
 // BattleAudienceAddPuni
 // BattleAudiencePuniAllEscape
 // BattleAudienceAddAudienceNum
