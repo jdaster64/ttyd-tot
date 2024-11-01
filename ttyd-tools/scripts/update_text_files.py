@@ -2029,8 +2029,8 @@ g_GlobalStrings = {
         b"Buy a total of 25 items from\n"
         b"Charlieton.",
     b"tot_achd_02":
-        b"Make deals with a total of\n"
-        b"10 NPCs across all tower runs.",
+        b"Deal with 10 shop floor guest\n"
+        b"NPCs, across all tower runs.",
     b"tot_achd_03":
         b"Recruit all partners.",
     b"tot_achd_04":
@@ -2166,8 +2166,8 @@ g_GlobalStrings = {
     b"tot_achd_44":
         b"Exchange all your levels in all\n"
         b"stats with Chet Rippo.\n"
-        b"All stats should max out at 1;\n"
-        b"infinite BP cannot be used.",
+        b'The "infinite BP" setting cannot\n'
+        b"be used, as it can't be reduced.",
     b"tot_achd_45":
         b"Double your coins with Lumpy\n"
         b"twice or more in a single run.",
@@ -4996,6 +4996,11 @@ g_GlobalStrings = {
         b"But if he could whip a dragon\n"
         b"by himself, he must have\n"
         b"seriously leveled up!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Plus, he seems to be immune\n"
+        b"to most types of status effects\n"
+        b"and counter hazards...\n"
         b"<k>\n"
         b"<p>\n"
         b"Whatever the case, we'd\n"

@@ -1480,9 +1480,9 @@ EVT_DEFINE_USER_FUNC(evtTot_GetRecipeResults) {
             int32_t item_2_stats = item_2.hp_restored + item_2.fp_restored;
             total_stats += item_2_stats > 5 ? item_2_stats : 5;
 
-            if (total_stats < 25) {
+            if (total_stats < 35) {
                 evtSetValue(evt, evt->evtArguments[1], ItemType::ZESS_DINNER);
-            } else if (total_stats < 45) {
+            } else if (total_stats < 55) {
                 evtSetValue(evt, evt->evtArguments[1], ItemType::ZESS_SPECIAL);
             } else {
                 evtSetValue(evt, evt->evtArguments[1], ItemType::ZESS_DELUXE);
