@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_enemy.h"
 #include "tot_gsw.h"
+#include "tot_manager_move.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
 
@@ -33,6 +34,7 @@ namespace MsgKey {
         TOT_FLOOR_SIGN,
         TOT_LOBBY_BACKSIGN,
         TOT_MOVELOG_DESC_DYN,
+        TOT_UPG_SMOOCH,
     };
 }
     
@@ -50,13 +52,17 @@ constexpr const char* kKeyLookups[] = {
     "tot_floor_sign",
     "tot_lobby_backsign",
     "tot_movelog_desc_dyn",
+    "tot_upg_smooch",
 };
 
+// Determines the info printed on lobby / floor signs dynamically.
+// "floor" = On floor sign (otherwise, on lobby sign)
+// "options" = Is the ability to set options unlocked?
 const char* GetRunInfoSignString(bool floor, bool options) {
     static char buf[512], temp[64];
 
     const int32_t base_x_offset = 210;
-    int32_t y_offset = 40 - (floor ? 13 : 0) - (options ? 27 : 0);
+    int32_t y_offset = options ? 0 : 27;
 
     char* ptr = buf;
     ptr += sprintf(ptr, "<kanban>\n");
@@ -70,9 +76,27 @@ const char* GetRunInfoSignString(bool floor, bool options) {
             "<pos %" PRId32 " %" PRId32 ">\n"
             "Floor: <col cc0000ff>\n"
             "%" PRId32 "\n</col>\n", x_offset, y_offset, g_Mod->state_.floor_);
+    } else {
+        const char* difficulty = "";
+        switch (g_Mod->state_.GetOptionValue(OPT_DIFFICULTY)) {
+            case OPTVAL_DIFFICULTY_HALF:
+                difficulty = "Hooktail";       break;
+            case OPTVAL_DIFFICULTY_FULL:
+                difficulty = "Gloomtail";      break;
+            case OPTVAL_DIFFICULTY_FULL_EX:
+                difficulty = "EX Difficulty";  break;
+        }
+        sprintf(temp, "Tower Type: %s", difficulty);
+        int32_t width = ttyd::fontmgr::FontGetMessageWidth(temp);
+        int32_t x_offset = base_x_offset - width * 0.5f;
 
-        y_offset += 27;
+        ptr += sprintf(ptr,
+            "<pos %" PRId32 " %" PRId32 ">\n"
+            "Tower Type: <col cc0000ff>\n"
+            "%s\n</col>\n", x_offset, y_offset, difficulty);
     }
+    
+    y_offset += 27;
 
     if (options) {
         const char* seed = g_Mod->state_.GetSeedAsString();
@@ -80,10 +104,13 @@ const char* GetRunInfoSignString(bool floor, bool options) {
         int32_t width = ttyd::fontmgr::FontGetMessageWidth(temp);
         int32_t x_offset = base_x_offset - width * 0.5f;
 
+        const char* seed_color = 
+            g_Mod->state_.GetOption(OPT_UNSEEDED_RUN) ? "0000ccff" : "cc0000ff";
+
         ptr += sprintf(ptr,
             "<pos %" PRId32 " %" PRId32 ">\n"
-            "Seed: <col 0000ccff>\n"
-            "%s\n</col>\n", x_offset, y_offset, seed);
+            "Seed: <col %s>\n"
+            "%s\n</col>\n", x_offset, y_offset, seed_color, seed);
             
         y_offset += 27;
 
@@ -208,6 +235,12 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
             } else {
                 return ttyd::msgdrv::msgSearch("tot_lock_defeatenemies");
             }
+            break;
+        case MsgKey::TOT_UPG_SMOOCH:
+            if (MoveManager::GetUnlockedLevel(MoveType::MOWZ_SMOOCH) >= 2) {
+                return ttyd::msgdrv::msgSearch("tot_upg_smooch_lv3");
+            }
+            break;
     }
     // Should not be reached.
     return nullptr;

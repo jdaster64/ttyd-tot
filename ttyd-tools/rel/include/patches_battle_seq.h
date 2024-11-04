@@ -18,7 +18,7 @@ int32_t CalculateCoinDrops(
     ttyd::npcdrv::NpcEntry* npc);
 
 // Banks SP regeneration for 3 turns / checks whether regen is active.
-void StoreGradualSpRegenEffect();
+void StoreGradualSpRegenEffect(int32_t turn_count = 3);
 void CheckGradualSpRegenEffect();
 
 }

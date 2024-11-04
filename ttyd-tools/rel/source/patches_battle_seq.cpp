@@ -645,8 +645,8 @@ int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
     return result < 100 ? result : 100;
 }
 
-void StoreGradualSpRegenEffect() {
-    g_GradualSpRecoveryTurns = 3;
+void StoreGradualSpRegenEffect(int32_t turn_count) {
+    g_GradualSpRecoveryTurns = turn_count;
 }
 
 EVT_BEGIN(ApplyStardustEffectToMario)

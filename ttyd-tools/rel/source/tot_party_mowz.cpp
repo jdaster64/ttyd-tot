@@ -2,6 +2,8 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "patches_battle.h"
+#include "patches_battle_seq.h"
 #include "tot_generate_item.h"
 #include "tot_manager_move.h"
 #include "tot_manager_reward.h"
@@ -144,7 +146,7 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeTeaseWeapon) {
     
     // Make changes in place, since the parameters are unchanged between uses.
     if (move_type == MoveType::MOWZ_TEASE) {
-        weapon->confuse_chance = ac_result * 1.2;
+        weapon->confuse_chance = ac_result * 1.27;
         weapon->confuse_time = 1;
     } else {  // Smoke Bomb
         int32_t success_level = 1 + (move_level + 2) * ac_result / 100;
@@ -153,6 +155,33 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeTeaseWeapon) {
         // 33%, 66%, 100% base rate max at level 1, 2, 3.
         weapon->dizzy_chance =
             100 * (success_level > 2 ? success_level - 2 : 0) / 3;
+    }
+    
+    return 2;
+}
+
+// Dynamically sets the status parameters for Smooch based on level / AC result.
+EVT_DECLARE_USER_FUNC(evtTot_MakeSmoochWeapon, 3)
+EVT_DEFINE_USER_FUNC(evtTot_MakeSmoochWeapon) {
+    auto* weapon = (BattleWeapon*)evtGetValue(evt, evt->evtArguments[0]);
+    int32_t move_level = evtGetValue(evt, evt->evtArguments[1]);
+    int32_t turn_count = evtGetValue(evt, evt->evtArguments[2]);
+
+    weapon->hp_regen_strength = 0;
+    weapon->hp_regen_time = 0;
+    weapon->fp_regen_strength = 0;
+    weapon->fp_regen_time = 0;
+    
+    if (move_level >= 1) {
+        weapon->hp_regen_strength = 5;
+        weapon->hp_regen_time = turn_count;
+    }
+    if (move_level >= 2) {
+        weapon->fp_regen_strength = 5;
+        weapon->fp_regen_time = turn_count;
+    }
+    if (move_level >= 3) {
+        patch::battle_seq::StoreGradualSpRegenEffect(turn_count);
     }
     
     return 2;
@@ -1539,6 +1568,8 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     RETURN()
 EVT_END()
 
+// HP Healing variant of Smooch (no longer in use).
+/*
 EVT_BEGIN(partyChuchurinaAttack_Kiss)
     USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
@@ -1703,6 +1734,181 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
         WAIT_FRM(120)
         USER_FUNC(btlevtcmd_RecoverHp, -2, 1, LW(5))
     END_INLINE()
+    
+    USER_FUNC(btlevtcmd_ACRStart, -2, 0, 15, 15, 20)
+    USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
+    SWITCH(LW(6))
+        CASE_LARGE_EQUAL(2)
+            USER_FUNC(evtTot_LogActiveMoveStylish, 0)
+            USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+            USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
+            USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PCH_Y_1"))
+            USER_FUNC(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+            USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
+            WAIT_MSEC(300)
+        CASE_ETC()
+            USER_FUNC(evt_audience_acrobat_notry)
+    END_SWITCH()
+    USER_FUNC(btlevtcmd_WaitEventEnd, LW(15))
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    USER_FUNC(evt_audience_ap_recovery)
+    USER_FUNC(btlevtcmd_InviteApInfoReport)
+    RUN_CHILD_EVT(PTR(&unk_evt_803537c4))
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(btlevtcmd_ResetFaceDirection, LW(3))
+        USER_FUNC(btlevtcmd_StartWaitEvent, LW(3))
+    END_IF()
+    USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0))
+    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
+    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+*/
+
+// Regen-status variant of Smooch.
+EVT_BEGIN(partyChuchurinaAttack_Kiss)
+    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    IF_EQUAL(LW(3), -1)
+        GOTO(99)
+    END_IF()
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
+    USER_FUNC(btlevtcmd_CommandPayWeaponCost, -2)
+    USER_FUNC(btlevtcmd_RunDataEventChild, -2, 7)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 7)
+    USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, -2)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 250)
+    USER_FUNC(btlevtcmd_GetUnitId, -2, LW(0))
+    IF_NOT_EQUAL(LW(0), LW(3))
+        USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+        USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    END_IF()
+    RUN_CHILD_EVT(PTR(&unk_evt_803537c4))
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(btlevtcmd_CalculateFaceDirection, LW(3), LW(4), -2, -1, 16, LW(15))
+        USER_FUNC(btlevtcmd_ChangeFaceDirection, LW(3), LW(15))
+    END_IF()
+    USER_FUNC(btlevtcmd_CommandGetWeaponActionLv, LW(0))
+    USER_FUNC(btlevtcmd_AcSetDifficulty, -2, LW(0))
+    USER_FUNC(btlevtcmd_AcGetDifficulty, LW(0))
+    SUB(LW(0), 3)
+    SWITCH(LW(0))
+        CASE_SMALL_EQUAL(-3)
+            SET(LW(0), 300)
+            SET(LW(1), 20)
+            SET(LW(2), 20)
+        CASE_EQUAL(-2)
+            SET(LW(0), 270)
+            SET(LW(1), 18)
+            SET(LW(2), 22)
+        CASE_EQUAL(-1)
+            SET(LW(0), 240)
+            SET(LW(1), 17)
+            SET(LW(2), 24)
+        CASE_EQUAL(0)
+            SET(LW(0), 210)
+            SET(LW(1), 16)
+            SET(LW(2), 25)
+        CASE_EQUAL(1)
+            SET(LW(0), 195)
+            SET(LW(1), 14)
+            SET(LW(2), 26)
+        CASE_EQUAL(2)
+            SET(LW(0), 180)
+            SET(LW(1), 13)
+            SET(LW(2), 27)
+        CASE_ETC()
+            SET(LW(0), 150)
+            SET(LW(1), 12)
+            SET(LW(2), 30)
+    END_SWITCH()
+    // Bar has three divisions; hitting 1/3, 2/3, 3/3 should give 1, 2, 3 turns.
+    USER_FUNC(btlevtcmd_AcSetParamAll, 11, LW(0), 178, LW(1), LW(2), 33, 34, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_AcSetGaugeParam, 34, 68, 100, 100)
+    // Disable the vanilla 1 base.
+    USER_FUNC(btlevtcmd_AcSetFlag, 1)
+    USER_FUNC(btlevtcmd_SetupAC, -2, 6, 1, 0)
+    WAIT_FRM(22)
+    USER_FUNC(btlevtcmd_StartAC, 1)
+    BROTHER_EVT()
+        USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+        USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(6))
+        USER_FUNC(btlevtcmd_GetStatusMg, LW(3), LW(7))
+        MULF(LW(6), 12)
+        MULF(LW(7), 7)
+        USER_FUNC(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
+        USER_FUNC(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(7))
+        USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 235, -1, 0)
+        USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+        USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    END_BROTHER()
+    USER_FUNC(btlevtcmd_ResultAC)
+
+    // Action command success level - subtract two from ac result (1 - 4).
+    USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(5))
+    SUB(LW(5), 2)
+    IF_SMALL(LW(5), 0)
+        SET(LW(5), -1)
+    END_IF()
+
+    IF_LARGE_EQUAL(LW(5), 0)
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_GetResultPrizeLv, -5, LW(5), LW(6))
+        USER_FUNC(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
+    ELSE()
+        USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
+    END_IF()
+    USER_FUNC(btlevtcmd_GetResultAC, LW(6))
+    USER_FUNC(btlevtcmd_StopAC)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 350)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PCH_K_1"))
+    WAIT_FRM(6)
+    IF_LARGE_EQUAL(LW(5), 0)
+        RUN_CHILD_EVT(PTR(&unk_evt_803537c4))
+        IF_NOT_EQUAL(LW(0), 0)
+            USER_FUNC(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 59)
+        END_IF()
+    END_IF()
+    USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(6))
+    MULF(LW(6), 16)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(6))
+    USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(6))
+    MULF(LW(6), 40)
+    ADD(LW(1), LW(6))
+    USER_FUNC(btlevtcmd_GetFaceDirection, LW(3), LW(6))
+    MUL(LW(6), 45)
+    USER_FUNC(evt_eff, 0, PTR("kiss"), 0, LW(0), LW(1), LW(2), LW(6), 0, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CHURINA_KISS1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    WAIT_FRM(40)
+    DIV(LW(6), 5)
+    
+    // Apply statuses based on level.
+    IF_LARGE_EQUAL(LW(5), 0)
+        ADD(LW(5), 1)
+        USER_FUNC(evtTot_GetMoveSelectedLevel, MoveType::MOWZ_SMOOCH, LW(6))
+        USER_FUNC(evtTot_MakeSmoochWeapon, LW(12), LW(6), LW(5))
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+
+        // For level 3 only, add "SP regen" effect / text.
+        IF_LARGE_EQUAL(LW(6), 3)
+            USER_FUNC(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+            USER_FUNC(evt_eff, PTR(""), PTR("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+            USER_FUNC(patch::battle::evtTot_ApplyCustomStatus,
+                LW(3), LW(4), 0,
+                /* splash colors */ 0xccf4ff, 0xffa0ff,
+                PTR("SFX_CONDITION_REST_HP_SLOW1"), 
+                PTR("tot_sp_regen_effect"))
+        END_IF()
+    END_IF()
     
     USER_FUNC(btlevtcmd_ACRStart, -2, 0, 15, 15, 20)
     USER_FUNC(btlevtcmd_ACRGetResult, LW(6), LW(7))
@@ -2117,7 +2323,7 @@ BattleWeapon customWeapon_MowzSmooch = {
     .base_sp_cost = 0,
     .superguards_allowed = 0,
     .unk_14 = 1.0,
-    .stylish_multiplier = 3,
+    .stylish_multiplier = 1,
     .unk_19 = 5,
     .bingo_card_chance = 100,
     .unk_1b = 50,

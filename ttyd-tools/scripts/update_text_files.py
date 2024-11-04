@@ -1128,8 +1128,8 @@ g_GlobalStrings = {
         b"with a burst of smoke.",
         
     b"msg_pch_kiss":
-        b"Replenish the party's HP\n"
-        b"with a friendly kiss.",
+        b"Give Mario a friendly kiss,\n"
+        b"restoring his stats over time.",
         
     b"tot_ptr3_thunder_ac":
         b"Press <icon PAD_A 0.6 1 2 6>"
@@ -1177,6 +1177,10 @@ g_GlobalStrings = {
         b"Upgrading this move will\n"
         b"increase its damage output.",
         
+    b"tot_upg_hits":
+        b"Upgrading this move will\n"
+        b"increase the number of hits.",
+        
     b"tot_upg_status":
         b"Upgrading this move will\n"
         b"increase its status duration.",
@@ -1189,13 +1193,13 @@ g_GlobalStrings = {
         b"Upgrading this move will\n"
         b"increase its status chance.",
     
+    b"tot_upg_smokebomb":
+        b"Upgrading this move ups its\n"
+        b"damage and dizzy chance.",
+    
     b"tot_upg_blizzard":
         b"Upgrading this move ups its\n"
         b"damage and freeze duration.",
-        
-    b"tot_upg_hits":
-        b"Upgrading this move will\n"
-        b"increase the number of hits.",
         
     b"tot_upg_scope_out":
         b"Upgrading this move makes it\n"
@@ -1223,7 +1227,11 @@ g_GlobalStrings = {
         
     b"tot_upg_smooch":
         b"Upgrading this move will\n"
-        b"increase the max HP healed.",
+        b"allow it to also restore FP.",
+        
+    b"tot_upg_smooch_lv3":
+        b"Upgrading this move will\n"
+        b"allow it to also restore SP.",
         
     b"tot_upg_sac1":
         b"Upgrading this move will\n"
@@ -1880,14 +1888,14 @@ g_GlobalStrings = {
         b"\nLv. 3: Deals 5 piercing damage\n"
         b"and 100% 1-turn Dizzy for 6 FP.",
     b"tot_movelog_d961":
-        b"\nLv. 1: Heal up to 5 HP for\n"
-        b"both Mario and Mowz for 4 FP.",
+        b"\nLv. 1: Replenishes 5 HP\n"
+        b"for up to 3 turns.",
     b"tot_movelog_d962":
-        b"\nLv. 2: Heal up to 10 HP for\n"
-        b"both Mario and Mowz for 7 FP.",
+        b"\nLv. 2: Replenishes 5 HP+FP\n"
+        b"for up to 3 turns.",
     b"tot_movelog_d963":
-        b"\nLv. 3: Heal up to 15 HP for\n"
-        b"both Mario and Mowz for 10 FP.",
+        b"\nLv. 3: Replenishes 5 HP+FP and\n"
+        b"1/3 max SP for up to 3 turns.",
         
     # Records log text.
     b"tot_recn_runstats_1":         b"Run Stats (1/2)",
