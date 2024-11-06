@@ -703,7 +703,7 @@ EVT_BEGIN(unitPiranha_attack_event)
         END_IF()
 
         USER_FUNC(evt_sub_random, 99, LW(1))
-        IF_LARGE_EQUAL(LW(1), 60)
+        IF_LARGE_EQUAL(LW(1), 65)
             SET(LW(9), PTR(&unitPiranha_weaponBreath))
             RUN_CHILD_EVT(PTR(&unitPiranha_breath_attack_event))
             GOTO(99)
@@ -1114,7 +1114,7 @@ EVT_DEFINE_USER_FUNC(evtTot_PiranhaSetAttackStatus) {
                 break;
         }
     } else if (unit_type == BattleUnitType::FROST_PIRANHA) {
-        attack->freeze_chance = 30;
+        attack->freeze_chance = 15;
         attack->freeze_time = 2;
     }
 

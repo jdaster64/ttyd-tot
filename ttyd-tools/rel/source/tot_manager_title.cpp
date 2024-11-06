@@ -14,8 +14,8 @@ namespace mod::tot {
 
 namespace {
 
-constexpr const char* kVersion = "v1.14";
-constexpr const char* kTitleInfo = "v1.14 r42" "\n" "2024-11-04";
+constexpr const char* kVersion = "v1.15";
+constexpr const char* kTitleInfo = "v1.15 r43" "\n" "2024-11-06";
     
 }
 

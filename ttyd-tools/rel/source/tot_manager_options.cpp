@@ -161,11 +161,14 @@ void OptionsManager::ApplyCurrentPresetOptions(bool first_time) {
         case OPTVAL_PRESET_RTA_RACE: {
             for (const auto& data : g_OptionMetadata) {
                 if (!data.check_for_default) continue;
+                if (data.option == OPT_SECRET_BOSS) continue;
                 g_Mod->state_.SetOption(data.option, GetDefaultValue(data.option));
             }
             if (first_time) {
                 g_Mod->state_.SetOption(
                     OPT_TIMER_DISPLAY, GetDefaultValue(OPT_TIMER_DISPLAY));
+                g_Mod->state_.SetOption(
+                    OPT_SECRET_BOSS, GetDefaultValue(OPT_SECRET_BOSS));
             }
             break;
         }
@@ -363,23 +366,36 @@ const char* OptionsManager::GetEncodedOptions() {
     encoding_bytes[1] = 99;
     int32_t encoded_bit_count = 12;
 
+    // Add additional indication for preset runs with non-default final boss.
+    const char* boss_option = "";
+    if (!OptionsManager::IsDefault(OPT_SECRET_BOSS)) {
+        switch (g_Mod->state_.GetOptionValue(OPT_SECRET_BOSS)) {
+            case OPTVAL_SECRET_BOSS_OFF:
+                boss_option = "SB:N, ";    break;
+            case OPTVAL_SECRET_BOSS_ON:
+                boss_option = "SB:Y, ";    break;
+            case OPTVAL_SECRET_BOSS_RANDOM:
+                boss_option = "SB:?, ";    break;
+        }
+    }
+
     // If a preset is selected, use its name + the current version instead.
     switch (g_Mod->state_.GetOptionValue(OPT_PRESET)) {
         case OPTVAL_PRESET_DEFAULT:
             if (g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)) {
                 sprintf(
-                    encoding_str, "RTA Race (%s)",
-                    TitleScreenManager::GetVersionString());
+                    encoding_str, "RTA Race (%s%s)",
+                    boss_option, TitleScreenManager::GetVersionString());
             } else {
                 sprintf(
-                    encoding_str, "Default (%s)",
-                    TitleScreenManager::GetVersionString());
+                    encoding_str, "Default (%s%s)",
+                    boss_option, TitleScreenManager::GetVersionString());
             }
             return encoding_str;
         case OPTVAL_PRESET_RTA_RACE:
             sprintf(
-                encoding_str, "RTA Race (%s)",
-                TitleScreenManager::GetVersionString());
+                encoding_str, "RTA Race (%s%s)",
+                boss_option, TitleScreenManager::GetVersionString());
             return encoding_str;
     }
 

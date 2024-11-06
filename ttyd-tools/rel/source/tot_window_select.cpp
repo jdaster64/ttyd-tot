@@ -101,6 +101,10 @@ OptionMenuData g_OptionMenuData[] = {
     { OPTVAL_DIFFICULTY_HALF, "tot_optr_diff_half", nullptr, 92, false, false },
     { OPTVAL_DIFFICULTY_FULL, "tot_optr_diff_full", nullptr, 93, false, false },
     { OPTVAL_DIFFICULTY_FULL_EX, "tot_optr_diff_ex", nullptr, 94, false, false },
+    { OPT_SECRET_BOSS, "tot_optr_secretboss", "tot_opth_secretboss", 95, true, false },
+    { OPTVAL_SECRET_BOSS_RANDOM, "tot_optr_secretboss_random", nullptr, 96, false, false },
+    { OPTVAL_SECRET_BOSS_OFF, "tot_optr_secretboss_off", nullptr, 97, false, false },
+    { OPTVAL_SECRET_BOSS_ON, "tot_optr_secretboss_on", nullptr, 98, false, false },
     { OPT_PRESET, "tot_optr_preset", "tot_opth_preset", 100, true, false },
     { OPTVAL_PRESET_CUSTOM, "tot_optr_preset_custom", nullptr, 101, false, false },
     { OPTVAL_PRESET_DEFAULT, "tot_optr_preset_default", nullptr, 102, false, false },
@@ -171,10 +175,6 @@ OptionMenuData g_OptionMenuData[] = {
     { OPT_NPC_CHOICE_2, "tot_optr_npc_2", nullptr, 301, true, false },
     { OPT_NPC_CHOICE_3, "tot_optr_npc_3", nullptr, 302, true, false },
     { OPT_NPC_CHOICE_4, "tot_optr_npc_4", nullptr, 303, true, false },
-    { OPT_SECRET_BOSS, "tot_optr_secretboss", "tot_opth_secretboss", 400, true, false },
-    { OPTVAL_SECRET_BOSS_RANDOM, "tot_optr_secretboss_random", nullptr, 401, false, false },
-    { OPTVAL_SECRET_BOSS_OFF, "tot_optr_secretboss_off", nullptr, 402, false, false },
-    { OPTVAL_SECRET_BOSS_ON, "tot_optr_secretboss_on", nullptr, 403, false, false },
 };
 
 uint32_t OptionLookup(uint16_t lookup_key) {
@@ -430,7 +430,7 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
 
             if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
                 option != OPT_PRESET && option != OPT_DIFFICULTY &&
-                option != OPT_TIMER_DISPLAY) {
+                option != OPT_SECRET_BOSS && option != OPT_TIMER_DISPLAY) {
                 // Play "failure" sound.
                 ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
             } else if (default_value >= 0) {
@@ -447,7 +447,7 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
             // a non-custom preset is selected.
             if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
                 option != OPT_PRESET && option != OPT_DIFFICULTY &&
-                option != OPT_TIMER_DISPLAY) {
+                option != OPT_SECRET_BOSS && option != OPT_TIMER_DISPLAY) {
                 // Play "failure" sound.
                 ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
             } else {
@@ -670,7 +670,7 @@ void DispMainWindow(WinMgrEntry* entry) {
                 uint32_t option = OptionLookup(row.value);
                 if (g_Mod->state_.CheckOptionValue(OPTVAL_PRESET_CUSTOM) ||
                     option == OPT_PRESET || option == OPT_DIFFICULTY ||
-                    option == OPT_TIMER_DISPLAY || 
+                    option == OPT_SECRET_BOSS || option == OPT_TIMER_DISPLAY || 
                     (int32_t)option == WIN_SEED_SELECT) {
                     row.flags &= ~WinMgrSelectEntryRow_Flags::GREYED_OUT;
                 } else {

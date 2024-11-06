@@ -104,8 +104,13 @@ const char* GetRunInfoSignString(bool floor, bool options) {
         int32_t width = ttyd::fontmgr::FontGetMessageWidth(temp);
         int32_t x_offset = base_x_offset - width * 0.5f;
 
-        const char* seed_color = 
-            g_Mod->state_.GetOption(OPT_UNSEEDED_RUN) ? "0000ccff" : "cc0000ff";
+        // Change color of seed number/name to red if selected manually.
+        bool seeded = !g_Mod->state_.GetOption(OPT_UNSEEDED_RUN);
+        if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
+            seeded = 
+                g_Mod->state_.seed_ || g_Mod->state_.GetOption(OPT_USE_SEED_NAME);
+        }
+        const char* seed_color = seeded ? "cc0000ff" : "0000ccff";
 
         ptr += sprintf(ptr,
             "<pos %" PRId32 " %" PRId32 ">\n"
