@@ -20,8 +20,5 @@ void ApplyFixedPatches();
 void DisplayTattleStats(
     gc::mtx34* matrix, int32_t number, int32_t is_small, uint32_t* color,
     ttyd::battle_unit::BattleWorkUnit* unit);
-    
-// Forces ATK/DEF to be shown at the start of an encounter.
-void RefreshExtraTattleStats();
 
 }

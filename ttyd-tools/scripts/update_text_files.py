@@ -2102,8 +2102,8 @@ g_GlobalStrings = {
         b"Finish a default run without\n"
         b"ever equipping a badge.",
     b"tot_achd_25":
-        b"Finish a run with no moves able\n"
-        b"to be upgraded further.",
+        b"Finish a run with all of your\n"
+        b"moves leveled to their max.",
     b"tot_achd_26":
         b"Finish a run with all bonus\n"
         b"conditions met (10 at minimum).",
@@ -6452,7 +6452,7 @@ g_PetalburgWestStrings = {
     b"tot_shopkeep_00":
         b"It's <NUM> coin<S> for\n"
         b"<AN_ITEM>.\n<wait 250>\n"
-        b"Would you like one?\n<o>",
+        b"Would you like it?\n<o>",
 
     b"tot_shopkeep_01":
         b"<p>\n"

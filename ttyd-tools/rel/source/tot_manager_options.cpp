@@ -246,6 +246,9 @@ bool OptionsManager::AllDefault() {
     for (const auto& data : g_OptionMetadata) {
         if (!data.check_for_default)
             continue;
+        // Always allow changing secret boss option.
+        if (data.option == OPT_SECRET_BOSS)
+            continue;
         if (g_Mod->state_.GetOption(data.option) != GetDefaultValue(data.option))
             return false;
     }
@@ -255,6 +258,9 @@ bool OptionsManager::AllDefault() {
 bool OptionsManager::AllDefaultExceptZeroStatLevels() {
     for (const auto& data : g_OptionMetadata) {
         if (!data.check_for_default)
+            continue;
+        // Always allow changing secret boss option.
+        if (data.option == OPT_SECRET_BOSS)
             continue;
         // Allow stats to be set to zero.
         if (data.check_for_default_stat && !g_Mod->state_.GetOption(data.option))

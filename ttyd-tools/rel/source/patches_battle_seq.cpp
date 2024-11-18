@@ -363,8 +363,6 @@ void ApplyFixedPatches() {
             // Init badge move levels and reset selected move levels.
             MoveManager::InitBadgeMoveLevels();
             MoveManager::ResetSelectedLevels();
-            // Force enemy ATK/DEF tattles to display at start of encounter.
-            partner::RefreshExtraTattleStats();
             // Reset cost of Quick Change switches.
             battle::ResetPartySwitchCost();
             // Reset SP regen status from prior fights.
@@ -455,8 +453,9 @@ void ApplyFixedPatches() {
                         bool disable = false;
                         for (int32_t i = 0; i < 64; ++i) {
                             auto* unit = battleWork->battle_units[i];
-                            if (unit && unit->alliance == 0 &&
-                                unit->current_kind <= BattleUnitType::BONETAIL) {
+                            if (unit &&
+                                unit->current_kind <= BattleUnitType::BONETAIL &&
+                                unit->alliance == 0 && unit->current_hp > 0) {
                                 disable = true;
                                 break;
                             }
