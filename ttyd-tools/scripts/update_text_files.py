@@ -5172,6 +5172,29 @@ g_TowerLobbyStrings = {
     b"tot_optr_secretboss_random":  b"Rarely Appears",
     b"tot_optr_secretboss_off":     b"Never Appears",
     b"tot_optr_secretboss_on":      b"Always Appears",
+    b"tot_optr_movea":              b"Move Availability",
+    b"tot_optr_movea_default":      b"Default",
+    b"tot_optr_movea_partner1":     b"Partners Start w/+1",
+    b"tot_optr_movea_random":       b"No Tier Requirements",
+    b"tot_optr_movea_custom":       b"Custom",
+    b"tot_optr_movel":              b"Move Limit",
+    b"tot_optr_movel_default":      b"None",
+    b"tot_optr_movel_4":            b"4",
+    b"tot_optr_movel_3":            b"3",
+    b"tot_optr_movel_2":            b"2",
+    b"tot_optr_movel_1":            b"1",
+    b"tot_optr_movel_0":            b"0",
+    b"tot_optr_stageh":             b"Stage Hazards",
+    b"tot_optr_stageh_n":           b"Normal",
+    b"tot_optr_stageh_h":           b"High",
+    b"tot_optr_stageh_l":           b"Low",
+    b"tot_optr_stageh_nf":          b"No Fog",
+    b"tot_optr_stageh_off":         b"Off",
+    b"tot_optr_runaway":            b"Runaway Chance",
+    b"tot_optr_runaway_off":        b"Default",
+    b"tot_optr_runaway_on":         b"Guaranteed",
+    b"tot_optr_countdown":          b"Countdown Timer",
+    b"tot_optr_countdown_off":      b"Off",
     
     b"tot_optr_off":                b"Off",
     b"tot_optr_on":                 b"On",
@@ -5327,6 +5350,26 @@ g_TowerLobbyStrings = {
     b"tot_opth_secretboss":
         b"Whether or not the secret,\n"
         b"alternate final boss can appear.",
+        
+    b"tot_opth_movea":
+        b"Changes how moves are offered\n"
+        b"throughout the tower.",
+        
+    b"tot_opth_movel":
+        b"Limits the number of moves of\n"
+        b"each type you can take.",
+        
+    b"tot_opth_stageh":
+        b"Changes the frequency or types\n"
+        b"of stage hazards that appear.",
+        
+    b"tot_opth_runaway":
+        b"Whether or not attempts to\n"
+        b"flee battles are guaranteed.",
+        
+    b"tot_opth_countdown":
+        b"Disables saving, and gives you\n"
+        b"a time limit to win, or else!",
         
     # Map text.
         

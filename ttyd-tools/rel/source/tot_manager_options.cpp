@@ -34,9 +34,12 @@ RunOptionMetadata g_OptionMetadata[] = {
     { OPT_PRESET, 0, -1, false, false },
     { OPT_DIFFICULTY, 0, -1, false, false },
     { OPT_TIMER_DISPLAY, 0, -1, false, false },
+    { OPT_COUNTDOWN_TIMER, OPTVAL_COUNTDOWN_OFF, -1, true, false },
     { OPT_NUM_CHESTS, OPTVAL_CHESTS_DEFAULT, -1, true, false },
     { OPT_BATTLE_DROPS, OPTVAL_DROP_STANDARD, -1, true, false },
     { OPT_STARTER_ITEMS, OPTVAL_STARTER_ITEMS_BASIC, -1, true, false },
+    { OPT_MOVE_AVAILABILITY, OPTVAL_MOVES_DEFAULT, -1, true, false },
+    { OPT_MOVE_LIMIT, OPTVAL_MOVE_LIMIT_DEFAULT, -1, true, false },
     { OPT_MAX_PARTNERS, 0, -1, true, false },
     { OPT_PARTNER, OPTVAL_PARTNER_RANDOM, -1, true, false },
     { OPT_REVIVE_PARTNERS, OPTVAL_REVIVE_PARTNERS_ON, -1, true, false },
@@ -49,6 +52,8 @@ RunOptionMetadata g_OptionMetadata[] = {
     { OPTNUM_ENEMY_ATK, 0, 100, true, false },
     { OPTNUM_SUPERGUARD_SP_COST, 0, 0, true, false },
     { OPT_AC_DIFFICULTY, OPTVAL_AC_DEFAULT, -1, true, false },
+    { OPT_RUN_AWAY, OPTVAL_RUN_AWAY_DEFAULT, -1, true, false },
+    { OPT_STAGE_HAZARDS, OPTVAL_STAGE_HAZARDS_NORMAL, -1, true, false },
     { OPT_RANDOM_DAMAGE, OPTVAL_RANDOM_DAMAGE_NONE, -1, true, false },
     { OPT_AUDIENCE_RANDOM_THROWS, OPTVAL_AUDIENCE_THROWS_OFF, -1, true, false },
     { OPT_OBFUSCATE_ITEMS, OPTVAL_OBFUSCATE_ITEMS_OFF, -1, true, false },
@@ -282,11 +287,11 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
                 case 1:
                     return 15;
                 case 2:
-                    return -5;
-                case 3:
                     return -10;
-                case 4:
+                case 3:
                     return -20;
+                case 4:
+                    return -30;
             }
             break;
         case OPT_STARTER_ITEMS:
@@ -340,6 +345,10 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
             return state.GetOption(option) ? -30 : 0;
         case OPT_OBFUSCATE_ITEMS:
             return state.GetOption(option) ? 30 : 0;
+        case OPT_REVIVE_PARTNERS:
+            return state.GetOption(option) ? 0 : 10;
+        case OPT_RUN_AWAY:
+            return state.GetOption(option) ? -10 : 0;
         case OPT_CHARLIETON_STOCK:
             switch (state.GetOptionValue(option)) {
                 case OPTVAL_CHARLIETON_SMALLER:
@@ -349,6 +358,24 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
                     return 20;
             }
             break;
+        case OPT_MOVE_AVAILABILITY:
+            switch (state.GetOptionValue(option)) {
+                case OPTVAL_MOVES_PARTNER_BONUS:
+                case OPTVAL_MOVES_RANDOM:
+                    return -15;
+                case OPTVAL_MOVES_CUSTOM:
+                    return -30;
+            }
+            break;
+        case OPT_MOVE_LIMIT:
+            // Adds 5% per additional level of restriction.
+            return state.GetOption(option) * 5;
+        case OPT_COUNTDOWN_TIMER: {
+            int32_t level = state.GetOption(option);
+            // Adds 10%, plus 5% per additional level of restriction.
+            if (level) return (level + 1) * 5;
+            break;
+        }
     }
 
     // All other options / option values have no impact on intensity.
@@ -365,8 +392,8 @@ int32_t OptionsManager::GetTotalIntensity() {
 }
 
 const char* OptionsManager::GetEncodedOptions() {
-    static char encoding_str[24] = { 0 };
-    int8_t encoding_bytes[24] = { 0 };
+    static char encoding_str[28] = { 0 };
+    int8_t encoding_bytes[28] = { 0 };
     // Start with version encoding, then period as separator from main encoding.
     encoding_bytes[0] = g_Mod->state_.version_ - 10;
     encoding_bytes[1] = 99;
@@ -405,31 +432,11 @@ const char* OptionsManager::GetEncodedOptions() {
             return encoding_str;
     }
 
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NUM_CHESTS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_BATTLE_DROPS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_STARTER_ITEMS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MAX_PARTNERS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_REVIVE_PARTNERS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_HP);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_FP);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_MARIO_BP);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_PARTNER_HP);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_INVENTORY_SACK_SIZE);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_HP);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_ENEMY_ATK);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPTNUM_SUPERGUARD_SP_COST);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_AC_DIFFICULTY);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_RANDOM_DAMAGE);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_AUDIENCE_RANDOM_THROWS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_OBFUSCATE_ITEMS);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_BANDIT_ESCAPE);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_CHARLIETON_STOCK);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_1);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_2);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_3);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_NPC_CHOICE_4);
-    EncodeOption(encoding_bytes, encoded_bit_count, OPT_SECRET_BOSS);
+    // Encode all options that can be changed / have an effect on gameplay.
+    for (const auto& data : g_OptionMetadata) {
+        if (!data.check_for_default) continue;
+        EncodeOption(encoding_bytes, encoded_bit_count, data.option);
+    }
 
     const int32_t kEncodedByteCount = (encoded_bit_count + 5) / 6;
     for (int32_t i = 0; i < kEncodedByteCount; ++i) {
