@@ -284,7 +284,7 @@ void SortItemLogType(WinPauseMenu* menu) {
 bool IsUnbreakable(int32_t cursor) {
     int32_t row = cursor / 10;
     int32_t col = cursor % 10;
-    return (row <= 1 || row >= 5) && (col <= 1 || col >= 8);
+    return (row <= 1 || row >= 6) && (col <= 1 || col >= 8);
 }
 
 void GetAchievementRewardDetails(
@@ -348,22 +348,22 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         // Skip squares that don't have a visible shadow.
         if (i % 10 < 8 && i / 10 < 5);
-        // Skip drawing corner squares if not completed.
-        if (states[i] != 2 && grid[i] >= 66) continue;
+        // Skip drawing secret squares if not completed.
+        if (states[i] != 2 && AchievementsManager::IsSecret(grid[i])) continue;
 
         gc::vec3 position = {
-            win_x + 105.0f + 36.0f * (i % 10),
-            win_y - 14.0f - 36.0f * (i / 10),
+            win_x + 140.0f + 32.0f * (i % 10),
+            win_y - 9.0f - 32.0f * (i / 10),
             0.0f
         };
-        gc::vec3 scale = { 0.642857f, 0.642857f, 0.642857f };
+        gc::vec3 scale = { 0.571429f, 0.571429f, 0.571429f };
         uint32_t color = 0x00000080U;
         ttyd::win_main::winTexSet(0x7b, &position, &scale, &color);
     }
     // Draw main square backgrounds.
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
-        // Skip drawing corner squares if not completed.
-        if (states[i] != 2 && grid[i] >= 66) continue;
+        // Skip drawing secret squares if not completed.
+        if (states[i] != 2 && AchievementsManager::IsSecret(grid[i])) continue;
 
         int32_t darker_shade = ((i ^ (i / 10)) & 1);
         int32_t success_shade = states[i] == 2 ? 13 : 0;
@@ -373,11 +373,11 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             case 2:  color = 0xFFFFFFFFU;  break;
         }
         gc::vec3 position = {
-            win_x + 101.0f + 36.0f * (i % 10),
-            win_y - 10.0f - 36.0f * (i / 10),
+            win_x + 136.0f + 32.0f * (i % 10),
+            win_y - 5.0f - 32.0f * (i / 10),
             0.0f
         };
-        gc::vec3 scale = { 0.642857f, 0.642857f, 0.642857f };
+        gc::vec3 scale = { 0.571429f, 0.571429f, 0.571429f };
         ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
         ttyd::win_main::winTexSet(
             0x7b + darker_shade + success_shade, &position, &scale, &color);
@@ -388,6 +388,10 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             GetAchievementRewardDetails(grid, i, &icon, nullptr);
             ttyd::win_main::winIconInit();
             scale = { 0.45f, 0.45f, 0.45f };
+            if (icon == IconType::HAMMER) {
+                scale.x = 0.40f;
+                scale.y = 0.40f;
+            }
             color = states[i] == 2 ? 0xFFFFFFFFU : 0x000000B0U;
             ttyd::win_main::winIconSet(icon, &position, &scale, &color);
         }
@@ -402,7 +406,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             case 1:  color = 0xb0b0b0FFU;  break;
             case 2:  color = 0xFFFFFFFFU;  break;
         }
-        gc::vec3 position = { win_x - 21.0f, win_y - 50.0f, 0.0f };
+        gc::vec3 position = { win_x - 8.0f, win_y - 56.0f, 0.0f };
         gc::vec3 scale = { 1.5f, 1.5f, 1.5f };
         ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
         ttyd::win_main::winTexSet(
@@ -450,7 +454,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
     for (int32_t i = 0; i < 5; ++i) {
         ttyd::win_main::winIconInit();
         gc::vec3 position = {
-            win_x - 80.0f + 30.0f * i, win_y - 155.0f - 10.0f * (i & 1), 0.0f
+            win_x - 67.0f + 30.0f * i, win_y - 161.0f - 10.0f * (i & 1), 0.0f
         };
         gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
         uint32_t color =
@@ -472,7 +476,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
 
     // Draw window with number of completed achievements.
     ttyd::win_root::winKirinukiGX(
-        win_x - 71.0f, win_y - 190.0f, 110.0f, 41.0f, menu, 0);
+        win_x - 58.0f, win_y - 196.0f, 110.0f, 41.0f, menu, 0);
     {
         ttyd::win_main::winFontInit();
         char buf[8];
@@ -482,8 +486,8 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             menu->achievement_log_total_count);
         int32_t width = ttyd::fontmgr::FontGetMessageWidth(buf);
         gc::vec3 position = {
-            win_x - 0.0f - 0.75f * width * 0.5f,
-            win_y - 201.0f,
+            win_x + 13.0f - 0.75f * width * 0.5f,
+            win_y - 207.0f,
             0.0f
         };
         gc::vec3 scale = { 0.75f, 0.75f, 0.75f };
@@ -493,7 +497,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
     {
         // Draw ribbon next to completed number.
         ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
-        gc::vec3 position = { win_x - 46.0f, win_y - 210.0f, 0.0f };
+        gc::vec3 position = { win_x - 33.0f, win_y - 216.0f, 0.0f };
         gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
         uint32_t color = 0xFFFFFFFFU;
         ttyd::win_main::winTexSet(0xb0, &position, &scale, &color);
@@ -508,9 +512,9 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
                 * 3.14159265f / 64.0f
             )));
 
-        for (int32_t i = 0; i < 70; ++i) {
+        for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
             // Skip corners and already unlocked tiles.
-            if (i == 0 || i == 9 || i == 60 || i == 69) continue;
+            if (i == 0 || i == 9 || i == 70 || i == 79) continue;
             if (states[i] == 2) continue;
             // Skip tiles that are breakable, but not currently selected.
             if (!IsUnbreakable(i) && i != menu->achievement_log_cursor_idx)
@@ -518,11 +522,11 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             
             ttyd::win_main::winIconInit();
             gc::vec3 position = {
-                win_x + 101.0f + 36.0f * (i % 10),
-                win_y - 10.0f - 36.0f * (i / 10),
+                win_x + 136.0f + 32.0f * (i % 10),
+                win_y - 5.0f - 32.0f * (i / 10),
                 0.0f
             };
-            gc::vec3 scale = { 1.125f, 1.125f, 1.125f };
+            gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
             // Flash unbreakable tiles red, selected breakable one white.
             uint32_t color =
                 (IsUnbreakable(i) ? 0xFF000000U : 0xFFFFFF00U) | alpha;
@@ -1332,7 +1336,7 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
         g_Mod->state_.GetOption(OPT_RUN_STARTED) ? 1 : 19;
     menu->records_log_timer_mode = 0;
 
-    menu->achievement_log_cursor_idx = 33;
+    menu->achievement_log_cursor_idx = 43;
     menu->achievement_log_completed_count = 0;
     menu->achievement_log_total_count = 0;
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
@@ -1340,7 +1344,7 @@ void LogMenuInit(ttyd::win_root::WinPauseMenu* menu) {
             g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i) &&
             !GetSWF(GSWF_AchUnlockQueue + i);
         if (completed) ++menu->achievement_log_completed_count;
-        if (i <= AchievementId::META_ALL_ACHIEVEMENTS || completed) {
+        if (!AchievementsManager::IsSecret(i) || completed) {
             ++menu->achievement_log_total_count;
         }
     }
@@ -1851,8 +1855,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
-                if (cursor != -1 && cursor < 60 && 
-                    !((cursor == 50 || cursor == 59) && !states[cursor + 10])) {
+                if (cursor != -1 && cursor < 70 && 
+                    !((cursor == 60 || cursor == 69) && !states[cursor + 10])) {
                     menu->achievement_log_cursor_idx += 10;
                     cursor = menu->achievement_log_cursor_idx;
                 }
@@ -1863,16 +1867,16 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     menu->achievement_log_cursor_idx = -1;
                     cursor = -1;
                 } else if (cursor % 10 > 0 && 
-                    !((cursor == 1 || cursor == 61) && !states[cursor - 1])) {
+                    !((cursor == 1 || cursor == 71) && !states[cursor - 1])) {
                     cursor = --menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_RIGHT) {
                 if (cursor == -1) {
-                    menu->achievement_log_cursor_idx = 30;
-                    cursor = 30;
+                    menu->achievement_log_cursor_idx = 43;
+                    cursor = 43;
                 } else if (cursor % 10 < 9 && 
-                    !((cursor == 8 || cursor == 68) && !states[cursor + 1])) {
+                    !((cursor == 8 || cursor == 78) && !states[cursor + 1])) {
                     cursor = ++menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
@@ -1894,8 +1898,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     // Go into "hammer use" mode, only if there are
                     // achievements left to unlock.
                     menu->achievement_log_using_hammer = 1;
-                    menu->achievement_log_cursor_idx = 34;
-                    cursor = 34;
+                    menu->achievement_log_cursor_idx = 43;
+                    cursor = 43;
                     ttyd::pmario_sound::psndSFXOn((char *)0x20012);
                 }
             }
@@ -1905,8 +1909,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 ttyd::win_root::winMsgEntry(menu, 0, "tot_ach_usehammer", 0);
                 // Set cursor position based on selected hammer.
                 int32_t hammer_index = menu->achievement_log_hammers - 1;
-                menu->main_cursor_target_x = -286.0f + 30.0f * hammer_index;
-                menu->main_cursor_target_y = -25.0f - 10.0f * (hammer_index & 1);
+                menu->main_cursor_target_x = -268.0f + 30.0f * hammer_index;
+                menu->main_cursor_target_y = -28.0f - 10.0f * (hammer_index & 1);
             } else if (
                 menu->achievement_log_using_hammer && IsUnbreakable(cursor) &&
                 states[cursor] < 2) {
@@ -1923,8 +1927,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
 
             if (cursor != -1) {
                 // Set cursor position based on selected entry.
-                menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
-                menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
+                menu->main_cursor_target_x = -70.0f + 32.0f * (cursor % 10);
+                menu->main_cursor_target_y = 125.0f - 32.0f * (cursor / 10);
             }
 
             break;
@@ -2159,7 +2163,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                         g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i) &&
                         !GetSWF(GSWF_AchUnlockQueue + i);
                     if (completed) ++menu->achievement_log_completed_count;
-                    if (i <= AchievementId::META_ALL_ACHIEVEMENTS || completed) {
+                    if (!AchievementsManager::IsSecret(i) || completed) {
                         ++menu->achievement_log_total_count;
                     }
                 }
@@ -2191,8 +2195,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             }
 
             // Lock cursor position based on selected entry.
-            menu->main_cursor_target_x = -105.0f + 36.0f * (cursor % 10);
-            menu->main_cursor_target_y = 120.0f - 36.0f * (cursor / 10);
+            menu->main_cursor_target_x = -70.0f + 32.0f * (cursor % 10);
+            menu->main_cursor_target_y = 125.0f - 32.0f * (cursor / 10);
             menu->main_cursor_x = menu->main_cursor_target_x;
             menu->main_cursor_y = menu->main_cursor_target_y;
 

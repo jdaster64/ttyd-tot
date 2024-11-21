@@ -162,9 +162,11 @@ void _PurchaseAllItems() {
     }
 }
 
-void _UnlockAchievements(int32_t max_achievement) {
-    for (int32_t i = 0; i <= max_achievement; ++i) {
-        AchievementsManager::MarkCompleted(i);
+void _UnlockAchievements(bool secret) {
+    for (int32_t i = 0; i <= AchievementId::MAX_ACHIEVEMENT; ++i) {
+        if (!AchievementsManager::IsSecret(i) || secret) {
+            AchievementsManager::MarkCompleted(i);
+        }
     }
 }
 
@@ -300,12 +302,8 @@ void DebugManager::Update() {
                     break;
                 }
                 case DEBUG_COMPLETE_ACHIEVEMENTS: {
-                    int32_t max_achievement = AchievementId::META_ALL_ACHIEVEMENTS;
-                    if (buttons & ButtonId::L) {
-                        // Also mark off secret achievements if L is held.
-                        max_achievement = AchievementId::MAX_ACHIEVEMENT - 1;
-                    }
-                    _UnlockAchievements(max_achievement);
+                    // Also mark off secret achievements if L is held.
+                    _UnlockAchievements(buttons & ButtonId::L);
                     break;
                 }
             }
@@ -608,7 +606,7 @@ void DebugManager::SpecialFileSetup() {
             _CompleteTutorialFlags();
             _PurchaseAllItems();
             _PurchaseAllCosmetics();
-            _UnlockAchievements(AchievementId::META_ALL_ACHIEVEMENTS);
+            _UnlockAchievements(false);
             _UnlockAllKeyItems();
             SetSWF(GSWF_Hooktail_FirstTimeChat);
             SetSWF(GSWF_Gloomtail_FirstTimeChat);

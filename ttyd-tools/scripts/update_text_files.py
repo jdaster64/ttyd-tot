@@ -2117,7 +2117,7 @@ g_GlobalStrings = {
         b"Finish a default run without\n"
         b"taking any damage.",
     b"tot_achd_29":
-        b"Finish a run with an intensity\n"
+        b"Finish a run with an Intensity\n"
         b"rating of 200% or higher.",
     b"tot_achd_30":
         b"Finish a run with one of Mario's\n"
@@ -2247,6 +2247,38 @@ g_GlobalStrings = {
     b"tot_achd_69":
         b"Take exactly 654 total damage\n"
         b"in a single tower run.",
+    b"tot_achd_70":
+        b"Use all moves at least once\n"
+        b"across all tower runs.",
+    b"tot_achd_71":
+        b"Finish a default run without\n"
+        b"using any unlockable moves.",
+    b"tot_achd_72":
+        b"Run away a total of 50 times\n"
+        b"across all tower runs.",
+    b"tot_achd_73":
+        b"Inflict a single enemy with 5 or\n"
+        b"more statuses simultaneously.",
+    b"tot_achd_74":
+        b"Prevent an enemy from Charging\n"
+        b"by using Allergic status.",
+    b"tot_achd_75":
+        b"Defeat a flying midboss with a\n"
+        b"Hammer move.",
+    b"tot_achd_76":
+        b"Earn 100 coins from a single\n"
+        b"battle.",
+    b"tot_achd_77":
+        b"Use a 3+ SP Special Move on the\n"
+        b"first turn of a battle.",
+    b"tot_achd_78":
+        b"Finish a tower run with a 40%+\n"
+        b"Intensity Countdown Timer.\n"
+        b"Cannot use any run settings\n"
+        b"that lower total Intensity.",
+    b"tot_achd_79":
+        b"Defeat a single type of enemy\n"
+        b"at least 100 times.",
     
     # Achievement menu option names.
     
@@ -2264,6 +2296,10 @@ g_GlobalStrings = {
     b"tot_acho_secretboss":     b"Secret Boss",
     b"tot_acho_infinitebp":     b"BP: Infinite",
     b"tot_acho_customloadout":  b"Items: Custom",
+    b"tot_acho_movea":          b"Move Availability",
+    b"tot_acho_movel":          b"Move Limit",
+    b"tot_acho_runaway":        b"Run Away Chance",
+    b"tot_acho_stageh":         b"Stage Hazards",
     
     b"tot_ach_usehammer":
         b"Use a Hammer to unlock an\n"
@@ -2345,7 +2381,7 @@ g_GlobalStrings = {
     b'tot_cos1_25':     b'Gold',
     b'tot_cos1_26':     b'Platinum',
     b'tot_cos1_27':     b'Game Boy',
-    b'tot_cos1_28':     b'3D World Beta',
+    b'tot_cos1_28':     b'Beta 3D World',
     
     b'tot_cos2_01':     b'Green',
     b'tot_cos2_02':     b'Red',
@@ -5190,7 +5226,7 @@ g_TowerLobbyStrings = {
     b"tot_optr_stageh_l":           b"Low",
     b"tot_optr_stageh_nf":          b"No Fog",
     b"tot_optr_stageh_off":         b"Off",
-    b"tot_optr_runaway":            b"Runaway Chance",
+    b"tot_optr_runaway":            b"Run Away Chance",
     b"tot_optr_runaway_off":        b"Default",
     b"tot_optr_runaway_on":         b"Guaranteed",
     b"tot_optr_countdown":          b"Countdown Timer",

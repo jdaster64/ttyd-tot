@@ -268,8 +268,8 @@ void ProgressManager::GetAchievementLogProgress(int32_t* cur, int32_t* tot) {
             if (g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, i)) {
                 ++current;
                 ++total;
-                if (i >= AchievementId::SECRET_COINS) ++secret;
-            } else if (i < AchievementId::SECRET_COINS) {
+                if (AchievementsManager::IsSecret(i)) ++secret;
+            } else if (AchievementsManager::IsSecret(i)) {
                 // Don't count up total for secret achievements.
                 ++total;
             }

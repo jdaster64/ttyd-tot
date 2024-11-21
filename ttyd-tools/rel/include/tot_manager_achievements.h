@@ -85,6 +85,18 @@ namespace AchievementId {
         SECRET_ZERO_STATS_3,
         SECRET_DAMAGE,
 
+        // Added in 2.0.
+        V2_AGG_USE_ALL_MOVES,
+        V2_RUN_BASE_MOVES_ONLY,
+        V2_AGG_RUN_AWAY_50,
+        V2_MISC_STATUS_5,
+        V2_MISC_ALLERGIC,
+        V2_MISC_HAMMERMAN,
+        V2_MISC_BATTLE_COINS_100,
+        V2_MISC_SP_TURN1,
+        V2_RUN_COUNTDOWN_40,
+        V2_AGG_ENEMY_TIMES_100,
+
         MAX_ACHIEVEMENT,
     };
 }
@@ -119,6 +131,9 @@ public:
 
     // Gets achievement data.
     static const AchievementData* GetData(int32_t ach);
+    
+    // Returns whether achievement is "secret" (not required for 100%).
+    static bool IsSecret(int32_t ach);
 
     // Marks off an achievement.
     static void MarkCompleted(int32_t ach);

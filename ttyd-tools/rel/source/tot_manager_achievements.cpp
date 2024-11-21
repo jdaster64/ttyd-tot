@@ -25,76 +25,86 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 namespace ItemType = ttyd::item_data::ItemType;
 
 const AchievementData g_AchievementData[] = {
-    { "tot_achd_00", nullptr, 44, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_TIMING_TUTOR },
-    { "tot_achd_01", "tot_acho_charlieton", 43, AchievementRewardType::OPTION, OPT_CHARLIETON_STOCK },
+    { "tot_achd_00", nullptr, 54, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_TIMING_TUTOR },
+    { "tot_achd_01", "tot_acho_charlieton", 53, AchievementRewardType::OPTION, OPT_CHARLIETON_STOCK },
     { "tot_achd_02", "tot_acho_npcchoice", 26, AchievementRewardType::OPTION, OPT_NPC_CHOICE_1 },
-    { "tot_achd_03", "tot_acho_partner", 23, AchievementRewardType::OPTION, OPT_PARTNER },
-    { "tot_achd_04", "tot_acho_acdiff", 34, AchievementRewardType::OPTION, OPT_AC_DIFFICULTY },
-    { "tot_achd_05", nullptr, 66, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_SUPER_PEEKABOO },
+    { "tot_achd_03", "tot_acho_partner", 33, AchievementRewardType::OPTION, OPT_PARTNER },
+    { "tot_achd_04", "tot_acho_acdiff", 44, AchievementRewardType::OPTION, OPT_AC_DIFFICULTY },
+    { "tot_achd_05", nullptr, 76, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_SUPER_PEEKABOO },
     { "tot_achd_06", "tot_acho_superguardcost", 46, AchievementRewardType::OPTION, OPTNUM_SUPERGUARD_SP_COST },
-    { "tot_achd_07", nullptr, 64, AchievementRewardType::ATTACK_FX, 10 },
+    { "tot_achd_07", nullptr, 74, AchievementRewardType::ATTACK_FX, 10 },
     { "tot_achd_08", "tot_acho_randomdamage", 17, AchievementRewardType::OPTION, OPT_RANDOM_DAMAGE },
-    { "tot_achd_09", nullptr, 33, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_PEEKABOO },
-    { "tot_achd_10", nullptr, 32, AchievementRewardType::ATTACK_FX, 9 },
-    { "tot_achd_11", nullptr, 22, AchievementRewardType::ATTACK_FX, 14 },
+    { "tot_achd_09", nullptr, 43, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_PEEKABOO },
+    { "tot_achd_10", nullptr, 42, AchievementRewardType::ATTACK_FX, 9 },
+    { "tot_achd_11", nullptr, 32, AchievementRewardType::ATTACK_FX, 14 },
     { "tot_achd_12", nullptr, 36, AchievementRewardType::KEY_ITEM, ItemType::TOT_KEY_BGM_TOGGLE },
     { "tot_achd_13", nullptr, 37, AchievementRewardType::YOSHI_COSTUME, 7 },
     { "tot_achd_14", nullptr, 27, AchievementRewardType::YOSHI_COSTUME, 6 },
     { "tot_achd_15", nullptr, 38, AchievementRewardType::MARIO_COSTUME, 12 },
     { "tot_achd_16", nullptr, 28, AchievementRewardType::MARIO_COSTUME, 13 },
     { "tot_achd_17", nullptr, 18, AchievementRewardType::MARIO_COSTUME, 14 },
-    { "tot_achd_18", nullptr, 14, AchievementRewardType::HAMMER, 0 },
-    { "tot_achd_19", nullptr, 42, AchievementRewardType::ATTACK_FX, 12 },
-    { "tot_achd_20", nullptr, 13, AchievementRewardType::MARIO_COSTUME, 11 },
-    { "tot_achd_21", nullptr, 24, AchievementRewardType::YOSHI_COSTUME, 10 },
+    { "tot_achd_18", nullptr, 25, AchievementRewardType::HAMMER, 0 },
+    { "tot_achd_19", nullptr, 52, AchievementRewardType::ATTACK_FX, 12 },
+    { "tot_achd_20", nullptr, 23, AchievementRewardType::MARIO_COSTUME, 11 },
+    { "tot_achd_21", nullptr, 34, AchievementRewardType::YOSHI_COSTUME, 10 },
     { "tot_achd_22", nullptr, 45, AchievementRewardType::HAMMER, 0 },
-    { "tot_achd_23", "tot_acho_audiencethrow", 65, AchievementRewardType::OPTION, OPT_AUDIENCE_RANDOM_THROWS },
-    { "tot_achd_24", "tot_acho_infinitebp", 40, AchievementRewardType::OPTION, OPTVAL_INFINITE_BP },
+    { "tot_achd_23", "tot_acho_audiencethrow", 75, AchievementRewardType::OPTION, OPT_AUDIENCE_RANDOM_THROWS },
+    { "tot_achd_24", "tot_acho_infinitebp", 50, AchievementRewardType::OPTION, OPTVAL_INFINITE_BP },
     { "tot_achd_25", nullptr, 31, AchievementRewardType::HAMMER, 0 },
-    { "tot_achd_26", nullptr, 20, AchievementRewardType::ATTACK_FX, 8 },
+    { "tot_achd_26", nullptr, 30, AchievementRewardType::ATTACK_FX, 8 },
     { "tot_achd_27", nullptr, 19, AchievementRewardType::MARIO_COSTUME, 17 },
-    { "tot_achd_28", nullptr, 50, AchievementRewardType::YOSHI_COSTUME, 20 },
-    { "tot_achd_29", nullptr, 8, AchievementRewardType::YOSHI_COSTUME, 9 },
-    { "tot_achd_30", nullptr, 58, AchievementRewardType::MARIO_COSTUME, 24 },
-    { "tot_achd_31", nullptr, 59, AchievementRewardType::MARIO_COSTUME, 25 },
-    { "tot_achd_32", "tot_acho_revive", 54, AchievementRewardType::OPTION, OPT_REVIVE_PARTNERS },
+    { "tot_achd_28", nullptr, 60, AchievementRewardType::YOSHI_COSTUME, 20 },
+    { "tot_achd_29", nullptr, 7, AchievementRewardType::YOSHI_COSTUME, 9 },
+    { "tot_achd_30", nullptr, 68, AchievementRewardType::MARIO_COSTUME, 24 },
+    { "tot_achd_31", nullptr, 69, AchievementRewardType::MARIO_COSTUME, 25 },
+    { "tot_achd_32", "tot_acho_revive", 64, AchievementRewardType::OPTION, OPT_REVIVE_PARTNERS },
     { "tot_achd_33", "tot_acho_bandit", 15, AchievementRewardType::OPTION, OPT_BANDIT_ESCAPE },
-    { "tot_achd_34", nullptr, 25, AchievementRewardType::MARIO_COSTUME, 5 },
+    { "tot_achd_34", nullptr, 24, AchievementRewardType::MARIO_COSTUME, 5 },
     { "tot_achd_35", nullptr, 47, AchievementRewardType::MARIO_COSTUME, 6 },
-    { "tot_achd_36", nullptr, 55, AchievementRewardType::MARIO_COSTUME, 7 },
-    { "tot_achd_37", nullptr, 7, AchievementRewardType::YOSHI_COSTUME, 16 },
-    { "tot_achd_38", nullptr, 63, AchievementRewardType::YOSHI_COSTUME, 15 },
+    { "tot_achd_36", nullptr, 65, AchievementRewardType::MARIO_COSTUME, 7 },
+    { "tot_achd_37", nullptr, 58, AchievementRewardType::YOSHI_COSTUME, 16 },
+    { "tot_achd_38", nullptr, 73, AchievementRewardType::YOSHI_COSTUME, 15 },
     { "tot_achd_39", nullptr, 48, AchievementRewardType::ATTACK_FX, 11 },
-    { "tot_achd_40", nullptr, 56, AchievementRewardType::MARIO_COSTUME, 9 },
+    { "tot_achd_40", nullptr, 66, AchievementRewardType::MARIO_COSTUME, 9 },
     { "tot_achd_41", nullptr, 6, AchievementRewardType::HAMMER, 0 },
-    { "tot_achd_42", "tot_acho_invincrease", 53, AchievementRewardType::OPTION, OPT_INVENTORY_SACK_SIZE },
+    { "tot_achd_42", "tot_acho_invincrease", 63, AchievementRewardType::OPTION, OPT_INVENTORY_SACK_SIZE },
     { "tot_achd_43", nullptr, 5, AchievementRewardType::MARIO_COSTUME, 16 },
-    { "tot_achd_44", nullptr, 30, AchievementRewardType::MARIO_COSTUME, 18 },
+    { "tot_achd_44", nullptr, 20, AchievementRewardType::MARIO_COSTUME, 18 },
     { "tot_achd_45", nullptr, 41, AchievementRewardType::YOSHI_COSTUME, 11 },
     { "tot_achd_46", nullptr, 29, AchievementRewardType::YOSHI_COSTUME, 17 },
     { "tot_achd_47", nullptr, 16, AchievementRewardType::ATTACK_FX, 7 },
     { "tot_achd_48", nullptr, 2, AchievementRewardType::MARIO_COSTUME, 10 },
     { "tot_achd_49", nullptr, 4, AchievementRewardType::ATTACK_FX, 13 },
     { "tot_achd_50", nullptr, 3, AchievementRewardType::MARIO_COSTUME, 20 },
-    { "tot_achd_51", nullptr, 67, AchievementRewardType::MARIO_COSTUME, 15 },
+    { "tot_achd_51", nullptr, 77, AchievementRewardType::MARIO_COSTUME, 15 },
     { "tot_achd_52", nullptr, 39, AchievementRewardType::MARIO_COSTUME, 19 },
-    { "tot_achd_53", nullptr, 52, AchievementRewardType::YOSHI_COSTUME, 14 },
+    { "tot_achd_53", nullptr, 62, AchievementRewardType::YOSHI_COSTUME, 14 },
     { "tot_achd_54", "tot_acho_customloadout", 35, AchievementRewardType::OPTION, OPTVAL_STARTER_ITEMS_CUSTOM },
-    { "tot_achd_55", nullptr, 61, AchievementRewardType::MARIO_COSTUME, 8 },
-    { "tot_achd_56", "tot_acho_obfuscated", 21, AchievementRewardType::OPTION, OPT_OBFUSCATE_ITEMS },
-    { "tot_achd_57", nullptr, 51, AchievementRewardType::MARIO_COSTUME, 21 },
-    { "tot_achd_58", nullptr, 62, AchievementRewardType::YOSHI_COSTUME, 13 },
+    { "tot_achd_55", nullptr, 71, AchievementRewardType::MARIO_COSTUME, 8 },
+    { "tot_achd_56", "tot_acho_obfuscated", 59, AchievementRewardType::OPTION, OPT_OBFUSCATE_ITEMS },
+    { "tot_achd_57", nullptr, 61, AchievementRewardType::MARIO_COSTUME, 21 },
+    { "tot_achd_58", nullptr, 72, AchievementRewardType::YOSHI_COSTUME, 13 },
     { "tot_achd_59", nullptr, 49, AchievementRewardType::ATTACK_FX, 6 },
     { "tot_achd_60", nullptr, 10, AchievementRewardType::YOSHI_COSTUME, 8 },
-    { "tot_achd_61", nullptr, 12, AchievementRewardType::YOSHI_COSTUME, 12 },
+    { "tot_achd_61", nullptr, 21, AchievementRewardType::YOSHI_COSTUME, 12 },
     { "tot_achd_62", "tot_acho_secretboss", 11, AchievementRewardType::OPTION, OPT_SECRET_BOSS },
-    { "tot_achd_63", nullptr, 57, AchievementRewardType::HAMMER, 0 },
+    { "tot_achd_63", nullptr, 67, AchievementRewardType::HAMMER, 0 },
     { "tot_achd_64", nullptr, 1, AchievementRewardType::YOSHI_COSTUME, 19 },
-    { "tot_achd_65", nullptr, 68, AchievementRewardType::YOSHI_COSTUME, 21 },
-    { "tot_achd_66", nullptr, 60, AchievementRewardType::MARIO_COSTUME, 22 },
-    { "tot_achd_67", nullptr, 9, AchievementRewardType::MARIO_COSTUME, 23 },
-    { "tot_achd_68", nullptr, 69, AchievementRewardType::MARIO_COSTUME, 26 },
-    { "tot_achd_69", nullptr, 0, AchievementRewardType::YOSHI_COSTUME, 18 },
+    { "tot_achd_65", nullptr, 78, AchievementRewardType::YOSHI_COSTUME, 21 },
+    { "tot_achd_66", nullptr, 70, AchievementRewardType::MARIO_COSTUME, 22 },
+    { "tot_achd_67", nullptr, 0, AchievementRewardType::MARIO_COSTUME, 23 },
+    { "tot_achd_68", nullptr, 79, AchievementRewardType::MARIO_COSTUME, 26 },
+    { "tot_achd_69", nullptr, 9, AchievementRewardType::YOSHI_COSTUME, 18 },
+    { "tot_achd_70", "tot_acho_movea", 22, AchievementRewardType::OPTION, OPT_MOVE_AVAILABILITY },
+    { "tot_achd_71", "tot_acho_movel", 55, AchievementRewardType::OPTION, OPT_MOVE_LIMIT },
+    { "tot_achd_72", "tot_acho_runaway", 56, AchievementRewardType::OPTION, OPT_RUN_AWAY },
+    { "tot_achd_73", "tot_acho_stageh", 51, AchievementRewardType::OPTION, OPT_STAGE_HAZARDS },
+    { "tot_achd_74", nullptr, 57, AchievementRewardType::MARIO_COSTUME, 27 },
+    { "tot_achd_75", nullptr, 40, AchievementRewardType::MARIO_COSTUME, 28 },
+    { "tot_achd_76", nullptr, 13, AchievementRewardType::YOSHI_COSTUME, 22 },
+    { "tot_achd_77", nullptr, 14, AchievementRewardType::YOSHI_COSTUME, 23 },
+    { "tot_achd_78", nullptr, 8, AchievementRewardType::YOSHI_COSTUME, 24 },
+    { "tot_achd_79", nullptr, 12, AchievementRewardType::YOSHI_COSTUME, 25 },
 };
 
 }  // namespace
@@ -110,6 +120,17 @@ void AchievementsManager::Draw() {
 
 const AchievementData* AchievementsManager::GetData(int32_t ach) {
     return &g_AchievementData[ach];
+}
+
+bool AchievementsManager::IsSecret(int32_t ach) {
+    switch (ach) {
+        case AchievementId::SECRET_COINS:
+        case AchievementId::SECRET_DAMAGE:
+        case AchievementId::SECRET_INFATUATE:
+        case AchievementId::SECRET_ZERO_STATS_3:
+            return true;
+    }
+    return false;
 }
 
 bool AchievementsManager::CheckCosmeticGroupUnlocked(
@@ -160,8 +181,7 @@ void AchievementsManager::MarkCompleted(int32_t ach) {
         case OPTVAL_RACE_MODE_ENABLED:
             return;
         case OPTVAL_100_MODE_ENABLED:
-            if (ach > AchievementId::META_ALL_ACHIEVEMENTS)
-                return;
+            if (IsSecret(ach)) return;
     }
 
     if (!g_Mod->state_.GetOption(FLAGS_ACHIEVEMENT, ach)) {
@@ -414,7 +434,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
     }
 }
 
-// Backing arrays of 
+// Backing arrays for "achievement grid" interface.
 int8_t g_AchievementGrid[AchievementId::MAX_ACHIEVEMENT + 1] = { -1 };
 int8_t g_AchievementStates[AchievementId::MAX_ACHIEVEMENT + 1] = { -1 };
 
@@ -432,12 +452,12 @@ int32_t AchievementsManager::GetAchievementStates(int8_t const ** arr, bool supp
     const auto& state = g_Mod->state_;
     int32_t queued_unlock = -1;
     int32_t queued_unlock_ach = -1;
-    for (int32_t i = 0; i < 70; ++i) {
+    for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         int32_t ach = g_AchievementGrid[i];
         g_AchievementStates[i] = state.GetOption(FLAGS_ACHIEVEMENT, ach) ? 2 : 0;
     }
     if (suppress_queued) {
-        for (int32_t i = 0; i < 70; ++i) {
+        for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
             int32_t ach = g_AchievementGrid[i];
             if (GetSWF(GSWF_AchUnlockQueue + ach)) {
                 // Suppress cell from being drawn as unlocked.
@@ -449,13 +469,13 @@ int32_t AchievementsManager::GetAchievementStates(int8_t const ** arr, bool supp
             }
         }
     }
-    for (int32_t i = 0; i < 70; ++i) {
+    for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         int32_t ach = g_AchievementGrid[i];
-        if (g_AchievementStates[i] == 0 && ach <= AchievementId::META_ALL_ACHIEVEMENTS && (
+        if (g_AchievementStates[i] == 0 && !IsSecret(ach) && (
             (i % 10 > 0 && g_AchievementStates[i -  1] == 2) ||
             (i % 10 < 9 && g_AchievementStates[i +  1] == 2) ||
             (i / 10 > 0 && g_AchievementStates[i - 10] == 2) ||
-            (i / 10 < 6 && g_AchievementStates[i + 10] == 2))) {
+            (i / 10 < 7 && g_AchievementStates[i + 10] == 2))) {
             g_AchievementStates[i] = 1;
         }
     }

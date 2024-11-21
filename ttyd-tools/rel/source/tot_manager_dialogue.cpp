@@ -220,9 +220,11 @@ void DialogueManager::SetConversation(int32_t id) {
             int8_t ids[AchievementId::MAX_ACHIEVEMENT + 1];
             int32_t num_cvs = 0;
             int32_t num_achievements = 0;
+            int32_t num_total_achievements = 0;
 
-            for (int32_t i = 0; i < 70; ++i) {
-                if (grid[i] >= AchievementId::SECRET_COINS) continue;
+            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+                if (AchievementsManager::IsSecret(i)) continue;
+                ++num_total_achievements;
 
                 if (states[i] == 2) {
                     ++num_achievements;
@@ -261,7 +263,7 @@ void DialogueManager::SetConversation(int32_t id) {
                 }
             }
 
-            if (num_achievements == AchievementId::SECRET_COINS) {
+            if (num_achievements == num_total_achievements) {
                 g_ConversationId = ConversationId::NPC_D_ALL_DONE;
             } else if (num_cvs < 1) {
                 g_ConversationId = ConversationId::NPC_D_NONE_ACTIVE;
