@@ -450,6 +450,8 @@ const CosmeticGroupData g_MarioCostumeGroupData[] = {
     { IconType::MARIO_COSTUME_ICONS + 23,   "tot_cos1_24" },
     { IconType::MARIO_COSTUME_ICONS + 24,   "tot_cos1_25" },
     { IconType::MARIO_COSTUME_ICONS + 25,   "tot_cos1_26" },
+    { IconType::MARIO_COSTUME_26,           "tot_cos1_27" },
+    { IconType::MARIO_COSTUME_27,           "tot_cos1_28" },
 };
 
 const MarioCostumeData g_MarioCostumeData[] = {
@@ -686,6 +688,28 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .secret = true,
         .group_id = 26,
     },
+    {
+        // Game Boy
+        .name_msg = "tot_cos1_27",
+        .help_msg = "tot_cos1_27_h",
+        .models = MARIO_MODEL_PATHS("6", true),
+        .price = 10,
+        .icon = IconType::MARIO_COSTUME_26,
+        // TODO: Shouldn't be secret or default group-id.
+        .secret = true,
+        .group_id = 0,
+    },
+    {
+        // 3D World unused Super Guide
+        .name_msg = "tot_cos1_28",
+        .help_msg = "tot_cos1_28_h",
+        .models = MARIO_MODEL_PATHS("7", true),
+        .price = 10,
+        .icon = IconType::MARIO_COSTUME_27,
+        // TODO: Shouldn't be secret or default group-id.
+        .secret = true,
+        .group_id = 0,
+    },
 };
 const int32_t g_NumMarioCostumes =
     sizeof(g_MarioCostumeData) / sizeof(MarioCostumeData);
@@ -715,6 +739,10 @@ const CosmeticGroupData g_YoshiCostumeGroupData[] = {
     { IconType::YOSHI_EXTRA_ICONS + 11,     "tot_cos2_19" },
     { IconType::YOSHI_EXTRA_ICONS + 12,     "tot_cos2_20" },
     { IconType::YOSHI_EXTRA_ICONS + 13,     "tot_cos2_21" },
+    { IconType::YOSHI_COSTUME_21,           "tot_cos2_22" },
+    { IconType::YOSHI_COSTUME_22,           "tot_cos2_23" },
+    { IconType::YOSHI_COSTUME_23,           "tot_cos2_24" },
+    { IconType::YOSHI_COSTUME_24,           "tot_cos2_25" },
 };
 
 const YoshiCostumeData g_YoshiCostumeData[] = {
@@ -923,6 +951,54 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 13,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 13,
         .group_id = 21,
+    },
+    {
+        // Tangerine
+        .name_msg = "tot_cos2_22",
+        .help_msg = "tot_cos2_22_h",
+        .models = YOSHI_MODEL_PATHS("A"),
+        .price = 10,
+        .icon = IconType::YOSHI_COSTUME_21,
+        .icon_hud = IconType::YOSHI_COSTUME_21_HUD,
+        // TODO: Shouldn't be secret or default group-id.
+        .secret = true,
+        .group_id = 0,
+    },
+    {
+        // Cerulean
+        .name_msg = "tot_cos2_23",
+        .help_msg = "tot_cos2_23_h",
+        .models = YOSHI_MODEL_PATHS("B"),
+        .price = 10,
+        .icon = IconType::YOSHI_COSTUME_22,
+        .icon_hud = IconType::YOSHI_COSTUME_22_HUD,
+        // TODO: Shouldn't be secret or default group-id.
+        .secret = true,
+        .group_id = 0,
+    },
+    {
+        // Azure
+        .name_msg = "tot_cos2_24",
+        .help_msg = "tot_cos2_24_h",
+        .models = YOSHI_MODEL_PATHS("C"),
+        .price = 10,
+        .icon = IconType::YOSHI_COSTUME_23,
+        .icon_hud = IconType::YOSHI_COSTUME_23_HUD,
+        // TODO: Shouldn't be secret or default group-id.
+        .secret = true,
+        .group_id = 0,
+    },
+    {
+        // Mustard
+        .name_msg = "tot_cos2_25",
+        .help_msg = "tot_cos2_25_h",
+        .models = YOSHI_MODEL_PATHS("D"),
+        .price = 10,
+        .icon = IconType::YOSHI_COSTUME_24,
+        .icon_hud = IconType::YOSHI_COSTUME_24_HUD,
+        // TODO: Shouldn't be secret or default group-id.
+        .secret = true,
+        .group_id = 0,
     },
 };
 const int32_t g_NumYoshiCostumes =

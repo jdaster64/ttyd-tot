@@ -2344,6 +2344,8 @@ g_GlobalStrings = {
     b'tot_cos1_24':     b'Silver',
     b'tot_cos1_25':     b'Gold',
     b'tot_cos1_26':     b'Platinum',
+    b'tot_cos1_27':     b'Game Boy',
+    b'tot_cos1_28':     b'3D World Beta',
     
     b'tot_cos2_01':     b'Green',
     b'tot_cos2_02':     b'Red',
@@ -2366,6 +2368,10 @@ g_GlobalStrings = {
     b'tot_cos2_19':     b'Silver',
     b'tot_cos2_20':     b'Gold',
     b'tot_cos2_21':     b'Platinum',
+    b'tot_cos2_22':     b'Tangerine',
+    b'tot_cos2_23':     b'Cerulean',
+    b'tot_cos2_24':     b'Azure',
+    b'tot_cos2_25':     b'Mustard',
     
     b'tot_cos0_01_h':
         b"Gives Mario's attacks a\n"
@@ -2527,6 +2533,12 @@ g_GlobalStrings = {
     b"tot_cos1_26_h":
         b"Wow, you're a super player!\n"
         b"You've really earned this!",
+    b"tot_cos1_27_h":
+        b"The peak of 80's portable\n"
+        b"gaming technology!",
+    b"tot_cos1_28_h":
+        b"Likely meant for a Super Guide,\n"
+        b"but works well with Hammerman.",
         
     b"tot_cos2_01_h":
         b"The classic green Yoshi.\n"
@@ -2591,6 +2603,18 @@ g_GlobalStrings = {
     b"tot_cos2_21_h":
         b"Thanks for playing this mod!\n"
         b"You've really earned this!",
+    b"tot_cos2_22_h":
+        b"A tropical color, reminiscent of\n"
+        b"surfing on sunny shores.",
+    b"tot_cos2_23_h":
+        b"A deep shade of blue, befitting\n"
+        b"a placid underground lake.",
+    b"tot_cos2_24_h":
+        b"A cool-looking shade that just\n"
+        b'screams "number one"!',
+    b"tot_cos2_25_h":
+        b"An earthy color that smacks of\n"
+        b"a familiar, formidable foe.",
     
     # Reworked in-battle Tattles for all enemies.
     

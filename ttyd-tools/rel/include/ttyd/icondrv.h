@@ -608,6 +608,16 @@ namespace IconType {
         ATTACK_FX_PURPLE,
         ATTACK_FX_FUCHSIA,
         ATTACK_FX_BROWN,
+        MARIO_COSTUME_26,
+        MARIO_COSTUME_27,
+        YOSHI_COSTUME_21,
+        YOSHI_COSTUME_22,
+        YOSHI_COSTUME_23,
+        YOSHI_COSTUME_24,
+        YOSHI_COSTUME_21_HUD,
+        YOSHI_COSTUME_22_HUD,
+        YOSHI_COSTUME_23_HUD,
+        YOSHI_COSTUME_24_HUD,
     };
 }
 
