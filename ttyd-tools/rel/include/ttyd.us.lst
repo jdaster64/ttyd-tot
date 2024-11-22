@@ -2055,6 +2055,7 @@
 // .text
 801138d8:_get_flower_suitoru_point
 80113950:_get_heart_suitoru_point
+801139c8:_get_escape_rate
 // .data
 8034cc60:btldefaultevt_Damage
 8034de14:btldefaultevt_ChangeParty

@@ -133,6 +133,8 @@ int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool) = nullptr;
 int32_t (*g__get_flower_suitoru_point_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_default.o  80113950
 int32_t (*g__get_heart_suitoru_point_trampoline)(EvtEntry*, bool) = nullptr;
+// battle_event_default.o  801139c8
+int32_t (*g__get_escape_rate_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_information.o  801141bc
 void (*g_BattleInformationSetDropMaterial_trampoline)(
     FbatBattleInformation*) = nullptr;

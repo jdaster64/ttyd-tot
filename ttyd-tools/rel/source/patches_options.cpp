@@ -10,6 +10,7 @@
 #include <ttyd/battle_audience.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
+#include <ttyd/battle_event_default.h>
 #include <ttyd/battle_mario.h>
 #include <ttyd/battle_seq_end.h>
 #include <ttyd/battle_stage_object.h>
@@ -100,6 +101,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Function hooks.
 extern void (*g_pouchReviseMarioParam_trampoline)();
 extern int32_t (*g_btlevtcmd_WeaponAftereffect_trampoline)(EvtEntry*, bool);
+extern int32_t (*g__get_escape_rate_trampoline)(EvtEntry*, bool);
 extern void (*g_BattleAudienceSetThrowItemMax_trampoline)();
 // Patch addresses.
 extern const int32_t g_BtlUnit_CheckPinchStatus_DangerThreshold_BH;
@@ -193,6 +195,19 @@ void ApplyFixedPatches() {
             // Copy back original values.
             memcpy(&weapon.bg_a1_a2_fall_weight, stage_hazard_chances, 12);
             
+            return 2;
+        });
+
+    // Guarantee running away from battle if enabled.
+    g__get_escape_rate_trampoline = mod::hookFunction(
+        ttyd::battle_event_default::_get_escape_rate,
+        [](EvtEntry* evt, bool isFirstCall) {
+            // Call original logic.
+            g__get_escape_rate_trampoline(evt, isFirstCall);
+            // Override with 100% chance if enabled.
+            if (g_Mod->state_.CheckOptionValue(OPTVAL_RUN_AWAY_GUARANTEED)) {
+                evtSetValue(evt, evt->evtArguments[0], 101);
+            }
             return 2;
         });
         

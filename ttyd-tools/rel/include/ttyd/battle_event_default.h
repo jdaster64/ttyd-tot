@@ -11,7 +11,7 @@ extern "C" {
 // .text
 EVT_DECLARE_USER_FUNC(_get_flower_suitoru_point, 2);
 EVT_DECLARE_USER_FUNC(_get_heart_suitoru_point, 2);
-// _get_escape_rate
+EVT_DECLARE_USER_FUNC(_get_escape_rate, 1);
 // _set_escape_ac_hlp_msg
 // _btl_escape_reset_move_color_lv_player_unit_all
 // btlevtcmd_audience_code_escape_fail
