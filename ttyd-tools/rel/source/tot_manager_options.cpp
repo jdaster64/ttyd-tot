@@ -315,6 +315,10 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
                     return -30;
             }
             break;
+        case OPT_REVIVE_PARTNERS:
+            // If partners are disabled, partner revive setting is irrelevant.
+            if (state.CheckOptionValue(OPTVAL_NO_PARTNERS)) return 0;
+            return state.GetOption(option) ? 0 : 10;
         case OPT_MARIO_HP:
         case OPT_MARIO_FP:
         case OPT_MARIO_BP:
@@ -345,8 +349,6 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
             return state.GetOption(option) ? -30 : 0;
         case OPT_OBFUSCATE_ITEMS:
             return state.GetOption(option) ? 30 : 0;
-        case OPT_REVIVE_PARTNERS:
-            return state.GetOption(option) ? 0 : 10;
         case OPT_RUN_AWAY:
             return state.GetOption(option) ? -10 : 0;
         case OPT_CHARLIETON_STOCK:

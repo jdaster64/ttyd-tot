@@ -639,6 +639,12 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_KEY_ATTACK_FX].icon_id = IconType::ATTACK_FX_R;
     itemDataTable[ItemType::TOT_KEY_ATTACK_FX].type_sort_order = 9;
 
+    itemDataTable[ItemType::TOT_KEY_MOVE_SELECTOR].name = "in_moveselect";
+    itemDataTable[ItemType::TOT_KEY_MOVE_SELECTOR].description = "msg_moveselect";
+    itemDataTable[ItemType::TOT_KEY_MOVE_SELECTOR].menu_description = "msg_moveselect";
+    itemDataTable[ItemType::TOT_KEY_MOVE_SELECTOR].icon_id = IconType::ROUTING_SLIP;
+    itemDataTable[ItemType::TOT_KEY_MOVE_SELECTOR].type_sort_order = 10;
+
     // Balance changes for individual items...
 
     // Various items have rebalanced recovery.
@@ -958,6 +964,9 @@ void ApplyFixedPatches() {
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED;
     itemDataTable[ItemType::PEACH_TART].weapon_params = &kPeachTartParams;
 
+    // Healthy Salad - Set target weighting flags to be same as basic HP items.
+    ttyd::battle_item_data::ItemWeaponData_HealthySalad.target_weighting_flags
+        = ttyd::battle_item_data::ItemWeaponData_Kinoko.target_weighting_flags;
 
     // Badge changes...
     

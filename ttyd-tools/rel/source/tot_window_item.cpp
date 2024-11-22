@@ -7,6 +7,7 @@
 #include "tot_generate_item.h"
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_manager_move.h"
 #include "tot_manager_reward.h"
 #include "tot_state.h"
 
@@ -33,6 +34,9 @@
 #include <ttyd/win_root.h>
 #include <ttyd/winmgr.h>
 
+#include <cinttypes>
+#include <cstdio>
+
 namespace mod::tot::win {
 
 namespace {
@@ -52,7 +56,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 namespace ItemUseLocation = ::ttyd::item_data::ItemUseLocation_Flags;
 
 // Array used for item selector dialog (no reason to shoehorn into menu struct.)
-int16_t g_SelectorItems[85] = { -1 };
+int16_t g_SelectorEntries[85] = { -1 };
 
 void GetPartyMemberMenuOrder(WinPartyData** out_party_data) {
     WinPartyData* party_data = g_winPartyDt;
@@ -633,29 +637,62 @@ void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
         winmgr_entry->x + 304, -winmgr_entry->y + 16 + 240,
         winmgr_entry->width, winmgr_entry->height - 32);
 
-    for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
-        int32_t id = menu->cosmetic_options[i];
+    if (menu->item_menu_state == 502) {
+        // Temporarily store current move loadout in menu->cosmetic_options.
+        int32_t num_moves = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOAD_SIZE);
+        for (int32_t i = 0; i < num_moves; ++i) {
+            menu->cosmetic_options[i] = 
+                g_Mod->state_.GetOption(STAT_PERM_MOVE_LOADOUT, i);
+        }
+        menu->cosmetic_options[num_moves] = -1;
+    }
 
+    for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
         const char* text = "???";
         int32_t icon = 0;
+        bool equipped = false;
         switch (menu->item_menu_state) {
             case 400: {
+                int32_t id = menu->cosmetic_options[i];
                 auto* data = CosmeticsManager::GetAttackFxData(id);
                 text = msgSearch(data->name_msg);
                 icon = data->icon;
+                equipped =
+                    CosmeticsManager::IsEquipped(CosmeticType::ATTACK_FX, id);
                 break;
             }
             case 401: {
+                int32_t id = menu->cosmetic_options[i];
                 auto* data = CosmeticsManager::GetMarioCostumeData(id);
                 text = msgSearch(data->name_msg);
                 icon = data->icon;
+                equipped =
+                    CosmeticsManager::IsEquipped(CosmeticType::MARIO_COSTUME, id);
                 break;
             }
             case 402: {
+                int32_t id = menu->cosmetic_options[i];
                 auto* data = CosmeticsManager::GetYoshiCostumeData(id);
                 text = msgSearch(data->name_msg);
                 icon = data->icon;
+                equipped =
+                    CosmeticsManager::IsEquipped(CosmeticType::YOSHI_COSTUME, id);
                 break;
+            }
+            case 502: {
+                int32_t id = g_SelectorEntries[i];
+                const auto* data = MoveManager::GetMoveData(id);
+                text = msgSearch(data->name_msg);
+
+                // TODO: Is there a reasonable way to show the partner icon too?
+                icon = data->icon_id;
+
+                for (int8_t* move = menu->cosmetic_options; *move >= 0; ++move) {
+                    if (*move == id) {
+                        equipped = true;
+                        break;
+                    }
+                }
             }
         }
 
@@ -683,9 +720,6 @@ void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
         }
         {
             // "Equipped" indicator.
-            int32_t equipped =
-                CosmeticsManager::IsEquipped(menu->item_menu_state - 400, id)
-                ? IconType::AC_LIGHT_GREEN : IconType::SP_ORB_EMPTY;
             gc::vec3 pos = { 
                 winmgr_entry->x + winmgr_entry->width - 24.0f,
                 y_trans, 
@@ -693,35 +727,103 @@ void DrawCosmeticSelectionDialog(WinMgrEntry* winmgr_entry) {
             };
             gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
             uint32_t icon_color = 0xFFFFFFFFU;
-            ttyd::win_main::winIconSet(equipped, &pos, &scale, &icon_color);
+            ttyd::win_main::winIconSet(
+                equipped ? IconType::AC_LIGHT_GREEN : IconType::SP_ORB_EMPTY,
+                &pos, &scale, &icon_color);
         }
     }
 
     ttyd::gx::GXTransform::GXSetScissor(0, 0, 608, 480);
 }
 
-int32_t PopulateSelectorItems(int32_t type) {
-    int32_t num_items = 0;
-    int32_t start_item =
-        type == 0 ? ItemType::THUNDER_BOLT : ItemType::POWER_JUMP;
-    int32_t end_item =
-        type == 0 ? ItemType::POWER_JUMP : ItemType::MAX_ITEM_TYPE;
+void DrawMoveSelectionDialog2(WinMgrEntry* winmgr_entry, WinPauseMenu* menu) {
+    ttyd::win_main::winFontInit();
+    uint32_t color = 0x000000FFU;
+    {
+        const char* msg = msgSearch("tot_winsel_movesel_cnt");
+        int32_t text_length = ttyd::fontmgr::FontGetMessageWidth(msg);
 
-    for (int32_t item = start_item; item < end_item; ++item) {
-        // If item is valid & purchased, add to array.
-        if (g_Mod->state_.GetOption(
-                FLAGS_ITEM_PURCHASED, item - ItemType::THUNDER_BOLT) &&
-            ttyd::item_data::itemDataTable[item].type_sort_order >= 0) {
-            g_SelectorItems[num_items++] = item;
+        gc::vec3 scale = { 0.8f, 0.8f, 1.0f };
+        gc::vec3 position = {
+            winmgr_entry->x + (winmgr_entry->width - text_length * scale.x) * 0.5f,
+            134.0f, 0.0f
+        };
+        ttyd::win_main::winFontSet(&position, &scale, &color, msg);
+    }
+    {
+        char msg[8];
+        sprintf(
+            msg, "%" PRId32 " / %" PRId32,
+            g_Mod->state_.GetOption(STAT_PERM_MOVE_LOAD_SIZE), 6);
+        int32_t text_length = ttyd::fontmgr::FontGetMessageWidth(msg);
+
+        gc::vec3 position = {
+            winmgr_entry->x + (winmgr_entry->width - text_length) * 0.5f,
+            110.0f, 0.0f
+        };
+        gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+        ttyd::win_main::winFontSet(&position, &scale, &color, msg);
+    }
+    {
+        const char* msg = msgSearch("tot_winsel_movesel_help");
+        int32_t text_length = ttyd::fontmgr::FontGetMessageWidth(msg);
+
+        gc::vec3 scale = { 0.55f, 0.55f, 1.0f };
+        gc::vec3 position = {
+            winmgr_entry->x + (winmgr_entry->width - text_length * scale.x) * 0.5f,
+            80.0f, 0.0f
+        };
+        ttyd::win_main::winFontSet(&position, &scale, &color, msg);
+    }
+}
+
+int32_t PopulateSelectorEntries(int32_t type) {
+    int32_t num_entries = 0;
+
+    switch (type) {
+        case 0:
+        case 1: {
+            // Item, Badge selectors
+            int32_t start_item =
+                type == 0 ? ItemType::THUNDER_BOLT : ItemType::POWER_JUMP;
+            int32_t end_item =
+                type == 0 ? ItemType::POWER_JUMP : ItemType::MAX_ITEM_TYPE;
+
+            for (int32_t item = start_item; item < end_item; ++item) {
+                // If item is valid & purchased, add to array.
+                if (g_Mod->state_.GetOption(
+                        FLAGS_ITEM_PURCHASED, item - ItemType::THUNDER_BOLT) &&
+                    ttyd::item_data::itemDataTable[item].type_sort_order >= 0) {
+                    g_SelectorEntries[num_entries++] = item;
+                }
+            }
+            g_SelectorEntries[num_entries] = -1;
+            
+            ttyd::system::qqsort(
+                g_SelectorEntries, num_entries, sizeof(int16_t),
+                (void*)TypeSortOrderComparator);
+            break;
+        }
+        case 2: {
+            // Move selector
+            for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+                // Only include unlockable (non-base) moves.
+                if (MoveManager::GetMoveData(i)->move_tier) {
+                    g_SelectorEntries[num_entries++] = i;
+                }
+                // Hack to order Star Powers by SP cost.
+                if (i == MoveType::SP_SHOWSTOPPER) {
+                    g_SelectorEntries[num_entries - 3] = MoveType::SP_SWEET_FEAST;
+                    g_SelectorEntries[num_entries - 2] = MoveType::SP_SHOWSTOPPER;
+                    g_SelectorEntries[num_entries - 1] = MoveType::SP_ART_ATTACK;
+                }
+            }
+            g_SelectorEntries[num_entries] = -1;
+            break;
         }
     }
-    g_SelectorItems[num_items] = -1;
-    
-    ttyd::system::qqsort(
-        g_SelectorItems, num_items, sizeof(int16_t),
-        (void*)TypeSortOrderComparator);
 
-    return num_items;
+    return num_entries;
 }
 
 void SetCurrentItemLoadoutEquipped(WinPauseMenu* menu, bool toggle) {
@@ -732,7 +834,7 @@ void SetCurrentItemLoadoutEquipped(WinPauseMenu* menu, bool toggle) {
 
     int32_t size = g_Mod->state_.GetOption(size_option);
     if (toggle) {
-        int32_t current_id = g_SelectorItems[menu->cosmetic_cursor_idx];
+        int32_t current_id = g_SelectorEntries[menu->cosmetic_cursor_idx];
 
         // Don't allow equipping multiple copies of unique badges.
         bool already_equipped = false;
@@ -767,6 +869,118 @@ void SetCurrentItemLoadoutEquipped(WinPauseMenu* menu, bool toggle) {
     }
 }
 
+void ToggleCustomMoveEquipped(WinPauseMenu* menu) {
+    int32_t current_move = g_SelectorEntries[menu->cosmetic_cursor_idx];
+
+    int8_t moves[MoveType::MOVE_TYPE_MAX] = { 0 };
+    int32_t num_moves = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOAD_SIZE);
+    for (int32_t i = 0; i < num_moves; ++i) {
+        moves[g_Mod->state_.GetOption(STAT_PERM_MOVE_LOADOUT, i)] = 1;
+    }
+
+    if (moves[current_move] == 0 && num_moves >= 6) {
+        // Too many moves equipped already.
+        ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+        return;
+    } else if (moves[current_move] == 0) {
+        // Equipping move; make sure we have any prerequisites.
+        const auto* data = MoveManager::GetMoveData(current_move);
+
+        if (current_move == MoveType::JUMP_SPRING ||
+            current_move == MoveType::HAMMER_ULTRA) {
+            if (moves[current_move - 1] == 0) {
+                // Must first take Spin Jump / Super Hammer for Spring / Ultra.
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                return;
+            }
+        } else if (current_move > MoveType::GOOMBELLA_BASE) {
+            // Tier 2 / 3 moves need at least 1 / 2 moves from previous tiers.
+            int32_t base_move = current_move / 6 * 6;
+            int32_t moves_found = 0;
+            for (int32_t i = 1; i < 6; ++i) {
+                if (moves[base_move + i]) ++moves_found;
+            }
+            // Not enough moves found.
+            if (moves_found < data->move_tier - 1) {
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                return;
+            }
+        } else if (current_move > MoveType::SP_SWEET_TREAT) {
+            // Need enough SP to be able to pay for the move.
+            int32_t base_move = MoveType::SP_SWEET_TREAT;
+            int32_t moves_found = 0;
+            for (int32_t i = 0; i < 8; ++i) {
+                if (moves[base_move + i]) ++moves_found;
+            }
+            // Not enough moves found.
+            if (moves_found < data->move_cost[2] - 4) {
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                return;
+            }
+        }
+
+        // Success.
+        ttyd::pmario_sound::psndSFXOn((char *)0x20038);
+        moves[current_move] = 1;
+    } else {
+        // Unequipping move; make sure we don't strand any moves.
+        moves[current_move] = 0;
+
+        if (current_move == MoveType::JUMP_SPIN ||
+            current_move == MoveType::HAMMER_SUPER) {
+            // Must first unequip Spring Jump / Ultra Hammer to unequip
+            // Spin Jump / Spin Hammer.
+            if (moves[current_move + 1]) {
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                return;
+            }
+        } else if (current_move > MoveType::GOOMBELLA_BASE) {
+            // Can't unequip a partner move if it leaves a higher-tiered one
+            // with insufficient picks before it.
+            int32_t tiers[4] = { 0 };
+            int32_t base_move = current_move / 6 * 6;
+            for (int32_t i = 1 ; i < 6; ++i) {
+                int32_t tier = MoveManager::GetMoveData(base_move + i)->move_tier;
+                if (moves[base_move + i]) ++tiers[tier];
+            }
+            if ((tiers[2] && tiers[1] < 1) ||
+                (tiers[3] && (tiers[1] + tiers[2]) < 2)) {
+                // Stranded with not enough requirements.
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                return;
+            }
+        } else if (current_move > MoveType::SP_SWEET_TREAT) {
+            // Can't unequip a Special move if it leaves a higher-tiered one
+            // with insufficient picks before it.
+            int32_t tiers[5] = { 0 };
+            int32_t base_move = MoveType::SP_SWEET_TREAT;
+            for (int32_t i = 0; i < 8; ++i) {
+                int32_t tier = 
+                    MoveManager::GetMoveData(base_move + i)->move_cost[2] - 3;
+                if (moves[base_move + i]) ++tiers[tier];
+            }
+            if ((tiers[2] && tiers[1] < 1) ||
+                (tiers[3] && (tiers[1] + tiers[2]) < 2) ||
+                (tiers[4] && (tiers[1] + tiers[2] + tiers[3]) < 3)) {
+                // Stranded with not enough requirements.
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                return;
+            }
+        }
+
+        // Success.
+        ttyd::pmario_sound::psndSFXOn((char *)0x20039);
+    }
+
+    // Re-assign moves with change made.
+    num_moves = 0;
+    for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+        if (moves[i])
+            g_Mod->state_.SetOption(STAT_PERM_MOVE_LOADOUT, i, num_moves++);
+    }
+    g_Mod->state_.SetOption(STAT_PERM_MOVE_LOAD_SIZE, num_moves);
+}
+
 void DrawLoadoutSelectionDialog(WinMgrEntry* winmgr_entry) {
     auto* menu = (WinPauseMenu*)ttyd::win_main::winGetPtr();
 
@@ -778,7 +992,7 @@ void DrawLoadoutSelectionDialog(WinMgrEntry* winmgr_entry) {
     // Draw item icons.
     ttyd::win_main::winIconInit();
     for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
-        int32_t icon = ttyd::item_data::itemDataTable[g_SelectorItems[i]].icon_id;
+        int32_t icon = ttyd::item_data::itemDataTable[g_SelectorEntries[i]].icon_id;
         gc::vec3 pos = { 
             -62.0f + 30.0f * (i % 13 - 6),
             124.0f - 30.0f * (i / 13),
@@ -973,20 +1187,41 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                                 ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
                             }
                             break;
+                        case ItemType::TOT_KEY_MOVE_SELECTOR:
+                            if (!g_Mod->state_.GetOption(OPT_RUN_STARTED)) {
+                                selector_type = 2;
+                            } else {
+                                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+                            }
+                            break;
                     }
                     if (selector_type != -1) {
                         int32_t num_selections = 
-                            PopulateSelectorItems(selector_type);
+                            PopulateSelectorEntries(selector_type);
                         if (num_selections > 0) {
                             menu->cosmetic_cursor_idx = 0;
                             menu->cosmetic_num_options = num_selections;
                             menu->item_menu_state = 500 + selector_type;
                             ttyd::pmario_sound::psndSFXOn((char *)0x20012);
 
-                            ttyd::winmgr::winMgrSetSize(
-                                menu->winmgr_entry_1, -270.f, 148.f, 540.f, 198.f);
-                            ttyd::winmgr::winMgrSetSize(
-                                menu->winmgr_entry_2, -160.f, -57.f, 320.f, 68.f);
+                            if (selector_type == 2) {
+                                int32_t height =
+                                    Min(menu->cosmetic_num_options, 8) * 24 + 32;
+                                
+                                ttyd::winmgr::winMgrSetSize(
+                                    menu->winmgr_entry_1, 
+                                    -46.f, 150.f, 350.f, height);
+                                ttyd::winmgr::winMgrSetSize(
+                                    menu->winmgr_entry_2, 
+                                    -294.f, 145.f, 244.f, 140.f);
+                            } else {
+                                ttyd::winmgr::winMgrSetSize(
+                                    menu->winmgr_entry_1,
+                                    -270.f, 148.f, 540.f, 198.f);
+                                ttyd::winmgr::winMgrSetSize(
+                                    menu->winmgr_entry_2,
+                                    -160.f, -57.f, 320.f, 68.f);
+                            }
                             ttyd::winmgr::winMgrOpen(menu->winmgr_entry_1);
                             ttyd::winmgr::winMgrOpen(menu->winmgr_entry_2);
                         } else {
@@ -1257,7 +1492,7 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
         }
         case 500:
         case 501: {
-            int32_t item = g_SelectorItems[menu->cosmetic_cursor_idx];
+            int32_t item = g_SelectorEntries[menu->cosmetic_cursor_idx];
 
             if (menu->buttons_pressed & ButtonId::START) {
                 menu->use_item_type = 0;
@@ -1314,6 +1549,58 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                 -92.0f + (menu->cosmetic_cursor_idx % 13 - 6) * 30.0f;
             menu->main_cursor_target_y =
                 124.0f - (menu->cosmetic_cursor_idx / 13) * 30.0f;
+            
+            break;
+        }
+        case 502: {
+            if (menu->buttons_pressed & ButtonId::START) {
+                menu->use_item_type = 0;
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
+                return -2;
+            } else if (menu->buttons_pressed & ButtonId::B) {
+                ttyd::pmario_sound::psndSFXOn((char *)0x20013);
+                menu->item_menu_state = 10;
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
+                ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
+            } else if (menu->buttons_pressed & ButtonId::A) {
+                ToggleCustomMoveEquipped(menu);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_UP) {
+                if (--menu->cosmetic_cursor_idx < 0) {
+                    menu->cosmetic_cursor_idx = menu->cosmetic_num_options - 1;
+                    if (menu->cosmetic_num_options > 8) {
+                        menu->cosmetic_menu_offset =
+                            menu->cosmetic_num_options - 8;
+                    }
+                } else {
+                    if (menu->cosmetic_menu_offset > 0 &&
+                        menu->cosmetic_menu_offset == menu->cosmetic_cursor_idx)
+                        --menu->cosmetic_menu_offset;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
+                if (++menu->cosmetic_cursor_idx >= menu->cosmetic_num_options) {
+                    menu->cosmetic_cursor_idx = 0;
+                    menu->cosmetic_menu_offset = 0;
+                } else {
+                    if (menu->cosmetic_menu_offset + 8 < menu->cosmetic_num_options &&
+                        menu->cosmetic_menu_offset + 7 == menu->cosmetic_cursor_idx)
+                        ++menu->cosmetic_menu_offset;
+                }
+                ttyd::pmario_sound::psndSFXOn((char *)0x20005);
+            }
+
+            // Update help text.
+            int32_t move = g_SelectorEntries[menu->cosmetic_cursor_idx];
+            ttyd::win_root::winMsgEntry(
+                menu, 0, MoveManager::GetMoveData(move)->desc_msg, 0);
+            
+            // Set cursor position.
+            menu->main_cursor_target_x = -60.0f;
+            menu->main_cursor_target_y = 123.0f - 24.0f * 
+                (menu->cosmetic_cursor_idx - menu->cosmetic_menu_offset);
+            // Set window scroll offset.
+            menu->cosmetic_menu_scroll_target_y = menu->cosmetic_menu_offset * 24.0f;
             
             break;
         }
@@ -1410,6 +1697,7 @@ void ItemSubdialogMain1(WinMgrEntry* winmgr_entry) {
             case 400:
             case 401:
             case 402:
+            case 502:
                 DrawCosmeticSelectionDialog(winmgr_entry);
                 break;
             case 500:
@@ -1463,6 +1751,9 @@ void ItemSubdialogMain2(WinMgrEntry* winmgr_entry) {
             case 500:
             case 501:
                 // Second window not used for loadout selector.
+                return;
+            case 502:   
+                DrawMoveSelectionDialog2(winmgr_entry, menu);
                 return;
         }
 

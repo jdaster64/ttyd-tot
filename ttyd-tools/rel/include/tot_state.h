@@ -617,7 +617,10 @@ enum Options : uint32_t {
     STAT_PERM_HALF_BEST_RTA     = 0x1bc'9'00'00,
     STAT_PERM_FULL_BEST_RTA     = 0x1bd'9'00'00,
     STAT_PERM_EX_BEST_RTA       = 0x1be'9'00'00,
-    // Next: 0x1bf
+    // Custom move loadout.
+    STAT_PERM_MOVE_LOADOUT      = 0x1bf'0'01'08,
+    STAT_PERM_MOVE_LOAD_SIZE    = 0x1c1'1'00'00,
+    // Next: 0x1c2
 };
 
 }  // namespace mod::tot

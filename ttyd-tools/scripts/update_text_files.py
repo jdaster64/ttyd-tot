@@ -56,6 +56,7 @@ g_GlobalStrings = {
     b"in_bgm":                  b"Music Toggle",
     b"in_itemselect":           b"Item Selector",
     b"in_badgeselect":          b"Badge Selector",
+    b"in_moveselect":           b"Move Selector",
     b"in_attack_fx":            b"Attack FX",
     b"in_m_emblem":             b"M Palette",
     b"in_y_emblem":             b"Y Palette",
@@ -116,6 +117,10 @@ g_GlobalStrings = {
     b'msg_badgeselect':
         b"Choose a preferred loadout\n"
         b"of up to 6 badges.",
+
+    b'msg_moveselect':
+        b"Choose up to 6 unlockable\n"
+        b"moves to gain from the start.",
 
     b'msg_attack_fx':
         b"Select which sound effects\n"
@@ -1250,6 +1255,15 @@ g_GlobalStrings = {
     b"tot_winsel_tradewhichstat": b"Trade which?",
     b"tot_winsel_whichduds":      b"Which getup?",
     b"tot_winsel_whichones":      b"Which ones?",
+    
+    b"tot_winsel_movesel_cnt":
+        b"Moves Picked",
+        
+    b"tot_winsel_movesel_help":
+        b" Note: Selections must follow\n"
+        b"  the usual tier requirements\n"
+        b"    for taking moves, e.g.\n"
+        b"Spin Jump before Spring Jump.",
     
     # File select text.
     
