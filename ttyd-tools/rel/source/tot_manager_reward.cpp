@@ -401,7 +401,8 @@ void SelectMoves(int32_t reward_type, bool is_upgrade_mode) {
             
             // For unlocking partner moves, limit the tiers that can appear
             // to 1 on the first pick, 1-2 on the second, and 1-3 otherwise.
-            if (!is_upgrade_mode && is_partner) {
+            if (!is_upgrade_mode && is_partner &&
+                !g_Mod->state_.CheckOptionValue(OPTVAL_MOVES_RANDOM)) {
                 int32_t tier = MoveManager::GetMoveData(move)->move_tier;
                 // Determine which # pick this is by the # of available moves.
                 int32_t max_rank = 6 - num_options;
@@ -530,6 +531,7 @@ void TrackChestReward(int32_t reward_type, int32_t collected) {
 // Evt declarations.
 EVT_DECLARE_USER_FUNC(evtTot_FullRecover, 0)
 EVT_DECLARE_USER_FUNC(evtTot_ShouldUnlockPartner, 2)
+EVT_DECLARE_USER_FUNC(evtTot_ShouldPartnerGetExtraMove, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetPartnerName, 2)
 EVT_DECLARE_USER_FUNC(evtTot_InitializePartyMember, 2)
 EVT_DECLARE_USER_FUNC(evtTot_PartyJumpOutOfChest, 7)
@@ -649,6 +651,7 @@ EVT_END()
 EVT_BEGIN(Reward_PartnerOrMove)
     USER_FUNC(evtTot_ShouldUnlockPartner, LW(13), LW(0))
     IF_EQUAL(LW(0), 0)
+LBL(10)
         // Partner is already unlocked; check for unlockable moves.
         USER_FUNC(evtTot_SelectMoves, 0, LW(13), LW(0), LW(1), LW(2))
         IF_LARGE(LW(0), 0)
@@ -696,6 +699,12 @@ EVT_BEGIN(Reward_PartnerOrMove)
         WAIT_MSEC(500)
         USER_FUNC(evt_party_run, 0)
         USER_FUNC(evt_party_run, 1)
+
+        // Also grant a move, if option enabled.
+        USER_FUNC(evtTot_ShouldPartnerGetExtraMove, LW(0))
+        IF_EQUAL(LW(0), 1)
+            GOTO(10)
+        END_IF()
     END_IF()
     RETURN()
 EVT_END()
@@ -1143,6 +1152,14 @@ EVT_DEFINE_USER_FUNC(evtTot_ShouldUnlockPartner) {
     int32_t should_unlock =
         idx && !(ttyd::mario_pouch::pouchGetPtr()->party_data[idx].flags & 1);
     evtSetValue(evt, evt->evtArguments[1], should_unlock);
+    return 2;
+}
+
+// Returns whether partners should get an extra move when you first meet them.
+EVT_DEFINE_USER_FUNC(evtTot_ShouldPartnerGetExtraMove) {
+    evtSetValue(
+        evt, evt->evtArguments[0], 
+        g_Mod->state_.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS));
     return 2;
 }
 

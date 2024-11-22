@@ -302,8 +302,10 @@ void MoveManager::ResetSelectedLevels() {
 bool MoveManager::IsUnlockable(int32_t move_type) {
     if (g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move_type) != 0)
         return false;
-    // Spring Jump / Ultra Hammer require unlocking Spin/Super as precursor.
+    // Spring Jump / Ultra Hammer require unlocking Spin/Super as precursor,
+    // unless playing with "random unlock order" setting.
     if (g_MoveData[move_type].move_tier == 4 &&
+        !g_Mod->state_.CheckOptionValue(OPTVAL_MOVES_RANDOM) &&
         g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move_type - 1) == 0)
         return false;
     return true;
@@ -445,9 +447,11 @@ uint32_t GetWeaponPowerFromSelectedLevel(
     BattleWorkUnit* unit1, BattleWeapon* weapon, BattleWorkUnit* unit2,
     BattleWorkUnitPart* part) {
     const int32_t move = weapon->damage_function_params[7];
-    const int32_t level = MoveManager::GetSelectedLevel(move);
     const int32_t ac_success =
         g_BattleWork->ac_manager_work.ac_result == 2 ? 1 : 0;
+    int32_t level = MoveManager::GetUnlockedLevel(move);
+    // To prevent issues with Spin Jump first strike if Spring Jump taken first.
+    if (level < 1) level = 1;
         
     int32_t power = weapon->damage_function_params[level * 2 - 2 + ac_success];
     if ((move & ~7) == MoveType::JUMP_BASE) {
@@ -462,9 +466,11 @@ uint32_t GetWeaponPowerFromMaxLevel(
     BattleWorkUnit* unit1, BattleWeapon* weapon, BattleWorkUnit* unit2,
     BattleWorkUnitPart* part) {
     const int32_t move = weapon->damage_function_params[7];
-    const int32_t level = MoveManager::GetUnlockedLevel(move);
     const int32_t ac_success =
         g_BattleWork->ac_manager_work.ac_result == 2 ? 1 : 0;
+    int32_t level = MoveManager::GetUnlockedLevel(move);
+    // To prevent issues with Spin Jump first strike if Spring Jump taken first.
+    if (level < 1) level = 1;
         
     int32_t power = weapon->damage_function_params[level * 2 - 2 + ac_success];
     if ((move & ~7) == MoveType::JUMP_BASE) {
