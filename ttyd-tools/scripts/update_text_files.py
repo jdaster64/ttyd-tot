@@ -1623,14 +1623,14 @@ g_GlobalStrings = {
         b"\nShows current HP, ATK & DEF\n"
         b"for all enemies of a given type.",
     b"tot_movelog_d331":
-        b"\nLv. 1: Deals 2+2 DEF-piercing\n"
-        b"damage for 3 FP.",
+        b"\nLv. 1: Deals 1 damage per\n"
+        b"hit, diminishing, for 3 FP.",
     b"tot_movelog_d332":
-        b"\nLv. 2: Deals 3+3 DEF-piercing\n"
-        b"damage for 4 FP.",
+        b"\nLv. 2: Deals 2 damage per\n"
+        b"hit, diminishing, for 5 FP.",
     b"tot_movelog_d333":
-        b"\nLv. 3: Deals 4+4 DEF-piercing\n"
-        b"damage for 5 FP.",
+        b"\nLv. 3: Deals 3 damage per\n"
+        b"hit, diminishing, for 7 FP.",
     b"tot_movelog_d341":
         b"\nLv. 1: Ensures the next attack\n"
         b"against the target will land.",
@@ -1638,14 +1638,14 @@ g_GlobalStrings = {
         b"\nLv. 2: Ensures the next attack\n"
         b"will land and inflict its status.",
     b"tot_movelog_d351":
-        b"\nLv. 1: Deals 1 damage per\n"
-        b"hit, diminishing, for 3 FP.",
+        b"\nLv. 1: Deals 2+2 DEF-piercing\n"
+        b"damage for 3 FP.",
     b"tot_movelog_d352":
-        b"\nLv. 2: Deals 2 damage per\n"
-        b"hit, diminishing, for 5 FP.",
+        b"\nLv. 2: Deals 3+3 DEF-piercing\n"
+        b"damage for 4 FP.",
     b"tot_movelog_d353":
-        b"\nLv. 3: Deals 3 damage per\n"
-        b"hit, diminishing, for 7 FP.",
+        b"\nLv. 3: Deals 4+4 DEF-piercing\n"
+        b"damage for 5 FP.",
     b"tot_movelog_d361":
         b"\nCosts 4 FP to use.",
     # Koops moves.

@@ -793,6 +793,11 @@ void ApplyFixedPatches() {
     // Can only be used in battle.
     itemDataTable[ItemType::SPACE_FOOD].usable_locations
         &= ~ItemUseLocation::kField;
+    // Can be used on any target, and has fully random target weighting flags.
+    ttyd::battle_item_data::ItemWeaponData_SpaceFood.target_class_flags = 
+        0x01100060;
+    ttyd::battle_item_data::ItemWeaponData_SpaceFood.target_weighting_flags = 
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM;
 
     // Snow Bunny guarantees one-turn Freeze and deals base 0 Ice damage.
     ttyd::battle_item_data::ItemWeaponData_SnowRabbit.damage_function =

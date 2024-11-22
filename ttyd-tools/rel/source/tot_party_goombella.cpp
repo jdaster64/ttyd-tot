@@ -74,8 +74,8 @@ extern BattleWeapon customWeapon_GoombellaIronbonk;
 
 BattleWeapon* g_WeaponTable[] = {
     &customWeapon_GoombellaHeadbonk, &customWeapon_GoombellaTattle,
-    &customWeapon_GoombellaIronbonk, &customWeapon_GoombellaScopeOut,
-    &customWeapon_GoombellaMultibonk, &customWeapon_GoombellaRallyWink
+    &customWeapon_GoombellaMultibonk, &customWeapon_GoombellaScopeOut,
+    &customWeapon_GoombellaIronbonk, &customWeapon_GoombellaRallyWink
 };
 
 void MakeSelectWeaponTable(
@@ -1235,7 +1235,7 @@ BattleWeapon customWeapon_GoombellaTattle = {
 
 BattleWeapon customWeapon_GoombellaMultibonk = {
     .name = "btl_wn_pkr_lv2",
-    .icon = IconType::PARTNER_MOVE_2,
+    .icon = IconType::PARTNER_MOVE_1,
     .item_id = 0,
     .description = "msg_pkr_renzoku_zutsuki",
     .base_accuracy = 100,
@@ -1406,7 +1406,7 @@ BattleWeapon customWeapon_GoombellaScopeOut = {
 
 BattleWeapon customWeapon_GoombellaIronbonk = {
     .name = "tot_ptr1_ironbonk",
-    .icon = IconType::PARTNER_MOVE_1,
+    .icon = IconType::PARTNER_MOVE_2,
     .item_id = 0,
     .description = "tot_ptr1_ironbonk_desc",
     .base_accuracy = 100,

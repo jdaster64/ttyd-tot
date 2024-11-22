@@ -102,10 +102,12 @@ extern uint32_t (*g_weaponGetPower_ZubaStar_trampoline)(
 extern const int32_t g_subsetevt_shot_damage_Patch_SuperInvolvedWeapon;
 extern const int32_t g_subsetevt_shot_damage_Patch_UltraInvolvedWeapon;
 extern const int32_t g_subsetevt_swallow_shot_damage_Patch_InvolvedWeapon;
+extern const int32_t g_sac_genki_main_object_Patch_NoRandTarget;
 extern const int32_t g_sac_genki_main_base_BlinkNumbers_BH;
 extern const int32_t g_sac_genki_main_base_BlinkNumbers_EH;
 extern const int32_t g_sac_genki_main_base_SetupTargets_BH;
 extern const int32_t g_sac_genki_main_base_SetupTargets_EH;
+extern const int32_t g_sac_genki_main_base_Patch_TargetAlloc;
 extern const int32_t g_genki_evt_common_Patch_SweetTreatFeastResult;
 extern const int32_t g_genki_evt_common_SweetTreatResultJumpPoint;
 extern const int32_t g_sac_deka_main_base_GetNumberOfBars_BH;
@@ -483,6 +485,16 @@ void ApplyFixedPatches() {
             return 2;
         });
 
+    // Allocate space for 50 targets whether using Sweet Treat or Sweet Feast.
+    mod::writePatch(
+        reinterpret_cast<void*>(g_sac_genki_main_base_Patch_TargetAlloc),
+        0x48000014 /* unconditional branch to always alloc 200 bytes */);
+
+    // Stop Sweet Treat from randomly generating targets after the 25th.
+    mod::writePatch(
+        reinterpret_cast<void*>(g_sac_genki_main_object_Patch_NoRandTarget),
+        0x60000000 /* nop */);
+
     // Patch Sweet Treat common event to apply Regen status for Feast.
     mod::writePatch(
         reinterpret_cast<void*>(g_genki_evt_common_Patch_SweetTreatFeastResult),
@@ -590,10 +602,10 @@ void SweetTreatSetUpTargets() {
     // Count of each type of target (HP, 3xHP, PHP, 3xPHP, FP, 3xFP, poison)
     // for the three levels of Sweet Treat and Sweet Feast.
     static constexpr const int8_t kTargetCounts[] = {
-        // Sweet Treat (up to 25 targets total)
-        7,  0,  7,  0,  8,  0,  3,
-        3,  4,  3,  4,  5,  3,  3,
-        0,  8,  0,  8,  0,  7,  2,
+        // Sweet Treat (up to 50 targets total)
+        8,  0,  8,  0,  8,  0,  2,
+        6,  2,  6,  2,  6,  2,  2,
+        4,  4,  4,  4,  4,  4,  2,
         // Sweet Feast (up to 50 targets total)
         14, 2,  14, 2,  14, 2,  2,
         9,  7,  9,  7,  9,  7,  2,
