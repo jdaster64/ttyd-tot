@@ -579,6 +579,7 @@ void OptionsManager::OnRunStart() {
     pouch.coins = 0;
     pouch.star_pieces = 0;
     
+    // Apply starting items.
     switch (state.GetOptionValue(OPT_STARTER_ITEMS)) {
         case OPTVAL_STARTER_ITEMS_BASIC: {
             ttyd::mario_pouch::pouchGetItem(ItemType::THUNDER_BOLT);
@@ -620,6 +621,15 @@ void OptionsManager::OnRunStart() {
                 ttyd::mario_pouch::pouchGetItem(item_id);
             }
             break;
+        }
+    }
+
+    // Apply starting moves.
+    if (state.CheckOptionValue(OPTVAL_MOVES_CUSTOM)) {
+        int32_t num_moves = state.GetOption(STAT_PERM_MOVE_LOAD_SIZE);
+        for (int32_t i = 0; i < num_moves; ++i) {
+            int32_t move = state.GetOption(STAT_PERM_MOVE_LOADOUT, i);
+            MoveManager::UpgradeMove(move);
         }
     }
     

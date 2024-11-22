@@ -53,6 +53,7 @@ using ::ttyd::mariost::g_MarioSt;
 using ::ttyd::msgdrv::msgSearch;
 
 namespace IconType = ::ttyd::icondrv::IconType;
+namespace ItemType = ::ttyd::item_data::ItemType;
 
 struct OptionMenuData {
     int32_t     option;     // Either ToT state Options or WindowOptions.
@@ -527,6 +528,14 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                         if (state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) &&
                             !AchievementsManager::CheckOptionUnlocked(
                                 OPTVAL_STARTER_ITEMS_CUSTOM)) {
+                            state.NextOption(option, change);
+                        }
+                        break;
+                    case OPT_MOVE_AVAILABILITY:
+                        // If custom moves key item isn't unlocked, skip option.
+                        if (state.CheckOptionValue(OPTVAL_MOVES_CUSTOM) &&
+                            !ttyd::mario_pouch::pouchCheckItem(
+                                ItemType::TOT_KEY_MOVE_SELECTOR)) {
                             state.NextOption(option, change);
                         }
                         break;

@@ -5226,7 +5226,7 @@ g_TowerLobbyStrings = {
     b"tot_optr_movea_default":      b"Default",
     b"tot_optr_movea_partner1":     b"Partners Start w/+1",
     b"tot_optr_movea_random":       b"No Tier Requirements",
-    b"tot_optr_movea_custom":       b"Custom",
+    b"tot_optr_movea_custom":       b"Custom Start",
     b"tot_optr_movel":              b"Move Limit",
     b"tot_optr_movel_default":      b"None",
     b"tot_optr_movel_4":            b"4",
