@@ -20,16 +20,34 @@ namespace mod::tot {
 namespace {
 
 using ::ttyd::evtmgr_cmd::evtGetValue;
+using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace IconType = ::ttyd::icondrv::IconType;
 
-uint64_t GetRTATime() {
+uint64_t GetCurrentRTATicks() {
     // Freeze RTA timer after ending floor.
     auto& state = g_Mod->state_;
     if (state.IsFinalBossFloor() && state.splits_rta_[state.floor_]) {
         return state.last_floor_rta_;
     }
     return ttyd::mariost::g_MarioSt->lastFrameRetraceTime;
+}
+
+uint64_t GetCountdownTicksLeft() {
+    auto& state = g_Mod->state_;
+    int32_t sets = (state.floor_ - 1) / 8 + 1;
+    int32_t centis_per_set =
+        (16 - state.GetOption(OPT_COUNTDOWN_TIMER)) * 60 * 100;
+    switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+        case OPTVAL_DIFFICULTY_FULL:
+        case OPTVAL_DIFFICULTY_FULL_EX:
+            centis_per_set = centis_per_set * 3 / 2;
+            break;
+    }
+    int64_t available_ticks = DurationCentisecondsToTicks(centis_per_set * sets);
+    int64_t elapsed_ticks = GetCurrentRTATicks() - state.run_start_time_rta_;
+    int64_t remaining = available_ticks - elapsed_ticks;
+    return remaining > 0 ? remaining : 0;
 }
 
 }  // namespace
@@ -46,19 +64,35 @@ void TimerManager::Draw() {
     uint32_t color = ~0U;
     
     uint64_t time_ticks;
-    switch (state.GetOptionValue(OPT_TIMER_DISPLAY)) {
-        case OPTVAL_TIMER_IGT: {
-            if (!state.igt_active_) return;
-            time_ticks = state.current_total_igt_;
-            break;
+
+    if (state.GetOption(OPT_COUNTDOWN_TIMER)) {
+        if (GetSWByte(GSW_CountdownTimerTriggered)) {
+            time_ticks = 0;
+        } else {
+            time_ticks = GetCountdownTicksLeft();
+            if (time_ticks == 0) SetSWByte(GSW_CountdownTimerTriggered, 1);
         }
-        case OPTVAL_TIMER_RTA: {
-            time_ticks = GetRTATime() - state.run_start_time_rta_;
-            color = 0xd0d0ffffU;
-            break;
-        }
-        default: {
-            return;
+        // Make timer become more red during the last 10 minutes.
+        int32_t low_time_centis = 10 * 60 * 100;
+        int32_t centis_left = Clamp(
+            (int32_t)DurationTicksToCentiseconds(time_ticks), 0, low_time_centis);
+        int32_t lightness = 128 * (0.5f + (1.0f * centis_left / low_time_centis));
+        color = 0xff0000ffU | (lightness * 0x010100);
+    } else {
+        switch (state.GetOptionValue(OPT_TIMER_DISPLAY)) {
+            case OPTVAL_TIMER_IGT: {
+                if (!state.igt_active_) return;
+                time_ticks = state.current_total_igt_;
+                break;
+            }
+            case OPTVAL_TIMER_RTA: {
+                time_ticks = GetCurrentRTATicks() - state.run_start_time_rta_;
+                color = 0xd0d0ffffU;
+                break;
+            }
+            default: {
+                return;
+            }
         }
     }
     
@@ -94,7 +128,7 @@ int32_t TimerManager::GetCurrentRunTotalTimeCentis() {
     auto& state = g_Mod->state_;
     if (state.CheckOptionValue(OPTVAL_TIMER_RTA)) {
         return DurationTicksToCentiseconds(
-            GetRTATime() - state.run_start_time_rta_);
+            GetCurrentRTATicks() - state.run_start_time_rta_);
     }
     return DurationTicksToCentiseconds(state.current_total_igt_);
 }

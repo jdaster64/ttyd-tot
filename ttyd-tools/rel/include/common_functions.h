@@ -53,6 +53,8 @@ uint32_t GetShiftedBitMask(uint32_t x, uint32_t start_bit, uint32_t end_bit);
 // Returns the number of characters printed to the string.
 int32_t IntegerToFmtString(
     int32_t val, char* out_buf, int32_t max_val = 999'999'999);
+// Converts a duration expressed in centiseconds to OSTicks.
+uint64_t DurationCentisecondsToTicks(int32_t val);
 // Converts a duration expressed in OSTicks (40.5M / sec) to centiseconds.
 uint32_t DurationTicksToCentiseconds(int64_t val);
 // Converts a duration expressed in OSTicks (40.5M / sec) to HH:MM:SS.ss parts.

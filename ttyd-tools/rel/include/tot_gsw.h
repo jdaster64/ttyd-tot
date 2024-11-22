@@ -19,6 +19,7 @@ enum GlobalWorkVars {
     GSW_NpcA_SpecialConversation,
     GSW_NpcF_CurrentConversation,
     GSW_Battle_AtomicBoo_BreathGuardCount,
+    GSW_CountdownTimerTriggered,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),

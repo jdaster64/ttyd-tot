@@ -679,6 +679,8 @@ void OptionsManager::OnRunStart() {
     SetSWF(GSWF_RunSettingsCleared, 0);
     // Clear state of Koopa's "run results" conversation.
     SetSWByte(GSW_NpcA_SpecialConversation, 0);
+    // Clear state of countdown timer having triggered.
+    SetSWByte(GSW_CountdownTimerTriggered, 0);
     
     // Start timers and mark run as started.
     state.SetOption(OPT_RUN_STARTED, 1);

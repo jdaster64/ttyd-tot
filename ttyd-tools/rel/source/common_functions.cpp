@@ -143,6 +143,13 @@ int32_t IntegerToFmtString(int32_t val, char* out_buf, int32_t max_val) {
     return sprintf(out_buf, "%" PRId32, val);
 }
 
+uint64_t DurationCentisecondsToTicks(int32_t val) {
+    const uint64_t kTicksPerCentisecond =
+        *reinterpret_cast<const int32_t*>(0x800000f8) / 400;
+    if (val < 0) val = 0;
+    return val * kTicksPerCentisecond;
+}
+
 uint32_t DurationTicksToCentiseconds(int64_t val) {
     const int32_t kTicksPerCentisecond =
         *reinterpret_cast<const int32_t*>(0x800000f8) / 400;

@@ -18,7 +18,6 @@ public:
     static int32_t GetCurrentRunTotalBattleTimeCentis();
     static int32_t GetNumberOfBattles();
 };
-
 // Toggles the in-game timer on or off.
 EVT_DECLARE_USER_FUNC(evtTot_ToggleIGT, 1)
 // Tracks the completion.
