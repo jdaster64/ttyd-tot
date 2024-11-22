@@ -241,6 +241,9 @@ bool HasAllMovesUnlocked(int32_t reward_type) {
     int32_t move_start = 0;
     int32_t num_moves = 0;
     GetMoveRange(reward_type, move_start, num_moves);
+
+    // If playing with limit, return early if already reached.
+    if (MoveManager::HasReachedLimit(move_start)) return true;
     
     for (int32_t i = 0; i < num_moves; ++i) {
         int32_t move = move_start + i;
@@ -323,6 +326,9 @@ int32_t SelectSpecialMove() {
     const int32_t max_sp = pouch.max_sp / 100;
     uint16_t weights[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     int32_t total_weight = 0;
+
+    // If playing with limit, return early if already reached.
+    if (MoveManager::HasReachedLimit(MoveType::SP_SWEET_TREAT)) return true;
     
     for (int32_t i = 2; i < 8; ++i) {
         auto* data = MoveManager::GetMoveData(MoveType::SP_SWEET_TREAT + i);

@@ -183,6 +183,9 @@ public:
     static const char* GetLogDescription(int32_t move_type);
     // Returns true if the partner for the given move has never been unlocked.
     static bool PartnerNeverObtained(int32_t move_type);
+
+    // Checks whether moves of a particular type have reached their limit.
+    static bool HasReachedLimit(int32_t move_base);
 };
 
 // battle_weapon_power-like interface for scaling ATK based on a move.

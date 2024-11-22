@@ -415,6 +415,32 @@ bool MoveManager::PartnerNeverObtained(int32_t move_type) {
     return !(g_Mod->state_.GetOption(STAT_PERM_PARTNERS_OBTAINED) & partner_flag);
 }
 
+bool MoveManager::HasReachedLimit(int32_t move_base) {
+    int32_t limit = 5 - g_Mod->state_.GetOption(OPT_MOVE_LIMIT);
+    if (limit == 5) return false;
+
+    // Get number of moves, and make sure that untaken partners aren't skipped.
+    int32_t num_moves = 8;
+    if (move_base >= MoveType::GOOMBELLA_BASE) {
+        num_moves = 6;
+
+        int32_t id = g_MoveData[move_base].partner_id;
+        if (!(ttyd::mario_pouch::pouchGetPtr()->party_data[id].flags & 1)) {
+            return false;
+        }
+    }
+    
+    // Count number of non-default moves unlocked for the given type.
+    int32_t unlocked = 0;
+    for (int32_t move = move_base; move < move_base + num_moves; ++move) {
+        if (g_MoveData[move].move_tier > 0 &&
+            g_Mod->state_.GetOption(STAT_RUN_MOVE_LV_UNLOCKED, move)) {
+            ++unlocked;
+        }
+    }
+    return unlocked >= limit;
+}
+
 uint32_t GetWeaponPowerFromSelectedLevel(
     BattleWorkUnit* unit1, BattleWeapon* weapon, BattleWorkUnit* unit2,
     BattleWorkUnitPart* part) {
