@@ -3,6 +3,7 @@
 #include "common_functions.h"
 #include "common_types.h"
 #include "mod.h"
+#include "tot_gsw.h"
 #include "tot_manager_debug.h"
 #include "tot_state.h"
 
@@ -28,6 +29,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Constants for secret codes.
 uint32_t secretCode_DebugMode       = 036363636;
 uint32_t secretCode_BumpAttack      = 043652131;
+uint32_t secretCode_CountdownKill   = 037373737;
 
 }
 
@@ -44,6 +46,7 @@ void CheatsManager::Update() {
     if (ttyd::system::keyGetButtonTrg(0) & ButtonId::R) code = 4;
     if (ttyd::system::keyGetButtonTrg(0) & ButtonId::X) code = 5;
     if (ttyd::system::keyGetButtonTrg(0) & ButtonId::Y) code = 6;
+    if (ttyd::system::keyGetButtonTrg(0) & ButtonId::Z) code = 7;
     if (code) code_history = (code_history << 3) | code;
 
     if ((code_history & 0xFFFFFF) == secretCode_DebugMode) {
@@ -58,6 +61,12 @@ void CheatsManager::Update() {
             ttyd::mario_pouch::pouchGetItem(ItemType::BUMP_ATTACK);
             ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
         }
+    }
+
+    if ((code_history & 0xFFFFFF) == secretCode_CountdownKill) {
+        code_history = 0;
+        SetSWByte(GSW_CountdownTimerState, 2);
+        ttyd::sound::SoundEfxPlayEx(0x265, 0, 0x64, 0x40);
     }
 }
 

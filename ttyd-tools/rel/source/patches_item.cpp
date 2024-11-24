@@ -474,7 +474,7 @@ void ApplyFixedPatches() {
     static const constexpr uint32_t kPriceTiers[] = {
         // Items / recipes.
         0x5a866873, 0x5a335335, 0xb7423343, 0x44474215, 0x03001676,
-        0x00800006, 0x40864330, 0xa0005000, 0x036bba80, 0x08086650,
+        0x00800006, 0x40864330, 0xa0005000, 0x056bba80, 0x08086650,
         0x00760057, 0x00000bb6, 0x85455809, 0x00000060,
         // Badges.
         0xb8a88dbb, 0xdd9d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,

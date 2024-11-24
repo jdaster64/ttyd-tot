@@ -66,11 +66,11 @@ void TimerManager::Draw() {
     uint64_t time_ticks;
 
     if (state.GetOption(OPT_COUNTDOWN_TIMER)) {
-        if (GetSWByte(GSW_CountdownTimerTriggered)) {
+        if (GetSWByte(GSW_CountdownTimerState) >= 2) {
             time_ticks = 0;
         } else {
             time_ticks = GetCountdownTicksLeft();
-            if (time_ticks == 0) SetSWByte(GSW_CountdownTimerTriggered, 1);
+            if (time_ticks == 0) SetSWByte(GSW_CountdownTimerState, 2);
         }
         // Make timer become more red during the last 10 minutes.
         int32_t low_time_centis = 10 * 60 * 100;

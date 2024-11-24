@@ -111,6 +111,7 @@ EVT_DECLARE_USER_FUNC(evtTot_OverrideLockKey, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SetPreviousPartner, 1)
 EVT_DECLARE_USER_FUNC(evtTot_UpdateDestinationMap, 0)
 EVT_DECLARE_USER_FUNC(evtTot_WaitForDragonLanding, 1)
+EVT_DECLARE_USER_FUNC(evtTot_WaitForPlayerActionable, 0)
 EVT_DECLARE_USER_FUNC(evtTot_WaitNpcAnimFrame, 2)
 
 // Other declarations.
@@ -352,11 +353,13 @@ EVT_BEGIN(Tower_SpawnHeartSaveBlock)
             0, 0, 0, 0, 0, 0, 0)
     END_IF()
 
-    // Spawn save block, but only on boss floors.
+    // Spawn save block, but only on boss floors, and not with countdown timer.
     USER_FUNC(evtTot_GetFloor, LW(3))
     IF_LARGE(LW(3), 0)
         IF_EQUAL(LW(4), 0)
-            USER_FUNC(evt_mobj_save_blk, PTR("sbox"), LW(6), LW(7), LW(8), 0, 0)
+            IF_EQUAL((int32_t)GSW_CountdownTimerState, 0)
+                USER_FUNC(evt_mobj_save_blk, PTR("sbox"), LW(6), LW(7), LW(8), 0, 0)
+            END_IF()
         END_IF()
     END_IF()
     
@@ -495,7 +498,156 @@ EVT_BEGIN(Tower_OpenExit)
     RETURN()
 EVT_END()
 
-EVT_BEGIN(Tower_RunGameOverScript)
+// LW(15) input:
+// - Died to timeout on field - 0
+// - Died to regular battle loss - 1
+// - Died to battle loss due to timeout - 3
+EVT_BEGIN(Tower_TimeUpScript)
+    USER_FUNC(evtTot_ToggleIGT, 0)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
+    USER_FUNC(evt_mario_dispflag_onoff, 1, 2)
+    USER_FUNC(evt_mario_key_onoff, 0)
+
+    // Start camera shake.
+    INLINE_EVT()
+        USER_FUNC(evt_snd_sfxon, PTR("SFX_STG2_QUAKE2"), EVT_NULLPTR)
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.00), FLOAT(0.01), 10000)
+    END_INLINE()
+
+    // Party reactions.
+    INLINE_EVT()
+        IF_EQUAL(LW(15), 0)
+            WAIT_MSEC(100)
+            USER_FUNC(evt_eff_fukidashi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60)
+            WAIT_MSEC(1500)
+            USER_FUNC(evt_mario_set_pose, PTR("M_I_O"))
+            WAIT_FRM(3)
+            USER_FUNC(evt_party_cont_onoff, 0, 0)
+            USER_FUNC(evt_mario_get_party, LW(0))
+            SWITCH(LW(0))
+                CASE_EQUAL(1)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PKR_D_1"))
+                CASE_EQUAL(2)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PNK_D_1"))
+                CASE_EQUAL(3)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("D_1"))
+                CASE_EQUAL(4)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PYS_D_1"))
+                CASE_EQUAL(5)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PWD_D_1"))
+                CASE_EQUAL(6)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PTR_D_1"))
+                CASE_EQUAL(7)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PCH_D_1"))
+            END_SWITCH()
+        ELSE()
+            USER_FUNC(evt_mario_set_pose, PTR("M_D_2"))
+            WAIT_FRM(3)
+            USER_FUNC(evt_party_cont_onoff, 0, 0)
+            USER_FUNC(evt_mario_get_party, LW(0))
+            SWITCH(LW(0))
+                CASE_EQUAL(1)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PKR_D_3"))
+                CASE_EQUAL(2)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PNK_D_3"))
+                CASE_EQUAL(3)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("D_3"))
+                CASE_EQUAL(4)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PYS_D_3"))
+                CASE_EQUAL(5)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PWD_D_3"))
+                CASE_EQUAL(6)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PTR_D_3"))
+                CASE_EQUAL(7)
+                    USER_FUNC(evt_party_set_pose, 0, PTR("PCH_D_3"))
+            END_SWITCH()
+        END_IF()
+    END_INLINE()
+
+    // Wait for explosions only if event started on the field.
+    IF_EQUAL(LW(15), 0)
+        WAIT_MSEC(1000)
+    END_IF()
+
+    // Initial, small explosions.
+    DO(10)
+        WAIT_MSEC(350)
+        USER_FUNC(evt_sub_random, 350, LW(0))
+        USER_FUNC(evt_sub_random, 150, LW(1))
+        USER_FUNC(evt_sub_random, 300, LW(2))
+        SUB(LW(0), 175)
+        SUB(LW(2), 150)
+        USER_FUNC(
+            evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
+            0, 0, 0, 0, 0, 0, 0)
+        USER_FUNC(evt_snd_sfxon, PTR("SFX_EVT_LOTTERY_BOMB_BURST1"), EVT_NULLPTR)
+    WHILE()
+
+    WAIT_MSEC(1000)
+
+    // Big series of explosions all at once.
+    INLINE_EVT()
+        USER_FUNC(evt_snd_sfxon, PTR("SFX_EVT_LOTTERY_BOMB_BURST1"), EVT_NULLPTR)
+        DO(30)
+            USER_FUNC(evt_sub_random, 200, LW(0))
+            USER_FUNC(evt_sub_random, 75, LW(1))
+            USER_FUNC(evt_sub_random, 75, LW(2))
+            SUB(LW(0), 100)
+            ADD(LW(2), 150)
+            USER_FUNC(
+                evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2),
+                FLOAT(5.0), 0, 0, 0, 0, 0, 0, 0)
+            SUB(LW(2), 5)
+            USER_FUNC(
+                evt_eff, PTR(""), PTR("kemuri_test"), 6, LW(0), LW(1), LW(2),
+                FLOAT(5.0), 0, 0, 0, 0, 0, 0, 0)
+            WAIT_MSEC(50)
+        WHILE()
+    END_INLINE()
+    
+    // Set Koopa's "run results" conversation to appropriate value.
+    IF_EQUAL(LW(15), 1)
+        // Died to battle normally.
+        SET((int32_t)GSW_NpcA_SpecialConversation, 20)
+    ELSE()
+        // Died to timeup, on field or in battle.
+        SET((int32_t)GSW_NpcA_SpecialConversation, 40)
+    END_IF()
+    
+    USER_FUNC(evtTot_ClearBattleResult)
+    WAIT_MSEC(100)
+
+    // Despawn partner, reload into lobby.
+    USER_FUNC(evt_mario_goodbye_party, 0)
+    USER_FUNC(evtTot_SetPreviousPartner, 0)
+    USER_FUNC(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    USER_FUNC(evt_bero_mapchange, PTR("gon_00"), PTR("w_bero"))
+
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_CheckTimeUp)
+    DO(0)
+        IF_EQUAL((int32_t)GSW_CountdownTimerState, 2)
+            USER_FUNC(evtTot_WaitForPlayerActionable)
+            SET(LW(15), 0)
+            RUN_CHILD_EVT(&Tower_TimeUpScript)
+            RETURN()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_GameOverScript)
+    // Call time-up script instead.
+    IF_LARGE_EQUAL((int32_t)GSW_CountdownTimerState, 1)
+        SET(LW(15), (int32_t)GSW_CountdownTimerState)
+        SET((int32_t)GSW_CountdownTimerState, 3)
+        RUN_CHILD_EVT(&Tower_TimeUpScript)
+        RETURN()
+    END_IF()
+
     USER_FUNC(evtTot_ToggleIGT, 0)
     USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
     USER_FUNC(evt_mario_dispflag_onoff, 1, 2)
@@ -569,7 +721,7 @@ EVT_BEGIN(Tower_CheckGameOver)
     DO(0)
         USER_FUNC(evt_npc_get_battle_result, LW(0))
         IF_EQUAL(LW(0), 3)
-            RUN_CHILD_EVT(&Tower_RunGameOverScript)
+            RUN_CHILD_EVT(&Tower_GameOverScript)
             RETURN()
         END_IF()
         WAIT_FRM(1)
@@ -790,7 +942,7 @@ EVT_BEGIN(Tower_FinalBossEvent)
         USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("door10"), 1)
         USER_FUNC(evt_mapobj_flag_onoff, 1, 0, PTR("kesu"), 1)
         USER_FUNC(evt_cam3d_evt_off, 0, 11)
-        RUN_CHILD_EVT(&Tower_RunGameOverScript)
+        RUN_CHILD_EVT(&Tower_GameOverScript)
         RETURN()
     END_IF()
     
@@ -962,7 +1114,7 @@ EVT_BEGIN(Tower_GoldFuzzyBossEvent)
         USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
         USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
         USER_FUNC(evt_cam3d_evt_off, 0, 11)
-        RUN_CHILD_EVT(&Tower_RunGameOverScript)
+        RUN_CHILD_EVT(&Tower_GameOverScript)
         RETURN()
     END_IF()
     
@@ -1066,6 +1218,12 @@ EVT_BEGIN(Tower_WaitForChestOpen)
     INLINE_EVT()
         LBL(2)
         WAIT_FRM(1)
+
+        // Quit early if countdown timer is elapsed.
+        IF_LARGE_EQUAL((int32_t)GSW_CountdownTimerState, 2)
+            RETURN()
+        END_IF()
+
         IF_EQUAL((int32_t)GSW_Tower_ChestClaimed, 0)
             IF_LARGE_EQUAL((int32_t)GSW_Tower_DisplayChestIcons, 1)
                 USER_FUNC(evtTot_DisplayChestIcons)
@@ -1121,7 +1279,11 @@ EVT_BEGIN(Tower_EnemySetup)
                 GOTO(1)
             END_IF()
             SET(LW(15), 0)
-            RUN_EVT(Tower_OpenGrate)
+
+            // Don't run grate opening animation if countdown timer is elapsed.
+            IF_SMALL((int32_t)GSW_CountdownTimerState, 2)
+                RUN_EVT(Tower_OpenGrate)
+            END_IF()
         END_INLINE()
     
         // Wait for a chest to be opened, then unlock the exit (if necessary).
@@ -1292,6 +1454,11 @@ EVT_BEGIN(gon_01_InitEvt)
         USER_FUNC(evt_snd_set_rev_mode, 2)
     END_IF()
     
+    // If countdown timer is enabled, spawn event waiting for it to hit 0.
+    IF_LARGE((int32_t)GSW_CountdownTimerState, 0)
+        RUN_EVT(Tower_CheckTimeUp)
+    END_IF()
+    
     USER_FUNC(evtTot_ToggleIGT, 1)
 
     RETURN()
@@ -1423,6 +1590,11 @@ EVT_DEFINE_USER_FUNC(evtTot_WaitForDragonLanding) {
     auto npc_name = (const char*)evtGetValue(evt, evt->evtArguments[0]);
     ttyd::npcdrv::NpcEntry* npc = ttyd::npcdrv::npcNameToPtr(npc_name);
     return npc->wKpaMobjDeadCheck ? 2 : 0;
+}
+
+// Wait for Mario to not have his controls disabled.
+EVT_DEFINE_USER_FUNC(evtTot_WaitForPlayerActionable) {
+    return ttyd::mario::marioKeyOffChk() ? 0 : 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_WaitNpcAnimFrame) {

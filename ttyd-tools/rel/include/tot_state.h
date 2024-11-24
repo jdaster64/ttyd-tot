@@ -463,7 +463,7 @@ enum Options : uint32_t {
     OPTVAL_MOVE_LIMIT_1         = 0x54e'3'00'04,
     OPTVAL_MOVE_LIMIT_0         = 0x54e'3'00'05,
 
-    // Countdown timer (not supported yet).
+    // Countdown timer.
     OPT_COUNTDOWN_TIMER         = 0x451'4'00'0b,
     OPTVAL_COUNTDOWN_OFF        = 0x451'4'00'00,
     // Next: 0x455

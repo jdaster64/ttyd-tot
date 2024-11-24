@@ -102,6 +102,7 @@ namespace ConversationId {
         NPC_A_W_EXDIFF,
         NPC_A_W_TIME,
         NPC_A_W_INTENSITY,
+        NPC_A_L_TIMEUP      = 11440,
 
         // NPC - East Petalburg gatekeeper
         NPC_GATEKEEPER      = 12000,

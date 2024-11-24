@@ -138,7 +138,8 @@ struct BattleWorkCommand {
     BattleWorkCommandMultiItem  multi_item_table[3];
     BattleWorkCommandCursor     cursor_table[14];
     int32_t         current_cursor_type;
-    int8_t          unk_544[0x18];
+    int32_t         unk_544;
+    int8_t          unk_548[0x14];
     void*           window_work;
     int8_t          unk_560[0x4];
     int32_t         selection_error_msg;
@@ -615,9 +616,9 @@ battle_unit::BattleWorkUnit* BattleGetUnitPtr(
     BattleWork* battleWork, int32_t idx);
 // BattleFree
 void* BattleAlloc(int32_t size);
-// BattleIncSeq
+void BattleIncSeq(BattleWork* battleWork, int32_t level);
 int32_t BattleGetSeq(BattleWork* battleWork, int32_t level);
-// BattleSetSeq
+void BattleSetSeq(BattleWork* battleWork, int32_t level, int32_t state);
 // BattleSetMarioParamToFieldBattle
 void Btl_UnitSetup(BattleWork* battleWork);
 // BattleEnd

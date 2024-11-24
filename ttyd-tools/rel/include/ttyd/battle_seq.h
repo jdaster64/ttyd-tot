@@ -17,7 +17,7 @@ extern "C" {
 // _mapobj_data_touch_scale
 uint32_t BattleCheckConcluded(ttyd::battle::BattleWork* battleWork);
 // BattleWaitAllActiveEvtEnd_NoBgSetEndWait
-// BattleWaitAllActiveEvtEnd
+int32_t BattleWaitAllActiveEvtEnd(ttyd::battle::BattleWork* battleWork);
 // battleMakePhaseEvtTable
 // battleSortPhaseMoveTable
 // btlseqPhaseFirstProcess

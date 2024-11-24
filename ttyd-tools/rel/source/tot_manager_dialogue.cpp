@@ -103,6 +103,7 @@ void DialogueManager::SetConversation(int32_t id) {
                     // New personal intensity record cleared.
                     g_ConversationId = ConversationId::NPC_A_W_INTENSITY;
                     break;
+                case 40:    // TODO: Add time-up message.
                 case 20: {
                     // Generic loss message.
                     g_ConversationId = ConversationId::NPC_A_L;

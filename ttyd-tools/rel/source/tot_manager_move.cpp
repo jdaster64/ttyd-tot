@@ -449,7 +449,7 @@ uint32_t GetWeaponPowerFromSelectedLevel(
     const int32_t move = weapon->damage_function_params[7];
     const int32_t ac_success =
         g_BattleWork->ac_manager_work.ac_result == 2 ? 1 : 0;
-    int32_t level = MoveManager::GetUnlockedLevel(move);
+    int32_t level = MoveManager::GetSelectedLevel(move);
     // To prevent issues with Spin Jump first strike if Spring Jump taken first.
     if (level < 1) level = 1;
         

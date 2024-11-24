@@ -29,7 +29,7 @@ void* BattleSetConfuseAct(
 // BattleGetSelectWeapon
 void _btlcmd_SetAttackEvent(
     battle_unit::BattleWorkUnit* unit, battle::BattleWorkCommand* command_work);
-// BattleCommandDisplay_AllEnd
+void BattleCommandDisplay_AllEnd(battle::BattleWork* battleWork);
 // BattleCommandDisplay_ProtectPartnerSelectMenuEnd
 // BattleCommandDisplay_ProtectPartnerSelectMenuDisp
 // BattleCommandDisplay_ProtectPartnerSelectMenuSetup
@@ -62,7 +62,7 @@ void _btlcmd_SetAttackEvent(
 // BattleCommandDisplay_ActMenuSetup
 // _cursor_init
 // BattleCommandDisplay
-// BattleCommandInput
+int32_t BattleCommandInput(battle::BattleWork* battleWork);
 // _btlcmd_SelectWeaponDecide
 // _btlcmd_MakePartyTable
 // _battleGetPartyIcon

@@ -25,6 +25,7 @@
 #include <ttyd/battle_unit.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_item.h>
+#include <ttyd/evt_snd.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/item_data.h>
@@ -102,6 +103,9 @@ namespace mod::tot::patch {
 
 namespace {
 
+// For convenience.
+using namespace ::ttyd::battle_event_cmd;
+
 using ::ttyd::battle::BattleWork;
 using ::ttyd::battle_database_common::BattleGroupSetup;
 using ::ttyd::battle_database_common::BattleWeapon;
@@ -126,9 +130,11 @@ extern void (*g_seq_battleInit_trampoline)(void);
 extern void (*g_fbatBattleMode_trampoline)(void);
 extern void (*g_Btl_UnitSetup_trampoline)(BattleWork*);
 extern void (*g_BtlActRec_JudgeRuleKeep_trampoline)(void);
+extern int32_t (*g_BattleWaitAllActiveEvtEnd_trampoline)(BattleWork*);
 extern void (*g__rule_disp_trampoline)(void);
 extern BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t);
 extern int32_t (*g_BattleSeqCmd_get_msg_trampoline)(EvtEntry*, bool);
+extern int32_t (*g_BattleCommandInput_trampoline)(BattleWork*);
 extern void (*g__btlcmd_UpdateSelectWeaponTable_trampoline)(
     BattleWork*, int32_t);
 extern int32_t (*g__btlcmd_MakeSelectWeaponTable_trampoline)(
@@ -189,6 +195,21 @@ EVT_BEGIN(SpawnCoinsEvtHook)
 RUN_CHILD_EVT(SpawnCoinsEvt)
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 EVT_PATCH_END()
+
+EVT_BEGIN(CountdownKillEvt)
+    USER_FUNC(ttyd::evt_snd::evt_snd_sfxon, PTR("SFX_BTL_THUNDERS_ATTACK4"), 0)
+    USER_FUNC(ttyd::evt_eff::evt_eff, PTR(""), PTR("sandars"), 
+        3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(btlevtcmd_DamageDirect, -3, 1, 99, 0x100, 3, 0)
+    USER_FUNC(btlevtcmd_GetUnitId, -4, LW(15))
+    IF_NOT_EQUAL(LW(15), -1)
+        USER_FUNC(btlevtcmd_GetHp, -4, LW(15))
+        IF_LARGE(LW(15), 0)
+            USER_FUNC(btlevtcmd_DamageDirect, -4, 1, 99, 0x100, 3, 0)
+        END_IF()
+    END_IF()
+    RETURN()
+EVT_END()
 
 // Copies NPC battle information to / from children of a parent NPC
 // (e.g. Piranha Plants, projectiles) when starting or ending a battle.
@@ -603,6 +624,52 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_btlseqTurn_SpGradualRecoveryProc_BH),
         reinterpret_cast<void*>(StartCheckGradualSpRecovery),
         reinterpret_cast<void*>(BranchBackCheckGradualSpRecovery));
+
+    // Handle Countdown Timer in-battle...
+    // On player's turn, wrest control if timer elapses.
+    g_BattleCommandInput_trampoline = mod::hookFunction(
+        ttyd::battle_seq_command::BattleCommandInput, [](BattleWork* battleWork) {
+            // Run original logic.
+            int32_t result = g_BattleCommandInput_trampoline(battleWork);
+            // Check for countdown timer elapsing, and end turn if so.
+            if (GetSWByte(GSW_CountdownTimerState) >= 2) {
+                auto* command_work = &battleWork->command_work;
+                command_work->unk_548[0x558 - 0x548] = 1;
+                if (command_work->state == 12 || command_work->state == 13) {
+                    command_work->unk_548[0x558 - 0x548] = 2;
+                }
+                ttyd::battle_seq_command::BattleCommandDisplay_AllEnd(battleWork);
+                command_work->unk_544 = command_work->current_cursor_type;
+                // Out of range, will end attack immediately.
+                command_work->current_cursor_type = 14;
+                command_work->state = 29;
+            }
+            return result;
+        });
+    // When blocking on an event after an action, if timer is up, kill player.
+    g_BattleWaitAllActiveEvtEnd_trampoline = mod::hookFunction(
+        ttyd::battle_seq::BattleWaitAllActiveEvtEnd, [](BattleWork* battleWork) {
+            // Run original logic.
+            int32_t result = g_BattleWaitAllActiveEvtEnd_trampoline(battleWork);
+            if (result && GetSWByte(GSW_CountdownTimerState) >= 2) {
+                // If attack ending, and battle would not otherwise end...
+                if (ttyd::battle::BattleGetSeq(battleWork, 6) == 0x6000007 &&
+                    !ttyd::battle_seq::BattleCheckConcluded(battleWork)) {
+                    // Remove Life Shrooms and do direct lethal damage to party.
+                    while (ttyd::mario_pouch::pouchCheckItem(ItemType::LIFE_SHROOM)) {
+                        ttyd::mario_pouch::pouchRemoveItem(ItemType::LIFE_SHROOM);
+                    }
+                    ttyd::evtmgr::evtEntry(
+                        const_cast<int32_t*>(CountdownKillEvt), 10, 0);
+                    ttyd::battle::BattleSetSeq(battleWork, 0, 3);
+                    ttyd::battle::BattleSetSeq(battleWork, 7, 0x7000000);
+                    battleWork->fbat_info->wResult = 3;
+                    SetSWByte(GSW_CountdownTimerState, 3);
+                    return 1;
+                }
+            }
+            return result;
+        });
 }
 
 int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {

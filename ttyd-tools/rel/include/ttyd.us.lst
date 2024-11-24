@@ -2218,6 +2218,7 @@
 
 // battle_seq.o
 8011aa34:BattleCheckConcluded
+8011ace8:BattleWaitAllActiveEvtEnd
 8011c350:_rule_disp
 8011edb8:_GetFirstAttackWeapon
 

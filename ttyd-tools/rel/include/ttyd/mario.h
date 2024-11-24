@@ -163,7 +163,7 @@ uint16_t marioSetMutekiTime(int32_t msec);
 // marioCtrlOff2
 // marioCtrlOn
 // marioCtrlOff
-// marioKeyOffChk
+int32_t marioKeyOffChk();
 // marioCtrlOffChk
 // marioFBattlePost
 // marioFBattlePrepare
