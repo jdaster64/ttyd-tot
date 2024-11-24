@@ -1256,8 +1256,8 @@ g_GlobalStrings = {
     b"tot_winsel_whichduds":      b"Which getup?",
     b"tot_winsel_whichones":      b"Which ones?",
     
-    b"tot_winsel_movesel_cnt":
-        b"Moves Picked",
+    b"tot_winsel_movesel_cnt":    b"Moves Picked",
+    b"tot_winsel_movesel_reset":  b"Reset All",
         
     b"tot_winsel_movesel_help":
         b" Note: Selections must follow\n"
