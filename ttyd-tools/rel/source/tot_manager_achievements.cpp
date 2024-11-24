@@ -69,7 +69,7 @@ const AchievementData g_AchievementData[] = {
     { "tot_achd_41", nullptr, 6, AchievementRewardType::HAMMER, 0 },
     { "tot_achd_42", "tot_acho_invincrease", 63, AchievementRewardType::OPTION, OPT_INVENTORY_SACK_SIZE },
     { "tot_achd_43", nullptr, 5, AchievementRewardType::MARIO_COSTUME, 16 },
-    { "tot_achd_44", nullptr, 20, AchievementRewardType::MARIO_COSTUME, 18 },
+    { "tot_achd_44", nullptr, 40, AchievementRewardType::MARIO_COSTUME, 18 },
     { "tot_achd_45", nullptr, 41, AchievementRewardType::YOSHI_COSTUME, 11 },
     { "tot_achd_46", nullptr, 29, AchievementRewardType::YOSHI_COSTUME, 17 },
     { "tot_achd_47", nullptr, 16, AchievementRewardType::ATTACK_FX, 7 },
@@ -92,7 +92,7 @@ const AchievementData g_AchievementData[] = {
     { "tot_achd_64", nullptr, 1, AchievementRewardType::YOSHI_COSTUME, 19 },
     { "tot_achd_65", nullptr, 78, AchievementRewardType::YOSHI_COSTUME, 21 },
     { "tot_achd_66", nullptr, 70, AchievementRewardType::MARIO_COSTUME, 22 },
-    { "tot_achd_67", nullptr, 0, AchievementRewardType::MARIO_COSTUME, 23 },
+    { "tot_achd_67", nullptr, 20, AchievementRewardType::MARIO_COSTUME, 23 },
     { "tot_achd_68", nullptr, 79, AchievementRewardType::MARIO_COSTUME, 26 },
     { "tot_achd_69", nullptr, 9, AchievementRewardType::YOSHI_COSTUME, 18 },
     { "tot_achd_70", "tot_acho_movea", 22, AchievementRewardType::OPTION, OPT_MOVE_AVAILABILITY },
@@ -100,7 +100,7 @@ const AchievementData g_AchievementData[] = {
     { "tot_achd_72", "tot_acho_runaway", 56, AchievementRewardType::OPTION, OPT_RUN_AWAY },
     { "tot_achd_73", "tot_acho_stageh", 51, AchievementRewardType::OPTION, OPT_STAGE_HAZARDS },
     { "tot_achd_74", nullptr, 57, AchievementRewardType::MARIO_COSTUME, 27 },
-    { "tot_achd_75", nullptr, 40, AchievementRewardType::MARIO_COSTUME, 28 },
+    { "tot_achd_75", nullptr, 0, AchievementRewardType::MARIO_COSTUME, 28 },
     { "tot_achd_76", nullptr, 13, AchievementRewardType::YOSHI_COSTUME, 22 },
     { "tot_achd_77", nullptr, 14, AchievementRewardType::YOSHI_COSTUME, 23 },
     { "tot_achd_78", nullptr, 8, AchievementRewardType::YOSHI_COSTUME, 24 },
@@ -126,7 +126,7 @@ bool AchievementsManager::IsSecret(int32_t ach) {
     switch (ach) {
         case AchievementId::SECRET_COINS:
         case AchievementId::SECRET_DAMAGE:
-        case AchievementId::SECRET_INFATUATE:
+        case AchievementId::V2_SECRET_RUN_HAMMERMAN:
         case AchievementId::SECRET_ZERO_STATS_3:
             return true;
     }

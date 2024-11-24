@@ -657,7 +657,6 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = MARIO_MODEL_PATHS("U", true),
         .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 22,
-        .secret = true,
         .group_id = 23,
     },
     {
@@ -704,6 +703,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = MARIO_MODEL_PATHS("7", true),
         .price = 20,
         .icon = IconType::MARIO_COSTUME_27,
+        .secret = true,
         .group_id = 28,
     },
 };

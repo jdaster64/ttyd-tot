@@ -2277,8 +2277,8 @@ g_GlobalStrings = {
         b"Prevent an enemy from Charging\n"
         b"by using Allergic status.",
     b"tot_achd_75":
-        b"Defeat a flying midboss with a\n"
-        b"Hammer move.",
+        b"Finish a run with Mario only\n"
+        b"using Hammer moves and Defend.",
     b"tot_achd_76":
         b"Earn 100 coins from a single\n"
         b"battle.",

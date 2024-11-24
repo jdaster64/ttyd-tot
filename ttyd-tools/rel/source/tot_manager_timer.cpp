@@ -295,6 +295,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     if (state.GetOption(STAT_RUN_TRADE_OFF_ON_BOSS)) {
         AchievementsManager::MarkCompleted(AchievementId::MISC_TRADE_OFF_BOSS);
     }
+    
+    if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 1000) {
+        AchievementsManager::MarkCompleted(AchievementId::RUN_INFATUATE);
+    }
 
     bool all_moves_maxed = true;
     for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
@@ -324,10 +328,6 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
 
     if (state.GetOption(STAT_RUN_PLAYER_DAMAGE) == 654) {
         AchievementsManager::MarkCompleted(AchievementId::SECRET_DAMAGE);
-    }
-    
-    if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 1000) {
-        AchievementsManager::MarkCompleted(AchievementId::SECRET_INFATUATE);
     }
 
     if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
