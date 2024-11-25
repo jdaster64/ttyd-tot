@@ -2485,7 +2485,7 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
         // Draw "!" icon above achievements banner if there's a pending unlock.
         if (submenu.id == 6 && menu->log_menu_state == 0) {
             bool achievement_queued = false;
-            for (int32_t i = 0; i < 70; ++i) {
+            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
                 if (GetSWF(GSWF_AchUnlockQueue + i)) {
                     achievement_queued = true;
                     break;

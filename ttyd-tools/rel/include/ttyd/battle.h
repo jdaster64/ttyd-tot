@@ -139,7 +139,8 @@ struct BattleWorkCommand {
     BattleWorkCommandCursor     cursor_table[14];
     int32_t         current_cursor_type;
     int32_t         unk_544;
-    int8_t          unk_548[0x14];
+    int32_t         current_operation_type;  // When in "Tactics" menu
+    int8_t          unk_54c[0x10];
     void*           window_work;
     int8_t          unk_560[0x4];
     int32_t         selection_error_msg;

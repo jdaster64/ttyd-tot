@@ -550,7 +550,10 @@ enum Options : uint32_t {
     // Used as temporary storage for run rewards.
     STAT_RUN_META_COINS_EARNED  = 0x062'7'00'00,
     STAT_RUN_META_SP_EARNED     = 0x063'7'00'00,
-    // Next: 0x064
+    // Only used for v2 achievement tracking.
+    STAT_RUN_UNLOCK_MOVES_USED  = 0x064'4'00'00,
+    STAT_RUN_HAMMERMAN_FAILED   = 0x065'4'00'00,
+    // Next: 0x066
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 

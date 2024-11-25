@@ -2268,17 +2268,17 @@ g_GlobalStrings = {
         b"Finish a default run without\n"
         b"using any unlockable moves.",
     b"tot_achd_72":
-        b"Run away a total of 50 times\n"
+        b"Run away a total of 30 times\n"
         b"across all tower runs.",
     b"tot_achd_73":
         b"Inflict a single enemy with 5 or\n"
-        b"more statuses simultaneously.",
+        b"more status ailments at once.",
     b"tot_achd_74":
         b"Prevent an enemy from Charging\n"
         b"by using Allergic status.",
     b"tot_achd_75":
-        b"Finish a run with Mario only\n"
-        b"using Hammer moves and Defend.",
+        b"Finish a run with Mario using\n"
+        b"only Hammer moves and Tactics.",
     b"tot_achd_76":
         b"Earn 100 coins from a single\n"
         b"battle.",
@@ -2286,7 +2286,7 @@ g_GlobalStrings = {
         b"Use a 3+ SP Special Move on the\n"
         b"first turn of a battle.",
     b"tot_achd_78":
-        b"Finish a tower run with a 40%+\n"
+        b"Finish a tower run with a 45%+\n"
         b"Intensity Countdown Timer.\n"
         b"Cannot use any run settings\n"
         b"that lower total Intensity.",

@@ -219,11 +219,17 @@ void ApplyFixedPatches() {
             if (idx >= 0 && (
                 ttyd::seqdrv::seqGetNextSeq() == SeqIndex::kBattle ||
                 ttyd::battle::g_BattleWork->fbat_info->wResult == 1)) {
-                if (g_Mod->state_.GetOption(STAT_PERM_ENEMY_KILLS, idx) < 9999)
-                    g_Mod->state_.ChangeOption(STAT_PERM_ENEMY_KILLS, 1, idx);
                 g_Mod->state_.ChangeOption(STAT_PERM_ENEMIES_DEFEATED, 1);
 
-                // If a midboss, check off its flag and check if 50 diff met.
+                // Track kills, giving achievement if 100+ of a type defeated.
+                if (g_Mod->state_.GetOption(STAT_PERM_ENEMY_KILLS, idx) < 9999)
+                    g_Mod->state_.ChangeOption(STAT_PERM_ENEMY_KILLS, 1, idx);
+                    
+                if (g_Mod->state_.GetOption(STAT_PERM_ENEMY_KILLS, idx) >= 100)
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::V2_AGG_ENEMY_TIMES_100);
+
+                // If a midboss, check off its flag and check if 30 types met.
                 if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
                     g_Mod->state_.SetOption(FLAGS_MIDBOSS_DEFEATED, idx);
 

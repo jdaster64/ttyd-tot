@@ -364,6 +364,17 @@ void MoveManager::LogMoveUse(int32_t move_type) {
     if (move_type < MoveType::SP_SWEET_TREAT) {
         g_Mod->state_.ChangeOption(STAT_RUN_JUMPS_HAMMERS_USED);
     }
+    if (g_MoveData[move_type].move_tier > 0) {
+        g_Mod->state_.ChangeOption(STAT_RUN_UNLOCK_MOVES_USED);
+    }
+
+    // Mark completion of "Use a 3+ SP move on turn 1".
+    if (move_type >= MoveType::SP_SWEET_TREAT && 
+        move_type <= MoveType::SP_SUPERNOVA &&
+        g_MoveData[move_type].move_cost[level - 1] >= 3 &&
+        ttyd::battle::g_BattleWork->turn_count == 1) {
+        AchievementsManager::MarkCompleted(AchievementId::V2_MISC_SP_TURN1);
+    }
 
     // Check for new completion of "Using 10 different Lvl. 3 moves".
     int32_t lv3_uses = 0;
@@ -376,6 +387,7 @@ void MoveManager::LogMoveUse(int32_t move_type) {
     }
 
     // Check for move log completion.
+    AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_ALL_MOVES);
     AchievementsManager::CheckCompleted(AchievementId::META_MOVE_LOG_ALL);
 }
 

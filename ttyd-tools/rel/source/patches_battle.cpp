@@ -588,6 +588,34 @@ uint32_t GetStatusDamageFromWeapon(
                     turns == 0 && strength == 0) {
                     BtlUnit_SetStatus(target, StatusEffectType::HUGE, 100, 1);
                 }
+
+                // Achievement for Charge status failing on an enemy.
+                if (!damage_result && type == StatusEffectType::CHARGE &&
+                    strength > 0 && target->true_kind <= BattleUnitType::BONETAIL) {
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::V2_MISC_ALLERGIC);
+                }
+
+                // Achievement for getting 5+ negative status on a single enemy.
+                if (damage_result && target->true_kind <= BattleUnitType::BONETAIL) {
+                    int32_t statuses = 0;
+                    if (target->sleep_turns)                    ++statuses;
+                    if (target->stop_turns)                     ++statuses;
+                    if (target->dizzy_turns)                    ++statuses;
+                    if (target->confusion_turns)                ++statuses;
+                    if (target->burn_turns)                     ++statuses;
+                    if (target->freeze_turns)                   ++statuses;
+                    if (target->allergic_turns)                 ++statuses;
+                    if (target->slow_turns)                     ++statuses;
+                    if (target->poison_strength > 0)            ++statuses;
+                    if (target->attack_change_strength < 0)     ++statuses;
+                    if (target->defense_change_strength < 0)    ++statuses;
+                    if (target->size_change_strength < 0)       ++statuses;
+                    if (statuses >= 5) {
+                        AchievementsManager::MarkCompleted(
+                            AchievementId::V2_MISC_STATUS_5);
+                    }
+                }
             }
         }
     }

@@ -296,8 +296,12 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         AchievementsManager::MarkCompleted(AchievementId::MISC_TRADE_OFF_BOSS);
     }
     
-    if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 1000) {
-        AchievementsManager::MarkCompleted(AchievementId::RUN_INFATUATE);
+    if (state.GetOption(STAT_RUN_UNLOCK_MOVES_USED) == 0) {
+        AchievementsManager::MarkCompleted(AchievementId::V2_RUN_BASE_MOVES_ONLY);
+    }
+
+    if (state.GetOption(STAT_RUN_HAMMERMAN_FAILED) == 0) {
+        AchievementsManager::MarkCompleted(AchievementId::V2_RUN_HAMMERMAN);
     }
 
     bool all_moves_maxed = true;
@@ -329,7 +333,12 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     if (state.GetOption(STAT_RUN_PLAYER_DAMAGE) == 654) {
         AchievementsManager::MarkCompleted(AchievementId::SECRET_DAMAGE);
     }
+    
+    if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 1000) {
+        AchievementsManager::MarkCompleted(AchievementId::SECRET_INFATUATE);
+    }
 
+    // Achievements that require default settings.
     if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
         if (state.GetOption(STAT_RUN_ITEMS_USED) == 0) {
             AchievementsManager::MarkCompleted(AchievementId::RUN_NO_ITEMS);
@@ -348,6 +357,15 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         }
     }
 
+    // Achievements that require all Intensity-neutral or harder settings.
+    if (OptionsManager::NoIntensityReduction()) {
+        // 8 levels = 10% + 7 * 5%
+        if (state.GetOption(OPT_COUNTDOWN_TIMER) >= 8) {
+            AchievementsManager::MarkCompleted(AchievementId::V2_RUN_COUNTDOWN_45);
+        }
+    }
+
+    // Achievements that require default settings except 0 stat levels.
     if (OptionsManager::AllDefaultExceptZeroStatLevels()) {
         int32_t mario_hp_scale = state.GetOption(OPT_MARIO_HP);
         int32_t mario_fp_scale = state.GetOption(OPT_MARIO_FP);

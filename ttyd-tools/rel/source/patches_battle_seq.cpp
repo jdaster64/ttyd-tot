@@ -233,17 +233,16 @@ void CopyChildBattleInfo(bool to_child) {
 // Checks whether the battle condition was satisfied, and if so,
 // adds a bonus item to the "recovered items" pool.
 void CheckBattleCondition() {
+    auto* battleWork = ttyd::battle::g_BattleWork;
     auto* fbat_info = ttyd::battle::g_BattleWork->fbat_info;
+    const auto& actrec = ttyd::battle::g_BattleWork->act_record_work;
     NpcBattleInfo* npc_info = fbat_info->wBattleInfo;
 
     // Track the number of turns spent / number of run aways at fight's end.
     auto& state = g_Mod->state_;
-    state.ChangeOption(
-        STAT_RUN_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
-    state.ChangeOption(
-        STAT_PERM_TURNS_SPENT, ttyd::battle::g_BattleWork->turn_count);
-    state.ChangeOption(
-        STAT_RUN_MOST_TURNS_CURRENT, ttyd::battle::g_BattleWork->turn_count);
+    state.ChangeOption(STAT_RUN_TURNS_SPENT, battleWork->turn_count);
+    state.ChangeOption(STAT_PERM_TURNS_SPENT, battleWork->turn_count);
+    state.ChangeOption(STAT_RUN_MOST_TURNS_CURRENT, battleWork->turn_count);
     if (state.GetOption(STAT_RUN_MOST_TURNS_CURRENT) >
         state.GetOption(STAT_RUN_MOST_TURNS_RECORD)) {
         // Update max turn count record.
@@ -254,6 +253,18 @@ void CheckBattleCondition() {
     if (fbat_info->wResult != 1) {
         state.ChangeOption(STAT_RUN_TIMES_RAN_AWAY);
         state.ChangeOption(STAT_PERM_TIMES_RAN_AWAY);
+        if (state.GetOption(STAT_PERM_TIMES_RAN_AWAY) >= 30) {
+            AchievementsManager::MarkCompleted(AchievementId::V2_AGG_RUN_AWAY_30);
+        }
+    }
+
+    // Track whether Mario used any actions other than Hammer or Tactics.
+    if (actrec.mario_times_jump_moves_used +
+        actrec.mario_times_attacking_special_moves_used +
+        actrec.mario_times_non_attacking_special_moves_used +
+        actrec.mario_num_times_attack_items_used +
+        actrec.mario_num_times_non_attack_items_used > 0) {
+        state.ChangeOption(STAT_RUN_HAMMERMAN_FAILED);
     }
     
     // Did not win the fight (e.g. ran away).
@@ -634,9 +645,9 @@ void ApplyFixedPatches() {
             // Check for countdown timer elapsing, and end turn if so.
             if (GetSWByte(GSW_CountdownTimerState) >= 2) {
                 auto* command_work = &battleWork->command_work;
-                command_work->unk_548[0x558 - 0x548] = 1;
+                command_work->unk_54c[0x558 - 0x54c] = 1;
                 if (command_work->state == 12 || command_work->state == 13) {
-                    command_work->unk_548[0x558 - 0x548] = 2;
+                    command_work->unk_54c[0x558 - 0x54c] = 2;
                 }
                 ttyd::battle_seq_command::BattleCommandDisplay_AllEnd(battleWork);
                 command_work->unk_544 = command_work->current_cursor_type;
@@ -697,6 +708,11 @@ int32_t CalculateCoinDrops(FbatBattleInformation* battleInfo, NpcEntry* npc) {
             } else {
                 result = 0;
             }
+        }
+
+        if (result >= 100) {
+            AchievementsManager::MarkCompleted(
+                AchievementId::V2_MISC_BATTLE_COINS_100);
         }
     }
 

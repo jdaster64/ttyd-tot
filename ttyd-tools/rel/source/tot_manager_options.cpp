@@ -393,6 +393,13 @@ int32_t OptionsManager::GetTotalIntensity() {
     return total;
 }
 
+bool OptionsManager::NoIntensityReduction() {
+    for (const auto& data : g_OptionMetadata) {
+        if (GetIntensity(data.option) < 0) return false;
+    }
+    return true;
+}
+
 const char* OptionsManager::GetEncodedOptions() {
     static char encoding_str[28] = { 0 };
     int8_t encoding_bytes[28] = { 0 };

@@ -81,20 +81,20 @@ namespace AchievementId {
         META_ALL_ACHIEVEMENTS,
 
         SECRET_COINS,
-        RUN_INFATUATE,
+        SECRET_INFATUATE,
         SECRET_ZERO_STATS_3,
         SECRET_DAMAGE,
 
         // Added in 2.0.
-        V2_AGG_USE_ALL_MOVES,
+        V2_META_USE_ALL_MOVES,
         V2_RUN_BASE_MOVES_ONLY,
-        V2_AGG_RUN_AWAY_50,
+        V2_AGG_RUN_AWAY_30,
         V2_MISC_STATUS_5,
         V2_MISC_ALLERGIC,
-        V2_SECRET_RUN_HAMMERMAN,
+        V2_RUN_HAMMERMAN,
         V2_MISC_BATTLE_COINS_100,
         V2_MISC_SP_TURN1,
-        V2_RUN_COUNTDOWN_40,
+        V2_RUN_COUNTDOWN_45,
         V2_AGG_ENEMY_TIMES_100,
 
         MAX_ACHIEVEMENT,

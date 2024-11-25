@@ -30,6 +30,8 @@ public:
     static int32_t GetIntensity(uint32_t option);
     // Returns the total intensity value given all options' settings.
     static int32_t GetTotalIntensity();
+    // Verifies whether all settings are at least Intensity-neutral.
+    static bool NoIntensityReduction();
 
     // Returns a string encoding of all currently selected options.
     static const char* GetEncodedOptions();
