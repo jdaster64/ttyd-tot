@@ -61,6 +61,15 @@ enum GlobalWorkVars {
     GSWF_Bonetail_FirstTimeChat,
     // Flag for having chatted with the innkeeper for the first time.
     GSWF_Innkeeper_FirstTimeChat,
+    // Flag for talking to move enthusiast after using all moves once.
+    GSWF_NpcK_CustomMovesUnlocked,
+    // Flags for making progress towards Countdown Timer unlock.
+    GSWF_White_FirstTimeChat,
+    GSWF_White_Progress_1,
+    GSWF_White_Progress_2,
+    GSWF_White_Progress_3,
+    GSWF_White_Progress_4,
+    GSWF_White_CountdownUnlocked,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

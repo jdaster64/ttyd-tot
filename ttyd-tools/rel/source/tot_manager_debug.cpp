@@ -146,6 +146,8 @@ void _CompleteTutorialFlags() {
     SetSWF(GSWF_HubShopTutorial);
     SetSWF(GSWF_RunOptionsTutorial);
     SetSWF(GSWF_NpcF_SeedUnlocked);
+    SetSWF(GSWF_NpcK_CustomMovesUnlocked);
+    SetSWF(GSWF_White_CountdownUnlocked);
 }
 
 void _PurchaseAllCosmetics() {

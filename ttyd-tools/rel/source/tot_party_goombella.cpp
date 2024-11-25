@@ -505,7 +505,7 @@ EVT_BEGIN(partyChristineAttack_Monosiri)
     USER_FUNC(evtTot_SetTattleLogFlags, LW(3))
     // Check for completion of Tattle Log.
     USER_FUNC(evtTot_CheckCompletedAchievement,
-        AchievementId::META_TATTLE_LOG_BASIC, EVT_NULLPTR, EVT_NULLPTR)
+        AchievementId::META_TATTLE_LOG_50, EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(evtTot_CheckCompletedAchievement,
         AchievementId::META_TATTLE_LOG_ALL, EVT_NULLPTR, EVT_NULLPTR)
 

@@ -301,8 +301,10 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
                     if (!state.GetOption(FLAGS_OPTION_UNLOCKED, i)) return;
                 }
             }
-            // Check for having unlocked the Bub-ulber 'set seed' option.
+            // Check for having unlocked options tied to NPCs.
             if (!GetSWF(GSWF_NpcF_SeedUnlocked)) return;
+            if (!GetSWF(GSWF_NpcK_CustomMovesUnlocked)) return;
+            if (!GetSWF(GSWF_White_CountdownUnlocked)) return;
             MarkCompleted(ach);
             break;
         }
@@ -384,14 +386,15 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
             MarkCompleted(ach);
             break;
         }
-        case AchievementId::META_TATTLE_LOG_BASIC: {
+        case AchievementId::META_TATTLE_LOG_50: {
+            int32_t tattles = 0;
             for (int32_t i = 1; i < 0xd8; ++i) {
                 int32_t custom_tattle_idx = GetCustomTattleIndex(i);
-                if (custom_tattle_idx >= 1 && custom_tattle_idx <= 95) {
-                    if (!ttyd::swdrv::swGet(i + 0x117a)) return;
+                if (custom_tattle_idx >= 1 && custom_tattle_idx <= 102) {
+                    if (ttyd::swdrv::swGet(i + 0x117a)) ++tattles;
                 }
             }
-            MarkCompleted(ach);
+            if (tattles >= 50) MarkCompleted(ach);
             break;
         }
         case AchievementId::META_TATTLE_LOG_ALL: {
@@ -434,8 +437,10 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
             break;
         }
         case AchievementId::META_ALL_ACHIEVEMENTS: {
-            for (int32_t i = 0; i < AchievementId::META_ALL_ACHIEVEMENTS; ++i) {
-                if (!state.GetOption(FLAGS_ACHIEVEMENT, i)) return;
+            for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+                // Verify all non-secret achievements other than this are done.
+                if (i != ach && !IsSecret(i) &&
+                    !state.GetOption(FLAGS_ACHIEVEMENT, i)) return;
             }
             MarkCompleted(ach);
             break;

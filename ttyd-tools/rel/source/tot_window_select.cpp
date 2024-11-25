@@ -214,6 +214,8 @@ bool OptionUnlocked(const OptionMenuData& data) {
     switch (data.option) {
         case WIN_SEED_SELECT:
             return GetSWF(GSWF_NpcF_SeedUnlocked);
+        case OPT_COUNTDOWN_TIMER:
+            return GetSWF(GSWF_White_CountdownUnlocked);
         case OPT_NPC_CHOICE_1:
         case OPT_NPC_CHOICE_2:
         case OPT_NPC_CHOICE_3:

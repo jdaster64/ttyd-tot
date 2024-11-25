@@ -2107,14 +2107,20 @@ g_GlobalStrings = {
         b"Finish a run with all 7 partners\n"
         b"in your party.",
     b"tot_achd_22":
-        b"Finish a default run without\n"
-        b"Jumping or Hammering in battle.",
+        b"Finish a run without Jumping\n"
+        b"or Hammering in battle.\n"
+        b"Cannot use any run settings\n"
+        b"that lower total Intensity.",
     b"tot_achd_23":
-        b"Finish a default run without\n"
-        b"ever using an item.",
+        b"Finish a tower run without\n"
+        b"ever using an item.\n"
+        b"Cannot use any run settings\n"
+        b"that lower total Intensity.",
     b"tot_achd_24":
-        b"Finish a default run without\n"
-        b"ever equipping a badge.",
+        b"Finish a tower run without\n"
+        b"ever equipping a badge.\n"
+        b"Cannot use any run settings\n"
+        b"that lower total Intensity.",
     b"tot_achd_25":
         b"Finish a run with all of your\n"
         b"moves leveled to their max.",
@@ -2229,7 +2235,7 @@ g_GlobalStrings = {
     b"tot_achd_58":
         b"100% complete the Badges log.",
     b"tot_achd_59":
-        b"Log all regular enemies in the\n"
+        b"Log 50 or more enemies in the\n"
         b"Tattle log.",
     b"tot_achd_60":
         b"100% complete the Tattle log.",

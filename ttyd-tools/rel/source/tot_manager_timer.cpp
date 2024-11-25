@@ -340,15 +340,6 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
 
     // Achievements that require default settings.
     if (state.CheckOptionValue(OPTVAL_PRESET_DEFAULT)) {
-        if (state.GetOption(STAT_RUN_ITEMS_USED) == 0) {
-            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_ITEMS);
-        }
-        if (state.GetOption(STAT_RUN_BADGES_EQUIPPED) == 0) {
-            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_BADGES);
-        }
-        if (state.GetOption(STAT_RUN_JUMPS_HAMMERS_USED) == 0) {
-            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_JUMP_HAMMER);
-        }
         if (state.GetOption(STAT_RUN_PLAYER_DAMAGE) == 0) {
             AchievementsManager::MarkCompleted(AchievementId::RUN_NO_DAMAGE);
         }
@@ -359,6 +350,15 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
 
     // Achievements that require all Intensity-neutral or harder settings.
     if (OptionsManager::NoIntensityReduction()) {
+        if (state.GetOption(STAT_RUN_JUMPS_HAMMERS_USED) == 0) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_JUMP_HAMMER);
+        }
+        if (state.GetOption(STAT_RUN_ITEMS_USED) == 0) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_ITEMS);
+        }
+        if (state.GetOption(STAT_RUN_BADGES_EQUIPPED) == 0) {
+            AchievementsManager::MarkCompleted(AchievementId::RUN_NO_BADGES);
+        }
         // 8 levels = 10% + 7 * 5%
         if (state.GetOption(OPT_COUNTDOWN_TIMER) >= 8) {
             AchievementsManager::MarkCompleted(AchievementId::V2_RUN_COUNTDOWN_45);

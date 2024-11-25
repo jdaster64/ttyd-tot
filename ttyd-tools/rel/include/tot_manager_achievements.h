@@ -72,7 +72,7 @@ namespace AchievementId {
         META_ITEM_LOG_BASIC,
         META_ITEM_LOG_ALL,
         META_BADGE_LOG_ALL,
-        META_TATTLE_LOG_BASIC,
+        META_TATTLE_LOG_50,
         META_TATTLE_LOG_ALL,
         META_MOVE_LOG_ALL,
         META_SECRET_BOSS,
