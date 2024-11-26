@@ -92,31 +92,13 @@ void StateManager::Init() {
 
 // Loading / saving functions.
 bool StateManager::Load(TotSaveSlot* save) {
+    int32_t previous_version = save->data.tot_state.version_;
+
     // Check version to make sure ToT data is valid before loading.
-    if (save->data.tot_state.version_ < kEarliestSupportedVersion)
+    if (previous_version < kEarliestSupportedVersion)
         return false;
 
     memcpy(this, &save->data.tot_state, sizeof(StateManager));
-
-    // Older version conversion logic.
-    if (version_ == 10) {
-        // Revert achievements that are no longer true.
-        const int32_t keyitems_ach = AchievementId::META_ALL_KEY_ITEMS;
-        const int32_t options_ach = AchievementId::META_ALL_OPTIONS;
-        const int32_t alldone_ach = AchievementId::META_ALL_ACHIEVEMENTS;
-
-        achievement_flags_[keyitems_ach / 0x20] &= ~(1 << (keyitems_ach % 0x20));
-        achievement_flags_[options_ach / 0x20] &= ~(1 << (options_ach % 0x20));
-        achievement_flags_[alldone_ach / 0x20] &= ~(1 << (alldone_ach % 0x20));
-
-        // Check if automatically eligible for new aggregate achievements.
-        AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_ALL_MOVES);
-        AchievementsManager::CheckCompleted(AchievementId::V2_AGG_ENEMY_TIMES_100);
-        AchievementsManager::CheckCompleted(AchievementId::V2_AGG_RUN_AWAY_30);
-
-        // Re-run special file setup to collect new achievements, options, etc.
-        DebugManager::SpecialFileSetup();
-    }
 
     version_ = kCurrentVersion;
     
@@ -203,6 +185,26 @@ bool StateManager::Load(TotSaveSlot* save) {
         SetOption(STAT_PERM_HALF_BEST_RTA,  100 * 60 * 60 * 100 - 1);
         SetOption(STAT_PERM_FULL_BEST_RTA,  100 * 60 * 60 * 100 - 1);
         SetOption(STAT_PERM_EX_BEST_RTA,    100 * 60 * 60 * 100 - 1);
+    }
+
+    // Older version conversion logic.
+    if (previous_version == 10) {
+        // Revert achievements that are no longer true.
+        const int32_t keyitems_ach = AchievementId::META_ALL_KEY_ITEMS;
+        const int32_t options_ach = AchievementId::META_ALL_OPTIONS;
+        const int32_t alldone_ach = AchievementId::META_ALL_ACHIEVEMENTS;
+
+        achievement_flags_[keyitems_ach / 0x20] &= ~(1 << (keyitems_ach % 0x20));
+        achievement_flags_[options_ach / 0x20] &= ~(1 << (options_ach % 0x20));
+        achievement_flags_[alldone_ach / 0x20] &= ~(1 << (alldone_ach % 0x20));
+
+        // Check if automatically eligible for new aggregate achievements.
+        AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_ALL_MOVES);
+        AchievementsManager::CheckCompleted(AchievementId::V2_AGG_ENEMY_TIMES_100);
+        AchievementsManager::CheckCompleted(AchievementId::V2_AGG_RUN_AWAY_30);
+
+        // Re-run special file setup to collect new achievements, options, etc.
+        DebugManager::SpecialFileSetup();
     }
     
     return true;
