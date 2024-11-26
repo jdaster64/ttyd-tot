@@ -430,7 +430,7 @@ void GetStatusParams(
 
     if (status_type == StatusEffectType::CHARGE) {
         // Scale Charge attacks in the same way as ATK and FP damage.
-        if (!weapon->item_id &&
+        if (strength > 0 && !weapon->item_id &&
             attacker->current_kind <= BattleUnitType::BONETAIL) {
             int32_t altered_charge;
             GetEnemyStats(
