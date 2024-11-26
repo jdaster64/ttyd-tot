@@ -6,6 +6,7 @@
 #include "mod.h"
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_debug.h"
 #include "tot_manager_options.h"
 #include "tot_manager_progress.h"
@@ -35,7 +36,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 const int32_t kEarliestSupportedVersion = 10;
-const int32_t kCurrentVersion = 10;
+const int32_t kCurrentVersion = 11;
 
 // Holds backup save data (updated on floor 0 and after every boss floor).
 TotSaveSlot g_BackupSave;
@@ -95,8 +96,27 @@ bool StateManager::Load(TotSaveSlot* save) {
     if (save->data.tot_state.version_ < kEarliestSupportedVersion)
         return false;
 
-    // TODO: Save version format conversion, if necessary.
     memcpy(this, &save->data.tot_state, sizeof(StateManager));
+
+    // Older version conversion logic.
+    if (version_ == 10) {
+        // Revert achievements that are no longer true.
+        const int32_t keyitems_ach = AchievementId::META_ALL_KEY_ITEMS;
+        const int32_t options_ach = AchievementId::META_ALL_OPTIONS;
+        const int32_t alldone_ach = AchievementId::META_ALL_ACHIEVEMENTS;
+
+        achievement_flags_[keyitems_ach / 0x20] &= ~(1 << (keyitems_ach % 0x20));
+        achievement_flags_[options_ach / 0x20] &= ~(1 << (options_ach % 0x20));
+        achievement_flags_[alldone_ach / 0x20] &= ~(1 << (alldone_ach % 0x20));
+
+        // Check if automatically eligible for new aggregate achievements.
+        AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_ALL_MOVES);
+        AchievementsManager::CheckCompleted(AchievementId::V2_AGG_ENEMY_TIMES_100);
+        AchievementsManager::CheckCompleted(AchievementId::V2_AGG_RUN_AWAY_30);
+
+        // Re-run special file setup to collect new achievements, options, etc.
+        DebugManager::SpecialFileSetup();
+    }
 
     version_ = kCurrentVersion;
     

@@ -269,7 +269,7 @@ void ProgressManager::GetAchievementLogProgress(int32_t* cur, int32_t* tot) {
                 ++current;
                 ++total;
                 if (AchievementsManager::IsSecret(i)) ++secret;
-            } else if (AchievementsManager::IsSecret(i)) {
+            } else if (!AchievementsManager::IsSecret(i)) {
                 // Don't count up total for secret achievements.
                 ++total;
             }

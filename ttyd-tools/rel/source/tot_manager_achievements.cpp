@@ -259,6 +259,23 @@ void AchievementsManager::UnlockReward(int32_t ach) {
 void AchievementsManager::CheckCompleted(int32_t ach) {
     const auto& state = g_Mod->state_;
     switch (ach) {
+        case AchievementId::V2_AGG_ENEMY_TIMES_100: {
+            // Only checked here when updating a file from pre-v2.00.
+            for (int32_t i = 1; i <= 102; ++i) {
+                if (state.GetOption(STAT_PERM_ENEMY_KILLS, i) >= 100) {
+                    MarkCompleted(ach);
+                    return;
+                }
+            }
+            break;
+        }
+        case AchievementId::V2_AGG_RUN_AWAY_30: {
+            // Only checked here when updating a file from pre-v2.00.
+            if (state.GetOption(STAT_PERM_TIMES_RAN_AWAY) >= 30) {
+                MarkCompleted(ach);
+            }
+            break;
+        }
         case AchievementId::MISC_RUN_COINS_999: {
             if (ttyd::mario_pouch::pouchGetPtr()->coins == 999 &&
                 state.GetOption(OPT_RUN_STARTED)) {
