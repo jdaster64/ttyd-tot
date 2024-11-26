@@ -2271,8 +2271,10 @@ g_GlobalStrings = {
         b"Use all moves at least once\n"
         b"across all tower runs.",
     b"tot_achd_71":
-        b"Finish a default run without\n"
-        b"using any unlockable moves.",
+        b"Finish a tower run without\n"
+        b"using any unlockable moves.\n"
+        b"Cannot use any run settings\n"
+        b"that lower total Intensity.",
     b"tot_achd_72":
         b"Run away a total of 30 times\n"
         b"across all tower runs.",

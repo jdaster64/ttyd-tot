@@ -295,10 +295,6 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     if (state.GetOption(STAT_RUN_TRADE_OFF_ON_BOSS)) {
         AchievementsManager::MarkCompleted(AchievementId::MISC_TRADE_OFF_BOSS);
     }
-    
-    if (state.GetOption(STAT_RUN_UNLOCK_MOVES_USED) == 0) {
-        AchievementsManager::MarkCompleted(AchievementId::V2_RUN_BASE_MOVES_ONLY);
-    }
 
     if (state.GetOption(STAT_RUN_HAMMERMAN_FAILED) == 0) {
         AchievementsManager::MarkCompleted(AchievementId::V2_RUN_HAMMERMAN);
@@ -352,6 +348,9 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     if (OptionsManager::NoIntensityReduction()) {
         if (state.GetOption(STAT_RUN_JUMPS_HAMMERS_USED) == 0) {
             AchievementsManager::MarkCompleted(AchievementId::RUN_NO_JUMP_HAMMER);
+        }
+        if (state.GetOption(STAT_RUN_UNLOCK_MOVES_USED) == 0) {
+            AchievementsManager::MarkCompleted(AchievementId::V2_RUN_BASE_MOVES_ONLY);
         }
         if (state.GetOption(STAT_RUN_ITEMS_USED) == 0) {
             AchievementsManager::MarkCompleted(AchievementId::RUN_NO_ITEMS);

@@ -1368,7 +1368,7 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     ttyd::win_main::winFontSet(&text_pos, &text_scale, &kBlack, text);
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     sprintf(text, OptionsManager::GetEncodedOptions());
-    ttyd::win_main::winFontSetWidth(&text_pos, &text_scale, &kAccent, 270.f, text);
+    ttyd::win_main::winFontSetWidth(&text_pos, &text_scale, &kAccent, 250.f, text);
 
     text_pos.x = max_x;
     text_pos.y = top_y;
