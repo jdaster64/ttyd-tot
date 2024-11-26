@@ -58,6 +58,7 @@ namespace ConversationId {
         NPC_K_PARTNER_5,
         NPC_K_PARTNER_6,
         NPC_K_PARTNER_7,
+        NPC_K_OPTION_UNLOCK = 7200,
 
         // Mayor Kroop
         NPC_KROOP           = 8000,
@@ -107,6 +108,12 @@ namespace ConversationId {
         // NPC - East Petalburg gatekeeper
         NPC_GATEKEEPER      = 12000,
         NPC_GATEKEEPER_POST = 12001,
+
+        // NPC - General White
+        NPC_WHITE           = 13000,
+        NPC_WHITE_FIRST     = 13010,
+        NPC_WHITE_PROGRESS  = 13020,
+        NPC_WHITE_UNLOCK    = 13030,
 
         // Boss battles.
 

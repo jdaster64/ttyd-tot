@@ -1227,6 +1227,10 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                             ttyd::pmario_sound::psndSFXOn((char *)0x20012);
 
                             if (selector_type == 2) {
+                                menu->cosmetic_menu_offset = 0;
+                                menu->cosmetic_menu_scroll_y = 0;
+                                menu->cosmetic_menu_scroll_target_y = 0;
+                                
                                 int32_t height =
                                     Min(menu->cosmetic_num_options, 8) * 24 + 32;
                                 

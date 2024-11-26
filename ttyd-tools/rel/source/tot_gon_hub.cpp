@@ -428,8 +428,42 @@ EVT_BEGIN(Npc_I_Talk)
 EVT_END()
 
 EVT_BEGIN(Npc_K_Talk)
-    SET(LW(15), (int32_t)ConversationId::NPC_K)
-    RUN_CHILD_EVT(Npc_ConversationDrive_Talk)
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_K)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+
+    // If the move option was just unlocked, give key item, show tutorial 
+    // message and check for "all options" achievement.
+    IF_STR_EQUAL(LW(0), PTR("tot_di007200_00"))
+        USER_FUNC(evt_pouch_check_item, 
+            (int32_t)ItemType::TOT_KEY_MOVE_SELECTOR, LW(0))
+        IF_EQUAL(LW(0), 0)
+            USER_FUNC(evtTot_GetUniqueItemName, LW(0))
+            USER_FUNC(
+                evt_item_entry, LW(0), (int32_t)ItemType::TOT_KEY_MOVE_SELECTOR,
+                FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+            USER_FUNC(evt_item_get_item, LW(0))
+        END_IF()
+
+        USER_FUNC(evtTot_CheckCompletedAchievement,
+            AchievementId::META_ALL_OPTIONS, EVT_NULLPTR, EVT_NULLPTR)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_custommove_tut"), 0, PTR("me"))
+    END_IF()
+
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Npc_GeneralWhite_Talk)
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_WHITE)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+    // If the move option was just unlocked, show tutorial message and
+    // check for "all options" achievement.
+    IF_STR_EQUAL(LW(0), PTR("tot_di013030_00"))
+        USER_FUNC(evtTot_CheckCompletedAchievement,
+            AchievementId::META_ALL_OPTIONS, EVT_NULLPTR, EVT_NULLPTR)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_countdown_tut"), 0, PTR("me"))
+    END_IF()
     RETURN()
 EVT_END()
 
@@ -597,6 +631,15 @@ EVT_BEGIN(Villager_A_InitEvt)
 EVT_END()
 
 EVT_BEGIN(Villager_A_MoveEvt)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(GeneralWhite_InitEvt)
+    // Only spawn in after the initial tutorial runs are finished.
+    IF_LARGE_EQUAL((int32_t)GSW_Tower_TutorialClears, 2)
+        USER_FUNC(evt_npc_set_position, PTR("me"), 375, 50, -105)
+    END_IF()
+
     RETURN()
 EVT_END()
 
@@ -934,11 +977,10 @@ const NpcSetupInfo gon_10_npc_data[10] = {
         .initEvtCode = npc_init_evt,
     },
     {
-        // Leave disabled for now.
         .name = g_NpcGeneralWhite,
         .flags = 0x4000'0600,
-        .initEvtCode = nullptr,     // (void*)init_white
-        .talkEvtCode = nullptr,     // (void*)talk_white
+        .initEvtCode = (void*)GeneralWhite_InitEvt,
+        .talkEvtCode = (void*)Npc_GeneralWhite_Talk
     },
 };
 

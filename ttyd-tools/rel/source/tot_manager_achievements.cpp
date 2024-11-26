@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_enemy.h"
 #include "tot_gsw.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_state.h"
 
 #include <ttyd/evtmgr.h>
@@ -138,12 +139,15 @@ bool AchievementsManager::CheckCosmeticGroupUnlocked(
     // Special case for cosmetics that are always available for purchase.
     if (group_id == 0) return true;
 
-    // Treat most cosmetic groups as unlocked in race mode.
+    // Treat most cosmetic groups as always unlocked in race mode.
     if (g_Mod->state_.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED)) {
         switch (reward_type) {
-            case AchievementRewardType::ATTACK_FX:      return true;
-            case AchievementRewardType::MARIO_COSTUME:  return group_id <= 21;
-            case AchievementRewardType::YOSHI_COSTUME:  return group_id <= 17;
+            case AchievementRewardType::ATTACK_FX:
+                return true;
+            case AchievementRewardType::MARIO_COSTUME: 
+                return group_id <= 21 || group_id >= 27;
+            case AchievementRewardType::YOSHI_COSTUME:
+                return group_id <= 17 || group_id >= 22;
         }
     }
         

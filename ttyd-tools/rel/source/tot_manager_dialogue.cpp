@@ -103,7 +103,10 @@ void DialogueManager::SetConversation(int32_t id) {
                     // New personal intensity record cleared.
                     g_ConversationId = ConversationId::NPC_A_W_INTENSITY;
                     break;
-                case 40:    // TODO: Add time-up message.
+                case 40:
+                    // Lost to countdown timer timeout.
+                    g_ConversationId = ConversationId::NPC_A_L_TIMEUP;
+                    break;
                 case 20: {
                     // Generic loss message.
                     g_ConversationId = ConversationId::NPC_A_L;
@@ -224,7 +227,7 @@ void DialogueManager::SetConversation(int32_t id) {
             int32_t num_total_achievements = 0;
 
             for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
-                if (AchievementsManager::IsSecret(i)) continue;
+                if (AchievementsManager::IsSecret(grid[i])) continue;
                 ++num_total_achievements;
 
                 if (states[i] == 2) {
@@ -246,6 +249,7 @@ void DialogueManager::SetConversation(int32_t id) {
                         case AchievementId::MISC_SUPERGUARD_BITE:
                         case AchievementId::MISC_SHINES_10:
                         case AchievementId::MISC_RUN_COINS_999:
+                        case AchievementId::V2_MISC_SP_TURN1:
                             ids[num_cvs++] = grid[i];
                             break;
                         case AchievementId::META_ITEM_LOG_BASIC:
@@ -254,8 +258,10 @@ void DialogueManager::SetConversation(int32_t id) {
                                 ids[num_cvs++] = grid[i];
                             break;
                         case AchievementId::META_ALL_OPTIONS:
-                            // Only hint if seeding option isn't unlocked.
-                            if (!GetSWF(GSWF_NpcF_SeedUnlocked))
+                            // Only hint if an NPC option isn't unlocked.
+                            if (!GetSWF(GSWF_NpcF_SeedUnlocked) ||
+                                !GetSWF(GSWF_NpcK_CustomMovesUnlocked) ||
+                                !GetSWF(GSWF_White_CountdownUnlocked))
                                 ids[num_cvs++] = grid[i];
                             break;
                         default:
@@ -404,6 +410,14 @@ void DialogueManager::SetConversation(int32_t id) {
                 break;
             }
 
+            if (!GetSWF(GSWF_NpcK_CustomMovesUnlocked) &&
+                state.GetOption(
+                    FLAGS_ACHIEVEMENT, AchievementId::V2_META_USE_ALL_MOVES)) {
+                g_ConversationId = ConversationId::NPC_K_OPTION_UNLOCK;
+                SetSWF(GSWF_NpcK_CustomMovesUnlocked);
+                break;
+            }
+
             int32_t ids[10] = { ConversationId::NPC_K_BADGE_MOVES };
             int32_t num_cvs = 1;
 
@@ -440,6 +454,49 @@ void DialogueManager::SetConversation(int32_t id) {
                 ConversationId::NPC_KROOP_CVS_START;
             int32_t cv_id = coins_earned % num_cvs;
             g_ConversationId = ConversationId::NPC_KROOP_CVS_START + cv_id;
+            break;
+        }
+        case ConversationId::NPC_WHITE: {
+            if (GetSWF(GSWF_White_CountdownUnlocked)) {
+                // Use default conversation.
+                break;
+            }
+
+            if (!GetSWF(GSWF_White_FirstTimeChat)) {
+                SetSWF(GSWF_White_FirstTimeChat);
+                g_ConversationId = ConversationId::NPC_WHITE_FIRST;
+                break;
+            }
+
+            // Count number of speedrun achievements the player has finished.
+            int32_t timer_achievements = 0;
+            if (state.GetOption(
+                FLAGS_ACHIEVEMENT, AchievementId::RUN_HALF_SPEED1))
+                ++timer_achievements;
+            if (state.GetOption(
+                FLAGS_ACHIEVEMENT, AchievementId::RUN_HALF_SPEED2))
+                ++timer_achievements;
+            if (state.GetOption(
+                FLAGS_ACHIEVEMENT, AchievementId::RUN_FULL_SPEED1))
+                ++timer_achievements;
+            if (state.GetOption(
+                FLAGS_ACHIEVEMENT, AchievementId::RUN_FULL_SPEED2))
+                ++timer_achievements;
+            if (state.GetOption(
+                FLAGS_ACHIEVEMENT, AchievementId::RUN_EX_SPEED1))
+                ++timer_achievements;
+            if (state.GetOption(
+                FLAGS_ACHIEVEMENT, AchievementId::RUN_EX_SPEED2))
+                ++timer_achievements;
+
+            if (timer_achievements >= 4) {
+                SetSWF(GSWF_White_CountdownUnlocked);
+                g_ConversationId = ConversationId::NPC_WHITE_UNLOCK;
+            } else {
+                g_ConversationId =
+                    ConversationId::NPC_WHITE_PROGRESS + timer_achievements;
+            }
+
             break;
         }
         case ConversationId::NPC_GATEKEEPER: {

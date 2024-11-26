@@ -5640,6 +5640,12 @@ g_TowerStrings = {
         b"lighten your load if you've\n"
         b"got junk weighing you down!\n<k>\n<p>\n"
         b"What're you selling?\n<o>",
+        
+    b"tot_wonky_introlimit":
+        b"Hey, buddy, I already said\n"
+        b"I got enough for now... <wait 250>please,\n"
+        b"think of my pocketbook!\n"
+        b"<k>",
     
     b"tot_wonky_topmenu":
         b"<select 0 2 0 40>\nItems\nBadges",
@@ -5668,6 +5674,18 @@ g_TowerStrings = {
     b"tot_wonky_thanksnext":
         b"<p>\nAnything else I can take\n"
         b"off your hands?\n<o>",
+        
+    b"tot_wonky_thankslimit":
+        b"<p>\nHey, <wait 150>thanks, ol' buddy!\n"
+        b"<wait 250>That'll be enough stuff for me\n"
+        b"for the moment...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Wouldn't want to spend all\n"
+        b"these coins in one place,\n"
+        b"you know?<wait 250> <shake>\n"
+        b"Hee hee hee!</shake>\n"
+        b"\n<k>",
         
     b"tot_wonky_thankslast":
         b"<p>\nDon't be a stranger!\n<k>",
@@ -6998,6 +7016,22 @@ g_PetalburgWestStrings = {
         b"Keep up the good work,\n"
         b"Mario! <wait 250>We know you can do it!\n"
         b"<k>",
+
+    b"tot_di011440_00":
+        b"How's it going, Mario?\n"
+        b"<wait 250>Ah, got a bit too bold with\n"
+        b"the countdown timer, eh?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, I'm sure you'll get the\n"
+        b"hang of thinking quicker on\n"
+        b"your feet with practice...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Setting a slightly less strict\n"
+        b"timer couldn't hurt either...\n"
+        b"<wait 200>Anyway, better luck next time!\n"
+        b"<k>",
         
     # NPC F (Bub-ulber) dialogue.
     
@@ -8318,14 +8352,19 @@ g_PetalburgWestStrings = {
         b"probably knew that already...\n"
         b"<k>\n"
         b"<p>\n"
+        b"There might be a few folks\n"
+        b"in town that could get you\n"
+        b"access to others, though.\n"
+        b"<k>\n"
+        b"<p>\n"
         b"Hmm... <wait 250>maybe try talking to\n"
         b"Bub-ulber down in the flower\n"
         b"patch just south of here?\n"
         b"<k>\n"
         b"<p>\n"
         b"I know he's knowledgeable\n"
-        b"about seeds, <wait 200>so maybe he can\n"
-        b"also help you out with this.\n"
+        b"about seeds, <wait 200>but maybe he'll\n"
+        b"have a lead on this too?\n"
         b"<k>",
 
     b"tot_di009156_00":
@@ -8368,6 +8407,42 @@ g_PetalburgWestStrings = {
         b"specialty items are probably\n"
         b"worth collecting as well...\n"
         b"<k>",
+        
+    b"tot_di009177_00":
+        b"Oh, it's you again. <wait 250>You want\n"
+        b"to use a bunch of Star Power\n"
+        b"on turn 1 of a battle, eh?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, there are a lot of\n"
+        b"different ways to boost the\n"
+        b"amount of SP you earn...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Super Start badges will give\n"
+        b"0.5 SP apiece at the start of\n"
+        b"a fight, which is huge!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If you or your partner is in\n"
+        b"Peril, you'll get a 100% boost\n"
+        b"to SP gained from attacks.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Super Appeal P badges will\n"
+        b"also yield an extra 0.50 SP\n"
+        b"apiece, alternatively.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If all that's not enough, you\n"
+        b"could try taking an enemy\n"
+        b"first strike with Pity Star...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If all else fails, and if you've\n"
+        b"got a lot of max Star Power,\n"
+        b"Mystic Eggs will do the trick!\n"
+        b"<k>",
 
     b"tot_di009300_00":
         b"Oh, it's you again. <wait 250>Welcome!\n"
@@ -8395,7 +8470,140 @@ g_PetalburgWestStrings = {
         b"Right now, just staying in\n"
         b"here seems pretty cozy, though.\n"
         b"Perhaps another time...\n"
-        b"<k>",  
+        b"<k>",
+        
+    # General White.
+    
+    b"tot_di013000_00":
+        b"Hut! <wait 250>Good day to you, Mr.\n"
+        b"Red 'Stache! <wait 200>Lovely weather\n"
+        b"we're having...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"This is just between the two \n"
+        b"of us, Mr. 'Stache, <wait 200>but that\n"
+        b"device hasn't been tested...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I can't promise that it'll do\n"
+        b"any substantial damage to\n"
+        b"the tower, <wait 100>BOOM...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Still, if you're game to give\n"
+        b"it a go, I'll have the timer\n"
+        b"ready, <wait 100>hut! <wait 200>Just say the word!\n"
+        b"<k>",
+    
+    b"tot_di013010_00":
+        b"Hut-hut! <wait 250>I am General White.\n"
+        b"<wait 250>I am forever indebted to you\n"
+        b"for fulfilling my life's dreams!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But! <wait 150>Mr. Red 'Stache, <wait 250>I cannot\n"
+        b"abide this terrible dragon\n"
+        b"worrying these poor folk...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I have just the thing to\n"
+        b"address this issue, <wait 100>hut! <wait 250>But I\n"
+        b"shall need your help, 'Stache!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"This plan is quite dangerous...\n"
+        b"<wait 250>I will share my plan when I\n"
+        b"am sure you are ready, BOOM!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Until then, <wait 100>you must fight,\n"
+        b"<wait 200>and do it quickly, hut-hut!\n"
+        b"<k>",
+    
+    b"tot_di013020_00":
+        b"This plan is quite dangerous...\n"
+        b"<wait 250>I will share my plan when I\n"
+        b"am sure you are ready, BOOM!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Until then, <wait 100>you must fight,\n"
+        b"<wait 200>and do it quickly, hut-hut!\n"
+        b"<k>",
+
+    b"tot_di013021_00":
+        b"Hut-hut! <wait 250>I see you once\n"
+        b"made good time against one\n"
+        b"of the terrible dragons, yes?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But it is not enough, <wait 100>hut!\n"
+        b"<wait 250>You must prove to me that\n"
+        b"this was no fluke!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Come back when you have\n"
+        b"more speedy clears under\n"
+        b"your belt, <wait 100>BOOM!\n"
+        b"<k>",
+
+    b"tot_di013022_00":
+        b"Hut-hut! <wait 250>I see you're proving\n"
+        b"yourself to be quite speedy\n"
+        b"indeed, Mustache!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Keep up the quick work, <wait 100>hut!\n"
+        b"<wait 250>I will share my plans with you\n"
+        b"soon enough...\n"
+        b"<k>",
+
+    b"tot_di013023_00":
+        b"Hut-hut! <wait 250>I see you're proving\n"
+        b"yourself to be quite speedy\n"
+        b"indeed, Mustache!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Keep up the quick work, <wait 100>hut!\n"
+        b"<wait 250>I will share my plans with you\n"
+        b"soon enough...\n"
+        b"<k>",
+
+    b"tot_di013030_00":
+        b"Hut! <wait 250>Mr. Mustache, I think\n"
+        b"you are finally ready to help\n"
+        b"with my plan!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"To be brief, BOOM...\n"
+        b"<wait 150>I've outfitted the tower with\n"
+        b"a timed explosive device!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Whenever you are ready, I'll\n"
+        b"start a timer, and you dispatch\n"
+        b"the beast before it runs!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Best of luck to you, <wait 100>BOOM!\n"
+        b"<k>",
+    
+    b"tot_countdown_tut":
+        b"<system>\n"
+        b"<p>\n"
+        b"You've unlocked the ability to\n"
+        b"set a countdown timer on\n"
+        b"your tower runs!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You'll get a set amount of time\n"
+        b"per set of floors, with any\n"
+        b"extra time rolling over.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Auto-saves and Save Blocks\n"
+        b"will be disabled, so you'll have\n"
+        b"to give it your best shot!\n"
+        b"<k>",
 
 }
 
@@ -9539,6 +9747,38 @@ g_PetalburgEastStrings = {
         b"You could probably let a\n"
         b"group of foes take each other\n"
         b"down with that move alone!\n"
+        b"<k>",
+
+    b"tot_di007200_00":
+        b"Oh, hi there, Mario!\n"
+        b"<wait 250>Wow, <wait 150>you've got quite a bit of\n"
+        b"experience using your moves!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Y'know what, <wait 200>how about I\n"
+        b"give you something so you can\n"
+        b"style on foes even faster?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Please take this, I insist!\n"
+        b"<k>",
+    
+    b"tot_custommove_tut":
+        b"<system>\n"
+        b"<p>\n"
+        b"You've unlocked the ability to\n"
+        b"pick a set of custom moves\n"
+        b"when starting a run!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b'To use it, choose the "Move\n'
+        b'Availability: Custom Start"\n'
+        b"option from the run settings.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Then, use the Move Selector\n"
+        b"item to pick up to six moves\n"
+        b"to unlock as soon as possible.\n"
         b"<k>",
     
     # Mayor Kroop.

@@ -553,7 +553,9 @@ enum Options : uint32_t {
     // Only used for v2 achievement tracking.
     STAT_RUN_UNLOCK_MOVES_USED  = 0x064'4'00'00,
     STAT_RUN_HAMMERMAN_FAILED   = 0x065'4'00'00,
-    // Next: 0x066
+    STAT_RUN_NPC_WONKY_FLOOR    = 0x066'3'00'00,
+    STAT_RUN_NPC_WONKY_TRADES   = 0x067'0'00'00,
+    // Next: 0x068
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 

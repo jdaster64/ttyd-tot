@@ -246,6 +246,7 @@ EVT_DECLARE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable, 1)
 EVT_DECLARE_USER_FUNC(evtTot_DowngradeStat, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetChetCost, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetDazzleCost, 1)
+EVT_DECLARE_USER_FUNC(evtTot_GetWonkyTrades, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetMoverCost, 2)
 EVT_DECLARE_USER_FUNC(evtTot_GetLumpyInfo, 2)
 EVT_DECLARE_USER_FUNC(evtTot_ReturnLumpy, 0)
@@ -433,6 +434,14 @@ LBL(0)
     USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
+
+    // Check for trade limit for floor.
+    USER_FUNC(evtTot_GetWonkyTrades, LW(0))
+    IF_LARGE_EQUAL(LW(0), 5)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_thankslimit"))
+        RETURN()
+    END_IF()
+
     USER_FUNC(ttyd::evt_shop::sell_pouchcheck_func)
     IF_EQUAL(LW(0), 0)
         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_thankslast"))
@@ -482,6 +491,14 @@ LBL(0)
     USER_FUNC(ttyd::evt_window::evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(ttyd::evt_window::evt_win_coin_off, LW(8))
+
+    // Check for trade limit for floor.
+    USER_FUNC(evtTot_GetWonkyTrades, LW(0))
+    IF_LARGE_EQUAL(LW(0), 5)
+        USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_thankslimit"))
+        RETURN()
+    END_IF()
+
     USER_FUNC(ttyd::evt_pouch::evt_pouch_get_havebadgecnt, LW(0))
     IF_EQUAL(LW(0), 0)
         USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_thankslast"))
@@ -501,20 +518,28 @@ EVT_END()
 
 // Talk script for Wonky.
 EVT_BEGIN(TowerNpc_WonkyTalk)
-    USER_FUNC(ttyd::evt_mario::evt_mario_key_onoff, 0)
-    USER_FUNC(ttyd::evt_win::unitwin_get_work_ptr, LW(10))
-    USER_FUNC(ttyd::evt_msg::evt_msg_print,
-        0, PTR("tot_wonky_intro"), 0, PTR("npc_wonky"))
-    USER_FUNC(ttyd::evt_msg::evt_msg_select, 0, PTR("tot_wonky_topmenu"))
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(unitwin_get_work_ptr, LW(10))
+
+    // Check that Wonky hasn't hit the limit of trades for this floor.
+    USER_FUNC(evtTot_GetWonkyTrades, LW(0))
+    IF_LARGE_EQUAL(LW(0), 5)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_wonky_introlimit"), 0, PTR("npc_wonky"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evt_msg_print, 0, PTR("tot_wonky_intro"), 0, PTR("npc_wonky"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_wonky_topmenu"))
     SWITCH(LW(0))
         CASE_EQUAL(0)
             RUN_CHILD_EVT(TowerNpc_SellItems)
         CASE_EQUAL(1)
             RUN_CHILD_EVT(TowerNpc_SellBadges)
         CASE_EQUAL(2)
-            USER_FUNC(ttyd::evt_msg::evt_msg_print_add, 0, PTR("tot_wonky_exit"))
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_wonky_exit"))
     END_SWITCH()
-    USER_FUNC(ttyd::evt_mario::evt_mario_key_onoff, 1)
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
     RETURN()
 EVT_END()
 
@@ -935,6 +960,15 @@ LBL(50)
     USER_FUNC(evtTot_GetItemName, LW(8), LW(6))
 
     USER_FUNC(evtTot_GetRecipeResults, LW(10), LW(11), LW(12))
+
+    // If either ingredient was Mystery, don't show what the result will be.
+    IF_EQUAL(LW(8), (int32_t)ItemType::MYSTERY)
+        GOTO(60)
+    END_IF()
+    IF_EQUAL(LW(9), (int32_t)ItemType::MYSTERY)
+        GOTO(60)
+    END_IF()
+
     IF_SMALL(LW(10), 2)
         USER_FUNC(evt_msg_print, 0, PTR("tot_zess_onlyrecipe"), 0, PTR("me"))
     ELSE()
@@ -948,6 +982,7 @@ LBL(50)
     END_IF()
     SET(LW(11), LW(0))
 
+LBL(60)
     IF_LARGE(LW(5), 0)
         // Prompt with coin cost.
         USER_FUNC(evt_win_coin_on, 0, LW(12))
@@ -1254,6 +1289,19 @@ EVT_DEFINE_USER_FUNC(evtTot_GetDazzleCost) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_GetWonkyTrades) {
+    auto& state = g_Mod->state_;
+    int32_t last_floor_taken = state.GetOption(STAT_RUN_NPC_WONKY_FLOOR);
+    if (last_floor_taken != state.floor_) {
+        // Reset the number of items bought if on a different floor.
+        state.SetOption(STAT_RUN_NPC_WONKY_FLOOR, state.floor_);
+        state.SetOption(STAT_RUN_NPC_WONKY_TRADES, 0);
+    }
+    evtSetValue(
+        evt, evt->evtArguments[0], state.GetOption(STAT_RUN_NPC_WONKY_TRADES));
+    return 2;
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_GetMoverCost) {
     if (evtGetValue(evt, evt->evtArguments[0]) == 0) {
         evtSetValue(evt, evt->evtArguments[1], 100 * GetBuyPriceScale() / 100);
@@ -1532,6 +1580,8 @@ EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
     const int32_t floor = state.floor_;
     switch (evtGetValue(evt, evt->evtArguments[0])) {
         case SecondaryNpcType::WONKY: {
+            state.SetOption(STAT_RUN_NPC_WONKY_FLOOR, floor);
+            state.ChangeOption(STAT_RUN_NPC_WONKY_TRADES, 1);
             state.ChangeOption(STAT_PERM_NPC_WONKY_TRADES, 1);
             state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
