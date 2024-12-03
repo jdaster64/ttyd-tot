@@ -221,7 +221,7 @@ void DialogueManager::SetConversation(int32_t id) {
             AchievementsManager::GetAchievementGrid(&grid);
             AchievementsManager::GetAchievementStates(&states, false);
 
-            int8_t ids[AchievementId::MAX_ACHIEVEMENT + 1];
+            int16_t ids[AchievementId::MAX_ACHIEVEMENT + 10];
             int32_t num_cvs = 0;
             int32_t num_achievements = 0;
             int32_t num_total_achievements = 0;
@@ -250,19 +250,30 @@ void DialogueManager::SetConversation(int32_t id) {
                         case AchievementId::MISC_SHINES_10:
                         case AchievementId::MISC_RUN_COINS_999:
                         case AchievementId::V2_MISC_SP_TURN1:
-                            ids[num_cvs++] = grid[i];
+                            ids[num_cvs++] =
+                                ConversationId::NPC_D_CVS_BASE + grid[i];
                             break;
                         case AchievementId::META_ITEM_LOG_BASIC:
                             // Only hint after Zess T. isn't a spoiler.
                             if (completed_runs >= 3)
-                                ids[num_cvs++] = grid[i];
+                                ids[num_cvs++] =
+                                    ConversationId::NPC_D_CVS_BASE + grid[i];
                             break;
                         case AchievementId::META_ALL_OPTIONS:
-                            // Only hint if an NPC option isn't unlocked.
-                            if (!GetSWF(GSWF_NpcF_SeedUnlocked) ||
-                                !GetSWF(GSWF_NpcK_CustomMovesUnlocked) ||
-                                !GetSWF(GSWF_White_CountdownUnlocked))
-                                ids[num_cvs++] = grid[i];
+                            // Give individual hints for NPC options that
+                            // aren't yet unlocked.
+                            if (!GetSWF(GSWF_NpcF_SeedUnlocked)) {
+                                ids[num_cvs++] =
+                                    ConversationId::NPC_D_OPTIONS_SEED;
+                            }
+                            if (!GetSWF(GSWF_NpcK_CustomMovesUnlocked)) {
+                                ids[num_cvs++] =
+                                    ConversationId::NPC_D_OPTIONS_MOVES;
+                            }
+                            if (!GetSWF(GSWF_White_CountdownUnlocked)) {
+                                ids[num_cvs++] =
+                                    ConversationId::NPC_D_OPTIONS_TIMER;
+                            }
                             break;
                         default:
                             break;
@@ -276,7 +287,7 @@ void DialogueManager::SetConversation(int32_t id) {
                 g_ConversationId = ConversationId::NPC_D_NONE_ACTIVE;
             } else {
                 int32_t cv_id = coins_earned % num_cvs;
-                g_ConversationId = ConversationId::NPC_D_CVS_BASE + ids[cv_id];
+                g_ConversationId = ids[cv_id];
             }
             break;
         }

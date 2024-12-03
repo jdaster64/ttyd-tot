@@ -72,6 +72,10 @@ namespace ConversationId {
         NPC_D_CVS_BASE      = 9100,
         NPC_D_NONE_ACTIVE   = 9300,
         NPC_D_ALL_DONE      = 9301,
+        // Specific hints for options achievement.
+        NPC_D_OPTIONS_SEED  = 9400,
+        NPC_D_OPTIONS_MOVES = 9401,
+        NPC_D_OPTIONS_TIMER = 9402,
 
         // NPC G (Blue Bub-ulb)
         NPC_G               = 10000,
