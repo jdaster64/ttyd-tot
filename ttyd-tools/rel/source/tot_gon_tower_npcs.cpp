@@ -209,7 +209,7 @@ RecipeInfo g_RecipeInfo[] = {
     { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
     { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
     { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::HEALING, },
-    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::SUPPORT, },
+    { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::RARE, RecipeItemType::STATUS, },
     { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
     { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, RecipeItemRarity::INVALID, RecipeItemType::INVALID, },
     { ItemType::INVALID_ITEM, ItemType::INVALID_ITEM, ItemType::PEACH_TART, RecipeItemRarity::RARE, RecipeItemType::SUPPORT, },
@@ -1507,14 +1507,16 @@ EVT_DEFINE_USER_FUNC(evtTot_GetRecipeResults) {
         // Return the correct specialty item.
         int32_t type_1 =
             g_RecipeInfo[g_CurrentIngredients[0] - ItemType::GOLD_BAR].item_type;
+        int32_t type_1_harmful =
+            type_1 == RecipeItemType::DAMAGE || type_1 == RecipeItemType::STATUS;
         int32_t type_2 =
             g_RecipeInfo[g_CurrentIngredients[1] - ItemType::GOLD_BAR].item_type;
+        int32_t type_2_harmful =
+            type_2 == RecipeItemType::DAMAGE || type_2 == RecipeItemType::STATUS;
         evtSetValue(evt, evt->evtArguments[0], 1);
-        if (type_1 == RecipeItemType::DAMAGE && type_2 == RecipeItemType::DAMAGE) {
+        if (type_1_harmful && type_2_harmful) {
             evtSetValue(evt, evt->evtArguments[1], ItemType::ZESS_DYNAMITE);
-        } else if (
-            type_1 == RecipeItemType::DAMAGE || type_1 == RecipeItemType::STATUS ||
-            type_2 == RecipeItemType::DAMAGE || type_2 == RecipeItemType::STATUS) {
+        } else if (type_1_harmful || type_2_harmful) {
             evtSetValue(evt, evt->evtArguments[1], ItemType::TRIAL_STEW);
         } else {
             // Returns Zess T. food item based on total stat worth.
