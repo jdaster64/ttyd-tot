@@ -190,18 +190,40 @@ bool StateManager::Load(TotSaveSlot* save) {
     // Older version conversion logic.
     if (previous_version == 10) {
         // Revert achievements that are no longer true.
-        const int32_t keyitems_ach = AchievementId::META_ALL_KEY_ITEMS;
-        const int32_t options_ach = AchievementId::META_ALL_OPTIONS;
-        const int32_t alldone_ach = AchievementId::META_ALL_ACHIEVEMENTS;
+        const int32_t kRevertAch[] = {
+            AchievementId::META_ALL_KEY_ITEMS,
+            AchievementId::META_ALL_OPTIONS,
+            AchievementId::META_ALL_ACHIEVEMENTS,
+        };
+        for (const auto& ach : kRevertAch) {
+            achievement_flags_[ach / 0x20] &= ~(1 << (ach % 0x20));
 
-        achievement_flags_[keyitems_ach / 0x20] &= ~(1 << (keyitems_ach % 0x20));
-        achievement_flags_[options_ach / 0x20] &= ~(1 << (options_ach % 0x20));
-        achievement_flags_[alldone_ach / 0x20] &= ~(1 << (alldone_ach % 0x20));
+            // Also unequip respective costumes for Mario / Yoshi.
+            const auto* data = AchievementsManager::GetData(ach);
+            switch (data->reward_type) {
+                case AchievementRewardType::MARIO_COSTUME: {
+                    int32_t costume_id = data->reward_id - 1;
+                    if (GetSWByte(GSW_MarioCostume) == costume_id) {
+                        SetSWByte(GSW_MarioCostume, 0);
+                    }
+                    break;
+                }
+                case AchievementRewardType::YOSHI_COSTUME: {
+                    int32_t costume_id = data->reward_id - 1;
+                    if (GetSWF(GSWF_YoshiColors + costume_id)) {
+                        SetSWF(GSWF_YoshiColors + costume_id, 0);
+                    }
+                    break;
+                }
+            }
+        }
 
         // Check if automatically eligible for new aggregate achievements.
         AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_ALL_MOVES);
         AchievementsManager::CheckCompleted(AchievementId::V2_AGG_ENEMY_TIMES_100);
         AchievementsManager::CheckCompleted(AchievementId::V2_AGG_RUN_AWAY_30);
+        // As well as achievements that've been retroactively made easier.
+        AchievementsManager::CheckCompleted(AchievementId::META_TATTLE_LOG_50);
 
         // Re-run special file setup to collect new achievements, options, etc.
         DebugManager::SpecialFileSetup();

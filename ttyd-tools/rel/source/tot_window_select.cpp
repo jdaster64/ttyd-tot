@@ -534,11 +534,26 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                         }
                         break;
                     case OPT_MOVE_AVAILABILITY:
+                        // NOTE: currently, this code relies on partner +1 and
+                        // and custom moves settings not being adjacent!
+
                         // If custom moves key item isn't unlocked, skip option.
                         if (state.CheckOptionValue(OPTVAL_MOVES_CUSTOM) &&
                             !ttyd::mario_pouch::pouchCheckItem(
                                 ItemType::TOT_KEY_MOVE_SELECTOR)) {
                             state.NextOption(option, change);
+                        }
+                        // If partners disabled, don't allow +1 move on pickup.
+                        if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
+                            state.GetOption(OPT_MAX_PARTNERS) == 0) {
+                            state.NextOption(option, change);
+                        }
+                        break;
+                    case OPT_MAX_PARTNERS:
+                        // If partners disabled, don't allow +1 move on pickup.
+                        if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
+                            state.GetOption(OPT_MAX_PARTNERS) == 0) {
+                            state.SetOption(OPTVAL_MOVES_DEFAULT);
                         }
                         break;
                     case OPT_NPC_CHOICE_1:
