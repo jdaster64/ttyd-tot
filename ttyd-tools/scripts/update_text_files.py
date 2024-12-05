@@ -2141,18 +2141,18 @@ g_GlobalStrings = {
         b"rating of 200% or higher.",
     b"tot_achd_30":
         b"Finish a run with one of Mario's\n"
-        b"stats at a maximum of 1.\n"
-        b"Settings must be default, aside\n"
-        b"from forcing any stat to 0.\n"
-        b"You can also start at default,\n"
-        b"using Chet Rippo to sell stats.",
+        b"stats at level 0.\n"
+        b"HP/FP/BP per level can be set\n"
+        b"to 0, or you can use Chet Rippo.\n"
+        b"All other custom-only settings\n"
+        b"must be left as default.",
     b"tot_achd_31":
         b"Finish a run with two of Mario's\n"
-        b"stats at a maximum of 1.\n"
-        b"Settings must be default, aside\n"
-        b"from forcing any stat to 0.\n"
-        b"You can also start at default,\n"
-        b"using Chet Rippo to sell stats.",
+        b"stats at level 0.\n"
+        b"HP/FP/BP per level can be set\n"
+        b"to 0, or you can use Chet Rippo.\n"
+        b"All other custom-only settings\n"
+        b"must be left as default.",
     b"tot_achd_32":
         b"Beat a floor with a fainted\n"
         b"partner.",
@@ -2259,11 +2259,11 @@ g_GlobalStrings = {
         b"Infatuated foes in a tower run.",
     b"tot_achd_68":
         b"Finish a run with all of Mario's\n"
-        b"stats at a maximum of 1.\n"
-        b"Settings must be default, aside\n"
-        b"from forcing any stat to 0.\n"
-        b"You can also start at default,\n"
-        b"using Chet Rippo to sell stats.",
+        b"stats at level 0.\n"
+        b"HP/FP/BP per level can be set\n"
+        b"to 0, or you can use Chet Rippo.\n"
+        b"All other custom-only settings\n"
+        b"must be left as default.",
     b"tot_achd_69":
         b"Take exactly 654 total damage\n"
         b"in a single tower run.",
