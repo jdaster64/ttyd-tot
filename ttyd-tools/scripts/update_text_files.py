@@ -1538,14 +1538,14 @@ g_GlobalStrings = {
         b"and 3-turn Burn for 7 FP.",
     # Special moves.
     b"tot_movelog_d211":
-        b"\nLv. 1: Heal up to 7 HP apiece\n"
+        b"\nLv. 1: Heal up to 8 HP apiece\n"
         b"and 8 FP, for 1 SP.",
     b"tot_movelog_d212":
-        b"\nLv. 2: Heal up to 15 HP apiece\n"
-        b"and 14 FP, for 2 SP.",
+        b"\nLv. 2: Heal up to 12 HP apiece\n"
+        b"and 12 FP, for 2 SP.",
     b"tot_movelog_d213":
-        b"\nLv. 3: Heal up to 24 HP apiece\n"
-        b"and 21 FP, for 3 SP.",
+        b"\nLv. 3: Heal up to 16 HP apiece\n"
+        b"and 16 FP, for 3 SP.",
     b"tot_movelog_d221":
         b"\nLv. 1: Deals 1 damage + 1 / bar,\n"
         b"up to a total of 4, for 1 SP.",
