@@ -102,8 +102,8 @@ const AchievementData g_AchievementData[] = {
     { "tot_achd_73", "tot_acho_stageh", 51, AchievementRewardType::OPTION, OPT_STAGE_HAZARDS },
     { "tot_achd_74", nullptr, 57, AchievementRewardType::MARIO_COSTUME, 27 },
     { "tot_achd_75", nullptr, 20, AchievementRewardType::MARIO_COSTUME, 28 },
-    { "tot_achd_76", nullptr, 13, AchievementRewardType::YOSHI_COSTUME, 22 },
-    { "tot_achd_77", nullptr, 14, AchievementRewardType::YOSHI_COSTUME, 23 },
+    { "tot_achd_76", nullptr, 13, AchievementRewardType::YOSHI_COSTUME, 23 },
+    { "tot_achd_77", nullptr, 14, AchievementRewardType::YOSHI_COSTUME, 22 },
     { "tot_achd_78", nullptr, 8, AchievementRewardType::YOSHI_COSTUME, 24 },
     { "tot_achd_79", nullptr, 12, AchievementRewardType::YOSHI_COSTUME, 25 },
 };
