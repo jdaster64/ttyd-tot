@@ -748,14 +748,14 @@ g_GlobalStrings = {
         b"Swapping partners costs FP,\n"
         b"but doesn't consume a turn.\n"
         b"Switching costs 1 FP initially,\n"
-        b"and increases per use up to 5.",
+        b"and increases per use up to 3.",
     
     b"msg_toughen_up":
-        b"Increases the defense given by\n"
+        b"Increases damage blocked by\n"
         b"Mario's Defend command by 1.",
         
     b"msg_toughen_up_p":
-        b"Increases the defense given by\n"
+        b"Increases damage blocked by\n"
         b"allies' Defend command by 1.",
         
     b"msg_super_start":
@@ -771,11 +771,11 @@ g_GlobalStrings = {
         b"when allies are at full HP.",
         
     b"msg_toughen_up_menu":
-        b"Increases the defense given by\n"
+        b"Increases damage blocked by\n"
         b"Mario's Defend command by 1.",
         
     b"msg_toughen_up_p_menu":
-        b"Increases the defense given by\n"
+        b"Increases damage blocked by\n"
         b"allies' Defend command by 1.",
         
     b"msg_pity_star":
@@ -785,10 +785,58 @@ g_GlobalStrings = {
     b"msg_pity_star_p":
         b"Increases Star Power gained\n"
         b"when enemies attack allies.",
+
+    b'menu_tamani_lucky':
+        b"Enemies attacking Mario will\n"
+        b'land hits 12.5% less often.',
+
+    b'msg_tamani_lucky':
+        b"Enemies attacking Mario will\n"
+        b'land hits 12.5% less often.',
+
+    b'menu_tamani_lucky_p':
+        b"Enemies attacking allies will\n"
+        b'land hits 12.5% less often.',
+
+    b'msg_tamani_lucky_p':
+        b"Enemies attacking allies will\n"
+        b'land hits 12.5% less often.',
+
+    b'menu_kekkou_lucky':
+        b"Enemies attacking Mario will\n"
+        b'land hits 25% less often.',
+
+    b'msg_kekkou_lucky':
+        b"Enemies attacking Mario will\n"
+        b'land hits 25% less often.',
+
+    b'menu_kekkou_lucky_p':
+        b"Enemies attacking allies will\n"
+        b'land hits 25% less often.',
+
+    b'msg_kekkou_lucky_p':
+        b"Enemies attacking allies will\n"
+        b'land hits 25% less often.',
+
+    b'menu_pinch_de_lucky':
+        b"When Mario is in Danger, foes\n"
+        b'land hits 33% less often.',
+
+    b'msg_pinch_de_lucky':
+        b"When Mario is in Danger, foes\n"
+        b'land hits 33% less often.',
+
+    b'menu_pinch_de_lucky_p':
+        b"When allies are in Danger, foes\n"
+        b'land hits 33% less often.',
+
+    b'msg_pinch_de_lucky_p':
+        b"When allies are in Danger, foes\n"
+        b'land hits 33% less often.',
         
     b"btl_hlp_cmd_operation_super_charge":
         b"Briefly increases DEF by\n"
-        b"more than Defending.",    
+        b"more than Defending.",
     
     b"menu_tamatsuki_jump":
         b"Wear this to use Tornado\n"
@@ -970,6 +1018,10 @@ g_GlobalStrings = {
     b"msg_st_chg_allergy":
         b"Allergic! Status effects\n"
         b"cannot be changed!",
+
+    b'btl_msg_defend_command_exec':
+        b'Damage taken this turn will\n'
+        b'be reduced!',
 
     b'msg_st_chg_freeze':
         b"Frozen! Breaking hits will\n"
@@ -7841,7 +7893,7 @@ g_PetalburgWestStrings = {
         b"<p>\n"
         b"Super Appeal makes your\n"
         b"appeals to the crowd net you\n"
-        b"an extra half-unit of SP.\n"
+        b"an extra chunk of SP.\n"
         b"<k>\n"
         b"<p>\n"
         b"Pity Star increases the SP\n"
@@ -8406,7 +8458,7 @@ g_PetalburgWestStrings = {
         b"<k>\n"
         b"<p>\n"
         b"Super Appeal P badges will\n"
-        b"also yield an extra 0.50 SP\n"
+        b"also yield an extra 0.40 SP\n"
         b"apiece, alternatively.\n"
         b"<k>\n"
         b"<p>\n"

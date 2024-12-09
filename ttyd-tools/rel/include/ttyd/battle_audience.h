@@ -8,6 +8,9 @@ struct SpBonusInfo;
 namespace ttyd::battle_database_common {
 struct BattleWeapon;
 }
+namespace ttyd::battle_unit {
+struct BattleWorkUnit;
+}
 
 namespace ttyd::battle_audience {
 
@@ -32,7 +35,7 @@ void BattleAudience_SetPresentItemType(int32_t harmful_item);
 // BattleAudience_Case_Escape_Bad
 // BattleAudience_Case_Escape_Good
 // BattleAudience_Case_Escape
-// BattleAudience_Case_Appeal
+void BattleAudience_Case_Appeal(ttyd::battle_unit::BattleWorkUnit* unit);
 // BattleAudience_Case_TurnEnd
 // BattleAudience_Case_FinalAttack
 // BattleAudience_Case_JumpNewRecord
@@ -74,9 +77,9 @@ void BattleAudience_Case_ActionCommandBad(
 // BattleAudienceSoundWhistleKind
 // BattleAudienceSoundWhistle
 // BattleAudienceSoundCheerKind
-// BattleAudienceSoundCheer
+void BattleAudienceSoundCheer(int32_t length, int32_t fade_length);
 // BattleAudienceSoundNoiseAlways
-// BattleAudienceSoundClap
+void BattleAudienceSoundClap(int32_t length, int32_t fade_length);
 // BattleAudienceSoundBooingKind
 // BattleAudienceSoundBooing
 // BattleAudienceDetectPakkunEatTarget
@@ -85,14 +88,14 @@ void BattleAudience_Case_ActionCommandBad(
 // BattleAudienceJoy_Sub
 // BattleAudienceJoyEnding
 // BattleAudienceJoySACLecture
-// BattleAudienceJoy
+void BattleAudienceJoy(int32_t cheer_type);
 // BattleAudienceCheer
 void BattleAudienceAddPhaseEvtList(int32_t phase_evt_type);
 // BattleAudienceAddPuni
 // BattleAudiencePuniAllEscape
 // BattleAudienceAddAudienceNum
 // BattleAudienceAddTargetNumSub
-// BattleAudienceAddTargetNum
+void BattleAudienceAddTargetNum(double added, double bonus);
 // BattleAudienceNumToTargetSub
 // BattleAudienceNumToTarget
 // BattleAudience_WinSetActive
@@ -102,7 +105,7 @@ void BattleAudience_ApRecoveryBuild(battle::SpBonusInfo* bonus_info);
 // BattleAudience_GetPPAudienceNum_L
 // BattleAudience_GetPPAudienceNum_R
 int32_t BattleAudience_GetPPAudienceNumKind(int32_t audience_kind);
-// BattleAudience_GetPPAudienceNum
+int32_t BattleAudience_GetPPAudienceNum();
 // BattleAudience_GetAudienceNum
 // BattleAudience_NoUsedFCHaitiRand
 // unk_801a21e0

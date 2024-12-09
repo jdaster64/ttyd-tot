@@ -230,6 +230,8 @@ int32_t (*g_btlevtcmd_get_monosiri_msg_no_trampoline)(EvtEntry*, bool) = nullptr
 void (*g_BtlActRec_JudgeRuleKeep_trampoline)(void) = nullptr;
 // battle_actrecord.o  8018f990
 void (*g_BtlActRec_AddCount_trampoline)(uint8_t*) = nullptr;
+// battle_audience.o  8019f190
+void (*g_BattleAudience_Case_Appeal_trampoline)(BattleWorkUnit*) = nullptr;
 // battle_audience.o  8019f670
 void (*g_BattleAudience_Case_ActionCommandBad_trampoline)(BattleWeapon*) = nullptr;
 // battle_audience.o  801a1d0c
@@ -478,7 +480,6 @@ extern const int32_t g_acShot_main_Patch_targetVar3_5 = 0x80198ea7;
 extern const int32_t g_acShot_main_Patch_sfxId_1 = 0x80198803;
 extern const int32_t g_acShot_main_Patch_sfxId_2 = 0x80198827;
 extern const int32_t g_acShot_main_Patch_sfxId_3 = 0x80198f13;
-extern const int32_t g_BattleAudience_Case_Appeal_Patch_AppealSp = 0x8019f238;
 extern const int32_t g_BattleAudienceAddPuni_EnableAlways_BH = 0x801a15c8;
 extern const int32_t g_BattleAudienceAddAudienceNum_EnableAlways_BH = 0x801a1734;
 extern const int32_t g_BattleAudienceItemCtrlProcess_Patch_CheckItemValidRange = 0x801a5418;

@@ -142,6 +142,7 @@ using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_unit;
 
 using ::ttyd::battle::BattleWork;
+using ::ttyd::battle::BattleWorkAudience;
 using ::ttyd::battle::BattleWorkCommand;
 using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_damage::CounterattackWork;
@@ -192,6 +193,7 @@ extern void (*g__btlcmd_SetAttackEvent_trampoline)(BattleWorkUnit*, BattleWorkCo
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
 extern void (*g_BtlUnit_ClearStatus_trampoline)(BattleWorkUnit*);
+extern void (*g_BattleAudience_Case_Appeal_trampoline)(BattleWorkUnit*);
 extern void (*g_BattleAudience_Case_ActionCommandBad_trampoline)(BattleWeapon*);
 extern void (*g_BattleAudience_ApRecoveryBuild_trampoline)(SpBonusInfo*);
 extern int32_t (*g_btlevtcmd_AnnounceMessage_trampoline)(EvtEntry*, bool);
@@ -669,7 +671,7 @@ bool CheckEvasionBadges(BattleWorkUnit* unit) {
     if (cap_badge_evasion) {
         float hit_chance = 100.f;
         for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
-            hit_chance *= 0.90f;
+            hit_chance *= 0.875f;
         }
         for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
             hit_chance *= 0.75f;
@@ -877,12 +879,7 @@ int32_t CalculateDefImpl(
     }
     
     // Defense modifiers.
-    
     def += target->badges_equipped.defend_plus;
-    if (target->status_flags & BattleUnitStatus_Flags::DEFENDING) {
-        // Toughen Up buffs the "Defend" action.
-        def += 1 + target->badges_equipped.super_charge;
-    }
     
     int8_t strength = 0;
     BtlUnit_GetStatus(target, StatusEffectType::DEFENSE_UP, nullptr, &strength);
@@ -1014,10 +1011,17 @@ int32_t CalculateBaseDamage(
         }
         if (damage < 1) damage = 1;
     }
+
+    // Defending now reduces damage taken directly, rather than adding DEF.
+    if (target->status_flags & BattleUnitStatus_Flags::DEFENDING) { 
+        // Toughen Up buffs the strength of the "Defend" action.
+        damage -= (1 + target->badges_equipped.super_charge);
+    }
+    // Guarding also reduces damage taken directly (as well as Damage Dodge).
     if (unk1 & 0x40000) {  // guarding
-        // Damage Dodge is now unpierceable.
         damage -= (1 + target->badges_equipped.damage_dodge);
     }
+
     if (element == AttackElement::FIRE) {
         damage -= target->badges_equipped.ice_power;
     }
@@ -1211,6 +1215,22 @@ void ApplyAttackSuccessBonuses(SpBonusInfo* bonus_info) {
     }
 }
 
+void HandleAppealReaction(BattleWorkAudience* aud_work, BattleWorkUnit* unit) {
+    int32_t aud_size = ttyd::battle_audience::BattleAudience_GetPPAudienceNum();
+    if (aud_size > 0) {
+        // Rebalanced regen: 40-80 instead of 25-75 base, + 40 per Super Appeal.
+        int32_t sp_regen = 40 + (aud_size / 5);
+        sp_regen += unit->badges_equipped.super_appeal * 40;
+        aud_work->impending_star_power += sp_regen;
+
+        ttyd::battle_audience::BattleAudienceSoundCheer(180, 60);
+        ttyd::battle_audience::BattleAudienceSoundClap(180, 60);
+        ttyd::battle_audience::BattleAudienceJoy(0);
+    }
+    ttyd::battle_audience::BattleAudienceAddTargetNum(
+        aud_work->base_target_audience * 0.05f, 0.0f);
+}
+
 void SpendAndIncrementPartySwitchCost() {
     if (g_PartySwitchPlayerInitiated) {
         // Spend FP (and track total FP spent in BattleActRec).
@@ -1223,8 +1243,8 @@ void SpendAndIncrementPartySwitchCost() {
         ttyd::battle_actrecord::BtlActRec_AddPoint(
             &battleWork->act_record_work.mario_fp_spent, switch_fp_cost);
         
-        // Increment cost of next use, until it hits 5 FP, or the player's max.
-        if (switch_fp_cost < 5 && switch_fp_cost < unit->max_fp) {
+        // Increment cost of next use, until it hits 3 FP, or the player's max.
+        if (switch_fp_cost < 3 && switch_fp_cost < unit->max_fp) {
             ++g_PartySwitchNextFpCost;
         }
     }
@@ -1678,6 +1698,15 @@ void ApplyFixedPatches() {
         [](SpBonusInfo* bonus_info) {
             // Replaces vanilla logic completely.
             ApplyAttackSuccessBonuses(bonus_info);
+        });
+
+    // Replace the logic for handling an Appeal action.
+    g_BattleAudience_Case_Appeal_trampoline = mod::hookFunction(
+        ttyd::battle_audience::BattleAudience_Case_Appeal,
+        [](BattleWorkUnit* unit) {
+            // Replaces vanilla logic completely.
+            auto* aud_work = &ttyd::battle::g_BattleWork->audience_work;
+            HandleAppealReaction(aud_work, unit);
         });
 
     // Add replacement for vanilla logic about Hammer Bros. throwing hammer if
