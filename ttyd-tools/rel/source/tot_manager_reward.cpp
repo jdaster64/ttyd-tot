@@ -328,7 +328,7 @@ int32_t SelectSpecialMove() {
     int32_t total_weight = 0;
 
     // If playing with limit, return early if already reached.
-    if (MoveManager::HasReachedLimit(MoveType::SP_SWEET_TREAT)) return true;
+    if (MoveManager::HasReachedLimit(MoveType::SP_SWEET_TREAT)) return 0;
     
     for (int32_t i = 2; i < 8; ++i) {
         auto* data = MoveManager::GetMoveData(MoveType::SP_SWEET_TREAT + i);

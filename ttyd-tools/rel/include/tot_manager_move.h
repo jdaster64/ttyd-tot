@@ -48,9 +48,9 @@ namespace MoveType {
         
         GOOMBELLA_BASE,
         GOOMBELLA_TATTLE,
-        GOOMBELLA_IRONBONK,
-        GOOMBELLA_SCOPE_OUT,
         GOOMBELLA_MULTIBONK,
+        GOOMBELLA_SCOPE_OUT,
+        GOOMBELLA_IRONBONK,
         GOOMBELLA_RALLY_WINK,
         
         KOOPS_BASE,

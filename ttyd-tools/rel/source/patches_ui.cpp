@@ -550,6 +550,8 @@ void ApplyFixedPatches() {
 
     // Add Mailbox SP to Key Items menu skip list (in place of Boat curse).
     ttyd::win_item::menu_skip_list[6] = ItemType::MAILBOX_SP;
+    // Included just to prevent bug introduced in v2.00 from untidying key items.
+    ttyd::win_item::menu_skip_list[7] = ItemType::STRANGE_SACK;
 
     // Patch out call to winMailGx.
     mod::writePatch(
