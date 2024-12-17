@@ -152,6 +152,7 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 
 // Function hooks.
 extern void (*g_statusWinDisp_trampoline)(void);
+extern void (*g_winRootDisp_trampoline)(CameraId, WinPauseMenu*);
 extern void (*g_itemUseDisp2_trampoline)(WinMgrEntry*);
 extern void (*g_itemUseDisp_trampoline)(WinMgrEntry*);
 extern void (*g_winItemDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
@@ -583,6 +584,16 @@ void ApplyFixedPatches() {
         ttyd::win_log::winLogDisp, [](
             CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
             tot::win::LogMenuDisp(camera, menu, tab_number);
+        });
+
+    // Hook main pause menu display method to display achievement icon.
+    g_winRootDisp_trampoline = mod::hookFunction(
+        ttyd::win_root::winRootDisp, [](
+            CameraId camera, WinPauseMenu* menu) {
+            // Run original logic.
+            g_winRootDisp_trampoline(camera, menu);
+            // Run additional logic to show new achievements are available.
+            tot::win::LogMenuDrawTabNotif(camera, menu);
         });
 
     // Update sorting functions used by certain win_log menus.

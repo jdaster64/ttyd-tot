@@ -2509,4 +2509,30 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
     }
 }
 
+void LogMenuDrawTabNotif(CameraId camera_id, WinPauseMenu* menu) {
+    // Don't draw if the Journal tab is currently selected...
+    if (menu->root_cursor_idx == 4) return;
+
+    // If not currently in Achievements tab, check for queued achievements...
+    if (!(menu->log_menu_state == 16 || menu->log_menu_state == 60)) {
+        bool achievement_queued = false;
+        for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
+            if (GetSWF(GSWF_AchUnlockQueue + i)) {
+                achievement_queued = true;
+                break;
+            }
+        }
+        if (achievement_queued) {
+            ttyd::win_main::winIconInit();
+            const auto& tab_info = menu->tab_header_info[4];
+            gc::vec3 position = { tab_info.x + 48.0f, tab_info.y + 24.0f, 0.0f };
+            gc::vec3 scale = { 0.8f, 0.8f, 0.8f };
+            uint32_t color = 0xFFFFFFFFU;
+            ttyd::win_main::winIconSet(
+                IconType::STATUS_EXCLAMATION_BUTTON,
+                &position, &scale, &color);
+        }
+    }
+}
+
 }  // namespace mod::tot::win

@@ -30,4 +30,7 @@ void LogMenuDisp(
     ttyd::dispdrv::CameraId camera_id, ttyd::win_root::WinPauseMenu* menu,
     int32_t tab_number);
 
+void LogMenuDrawTabNotif(
+    ttyd::dispdrv::CameraId camera_id, ttyd::win_root::WinPauseMenu* menu);
+
 }

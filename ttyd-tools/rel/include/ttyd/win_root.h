@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ttyd/dispdrv.h>
+
 #include <cstdint>
 
 // Forward declarations.
@@ -23,8 +25,9 @@ struct WinTabHeaderInfo {
     float       y;
     int32_t     state;
     int32_t     timer;
+    const char* desc;
 };
-static_assert(sizeof(WinTabHeaderInfo) == 0x14);
+static_assert(sizeof(WinTabHeaderInfo) == 0x18);
 
 struct WinTabBodyInfo {
     int32_t     id;
@@ -102,7 +105,7 @@ struct WinPauseMenu {
     evtmgr::EvtEntry* use_item_evt;                         // 0x003c
     int32_t     root_cursor_idx;                            // 0x0040
     int32_t     root_cursor_max;                            // 0x0044
-    WinTabHeaderInfo tab_header_info[6];                    // 0x0048
+    WinTabHeaderInfo tab_header_info[5];                    // 0x0048
     WinTabBodyInfo   tab_body_info[5];                      // 0x00c0
     // Used by sort menu, possibly description window as well?
     int32_t     parent_menu_state;                          // 0x0124
@@ -346,7 +349,8 @@ void winMsgEntry(
 // winMsgMain
 void winBgGX(double x, double y, WinPauseMenu* menu, int32_t type);
 // winBgMain
-// winRootDisp
+void winRootDisp(
+    ttyd::dispdrv::CameraId camera, ttyd::win_root::WinPauseMenu* menu);
 // winRootMain
 
 // .data

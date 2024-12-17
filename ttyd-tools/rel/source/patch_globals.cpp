@@ -188,6 +188,8 @@ int32_t (*g_BattleItemData_rank_up_trampoline)(EvtEntry*, bool) = nullptr;
 void (*g_statusWinDisp_trampoline)(void) = nullptr;
 // mario_party.o  80140ea4
 int32_t (*g_partyGetHp_trampoline)(int32_t) = nullptr;
+// win_root.o  801645d0
+void (*g_winRootDisp_trampoline)(CameraId, WinPauseMenu*) = nullptr;
 // win_item.o  80169cf0
 void (*g_itemUseDisp2_trampoline)(WinMgrEntry*) = nullptr;
 // win_item.o  80169ec0
