@@ -19,6 +19,7 @@
 #include <ttyd/battle_unit.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
+#include <ttyd/fontmgr.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mario_pouch.h>
@@ -32,6 +33,8 @@
 #include <ttyd/sac_zubastar.h>
 #include <ttyd/sound.h>
 #include <ttyd/system.h>
+#include <ttyd/win_main.h>
+#include <ttyd/windowdrv.h>
 
 #include <cinttypes>
 #include <cstdio>
@@ -163,6 +166,8 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
     if (!win_data || !win_data[0]) return;
     
     auto* cursor = reinterpret_cast<BattleWorkCommandCursor*>(win_data[0]);
+    bool can_change_level = false;
+
     if (is_strategies_menu) {
         auto* battleWork = ttyd::battle::g_BattleWork;
         auto* strats = battleWork->command_work.operation_table;
@@ -193,6 +198,10 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
             
             // If current selection, and L/R pressed, change power level.
             if (i == cursor->abs_position) {
+                if (MoveManager::GetUnlockedLevel(move_type) > 1) {
+                    can_change_level = true;
+                }
+
                 if (left_press &&
                     MoveManager::ChangeSelectedLevel(move_type, -1)) {
                     ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
@@ -240,6 +249,10 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
             if (weapon->base_sp_cost) {
                 // If current selection, and L/R pressed, change power level.
                 if (i == cursor->abs_position) {
+                    if (MoveManager::GetUnlockedLevel(move_type) > 1) {
+                        can_change_level = true;
+                    }
+
                     if (left_press && 
                         MoveManager::ChangeSelectedLevel(move_type, -1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
@@ -268,6 +281,10 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                 // Otherwise, must be a free / FP-costing move.            
                 // If current selection, and L/R pressed, change power level.
                 if (i == cursor->abs_position) {
+                    if (MoveManager::GetUnlockedLevel(move_type) > 1) {
+                        can_change_level = true;
+                    }
+
                     if (left_press && 
                         MoveManager::ChangeSelectedLevel(move_type, -1)) {
                         ttyd::sound::SoundEfxPlayEx(0x478, 0, 0x64, 0x40);
@@ -320,6 +337,35 @@ void CheckForSelectingWeaponLevel(bool is_strategies_menu) {
                     &weapon->base_fp_cost, &new_cost, sizeof(new_cost));
             }
         }
+    }
+
+    // If the current selection can have its level changed, draw tutorial win.
+    if (can_change_level) {
+        const float win_x = 44.0f;
+        const float win_y = 104.0f;
+
+        uint8_t kWinColor[] = { 0xff, 0xff, 0xff, 0xcf };
+        uint32_t kIconColor = 0xFFFFFFFFU;
+        ttyd::windowdrv::windowDispGX_Waku_col(
+            0, kWinColor, win_x, win_y, 200.f, 25.f, 10.f);
+
+        ttyd::fontmgr::FontDrawStart();
+        ttyd::fontmgr::FontDrawColorIDX(0);
+        ttyd::fontmgr::FontDrawScale(0.7f);
+        const char* msg = ttyd::msgdrv::msgSearch("tot_select_move_level");
+        int32_t length = ttyd::fontmgr::FontGetMessageWidth(msg);
+        ttyd::fontmgr::FontDrawString(
+            win_x + 10.0f + 120.0f - 0.35 * length, win_y - 4.0f, msg);
+
+        ttyd::win_main::winIconInit();
+        gc::vec3 position = { win_x + 19.0f, win_y - 12.0f, 0.0f };
+        gc::vec3 scale = { 0.5f, 0.5f, 0.5f };
+        ttyd::win_main::winIconSet(
+            IconType::CONTROL_STICK_CENTER, &position, &scale, &kIconColor);
+        position.x += 28.0f;
+        gc::vec3 dpad_scale = { 0.4f, 0.4f, 0.4f };
+        ttyd::win_main::winIconSet(
+            IconType::HUD_DPAD, &position, &dpad_scale, &kIconColor);
     }
 }
 

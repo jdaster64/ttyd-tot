@@ -35,7 +35,12 @@ Tower of Trials uses a separate save data file from the original TTYD, so make
 sure whatever memory card you're using has space for an additional 17 blocks.
 
 ### Known Issues
-*   No major issues known at the moment.
+*   Loading a file with a run already in progress will cause the next floor's
+    map to look like the bottom floors of the tower, regardless of progress.
+    This will likely not be fixed, as it is only a visual issue and will correct
+    itself on the following floor, and making the map information propagate
+    through TTYD's various loading-zone object systems is tricky to do
+    without breaking them.
 
 ### Credits
 *   **PistonMiner** - For the initial REL framework and related tools,

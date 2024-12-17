@@ -1195,6 +1195,9 @@ g_GlobalStrings = {
         b"<icon PAD_X 0.6 1 2 6> repeatedly\n"
         b"in quick succession!",
         
+    b"tot_select_move_level":
+        b"Select Level",
+        
     # Shortened move names
     
     b"tot_mj_spring_abb":   b"Spring J.",
