@@ -242,6 +242,14 @@ bool HasAllMovesUnlocked(int32_t reward_type) {
     int32_t num_moves = 0;
     GetMoveRange(reward_type, move_start, num_moves);
 
+    // If partner reward, and partner is not yet unlocked, don't skip.
+    if (move_start >= MoveType::GOOMBELLA_BASE) {
+        int32_t id = MoveManager::GetMoveData(move_start)->partner_id;
+        if (!(ttyd::mario_pouch::pouchGetPtr()->party_data[id].flags & 1)) {
+            return false;
+        }
+    }
+
     // If playing with limit, return early if already reached.
     if (MoveManager::HasReachedLimit(move_start)) return true;
     
