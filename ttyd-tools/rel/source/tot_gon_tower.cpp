@@ -347,10 +347,12 @@ EVT_BEGIN(Tower_SpawnHeartSaveBlock)
             evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_TRANSFORM4"), 
             -100, 60, -80, 0)
 
-        // Play bomb effect for save block as well.
-        USER_FUNC(
-            evt_eff, PTR(""), PTR("bomb"), 0, LW(6), LW(7), LW(8), FLOAT(1.0),
-            0, 0, 0, 0, 0, 0, 0)
+        // Play bomb effect for save block as well, if not on countdown timer.
+        IF_EQUAL((int32_t)GSW_CountdownTimerState, 0)
+            USER_FUNC(
+                evt_eff, PTR(""), PTR("bomb"), 0, LW(6), LW(7), LW(8), FLOAT(1.0),
+                0, 0, 0, 0, 0, 0, 0)
+        END_IF()
     END_IF()
 
     // Spawn save block, but only on boss floors, and not with countdown timer.
