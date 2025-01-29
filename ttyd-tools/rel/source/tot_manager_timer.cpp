@@ -358,9 +358,9 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         if (state.GetOption(STAT_RUN_BADGES_EQUIPPED) == 0) {
             AchievementsManager::MarkCompleted(AchievementId::RUN_NO_BADGES);
         }
-        // 8 levels = 10% + 7 * 5%
+        // 8 levels = 15% + 7 * 5% = 50% intensity
         if (state.GetOption(OPT_COUNTDOWN_TIMER) >= 8) {
-            AchievementsManager::MarkCompleted(AchievementId::V2_RUN_COUNTDOWN_45);
+            AchievementsManager::MarkCompleted(AchievementId::V2_RUN_COUNTDOWN_50);
         }
     }
 

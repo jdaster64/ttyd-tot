@@ -484,6 +484,15 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                     OptionsManager::ApplyCurrentPresetOptions();
                 }
             }
+        } else if (g_MarioSt->gamepad_buttons_pressed[0] & ButtonId::Y) {
+            // Try randomizing the option, if allowed.
+            if (OptionsManager::RandomizeOption(option)) {
+                // Play menu back-out sound to indicate randomization action.
+                ttyd::pmario_sound::psndSFXOn((const char*)0x2002b);
+            } else {
+                // Play "failure" sound.
+                ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
+            }
         } else if (change) {
             // Allow changing only preset, difficulty and timer options if
             // a non-custom preset is selected.
@@ -493,93 +502,8 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                 // Play "failure" sound.
                 ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
             } else {
-                // Change the option, wrapping around if necessary.
-                state.NextOption(option, change);
-
-                // Special handling for particular options.
-                switch (option) {
-                    case OPT_PRESET:
-                        // "RTA Race" option set is redundant for race mode.
-                        if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) &&
-                            state.CheckOptionValue(OPTVAL_PRESET_RTA_RACE))
-                            state.NextOption(option, change);
-                        break;
-                    case OPT_DIFFICULTY:
-                        // Set NPC choice 4 to None / Random by default when
-                        // swapping difficulties.
-                        if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
-                            state.SetOption(
-                                OPT_NPC_CHOICE_4,
-                                tot::gon::GetNumSecondaryNpcTypes() + 1);
-                        } else {
-                            state.SetOption(
-                                OPT_NPC_CHOICE_4,
-                                tot::gon::GetNumSecondaryNpcTypes());
-                        }
-                        break;
-                    case OPT_MARIO_BP:
-                        // If Infinite BP isn't unlocked, skip it.
-                        if (state.CheckOptionValue(OPTVAL_INFINITE_BP) &&
-                            !AchievementsManager::CheckOptionUnlocked(
-                                OPTVAL_INFINITE_BP)) {
-                            state.NextOption(option, change);
-                        }
-                        break;
-                    case OPT_STARTER_ITEMS:
-                        // If "custom" starting items isn't unlocked, skip it.
-                        if (state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) &&
-                            !AchievementsManager::CheckOptionUnlocked(
-                                OPTVAL_STARTER_ITEMS_CUSTOM)) {
-                            state.NextOption(option, change);
-                        }
-                        break;
-                    case OPT_MOVE_AVAILABILITY:
-                        // NOTE: currently, this code relies on partner +1 and
-                        // and custom moves settings not being adjacent!
-
-                        // If custom moves key item isn't unlocked, skip option.
-                        if (state.CheckOptionValue(OPTVAL_MOVES_CUSTOM) &&
-                            !ttyd::mario_pouch::pouchCheckItem(
-                                ItemType::TOT_KEY_MOVE_SELECTOR)) {
-                            state.NextOption(option, change);
-                        }
-                        // If partners disabled, don't allow +1 move on pickup.
-                        if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
-                            state.GetOption(OPT_MAX_PARTNERS) == 0) {
-                            state.NextOption(option, change);
-                        }
-                        break;
-                    case OPT_MAX_PARTNERS:
-                        // If partners disabled, don't allow +1 move on pickup.
-                        if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
-                            state.GetOption(OPT_MAX_PARTNERS) == 0) {
-                            state.SetOption(OPTVAL_MOVES_DEFAULT);
-                        }
-                        break;
-                    case OPT_NPC_CHOICE_1:
-                    case OPT_NPC_CHOICE_2:
-                    case OPT_NPC_CHOICE_3:
-                    case OPT_NPC_CHOICE_4: {
-                        // Skip past duplicate NPCs.
-                        int32_t matches;
-                        do {
-                            matches = 0;
-                            int32_t cur = state.GetOption(option);
-                            if (cur < tot::gon::GetNumSecondaryNpcTypes()) {
-                                matches += 
-                                    state.GetOption(OPT_NPC_CHOICE_1) == cur ? 1 : 0;
-                                matches += 
-                                    state.GetOption(OPT_NPC_CHOICE_2) == cur ? 1 : 0;
-                                matches += 
-                                    state.GetOption(OPT_NPC_CHOICE_3) == cur ? 1 : 0;
-                                matches += 
-                                    state.GetOption(OPT_NPC_CHOICE_4) == cur ? 1 : 0;
-                                if (matches > 1)
-                                    state.NextOption(option, change);
-                            }
-                        } while (matches > 1);
-                    }
-                }
+                // Advance to the next valid option.
+                OptionsManager::AdvanceOption(option, change);
                 // Play selection sound.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x20005);
                 // Enforce / re-enforce current preset's settings.

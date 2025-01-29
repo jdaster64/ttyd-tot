@@ -94,7 +94,7 @@ namespace AchievementId {
         V2_RUN_HAMMERMAN,
         V2_MISC_BATTLE_COINS_100,
         V2_MISC_SP_TURN1,
-        V2_RUN_COUNTDOWN_45,
+        V2_RUN_COUNTDOWN_50,
         V2_AGG_ENEMY_TIMES_100,
 
         MAX_ACHIEVEMENT,

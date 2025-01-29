@@ -5,6 +5,7 @@
 #include "tot_generate_item.h"
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_reward.h"
 #include "tot_manager_title.h"
@@ -29,41 +30,42 @@ struct RunOptionMetadata {
     int32_t  default_value;             // Used instead if default_optval = 0.
     int8_t   check_for_default;
     int8_t   check_for_default_stat;
+    int8_t   randomize_type;            // 0 = never, 1 = by request, 2 = always
 };
 RunOptionMetadata g_OptionMetadata[] = {
-    { OPT_PRESET, 0, -1, false, false },
-    { OPT_DIFFICULTY, 0, -1, false, false },
-    { OPT_TIMER_DISPLAY, 0, -1, false, false },
-    { OPT_COUNTDOWN_TIMER, OPTVAL_COUNTDOWN_OFF, -1, true, false },
-    { OPT_NUM_CHESTS, OPTVAL_CHESTS_DEFAULT, -1, true, false },
-    { OPT_BATTLE_DROPS, OPTVAL_DROP_STANDARD, -1, true, false },
-    { OPT_STARTER_ITEMS, OPTVAL_STARTER_ITEMS_BASIC, -1, true, false },
-    { OPT_MOVE_AVAILABILITY, OPTVAL_MOVES_DEFAULT, -1, true, false },
-    { OPT_MOVE_LIMIT, OPTVAL_MOVE_LIMIT_DEFAULT, -1, true, false },
-    { OPT_MAX_PARTNERS, 0, -1, true, false },
-    { OPT_PARTNER, OPTVAL_PARTNER_RANDOM, -1, true, false },
-    { OPT_REVIVE_PARTNERS, OPTVAL_REVIVE_PARTNERS_ON, -1, true, false },
-    { OPT_MARIO_HP, 0, 5, true, true },
-    { OPT_MARIO_FP, 0, 5, true, true },
-    { OPT_MARIO_BP, 0, 5, true, true },
-    { OPT_PARTNER_HP, 0, 5, true, true },
-    { OPT_INVENTORY_SACK_SIZE, 0, 2, true, false },
-    { OPTNUM_ENEMY_HP, 0, 100, true, false },
-    { OPTNUM_ENEMY_ATK, 0, 100, true, false },
-    { OPTNUM_SUPERGUARD_SP_COST, 0, 0, true, false },
-    { OPT_AC_DIFFICULTY, OPTVAL_AC_DEFAULT, -1, true, false },
-    { OPT_RUN_AWAY, OPTVAL_RUN_AWAY_DEFAULT, -1, true, false },
-    { OPT_STAGE_HAZARDS, OPTVAL_STAGE_HAZARDS_NORMAL, -1, true, false },
-    { OPT_RANDOM_DAMAGE, OPTVAL_RANDOM_DAMAGE_NONE, -1, true, false },
-    { OPT_AUDIENCE_RANDOM_THROWS, OPTVAL_AUDIENCE_THROWS_OFF, -1, true, false },
-    { OPT_OBFUSCATE_ITEMS, OPTVAL_OBFUSCATE_ITEMS_OFF, -1, true, false },
-    { OPT_BANDIT_ESCAPE, OPTVAL_BANDIT_NO_REFIGHT, -1, true, false },
-    { OPT_CHARLIETON_STOCK, OPTVAL_CHARLIETON_NORMAL, -1, true, false },
-    { OPT_NPC_CHOICE_1, 0, -1, true, false },
-    { OPT_NPC_CHOICE_2, 0, -1, true, false },
-    { OPT_NPC_CHOICE_3, 0, -1, true, false },
-    { OPT_NPC_CHOICE_4, 0, -1, true, false },
-    { OPT_SECRET_BOSS, OPTVAL_SECRET_BOSS_RANDOM, -1, true, false },
+    { OPT_PRESET, 0, -1, false, false, 1 },
+    { OPT_DIFFICULTY, 0, -1, false, false, 0 },
+    { OPT_TIMER_DISPLAY, 0, -1, false, false, 0 },
+    { OPT_COUNTDOWN_TIMER, OPTVAL_COUNTDOWN_OFF, -1, true, false, 1 },
+    { OPT_NUM_CHESTS, OPTVAL_CHESTS_DEFAULT, -1, true, false, 2 },
+    { OPT_BATTLE_DROPS, OPTVAL_DROP_STANDARD, -1, true, false, 2 },
+    { OPT_STARTER_ITEMS, OPTVAL_STARTER_ITEMS_BASIC, -1, true, false, 2 },
+    { OPT_MOVE_AVAILABILITY, OPTVAL_MOVES_DEFAULT, -1, true, false, 2 },
+    { OPT_MOVE_LIMIT, OPTVAL_MOVE_LIMIT_DEFAULT, -1, true, false, 2 },
+    { OPT_MAX_PARTNERS, 0, -1, true, false, 2 },
+    { OPT_PARTNER, OPTVAL_PARTNER_RANDOM, -1, true, false, 2 },
+    { OPT_REVIVE_PARTNERS, OPTVAL_REVIVE_PARTNERS_ON, -1, true, false, 2 },
+    { OPT_MARIO_HP, 0, 5, true, true, 2 },
+    { OPT_MARIO_FP, 0, 5, true, true, 2 },
+    { OPT_MARIO_BP, 0, 5, true, true, 2 },
+    { OPT_PARTNER_HP, 0, 5, true, true, 2 },
+    { OPT_INVENTORY_SACK_SIZE, 0, 2, true, false, 2 },
+    { OPTNUM_ENEMY_HP, 0, 100, true, false, 2 },
+    { OPTNUM_ENEMY_ATK, 0, 100, true, false, 2 },
+    { OPTNUM_SUPERGUARD_SP_COST, 0, 0, true, false, 2 },
+    { OPT_AC_DIFFICULTY, OPTVAL_AC_DEFAULT, -1, true, false, 2 },
+    { OPT_RUN_AWAY, OPTVAL_RUN_AWAY_DEFAULT, -1, true, false, 1 },
+    { OPT_STAGE_HAZARDS, OPTVAL_STAGE_HAZARDS_NORMAL, -1, true, false, 1 },
+    { OPT_RANDOM_DAMAGE, OPTVAL_RANDOM_DAMAGE_NONE, -1, true, false, 1 },
+    { OPT_AUDIENCE_RANDOM_THROWS, OPTVAL_AUDIENCE_THROWS_OFF, -1, true, false, 1 },
+    { OPT_OBFUSCATE_ITEMS, OPTVAL_OBFUSCATE_ITEMS_OFF, -1, true, false, 1 },
+    { OPT_BANDIT_ESCAPE, OPTVAL_BANDIT_NO_REFIGHT, -1, true, false, 1 },
+    { OPT_CHARLIETON_STOCK, OPTVAL_CHARLIETON_NORMAL, -1, true, false, 2 },
+    { OPT_NPC_CHOICE_1, 0, -1, true, false, 2 },
+    { OPT_NPC_CHOICE_2, 0, -1, true, false, 2 },
+    { OPT_NPC_CHOICE_3, 0, -1, true, false, 2 },
+    { OPT_NPC_CHOICE_4, 0, -1, true, false, 2 },
+    { OPT_SECRET_BOSS, OPTVAL_SECRET_BOSS_RANDOM, -1, true, false, 1 },
 };
 
 void EncodeOption(
@@ -157,6 +159,21 @@ void SetBaseStats() {
         ttyd::mario_pouch::_party_max_hp_table[i * 4] = pouch.party_data[i].max_hp;
     }
 }
+
+bool OptionUnlocked(uint32_t option) {
+    switch (option) {
+        case OPT_COUNTDOWN_TIMER:
+            return GetSWF(GSWF_White_CountdownUnlocked);
+        case OPT_NPC_CHOICE_1:
+        case OPT_NPC_CHOICE_2:
+        case OPT_NPC_CHOICE_3:
+        case OPT_NPC_CHOICE_4:
+            // All NPC choices unlocked at once.
+            return AchievementsManager::CheckOptionUnlocked(OPT_NPC_CHOICE_1);
+        default:
+            return AchievementsManager::CheckOptionUnlocked(option);
+    }
+}
     
 }
 
@@ -189,6 +206,228 @@ void OptionsManager::ApplyCurrentPresetOptions(bool first_time) {
             break;
         }
     }
+}
+
+void OptionsManager::AdvanceOption(uint32_t option, int32_t change) {
+    auto& state = g_Mod->state_;
+    // Change the option, wrapping around if necessary.
+    state.NextOption(option, change);
+
+    // Special handling for particular options.
+    switch (option) {
+        case OPT_PRESET:
+            // "RTA Race" option set is redundant for race mode.
+            if (state.CheckOptionValue(OPTVAL_RACE_MODE_ENABLED) &&
+                state.CheckOptionValue(OPTVAL_PRESET_RTA_RACE))
+                state.NextOption(option, change);
+            break;
+        case OPT_DIFFICULTY:
+            // Set NPC choice 4 to None / Random by default when
+            // swapping difficulties.
+            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
+                state.SetOption(
+                    OPT_NPC_CHOICE_4, tot::gon::GetNumSecondaryNpcTypes() + 1);
+            } else {
+                state.SetOption(
+                    OPT_NPC_CHOICE_4, tot::gon::GetNumSecondaryNpcTypes());
+            }
+            break;
+        case OPT_MARIO_BP:
+            // If Infinite BP isn't unlocked, skip it.
+            if (state.CheckOptionValue(OPTVAL_INFINITE_BP) &&
+                !AchievementsManager::CheckOptionUnlocked(
+                    OPTVAL_INFINITE_BP)) {
+                state.NextOption(option, change);
+            }
+            break;
+        case OPT_STARTER_ITEMS:
+            // If "custom" starting items isn't unlocked, skip it.
+            if (state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) &&
+                !AchievementsManager::CheckOptionUnlocked(
+                    OPTVAL_STARTER_ITEMS_CUSTOM)) {
+                state.NextOption(option, change);
+            }
+            break;
+        case OPT_MOVE_AVAILABILITY:
+            // NOTE: currently, this code relies on partner +1 and
+            // and custom moves settings not being adjacent!
+
+            // If custom moves key item isn't unlocked, skip option.
+            if (state.CheckOptionValue(OPTVAL_MOVES_CUSTOM) &&
+                !ttyd::mario_pouch::pouchCheckItem(
+                    ItemType::TOT_KEY_MOVE_SELECTOR)) {
+                state.NextOption(option, change);
+            }
+            // If partners disabled, don't allow +1 move on pickup.
+            if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
+                state.GetOption(OPT_MAX_PARTNERS) == 0) {
+                state.NextOption(option, change);
+            }
+            break;
+        case OPT_MAX_PARTNERS:
+            // If partners disabled, don't allow +1 move on pickup.
+            if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
+                state.GetOption(OPT_MAX_PARTNERS) == 0) {
+                state.SetOption(OPTVAL_MOVES_DEFAULT);
+            }
+            break;
+        case OPT_NPC_CHOICE_1:
+        case OPT_NPC_CHOICE_2:
+        case OPT_NPC_CHOICE_3:
+        case OPT_NPC_CHOICE_4: {
+            // Skip past duplicate NPCs.
+            int32_t matches;
+            do {
+                matches = 0;
+                int32_t cur = state.GetOption(option);
+                if (cur < tot::gon::GetNumSecondaryNpcTypes()) {
+                    matches += 
+                        state.GetOption(OPT_NPC_CHOICE_1) == cur ? 1 : 0;
+                    matches += 
+                        state.GetOption(OPT_NPC_CHOICE_2) == cur ? 1 : 0;
+                    matches += 
+                        state.GetOption(OPT_NPC_CHOICE_3) == cur ? 1 : 0;
+                    matches += 
+                        state.GetOption(OPT_NPC_CHOICE_4) == cur ? 1 : 0;
+                    if (matches > 1)
+                        state.NextOption(option, change);
+                }
+            } while (matches > 1);
+        }
+    }
+}
+
+bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
+    auto& state = g_Mod->state_;
+
+    bool found = false;
+    for (const auto& data : g_OptionMetadata) {
+        if (data.option == option) {
+            found = true;
+
+            switch (data.randomize_type) {
+                case 1: {   // Only randomize if explicitly asked.
+                    if (!explicitly) return false;
+
+                    switch (option) {
+                        case OPT_PRESET: {
+                            // Cannot randomize preset.
+                            if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM))
+                                return false;
+
+                            // If preset is custom, randomize all other options
+                            // with explicitly = false (user did not ask).
+                            for (const auto& data : g_OptionMetadata) {
+                                if (OptionUnlocked(data.option))
+                                    RandomizeOption(data.option, false);
+                            }
+                            return true;
+                        }
+                    }
+
+                    break;
+                }
+                case 2: {   // Randomize always.
+                    switch (option) {
+                        case OPTNUM_ENEMY_HP:
+                        case OPTNUM_ENEMY_ATK: {
+                            // Randomize w/ ~triangle distribution over 5%-200%.
+                            int32_t value = state.Rand(20) + state.Rand(21) + 1;
+                            state.SetOption(option, value * 5);
+                            return true;
+                        }
+
+                        case OPTNUM_SUPERGUARD_SP_COST: {
+                            state.SetOption(option, state.Rand(101));
+                            return true;
+                        }
+
+                        case OPT_NPC_CHOICE_4: {
+                            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF))
+                                return false;
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+                default:
+                    // Never randomize.
+                    return false;
+            }
+        }
+    }
+    // Couldn't find a valid option.
+    if (!found) return false;
+
+    // Standard randomization.
+    bool successful = false;
+    while (!successful) {
+        int32_t value = state.Rand((option & 0xff) + 1);
+        state.SetOption(option, value);
+        successful = true;
+    
+        // Handle invalid combinations of options by retrying.
+        switch (option) {
+            case OPT_MARIO_BP:
+                // If Infinite BP isn't unlocked, retry.
+                if (state.CheckOptionValue(OPTVAL_INFINITE_BP) &&
+                    !AchievementsManager::CheckOptionUnlocked(
+                        OPTVAL_INFINITE_BP)) {
+                    successful = false;
+                }
+                break;
+            case OPT_STARTER_ITEMS:
+                // If "custom" starting items isn't unlocked, retry.
+                if (state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) &&
+                    !AchievementsManager::CheckOptionUnlocked(
+                        OPTVAL_STARTER_ITEMS_CUSTOM)) {
+                    successful = false;
+                }
+                break;
+            case OPT_MOVE_AVAILABILITY:
+                // If custom moves key item isn't unlocked, retry.
+                if (state.CheckOptionValue(OPTVAL_MOVES_CUSTOM) &&
+                    !ttyd::mario_pouch::pouchCheckItem(
+                        ItemType::TOT_KEY_MOVE_SELECTOR)) {
+                    successful = false;
+                }
+                // If partners disabled, retry on +1 move on pickup.
+                if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
+                    state.GetOption(OPT_MAX_PARTNERS) == 0) {
+                    successful = false;
+                }
+                break;
+            case OPT_MAX_PARTNERS:
+                // If partners were just disabled, override +1 move on pickup.
+                if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
+                    state.GetOption(OPT_MAX_PARTNERS) == 0) {
+                    state.SetOption(OPTVAL_MOVES_DEFAULT);
+                }
+                break;
+            case OPT_NPC_CHOICE_1:
+            case OPT_NPC_CHOICE_2:
+            case OPT_NPC_CHOICE_3:
+            case OPT_NPC_CHOICE_4: {
+                // If NPC type is duplicated, retry.
+                int32_t matches = 0;
+                if (value < tot::gon::GetNumSecondaryNpcTypes()) {
+                    matches +=
+                        state.GetOption(OPT_NPC_CHOICE_1) == value ? 1 : 0;
+                    matches += 
+                        state.GetOption(OPT_NPC_CHOICE_2) == value ? 1 : 0;
+                    matches += 
+                        state.GetOption(OPT_NPC_CHOICE_3) == value ? 1 : 0;
+                    matches += 
+                        state.GetOption(OPT_NPC_CHOICE_4) == value ? 1 : 0;
+                    if (matches > 1)
+                        successful = false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 int32_t OptionsManager::GetDefaultValue(uint32_t option) {
@@ -374,8 +613,8 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
             return state.GetOption(option) * 5;
         case OPT_COUNTDOWN_TIMER: {
             int32_t level = state.GetOption(option);
-            // Adds 10%, plus 5% per additional level of restriction.
-            if (level) return (level + 1) * 5;
+            // Adds 15%, plus 5% per additional level of restriction.
+            if (level) return (level + 2) * 5;
             break;
         }
     }

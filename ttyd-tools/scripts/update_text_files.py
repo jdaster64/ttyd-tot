@@ -2164,18 +2164,18 @@ g_GlobalStrings = {
     b"tot_achd_22":
         b"Finish a run without Jumping\n"
         b"or Hammering in battle.\n"
-        b"Cannot use any run settings\n"
-        b"that lower total Intensity.",
+        b"Cannot use any run option\n"
+        b"that lowers total Intensity.",
     b"tot_achd_23":
         b"Finish a tower run without\n"
         b"ever using an item.\n"
-        b"Cannot use any run settings\n"
-        b"that lower total Intensity.",
+        b"Cannot use any run option\n"
+        b"that lowers total Intensity.",
     b"tot_achd_24":
         b"Finish a tower run without\n"
         b"ever equipping a badge.\n"
-        b"Cannot use any run settings\n"
-        b"that lower total Intensity.",
+        b"Cannot use any run option\n"
+        b"that lowers total Intensity.",
     b"tot_achd_25":
         b"Finish a run with all of your\n"
         b"moves leveled to their max.",
@@ -2328,8 +2328,8 @@ g_GlobalStrings = {
     b"tot_achd_71":
         b"Finish a tower run without\n"
         b"using any unlockable moves.\n"
-        b"Cannot use any run settings\n"
-        b"that lower total Intensity.",
+        b"Cannot use any run option\n"
+        b"that lowers total Intensity.",
     b"tot_achd_72":
         b"Run away a total of 30 times\n"
         b"across all tower runs.",
@@ -2349,10 +2349,10 @@ g_GlobalStrings = {
         b"Use a 3+ SP Special Move on the\n"
         b"first turn of a battle.",
     b"tot_achd_78":
-        b"Finish a tower run with a 45%+\n"
+        b"Finish a tower run with a 50%+\n"
         b"Intensity Countdown Timer.\n"
-        b"Cannot use any run settings\n"
-        b"that lower total Intensity.",
+        b"Cannot use any run option\n"
+        b"that lowers total Intensity.",
     b"tot_achd_79":
         b"Defeat a single type of enemy\n"
         b"at least 100 times.",
@@ -5494,6 +5494,9 @@ g_TowerLobbyStrings = {
         b"Press left/right to change an\n"
         b"option, X to revert it to its\n"
         b"default, and B to back out.\n<k>\n<p>\n"
+        b"If using the Custom settings\n"
+        b"preset, you can also press Y to\n"
+        b"choose random settings!\n<k>\n<p>\n"
         b"Certain options will increase\n"
         b"or decrease a run's Intensity,\n"
         b"affecting the rewards earned.\n<k>\n<p>\n"

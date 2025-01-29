@@ -14,6 +14,13 @@ public:
     // If 'first_time' is set, enforces default timer type, and sets DEFAULT
     // settings when changing to CUSTOM as well.
     static void ApplyCurrentPresetOptions(bool first_time = false);
+    // Handles advancing to the next possible option.
+    static void AdvanceOption(uint32_t option, int32_t change = 1);
+    // Selects a random value for the current option, either explicitly,
+    // i.e. the user randomized that option alone, or implicitly, if the
+    // user randomizes the Custom preset.
+    // Returns false if no valid value found, or option cannot be randomized.
+    static bool RandomizeOption(uint32_t option, bool explicitly = true);
     
     // Returns the default value for a given option, or -1 if there is none.
     static int32_t GetDefaultValue(uint32_t option);
