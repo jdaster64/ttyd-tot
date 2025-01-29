@@ -2583,6 +2583,11 @@
 80141050:marioGetPartyId
 801410e8:marioGetParty
 
+// eff_miss_star.o
+8014375c:effMissStarDisp
+80143a84:effMissStarMain
+80143c80:effMissStarEntry
+
 // battle_stage_object.o
 80148374:_nozzle_type_init
 

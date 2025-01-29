@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "tot_generate_enemy.h"
+#include "tot_manager_achievements.h"
 
 #include <gc/types.h>
 #include <ttyd/battle.h>
@@ -13,6 +14,7 @@
 #include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
+#include <ttyd/eff_miss_star.h>
 #include <ttyd/eff_updown.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
@@ -43,6 +45,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 
 // Function / USER_FUNC declarations.
 EVT_DECLARE_USER_FUNC(evtTot_CheckCanWaitToCounterattack, 1)
+EVT_DECLARE_USER_FUNC(evtTot_HandleFailedChargeEffect, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SpawnUpDownEffect, 2)
 
 // Unit work variable definitions.
@@ -316,17 +319,23 @@ EVT_BEGIN(unitBobOmb_attack_event_spark)
         IF_EQUAL(LW(5), (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB)
             // Change to idle pose.
             USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
-            
-            // Apply Charge status directly.
-            USER_FUNC(
-                evtTot_GetEnemyStats, 
-                (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB,
-                EVT_NULLPTR, LW(5), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR,
-                (int32_t)unitBobOmb_weaponBomb.damage_function_params[0])
-            USER_FUNC(btlevtcmd_OnOffStatus, -2, 16, LW(5), LW(5), 1)
-            USER_FUNC(evtTot_SpawnUpDownEffect, -2, LW(5))
-            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_CONDITION_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            
+
+            // Try to Charge (applying status directly), unless Allergic.
+            USER_FUNC(btlevtcmd_CheckStatus, -2, 0, LW(5))
+            IF_EQUAL(LW(5), 0)
+                USER_FUNC(
+                    evtTot_GetEnemyStats, 
+                    (int32_t)BattleUnitType::TOT_HYPER_BOB_OMB,
+                    EVT_NULLPTR, LW(5), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR,
+                    (int32_t)unitBobOmb_weaponBomb.damage_function_params[0])
+                USER_FUNC(btlevtcmd_OnOffStatus, -2, 16, LW(5), LW(5), 1)
+                USER_FUNC(evtTot_SpawnUpDownEffect, -2, LW(5))
+                USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_CONDITION_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            ELSE()
+                USER_FUNC(evtTot_HandleFailedChargeEffect, -2)
+                USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_ATTACK_MISS2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            END_IF()
+
             // Wait a bit, then jump again before attacking.
             WAIT_MSEC(1000)
             USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_BOMB_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -763,6 +772,24 @@ EVT_DEFINE_USER_FUNC(evtTot_CheckCanWaitToCounterattack) {
     return 2;
 }
 
+EVT_DEFINE_USER_FUNC(evtTot_HandleFailedChargeEffect) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    id = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    
+    float x, y, z;
+    ttyd::battle_unit::BtlUnit_GetPos(unit, &x, &y, &z);
+    y += 0.5f * ttyd::battle_unit::BtlUnit_GetHeight(unit);
+    
+    ttyd::eff_miss_star::effMissStarEntry(x, y, z, 0, 1, 1);
+
+    // Treat as failed Charge for purposes of achievement.
+    AchievementsManager::MarkCompleted(AchievementId::V2_MISC_ALLERGIC);
+    
+    return 2;
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_SpawnUpDownEffect) {
     auto* battleWork = ttyd::battle::g_BattleWork;
     int32_t id = evtGetValue(evt, evt->evtArguments[0]);
@@ -778,7 +805,7 @@ EVT_DEFINE_USER_FUNC(evtTot_SpawnUpDownEffect) {
     
     ttyd::eff_updown::effUpdownEntry(x, y, z, 0, strength, 60);
     
-    return 2;        
+    return 2;
 }
 
 }  // namespace mod::tot::custom
