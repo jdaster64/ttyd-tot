@@ -370,6 +370,7 @@ extern const int32_t g_loadDraw_DrawLevelString_EH = 0x800f4d98;
 extern const int32_t g_loadDraw_DrawCrystalStars_BH = 0x800f4fe0;
 extern const int32_t g_loadDraw_DrawCrystalStars_EH = 0x800f5094;
 extern const int32_t g_loadMain_Patch_SkipZeroingGswfs = 0x800f6358;
+extern const int32_t g_BtlUnit_EquipItem_Patch_ReviseHpFp = 0x800f83cc;
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH = 0x800fa224;
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_EH = 0x800fa238;
 extern const int32_t g_BattleCheckDamage_CheckExplosiveKO_BH = 0x800fb2cc;

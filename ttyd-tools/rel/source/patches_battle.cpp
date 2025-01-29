@@ -200,6 +200,7 @@ extern int32_t (*g_btlevtcmd_AnnounceMessage_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_battleAcMain_ButtonDown_trampoline)(BattleWork*);
 extern void (*g_init_breath_trampoline)(EffGonbabaBreathWork*, int32_t, int32_t);
 // Patch addresses.
+extern const int32_t g_BtlUnit_EquipItem_Patch_ReviseHpFp;
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_BH;
 extern const int32_t g_BattleActionCommandCheckDefence_GetDifficulty_EH;
 extern const int32_t g_BattleCheckDamage_AlwaysFreezeBreak_BH;
@@ -1663,9 +1664,26 @@ void ApplyFixedPatches() {
         }
     }
 
-    // Make midbosses regain their Huge status when KOed with a Life Shroom.
+    // Make unequipping items from enemies no longer revert their max FP.
+    mod::writePatch(
+        reinterpret_cast<void*>(g_BtlUnit_EquipItem_Patch_ReviseHpFp),
+        0x60000000U /* nop */);
+
+    // Make midbosses regain their Huge status and flipped shell/bomb-flippable
+    // enemies retain their stunned state when KOed with a Life Shroom.
     g_BtlUnit_ClearStatus_trampoline = mod::hookFunction(
         ttyd::battle_unit::BtlUnit_ClearStatus, [](BattleWorkUnit* unit) {
+
+            int32_t flipped_turns = 0;
+            switch (unit->true_kind) {
+                case BattleUnitType::KOOPS:
+                    // Koops already correctly revives as active.
+                    break;
+                default:
+                    flipped_turns = unit->flipped_turns;
+                    break;
+            }
+
             // Run original logic.
             g_BtlUnit_ClearStatus_trampoline(unit);
 
@@ -1673,6 +1691,10 @@ void ApplyFixedPatches() {
             if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
                 unit->size_change_strength = 1;
                 unit->size_change_turns = 100;
+            }
+            // Re-apply flipped turn count.
+            if (flipped_turns > 0) {
+                unit->flipped_turns = flipped_turns;
             }
         });
         
