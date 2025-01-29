@@ -70,6 +70,7 @@ void ApplyMidbossStats(BattleWorkUnit* unit) {
         unit->unit_work[3] = 0;
         
         unit->current_hp *= 6;
+        unit->max_hp *= 6;
         unit->base_max_hp *= 6;
         
         // Apply permanent Huge status.

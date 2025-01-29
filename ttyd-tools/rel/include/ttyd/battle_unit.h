@@ -491,7 +491,7 @@ int32_t BtlUnit_GetCoin(BattleWorkUnit* unit);
 // BtlUnit_GetExp
 // BtlUnit_CheckPinchStatus
 // BtlUnit_SetParamToPouch
-// BtlUnit_ReviseHpFp
+void BtlUnit_ReviseHpFp(BattleWorkUnit* unit);
 // BtlUnit_SetParamFromPouch
 int32_t BtlUnit_CanActStatus(BattleWorkUnit* unit);
 // BtlUnit_CanGuardStatus
