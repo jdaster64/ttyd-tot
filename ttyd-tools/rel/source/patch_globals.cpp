@@ -117,6 +117,8 @@ void (*g_BattleDamageDirect_trampoline)(
 int32_t (*g_btlevtcmd_WeaponAftereffect_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_cmd.o  801056f4
 int32_t (*g_btlevtcmd_GetItemRecoverParam_trampoline)(EvtEntry*, bool) = nullptr;
+// battle_event_cmd.o  801057e8
+int32_t (*g_btlevtcmd_CommandGetWeaponAddress_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_cmd.o  8010a388
 int32_t (*g_btlevtcmd_SetEventAttack_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_cmd.o  8010af58
@@ -154,6 +156,8 @@ BattleWeapon* (*g__GetFirstAttackWeapon_trampoline)(int32_t) = nullptr;
 int32_t (*g_BattleSeqCmd_get_msg_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_seq_command.o  8011f62c
 void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*) = nullptr;
+// battle_seq_command.o  8012021c
+BattleWeapon* (*g_BattleGetSelectWeapon_trampoline)(BattleWork*) = nullptr;
 // battle_seq_command.o  80120268
 void (*g__btlcmd_SetAttackEvent_trampoline)(BattleWorkUnit*, BattleWorkCommand*) = nullptr;
 // battle_seq_command.o  801229d8

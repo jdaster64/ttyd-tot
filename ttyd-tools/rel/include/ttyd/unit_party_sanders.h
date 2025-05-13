@@ -25,8 +25,8 @@ EVT_DECLARE_USER_FUNC(_sanders_make_extra_work_area, 0)
 // defence
 // defence_attr
 // regist
-// pose_table_sanders_stay
-// pose_table_counter_sanders
+extern battle_database_common::PoseTableEntry pose_table_sanders_stay[25];
+extern battle_database_common::PoseTableEntry pose_table_counter_sanders[20];
 // data_table
 // unitpartsdata_Party_Sanders
 // unitdata_Party_Sanders

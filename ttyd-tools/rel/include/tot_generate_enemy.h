@@ -65,9 +65,9 @@ int8_t GetCustomTattleIndex(int32_t unit_type);
 bool GetTattleDisplayStats(int32_t unit_type, int32_t* atk, int32_t* def);
 
 // Used for debugging purposes:
-// Returns whether a battle unit type can included in a starting loadout.
-bool IsEligibleLoadoutEnemy(int32_t unit_type);
 // Returns whether a battle unit type can be the first enemy in a loadout.
 bool IsEligibleFrontEnemy(int32_t unit_type);
+// Returns whether a battle unit type can be a back enemy in a loadout.
+bool IsEligibleBackEnemy(int32_t unit_type);
 
 }

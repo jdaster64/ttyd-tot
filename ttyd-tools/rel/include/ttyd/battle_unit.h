@@ -393,7 +393,8 @@ struct BattleWorkUnit {
     int8_t          unk_137;
     
     uint32_t        status_flags;
-    int8_t          unk_13c[4];
+    int16_t         party_moves_disabled_turns;
+    int16_t         party_items_disabled_turns;
     uint32_t        protect_unit_idx;   // related to Shell Shield?
     battle_database_common::StatusVulnerability* status_vulnerability;
     MovementParams  movement_params;
@@ -445,7 +446,9 @@ struct BattleWorkUnit {
     int32_t         held_item;
     battle_database_common::ItemDropData* held_item_table;
     
-    int8_t          misc_0x310[0x824];
+    int8_t          misc_0x310[4];
+    void*           extra_work;
+    int8_t          misc_0x318[0x81c];
 
     // Added fields; only for ToT.
 
@@ -462,7 +465,7 @@ static_assert(sizeof(BattleWorkUnit) == 0xb50);
 
 extern "C" {
 
-// BtlUnit_CheckShadowGuard
+int32_t BtlUnit_CheckShadowGuard(BattleWorkUnit* unit);
 // BtlUnit_EnemyItemCanUseCheck
 // BtlUnit_HpGaugeMain
 // BtlUnit_HpGaugeInit
@@ -554,7 +557,7 @@ void BtlUnit_SetScale(BattleWorkUnit* unit, float x, float y, float z);
 void BtlUnit_GetScale(BattleWorkUnit* unit, float* x, float* y, float* z);
 // BtlUnit_SetBaseScale
 // BtlUnit_AddPartsRotateOffset
-// BtlUnit_SetPartsRotateOffset
+void BtlUnit_SetPartsRotateOffset(BattleWorkUnitPart* part, float x, float y, float z);
 // BtlUnit_SetRotateOffset
 // BtlUnit_GetPartsBaseRotate
 // BtlUnit_SetPartsBaseRotate
@@ -562,7 +565,7 @@ void BtlUnit_GetScale(BattleWorkUnit* unit, float* x, float* y, float* z);
 // BtlUnit_SetBaseRotate
 // BtlUnit_AddPartsRotate
 // BtlUnit_GetPartsRotate
-// BtlUnit_SetPartsRotate
+void BtlUnit_SetPartsRotate(BattleWorkUnitPart* part, float x, float y, float z);
 // BtlUnit_AddRotate
 // BtlUnit_GetRotate
 // BtlUnit_SetRotate

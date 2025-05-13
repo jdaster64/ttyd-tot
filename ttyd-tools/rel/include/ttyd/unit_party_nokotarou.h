@@ -25,8 +25,8 @@ void __makeTechMenuFunc_nokotarou(
 // defence_attr
 // defence_turn
 // regist
-// pose_table_nokotarou_stay
-// pose_table_nokotarou_turn
+extern battle_database_common::PoseTableEntry pose_table_nokotarou_stay[26];
+extern battle_database_common::PoseTableEntry pose_table_nokotarou_turn[12];
 // data_table
 // unitpartsdata_Party_Nokotarou
 // unitdata_Party_Nokotarou

@@ -426,13 +426,11 @@ enum Options : uint32_t {
     OPT_NPC_CHOICE_4            = 0x440'4'00'09,
 
     // Determines whether the secret boss will appear.
-    OPT_SECRET_BOSS             = 0x444'2'00'02,
-    OPTVAL_SECRET_BOSS_RANDOM   = 0x544'2'00'00,
-    OPTVAL_SECRET_BOSS_OFF      = 0x544'2'00'01,
-    OPTVAL_SECRET_BOSS_ON       = 0x544'2'00'02,
-
-    // Whether to enable Merlee curses (not supported).
-    OPT_MERLEE_CURSE            = 0x446'1'00'01,
+    // TODO: Add support for other bosses, once implemented.
+    OPT_SECRET_BOSS             = 0x444'3'00'02,
+    OPTVAL_SECRET_BOSS_RANDOM   = 0x544'3'00'00,
+    OPTVAL_SECRET_BOSS_OFF      = 0x544'3'00'01,
+    OPTVAL_SECRET_BOSS_ON       = 0x544'3'00'02,
 
     // Changes to stage hazard rates.
     OPT_STAGE_HAZARDS           = 0x447'3'00'04,
@@ -448,6 +446,7 @@ enum Options : uint32_t {
     OPTVAL_RUN_AWAY_GUARANTEED  = 0x54a'2'00'01,
 
     // Different options for how moves are offered.
+    // TODO: Move to a different starting bit, to allow for "forced" option.
     OPT_MOVE_AVAILABILITY       = 0x44c'2'00'03,
     OPTVAL_MOVES_DEFAULT        = 0x54c'2'00'00,
     OPTVAL_MOVES_PARTNER_BONUS  = 0x54c'2'00'01,
@@ -466,7 +465,10 @@ enum Options : uint32_t {
     // Countdown timer.
     OPT_COUNTDOWN_TIMER         = 0x451'4'00'0b,
     OPTVAL_COUNTDOWN_OFF        = 0x451'4'00'00,
-    // Next: 0x455
+
+    // Whether to enable Merlee curses (not supported).
+    OPT_MERLEE_CURSE            = 0x455'1'00'01,
+    // Next: 0x456
     
     // Internal options; are not automatically reset between runs.
     OPT_RUN_STARTED             = 0x4c0'1'00'01,

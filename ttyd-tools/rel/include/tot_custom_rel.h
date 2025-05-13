@@ -124,6 +124,9 @@ extern ttyd::battle_database_common::BattleUnitKind unit_Gloomtail;
 extern ttyd::battle_database_common::BattleUnitKind unit_Bonetail;
 extern ttyd::battle_database_common::BattleUnitKind unit_GoldFuzzy;
 extern ttyd::battle_database_common::BattleUnitKind unit_FuzzyHorde;
+extern ttyd::battle_database_common::BattleUnitKind unit_Bowser;
+extern ttyd::battle_database_common::BattleUnitKind unit_Kammy;
+extern ttyd::battle_database_common::BattleUnitKind unit_Doopliss;
 
 // Other functions and structures referenced by patches, etc.
 extern ttyd::battle_database_common::BattleWeapon unitBobOmb_weaponBomb;
@@ -133,6 +136,9 @@ extern ttyd::battle_database_common::BattleUnitKindPart part_Yux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_ZYux_Main;
 extern ttyd::battle_database_common::BattleUnitKindPart part_XYux_Main;
 extern int8_t defense_GreenMagikoopa[5];
+
+// Exposed for ease of integration into party scripts.
+extern ttyd::battle_database_common::BattleWeapon* unitDoopliss_weaponSelected;
 
 // Hooked / patched for Infatuate reasons.
 EVT_DECLARE_USER_FUNC(unitBoo_teresa_check_trans, 1);

@@ -186,9 +186,11 @@ extern void (*g_BattleCheckPikkyoro_trampoline)(BattleWeapon*, uint32_t*);
 extern void (*g_BattleDamageDirect_trampoline)(
     int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
     uint32_t, uint32_t, uint32_t);
+extern int32_t (*g_btlevtcmd_CommandGetWeaponAddress_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_GetSelectEnemy_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool);
 extern void* (*g_BattleSetConfuseAct_trampoline)(BattleWork*, BattleWorkUnit*);
+extern BattleWeapon* (*g_BattleGetSelectWeapon_trampoline)(BattleWork*);
 extern void (*g__btlcmd_SetAttackEvent_trampoline)(BattleWorkUnit*, BattleWorkCommand*);
 extern uint32_t (*g_BtlUnit_CheckRecoveryStatus_trampoline)(
     BattleWorkUnit*, int8_t);
@@ -1076,6 +1078,16 @@ int32_t CalculateBaseDamage(
     if (freeze_broken && damage >= 20) {
         AchievementsManager::MarkCompleted(AchievementId::MISC_FROZEN_20);
     }
+
+    // "Critical hit" effects ignore all damage calculation; deal half of
+    // current HP if guarded, or 1 damage if guarded.
+    if (sp & AttackSpecialProperty_Flags::TOT_CRITICAL_HIT) {
+        if (unk1 & 0x40000) {
+            damage = 1;
+        } else {
+            damage = (target->current_hp + 1) / 2;
+        }
+    }
     
     return damage;
 }
@@ -1936,6 +1948,37 @@ void ApplyFixedPatches() {
             if (g_GonbabaBreathDir == 1) {
                 work->velocity.x *= -1.0f;
             }
+        });
+
+    // Override weapon-from-command logic for Doopliss, since he shares party
+    g_btlevtcmd_CommandGetWeaponAddress_trampoline = mod::hookFunction(
+        ttyd::battle_event_cmd::btlevtcmd_CommandGetWeaponAddress,
+        [](EvtEntry* evt, bool isFirstCall) {
+            int32_t unit_idx = ttyd::battle_sub::BattleTransID(
+                evt, evtGetValue(evt, evt->evtArguments[0]));
+            auto* battleWork = ttyd::battle::g_BattleWork;
+            auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
+
+            // Override for Doopliss so it doesn't attempt to use the party's
+            // currently selected weapon instead.
+            if (unit->true_kind == BattleUnitType::DOOPLISS_CH_8) {
+                evtSetValue(evt, evt->evtArguments[1], PTR(custom::unitDoopliss_weaponSelected));
+                return 2;
+            }
+
+            // Otherwise, use the original function's logic.
+            return g_btlevtcmd_CommandGetWeaponAddress_trampoline(evt, isFirstCall);
+        });
+    g_BattleGetSelectWeapon_trampoline = mod::hookFunction(
+        ttyd::battle_seq_command::BattleGetSelectWeapon,
+        [](BattleWork* battleWork) {
+            auto* unit = battleWork->battle_units[battleWork->active_unit_idx];
+            if (unit->true_kind == BattleUnitType::DOOPLISS_CH_8) {
+                return custom::unitDoopliss_weaponSelected;
+            }
+
+            // Run original logic.
+            return g_BattleGetSelectWeapon_trampoline(battleWork);
         });
 }
 

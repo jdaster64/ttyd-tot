@@ -31,10 +31,10 @@ EVT_DECLARE_USER_FUNC(yoshi_original_color_anim_set, 1)
 // defence
 // defence_attr
 // regist
-// pose_table_yoshi_stay
-extern uint32_t pose_table_egg_g[1];
-extern uint32_t pose_table_egg_y[1];
-extern uint32_t pose_table_egg_p[1];
+extern ttyd::battle_database_common::PoseTableEntry pose_table_yoshi_stay[25];
+extern ttyd::battle_database_common::PoseTableEntry pose_table_egg_g[4];
+extern ttyd::battle_database_common::PoseTableEntry pose_table_egg_y[4];
+extern ttyd::battle_database_common::PoseTableEntry pose_table_egg_p[4];
 // data_table
 // unitpartsdata_Party_Yoshi
 // unitdata_Party_Yoshi

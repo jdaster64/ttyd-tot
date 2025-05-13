@@ -26,7 +26,7 @@ EVT_DECLARE_USER_FUNC(krb_get_dir, 5)
 // defence
 // defence_attr
 // regist
-// pose_table_christine_stay
+extern battle_database_common::PoseTableEntry pose_table_christine_stay[25];
 // data_table
 // unitpartsdata_Party_Christine
 // unitdata_Party_Christine

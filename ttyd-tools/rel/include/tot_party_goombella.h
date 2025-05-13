@@ -15,4 +15,6 @@ namespace mod::tot::party_goombella {
 void MakeSelectWeaponTable(
     ttyd::battle::BattleWorkCommand* command_work, int32_t* num_options);
 
+extern ttyd::battle_database_common::BattleWeapon* g_WeaponTable[6];
+
 }

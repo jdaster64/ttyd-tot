@@ -18,4 +18,6 @@ void MakeSelectWeaponTable(
 // Returns a pointer to a custom override of Vivian's unhiding event.
 void* GetVivianUnhideEvt();
 
+extern ttyd::battle_database_common::BattleWeapon* g_WeaponTable[6];
+
 }

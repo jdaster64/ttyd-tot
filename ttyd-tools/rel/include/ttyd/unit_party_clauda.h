@@ -32,7 +32,7 @@ extern battle_database_common::BattleWeapon partyWeapon_ClaudaKumogakureAttack;
 // defence
 // defence_attr
 // regist
-// pose_table_clauda_stay
+extern battle_database_common::PoseTableEntry pose_table_clauda_stay[25];
 // data_table
 // unitpartsdata_Party_Clauda
 // unitdata_Party_Clauda

@@ -26,7 +26,8 @@ void* BattleSetConfuseAct(
 // BattleDrawEnemyHPBar
 // BattleDrawEnemyHP
 // _check_present_item
-// BattleGetSelectWeapon
+ttyd::battle_database_common::BattleWeapon* BattleGetSelectWeapon(
+    battle::BattleWork* battleWork);
 void _btlcmd_SetAttackEvent(
     battle_unit::BattleWorkUnit* unit, battle::BattleWorkCommand* command_work);
 void BattleCommandDisplay_AllEnd(battle::BattleWork* battleWork);

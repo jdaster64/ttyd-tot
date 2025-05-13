@@ -3,6 +3,7 @@
 #include <cstdint>
 
 namespace ttyd::battle_unit {
+struct BattleWorkUnit;
 struct BattleWorkUnitPart;
 }
 
@@ -27,7 +28,7 @@ extern "C" {
 void btlDispPoseAnime(battle_unit::BattleWorkUnitPart* part);
 // btlDispChangePeraAnime
 // btlDispChangeAnime
-// btlDispEntAnime
+void btlDispEntAnime(battle_unit::BattleWorkUnit* unit);
 // btlUnitPartsBlurDisp
 // _partsBlurControl
 // btlUnitPartsBlurControl

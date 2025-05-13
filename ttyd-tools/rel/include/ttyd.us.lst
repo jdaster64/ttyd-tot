@@ -1748,6 +1748,7 @@
 
 // battle_disp.o
 801010f4:btlDispPoseAnime
+801011fc:btlDispEntAnime
 
 // battle_event_cmd.o
 80103d14:btlevtcmd_ftof
@@ -2075,6 +2076,7 @@
 // 80113d4c:_binta_effect
 80113f88:_add_star_point_disp_offset
 // .data
+803501ec:subsetevt_dead_core_nospin_norotate
 8035149c:subsetevt_counter_damage
 803532b0:subsetevt_confuse_flustered
 803537c4:unk_evt_803537c4
@@ -2286,35 +2288,129 @@
 
 // battle_sub.o
 801253ec:BattleTransID
+80125b70:btlMovePos
 
 // battle_unit.o
+80125d08:BtlUnit_CheckShadowGuard
+80125d44:BtlUnit_EnemyItemCanUseCheck
+80125d88:BtlUnit_HpGaugeMain
+80125fd8:BtlUnit_HpGaugeInit
 80126088:BtlUnit_snd_se_pos
+8012619c:BtlUnit_snd_se
+801261f8:BtlUnit_ControlPoseSoundMain
+801264b4:BtlUnit_PoseSoundInit
+801264cc:BtlUnit_SetCommandAnimPose
+80126558:BtlUnit_SetSeMode
+80126588:BtlUnit_LoadSeMode
+801266d4:BtlUnit_ResetMoveStatus
+801267cc:BtlUnit_GetGuardKouraPtr
 80126840:BtlUnit_PayWeaponCost
+801268fc:BtlUnit_CheckWeaponCost
 80126968:BtlUnit_GetWeaponCost
+80126ac0:BtlUnit_SetMaxFp
+80126b14:BtlUnit_GetMaxFp
+80126b58:BtlUnit_RecoverFp
+80126bec:BtlUnit_RecoverHp
 80126c10:BtlUnit_SetFp
 80126c64:BtlUnit_GetFp
 80126ca8:BtlUnit_GetCoin
+80126d20:BtlUnit_GetExp
+80126:BtlUnit_CheckPinchStatus
+80126f00:BtlUnit_SetParamToPouch
 80126fe8:BtlUnit_ReviseHpFp
+80127134:BtlUnit_SetParamFromPouch
 8012724c:BtlUnit_CanActStatus
+801272dc:BtlUnit_CanGuardStatus
+801272fc:BtlUnit_CheckData
 8012733c:BtlUnit_GetData
+8012737c:BtlUnit_GetACPossibility
+80127434:BtlUnit_SetTotalHitDamage
+80127440:BtlUnit_GetTotalHitDamage
+80127448:BtlUnit_GetHitDamage
+80127454:BtlUnit_GetEnemyBelong
+80127480:BtlUnit_GetTalkTogePos
+80127564:BtlUnit_ChangeStayAnim
+801275ac:BtlUnit_ChangeTalkAnim
+801275f4:BtlUnit_SetBodyAnim
+80127640:BtlUnit_SetBodyAnimType
+80127688:BtlUnit_SetAnim
+801276ac:BtlUnit_SetAnimType
+8012772c:BtlUnit_GetPoseNameFromType
 801277ac:BtlUnit_OffUnitFlag
 801277bc:BtlUnit_OnUnitFlag
 801277cc:BtlUnit_CheckUnitFlag
+801277d8:BtlUnit_OffStatusFlag
 801277e8:BtlUnit_OnStatusFlag
+801277f8:BtlUnit_CheckStatusFlag
 80127814:BtlUnit_CheckStatus
 80127890:BtlUnit_CheckRecoveryStatus
 80127b58:BtlUnit_ClearStatus
 80127bac:BtlUnit_SetStatus
 80127f34:BtlUnit_GetStatus
+801280f8:_CheckMoveCount
+80128144:BtlUnit_GetBelong
+8012814c:BtlUnit_SetJumpSpeed
+80128154:BtlUnit_SetPartsMoveSpeed
+8012815c:BtlUnit_SetMoveSpeed
+80128164:BtlUnit_SetPartsFallAccel
+8012816c:BtlUnit_SetFallAccel
+80128174:BtlUnit_SetPartsMoveTargetPos
+801281a8:BtlUnit_SetMoveTargetPos
+801281dc:BtlUnit_SetPartsMoveCurrentPos
+80128210:BtlUnit_SetMoveCurrentPos
+80128244:BtlUnit_SetPartsMoveStartPos
+80128278:BtlUnit_SetMoveStartPos
+801282ac:BtlUnit_AddPartsDispOffset
+801282f8:BtlUnit_SetPartsDispOffset
+8012832c:BtlUnit_SetDispOffset
+80128360:BtlUnit_AddPartsOffsetPos
+80128388:BtlUnit_SetPartsOffsetPos
+801283bc:BtlUnit_GetPartsOffsetPos
+801283d8:BtlUnit_SetOffsetPos
+8012840c:BtlUnit_SetHeight
 80128414:BtlUnit_GetHeight
+8012841c:BtlUnit_GetWidth
+80128424:BtlUnit_AddPartsScale
+80128470:BtlUnit_SetPartsScale
+801284a4:BtlUnit_SetPartsBaseScale
+801284d8:BtlUnit_AddScale
 80128524:BtlUnit_SetScale
 80128558:BtlUnit_GetScale
+80128574:BtlUnit_SetBaseScale
+801285a8:BtlUnit_AddPartsRotateOffset
+801285d0:BtlUnit_SetPartsRotateOffset
+80128604:BtlUnit_SetRotateOffset
+80128638:BtlUnit_GetPartsBaseRotate
+80128654:BtlUnit_SetPartsBaseRotate
+80128664:BtlUnit_GetBaseRotate
+80128680:BtlUnit_SetBaseRotate
+801286e0:BtlUnit_AddPartsRotate
+80128798:BtlUnit_GetPartsRotate
+801287b4:BtlUnit_SetPartsRotate
+801287c4:BtlUnit_AddRotate
+80128898:BtlUnit_GetRotate
+801288b4:BtlUnit_SetRotate
+80128968:BtlUnit_SetPartsHomePos
+80128978:BtlUnit_AddHomePos
+801289a0:BtlUnit_SetHomePos
+801289b0:BtlUnit_GetHomePos
+801289cc:BtlUnit_SetHitCursorOffset
+801289dc:BtlUnit_SetHitOffset
 801289ec:BtlUnit_GetHitPos
+80128b10:BtlUnit_GetPartsWorldPos
+80128bf0:BtlUnit_AddPartsPos
+80128c18:BtlUnit_SetPartsPos
+80128c28:BtlUnit_GetPartsPos
+80128c44:BtlUnit_AddPos
+80128c6c:BtlUnit_SetPos
 80128c7c:BtlUnit_GetPos
 80128c98:BtlUnit_GetBodyPartsId
 80128cd8:BtlUnit_GetPartsPtr
+80128d18:BtlUnit_GetUnitId
+80128d20:BtlUnit_Spawn
 80128e08:BtlUnit_Delete
 80128fe0:BtlUnit_Entry
+80129694:BtlUnit_Init
 
 // battle_unit_event.o
 801296e0:BattleRunWaitEvent
@@ -2583,10 +2679,45 @@
 80141050:marioGetPartyId
 801410e8:marioGetParty
 
+// eff_stardust.o
+80141808:effStardustEntry
+
 // eff_miss_star.o
 8014375c:effMissStarDisp
 80143a84:effMissStarMain
 80143c80:effMissStarEntry
+
+// unit_mario.o
+// .text
+801453b0:unit_mario__get_mario_hammer_lv
+80145404:_mario_super_emblem_anim_set
+80145614:_mario_makkuro_set
+801456a4:faker_mario_makkuro_set
+801456d0:unit_mario_callback
+801457bc:mario_pinch_pose_sound_callback
+80145830:_get_local_frame
+// .data
+803728b8:pose_table_mario_stay
+803729c8:data_table_mario
+80372a18:unitpartsdata_Mario
+80372afc:unitdata_Mario
+80372bc0:unit_mario_battle_entry_event
+80372ce4:mario_ride_btl_entry_event
+80372ec4:unit_mario_init_event
+80372ff0:mario_dead_event
+803730fc:mario_emergency_revival_event
+80373304:mario_appeal_event
+8037337c:unit_mario_attack_audience_event
+803733b8:btlataudevtMarioJump
+8037376c:btlataudevtMarioHammer
+80417ba0:unit_mario_defence
+80417ba8:unit_mario_defence_attr
+80417bb0:unit_mario_regist
+80417bc8:pose_table_object
+80417be0:unit_mario_pose_sound_timing_table
+80417c08:unit_mario_damage_event
+80417c30:unit_mario_attack_event
+80417c38:unit_mario_wait_event
 
 // battle_stage_object.o
 80148374:_nozzle_type_init
@@ -3312,8 +3443,19 @@
 // eff_kemuri9_n64.o
 801ce8a4:effKemuri9N64Entry
 
+// eff_magic1_n64.o
+801d4194:effMagic1Disp
+801d4300:effMagic1_main_dl
+801d4bfc:effMagic1Main
+801d4e04:effMagic1N64Entry
+
 // eff_stamp_n64.o
 801eaf74:effStampN64Entry
+
+// eff_thunderflare_n64.o
+801f2500:effThunderflareDisp
+801f2858:effThunderflareMain
+801f2c14:effThunderflareN64Entry
 
 // eff_vapor_n64.o
 801f4200:effVaporN64Entry
@@ -3468,6 +3610,11 @@
 // .data
 803b6174:select_desc_tbl
 8041db40:winmgr_work
+
+// eff_scanning.o
+80243524:effScanningDisp
+80243620:effScanningMain
+802437a4:effScanningEntry
 
 // sac_genki.o
 // .text

@@ -32,7 +32,7 @@ EVT_DECLARE_USER_FUNC(_chuchu_make_extra_work_area, 0)
 // defence
 // defence_attr
 // regist
-// pose_table_chuchurina_stay
+extern battle_database_common::PoseTableEntry pose_table_chuchurina_stay[24];
 // data_table
 // unitpartsdata_Party_Chuchurina
 // unitdata_Party_Chuchurina

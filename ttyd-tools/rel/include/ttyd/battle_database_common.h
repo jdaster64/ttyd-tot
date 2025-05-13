@@ -369,6 +369,8 @@ namespace AttackSpecialProperty_Flags {
 
         // Custom for ToT; deals more damage on successive hits.
         TOT_INCREASING_BY_TARGET = 0x100'0000U,
+        // Custom for ToT; deals heavy damage if not guarded, and 1 otherwise.
+        TOT_CRITICAL_HIT = 0x200'0000U,
     };
 }
 

@@ -10,9 +10,6 @@ struct BattleWeapon;
 }
 
 namespace mod::tot::party_mario {
-    
-extern ttyd::battle_database_common::BattleWeapon customWeapon_SuperHammerRecoil;
-extern ttyd::battle_database_common::BattleWeapon customWeapon_UltraHammerRecoil;
 
 // Custom function to populate the weapon selection dialog.
 int32_t MakeSelectWeaponTable(
@@ -21,5 +18,12 @@ int32_t MakeSelectWeaponTable(
 // Custom function to get First Strike attacks.   
 ttyd::battle_database_common::BattleWeapon* GetFirstAttackWeapon(
     int32_t attack_type);
+
+extern ttyd::battle_database_common::BattleWeapon* g_CustomJumpWeapons[8];
+extern ttyd::battle_database_common::BattleWeapon* g_CustomHammerWeapons[8];
+extern ttyd::battle_database_common::BattleWeapon* g_CustomHammerThrowWeapons[8];
+
+extern ttyd::battle_database_common::BattleWeapon customWeapon_SuperHammerRecoil;
+extern ttyd::battle_database_common::BattleWeapon customWeapon_UltraHammerRecoil;
 
 }

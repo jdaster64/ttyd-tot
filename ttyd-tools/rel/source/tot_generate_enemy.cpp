@@ -236,17 +236,17 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_Gloomtail, 0, 198, 0x11, 98, 160, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, 0x11, 105, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Bowser, 0, 199, 0x11, 103, 150, 8, 2, 8, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Kammy, 0, 207, -1, 104, 100, 6, 0, 6, 0, 50, -1, 3, 3, 40, 30 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -647,6 +647,7 @@ void SelectEnemies() {
         }
 
         // Determine whether to use Gold Fuzzy alternate boss.
+        // TODO: Track cases for other optional bosses.
         switch (state.GetOptionValue(OPT_SECRET_BOSS)) {
             case OPTVAL_SECRET_BOSS_ON:
                 enemy_type = BattleUnitType::GOLD_FUZZY;
@@ -948,6 +949,9 @@ void BuildBattle(
             case BattleUnitType::HOOKTAIL:
             case BattleUnitType::GLOOMTAIL:
             case BattleUnitType::BONETAIL:
+            case BattleUnitType::BOWSER_CH_8:
+            case BattleUnitType::KAMMY_KOOPA:
+            case BattleUnitType::DOOPLISS_CH_8:
                 // Use a Goomba on the overworld; don't first strike it!
                 npc_tribe = 
                     ttyd::npc_data::npcTribe + kEnemyInfo[1].npc_tribe_idx;
@@ -1004,7 +1008,7 @@ void BuildBattle(
         float x = kEnemyPartyCenterX + offset * kEnemyPartySepX;
         float z = offset * kEnemyPartySepZ;
         
-        // Make sure bosses appear in the right position.
+        // Make sure bosses appear in the right position, if not standard.
         switch (g_Enemies[i]) {
             case BattleUnitType::GOLD_FUZZY:
                 x = 125.0f;
@@ -1063,10 +1067,19 @@ void BuildBattle(
     }
     
     if (state.IsFinalBossFloor()) {
-        if (g_Enemies[0] != BattleUnitType::GOLD_FUZZY) {
-            battle->music_name = "BGM_BOSS_STG1_GONBABA1";
-        } else {
-            battle->music_name = "BGM_CHUBOSS_BATTLE1";
+        switch (g_Enemies[0]) {
+            case BattleUnitType::GOLD_FUZZY:
+                battle->music_name = "BGM_CHUBOSS_BATTLE1";
+                break;
+            case BattleUnitType::BOWSER_CH_8:
+                battle->music_name = "BGM_BOSS_STG8_KOOPA";
+                break;
+            case BattleUnitType::DOOPLISS_CH_8:
+                battle->music_name = "BGM_BOSS_STG4_RUNPELL1";
+                break;
+            default:
+                battle->music_name = "BGM_BOSS_STG1_GONBABA1";
+                break;
         }
     } else if (state.floor_ == 32) {
         battle->music_name = "BGM_BOSS_STG4_RUNPELL1";
@@ -1139,6 +1152,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     evtSetValue(evt, evt->evtArguments[4], x_pos);
     evtSetValue(evt, evt->evtArguments[5], y_pos);
     evtSetValue(evt, evt->evtArguments[6], z_pos);
+    // TODO: Set to different values for other optional bosses.
     evtSetValue(evt, evt->evtArguments[7], g_Enemies[0] == BattleUnitType::GOLD_FUZZY);
 
     // Double effective height of midboss field NPCs (for "!" indicator, mostly).
@@ -1220,6 +1234,7 @@ bool GetEnemyStats(
         base_def_pct = 100;
 
         // For Gold Fuzzy / Fuzzy Horde, scale stats by difficulty.
+        // TODO: Do the same for other optional boss fights.
         if (unit_type == BattleUnitType::GOLD_FUZZY ||
             unit_type == BattleUnitType::FUZZY_HORDE) {
             switch (state.GetOptionValue(OPT_DIFFICULTY)) {
@@ -1584,15 +1599,16 @@ bool GetTattleDisplayStats(int32_t unit_type, int32_t* atk, int32_t* def) {
         unit_type, nullptr, atk, def, nullptr, nullptr, base_atk_power);
 }
 
-bool IsEligibleLoadoutEnemy(int32_t unit_type) {
-    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0) return false;
-    return kEnemyInfo[unit_type].kind != nullptr;
-}
-
 bool IsEligibleFrontEnemy(int32_t unit_type) {
     if (unit_type > BattleUnitType::BONETAIL || unit_type < 0) return false;
-    return kEnemyInfo[unit_type].ai_type_idx >= 0 &&
-           kEnemyInfo[unit_type].kind != nullptr;
+    return kEnemyInfo[unit_type].kind != nullptr &&
+           kEnemyInfo[unit_type].ai_type_idx >= 0;
+}
+
+bool IsEligibleBackEnemy(int32_t unit_type) {
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0) return false;
+    return kEnemyInfo[unit_type].kind != nullptr &&
+           kEnemyInfo[unit_type].tattle_idx < 97;
 }
 
 }  // namespace mod::tot

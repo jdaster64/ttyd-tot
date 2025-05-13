@@ -17,6 +17,7 @@ EVT_DECLARE_USER_FUNC(_add_star_point_disp_offset, 4)
 // _disable_restore_command_cursor
 
 // .data
+extern int32_t subsetevt_dead_core_nospin_norotate[1];
 extern int32_t subsetevt_counter_damage[1];
 extern int32_t subsetevt_confuse_flustered[1];
 extern int32_t unk_evt_803537c4[1];

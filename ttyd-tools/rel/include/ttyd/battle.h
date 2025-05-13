@@ -556,7 +556,10 @@ struct BattleWork {
 
     const char*     weapon_ac_help_msg;
     uint32_t        battle_ac_help_disp_type;
-    int8_t          unk_19010[0x4c];
+    int8_t          unk_19010[0x40];
+    int32_t         mario_jump_disabled_turns;
+    int32_t         mario_hammer_disabled_turns;
+    int32_t         mario_items_disabled_turns;
     int32_t         lucky_start_evt_tid;
     int32_t         reserve_items[4];
     int32_t         curtain_sfx_entry_idx;
@@ -615,7 +618,7 @@ battle_unit::BattleWorkUnitPart* BattleGetUnitPartsPtr(
 // BattleSetUnitPtr
 battle_unit::BattleWorkUnit* BattleGetUnitPtr(
     BattleWork* battleWork, int32_t idx);
-// BattleFree
+void BattleFree(void* alloc);
 void* BattleAlloc(int32_t size);
 void BattleIncSeq(BattleWork* battleWork, int32_t level);
 int32_t BattleGetSeq(BattleWork* battleWork, int32_t level);

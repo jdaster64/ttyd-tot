@@ -18,4 +18,6 @@ void MakeSelectWeaponTable(
 // Custom function to get First Strike attacks.
 ttyd::battle_database_common::BattleWeapon* GetFirstAttackWeapon();
 
+extern ttyd::battle_database_common::BattleWeapon* g_WeaponTable[6];
+
 }

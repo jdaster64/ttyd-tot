@@ -359,17 +359,19 @@ void DebugManager::Update() {
         
         do {
             if (g_CursorPos == 0) {
-                // If valid for the front, fill the first 3 slots with the type.
-                // (Bosses only fill the first slot and wipe all others).
+                // If valid front enemy, fill 3 slots (or 1, for bosses)
+                // with this type of enemy, and wipe the rest.
                 if (IsEligibleFrontEnemy(enemy_type)) {
                     int32_t num_enemies = 3;
                     switch (enemy_type) {
-                        case BattleUnitType::GOLD_FUZZY:
                         case BattleUnitType::ATOMIC_BOO:
                         case BattleUnitType::TOT_COSMIC_BOO:
                         case BattleUnitType::HOOKTAIL:
                         case BattleUnitType::GLOOMTAIL:
                         case BattleUnitType::BONETAIL:
+                        case BattleUnitType::GOLD_FUZZY:
+                        case BattleUnitType::BOWSER_CH_8:
+                        case BattleUnitType::DOOPLISS_CH_8:
                             num_enemies = 1;
                             break;
                     }
@@ -378,40 +380,18 @@ void DebugManager::Update() {
                     break;
                 }
             } else {
-                // If valid, change the currently selected slot only.
-                if (IsEligibleLoadoutEnemy(enemy_type) || enemy_type == -1) {
-                    bool valid_back_enemy = true;
-                    switch (enemy_type) {
-                        case BattleUnitType::GOLD_FUZZY:
-                        case BattleUnitType::FUZZY_HORDE:
-                        case BattleUnitType::ATOMIC_BOO:
-                        case BattleUnitType::TOT_COSMIC_BOO:
-                        case BattleUnitType::HOOKTAIL:
-                        case BattleUnitType::GLOOMTAIL:
-                        case BattleUnitType::BONETAIL:
-                            valid_back_enemy = false;
-                            break;
-                    }
-                    switch (g_DebugEnemies[0]) {
-                        case BattleUnitType::GOLD_FUZZY:
-                        case BattleUnitType::ATOMIC_BOO:
-                        case BattleUnitType::TOT_COSMIC_BOO:
-                        case BattleUnitType::HOOKTAIL:
-                        case BattleUnitType::GLOOMTAIL:
-                        case BattleUnitType::BONETAIL:
-                        case -1:
-                            valid_back_enemy = false;
-                            break;
-                    }
-                    if (valid_back_enemy) {
-                        g_DebugEnemies[g_CursorPos] = enemy_type;
-                        // Exception: if type == "None", clear all later slots.
-                        if (enemy_type == -1) {
-                            for (int32_t i = g_CursorPos + 1; i < 5; ++i)
-                                g_DebugEnemies[i] = -1;
-                        }
-                        break;
-                    }
+                // If valid back enemy (and the front enemy isn't a boss),
+                // change only the selected slot.
+                if (IsEligibleBackEnemy(enemy_type) && 
+                    !IsEligibleBackEnemy(g_DebugEnemies[0])) {
+                    g_DebugEnemies[g_CursorPos] = enemy_type;
+                    break;
+                }
+                // Exception: if type == "None", clear this and all later slots.
+                if (enemy_type == -1) {
+                    for (int32_t i = g_CursorPos; i < 5; ++i)
+                        g_DebugEnemies[i] = -1;
+                    break;
                 }
             }
 

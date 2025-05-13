@@ -178,6 +178,14 @@ const MoveData* MoveManager::GetMoveData(int32_t starting_move) {
     return g_MoveData + starting_move;
 }
 
+int32_t MoveManager::GetBaseMoveType(int32_t move_type) {
+    if (move_type < MoveType::GOOMBELLA_BASE) {
+        return move_type / 8 * 8;
+    } else {
+        return MoveType::GOOMBELLA_BASE + (move_type - MoveType::GOOMBELLA_BASE) / 6 * 6;
+    }
+}
+
 int32_t MoveManager::GetMoveTypeFromBadge(int32_t badge_id) {
     switch (badge_id) {
         case ItemType::CHARGE:

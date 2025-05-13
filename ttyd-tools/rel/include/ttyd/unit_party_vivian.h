@@ -30,7 +30,7 @@ EVT_DECLARE_USER_FUNC(battle_evt_majo_disp_on, 6)
 // defence
 // defence_attr
 // regist
-// pose_table_vivian_stay
+extern battle_database_common::PoseTableEntry pose_table_vivian_stay[24];
 extern battle_database_common::DataTableEntry data_table_Party_Vivian[20];
 // unitpartsdata_Party_Vivian
 // unitdata_Party_Vivian
@@ -48,7 +48,7 @@ extern battle_database_common::BattleWeapon partyWeapon_VivianCharmKissAttack;
 // partyVivianAttack_ShadowGuard
 // partyVivianAttack_MagicalPowder
 // partyVivianAttack_CharmKissAttack
-// vivian_shadow_tail_event
+extern int32_t vivian_shadow_tail_event[1];
 // vivian_counter_damage_event
 // vivian_appeal_event
 // party_win_reaction

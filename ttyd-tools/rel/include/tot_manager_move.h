@@ -147,6 +147,8 @@ public:
     
     // Returns a pointer to the move data array starting at starting_move.
     static const MoveData* GetMoveData(int32_t starting_move = MoveType::JUMP_BASE);
+    // Returns the base move type for a move (e.g. JUMP_BASE for Multibounce).
+    static int32_t GetBaseMoveType(int32_t move_type);
     // Returns the move type corresponding to a particular badge.
     static int32_t GetMoveTypeFromBadge(int32_t badge_id);
 

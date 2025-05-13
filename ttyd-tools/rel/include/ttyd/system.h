@@ -42,9 +42,9 @@ void makeKey();
 void qqsort(void* data, uint32_t num_entries, uint32_t entry_size, void* comparator);
 double intplGetValue(
     double start, double end, int32_t ease_mode, int32_t step, int32_t num_steps);
-// angleABf
+double angleABf(double x_start, double z_start, double x_end, double z_end);
 // compAngle
-// distABf
+double distABf(double x_start, double z_start, double x_end, double z_end);
 // reviseAngle
 const char *getMarioStDvdRoot();
 
