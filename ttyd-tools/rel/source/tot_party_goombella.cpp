@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "patch.h"
 #include "patches_battle.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 
@@ -143,11 +144,17 @@ EVT_DEFINE_USER_FUNC(evtTot_SetReticleParams) {
 
 EVT_BEGIN(partyChristineAttack_NormalAttack)
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
-    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
     USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     USER_FUNC(btlevtcmd_WaitGuardMove)
@@ -530,11 +537,17 @@ EVT_END()
 
 EVT_BEGIN(partyChristineAttack_RenzokuAttack)
     USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.70))
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
-    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
     USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     USER_FUNC(btlevtcmd_WaitGuardMove)

@@ -37,7 +37,7 @@ extern ttyd::battle_database_common::PoseTableEntry pose_table_egg_y[4];
 extern ttyd::battle_database_common::PoseTableEntry pose_table_egg_p[4];
 // data_table
 // unitpartsdata_Party_Yoshi
-// unitdata_Party_Yoshi
+extern battle_database_common::BattleUnitKind unitdata_Party_Yoshi;
 // battle_entry_event
 // init_event
 // damage_event

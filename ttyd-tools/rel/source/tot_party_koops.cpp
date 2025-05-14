@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "patch.h"
+#include "tot_gsw.h"
 #include "tot_manager_move.h"
 
 #include <ttyd/ac_pendulum_crane_timing.h>
@@ -232,11 +233,17 @@ EVT_BEGIN(partyNokotarouAttack_FirstAttack)
 EVT_END()
 
 EVT_BEGIN(partyNokotarouAttack_NormalAttack)
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
-    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
     USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     USER_FUNC(btlevtcmd_WaitGuardMove)
@@ -466,11 +473,17 @@ EVT_BEGIN(partyNokotarouAttack_NormalAttack)
 EVT_END()
 
 EVT_BEGIN(partyNokotarouAttack_SyubibinKoura)
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
-    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
     USER_FUNC(btlevtcmd_AttackDeclareAll, -2)
     USER_FUNC(btlevtcmd_WaitGuardMove)
@@ -920,11 +933,17 @@ EVT_BEGIN(partyNokotarouAttack_KouraGuard)
 EVT_END()
 
 EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
-    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
     USER_FUNC(btlevtcmd_AttackDeclareAll, -2)
     USER_FUNC(btlevtcmd_WaitGuardMove)
@@ -1213,8 +1232,14 @@ EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
 EVT_END()
 
 EVT_BEGIN(customAttack_BulkUp)
-    SET(LW(12), PTR(&customWeapon_KoopsBulkUp))
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        // Boss can only use this move on self.
+        SET(LW(3), -2)
+        SET(LW(4), 1)
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
@@ -1319,8 +1344,15 @@ EVT_END()
 EVT_BEGIN(customAttack_Withdraw)
     // Set gauge color parameters.
     USER_FUNC(evtTot_SetPendulumAcParams, MoveType::KOOPS_WITHDRAW)
-    SET(LW(12), PTR(&customWeapon_KoopsWithdraw))
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        // Boss can only use this move on self.
+        SET(LW(3), -2)
+        SET(LW(4), 1)
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
@@ -1654,7 +1686,6 @@ BattleWeapon customWeapon_KoopsPowerShell = {
         AttackCounterResistance_Flags::ALL &
         ~AttackCounterResistance_Flags::PAYBACK,
     .target_weighting_flags =
-        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
@@ -1768,7 +1799,6 @@ BattleWeapon customWeapon_KoopsShellSlam = {
         AttackCounterResistance_Flags::ALL &
         ~AttackCounterResistance_Flags::PAYBACK,
     .target_weighting_flags =
-        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,
         

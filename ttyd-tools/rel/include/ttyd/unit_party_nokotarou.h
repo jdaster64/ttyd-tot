@@ -29,7 +29,7 @@ extern battle_database_common::PoseTableEntry pose_table_nokotarou_stay[26];
 extern battle_database_common::PoseTableEntry pose_table_nokotarou_turn[12];
 // data_table
 // unitpartsdata_Party_Nokotarou
-// unitdata_Party_Nokotarou
+extern battle_database_common::BattleUnitKind unitdata_Party_Nokotarou;
 // battle_entry_event
 // init_event
 // damage_event

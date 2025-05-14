@@ -34,6 +34,7 @@
 #include <ttyd/system.h>
 #include <ttyd/unit_bomzou.h>
 #include <ttyd/unit_koura.h>
+#include <ttyd/unit_mario.h>
 #include <ttyd/unit_party_christine.h>
 #include <ttyd/unit_party_chuchurina.h>
 #include <ttyd/unit_party_clauda.h>
@@ -358,9 +359,37 @@ void ApplyFixedPatches() {
         ttyd::unit_koura::unitKoura_defense_attr[i] = 4;
     }
 
-    // Replace Vivian's unveiling event with custom one.
+    // Replace Vivian's unveiling event with a custom one.
     ttyd::unit_party_vivian::data_table_Party_Vivian[0].data =
         tot::party_vivian::GetVivianUnhideEvt();
+
+    // Give party a higher resistance to Power Bounce / Multibonk.
+    ttyd::unit_mario::unitdata_Mario.pb_soft_cap = 5;
+    ttyd::unit_party_christine::unitdata_Party_Christine.pb_soft_cap = 5;
+    ttyd::unit_party_nokotarou::unitdata_Party_Nokotarou.pb_soft_cap = 5;
+    ttyd::unit_party_clauda::unitdata_Party_Clauda.pb_soft_cap = 5;
+    ttyd::unit_party_yoshi::unitdata_Party_Yoshi.pb_soft_cap = 5;
+    ttyd::unit_party_vivian::unitdata_Party_Vivian.pb_soft_cap = 5;
+    ttyd::unit_party_sanders::unitdata_Party_Sanders.pb_soft_cap = 5;
+    ttyd::unit_party_chuchurina::unitdata_Party_Chuchurina.pb_soft_cap = 5;
+
+    // Allow party to be susceptible to Lickety Spit.
+    ttyd::unit_mario::unitdata_Mario.swallow_attributes = 2;
+    ttyd::unit_party_christine::unitdata_Party_Christine.swallow_attributes = 2;
+    ttyd::unit_party_nokotarou::unitdata_Party_Nokotarou.swallow_attributes = 2;
+    ttyd::unit_party_clauda::unitdata_Party_Clauda.swallow_attributes = 2;
+    ttyd::unit_party_yoshi::unitdata_Party_Yoshi.swallow_attributes = 2;
+    ttyd::unit_party_vivian::unitdata_Party_Vivian.swallow_attributes = 2;
+    ttyd::unit_party_sanders::unitdata_Party_Sanders.swallow_attributes = 2;
+    ttyd::unit_party_chuchurina::unitdata_Party_Chuchurina.swallow_attributes = 2;
+    ttyd::unit_mario::unitdata_Mario.swallow_chance = 0;
+    ttyd::unit_party_christine::unitdata_Party_Christine.swallow_chance = 0;
+    ttyd::unit_party_nokotarou::unitdata_Party_Nokotarou.swallow_chance = 0;
+    ttyd::unit_party_clauda::unitdata_Party_Clauda.swallow_chance = 0;
+    ttyd::unit_party_yoshi::unitdata_Party_Yoshi.swallow_chance = 0;
+    ttyd::unit_party_vivian::unitdata_Party_Vivian.swallow_chance = 0;
+    ttyd::unit_party_sanders::unitdata_Party_Sanders.swallow_chance = 0;
+    ttyd::unit_party_chuchurina::unitdata_Party_Chuchurina.swallow_chance = 0;
 }
 
 void DisplayTattleStats(

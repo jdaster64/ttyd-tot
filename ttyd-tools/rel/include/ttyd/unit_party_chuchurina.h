@@ -35,7 +35,7 @@ EVT_DECLARE_USER_FUNC(_chuchu_make_extra_work_area, 0)
 extern battle_database_common::PoseTableEntry pose_table_chuchurina_stay[24];
 // data_table
 // unitpartsdata_Party_Chuchurina
-// unitdata_Party_Chuchurina
+extern battle_database_common::BattleUnitKind unitdata_Party_Chuchurina;
 // battle_entry_event
 // init_event
 // damage_event

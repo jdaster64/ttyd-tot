@@ -33,7 +33,7 @@ EVT_DECLARE_USER_FUNC(battle_evt_majo_disp_on, 6)
 extern battle_database_common::PoseTableEntry pose_table_vivian_stay[24];
 extern battle_database_common::DataTableEntry data_table_Party_Vivian[20];
 // unitpartsdata_Party_Vivian
-// unitdata_Party_Vivian
+extern battle_database_common::BattleUnitKind unitdata_Party_Vivian;
 // battle_entry_event
 // init_event
 // damage_event

@@ -29,7 +29,7 @@ extern battle_database_common::PoseTableEntry pose_table_sanders_stay[25];
 extern battle_database_common::PoseTableEntry pose_table_counter_sanders[20];
 // data_table
 // unitpartsdata_Party_Sanders
-// unitdata_Party_Sanders
+extern battle_database_common::BattleUnitKind unitdata_Party_Sanders;
 // battle_entry_event
 // init_event
 // damage_event

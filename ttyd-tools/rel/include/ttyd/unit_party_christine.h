@@ -29,7 +29,7 @@ EVT_DECLARE_USER_FUNC(krb_get_dir, 5)
 extern battle_database_common::PoseTableEntry pose_table_christine_stay[25];
 // data_table
 // unitpartsdata_Party_Christine
-// unitdata_Party_Christine
+extern battle_database_common::BattleUnitKind unitdata_Party_Christine;
 // battle_entry_event
 // init_event
 // damage_event

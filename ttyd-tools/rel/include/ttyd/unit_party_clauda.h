@@ -35,7 +35,7 @@ extern battle_database_common::BattleWeapon partyWeapon_ClaudaKumogakureAttack;
 extern battle_database_common::PoseTableEntry pose_table_clauda_stay[25];
 // data_table
 // unitpartsdata_Party_Clauda
-// unitdata_Party_Clauda
+extern battle_database_common::BattleUnitKind unitdata_Party_Clauda;
 // battle_entry_event
 // init_event
 // damage_event

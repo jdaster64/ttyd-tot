@@ -1027,6 +1027,7 @@ EVT_BEGIN(unitDoopliss_battle_entry_event)
 EVT_END()
 
 EVT_BEGIN(unitDoopliss_dead_event)
+    SET((int32_t)GSW_Battle_DooplissMove, 0)
     USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_GetPos, -2, LW(3), LW(4), LW(5))
     SET(LW(6), 1)
@@ -1245,9 +1246,8 @@ BattleUnitKind unit_Doopliss = {
     .cut_height = 48.0f,
     .turn_order = 0,
     .turn_order_variance = 0,
-    // TODO: Allow Lickety Spit but not Gulp?
-    .swallow_chance = -1,
-    .swallow_attributes = 0,
+    .swallow_chance = 0,
+    .swallow_attributes = 2,
     .hammer_knockback_chance = 100,
     .itemsteal_param = 20,
     .star_point_disp_offset = { 0.0f, 0.0f, 0.0f },
@@ -1265,7 +1265,7 @@ BattleUnitKind unit_Doopliss = {
 
 
 EVT_DEFINE_USER_FUNC(evtTot_Doopliss_MakeExtraWorkArea) {
-    int32_t unit_idx = ttyd::battle_sub::BattleTransID(evt, evtGetValue(evt, -2));
+    int32_t unit_idx = ttyd::battle_sub::BattleTransID(evt, -2);
     auto* battleWork = ttyd::battle::g_BattleWork;
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
     unit->extra_work = ttyd::battle::BattleAlloc(sizeof(BattleWeapon));
@@ -1274,7 +1274,7 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_MakeExtraWorkArea) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_Doopliss_SelectWeapon) {
-    int32_t unit_idx = ttyd::battle_sub::BattleTransID(evt, evtGetValue(evt, -2));
+    int32_t unit_idx = ttyd::battle_sub::BattleTransID(evt, -2);
     auto* battleWork = ttyd::battle::g_BattleWork;
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
 
@@ -1313,48 +1313,44 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_SelectWeapon) {
         for (int32_t move = move_start; move < move_start + 6; ++move) {
             switch (move) {
                 case MoveType::GOOMBELLA_BASE:
-                // case MoveType::GOOMBELLA_TATTLE:
                 case MoveType::GOOMBELLA_MULTIBONK:
-                case MoveType::GOOMBELLA_SCOPE_OUT:
                 case MoveType::GOOMBELLA_IRONBONK:
-                // case MoveType::GOOMBELLA_RALLY_WINK:
+                
                 case MoveType::KOOPS_BASE:
                 case MoveType::KOOPS_POWER_SHELL:
-                // case MoveType::KOOPS_WITHDRAW:       // Consider adding?
-                // case MoveType::KOOPS_SHELL_SHIELD:
+                // Consider adding; also consider having him flippable; in
+                // both cases, the state should resolve itself in phase 3.
+                // case MoveType::KOOPS_WITHDRAW:
                 case MoveType::KOOPS_BULK_UP:
                 case MoveType::KOOPS_SHELL_SLAM:
+
                 case MoveType::FLURRIE_BASE:
-                // case MoveType::FLURRIE_GALE_FORCE:
                 case MoveType::FLURRIE_LIP_LOCK:
-                // case MoveType::FLURRIE_DODGY_FOG:    // Consider adding?
                 case MoveType::FLURRIE_BLIZZARD:
                 case MoveType::FLURRIE_THUNDER_STORM:
+
                 case MoveType::YOSHI_BASE:
-                // case MoveType::YOSHI_GULP:           // Consider adding?
+                case MoveType::YOSHI_GULP:
                 case MoveType::YOSHI_EGG_BARRAGE:
-                // case MoveType::YOSHI_SWALLOW:
                 case MoveType::YOSHI_MINI_EGG:
                 case MoveType::YOSHI_STAMPEDE:
+
                 case MoveType::VIVIAN_BASE:
                 case MoveType::VIVIAN_CURSE:
+                // Consider adding?
                 // case MoveType::VIVIAN_NEUTRALIZE:
-                // case MoveType::VIVIAN_VEIL:
                 case MoveType::VIVIAN_FIERY_JINX:
-                // case MoveType::VIVIAN_INFATUATE:
+                
                 case MoveType::BOBBERY_BASE:
                 case MoveType::BOBBERY_BOMB_SQUAD:
-                // case MoveType::BOBBERY_HOLD_FAST:
                 case MoveType::BOBBERY_POISON_BOMB:
                 case MoveType::BOBBERY_BOBOMBAST:
-                // case MoveType::BOBBERY_MEGATON_BOMB: // Consider adding?
+                // Consider adding; would need to check for existing bomb.
+                // case MoveType::BOBBERY_MEGATON_BOMB:
+
                 case MoveType::MOWZ_BASE:
-                // case MoveType::MOWZ_KISS_THIEF:
                 case MoveType::MOWZ_TEASE:
-                // case MoveType::MOWZ_EMBARGO:
-                case MoveType::MOWZ_SMOKE_BOMB:
-                // case MoveType::MOWZ_SMOOCH: 
-                {
+                case MoveType::MOWZ_SMOKE_BOMB: {
                     int32_t unlocked_level = MoveManager::GetUnlockedLevel(move);
                     const auto* data = MoveManager::GetMoveData(move);
                     if (unlocked_level && data->move_tier <= ai_phase) {
@@ -1628,6 +1624,9 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
     for (int32_t i = 0; i < 200; ++i) {
         ttyd::battle::_EquipItem(unit, equip_flags, pouch->equipped_badges[i]);
     }
+    // For jump-like commands, it might be easier to just use the built-in ACs
+    // than to disable them completely.
+    unit->badges_equipped.auto_command_badge = 1;
     
     // TODO: Consider:
     // - changing status vulnerability tables per transformation

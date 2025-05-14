@@ -1275,9 +1275,8 @@ BattleUnitKind unit_Kammy = {
     .cut_height = 42.0f,
     .turn_order = 0,
     .turn_order_variance = 0,
-    // TODO: Allow Lickety Spit but not Gulp?
-    .swallow_chance = -1,
-    .swallow_attributes = 0,
+    .swallow_chance = 0,
+    .swallow_attributes = 2,
     .hammer_knockback_chance = 100,
     .itemsteal_param = 20,
     .star_point_disp_offset = { 0.0f, 0.0f, 0.0f },
@@ -2385,9 +2384,8 @@ BattleUnitKind unit_Bowser = {
     .cut_height = 80.0f,
     .turn_order = 0,
     .turn_order_variance = 0,
-    // TODO: Allow Lickety Spit but not Gulp?
-    .swallow_chance = -1,
-    .swallow_attributes = 0,
+    .swallow_chance = 0,
+    .swallow_attributes = 2,
     .hammer_knockback_chance = 100,
     .itemsteal_param = 20,
     .star_point_disp_offset = { 0.0f, 0.0f, 0.0f },

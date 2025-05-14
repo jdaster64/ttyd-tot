@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_generate_item.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_manager_reward.h"
@@ -97,6 +98,44 @@ void MakeSelectWeaponTable(
     }
 }
 
+// Check whether the target can be swallowed with Lickety Spit / Gulp.
+EVT_DECLARE_USER_FUNC(evtTot_GetSwallowRate, 3)
+EVT_DEFINE_USER_FUNC(evtTot_GetSwallowRate) {
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t unit_idx = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, unit_idx);
+
+    if (evt->evtArguments[1]) {
+        switch (unit->true_kind) {
+            case BattleUnitType::MARIO:
+            case BattleUnitType::GOOMBELLA:
+            case BattleUnitType::KOOPS:
+            case BattleUnitType::FLURRIE:
+            case BattleUnitType::YOSHI:
+            case BattleUnitType::VIVIAN:
+            case BattleUnitType::BOBBERY:
+            case BattleUnitType::MS_MOWZ:
+            case BattleUnitType::GOLD_FUZZY:
+            case BattleUnitType::BOWSER_CH_8:
+            case BattleUnitType::KAMMY_KOOPA:
+            case BattleUnitType::DOOPLISS_CH_8:
+            case BattleUnitType::DOOPLISS_CH_8_GOOMBELLA:
+            case BattleUnitType::DOOPLISS_CH_8_KOOPS:
+            case BattleUnitType::DOOPLISS_CH_8_FLURRIE:
+            case BattleUnitType::DOOPLISS_CH_8_YOSHI:
+            case BattleUnitType::DOOPLISS_CH_8_VIVIAN:
+            case BattleUnitType::DOOPLISS_CH_8_BOBBERY:
+            case BattleUnitType::DOOPLISS_CH_8_MS_MOWZ:
+                evtSetValue(evt, evt->evtArguments[2], -1);
+                return 2;
+        }
+    }
+    
+    evtSetValue(evt, evt->evtArguments[2], unit->swallow_chance);
+    return 2;
+}
+
 // Check whether Gulp KOed target was a midboss.
 EVT_DECLARE_USER_FUNC(evtTot_CheckSwallowMidbossAchievement, 1)
 EVT_DEFINE_USER_FUNC(evtTot_CheckSwallowMidbossAchievement) {
@@ -180,11 +219,17 @@ EVT_DEFINE_USER_FUNC(evtTot_SetGulpStruggleParam) {
 }
 
 EVT_BEGIN(partyYoshiAttack_NormalAttack)
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
-    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
     USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     USER_FUNC(btlevtcmd_WaitGuardMove)
@@ -455,7 +500,14 @@ EVT_BEGIN(partyYoshiAttack_NormalAttack)
 EVT_END()
 
 EVT_BEGIN(partyYoshiAttack_Nomikomi)
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
@@ -559,7 +611,7 @@ LBL(5)
         WAIT_FRM(43)
         GOTO(90)
     END_IF()
-    USER_FUNC(_get_swallow_param, LW(3), LW(7))
+    USER_FUNC(evtTot_GetSwallowRate, LW(3), 0, LW(7))
     IF_EQUAL(LW(7), -1)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
         WAIT_FRM(43)
@@ -795,7 +847,14 @@ EVT_BEGIN(_egg_attack_event)
 EVT_END()
 
 EVT_BEGIN(partyYoshiAttack_EggAttack)
-    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    ELSE()
+        USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+        USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
+    END_IF()
     IF_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF()
@@ -1391,7 +1450,7 @@ LBL(5)
         WAIT_FRM(43)
         GOTO(90)
     END_IF()
-    USER_FUNC(_get_swallow_param, LW(3), LW(7))
+    USER_FUNC(evtTot_GetSwallowRate, LW(3), 1, LW(7))
     IF_EQUAL(LW(7), -1)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
         WAIT_FRM(43)
@@ -2097,7 +2156,6 @@ BattleWeapon customWeapon_YoshiStampede = {
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
-        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,
         
