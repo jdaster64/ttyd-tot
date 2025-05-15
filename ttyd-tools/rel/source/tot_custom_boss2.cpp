@@ -1157,11 +1157,14 @@ EVT_BEGIN(unitDoopliss_init_event)
     USER_FUNC(btlevtcmd_SetEventConfusion, -2, PTR(&btldefaultevt_Confuse))
     USER_FUNC(btlevtcmd_SetEventEntry, -2, PTR(&unitDoopliss_battle_entry_event))
     
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 1)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_FormTurnCount, 1)
+    // TODO: Values changed for ease of testing only!
+    // Both AiState and FormTurnCount should start at 1 in the actual fight.
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 3)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_FormTurnCount, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_CurrentForm, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_VivianTailEvent, 0)
 
+    // Necessary for some attacks that have variable success (e.g. Tease).
     USER_FUNC(evtTot_Doopliss_MakeExtraWorkArea)
     
     USER_FUNC(btlevtcmd_SetWalkSound, -2, PTR("SFX_BOSS_RNPL_MOVE1L"), PTR("SFX_BOSS_RNPL_MOVE1R"), 0, 15, 15)
