@@ -939,7 +939,9 @@ int32_t CalculateBaseDamage(
     if (weapon_fn) atk = weapon_fn(attacker, weapon, target, part);
     
     int32_t should_scale_atk =
-        attacker->current_kind <= BattleUnitType::BONETAIL 
+        attacker->current_kind <= BattleUnitType::BONETAIL
+        && !(attacker->current_kind >= BattleUnitType::DOOPLISS_CH_8_FAKE_MARIO &&
+             attacker->current_kind <= BattleUnitType::DOOPLISS_CH_8_MS_MOWZ)
         && !(weapon->target_property_flags & AttackTargetProperty_Flags::RECOIL_DAMAGE)
         && !weapon->item_id
         && atk > 0;

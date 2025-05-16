@@ -1340,8 +1340,7 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_SelectWeapon) {
 
                 case MoveType::VIVIAN_BASE:
                 case MoveType::VIVIAN_CURSE:
-                // Consider adding?
-                // case MoveType::VIVIAN_NEUTRALIZE:
+                case MoveType::VIVIAN_NEUTRALIZE:
                 case MoveType::VIVIAN_FIERY_JINX:
                 
                 case MoveType::BOBBERY_BASE:

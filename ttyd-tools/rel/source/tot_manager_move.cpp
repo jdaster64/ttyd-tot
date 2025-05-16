@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 
 #include <ttyd/battle.h>
@@ -467,8 +468,11 @@ uint32_t GetWeaponPowerFromSelectedLevel(
     BattleWorkUnit* unit1, BattleWeapon* weapon, BattleWorkUnit* unit2,
     BattleWorkUnitPart* part) {
     const int32_t move = weapon->damage_function_params[7];
+
     const int32_t ac_success =
-        g_BattleWork->ac_manager_work.ac_result == 2 ? 1 : 0;
+        ((g_BattleWork->ac_manager_work.ac_result == 2) || 
+        GetSWByte(GSW_Battle_DooplissMove)) ? 1 : 0;
+
     int32_t level = MoveManager::GetSelectedLevel(move);
     // To prevent issues with Spin Jump first strike if Spring Jump taken first.
     if (level < 1) level = 1;
