@@ -554,6 +554,9 @@ LBL(21)
             ELSE()
                 SET(LW(6), 0x2)
             END_IF()
+            
+            USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
             IF_FLAG(LW(6), 0x2)
                 USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
             ELSE()
@@ -563,6 +566,9 @@ LBL(21)
         CASE_END()
     END_SWITCH()
     USER_FUNC(evt_btl_camera_shake_h, 0, 2, 0, 12, 13)
+    
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     USER_FUNC(btlevtcmd_GetUnitWork, -2, 5, LW(0))
     IF_LARGE_EQUAL(LW(10), LW(0))
         USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_CHUCHURINA_ATTACK3"), 0)
@@ -1473,6 +1479,11 @@ LBL(10)
     // By default, consider action unsuccessful.
     SET(LW(11), -1)
     
+    IF_EQUAL(LW(10), 0)
+        USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+        SET(LW(10), 1)
+    END_IF()
+    
     IF_NOT_EQUAL(LW(12), PTR(&customWeapon_MowzEmbargo))
         IF_LARGE_EQUAL(LW(13), 0)
             USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
@@ -1545,7 +1556,6 @@ LBL(40)
 LBL(50)
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_NOT_EQUAL(LW(3), -1)
-        ADD(LW(10), 1)
         GOTO(10)
     END_IF()
     // If there were any successful hits, give the appropriate reward.
@@ -2019,7 +2029,7 @@ BattleWeapon customWeapon_MowzLoveSlapL = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -2046,7 +2056,7 @@ BattleWeapon customWeapon_MowzLoveSlapL = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_binta",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
@@ -2083,7 +2093,7 @@ BattleWeapon customWeapon_MowzLoveSlapR = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -2110,7 +2120,7 @@ BattleWeapon customWeapon_MowzLoveSlapR = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_binta",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
@@ -2147,7 +2157,7 @@ BattleWeapon customWeapon_MowzLoveSlapLFinal = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -2174,7 +2184,7 @@ BattleWeapon customWeapon_MowzLoveSlapLFinal = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_binta",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
@@ -2211,7 +2221,7 @@ BattleWeapon customWeapon_MowzLoveSlapRFinal = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -2238,7 +2248,7 @@ BattleWeapon customWeapon_MowzLoveSlapRFinal = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_binta",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
@@ -2332,7 +2342,7 @@ BattleWeapon customWeapon_MowzTease = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -2356,7 +2366,7 @@ BattleWeapon customWeapon_MowzTease = {
     .weapon_ac_level = 3,
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_madowaseru",
-    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .special_property_flags = AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -2500,7 +2510,7 @@ BattleWeapon customWeapon_MowzSmokeBomb = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -2525,7 +2535,7 @@ BattleWeapon customWeapon_MowzSmokeBomb = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_madowaseru",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,

@@ -762,30 +762,30 @@ EVT_BEGIN(unitAtomicBoo_breath_event_sub)
 LBL(90)
     GOTO(99)
 LBL(91)
-    // Use an arbitrary unused global variable to track how many checks have
-    // taken place; just setting this here could cause race-condition issues,
+    // Use a global variable to track how many checks have taken place;
+    // just setting this here could cause race-condition issues,
     // but for this particular attack hits happen ~simultaneously for all
     // targets so it shouldn't be an issue.
-    SET((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 0)
+    SET((int32_t)GSW_Battle_Multihit_GuardCount, 0)
     
     WAIT_FRM(15)
-    IF_SMALL((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 1)
+    IF_SMALL((int32_t)GSW_Battle_Multihit_GuardCount, 1)
         USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        SET((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 1)
+        SET((int32_t)GSW_Battle_Multihit_GuardCount, 1)
     END_IF()
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 0, LW(5))
         
     WAIT_FRM(30)
-    IF_SMALL((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 2)
+    IF_SMALL((int32_t)GSW_Battle_Multihit_GuardCount, 2)
         USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        SET((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 2)
+        SET((int32_t)GSW_Battle_Multihit_GuardCount, 2)
     END_IF()
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 0, LW(5))
     
     WAIT_FRM(30)
-    IF_SMALL((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 3)
+    IF_SMALL((int32_t)GSW_Battle_Multihit_GuardCount, 3)
         USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        SET((int32_t)GSW_Battle_AtomicBoo_BreathGuardCount, 3)
+        SET((int32_t)GSW_Battle_Multihit_GuardCount, 3)
     END_IF()
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 0x100, LW(5))
         

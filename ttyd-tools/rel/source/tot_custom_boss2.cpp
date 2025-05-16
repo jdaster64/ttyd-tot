@@ -94,10 +94,23 @@ extern DataTableEntry unitDoopliss_data_table[];
 
 int8_t unitDoopliss_defense[] = { 0, 0, 0, 0, 0 };
 int8_t unitDoopliss_defense_attr[] = { 0, 0, 0, 0, 0 };
+int8_t unitDoopliss_defense_P2[] = { 1, 1, 1, 1, 1 };
 
 StatusVulnerability unitDoopliss_status = {
-     40,  50,  40, 100,  40, 100, 100,  30,
-    100,  60, 100,  60, 100,  80,  40,   0,
+     40,  40,  40, 100,  40, 100, 100,  40,
+    100,  60, 100,  60, 100,  80,  80,   0,
+      0, 100,  40, 100, 100,   0,
+};
+// Flurrie: doubly weak to Dizzy
+StatusVulnerability unitDoopliss_status_P3 = {
+     40,  40,  80, 100,  40, 100, 100,  40,
+    100,  60, 100,  60, 100,  80,  80,   0,
+      0, 100,  40, 100, 100,   0,
+};
+// Bobbery: doubly weak to Freeze
+StatusVulnerability unitDoopliss_status_P6 = {
+     40,  40,  40, 100,  40, 100, 100,  80,
+    100,  60, 100,  60, 100,  80,  80,   0,
       0, 100,  40, 100, 100,   0,
 };
 
@@ -630,6 +643,13 @@ EVT_END()
 EVT_BEGIN(unitDoopliss_damage_event)
     SET(LW(10), -2)
     SET(LW(11), 1)
+    
+    USER_FUNC(btlevtcmd_GetUnitKind, -2, LW(0))
+    IF_EQUAL(LW(0), (int32_t)BattleUnitType::DOOPLISS_CH_8_VIVIAN)
+        // Have the tail resume tracking the body, in case it was off before.
+        USER_FUNC(btlevtcmd_SetUnitWork, -2, 3, 0)
+    END_IF()
+
     RUN_CHILD_EVT(PTR(&btldefaultevt_Damage))
     RETURN()
 EVT_END()
@@ -1626,12 +1646,11 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
     for (int32_t i = 0; i < 200; ++i) {
         ttyd::battle::_EquipItem(unit, equip_flags, pouch->equipped_badges[i]);
     }
-    // For jump-like commands, it might be easier to just use the built-in ACs
-    // than to disable them completely.
-    unit->badges_equipped.auto_command_badge = 1;
     
-    // TODO: Consider:
-    // - changing status vulnerability tables per transformation
+    // TODO:
+    // - Handle Jumpman + Hammerman case, if Doopliss already wasted a turn
+    // - change DEF per transformation
+    // - change status vulnerability tables per transformation
     // - is it sensible to clear all status effects?
     
     return 2;

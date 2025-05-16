@@ -256,6 +256,9 @@ LBL(10)
     USER_FUNC(btlevtcmd_ftomsec, 4, LW(0))
     WAIT_MSEC(LW(0))
     USER_FUNC(evt_snd_sfxon, PTR("SFX_BTL_VIVIAN_ATTACK4"), 0)
+    
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
         USER_FUNC(btlevtcmd_GetResultAC, LW(0))
         IF_FLAG(LW(0), 0x2)
@@ -577,6 +580,12 @@ LBL(10)
     // hitting all other targets, SP regeneration, etc.
     USER_FUNC(btlevtcmd_GetUnitId, -2, LW(14))
     USER_FUNC(btlevtcmd_GetUnitId, LW(3), LW(15))
+
+    IF_EQUAL(LW(10), 0)
+        USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+        SET(LW(10), 1)
+    END_IF()
+
     IF_EQUAL(LW(14), LW(15))
         // Targeting self.
         SET(LW(5), 18)
@@ -635,7 +644,6 @@ LBL(50)
 
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_NOT_EQUAL(LW(3), -1)
-        ADD(LW(10), 1)
         GOTO(10)
     END_IF()
 LBL(80)
@@ -772,6 +780,8 @@ LBL(10)
         END_IF()
         GOTO(50)
     END_IF()
+    
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
 
     IF_FLAG(LW(7), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
@@ -940,7 +950,7 @@ BattleWeapon customWeapon_VivianShadeFist = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -965,7 +975,7 @@ BattleWeapon customWeapon_VivianShadeFist = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_kagenuke",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::TOP_SPIKY,
@@ -1056,7 +1066,7 @@ BattleWeapon customWeapon_VivianFieryJinx = {
     .base_accuracy = 100,
     .base_fp_cost = 6,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1081,7 +1091,7 @@ BattleWeapon customWeapon_VivianFieryJinx = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_mahou_no_kona",
     .special_property_flags = 
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
@@ -1166,7 +1176,7 @@ BattleWeapon customWeapon_VivianCurse = {
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1191,7 +1201,7 @@ BattleWeapon customWeapon_VivianCurse = {
     .weapon_ac_level = 3,
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_meromero_kiss",
-    .special_property_flags = AttackSpecialProperty_Flags::UNGUARDABLE,
+    .special_property_flags = AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
@@ -1222,7 +1232,7 @@ BattleWeapon customWeapon_VivianNeutralize = {
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1247,7 +1257,7 @@ BattleWeapon customWeapon_VivianNeutralize = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_mahou_no_kona",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::CANNOT_MISS,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =

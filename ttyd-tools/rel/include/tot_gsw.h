@@ -18,7 +18,7 @@ enum GlobalWorkVars {
     GSW_Tower_TutorialClears,
     GSW_NpcA_SpecialConversation,
     GSW_NpcF_CurrentConversation,
-    GSW_Battle_AtomicBoo_BreathGuardCount,
+    GSW_Battle_Multihit_GuardCount,
     GSW_CountdownTimerState,
     GSW_Battle_DooplissMove,
 

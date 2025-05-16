@@ -328,7 +328,7 @@ EVT_BEGIN(unitBombzo_explosion_event)
         GOTO(99)
     END_IF()
     SET(LW(10), 0)
-    LBL(10)
+LBL(10)
     USER_FUNC(btlevtcmd_GetUnitId, -2, LW(0))
     IF_EQUAL(LW(0), LW(3))
         GOTO(80)
@@ -789,6 +789,7 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
         END_IF()
         GOTO(90)
     END_IF()
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
     IF_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
         IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
@@ -1413,7 +1414,9 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     USER_FUNC(evt_btl_camera_shake_h, 0, 10, 0, 20, 13)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+
     SET(LW(10), 0)
+
 LBL(10)
     USER_FUNC(btlevtcmd_CommandPreCheckDamage, -2, LW(3), LW(4), 256, LW(6))
     IF_NOT_EQUAL(LW(6), 1)
@@ -1428,6 +1431,12 @@ LBL(10)
         END_IF()
         GOTO(50)
     END_IF()
+
+    IF_EQUAL(LW(10), 0)
+        USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+        SET(LW(10), 1)
+    END_IF()
+
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
         USER_FUNC(btlevtcmd_GetResultAC, LW(0))
         IF_FLAG(LW(0), 0x2)
@@ -1465,7 +1474,6 @@ LBL(10)
 LBL(50)
     USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_NOT_EQUAL(LW(3), -1)
-        ADD(LW(10), 1)
         GOTO(10)
     END_IF()
 LBL(90)
@@ -1713,7 +1721,7 @@ BattleWeapon customWeapon_BobberyBomb = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -1740,7 +1748,7 @@ BattleWeapon customWeapon_BobberyBomb = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_bakuhatsu",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_BOMB |
@@ -1942,7 +1950,7 @@ BattleWeapon customWeapon_BobberyBobombast = {
     .base_accuracy = 100,
     .base_fp_cost = 9,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1967,7 +1975,7 @@ BattleWeapon customWeapon_BobberyBobombast = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_super_bakuhatsu",
     .special_property_flags = 
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_BOMB |
         AttackSpecialProperty_Flags::FREEZE_BREAK |

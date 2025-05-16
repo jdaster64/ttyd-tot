@@ -208,7 +208,11 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
     IF_NOT_EQUAL(LW(5), 1)
         GOTO(10)
     END_IF()
-    USER_FUNC(btlevtcmd_GetResultAC, LW(0))
+    IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
+        USER_FUNC(btlevtcmd_GetResultAC, LW(0))
+    ELSE()
+        SET(LW(0), 0x2)
+    END_IF()
     IF_FLAG(LW(0), 0x2)
         GOTO(20)
     END_IF()
@@ -273,6 +277,9 @@ LBL(10)
 LBL(20)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_ATT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BTL_CLAUD_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
         USER_FUNC(btlevtcmd_GetResultAC, LW(0))
         IF_FLAG(LW(0), 0x2)
@@ -466,10 +473,14 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             ELSE()
                 SET(LW(5), 1)
             END_IF()
-            USER_FUNC(evt_eff, 0, PTR("ibuki"), LW(5), LW(0), LW(1), LW(2), 400, 0, 0, 0, 0, 0, 0, 0)
+            SET(LW(10), 400)
+            IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 1)
+                SET(LW(10), 150)
+            END_IF()
+            USER_FUNC(evt_eff, 0, PTR("ibuki"), LW(5), LW(0), LW(1), LW(2), LW(10), 0, 0, 0, 0, 0, 0, 0)
         
             BROTHER_EVT()
-                WAIT_FRM(400)
+                WAIT_FRM(LW(10))
                 USER_FUNC(evt_snd_sfxoff, LW(14))
             END_BROTHER()
             
@@ -653,6 +664,17 @@ LBL(10)
     END_IF()
     
     IF_LARGE_EQUAL(LW(8), 0)
+        IF_EQUAL(LW(12), PTR(&customWeapon_FlurrieBlizzard))
+            // Blizzard uses a single guard press (DAS-guarded)
+            IF_SMALL(LW(10), 1)
+                USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+                SET(LW(10), 1)
+            END_IF()
+        ELSE()
+            // Thunder Storm uses separate ones
+            USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+        END_IF()
+
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
         
         // Only show 'Nice' effect for Gale Force if the status procs.
@@ -699,7 +721,6 @@ LBL(51)
 LBL(52)
         USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         IF_NOT_EQUAL(LW(3), -1)
-            ADD(LW(10), 1)
             GOTO(10)
         END_IF()
     END_IF()
@@ -948,6 +969,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
     USER_FUNC(btlevtcmd_SetRGB, LW(3), LW(4), 255, 255, 255)
     USER_FUNC(btlevtcmd_AcGetOutputParam, 0, LW(0))
     USER_FUNC(_make_kiss_weapon, LW(12), LW(0))
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
     IF_FLAG(LW(9), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
     ELSE()
@@ -1090,7 +1112,7 @@ BattleWeapon customWeapon_FlurrieBodySlam = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -1114,7 +1136,7 @@ BattleWeapon customWeapon_FlurrieBodySlam = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_body_press",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
@@ -1207,7 +1229,7 @@ BattleWeapon customWeapon_FlurrieLipLock = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1232,7 +1254,7 @@ BattleWeapon customWeapon_FlurrieLipLock = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_sexy_kiss",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
@@ -1327,7 +1349,7 @@ BattleWeapon customWeapon_FlurrieBlizzard = {
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1353,7 +1375,7 @@ BattleWeapon customWeapon_FlurrieBlizzard = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_breath",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
@@ -1385,7 +1407,7 @@ BattleWeapon customWeapon_FlurrieThunderStorm = {
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1411,7 +1433,7 @@ BattleWeapon customWeapon_FlurrieThunderStorm = {
     .unk_6f = 2,
     .ac_help_msg = "tot_ptr3_thunder_ac",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,

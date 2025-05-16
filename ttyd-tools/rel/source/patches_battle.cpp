@@ -1327,39 +1327,46 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(StartGetGuardDifficulty),
         reinterpret_cast<void*>(BranchBackGetGuardDifficulty));
     
-    // Handle Superguard cost option.
+    // Handle Superguard cost option & party-vs.party guardable moves.
     g_BattleActionCommandCheckDefence_trampoline = mod::hookFunction(
         ttyd::battle_ac::BattleActionCommandCheckDefence,
         [](BattleWorkUnit* unit, BattleWeapon* weapon) {
-            // Run normal logic if option turned off.
             const int32_t sp_cost =
                 g_Mod->state_.GetOption(OPTNUM_SUPERGUARD_SP_COST);
-            if (sp_cost <= 0) {
-                const int32_t defense_result =
-                    g_BattleActionCommandCheckDefence_trampoline(unit, weapon);
-                if (defense_result == 5) {
-                    // Successful Superguard, track in play stats.
-                    g_Mod->state_.ChangeOption(STAT_RUN_SUPERGUARDS);
-                    g_Mod->state_.ChangeOption(STAT_PERM_SUPERGUARDS);
-                    if (g_Mod->state_.GetOption(STAT_PERM_SUPERGUARDS) >= 100)
-                        AchievementsManager::MarkCompleted(
-                            AchievementId::AGG_SUPERGUARD_100);
-                }
-                return defense_result;
-            }
             
+            int8_t guard_frames[7];
             int8_t superguard_frames[7];
+            bool restore_guard_frames = false;
             bool restore_superguard_frames = false;
-            // Temporarily disable Superguarding if SP is too low.
-            if (ttyd::mario_pouch::pouchGetAP() < sp_cost) {
+
+            if ((weapon->special_property_flags &
+                AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE) &&
+                !GetSWByte(GSW_Battle_DooplissMove)) {
+                // Disable guarding AND Superguarding during party-vs.-party
+                // moves, unless they're being used by Doopliss.
+                restore_guard_frames = true;
+                memcpy(guard_frames, ttyd::battle_ac::guard_frames, 7);
+                for (int32_t i = 0; i < 7; ++i) {
+                    ttyd::battle_ac::guard_frames[i] = 0;
+                }
+
+                restore_superguard_frames = true;
+                memcpy(superguard_frames, ttyd::battle_ac::superguard_frames, 7);
+                for (int32_t i = 0; i < 7; ++i) {
+                    ttyd::battle_ac::superguard_frames[i] = 0;
+                }
+            } else if (ttyd::mario_pouch::pouchGetAP() < sp_cost) {
+                // Temporarily disable Superguarding if SP is too low.
                 restore_superguard_frames = true;
                 memcpy(superguard_frames, ttyd::battle_ac::superguard_frames, 7);
                 for (int32_t i = 0; i < 7; ++i) {
                     ttyd::battle_ac::superguard_frames[i] = 0;
                 }
             }
+
             const int32_t defense_result =
                 g_BattleActionCommandCheckDefence_trampoline(unit, weapon);
+
             if (defense_result == 5) {
                 // Successful Superguard, subtract SP and track in play stats.
                 ttyd::mario_pouch::pouchAddAP(-sp_cost);
@@ -1369,9 +1376,14 @@ void ApplyFixedPatches() {
                     AchievementsManager::MarkCompleted(
                         AchievementId::AGG_SUPERGUARD_100);
             }
+
+            if (restore_guard_frames) {
+                memcpy(ttyd::battle_ac::guard_frames, guard_frames, 7);
+            }
             if (restore_superguard_frames) {
                 memcpy(ttyd::battle_ac::superguard_frames, superguard_frames, 7);
             }
+
             return defense_result;
         });
 

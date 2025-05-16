@@ -331,6 +331,9 @@ LBL(10)
         SET(LW(6), 0x2)
         USER_FUNC(btlevtcmd_SetScale, -2, FLOAT(1.0), FLOAT(1.0), FLOAT(1.0))
     END_IF()
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
     
@@ -807,6 +810,8 @@ LBL(10)
         USER_FUNC(btlevtcmd_SetScale, -2, FLOAT(1.0), FLOAT(1.0), FLOAT(1.0))
     END_IF()
 
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
         IF_SMALL_EQUAL(LW(10), 0)
@@ -1201,7 +1206,7 @@ BattleWeapon customWeapon_GoombellaHeadbonk = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -1227,7 +1232,7 @@ BattleWeapon customWeapon_GoombellaHeadbonk = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_zutsuki",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
@@ -1317,7 +1322,7 @@ BattleWeapon customWeapon_GoombellaMultibonk = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1343,7 +1348,7 @@ BattleWeapon customWeapon_GoombellaMultibonk = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_zutsuki",
     .special_property_flags = 
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
@@ -1488,7 +1493,7 @@ BattleWeapon customWeapon_GoombellaIronbonk = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -1514,7 +1519,7 @@ BattleWeapon customWeapon_GoombellaIronbonk = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_zutsuki",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |

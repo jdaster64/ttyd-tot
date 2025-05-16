@@ -427,6 +427,9 @@ LBL(50)
     ELSE()  
         SET(LW(0), 0x2)
     END_IF()
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_FLAG(LW(0), 0x2)
         IF_LARGE_EQUAL(LW(13), LW(14))
             USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
@@ -646,7 +649,7 @@ LBL(5)
     END_IF()
     WAIT_FRM(7)
 
-    // If not swallowable, or Huge, move fails entirely.
+    // If not swallowable, Huge, or guarded, move fails entirely.
     USER_FUNC(btlevtcmd_CheckStatus, LW(3), 10, LW(7))
     IF_NOT_EQUAL(LW(7), 0)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
@@ -655,6 +658,13 @@ LBL(5)
     END_IF()
     USER_FUNC(evtTot_GetSwallowRate, LW(3), 0, LW(7))
     IF_EQUAL(LW(7), -1)
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
+        WAIT_FRM(43)
+        GOTO(90)
+    END_IF()
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+    USER_FUNC(btlevtcmd_GetResultACDefence, LW(7))
+    IF_LARGE_EQUAL(LW(7), 4)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
         WAIT_FRM(43)
         GOTO(90)
@@ -900,12 +910,16 @@ EVT_BEGIN(_egg_attack_event)
     END_IF()
     USER_FUNC(btlevtcmd_GetPartsWork, -2, LW(12), 2, LW(0))
     USER_FUNC(btlevtcmd_GetPartsWork, -2, LW(12), 6, LW(1))
+
+    USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(14))
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(14))
+
     IF_EQUAL(LW(1), 0)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(0), 1073872896, LW(5))
     ELSE()
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(0), 1073873152, LW(5))
     END_IF()
-    LBL(89)
+LBL(89)
     RETURN()
 EVT_END()
 
@@ -1446,6 +1460,9 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     WAIT_MSEC(1000)
     USER_FUNC(_wait_yoshig_run, -2)
     SET(LW(15), 0)
+    
+    SET((int32_t)GSW_Battle_Multihit_GuardCount, 0)
+
 LBL(70)
     IF_EQUAL(LW(3), -1)
         IF_NOT_EQUAL(LW(15), 0)
@@ -1469,7 +1486,15 @@ LBL(70)
     END_IF()
     USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(14))
     BROTHER_EVT_ID(LW(15))
+        SET(LW(11), 0)
         DO(LW(14))
+            // Check for defensive actions once per hit across all targets.
+            ADD(LW(11), 1)
+            IF_SMALL((int32_t)GSW_Battle_Multihit_GuardCount, LW(11))
+                USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+                SET((int32_t)GSW_Battle_Multihit_GuardCount, LW(11))
+            END_IF()
+
             IF_LARGE_EQUAL(LW(14), 2)
                 USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
                 IF_LARGE_EQUAL(LW(0), 2)
@@ -1852,7 +1877,7 @@ BattleWeapon customWeapon_YoshiGroundPound = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -1878,7 +1903,7 @@ BattleWeapon customWeapon_YoshiGroundPound = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hip_drop",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
@@ -1915,7 +1940,7 @@ BattleWeapon customWeapon_YoshiGulp_Shot = {
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -1942,7 +1967,7 @@ BattleWeapon customWeapon_YoshiGulp_Shot = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_nomikomi",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags =
@@ -2060,7 +2085,7 @@ BattleWeapon customWeapon_YoshiGulp_Dmg0 = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_nomikomi",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING,
     .counter_resistance_flags =
         AttackCounterResistance_Flags::ALL,
@@ -2200,7 +2225,7 @@ BattleWeapon customWeapon_YoshiMiniEgg = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -2225,7 +2250,7 @@ BattleWeapon customWeapon_YoshiMiniEgg = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_wonder_egg",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::BADGE_BUFFABLE |
         AttackSpecialProperty_Flags::STATUS_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
@@ -2258,7 +2283,7 @@ BattleWeapon customWeapon_YoshiStampede = {
     .base_accuracy = 100,
     .base_fp_cost = 6,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -2285,7 +2310,7 @@ BattleWeapon customWeapon_YoshiStampede = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_taigun_yoshi",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::DIMINISHING_BY_HIT |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
@@ -2315,7 +2340,7 @@ BattleWeapon customWeapon_YoshiEggBarrage = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -2340,7 +2365,7 @@ BattleWeapon customWeapon_YoshiEggBarrage = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_wonder_egg",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::BADGE_BUFFABLE |
         AttackSpecialProperty_Flags::STATUS_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
