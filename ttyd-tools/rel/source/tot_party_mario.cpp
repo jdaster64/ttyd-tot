@@ -516,6 +516,9 @@ LBL(10)
         WAIT_FRM(4)
         SET(LW(6), 0x2)
     END_IF()
+    
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
         IF_EQUAL(LW(11), 0)
@@ -797,6 +800,9 @@ LBL(10)
             WAIT_FRM(4)
             SET(LW(6), 0x2)
         END_IF()
+        
+        USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
         IF_NOT_FLAG(LW(6), 0x2)
             USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
             USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
@@ -898,6 +904,9 @@ LBL(55)
         WAIT_FRM(4)
         SET(LW(6), 0x2)
     END_IF()
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_SpinJump2), 131328, LW(5))
         USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -1273,6 +1282,9 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
         WAIT_FRM(8)
         SET(LW(6), 0x2)
     END_IF()
+    
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
         USER_FUNC(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
@@ -1353,6 +1365,9 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
         WAIT_FRM(4)
         SET(LW(6), 0x2)
     END_IF()
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
         USER_FUNC(evt_btl_camera_set_mode, 0, 0)
@@ -1428,6 +1443,9 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
         SET(LW(6), 0x2)
     END_IF()
     SET(LW(12), PTR(&customWeapon_SpringJump2))
+    
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
         IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
@@ -1644,6 +1662,9 @@ EVT_BEGIN(marioAttackEvent_GatsuDokaJump)
         WAIT_FRM(4)
         SET(LW(6), 0x2)
     END_IF()
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
         USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
@@ -1871,6 +1892,9 @@ LBL(10)
         WAIT_FRM(4)
         SET(LW(6), 0x2)
     END_IF()
+    
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
         USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
@@ -2127,6 +2151,9 @@ LBL(10)
         END_IF()
         SET(LW(6), 0x2)
     END_IF()
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
         USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
@@ -2346,6 +2373,9 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
         WAIT_FRM(4)
         SET(LW(6), 0x2)
     END_IF()
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_NOT_FLAG(LW(6), 0x2)
         USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 256, LW(5))
         USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
@@ -2632,6 +2662,7 @@ LBL(50)
                             USER_FUNC(btlevtcmd_CheckDamage, -5, LW(3), LW(4), PTR(&customWeapon_TornadoJumpRecoil), 256, LW(5))
                         END_IF()
                     ELSE()
+                        USER_FUNC(btlevtcmd_ResultACDefence, LW(3), PTR(&customWeapon_TornadoJumpRecoil))
                         USER_FUNC(btlevtcmd_CheckDamage, -5, LW(3), LW(4), PTR(&customWeapon_TornadoJumpRecoil), 131328, LW(5))
                     END_IF()
                 CASE_ETC()
@@ -3025,6 +3056,9 @@ EVT_BEGIN(marioAttackEvent_NormalHammer)
         END_IF()
         GOTO(90)
     END_IF()
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
         USER_FUNC(btlevtcmd_GetResultAC, LW(6))
         IF_NOT_FLAG(LW(6), 0x2)
@@ -3360,6 +3394,9 @@ EVT_BEGIN(marioAttackEvent_KaitenHammer)
         END_IF()
         GOTO(90)
     END_IF()
+    
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
         USER_FUNC(btlevtcmd_GetResultAC, LW(6))
         IF_NOT_FLAG(LW(6), 0x2)
@@ -3583,6 +3620,7 @@ LBL(98)
         WAIT_FRM(1)
         GOTO(98)
     END_IF()
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), PTR(&customWeapon_UltraHammerFinisher))
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_UltraHammerFinisher), 131328, LW(5))
 LBL(99)
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
@@ -3647,6 +3685,9 @@ EVT_BEGIN(marioAttackEvent_HammerNageru_object)
         USER_FUNC(evt_btl_camera_off_posoffset_manual, 0)
     END_INLINE()
     USER_FUNC(btlevtcmd_WeaponAftereffect, LW(12))
+
+    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
+
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
         USER_FUNC(btlevtcmd_GetResultAC, LW(0))
         IF_FLAG(LW(0), 0x2)
@@ -3925,6 +3966,7 @@ EVT_BEGIN(marioAttackEvent_JishinHammer)
         USER_FUNC(btlevtcmd_StartAC, 1)
     END_IF()
     WAIT_FRM(75)
+    SET((int32_t)GSW_Battle_Multihit_GuardCount, 0)
 
     // No-op?
     // BROTHER_EVT_ID(LW(13))
@@ -4091,6 +4133,13 @@ LBL(51)
         USER_FUNC(btlevtcmd_DamageDirect, LW(3), LW(4), 0, 0, 2, 0)
         INLINE_EVT()
             WAIT_FRM(42)
+            
+            IF_SMALL((int32_t)GSW_Battle_Multihit_GuardCount, 1)
+                USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(5))
+                USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(5))
+                SET((int32_t)GSW_Battle_Multihit_GuardCount, 1)
+            END_IF()
+
             IF_FLAG(LW(7), 0x2)
                 USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
             ELSE()
@@ -4192,6 +4241,7 @@ EVT_END()
 
 EVT_BEGIN(marioAttackEvent_FireNaguri_object)
     USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(15))
+    SET((int32_t)GSW_Battle_Multihit_GuardCount, 0)
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
         USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     ELSE()
@@ -4311,6 +4361,13 @@ LBL(51)
         ELSE()
             SET(LW(0), 0x2)
         END_IF()
+
+        IF_SMALL((int32_t)GSW_Battle_Multihit_GuardCount, 1)
+            USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(5))
+            USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(5))
+            SET((int32_t)GSW_Battle_Multihit_GuardCount, 1)
+        END_IF()
+
         IF_FLAG(LW(0), 0x2)
             USER_FUNC(btlevtcmd_CommandCheckDamage, -2, LW(3), LW(4), 131328, LW(5))
         ELSE()
@@ -4589,7 +4646,7 @@ BattleWeapon customWeapon_Jump = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -4615,7 +4672,7 @@ BattleWeapon customWeapon_Jump = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
@@ -4651,7 +4708,7 @@ BattleWeapon customWeapon_SpinJump = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -4677,7 +4734,7 @@ BattleWeapon customWeapon_SpinJump = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_k_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -4712,7 +4769,7 @@ BattleWeapon customWeapon_SpinJump2 = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -4738,7 +4795,7 @@ BattleWeapon customWeapon_SpinJump2 = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_k_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -4773,7 +4830,7 @@ BattleWeapon customWeapon_SpringJump = {
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -4799,7 +4856,7 @@ BattleWeapon customWeapon_SpringJump = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_j_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -4834,7 +4891,7 @@ BattleWeapon customWeapon_SpringJump2 = {
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -4860,7 +4917,7 @@ BattleWeapon customWeapon_SpringJump2 = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_j_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -4956,7 +5013,7 @@ BattleWeapon customWeapon_Hammer = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -4982,7 +5039,7 @@ BattleWeapon customWeapon_Hammer = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
@@ -5017,7 +5074,7 @@ BattleWeapon customWeapon_SuperHammer = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5043,7 +5100,7 @@ BattleWeapon customWeapon_SuperHammer = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_kaiten_hammer",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
@@ -5129,7 +5186,7 @@ BattleWeapon customWeapon_UltraHammer = {
     .base_accuracy = 100,
     .base_fp_cost = 4,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5155,7 +5212,7 @@ BattleWeapon customWeapon_UltraHammer = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_ultra_hammer",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = 
@@ -5263,7 +5320,7 @@ BattleWeapon customWeapon_UltraHammerFinisher = {
     .unk_6f = 2,
     .ac_help_msg = nullptr,
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::CANNOT_MISS |
@@ -5414,7 +5471,7 @@ BattleWeapon customWeapon_PowerSoftStomp = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5440,7 +5497,7 @@ BattleWeapon customWeapon_PowerSoftStomp = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -5478,7 +5535,7 @@ BattleWeapon customWeapon_Multibounce = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5505,7 +5562,7 @@ BattleWeapon customWeapon_Multibounce = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -5539,7 +5596,7 @@ BattleWeapon customWeapon_PowerBounce = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5565,7 +5622,7 @@ BattleWeapon customWeapon_PowerBounce = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -5601,7 +5658,7 @@ BattleWeapon customWeapon_SleepyStomp = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5627,7 +5684,7 @@ BattleWeapon customWeapon_SleepyStomp = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -5664,7 +5721,7 @@ BattleWeapon customWeapon_TornadoJump = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 1,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5690,7 +5747,7 @@ BattleWeapon customWeapon_TornadoJump = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_tatsumaki_jump",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::GROUNDS_WINGED |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -5725,7 +5782,7 @@ BattleWeapon customWeapon_TornadoJumpRecoil = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 0.0,
     .stylish_multiplier = 0,
     .unk_19 = 0,
@@ -5751,7 +5808,7 @@ BattleWeapon customWeapon_TornadoJumpRecoil = {
     .unk_6f = 2,
     .ac_help_msg = nullptr,
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags = 0,
@@ -5780,7 +5837,7 @@ BattleWeapon customWeapon_PowerPiercingSmash = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5806,7 +5863,7 @@ BattleWeapon customWeapon_PowerPiercingSmash = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
@@ -5841,7 +5898,7 @@ BattleWeapon customWeapon_ShrinkSmash = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5867,7 +5924,7 @@ BattleWeapon customWeapon_ShrinkSmash = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
@@ -5904,7 +5961,7 @@ BattleWeapon customWeapon_IceSmash = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5930,7 +5987,7 @@ BattleWeapon customWeapon_IceSmash = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = 
@@ -5965,7 +6022,7 @@ BattleWeapon customWeapon_QuakeHammer = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -5991,7 +6048,7 @@ BattleWeapon customWeapon_QuakeHammer = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::FLIPS_BOMB |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
@@ -6025,7 +6082,7 @@ BattleWeapon customWeapon_FireDrive = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -6050,7 +6107,7 @@ BattleWeapon customWeapon_FireDrive = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_fire_naguri",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::DIMINISHING_BY_TARGET |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
@@ -6143,7 +6200,7 @@ BattleWeapon customWeapon_HammerThrow = {
     .base_accuracy = 100,
     .base_fp_cost = 0,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 1,
@@ -6167,7 +6224,7 @@ BattleWeapon customWeapon_HammerThrow = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer_nageru",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::USABLE_IF_CONFUSED |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
@@ -6200,7 +6257,7 @@ BattleWeapon customWeapon_PowerPiercingSmashThrow = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -6224,7 +6281,7 @@ BattleWeapon customWeapon_PowerPiercingSmashThrow = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer_nageru",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING |
@@ -6257,7 +6314,7 @@ BattleWeapon customWeapon_ShrinkSmashThrow = {
     .base_accuracy = 100,
     .base_fp_cost = 2,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -6281,7 +6338,7 @@ BattleWeapon customWeapon_ShrinkSmashThrow = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer_nageru",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
@@ -6316,7 +6373,7 @@ BattleWeapon customWeapon_IceSmashThrow = {
     .base_accuracy = 100,
     .base_fp_cost = 3,
     .base_sp_cost = 0,
-    .superguards_allowed = 0,
+    .superguards_allowed = 2,
     .unk_14 = 1.0,
     .stylish_multiplier = 1,
     .unk_19 = 5,
@@ -6340,7 +6397,7 @@ BattleWeapon customWeapon_IceSmashThrow = {
     .unk_6f = 2,
     .ac_help_msg = "msg_ac_hammer_nageru",
     .special_property_flags =
-        AttackSpecialProperty_Flags::UNGUARDABLE |
+        AttackSpecialProperty_Flags::TOT_PARTY_UNGUARDABLE |
         AttackSpecialProperty_Flags::MAKES_ATTACK_FX_SOUND |
         AttackSpecialProperty_Flags::ALL_BUFFABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
