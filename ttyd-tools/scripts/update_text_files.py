@@ -5151,6 +5151,102 @@ g_GlobalStrings = {
         b"Whatever the case, we'd\n"
         b"better stay on our toes!\n"
         b"<k>",
+
+    # TODO: Update Tattles for new bosses.
+    
+    b'btl_hlp_koopa':
+        b"That's Bowser, genius.\n"
+        b'<wait 250>\n'
+        b"You've only fought this guy\n"
+        b'like, a bazillion times.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"He'll keep kidnapping Peach,\n"
+        b"and you'll keep fighting him,\n"
+        b'until the end of time, I think.\n'
+        b'<k>\n'
+        b"%s"
+        b'<p>\n'
+        b'His fire breath and bites\n'
+        b'can inflict Burn and Poison,\n'
+        b'wearing us down slowly.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"If he stomps you, you'll be\n"
+        b'unable to use one of your\n'
+        b'commands for a little while.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"If he gets desperate, he's\n"
+        b"also got a nasty bite that'll\n"
+        b'drop your HP by half! Yikes!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"I don't know what Bowser's\n"
+        b'doing here, but we gotta\n'
+        b'defeat him quick!\n'
+        b'<k>',
+
+    b'btl_hlp_kamec_obaba':
+        b"That's Kammy Koopa.\n"
+        b'<wait 250>\n'
+        b"She's an evil old witch who's\n"
+        b'always helping Bowser out.\n'
+        b'<k>\n'
+        b"%s"
+        b'<p>\n'
+        b'She uses magic to raise\n'
+        b'her ATK and DEF stats, or\n'
+        b'become electrified or invisible.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'If she gets low on HP, she\n'
+        b'might start using even more\n'
+        b'potent spells or healing magic.\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Oh, <wait 100>here's a tip: <wait 150>she always\n"
+        b'attacks, <wait 150>buffs Bowser, <wait 150>then\n'
+        b'herself, in that order. <wait 250>Neat!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Still, <wait 100>her magic spells are so\n'
+        b'unpredictable, we might wanna\n'
+        b"take her first, <wait 150>don'tcha think?\n"
+        b'<k>',
+
+    b'btl_hlp_ranperu_las':
+        b"That's Doopliss.\n"
+        b'<wait 250>\n'
+        b'Wait, I thought he was on our\n'
+        b'side now! <wait 150>Man, what a card!\n'
+        b'<k>\n'
+        b"%s"
+        b'<p>\n'
+        b'He must have really boned\n'
+        b'up on his skills when he went\n'
+        b'touring with Flurrie...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'When he transforms into\n'
+        b'one of us, <wait 250>he can use almost\n'
+        b'any of our moves!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"If we wear him down, he'll\n"
+        b'even use level-2 and 3 moves\n'
+        b'if we have them upgraded...\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Plus, he'll copy the effects of\n"
+        b"all the badges we've got\n"
+        b'equipped, too! What a pain!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b'Man, if this joker beats us\n'
+        b"at our own game, I don't think\n"
+        b"we'll ever live it down!\n"
+        b'<k>',
     
     # TODO: Maybe menu Tattles for all enemies - b"menu_enemy_001", etc.
     
@@ -6252,6 +6348,35 @@ g_TowerBossFloorStrings = {
         b"Gack!\n"
         b"<k>",
         
+    # TODO: Field placeholder text for new boss fights.
+    
+    b"tot_di074000_00":
+        b"2A Field 1\n<k>",
+    b"tot_di074100_00":
+        b"2A Field 2\n<k>",
+    b"tot_di074200_00":
+        b"2A Field 3\n<k>",
+    b"tot_di074300_00":
+        b"2A Field Death\n<k>",
+    
+    b"tot_di079000_00":
+        b"2B Field 1\n<k>",
+    b"tot_di079100_00":
+        b"2B Field 2\n<k>",
+    b"tot_di079200_00":
+        b"2B Field 3\n<k>",
+    b"tot_di079300_00":
+        b"2B Field Death\n<k>",
+    
+    b"tot_di084000_00":
+        b"3 Field 1\n<k>",
+    b"tot_di084100_00":
+        b"3 Field 2\n<k>",
+    b"tot_di084200_00":
+        b"3 Field 3\n<k>",
+    b"tot_di084300_00":
+        b"3 Field Death\n<k>",
+        
     
     # Boss battle dialogue.
     
@@ -6644,6 +6769,41 @@ g_TowerBossFloorStrings = {
         b"you look...\n<k>\n<p>\n"
         b"But I'm not through yet!\n<wait 250>\n"
         b"Everyone! GET 'EM!!!\n<k>",
+        
+    # TODO: In-battle placeholder text for new boss fights.
+    
+    b"tot_di070000_00":
+        b"2A Intro\n<k>",
+    b"tot_di070100_00":
+        b"2A Taunt\n<k>",
+    b"tot_di070200_00":
+        b"2A Phase 2\n<k>",
+    b"tot_di070300_00":
+        b"2A Death A\n<k>",
+    b"tot_di070400_00":
+        b"2A Death B\n<k>",
+    
+    b"tot_di075000_00":
+        b"2B Intro\n<k>",
+    b"tot_di075100_00":
+        b"2B Taunt\n<k>",
+    b"tot_di075200_00":
+        b"2B Phase 2\n<k>",
+    b"tot_di075300_00":
+        b"2B Death A\n<k>",
+    b"tot_di075400_00":
+        b"2B Death B\n<k>",
+    
+    b"tot_di080000_00":
+        b"3 Intro\n<k>",
+    b"tot_di080100_00":
+        b"3 Phase 2\n<k>",
+    b"tot_di080200_00":
+        b"3 Phase 3\n<k>",
+    b"tot_di080300_00":
+        b"3 Jumpman Hammerman\n<k>",
+    b"tot_di080400_00":
+        b"3 Death\n<k>",
 }
 
 g_PetalburgWestStrings = {
@@ -10288,10 +10448,11 @@ g_StringMap = {
     'gon_00': g_TowerLobbyStrings,
     
     # Tower floors.
-    'gon_01': ChainMap(g_TowerStrings, g_Tower1Strings),
-    'gon_02': ChainMap(g_TowerStrings, g_Tower2Strings),
-    'gon_03': ChainMap(g_TowerStrings, g_Tower3Strings),
-    'gon_04': ChainMap(g_TowerStrings, g_Tower4Strings),
+    # Boss floor strings included on all tower floors for ease of testing.
+    'gon_01': ChainMap(g_TowerStrings, g_Tower1Strings, g_TowerBossFloorStrings),
+    'gon_02': ChainMap(g_TowerStrings, g_Tower2Strings, g_TowerBossFloorStrings),
+    'gon_03': ChainMap(g_TowerStrings, g_Tower3Strings, g_TowerBossFloorStrings),
+    'gon_04': ChainMap(g_TowerStrings, g_Tower4Strings, g_TowerBossFloorStrings),
     
     # Tower boss floor.
     'gon_05': g_TowerBossFloorStrings,

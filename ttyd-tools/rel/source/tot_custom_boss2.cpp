@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gsw.h"
+#include "tot_manager_dialogue.h"
 #include "tot_party_bobbery.h"
 #include "tot_party_flurrie.h"
 #include "tot_party_goombella.h"
@@ -809,10 +810,13 @@ EVT_BEGIN(unitDoopliss_attack_event)
         RUN_CHILD_EVT(LW(15))
     ELSE()
         // No valid moves; Mario must have equipped both Jumpman + Hammerman.
-        // TODO: New dialogue.
         USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
         USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_DisabledNJNH, 1)
-        USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_30"), 0, -2)
+
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_DISABLE)
+        USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+        USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+
         USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
         USER_FUNC(evtTot_Doopliss_DisableNJNH)
     END_IF()
@@ -1058,8 +1062,11 @@ EVT_BEGIN(unitDoopliss_phase_event)
         IF_SMALL(LW(0), 3)
             USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
             USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 3)
-            // TODO: New dialogue.
-            USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_20"), 0, -2)
+
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_P3)
+            USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+            USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+
             USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
         END_IF()
     ELSE()
@@ -1067,8 +1074,11 @@ EVT_BEGIN(unitDoopliss_phase_event)
             IF_SMALL(LW(0), 2)
                 USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
                 USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 2)
-                // TODO: New dialogue.
-                USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_10"), 0, -2)
+
+                USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_P2)
+                USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+                USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+
                 USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
             END_IF()
         END_IF()
@@ -1109,8 +1119,11 @@ EVT_BEGIN(unitDoopliss_battle_entry_event)
     WAIT_FRM(60)
     WAIT_FRM(60)
     RUN_CHILD_EVT(PTR(&unitDoopliss_self_camera_focus_event))
-    // TODO: New dialogue.
-    USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_00"), 0, -2)
+
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_INTRO)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+    
     WAIT_MSEC(300)
     USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
@@ -1159,7 +1172,11 @@ EVT_BEGIN(unitDoopliss_dead_event)
     USER_FUNC(btlevtcmd_WaitAttackEnd)
     USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
     RUN_CHILD_EVT(PTR(&unitDoopliss_self_camera_focus_event))
-    USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_10"), 0, -2)
+
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_DEATH)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+    
     USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
 LBL(90)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
@@ -1248,10 +1265,8 @@ EVT_BEGIN(unitDoopliss_init_event)
     USER_FUNC(btlevtcmd_SetEventConfusion, -2, PTR(&btldefaultevt_Confuse))
     USER_FUNC(btlevtcmd_SetEventEntry, -2, PTR(&unitDoopliss_battle_entry_event))
     
-    // TODO: Values changed for ease of testing only!
-    // Both AiState and FormTurnCount should start at 1 in the actual fight.
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 3)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_FormTurnCount, 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 1)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_FormTurnCount, 1)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_CurrentForm, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_VivianTailEvent, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_DisabledNJNH, 0)

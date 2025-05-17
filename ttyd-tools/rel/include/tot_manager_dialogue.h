@@ -188,6 +188,36 @@ namespace ConversationId {
         SBOSS_F2            = 60200,
         SBOSS_F3            = 60300,
         SBOSS_PHASE2        = 61000,
+        // Extra 2A
+        BOSS_2A_INTRO       = 70000,
+        BOSS_2A_TAUNT       = 70100,
+        BOSS_2A_P2          = 70200,
+        BOSS_2A_DEATH_A     = 70300,
+        BOSS_2A_DEATH_B     = 70400,
+        BOSS_2A_F1          = 74000,
+        BOSS_2A_F2          = 74100,
+        BOSS_2A_F3          = 74200,
+        BOSS_2A_F1_END      = 74300,
+        // Extra 2B
+        BOSS_2B_INTRO       = 75000,
+        BOSS_2B_TAUNT       = 75100,
+        BOSS_2B_P2          = 75200,
+        BOSS_2B_DEATH_A     = 75300,
+        BOSS_2B_DEATH_B     = 75400,
+        BOSS_2B_F1          = 79000,
+        BOSS_2B_F2          = 79100,
+        BOSS_2B_F3          = 79200,
+        BOSS_2B_F_END       = 79300,
+        // Extra 3
+        BOSS_3_INTRO        = 80000,
+        BOSS_3_P2           = 80100,
+        BOSS_3_P3           = 80200,
+        BOSS_3_DISABLE      = 80300,
+        BOSS_3_DEATH        = 80400,
+        BOSS_3_F1           = 84000,
+        BOSS_3_F2           = 84100,
+        BOSS_3_F3           = 84200,
+        BOSS_3_F_END        = 84300,
     };
 }
 

@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gsw.h"
+#include "tot_manager_dialogue.h"
 #include "tot_state.h"
 
 #include <gc/types.h>
@@ -1050,7 +1051,9 @@ EVT_BEGIN(unitKammy_phase_event)
         IF_LARGE_EQUAL(LW(1), 50)
             GOTO(10)
         END_IF()
+
         // TODO: Maybe add dialogue.
+
         USER_FUNC(btlevtcmd_AddUnitWork, -2, UW_Kammy_AiState, (int32_t)KammyAiState::PHASE_2_ATTACK)
     END_IF()
 
@@ -1169,8 +1172,11 @@ EVT_BEGIN(unitKammy_dead_event)
             RUN_CHILD_EVT(PTR(&unitKammy_camera_focus_event))
             USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("T_3"))
             USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("D_3"))
-            // TODO: New dialogue.
-            USER_FUNC(evt_msg_print, 2, PTR("stg8_las_100_01"), 0, -2)
+
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2B_DEATH_A)
+            USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+            USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+
             WAIT_MSEC(200)
             USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("D_3"))
             USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitKammy_pose_table_dead))
@@ -1195,8 +1201,11 @@ EVT_BEGIN(unitKammy_dead_event)
             RUN_CHILD_EVT(PTR(&unitKammy_camera_focus_event))
             USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("D_1"))
             USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("D_1"))
-            // TODO: New dialogue.
-            USER_FUNC(evt_msg_print, 2, PTR("stg8_las_100_03"), 0, -2)
+
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2B_DEATH_B)
+            USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+            USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+
             WAIT_MSEC(200)
             USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("D_3"))
             USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitKammy_pose_table_dead))
@@ -1651,13 +1660,20 @@ EVT_BEGIN(unitBowser_first_damage_event)
         WAIT_MSEC(1000)
         USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("KPA_T_2"))
         USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("KPA_S_3"))
-        // TODO: New dialogue.
-        USER_FUNC(evt_msg_print, 2, PTR("stg8_las_98"), 0, -2)
+
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2A_TAUNT)
+        USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+        USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+        
         WAIT_MSEC(300)
         USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("KPA_S_1"))
         IF_EQUAL(GW(11), 0)
             RUN_CHILD_EVT(PTR(&unitKammy_camera_focus_event))
-            USER_FUNC(evt_msg_print, 2, PTR("stg8_las_99"), 0, GW(9))
+
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2B_TAUNT)
+            USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+            USER_FUNC(evt_msg_print, 2, LW(0), 0, GW(9))
+
             WAIT_MSEC(300)
         END_IF()
         USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_Bowser_IsLeaning, LW(0))
@@ -2197,8 +2213,11 @@ EVT_BEGIN(unitBowser_half_hp_event)
             RUN_CHILD_EVT(PTR(&unitBowser_camera_focus_event))
             USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("KPA_T_3"))
             USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("KPA_S_4"))
-            // TODO: New dialogue.
-            USER_FUNC(evt_msg_print, 2, PTR("stg8_las_100"), 0, -2)
+
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2A_P2)
+            USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+            USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+            
             WAIT_MSEC(300)
             USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
             USER_FUNC(evt_btl_camera_set_mode, 0, 0)
@@ -2292,8 +2311,11 @@ EVT_BEGIN(unitBowser_dead_event)
             WAIT_MSEC(200)
             USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("KPA_T_8"))
             USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("KPA_Z_3"))
-            // TODO: New dialogue.
-            USER_FUNC(evt_msg_print, 2, PTR("stg8_las_100_02"), 0, -2)
+
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2A_DEATH_A)
+            USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+            USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+
             WAIT_MSEC(300)
             USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(&unitBowser_pose_table_dead))
             SET(GW(10), 2)
@@ -2302,8 +2324,11 @@ EVT_BEGIN(unitBowser_dead_event)
         CASE_ETC()
             USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("KPA_D_1"))
             USER_FUNC(btlevtcmd_SetStayPose, -2, PTR("KPA_D_1"))
-            // TODO: New dialogue.
-            USER_FUNC(evt_msg_print, 2, PTR("stg8_las_100_04"), 0, -2)
+
+            USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2A_DEATH_B)
+            USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+            USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
+
             WAIT_MSEC(300)
             USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_VOICE_KOOPA_SATIATED2_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
             USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("KPA_D_2"))
@@ -2338,12 +2363,18 @@ EVT_BEGIN(unitBowser_battle_entry_event)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_VOICE_KOOPA_LAUGH2_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("KPA_Y_2"))
     WAIT_MSEC(1000)
-    // TODO: New dialogue.
-    USER_FUNC(evt_msg_print, 2, PTR("stg8_las_96"), 0, -2)
+
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2A_INTRO)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
     WAIT_MSEC(300)
+
     RUN_CHILD_EVT(PTR(&unitKammy_camera_focus_event))
-    USER_FUNC(evt_msg_print, 2, PTR("stg8_las_97"), 0, GW(9))
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2B_INTRO)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 2, LW(0), 0, GW(9))
     WAIT_MSEC(300)
+
     USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     RETURN()
@@ -2378,11 +2409,10 @@ EVT_BEGIN(unitBowser_init_event)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_HasTaunted, 0)
     USER_FUNC(btlevtcmd_GetMaxHp, -2, LW(0))
     DIV(LW(0), 2)
+    
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_HpThreshold, LW(0))
-
-    // TODO: For testing only; should both be set to 0 in final fight.
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_LowHpEvent, 1)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_AiState, 3)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_LowHpEvent, 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_AiState, 0)
 
     USER_FUNC(btlevtcmd_SetWalkSound, -2, PTR("SFX_BOSS_KOOPA_MOVE1L"), PTR("SFX_BOSS_KOOPA_MOVE1R"), 0, 15, 15)
     USER_FUNC(btlevtcmd_SetRunSound, -2, PTR("SFX_BOSS_KOOPA_MOVE1L"), PTR("SFX_BOSS_KOOPA_MOVE1R"), 0, 8, 8)
