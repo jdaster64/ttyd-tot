@@ -506,7 +506,7 @@ BattleWeapon unitKammy_weaponFastMagic = {
         
     // status chances
     .fast_chance = 100,
-    .fast_time = 3,
+    .fast_time = 4,
     
     .attack_evt_code = nullptr,
     .bg_a1_a2_fall_weight = 0,
@@ -735,7 +735,6 @@ EVT_END()
 EVT_BEGIN(unitKammy_blast_magic_event)
     USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
     USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
-    // TODO: Make variant that hits all targets?
     USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_EQUAL(LW(3), -1)
         USER_FUNC(btlevtcmd_CheckToken, -2, 16, LW(0))
@@ -749,6 +748,8 @@ EVT_BEGIN(unitKammy_blast_magic_event)
     USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
     USER_FUNC(btlevtcmd_WaitGuardMove)
     USER_FUNC(btlevtcmd_PayWeaponCost, -2, LW(9))
+    SET(LW(14), 0)
+LBL(10)
     USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
     RUN_CHILD_EVT(PTR(&unitKammy_magic_common_event))
@@ -805,18 +806,38 @@ LBL(90)
     MUL(LW(10), LW(0))
     SUB(LW(11), 5)
     USER_FUNC(evtTot_Kammy_SpawnMagicParticles, -2, LW(10), LW(11), LW(12), 60)
-    WAIT_FRM(60)
-    GOTO(98)
+    WAIT_FRM(15)
+    GOTO(92)
+
 LBL(91)
     USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     ADD(LW(0), -57)
     ADD(LW(1), 10)
     USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
     USER_FUNC(evtTot_Kammy_SpawnMagicParticles, -2, LW(10), LW(11), LW(12), 45)
+
+    BROTHER_EVT()
+        WAIT_FRM(45)
+        USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    END_BROTHER()
+
+LBL(92)
+    // Attack two targets at random when at low health.
+    ADD(LW(14), 1)
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_Kammy_AiState, LW(0))
+    IF_LARGE_EQUAL(LW(0), (int32_t)KammyAiState::PHASE_2_ATTACK)
+        IF_SMALL(LW(14), 2)
+            USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+            USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+            USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+            IF_NOT_EQUAL(LW(3), -1)
+                GOTO(10)
+            END_IF()
+        END_IF()
+    END_IF()
+    
     WAIT_FRM(45)
-    USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
-    GOTO(98)
 LBL(98)
     WAIT_FRM(30)
     USER_FUNC(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
@@ -970,9 +991,9 @@ LBL(80)
                 MUL(LW(13), 100)
                 DIV(LW(13), LW(14))
                 
-                // Weight for healing = 0 - 50, from 50% - 0% of max HP.
+                // Weight for healing = 0 - 100, from 50% - 0% of max HP.
                 SUB(LW(13), 50)
-                MUL(LW(13), -1)
+                MUL(LW(13), -2)
                 IF_LARGE(LW(13), 0)
                     SET(LW(11), LW(13))
                 END_IF()
@@ -1004,7 +1025,6 @@ LBL(80)
             CASE_END()
         CASE_ETC()
             USER_FUNC(btlevtcmd_AddUnitWork, -2, UW_Kammy_AiState, 1)
-            // TODO: Add option for multi-blast?
             SET(LW(9), PTR(&unitKammy_weaponBlast))
             RUN_CHILD_EVT(PTR(&unitKammy_blast_magic_event))
             GOTO(99)
@@ -1574,6 +1594,8 @@ BattleWeapon unitBowser_weaponBreath = {
     .target_weighting_flags = 0,
         
     // status chances
+    .burn_chance = 80,
+    .burn_time = 3,
     
     .attack_evt_code = nullptr,
     .bg_a1_a2_fall_weight = 0,
@@ -2000,10 +2022,19 @@ EVT_BEGIN(unitBowser_critical_bite_attack_event)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BOSS_KOOPA_BITE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+
+    // Improve sound effect syncing with animation.
+    BROTHER_EVT_ID(LW(15))
+        WAIT_FRM(15)
+        DO(8)
+            USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BOSS_KOOPA_BITE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            WAIT_FRM(12)
+        WHILE()
+    END_BROTHER()
+
     WAIT_MSEC(170)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("KPA_A_3B"))
     WAIT_MSEC(150)
-    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BOSS_KOOPA_BITE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR(4)
@@ -2027,6 +2058,8 @@ EVT_BEGIN(unitBowser_critical_bite_attack_event)
             CASE_END()
     END_SWITCH()
 LBL(90)
+    DELETE_EVT(LW(15))
+    SET(LW(15), -1)
     WAIT_MSEC(100)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("KPA_A_3C"))
     WAIT_MSEC(150)
@@ -2038,7 +2071,11 @@ LBL(91)
     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("KPA_A_3C"))
     WAIT_MSEC(150)
+    SET(LW(15), -1)
 LBL(98)
+    IF_NOT_EQUAL(LW(15), -1)
+        DELETE_EVT(LW(15))
+    END_IF()
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     WAIT_MSEC(250)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("KPA_R_1"))
@@ -2342,8 +2379,11 @@ EVT_BEGIN(unitBowser_init_event)
     USER_FUNC(btlevtcmd_GetMaxHp, -2, LW(0))
     DIV(LW(0), 2)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_HpThreshold, LW(0))
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_LowHpEvent, 0)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_AiState, 0)
+
+    // TODO: For testing only; should both be set to 0 in final fight.
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_LowHpEvent, 1)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Bowser_AiState, 3)
+
     USER_FUNC(btlevtcmd_SetWalkSound, -2, PTR("SFX_BOSS_KOOPA_MOVE1L"), PTR("SFX_BOSS_KOOPA_MOVE1R"), 0, 15, 15)
     USER_FUNC(btlevtcmd_SetRunSound, -2, PTR("SFX_BOSS_KOOPA_MOVE1L"), PTR("SFX_BOSS_KOOPA_MOVE1R"), 0, 8, 8)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
