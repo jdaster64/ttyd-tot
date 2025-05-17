@@ -78,6 +78,7 @@ constexpr const int32_t UW_Doopliss_AiState = 8;
 constexpr const int32_t UW_Doopliss_FormTurnCount = 9;
 constexpr const int32_t UW_Doopliss_CurrentForm = 10;
 constexpr const int32_t UW_Doopliss_VivianTailEvent = 11;
+constexpr const int32_t UW_Doopliss_DisabledNJNH = 12;
 
 // Definition for currently selected weapon; exposed for ease of integration
 // into party scripts.
@@ -89,6 +90,7 @@ EVT_DECLARE_USER_FUNC(evtTot_Doopliss_SelectWeapon, 1)
 EVT_DECLARE_USER_FUNC(evtTot_Doopliss_CheckVeiled, 1)
 EVT_DECLARE_USER_FUNC(evtTot_Doopliss_SpawnScanEffect, 4)
 EVT_DECLARE_USER_FUNC(evtTot_Doopliss_HandleTransform, 1)
+EVT_DECLARE_USER_FUNC(evtTot_Doopliss_DisableNJNH, 0)
 
 extern DataTableEntry unitDoopliss_data_table[];
 
@@ -386,9 +388,9 @@ BattleUnitKindPart unitDoopliss_parts_P2[] = {
         .unk_30 = 20,
         .unk_32 = 30,
         .base_alpha = 255,
-        .defense = unitDoopliss_defense,
+        .defense = unitDoopliss_defense_P2,
         .defense_attr = unitDoopliss_defense_attr,
-        .attribute_flags = 0x0000'0009,
+        .attribute_flags = 0x0000'1009,  // shell-flippable
         .counter_attribute_flags = 0,
         .pose_table = ttyd::unit_party_nokotarou::pose_table_nokotarou_stay,
     },
@@ -802,9 +804,17 @@ EVT_BEGIN(unitDoopliss_attack_event)
             USER_FUNC(evtTot_Doopliss_SelectWeapon, LW(15))
     END_SWITCH()
 
-    // If a move script was selected, run it, otherwise just idle.
     IF_NOT_EQUAL(LW(15), 0)
+        // If a move script was selected, run it, otherwise just idle.
         RUN_CHILD_EVT(LW(15))
+    ELSE()
+        // No valid moves; Mario must have equipped both Jumpman + Hammerman.
+        // TODO: New dialogue.
+        USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
+        USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_DisabledNJNH, 1)
+        USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_30"), 0, -2)
+        USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
+        USER_FUNC(evtTot_Doopliss_DisableNJNH)
     END_IF()
 
 LBL(99)
@@ -974,7 +984,7 @@ EVT_BEGIN(unitDoopliss_transform_event)
         WAIT_FRM(1)
     WHILE()
 
-    // TODO: Mario doesn't currently have a talking animation; probably fine.
+    // Mario doesn't have a talking animation; it's probably fine.
     USER_FUNC(btlevtcmd_SetTalkPoseType, -2, 65)
     USER_FUNC(btlevtcmd_SetStayPoseType, -2, 43)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
@@ -982,54 +992,115 @@ LBL(99)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(unitDoopliss_P2_flip_event)
+    SET(LW(10), -2)
+    SET(LW(11), 1)
+    USER_FUNC(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&unitDoopliss_defense))
+    USER_FUNC(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(&ttyd::unit_party_nokotarou::pose_table_nokotarou_turn))
+    USER_FUNC(btlevtcmd_SetOverTurnCount, LW(10), 2)
+    USER_FUNC(btlevtcmd_AnimeChangePose, LW(10), LW(11), PTR("PNK_D_1"))
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_SetFallAccel, -2, FLOAT(1.0))
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
+    USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 6, -1)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitDoopliss_P2_wakeup_event)
+    SET(LW(10), -2)
+    SET(LW(11), 1)
+    USER_FUNC(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&unitDoopliss_defense_P2))
+    USER_FUNC(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(&ttyd::unit_party_nokotarou::pose_table_nokotarou_stay))
+    USER_FUNC(btlevtcmd_SetOverTurnCount, LW(10), 0)
+    USER_FUNC(btlevtcmd_AnimeChangePose, LW(10), LW(11), PTR("PNK_S_1"))
+    USER_FUNC(btlevtcmd_SetFallAccel, -2, FLOAT(1.0))
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(unitDoopliss_phase_event)
     USER_FUNC(btlevtcmd_CheckPhase, LW(0), 0x4000003)
-    IF_NOT_EQUAL(LW(0), 0)
-        USER_FUNC(btlevtcmd_CheckActStatus, -2, LW(0))
-        IF_NOT_EQUAL(LW(0), 0)
-            // Check for low-health events.
-            USER_FUNC(btlevtcmd_GetHp, -2, LW(11))
-            USER_FUNC(btlevtcmd_GetMaxHp, -2, LW(12))
-            MUL(LW(11), 100)
-            DIV(LW(11), LW(12))
-            USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_Doopliss_AiState, LW(0))
-            
-            IF_SMALL_EQUAL(LW(11), 33)
-                IF_SMALL(LW(0), 3)
-                    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 3)
-                    // TODO: New dialogue.
-                    USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_20"), 0, -2)
-                END_IF()
-            ELSE()
-                IF_SMALL_EQUAL(LW(11), 66)
-                    IF_SMALL(LW(0), 2)
-                        USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 2)
-                        // TODO: New dialogue.
-                        USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_10"), 0, -2)
-                    END_IF()
-                END_IF()
-            END_IF()
-        
-            USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_Doopliss_FormTurnCount, LW(0))
-            IF_LARGE(LW(0), 0)
-                USER_FUNC(btlevtcmd_AddUnitWork, -2, UW_Doopliss_FormTurnCount, -1)
-            ELSE()
-                USER_FUNC(evtTot_Doopliss_CheckVeiled, LW(0))
-                IF_EQUAL(LW(0), 0)
-                    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_FormTurnCount, 2)
-                    USER_FUNC(btlevtcmd_PhaseEventStartDeclare, -2)
-                    RUN_CHILD_EVT(PTR(&unitDoopliss_transform_event))
-                    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
-                END_IF()
+    IF_EQUAL(LW(0), 0)
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(btlevtcmd_CheckActStatus, -2, LW(0))
+    IF_EQUAL(LW(0), 0)
+        GOTO(99)
+    END_IF()
+
+    // Check for Withdraw status.
+    USER_FUNC(btlevtcmd_CheckPartsAttribute, -2, 1, int(0xe0000000), LW(0))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+        USER_FUNC(btlevtcmd_SetFallAccel, -2, FLOAT(1.0))
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
+        USER_FUNC(btlevtcmd_OffPartsAttribute, -2, 1, int(0xe0000000))
+        USER_FUNC(btlevtcmd_OnPartsAttribute, -2, 1, int(0x1000))
+    END_IF()
+    // Check for flipped status.
+    USER_FUNC(btlevtcmd_GetOverTurnCount, -2, LW(0))
+    IF_LARGE(LW(0), 0)
+        RUN_CHILD_EVT(unitDoopliss_P2_wakeup_event)
+    END_IF()
+
+    // Check for low-health events.
+    USER_FUNC(btlevtcmd_GetHp, -2, LW(11))
+    USER_FUNC(btlevtcmd_GetMaxHp, -2, LW(12))
+    MUL(LW(11), 100)
+    DIV(LW(11), LW(12))
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_Doopliss_AiState, LW(0))
+    
+    IF_SMALL(LW(11), 40)
+        IF_SMALL(LW(0), 3)
+            USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
+            USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 3)
+            // TODO: New dialogue.
+            USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_20"), 0, -2)
+            USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
+        END_IF()
+    ELSE()
+        IF_SMALL(LW(11), 70)
+            IF_SMALL(LW(0), 2)
+                USER_FUNC(btlevtcmd_StatusWindowOnOff, 0)
+                USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_AiState, 2)
+                // TODO: New dialogue.
+                USER_FUNC(evt_msg_print, 2, PTR("btl_majo3_10"), 0, -2)
+                USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
             END_IF()
         END_IF()
     END_IF()
+
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_Doopliss_FormTurnCount, LW(0))
+    IF_LARGE(LW(0), 0)
+        USER_FUNC(btlevtcmd_AddUnitWork, -2, UW_Doopliss_FormTurnCount, -1)
+    ELSE()
+        USER_FUNC(evtTot_Doopliss_CheckVeiled, LW(0))
+        IF_EQUAL(LW(0), 0)
+            USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_FormTurnCount, 2)
+            USER_FUNC(btlevtcmd_PhaseEventStartDeclare, -2)
+            RUN_CHILD_EVT(PTR(&unitDoopliss_transform_event))
+            USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+        END_IF()
+    END_IF()
+LBL(99)
     RETURN()
 EVT_END()
 
 EVT_BEGIN(unitDoopliss_wait_event)
     SET((int32_t)GSW_Battle_DooplissMove, 0)
-    USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+
+    // Handle Koops' withdraw state, otherwise use default idle pose.
+    USER_FUNC(btlevtcmd_CheckPartsAttribute, -2, 1, int(0xe0000000), LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("PNK_A_1"))
+    ELSE()
+        USER_FUNC(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    END_IF()
+
     RETURN()
 EVT_END()
 
@@ -1073,7 +1144,7 @@ EVT_BEGIN(unitDoopliss_dead_event)
         USER_FUNC(evt_eff, PTR(""), PTR("kemuri_test"), 7, LW(0), LW(1), LW(2), FLOAT(2.0), 0, 0, 0, 0, 0, 0, 0)
         USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BOSS_RNPL_TRANSFORM4"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_MSEC(300)
-        // TODO: Move most of this into helper function?
+        
         USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, LW(11), PTR(&unitDoopliss_pose_table))
         USER_FUNC(btlevtcmd_ChangeDataTable, -2, PTR(&unitDoopliss_data_table))
         USER_FUNC(btlevtcmd_ReplaceParts, -2, LW(11), PTR(&unitDoopliss_parts), 1)
@@ -1183,6 +1254,7 @@ EVT_BEGIN(unitDoopliss_init_event)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_FormTurnCount, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_CurrentForm, 0)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_VivianTailEvent, 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Doopliss_DisabledNJNH, 0)
 
     // Necessary for some attacks that have variable success (e.g. Tease).
     USER_FUNC(evtTot_Doopliss_MakeExtraWorkArea)
@@ -1210,8 +1282,7 @@ DataTableEntry unitDoopliss_data_table_P1[] = {
 
 DataTableEntry unitDoopliss_data_table_P2[] = {
     49, (void*)unitDoopliss_Party_dead_event,
-    // Koops Doopliss will not be flippable.
-    // 13, (void*)unitDoopliss_P2_flip_event,
+    13, (void*)unitDoopliss_P2_flip_event,
     0, nullptr,
 };
 
@@ -1341,9 +1412,7 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_SelectWeapon) {
                 
                 case MoveType::KOOPS_BASE:
                 case MoveType::KOOPS_POWER_SHELL:
-                // Consider adding; also consider having him flippable; in
-                // both cases, the state should resolve itself in phase 3.
-                // case MoveType::KOOPS_WITHDRAW:
+                case MoveType::KOOPS_WITHDRAW:
                 case MoveType::KOOPS_BULK_UP:
                 case MoveType::KOOPS_SHELL_SLAM:
 
@@ -1367,7 +1436,8 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_SelectWeapon) {
                 case MoveType::BOBBERY_BOMB_SQUAD:
                 case MoveType::BOBBERY_POISON_BOMB:
                 case MoveType::BOBBERY_BOBOMBAST:
-                // Consider adding; would need to check for existing bomb.
+                // This is probably a little too mean, given Bobbery's already
+                // got two unguardable moves and you'd have one turn to react.
                 // case MoveType::BOBBERY_MEGATON_BOMB:
 
                 case MoveType::MOWZ_BASE:
@@ -1481,6 +1551,8 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
     
     BattleUnitKindPart* kind_parts = nullptr;
     int32_t num_parts = 1;
+
+    unit->status_vulnerability = &unitDoopliss_status;
     
     switch (evtGetValue(evt, evt->evtArguments[0])) {
         case BattleUnitType::MARIO: {
@@ -1526,6 +1598,7 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
             kind_parts = unitDoopliss_parts_P3;
             
             unit->current_kind = BattleUnitType::DOOPLISS_CH_8_FLURRIE;
+            unit->status_vulnerability = &unitDoopliss_status_P3;
             unit->data_table = (void*)unitDoopliss_data_table_P3;
             unit->unit_work[UW_Doopliss_CurrentForm] = 4;
             
@@ -1572,6 +1645,7 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
             kind_parts = unitDoopliss_parts_P6;
             
             unit->current_kind = BattleUnitType::DOOPLISS_CH_8_BOBBERY;
+            unit->status_vulnerability = &unitDoopliss_status_P6;
             unit->data_table = (void*)unitDoopliss_data_table_P6;
             unit->unit_work[UW_Doopliss_CurrentForm] = 7;
             
@@ -1646,13 +1720,24 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
     for (int32_t i = 0; i < 200; ++i) {
         ttyd::battle::_EquipItem(unit, equip_flags, pouch->equipped_badges[i]);
     }
+    // If Doopliss already remarked on having Jumpman and Hammerman both on,
+    // ignore those badges for the rest of the fight.
+    if (unit->unit_work[UW_Doopliss_DisabledNJNH] == 1) {
+        unit->badges_equipped.jumpman = 0;
+        unit->badges_equipped.hammerman = 0;
+    }
     
-    // TODO:
-    // - Handle Jumpman + Hammerman case, if Doopliss already wasted a turn
-    // - change DEF per transformation
-    // - change status vulnerability tables per transformation
-    // - is it sensible to clear all status effects?
-    
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_Doopliss_DisableNJNH) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = ttyd::battle_sub::BattleTransID(evt, -2);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+
+    unit->badges_equipped.jumpman = 0;
+    unit->badges_equipped.hammerman = 0;
+
     return 2;
 }
 
