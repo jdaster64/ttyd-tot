@@ -732,11 +732,38 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 20,
         .icon = IconType::MARIO_COSTUME_27,
         .group_id = 28,
+        .sort_order = 21,
+    },
+    {
+        // Wario's Woods NES
+        .name_msg = "tot_cos1_29",
+        .help_msg = "tot_cos1_29_h",
+        .models = MARIO_MODEL_PATHS("8", true),
+        .price = 20,
+        .icon = IconType::MARIO_COSTUME_28,
+        .group_id = 29,
+        .sort_order = 23,
+    },
+    {
+        // Foreman Spike
+        .name_msg = "tot_cos1_30",
+        .help_msg = "tot_cos1_30_h",
+        .models = MARIO_MODEL_PATHS("9", true),
+        .price = 20,
+        .icon = IconType::MARIO_COSTUME_29,
+        .group_id = 30,
         .sort_order = 22,
     },
-    // Wario's Woods: sort order 21
-    // Foreman Spike: sort order 23
-    // Virtual Boy:   sort order 26
+    {
+        // Virtual Boy
+        .name_msg = "tot_cos1_31",
+        .help_msg = "tot_cos1_31_h",
+        .models = MARIO_MODEL_PATHS("V", true),
+        .price = 20,
+        .icon = IconType::MARIO_COSTUME_30,
+        .group_id = 31,
+        .sort_order = 26,
+    },
 };
 const int32_t g_NumMarioCostumes =
     sizeof(g_MarioCostumeData) / sizeof(MarioCostumeData);
@@ -770,6 +797,11 @@ const CosmeticGroupData g_YoshiCostumeGroupData[] = {
     { IconType::YOSHI_COSTUME_22,           "tot_cos2_23" },
     { IconType::YOSHI_COSTUME_23,           "tot_cos2_24" },
     { IconType::YOSHI_COSTUME_24,           "tot_cos2_25" },
+    { IconType::YOSHI_COSTUME_25,           "tot_cos2_26" },
+    { IconType::YOSHI_COSTUME_26,           "tot_cos2_27" },
+    { IconType::YOSHI_COSTUME_27,           "tot_cos2_28" },
+    { IconType::YOSHI_COSTUME_28,           "tot_cos2_29" },
+    { IconType::YOSHI_COSTUME_29,           "tot_cos2_30" },
 };
 
 const YoshiCostumeData g_YoshiCostumeData[] = {
@@ -1044,11 +1076,61 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .group_id = 25,
         .sort_order = 11,
     },
-    // Pea Green: sort order 14
-    // Bubblegum: sort order 21
-    // Maroon:    sort order 23
-    // Chestnut:  sort order  9
-    // Olive:     sort order 25
+    {
+        // Pea Green
+        .name_msg = "tot_cos2_26",
+        .help_msg = "tot_cos2_26_h",
+        .models = YOSHI_MODEL_PATHS("E"),
+        .price = 20,
+        .icon = IconType::YOSHI_COSTUME_25,
+        .icon_hud = IconType::YOSHI_COSTUME_25_HUD,
+        .group_id = 26,
+        .sort_order = 14,
+    },
+    {
+        // Bubblegum
+        .name_msg = "tot_cos2_27",
+        .help_msg = "tot_cos2_27_h",
+        .models = YOSHI_MODEL_PATHS("F"),
+        .price = 20,
+        .icon = IconType::YOSHI_COSTUME_26,
+        .icon_hud = IconType::YOSHI_COSTUME_26_HUD,
+        .group_id = 27,
+        .sort_order = 21,
+    },
+    {
+        // Mustard
+        .name_msg = "tot_cos2_28",
+        .help_msg = "tot_cos2_28_h",
+        .models = YOSHI_MODEL_PATHS("G"),
+        .price = 20,
+        .icon = IconType::YOSHI_COSTUME_27,
+        .icon_hud = IconType::YOSHI_COSTUME_27_HUD,
+        .group_id = 28,
+        .sort_order = 23,
+    },
+    {
+        // Mustard
+        .name_msg = "tot_cos2_29",
+        .help_msg = "tot_cos2_29_h",
+        .models = YOSHI_MODEL_PATHS("8"),
+        .price = 20,
+        .icon = IconType::YOSHI_COSTUME_28,
+        .icon_hud = IconType::YOSHI_COSTUME_28_HUD,
+        .group_id = 29,
+        .sort_order = 9,
+    },
+    {
+        // Olive
+        .name_msg = "tot_cos2_30",
+        .help_msg = "tot_cos2_30_h",
+        .models = YOSHI_MODEL_PATHS("9"),
+        .price = 20,
+        .icon = IconType::YOSHI_COSTUME_29,
+        .icon_hud = IconType::YOSHI_COSTUME_29_HUD,
+        .group_id = 30,
+        .sort_order = 25,
+    },
 };
 const int32_t g_NumYoshiCostumes =
     sizeof(g_YoshiCostumeData) / sizeof(YoshiCostumeData);

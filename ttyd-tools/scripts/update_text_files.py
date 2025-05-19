@@ -2459,6 +2459,9 @@ g_GlobalStrings = {
     b'tot_cos1_26':     b'Platinum',
     b'tot_cos1_27':     b'Game Boy',
     b'tot_cos1_28':     b'Beta 3D World',
+    b'tot_cos1_29':     b"Wario's Woods",
+    b'tot_cos1_30':     b'Foreman Spike',
+    b'tot_cos1_31':     b'Virtual Boy',
     
     b'tot_cos2_01':     b'Green',
     b'tot_cos2_02':     b'Red',
@@ -2485,6 +2488,11 @@ g_GlobalStrings = {
     b'tot_cos2_23':     b'Cerulean',
     b'tot_cos2_24':     b'Azure',
     b'tot_cos2_25':     b'Mustard',
+    b'tot_cos2_26':     b'Pea Green',
+    b'tot_cos2_27':     b'Bubblegum',
+    b'tot_cos2_28':     b'Maroon',
+    b'tot_cos2_29':     b'Chestnut',
+    b'tot_cos2_30':     b'Olive',
     
     b'tot_cos0_01_h':
         b"Gives Mario's attacks a\n"
@@ -2652,6 +2660,15 @@ g_GlobalStrings = {
     b"tot_cos1_28_h":
         b"Likely meant for a Super Guide,\n"
         b"but works well with Hammerman.",
+    b"tot_cos1_29_h":
+        b"The NES's palette was limiting,\n"
+        b"but really, purple and white?",
+    b"tot_cos1_30_h":
+        b"Industrial colors that call back\n"
+        b"to Mario's days doing odd jobs.",
+    b"tot_cos1_31_h":
+        b"One-third the colors, three times\n"
+        b"the eye strain!",
         
     b"tot_cos2_01_h":
         b"The classic green Yoshi.\n"
@@ -2726,8 +2743,23 @@ g_GlobalStrings = {
         b"A cool-looking shade that just\n"
         b'screams "number one"!',
     b"tot_cos2_25_h":
-        b"An earthy color that smacks of\n"
+        b"An intense color that smacks of\n"
         b"a familiar, formidable foe.",
+    b"tot_cos2_26_h":
+        b"This pale shade makes you want\n"
+        b"a short nap on a grassy patch.",
+    b"tot_cos2_27_h":
+        b"A gorgeous shade that brings on\n"
+        b"feelings of romance.",
+    b"tot_cos2_28_h":
+        b"An unsettling shade, reminiscent\n"
+        b"of deep-sea-dwelling monsters.",
+    b"tot_cos2_29_h":
+        b"A homey color, making one think\n"
+        b"of mouthfuls of nutty sweets.",
+    b"tot_cos2_30_h":
+        b"An earthy color, bringing to mind\n"
+        b"giant prehistoric beasts.",
     
     # Reworked in-battle Tattles for all enemies.
     

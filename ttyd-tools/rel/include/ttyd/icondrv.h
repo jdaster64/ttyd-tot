@@ -618,6 +618,19 @@ namespace IconType {
         YOSHI_COSTUME_22_HUD,
         YOSHI_COSTUME_23_HUD,
         YOSHI_COSTUME_24_HUD,
+        MARIO_COSTUME_28,
+        MARIO_COSTUME_29,
+        MARIO_COSTUME_30,
+        YOSHI_COSTUME_25,
+        YOSHI_COSTUME_26,
+        YOSHI_COSTUME_27,
+        YOSHI_COSTUME_28,
+        YOSHI_COSTUME_29,
+        YOSHI_COSTUME_25_HUD,
+        YOSHI_COSTUME_26_HUD,
+        YOSHI_COSTUME_27_HUD,
+        YOSHI_COSTUME_28_HUD,
+        YOSHI_COSTUME_29_HUD,
     };
 }
 
