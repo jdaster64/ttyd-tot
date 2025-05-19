@@ -109,7 +109,7 @@ int8_t unitKammy_defense[] = { 0, 0, 0, 0, 0 };
 int8_t unitKammy_defense_attr[] = { 0, 0, 0, 0, 0 };
 
 StatusVulnerability unitKammy_status = {
-     40,  40,  60, 100,  40, 100, 100,  40,
+     40,  30,  60, 100,  40, 100, 100,  40,
     100,  60, 100,  60, 100,  80,  40,   0,
       0, 100,  40, 100, 100,   0,
 };

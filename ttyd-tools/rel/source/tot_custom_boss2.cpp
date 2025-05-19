@@ -101,19 +101,19 @@ int8_t unitDoopliss_defense_attr[] = { 0, 0, 0, 0, 0 };
 int8_t unitDoopliss_defense_P2[] = { 1, 1, 1, 1, 1 };
 
 StatusVulnerability unitDoopliss_status = {
-     40,  40,  40, 100,  40, 100, 100,  40,
+     40,  30,  40, 100,  40, 100, 100,  40,
     100,  60, 100,  60, 100,  80,  80,   0,
       0, 100,  40, 100, 100,   0,
 };
 // Flurrie: doubly weak to Dizzy
 StatusVulnerability unitDoopliss_status_P3 = {
-     40,  40,  80, 100,  40, 100, 100,  40,
+     40,  30,  80, 100,  40, 100, 100,  40,
     100,  60, 100,  60, 100,  80,  80,   0,
       0, 100,  40, 100, 100,   0,
 };
 // Bobbery: doubly weak to Freeze
 StatusVulnerability unitDoopliss_status_P6 = {
-     40,  40,  40, 100,  40, 100, 100,  80,
+     40,  30,  40, 100,  40, 100, 100,  80,
     100,  60, 100,  60, 100,  80,  80,   0,
       0, 100,  40, 100, 100,   0,
 };

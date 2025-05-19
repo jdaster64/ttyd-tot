@@ -236,15 +236,15 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_Gloomtail, 0, 198, 0x11, 98, 160, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, 0x11, 105, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, 0x11, 105, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
     { &custom::unit_Bowser, 0, 199, 0x11, 103, 120, 8, 2, 8, 0, 50, -1, 3, 3, 0, 0 },
     { &custom::unit_Kammy, 0, 207, -1, 104, 90, 6, 0, 6, 0, 50, -1, 3, 3, 40, 30 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -1307,14 +1307,14 @@ bool GetEnemyStats(
             case BattleUnitType::DOOPLISS_CH_8_MS_MOWZ: {
                 switch (state.GetOptionValue(OPT_DIFFICULTY)) {
                     case OPTVAL_DIFFICULTY_HALF:
-                        // 80 HP
+                        // 100 HP
                         base_hp_pct = 50;
                         break;
                     case OPTVAL_DIFFICULTY_FULL_EX:
-                        // 240 HP
+                        // 300 HP
                         base_hp_pct = 150;
                         break;
-                    // default: 160 HP; 4 ATK
+                    // default: 200 HP; 4 ATK
                 }
                 break;
             }
