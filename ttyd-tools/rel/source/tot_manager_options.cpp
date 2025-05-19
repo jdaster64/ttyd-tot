@@ -87,11 +87,12 @@ void EncodeOption(
         if (num_bits > bits_left) {
             encoded_bit_count += bits_left;
             value >>= bits_left;
+            num_bits -= bits_left;
             bits_left = 6;
         } else {
             encoded_bit_count += num_bits;
+            num_bits = 0;
         }
-        num_bits -= bits_left;
     }
 }
 
@@ -653,8 +654,12 @@ const char* OptionsManager::GetEncodedOptions() {
         switch (g_Mod->state_.GetOptionValue(OPT_SECRET_BOSS)) {
             case OPTVAL_SECRET_BOSS_OFF:
                 boss_option = "SB:N, ";    break;
-            case OPTVAL_SECRET_BOSS_ON:
-                boss_option = "SB:Y, ";    break;
+            case OPTVAL_SECRET_BOSS_1:
+                boss_option = "SB:1, ";    break;
+            case OPTVAL_SECRET_BOSS_2:
+                boss_option = "SB:2, ";    break;
+            case OPTVAL_SECRET_BOSS_3:
+                boss_option = "SB:3, ";    break;
             case OPTVAL_SECRET_BOSS_RANDOM:
                 boss_option = "SB:?, ";    break;
         }

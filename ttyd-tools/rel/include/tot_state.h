@@ -427,10 +427,12 @@ enum Options : uint32_t {
 
     // Determines whether the secret boss will appear.
     // TODO: Add support for other bosses, once implemented.
-    OPT_SECRET_BOSS             = 0x444'3'00'02,
+    OPT_SECRET_BOSS             = 0x444'3'00'04,
     OPTVAL_SECRET_BOSS_RANDOM   = 0x544'3'00'00,
     OPTVAL_SECRET_BOSS_OFF      = 0x544'3'00'01,
-    OPTVAL_SECRET_BOSS_ON       = 0x544'3'00'02,
+    OPTVAL_SECRET_BOSS_1        = 0x544'3'00'02,
+    OPTVAL_SECRET_BOSS_2        = 0x544'3'00'03,
+    OPTVAL_SECRET_BOSS_3        = 0x544'3'00'04,
 
     // Changes to stage hazard rates.
     OPT_STAGE_HAZARDS           = 0x447'3'00'04,

@@ -236,17 +236,17 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_Gloomtail, 0, 198, 0x11, 98, 160, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, 0x11, 105, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, 0x11, 105, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 149, -1, -1, 160, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
     { &custom::unit_Bowser, 0, 199, 0x11, 103, 120, 8, 2, 8, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Kammy, 0, 207, -1, 104, 100, 6, 0, 6, 0, 50, -1, 3, 3, 40, 30 },
+    { &custom::unit_Kammy, 0, 207, -1, 104, 90, 6, 0, 6, 0, 50, -1, 3, 3, 40, 30 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -503,6 +503,9 @@ BattleGroupSetup g_CustomBattleParty;
 int8_t g_CustomAudienceWeights[12];
 NpcTribeDescription* g_LastMidbossTribe = nullptr;
 
+// TODO: Remove this when no longer necessary.
+bool g_isAlternateFinalBoss = false;
+
 // Base enemy weights at level 2 ~ 10, per difficulty level.
 const int8_t kBaseWeights[21][9] = {
     // Tutorial 
@@ -646,13 +649,26 @@ void SelectEnemies() {
                 break;
         }
 
-        // Determine whether to use Gold Fuzzy alternate boss.
-        // TODO: Track cases for other optional bosses.
+        g_isAlternateFinalBoss = false;
+
+        // Determine whether to use alternate final boss.
         switch (state.GetOptionValue(OPT_SECRET_BOSS)) {
-            case OPTVAL_SECRET_BOSS_ON:
+            case OPTVAL_SECRET_BOSS_1:
                 enemy_type = BattleUnitType::GOLD_FUZZY;
+                g_isAlternateFinalBoss = true;
+                break;
+            case OPTVAL_SECRET_BOSS_2:
+                // Kammy is spawned dynamically in-battle.
+                enemy_type = BattleUnitType::BOWSER_CH_8;
+                g_isAlternateFinalBoss = true;
+                break;
+            case OPTVAL_SECRET_BOSS_3:
+                enemy_type = BattleUnitType::DOOPLISS_CH_8;
+                g_isAlternateFinalBoss = true;
                 break;
             case OPTVAL_SECRET_BOSS_RANDOM: {
+
+                // TODO: Change logic for picking final bosses.
 
                 // Base chance of using the alternate boss, out of 100.
                 int32_t boss_chance = 20;
@@ -965,6 +981,13 @@ void BuildBattle(
         num_npcs = 2;
         // Always set bosses to basic "Gold Fuzzy" AI type.
         npc_ai = &ttyd::npc_data::npc_ai_type_table[NpcAiType::GOLD_FUZZY];
+
+        // TODO: remove when no longer using dummy cutscenes for new bosses.
+        if (g_isAlternateFinalBoss) {
+            npc_tribe =
+                ttyd::npc_data::npcTribe + 
+                kEnemyInfo[BattleUnitType::GOLD_FUZZY].npc_tribe_idx;
+        }
     }
     
     memset(npc_setup_info, 0, sizeof(NpcSetupInfo) * 3);
@@ -1152,8 +1175,12 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     evtSetValue(evt, evt->evtArguments[4], x_pos);
     evtSetValue(evt, evt->evtArguments[5], y_pos);
     evtSetValue(evt, evt->evtArguments[6], z_pos);
+
+    // TODO: Remove when not using dummy cutscenes for new bosses.
+    evtSetValue(evt, evt->evtArguments[7], g_isAlternateFinalBoss);
+
     // TODO: Set to different values for other optional bosses.
-    evtSetValue(evt, evt->evtArguments[7], g_Enemies[0] == BattleUnitType::GOLD_FUZZY);
+    // evtSetValue(evt, evt->evtArguments[7], g_Enemies[0] == BattleUnitType::GOLD_FUZZY);
 
     // Double effective height of midboss field NPCs (for "!" indicator, mostly).
     if (IsMidbossFloor(g_Mod->state_.floor_)) {
@@ -1233,22 +1260,63 @@ bool GetEnemyStats(
         base_atk_pct = 100;
         base_def_pct = 100;
 
-        // For Gold Fuzzy / Fuzzy Horde, scale stats by difficulty.
-        // TODO: Do the same for other optional boss fights.
-        if (unit_type == BattleUnitType::GOLD_FUZZY ||
-            unit_type == BattleUnitType::FUZZY_HORDE) {
-            switch (state.GetOptionValue(OPT_DIFFICULTY)) {
-                case OPTVAL_DIFFICULTY_HALF:
-                    // 75 HP, 100 HP horde; 5 ATK
-                    base_hp_pct = 50;
-                    base_atk_pct = 70;
-                    break;
-                case OPTVAL_DIFFICULTY_FULL_EX:
-                    // 225 HP, 300 HP horde; 9 ATK
-                    base_hp_pct = 150;
-                    base_atk_pct = 130;
-                    break;
-                // default: 150 HP, 200 HP horde; 7 ATK
+        // For secret bosses, scale stats by difficulty.
+        switch (unit_type) {
+            case BattleUnitType::GOLD_FUZZY:
+            case BattleUnitType::FUZZY_HORDE: {
+                switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+                    case OPTVAL_DIFFICULTY_HALF:
+                        // 75 HP, 100 HP horde; 5 ATK
+                        base_hp_pct = 50;
+                        base_atk_pct = 70;
+                        break;
+                    case OPTVAL_DIFFICULTY_FULL_EX:
+                        // 225 HP, 300 HP horde; 9 ATK
+                        base_hp_pct = 150;
+                        base_atk_pct = 130;
+                        break;
+                    // default: 150 HP, 200 HP horde; 7 ATK
+                }
+                break;
+            }
+            case BattleUnitType::BOWSER_CH_8:
+            case BattleUnitType::KAMMY_KOOPA: {
+                switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+                    case OPTVAL_DIFFICULTY_HALF:
+                        // 60 HP / 45 HP; 6 / 5 ATK
+                        base_hp_pct = 50;
+                        base_atk_pct = 80;
+                        break;
+                    case OPTVAL_DIFFICULTY_FULL_EX:
+                        // 160 / 120 HP; 10 / 7 ATK
+                        base_hp_pct = 133;
+                        base_atk_pct = 120;
+                        break;
+                    // default: 120 / 90 HP; 8 / 6 ATK
+                }
+                break;
+            }
+            case BattleUnitType::DOOPLISS_CH_8:
+            case BattleUnitType::DOOPLISS_CH_8_FAKE_MARIO:
+            case BattleUnitType::DOOPLISS_CH_8_GOOMBELLA:
+            case BattleUnitType::DOOPLISS_CH_8_KOOPS:
+            case BattleUnitType::DOOPLISS_CH_8_FLURRIE:
+            case BattleUnitType::DOOPLISS_CH_8_YOSHI:
+            case BattleUnitType::DOOPLISS_CH_8_VIVIAN:
+            case BattleUnitType::DOOPLISS_CH_8_BOBBERY:
+            case BattleUnitType::DOOPLISS_CH_8_MS_MOWZ: {
+                switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+                    case OPTVAL_DIFFICULTY_HALF:
+                        // 80 HP
+                        base_hp_pct = 50;
+                        break;
+                    case OPTVAL_DIFFICULTY_FULL_EX:
+                        // 240 HP
+                        base_hp_pct = 150;
+                        break;
+                    // default: 160 HP; 4 ATK
+                }
+                break;
             }
         }
     }

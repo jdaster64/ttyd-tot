@@ -126,6 +126,20 @@ void DialogueManager::SetConversation(int32_t id) {
                         case BattleUnitType::FUZZY_HORDE:
                             g_ConversationId = ConversationId::NPC_A_L_SECRET;
                             break;
+                        // TODO: Add unique conversations for other bosses.
+                        // case BattleUnitType::BOWSER_CH_8:
+                        // case BattleUnitType::KAMMY_KOOPA:
+                        //     break;
+                        // case BattleUnitType::DOOPLISS_CH_8:
+                        // case BattleUnitType::DOOPLISS_CH_8_FAKE_MARIO:
+                        // case BattleUnitType::DOOPLISS_CH_8_GOOMBELLA:
+                        // case BattleUnitType::DOOPLISS_CH_8_KOOPS:
+                        // case BattleUnitType::DOOPLISS_CH_8_FLURRIE:
+                        // case BattleUnitType::DOOPLISS_CH_8_YOSHI:
+                        // case BattleUnitType::DOOPLISS_CH_8_VIVIAN:
+                        // case BattleUnitType::DOOPLISS_CH_8_BOBBERY:
+                        // case BattleUnitType::DOOPLISS_CH_8_MS_MOWZ:
+                        //     break;
                         case BattleUnitType::BOMB_SQUAD_BOMB:
                             g_ConversationId = ConversationId::NPC_A_L_BOMB;
                             break;

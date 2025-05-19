@@ -251,6 +251,8 @@ void ApplyFixedPatches() {
                         AchievementId::MISC_POISON_50);
                 }
 
+                // TODO: Move this check to "run finished" script, as it won't
+                // work for the Bowser / Kammy fight.
                 if (unit->true_kind == BattleUnitType::GOLD_FUZZY) {
                     AchievementsManager::MarkCompleted(
                         AchievementId::META_SECRET_BOSS);

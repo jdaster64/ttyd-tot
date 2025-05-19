@@ -5377,10 +5377,12 @@ g_TowerLobbyStrings = {
     b"tot_optr_audthrows_off":      b"Normal",
     b"tot_optr_audthrows_on":       b"Random Items",
     b"tot_optr_itemshuffle":        b"Obfuscated Items",
-    b"tot_optr_secretboss":         b"Secret Boss",
-    b"tot_optr_secretboss_random":  b"Rarely Appears",
-    b"tot_optr_secretboss_off":     b"Never Appears",
-    b"tot_optr_secretboss_on":      b"Always Appears",
+    b"tot_optr_secretboss":         b"Final Boss",
+    b"tot_optr_secretboss_random":  b"Random",
+    b"tot_optr_secretboss_off":     b"Default",
+    b"tot_optr_secretboss_1":       b"Secret Boss 1",
+    b"tot_optr_secretboss_2":       b"Secret Boss 2",
+    b"tot_optr_secretboss_3":       b"Secret Boss 3",
     b"tot_optr_movea":              b"Move Availability",
     b"tot_optr_movea_default":      b"Default",
     b"tot_optr_movea_partner1":     b"Partners Start w/+1",
@@ -5557,8 +5559,8 @@ g_TowerLobbyStrings = {
         b"names, icons and descriptions.",
         
     b"tot_opth_secretboss":
-        b"Whether or not the secret,\n"
-        b"alternate final boss can appear.",
+        b"Whether or not an alternate\n"
+        b"final boss will appear.",
         
     b"tot_opth_movea":
         b"Changes how moves are offered\n"

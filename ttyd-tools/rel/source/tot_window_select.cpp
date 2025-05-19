@@ -97,15 +97,17 @@ OptionMenuData g_OptionMenuData[] = {
     { OPTVAL_TIMER_NONE, "tot_optr_timer_none", nullptr, 81, false, false },
     { OPTVAL_TIMER_IGT, "tot_optr_timer_igt", nullptr, 82, false, false },
     { OPTVAL_TIMER_RTA, "tot_optr_timer_rta", nullptr, 83, false, false },
-    { OPT_DIFFICULTY, "tot_optr_difficulty", "tot_opth_difficulty", 90, true, false },
-    { OPTVAL_DIFFICULTY_TUTORIAL, "tot_optr_diff_tutorial", nullptr, 91, false, false },
-    { OPTVAL_DIFFICULTY_HALF, "tot_optr_diff_half", nullptr, 92, false, false },
-    { OPTVAL_DIFFICULTY_FULL, "tot_optr_diff_full", nullptr, 93, false, false },
-    { OPTVAL_DIFFICULTY_FULL_EX, "tot_optr_diff_ex", nullptr, 94, false, false },
-    { OPT_SECRET_BOSS, "tot_optr_secretboss", "tot_opth_secretboss", 95, true, false },
-    { OPTVAL_SECRET_BOSS_RANDOM, "tot_optr_secretboss_random", nullptr, 96, false, false },
-    { OPTVAL_SECRET_BOSS_OFF, "tot_optr_secretboss_off", nullptr, 97, false, false },
-    { OPTVAL_SECRET_BOSS_ON, "tot_optr_secretboss_on", nullptr, 98, false, false },
+    { OPT_DIFFICULTY, "tot_optr_difficulty", "tot_opth_difficulty", 85, true, false },
+    { OPTVAL_DIFFICULTY_TUTORIAL, "tot_optr_diff_tutorial", nullptr, 86, false, false },
+    { OPTVAL_DIFFICULTY_HALF, "tot_optr_diff_half", nullptr, 87, false, false },
+    { OPTVAL_DIFFICULTY_FULL, "tot_optr_diff_full", nullptr, 88, false, false },
+    { OPTVAL_DIFFICULTY_FULL_EX, "tot_optr_diff_ex", nullptr, 89, false, false },
+    { OPT_SECRET_BOSS, "tot_optr_secretboss", "tot_opth_secretboss", 90, true, false },
+    { OPTVAL_SECRET_BOSS_RANDOM, "tot_optr_secretboss_random", nullptr, 91, false, false },
+    { OPTVAL_SECRET_BOSS_OFF, "tot_optr_secretboss_off", nullptr, 92, false, false },
+    { OPTVAL_SECRET_BOSS_1, "tot_optr_secretboss_1", nullptr, 93, false, false },
+    { OPTVAL_SECRET_BOSS_2, "tot_optr_secretboss_2", nullptr, 94, false, false },
+    { OPTVAL_SECRET_BOSS_3, "tot_optr_secretboss_3", nullptr, 95, false, false },
     { OPT_PRESET, "tot_optr_preset", "tot_opth_preset", 100, true, false },
     { OPTVAL_PRESET_CUSTOM, "tot_optr_preset_custom", nullptr, 101, false, false },
     { OPTVAL_PRESET_DEFAULT, "tot_optr_preset_default", nullptr, 102, false, false },
@@ -1268,7 +1270,7 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     const float top_y = entry->y - 10.f;
     const float space_y = -24.0f;
     
-    char text[24];
+    char text[32];
     gc::vec3 text_pos = { min_x, top_y, 0.0f };
     gc::vec3 text_scale = { 0.9f, 1.0f, 1.0f };
     
@@ -1308,6 +1310,7 @@ void DispResultsWindowTopBar(WinMgrEntry* entry) {
     text_pos.x += ttyd::fontmgr::FontGetMessageWidth(text) * text_scale.x;
     sprintf(text, OptionsManager::GetEncodedOptions());
     ttyd::win_main::winFontSetWidth(&text_pos, &text_scale, &kAccent, 250.f, text);
+    text_scale.x = 0.9f;
 
     text_pos.x = max_x;
     text_pos.y = top_y;
