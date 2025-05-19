@@ -78,11 +78,9 @@ enum GlobalWorkVars {
     GSWF_AttackFxFlags                      = GSWF(7500),
     GSWF_AttackFxFlags_End                  = GSWF_AttackFxFlags + 30,
     GSWF_YoshiColors                        = GSWF_AttackFxFlags_End,
-    GSWF_YoshiColors_End                    = GSWF_YoshiColors + 30,
-    GSWF_MarioColors                        = GSWF_YoshiColors_End,
-    GSWF_MarioColors_End                    = GSWF_MarioColors + 30,
+    GSWF_YoshiColors_End                    = GSWF_YoshiColors + 60,
     // Used for queueing animations for achievement unlocking.
-    GSWF_AchWinQueue                        = GSWF_MarioColors_End,
+    GSWF_AchWinQueue                        = GSWF_YoshiColors_End,
     GSWF_AchWinQueue_End                    = GSWF_AchWinQueue + 128,
     GSWF_AchUnlockQueue                     = GSWF_AchWinQueue_End,
     GSWF_AchUnlockQueue_End                 = GSWF_AchUnlockQueue + 128,

@@ -180,15 +180,15 @@ struct WinPauseMenu {
     int32_t     email_line_current;                         // 0x0268
     int16_t     email_line_count;                           // 0x026c
     // Fields from 0x026e ~ 0x02c8 are altered from vanilla.
-    int8_t      cosmetic_options[30];                       // 0x026e
-    int32_t     cosmetic_num_options;                       // 0x028c
-    int32_t     cosmetic_cursor_idx;                        // 0x0290
-    float       cosmetic_menu_scroll_y;                     // 0x0294
-    float       cosmetic_menu_scroll_target_y;              // 0x0298
-    int32_t     cosmetic_menu_offset;                       // 0x029c
-    int32_t     cosmetic_menu_type;                         // 0x02a0
+    int8_t      cosmetic_options[34];                       // 0x026e
+    int32_t     cosmetic_num_options;                       // 0x0290
+    int32_t     cosmetic_cursor_idx;                        // 0x0294
+    float       cosmetic_menu_scroll_y;                     // 0x0298
+    float       cosmetic_menu_scroll_target_y;              // 0x029c
+    int32_t     cosmetic_menu_offset;                       // 0x02a0
+    int32_t     cosmetic_menu_type;                         // 0x02a4
     // Reserved space for other menus.
-    int8_t      unused_0x02a0[0x24];                        // 0x02a4
+    int8_t      unused_0x02a0[0x20];                        // 0x02a8
     int32_t     super_luigi_book_id;                        // 0x02c8
     int32_t     super_luigi_page_count;                     // 0x02cc
     int32_t     super_luigi_page;                           // 0x02d0

@@ -1040,8 +1040,7 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
         USER_FUNC(btlevtcmd_StartAC, 1)
         SET(LW(12), 2)
     ELSE()
-        // TODO: Verify these are being used correctly:
-        // LW(12) = current part index, LW(13) = highest-used part index?
+        // LW(12) = current part index, LW(13) = highest-used part index.
         SET(LW(12), 2)
         SET(LW(13), LW(1))
         ADD(LW(13), 1)

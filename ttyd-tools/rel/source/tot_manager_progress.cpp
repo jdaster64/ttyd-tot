@@ -397,7 +397,7 @@ void ProgressManager::GetHubAttackFXProgress(int32_t* cur, int32_t* tot) {
         total = 0;
         secret = 0;
 
-        for (int32_t i = 0; i < 30; ++i) {
+        for (int32_t i = 0; i < 32; ++i) {
             const auto* data = CosmeticsManager::GetAttackFxData(i);
             if (!data) continue;
             if (CosmeticsManager::IsAvailable(CosmeticType::ATTACK_FX, i)) {
@@ -429,7 +429,7 @@ void ProgressManager::GetHubMarioCostumeProgress(int32_t* cur, int32_t* tot) {
         total = 0;
         secret = 0;
 
-        for (int32_t i = 0; i < 30; ++i) {
+        for (int32_t i = 0; i < 32; ++i) {
             const auto* data = CosmeticsManager::GetMarioCostumeData(i);
             if (!data) continue;
             if (CosmeticsManager::IsAvailable(CosmeticType::MARIO_COSTUME, i)) {
@@ -464,7 +464,7 @@ void ProgressManager::GetHubYoshiCostumeProgress(int32_t* cur, int32_t* tot) {
         total = 0;
         secret = 0;
 
-        for (int32_t i = 0; i < 30; ++i) {
+        for (int32_t i = 0; i < 32; ++i) {
             const auto* data = CosmeticsManager::GetYoshiCostumeData(i);
             if (!data) continue;
             if (CosmeticsManager::IsAvailable(CosmeticType::YOSHI_COSTUME, i)) {

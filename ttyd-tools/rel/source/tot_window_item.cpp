@@ -1165,14 +1165,10 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                             break;
                     }
                     if (cosmetic_type != -1) {
-                        menu->cosmetic_num_options = 0;
-                        for (int32_t i = 0; i < 30; ++i) {
-                            if (CosmeticsManager::IsAvailable(
-                                cosmetic_type, i)) {
-                                menu->cosmetic_options[
-                                    menu->cosmetic_num_options++] = i;
-                            }
-                        }
+                        menu->cosmetic_num_options = 
+                            CosmeticsManager::GetActiveCosmetics(
+                                cosmetic_type, menu->cosmetic_options);
+
                         menu->cosmetic_cursor_idx = 0;
                         menu->cosmetic_menu_offset = 0;
                         menu->cosmetic_menu_scroll_y = 0;

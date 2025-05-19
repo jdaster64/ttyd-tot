@@ -462,6 +462,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = { "a/a_mario", "a/a_mario_r", "a/b_mario", "a/e_mario" },
         .icon = IconType::MARIO_COSTUME_ICONS + 0,
         .group_id = -1,
+        .sort_order = 1,
     },
     {
         // Luigi
@@ -470,6 +471,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = MARIO_MODEL_PATHS("l", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 1,
         .group_id = 0,
+        .sort_order = 2,
     },
     {
         // Wario
@@ -478,6 +480,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = MARIO_MODEL_PATHS("w", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 2,
         .group_id = 0,
+        .sort_order = 3,
     },
     {
         // Waluigi
@@ -486,6 +489,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .models = MARIO_MODEL_PATHS("wl", true),
         .icon = IconType::MARIO_COSTUME_ICONS + 3,
         .group_id = 0,
+        .sort_order = 4,
     },
     {
         // Fire Mario
@@ -495,6 +499,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 4,
         .group_id = 5,
+        .sort_order = 5,
     },
     {
         // Ice Mario
@@ -504,6 +509,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 5,
         .group_id = 6,
+        .sort_order = 6,
     },
     {
         // Bubble Mario
@@ -513,6 +519,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 6,
         .group_id = 7,
+        .sort_order = 7,
     },
     {
         // Superball Mario
@@ -522,6 +529,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 7,
         .icon = IconType::MARIO_COSTUME_ICONS + 7,
         .group_id = 8,
+        .sort_order = 8,
     },
     {
         // Flying Mario
@@ -531,6 +539,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 8,
         .group_id = 9,
+        .sort_order = 9,
     },
     {
         // Classic (Mario Bros.) Mario
@@ -540,6 +549,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 9,
         .group_id = 10,
+        .sort_order = 10,
     },
     {
         // Classic (Super Mario Bros.) Luigi
@@ -549,6 +559,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 10,
         .group_id = 11,
+        .sort_order = 11,
     },
     {
         // SMB1 Mario
@@ -558,6 +569,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 11,
         .group_id = 12,
+        .sort_order = 12,
     },
     {
         // SMB Deluxe Luigi
@@ -567,6 +579,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 12,
         .group_id = 13,
+        .sort_order = 13,
     },
     {
         // SMB3
@@ -576,6 +589,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 13,
         .group_id = 14,
+        .sort_order = 14,
     },
     {
         // Super Mario World
@@ -585,6 +599,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 14,
         .group_id = 15,
+        .sort_order = 15,
     },
     {
         // Mario Golf 1
@@ -594,6 +609,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 15,
         .group_id = 16,
+        .sort_order = 16,
     },
     {
         // Mario Golf 2
@@ -603,6 +619,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 16,
         .group_id = 17,
+        .sort_order = 17,
     },
     {
         // Super Smash Bros. 1
@@ -612,6 +629,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 17,
         .group_id = 18,
+        .sort_order = 18,
     },
     {
         // Super Smash Bros. 2
@@ -621,6 +639,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 18,
         .group_id = 19,
+        .sort_order = 19,
     },
     {
         // Mario Maker
@@ -630,6 +649,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 15,
         .icon = IconType::MARIO_COSTUME_ICONS + 19,
         .group_id = 20,
+        .sort_order = 20,
     },
     {
         // Toadette
@@ -639,6 +659,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 15,
         .icon = IconType::MARIO_COSTUME_ICONS + 20,
         .group_id = 21,
+        .sort_order = 24,
     },
     {
         // Secret
@@ -649,6 +670,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .icon = IconType::MARIO_COSTUME_ICONS + 21,
         .secret = true,
         .group_id = 22,
+        .sort_order = 28,
     },
     {
         // Shadowy
@@ -659,6 +681,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .icon = IconType::MARIO_COSTUME_ICONS + 22,
         .secret = true,
         .group_id = 23,
+        .sort_order = 27,
     },
     {
         // Silver
@@ -668,6 +691,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 23,
         .group_id = 24,
+        .sort_order = 29,
     },
     {
         // Gold
@@ -677,6 +701,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 24,
         .group_id = 25,
+        .sort_order = 30,
     },
     {
         // Platinum
@@ -687,6 +712,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .icon = IconType::MARIO_COSTUME_ICONS + 25,
         .secret = true,
         .group_id = 26,
+        .sort_order = 31,
     },
     {
         // Game Boy
@@ -696,6 +722,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 20,
         .icon = IconType::MARIO_COSTUME_26,
         .group_id = 27,
+        .sort_order = 25,
     },
     {
         // 3D World unused Super Guide
@@ -705,7 +732,11 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .price = 20,
         .icon = IconType::MARIO_COSTUME_27,
         .group_id = 28,
+        .sort_order = 22,
     },
+    // Wario's Woods: sort order 21
+    // Foreman Spike: sort order 23
+    // Virtual Boy:   sort order 26
 };
 const int32_t g_NumMarioCostumes =
     sizeof(g_MarioCostumeData) / sizeof(MarioCostumeData);
@@ -750,6 +781,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_GREEN,
         .icon_hud = IconType::HUD_YOSHI_GREEN,
         .group_id = -1,
+        .sort_order = 1,
     },
     {
         // Red
@@ -759,6 +791,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_RED,
         .icon_hud = IconType::HUD_YOSHI_RED,
         .group_id = 0,
+        .sort_order = 2,
     },
     {
         // Blue
@@ -768,6 +801,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_BLUE,
         .icon_hud = IconType::HUD_YOSHI_BLUE,
         .group_id = 0,
+        .sort_order = 3,
     },
     {
         // Orange
@@ -777,6 +811,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_ORANGE,
         .icon_hud = IconType::HUD_YOSHI_ORANGE,
         .group_id = 0,
+        .sort_order = 4,
     },
     {
         // Pink
@@ -786,6 +821,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_PINK,
         .icon_hud = IconType::HUD_YOSHI_PINK,
         .group_id = 0,
+        .sort_order = 5,
     },
     {
         // Black
@@ -796,6 +832,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_BLACK,
         .icon_hud = IconType::HUD_YOSHI_BLACK,
         .group_id = 6,
+        .sort_order = 6,
     },
     {
         // White
@@ -806,6 +843,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_WHITE,
         .icon_hud = IconType::HUD_YOSHI_WHITE,
         .group_id = 7,
+        .sort_order = 7,
     },
     {
         // Brown
@@ -816,6 +854,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 0,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 0,
         .group_id = 8,
+        .sort_order = 24,
     },
     {
         // Scarlet
@@ -826,6 +865,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 1,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 1,
         .group_id = 9,
+        .sort_order = 8,
     },
     {
         // Yellow
@@ -836,6 +876,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 2,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 2,
         .group_id = 10,
+        .sort_order = 12,
     },
     {
         // Lime
@@ -846,6 +887,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 3,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 3,
         .group_id = 11,
+        .sort_order = 13,
     },
     {
         // Teal
@@ -856,6 +898,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 4,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 4,
         .group_id = 12,
+        .sort_order = 15,
     },
     {
         // Indigo
@@ -866,6 +909,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 5,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 5,
         .group_id = 13,
+        .sort_order = 18,
     },
     {
         // Purple
@@ -876,6 +920,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 6,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 6,
         .group_id = 14,
+        .sort_order = 19,
     },
     {
         // Lilac
@@ -886,6 +931,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 7,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 7,
         .group_id = 15,
+        .sort_order = 20,
     },
     {
         // Fuchsia
@@ -896,6 +942,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 8,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 8,
         .group_id = 16,
+        .sort_order = 22,
     },
     {
         // Grey
@@ -906,6 +953,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 9,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 9,
         .group_id = 17,
+        .sort_order = 26,
     },
     {
         // Secret
@@ -917,6 +965,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 10,
         .secret = true,
         .group_id = 18,
+        .sort_order = 27,
     },
     {
         // Silver
@@ -927,6 +976,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 11,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 11,
         .group_id = 19,
+        .sort_order = 28,
     },
     {
         // Gold
@@ -937,6 +987,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 12,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 12,
         .group_id = 20,
+        .sort_order = 29,
     },
     {
         // Platinum
@@ -947,6 +998,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_EXTRA_ICONS + 13,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 13,
         .group_id = 21,
+        .sort_order = 30,
     },
     {
         // Tangerine
@@ -957,6 +1009,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_COSTUME_21,
         .icon_hud = IconType::YOSHI_COSTUME_21_HUD,
         .group_id = 22,
+        .sort_order = 10,
     },
     {
         // Cerulean
@@ -967,6 +1020,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_COSTUME_22,
         .icon_hud = IconType::YOSHI_COSTUME_22_HUD,
         .group_id = 23,
+        .sort_order = 16,
     },
     {
         // Azure
@@ -977,6 +1031,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_COSTUME_23,
         .icon_hud = IconType::YOSHI_COSTUME_23_HUD,
         .group_id = 24,
+        .sort_order = 17,
     },
     {
         // Mustard
@@ -987,10 +1042,24 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .icon = IconType::YOSHI_COSTUME_24,
         .icon_hud = IconType::YOSHI_COSTUME_24_HUD,
         .group_id = 25,
+        .sort_order = 11,
     },
+    // Pea Green: sort order 14
+    // Bubblegum: sort order 21
+    // Maroon:    sort order 23
+    // Chestnut:  sort order  9
+    // Olive:     sort order 25
 };
 const int32_t g_NumYoshiCostumes =
     sizeof(g_YoshiCostumeData) / sizeof(YoshiCostumeData);
+
+
+int32_t comp_MarioCostume(int8_t* lhs, int8_t* rhs) {
+    return g_MarioCostumeData[*lhs].sort_order - g_MarioCostumeData[*rhs].sort_order;
+}
+int32_t comp_YoshiCostume(int8_t* lhs, int8_t* rhs) {
+    return g_YoshiCostumeData[*lhs].sort_order - g_YoshiCostumeData[*rhs].sort_order;
+}
 
 const CosmeticGroupData* CosmeticsManager::GetGroupData(
     int32_t type, int32_t group_id) {
@@ -1115,6 +1184,27 @@ const YoshiCostumeData* CosmeticsManager::GetYoshiCostumeData(int32_t id) {
     return &g_YoshiCostumeData[id];
 }
 
+int32_t CosmeticsManager::GetActiveCosmetics(int32_t type, int8_t* arr) {
+    int32_t num_unlocked = 0;
+    for (int32_t i = 0; i < 32; ++i) {
+        if (CosmeticsManager::IsAvailable(type, i)) {
+            arr[num_unlocked++] = i;
+        }
+    }
+    // Attack FX are already sorted in menu order by default.
+    switch (type) {
+        case CosmeticType::MARIO_COSTUME:
+            ttyd::system::qqsort(
+                arr, num_unlocked, sizeof(int8_t), (void*)comp_MarioCostume);
+            break;
+        case CosmeticType::YOSHI_COSTUME:
+            ttyd::system::qqsort(
+                arr, num_unlocked, sizeof(int8_t), (void*)comp_YoshiCostume);
+            break;
+    }
+    return num_unlocked;
+}
+
 int32_t CosmeticsManager::GetCosmeticCount(int32_t type) {
     switch (type) {
         case CosmeticType::ATTACK_FX:       return g_NumAttackFx;
@@ -1125,11 +1215,11 @@ int32_t CosmeticsManager::GetCosmeticCount(int32_t type) {
 }
     
 void CosmeticsManager::PickYoshiColor() {
-    int32_t colors[30] = { 0 };
+    int32_t colors[32] = { 0 };
     int32_t num_colors = 0;
     int32_t selected_color = 0;
     
-    for (int32_t i = 0; i < 30; ++i) {
+    for (int32_t i = 0; i < 32; ++i) {
         if (GetSWF(GSWF_YoshiColors + i)) {
             colors[num_colors++] = i;
         }
@@ -1141,10 +1231,10 @@ void CosmeticsManager::PickYoshiColor() {
 }
     
 int32_t CosmeticsManager::PickActiveFX() {
-    int32_t sounds[30] = { 0 };
+    int32_t sounds[32] = { 0 };
     int32_t num_sounds = 0;
     
-    for (int32_t i = 1; i < 30; ++i) {
+    for (int32_t i = 1; i < 32; ++i) {
         if (GetSWF(GSWF_AttackFxFlags + i)) {
             sounds[num_sounds++] = i;
         }

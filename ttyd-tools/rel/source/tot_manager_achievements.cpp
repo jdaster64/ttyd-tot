@@ -304,7 +304,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
         case AchievementId::META_COSMETICS_5: {
             int32_t cosmetics = 0;
             for (int32_t type = 0; type <= 2; ++type) {
-                for (int32_t i = 1; i < 30; ++i) {
+                for (int32_t i = 1; i < 32; ++i) {
                     if (state.GetOption(FLAGS_COSMETIC_PURCHASED, type * 32 + i))
                         ++cosmetics;
                 }

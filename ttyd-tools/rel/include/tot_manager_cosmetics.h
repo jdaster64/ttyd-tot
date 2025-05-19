@@ -36,7 +36,8 @@ struct MarioCostumeData {
     int16_t price = 5;
     int16_t icon;
     int16_t secret = false;
-    int16_t group_id;
+    int8_t group_id;
+    int8_t sort_order;
 };
 
 struct YoshiCostumeData {
@@ -48,6 +49,7 @@ struct YoshiCostumeData {
     int16_t icon_hud;
     int8_t secret = false;
     int8_t group_id;
+    int32_t sort_order;
 };
     
 class CosmeticsManager {
@@ -70,6 +72,10 @@ public:
     static const AttackFxData* GetAttackFxData(int32_t id);
     static const MarioCostumeData* GetMarioCostumeData(int32_t id);
     static const YoshiCostumeData* GetYoshiCostumeData(int32_t id);
+
+    // Returns the number of active cosmetics of the type, and copies a sorted
+    // array of all the unlocked cosmetics to arr.
+    static int32_t GetActiveCosmetics(int32_t type, int8_t* arr);
 
     // Returns one past the last valid id for each cosmetic type.
     static int32_t GetCosmeticCount(int32_t type);
