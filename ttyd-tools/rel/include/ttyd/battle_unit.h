@@ -275,7 +275,7 @@ struct BattleWorkUnitPart {
     int8_t*             defense_attr;
     
     void*               pose_table;
-    int32_t             anim_pose_type;
+    int32_t             anim_pose_id;
     char                anim_pose_name[64];  // length unknown
     uint32_t            unk_204;  // anim-related flags
     float               unk_208;

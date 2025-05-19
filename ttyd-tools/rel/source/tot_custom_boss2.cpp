@@ -15,6 +15,7 @@
 #include "tot_state.h"
 
 #include <gc/types.h>
+#include <ttyd/animdrv.h>
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
 #include <ttyd/battle_database_common.h>
@@ -1157,14 +1158,8 @@ EVT_BEGIN(unitDoopliss_dead_event)
         USER_FUNC(evt_eff, PTR(""), PTR("kemuri_test"), 7, LW(0), LW(1), LW(2), FLOAT(2.0), 0, 0, 0, 0, 0, 0, 0)
         USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_BOSS_RNPL_TRANSFORM4"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_MSEC(300)
-        
-        USER_FUNC(btlevtcmd_AnimeSetPoseTable, -2, LW(11), PTR(&unitDoopliss_pose_table))
-        USER_FUNC(btlevtcmd_ChangeDataTable, -2, PTR(&unitDoopliss_data_table))
-        USER_FUNC(btlevtcmd_ReplaceParts, -2, LW(11), PTR(&unitDoopliss_parts), 1)
-        USER_FUNC(btlevtcmd_ChangeKind, -2, (int32_t)BattleUnitType::DOOPLISS_CH_8)
-        USER_FUNC(btlevtcmd_SetEventWait, -2, PTR(&unitDoopliss_wait_event))
-        USER_FUNC(btlevtcmd_OnUnitFlag, -2, 4)
-        USER_FUNC(btlevtcmd_ClearAllStatus, -2)
+        // Transform back to Doopliss.
+        USER_FUNC(evtTot_Doopliss_HandleTransform, (int32_t)BattleUnitType::DOOPLISS_CH_8)
     END_IF()
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("D_2"))
     USER_FUNC(btlevtcmd_SetTalkPose, -2, PTR("D_2"))
@@ -1570,6 +1565,18 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
     unit->status_vulnerability = &unitDoopliss_status;
     
     switch (evtGetValue(evt, evt->evtArguments[0])) {
+        case BattleUnitType::DOOPLISS_CH_8: {
+            kind_parts = unitDoopliss_parts;
+            num_parts = 7;
+
+            unit->current_kind = BattleUnitType::DOOPLISS_CH_8;
+            unit->data_table = (void*)unitDoopliss_data_table;
+            unit->unit_work[UW_Doopliss_CurrentForm] = 0;
+
+            ttyd::battle_unit::BtlUnit_ClearStatus(unit);
+
+            break;
+        }
         case BattleUnitType::MARIO: {
             kind_parts = unitDoopliss_parts_Mario;
             num_parts = 3;
@@ -1720,6 +1727,9 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
         part->addl_target_offset_x = 0;
         ttyd::battle_unit::BtlUnit_SetPartsRotate(part, 0.0f, 0.0f, 0.0f);
         ttyd::battle_unit::BtlUnit_SetPartsRotateOffset(part, 0.0f, 0.0f, 0.0f);
+
+        // Release the existing animPose.
+        ttyd::animdrv::animPoseRelease(part->anim_pose_id);
         
         part = part->next_part;
     }
@@ -1729,17 +1739,19 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
     unit->unit_flags |= 4;
 
     // Equip copies of Mario or partner's current badge loadout.
-    auto* pouch = ttyd::mario_pouch::pouchGetPtr();
-    uint32_t equip_flags = evt->evtArguments[0] == BattleUnitType::MARIO ? 2 : 4;
     memset(&unit->badges_equipped, 0, sizeof(ttyd::battle_unit::BadgesEquipped));
-    for (int32_t i = 0; i < 200; ++i) {
-        ttyd::battle::_EquipItem(unit, equip_flags, pouch->equipped_badges[i]);
-    }
-    // If Doopliss already remarked on having Jumpman and Hammerman both on,
-    // ignore those badges for the rest of the fight.
-    if (unit->unit_work[UW_Doopliss_DisabledNJNH] == 1) {
-        unit->badges_equipped.jumpman = 0;
-        unit->badges_equipped.hammerman = 0;
+    if (unit->current_kind != BattleUnitType::DOOPLISS_CH_8) {
+        auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+        uint32_t equip_flags = unit->current_kind == BattleUnitType::MARIO ? 2 : 4;
+        for (int32_t i = 0; i < 200; ++i) {
+            ttyd::battle::_EquipItem(unit, equip_flags, pouch->equipped_badges[i]);
+        }
+        // If Doopliss already remarked on having Jumpman and Hammerman both on,
+        // ignore those badges for the rest of the fight.
+        if (unit->unit_work[UW_Doopliss_DisabledNJNH] == 1) {
+            unit->badges_equipped.jumpman = 0;
+            unit->badges_equipped.hammerman = 0;
+        }
     }
     
     return 2;
