@@ -33,6 +33,7 @@ using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::filemgr::File;
 using ::ttyd::npcdrv::FbatBattleInformation;
 using ::ttyd::seqdrv::SeqIndex;
+using ::ttyd::win_root::WinLogTattleMenuWork;
 using ::ttyd::win_root::WinPauseMenu;
 using ::ttyd::winmgr::WinMgrEntry;
 using ::ttyd::winmgr::WinMgrSelectEntry;
@@ -214,6 +215,8 @@ int32_t (*g_winMarioMain_trampoline)(WinPauseMenu*) = nullptr;
 void (*g_winMarioInit2_trampoline)(WinPauseMenu*) = nullptr;
 // win_item.o  80170dc0
 void (*g_winMarioInit_trampoline)(WinPauseMenu*) = nullptr;
+// win_log.o  80171034
+void (*g_monosiri_disp_trampoline)(CameraId, WinLogTattleMenuWork*) = nullptr;
 // win_log.o  80173c70
 void (*g_winLogDisp_trampoline)(CameraId, WinPauseMenu*, int32_t) = nullptr;
 // win_log.o  80174758

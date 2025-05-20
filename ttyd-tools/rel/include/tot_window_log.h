@@ -5,7 +5,10 @@
 #include <cstdint>
 
 // Forward declarations.
-namespace ttyd::win_root { struct WinPauseMenu; }
+namespace ttyd::win_root {
+    struct WinLogTattleMenuWork;
+    struct WinPauseMenu; 
+}
 namespace ttyd::winmgr { struct WinMgrEntry; }
 
 namespace mod::tot::win {
@@ -29,6 +32,10 @@ void LogMenuMain2(ttyd::win_root::WinPauseMenu* menu);
 void LogMenuDisp(
     ttyd::dispdrv::CameraId camera_id, ttyd::win_root::WinPauseMenu* menu,
     int32_t tab_number);
+
+void TattleMenuDrawMidbossRibbon(
+    ttyd::dispdrv::CameraId camera_id,
+    ttyd::win_root::WinLogTattleMenuWork* tattle_work);
 
 void LogMenuDrawTabNotif(
     ttyd::dispdrv::CameraId camera_id, ttyd::win_root::WinPauseMenu* menu);

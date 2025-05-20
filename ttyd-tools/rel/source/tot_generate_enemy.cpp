@@ -162,7 +162,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_FireBro, 1, 293, 0x04, 26, 16, 4, 2, 1, 2, 9, 3, 2, 1, 0, 0 },
     { &custom::unit_RedChomp, 1, 306, 0x2c, 82, 12, 10, 5, 5, 0, 8, -1, 2, 0, 0, 0 },
     { &custom::unit_DarkKoopatrol, 1, 307, 0x2d, 19, 25, 10, 3, 5, 0, 10, 8, 3, 1, 0, 0 },
-    { &custom::unit_IronCleft, 0, 289, 0x16, 74, 8, 8, 1, 3, 0, 9, -1, 2, 0, 0, 0 },
+    { &custom::unit_IronCleft, 0, 289, 0x16, 74, 6, 8, 1, 3, 0, 9, -1, 2, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
     { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
@@ -1717,6 +1717,11 @@ bool GetTattleDisplayStats(int32_t unit_type, int32_t* atk, int32_t* def) {
     int32_t base_atk_power = ei.atk_offset + ei.atk_reference;
     return GetEnemyStats(
         unit_type, nullptr, atk, def, nullptr, nullptr, base_atk_power);
+}
+
+bool IsEligibleMidboss(int32_t unit_type) {
+    if (unit_type > BattleUnitType::BONETAIL || unit_type < 0) return false;
+    return kEnemyInfo[unit_type].midboss_eligible;
 }
 
 bool IsEligibleFrontEnemy(int32_t unit_type) {

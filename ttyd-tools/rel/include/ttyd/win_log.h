@@ -14,7 +14,9 @@ namespace ttyd::win_log {
 
 extern "C" {
 
-// monosiri_disp
+void monosiri_disp(
+    ttyd::dispdrv::CameraId camera, 
+    ttyd::win_root::WinLogTattleMenuWork* tattle_work);
 // capture
 // monosiriExit
 // monosiriCloseWait

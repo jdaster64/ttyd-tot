@@ -50,6 +50,7 @@ using namespace ::ttyd::gx::GXTev;
 using ::ttyd::dispdrv::CameraId;
 using ::ttyd::item_data::itemDataTable;
 using ::ttyd::msgdrv::msgSearch;
+using ::ttyd::win_root::WinLogTattleMenuWork;
 using ::ttyd::win_root::WinPauseMenu;
 using ::ttyd::winmgr::WinMgrEntry;
 
@@ -1691,11 +1692,10 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 if (ttyd::swdrv::swGet(menu->tattle_logs[menu->tattle_log_cursor_idx].id + 0x117a)) {
                     ttyd::pmario_sound::psndSFXOn((char *)0x20012);
                     menu->log_menu_state = 21;                    
-                    auto* work = (ttyd::win_root::WinLogTattleMenuWork*)
+                    auto* work = (WinLogTattleMenuWork*)
                         ttyd::memory::_mapAlloc(
-                            ttyd::memory::mapalloc_base_ptr,
-                            sizeof(ttyd::win_root::WinLogTattleMenuWork));
-                    memset(work, 0, sizeof(ttyd::win_root::WinLogTattleMenuWork));
+                            ttyd::memory::mapalloc_base_ptr, sizeof(WinLogTattleMenuWork));
+                    memset(work, 0, sizeof(WinLogTattleMenuWork));
                     work->state = 0;
                     work->enemy_id = menu->tattle_logs[menu->tattle_log_cursor_idx].id;
                     work->x = 500.0f;
@@ -2507,6 +2507,25 @@ void LogMenuDisp(CameraId camera_id, WinPauseMenu* menu, int32_t tab_number) {
             }
         }
     }
+}
+
+void TattleMenuDrawMidbossRibbon(
+    CameraId camera_id, WinLogTattleMenuWork* tattle_work) {
+
+    auto* menu = ttyd::win_main::winGetPtr();
+    if (!menu || !menu->win_tpl || !menu->win_tpl->mpFileData) return;
+
+    if (!IsEligibleMidboss(tattle_work->enemy_id)) return;
+
+    bool defeated =
+        g_Mod->state_.GetOption(FLAGS_MIDBOSS_DEFEATED, tattle_work->enemy_id);
+    
+    // Draw ribbon next to enemy name / defeated count if midboss defeated.
+    ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
+    gc::vec3 position = { tattle_work->x + 25.0f, tattle_work->y - 202.0f, 0.0f };
+    gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
+    uint32_t color = defeated ? 0xFFFFFFFFU : 0x606060FFU;
+    ttyd::win_main::winTexSet(0xb0, &position, &scale, &color);
 }
 
 void LogMenuDrawTabNotif(CameraId camera_id, WinPauseMenu* menu) {

@@ -140,6 +140,7 @@ using ::ttyd::evtmgr::EvtEntry;
 using ::ttyd::mario_pouch::PouchData;
 using ::ttyd::msgdrv::msgSearch;
 using ::ttyd::win_party::WinPartyData;
+using ::ttyd::win_root::WinLogTattleMenuWork;
 using ::ttyd::win_root::WinPauseMenu;
 using ::ttyd::winmgr::WinMgrEntry;
 using ::ttyd::winmgr::WinMgrSelectEntry;
@@ -163,6 +164,7 @@ extern void (*g_winMarioDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
 extern int32_t (*g_winMarioMain_trampoline)(WinPauseMenu*);
 extern void (*g_winMarioInit2_trampoline)(WinPauseMenu*);
 extern void (*g_winMarioInit_trampoline)(WinPauseMenu*);
+extern void (*g_monosiri_disp_trampoline)(CameraId, WinLogTattleMenuWork*);
 extern void (*g_winLogDisp_trampoline)(CameraId, WinPauseMenu*, int32_t);
 extern void (*g_winLogMain2_trampoline)(WinPauseMenu*);
 extern int32_t (*g_winLogMain_trampoline)(WinPauseMenu*);
@@ -584,6 +586,17 @@ void ApplyFixedPatches() {
         ttyd::win_log::winLogDisp, [](
             CameraId camera, WinPauseMenu* menu, int32_t tab_number) {
             tot::win::LogMenuDisp(camera, menu, tab_number);
+        });
+
+    // Hook Tattle info display method to show icon for having defeated
+    // the enemy as a midboss, if applicable.
+    g_monosiri_disp_trampoline = mod::hookFunction(
+        ttyd::win_log::monosiri_disp, [](
+            CameraId camera, WinLogTattleMenuWork* tattle_work) {
+            // Run original logic.
+            g_monosiri_disp_trampoline(camera, tattle_work);
+            // Run additional logic to show midboss icon.
+            tot::win::TattleMenuDrawMidbossRibbon(camera, tattle_work);
         });
 
     // Hook main pause menu display method to display achievement icon.
