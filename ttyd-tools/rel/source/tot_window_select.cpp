@@ -2429,12 +2429,9 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
         case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
         case MenuType::COSMETICS_SHOP_YOSHI_COSTUME: {
             int32_t cosmetic_type = type - MenuType::COSMETICS_SHOP_ATTACK_FX;
-            int32_t num_cosmetics = 0;
-            int8_t cosmetics[30];
-            for (int32_t i = 1; i <= 30; ++i) {
-                if (CosmeticsManager::IsPurchaseable(cosmetic_type, i))
-                    cosmetics[num_cosmetics++] = i;
-            }
+            int8_t cosmetics[32];
+            int32_t num_cosmetics = CosmeticsManager::GetPurchaseableCosmetics(
+                cosmetic_type, cosmetics);
 
             sel_entry->num_rows = num_cosmetics;
             sel_entry->row_data = 

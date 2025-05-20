@@ -73,9 +73,10 @@ public:
     static const MarioCostumeData* GetMarioCostumeData(int32_t id);
     static const YoshiCostumeData* GetYoshiCostumeData(int32_t id);
 
-    // Returns the number of active cosmetics of the type, and copies a sorted
-    // array of all the unlocked cosmetics to arr.
-    static int32_t GetActiveCosmetics(int32_t type, int8_t* arr);
+    // Returns the number of active / purchaseable cosmetics of the given
+    // type, and fills in an array with them sorted by a custom sort order.
+    static int32_t GetAvailableCosmetics(int32_t type, int8_t* arr);
+    static int32_t GetPurchaseableCosmetics(int32_t type, int8_t* arr);
 
     // Returns one past the last valid id for each cosmetic type.
     static int32_t GetCosmeticCount(int32_t type);

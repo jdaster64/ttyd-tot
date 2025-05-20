@@ -496,7 +496,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_05",
         .help_msg = "tot_cos1_05_h",
         .models = MARIO_MODEL_PATHS("A", true),
-        .price = 7,
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 4,
         .group_id = 5,
         .sort_order = 5,
@@ -506,7 +506,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_06",
         .help_msg = "tot_cos1_06_h",
         .models = MARIO_MODEL_PATHS("B", true),
-        .price = 7,
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 5,
         .group_id = 6,
         .sort_order = 6,
@@ -516,7 +516,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_07",
         .help_msg = "tot_cos1_07_h",
         .models = MARIO_MODEL_PATHS("C", true),
-        .price = 7,
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_ICONS + 6,
         .group_id = 7,
         .sort_order = 7,
@@ -526,7 +526,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_08",
         .help_msg = "tot_cos1_08_h",
         .models = MARIO_MODEL_PATHS("D", true),
-        .price = 7,
+        .price = 15,
         .icon = IconType::MARIO_COSTUME_ICONS + 7,
         .group_id = 8,
         .sort_order = 8,
@@ -536,7 +536,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_09",
         .help_msg = "tot_cos1_09_h",
         .models = MARIO_MODEL_PATHS("E", true),
-        .price = 10,
+        .price = 15,
         .icon = IconType::MARIO_COSTUME_ICONS + 8,
         .group_id = 9,
         .sort_order = 9,
@@ -566,7 +566,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_12",
         .help_msg = "tot_cos1_12_h",
         .models = MARIO_MODEL_PATHS("H", true),
-        .price = 10,
+        .price = 15,
         .icon = IconType::MARIO_COSTUME_ICONS + 11,
         .group_id = 12,
         .sort_order = 12,
@@ -576,7 +576,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_13",
         .help_msg = "tot_cos1_13_h",
         .models = MARIO_MODEL_PATHS("I", true),
-        .price = 10,
+        .price = 15,
         .icon = IconType::MARIO_COSTUME_ICONS + 12,
         .group_id = 13,
         .sort_order = 13,
@@ -586,7 +586,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_14",
         .help_msg = "tot_cos1_14_h",
         .models = MARIO_MODEL_PATHS("J", true),
-        .price = 10,
+        .price = 15,
         .icon = IconType::MARIO_COSTUME_ICONS + 13,
         .group_id = 14,
         .sort_order = 14,
@@ -596,7 +596,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_15",
         .help_msg = "tot_cos1_15_h",
         .models = MARIO_MODEL_PATHS("K", true),
-        .price = 10,
+        .price = 15,
         .icon = IconType::MARIO_COSTUME_ICONS + 14,
         .group_id = 15,
         .sort_order = 15,
@@ -616,7 +616,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_17",
         .help_msg = "tot_cos1_17_h",
         .models = MARIO_MODEL_PATHS("N", true),
-        .price = 10,
+        .price = 20,
         .icon = IconType::MARIO_COSTUME_ICONS + 16,
         .group_id = 17,
         .sort_order = 17,
@@ -636,7 +636,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_19",
         .help_msg = "tot_cos1_19_h",
         .models = MARIO_MODEL_PATHS("P", true),
-        .price = 10,
+        .price = 20,
         .icon = IconType::MARIO_COSTUME_ICONS + 18,
         .group_id = 19,
         .sort_order = 19,
@@ -666,7 +666,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_22",
         .help_msg = "tot_cos1_22_h",
         .models = MARIO_MODEL_PATHS("T", true),
-        .price = 15,
+        .price = 25,
         .icon = IconType::MARIO_COSTUME_ICONS + 21,
         .secret = true,
         .group_id = 22,
@@ -719,7 +719,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_27",
         .help_msg = "tot_cos1_27_h",
         .models = MARIO_MODEL_PATHS("6", true),
-        .price = 20,
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_26,
         .group_id = 27,
         .sort_order = 25,
@@ -729,7 +729,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_28",
         .help_msg = "tot_cos1_28_h",
         .models = MARIO_MODEL_PATHS("7", true),
-        .price = 20,
+        .price = 10,
         .icon = IconType::MARIO_COSTUME_27,
         .group_id = 28,
         .sort_order = 21,
@@ -739,7 +739,7 @@ const MarioCostumeData g_MarioCostumeData[] = {
         .name_msg = "tot_cos1_29",
         .help_msg = "tot_cos1_29_h",
         .models = MARIO_MODEL_PATHS("8", true),
-        .price = 20,
+        .price = 15,
         .icon = IconType::MARIO_COSTUME_28,
         .group_id = 29,
         .sort_order = 23,
@@ -882,7 +882,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_08",
         .help_msg = "tot_cos2_08_h",
         .models = YOSHI_MODEL_PATHS("H"),
-        .price = 10,
+        .price = 15,
         .icon = IconType::YOSHI_EXTRA_ICONS + 0,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 0,
         .group_id = 8,
@@ -893,7 +893,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_09",
         .help_msg = "tot_cos2_09_h",
         .models = YOSHI_MODEL_PATHS("I"),
-        .price = 10,
+        .price = 20,
         .icon = IconType::YOSHI_EXTRA_ICONS + 1,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 1,
         .group_id = 9,
@@ -926,7 +926,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_12",
         .help_msg = "tot_cos2_12_h",
         .models = YOSHI_MODEL_PATHS("L"),
-        .price = 10,
+        .price = 15,
         .icon = IconType::YOSHI_EXTRA_ICONS + 4,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 4,
         .group_id = 12,
@@ -937,7 +937,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_13",
         .help_msg = "tot_cos2_13_h",
         .models = YOSHI_MODEL_PATHS("M"),
-        .price = 10,
+        .price = 15,
         .icon = IconType::YOSHI_EXTRA_ICONS + 5,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 5,
         .group_id = 13,
@@ -992,7 +992,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_18",
         .help_msg = "tot_cos2_18_h",
         .models = YOSHI_MODEL_PATHS("S"),
-        .price = 15,
+        .price = 25,
         .icon = IconType::YOSHI_EXTRA_ICONS + 10,
         .icon_hud = IconType::YOSHI_EXTRA_HUD_ICONS + 10,
         .secret = true,
@@ -1037,7 +1037,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_22",
         .help_msg = "tot_cos2_22_h",
         .models = YOSHI_MODEL_PATHS("A"),
-        .price = 20,
+        .price = 10,
         .icon = IconType::YOSHI_COSTUME_21,
         .icon_hud = IconType::YOSHI_COSTUME_21_HUD,
         .group_id = 22,
@@ -1048,7 +1048,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_23",
         .help_msg = "tot_cos2_23_h",
         .models = YOSHI_MODEL_PATHS("B"),
-        .price = 20,
+        .price = 15,
         .icon = IconType::YOSHI_COSTUME_22,
         .icon_hud = IconType::YOSHI_COSTUME_22_HUD,
         .group_id = 23,
@@ -1081,7 +1081,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .name_msg = "tot_cos2_26",
         .help_msg = "tot_cos2_26_h",
         .models = YOSHI_MODEL_PATHS("E"),
-        .price = 20,
+        .price = 15,
         .icon = IconType::YOSHI_COSTUME_25,
         .icon_hud = IconType::YOSHI_COSTUME_25_HUD,
         .group_id = 26,
@@ -1099,7 +1099,7 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .sort_order = 21,
     },
     {
-        // Mustard
+        // Maroon
         .name_msg = "tot_cos2_28",
         .help_msg = "tot_cos2_28_h",
         .models = YOSHI_MODEL_PATHS("G"),
@@ -1110,11 +1110,11 @@ const YoshiCostumeData g_YoshiCostumeData[] = {
         .sort_order = 23,
     },
     {
-        // Mustard
+        // Chestnut
         .name_msg = "tot_cos2_29",
         .help_msg = "tot_cos2_29_h",
         .models = YOSHI_MODEL_PATHS("8"),
-        .price = 20,
+        .price = 10,
         .icon = IconType::YOSHI_COSTUME_28,
         .icon_hud = IconType::YOSHI_COSTUME_28_HUD,
         .group_id = 29,
@@ -1266,10 +1266,31 @@ const YoshiCostumeData* CosmeticsManager::GetYoshiCostumeData(int32_t id) {
     return &g_YoshiCostumeData[id];
 }
 
-int32_t CosmeticsManager::GetActiveCosmetics(int32_t type, int8_t* arr) {
+int32_t CosmeticsManager::GetAvailableCosmetics(int32_t type, int8_t* arr) {
     int32_t num_unlocked = 0;
     for (int32_t i = 0; i < 32; ++i) {
         if (CosmeticsManager::IsAvailable(type, i)) {
+            arr[num_unlocked++] = i;
+        }
+    }
+    // Attack FX are already sorted in menu order by default.
+    switch (type) {
+        case CosmeticType::MARIO_COSTUME:
+            ttyd::system::qqsort(
+                arr, num_unlocked, sizeof(int8_t), (void*)comp_MarioCostume);
+            break;
+        case CosmeticType::YOSHI_COSTUME:
+            ttyd::system::qqsort(
+                arr, num_unlocked, sizeof(int8_t), (void*)comp_YoshiCostume);
+            break;
+    }
+    return num_unlocked;
+}
+
+int32_t CosmeticsManager::GetPurchaseableCosmetics(int32_t type, int8_t* arr) {
+    int32_t num_unlocked = 0;
+    for (int32_t i = 0; i < 32; ++i) {
+        if (CosmeticsManager::IsPurchaseable(type, i)) {
             arr[num_unlocked++] = i;
         }
     }

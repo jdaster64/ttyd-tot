@@ -1166,7 +1166,7 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                     }
                     if (cosmetic_type != -1) {
                         menu->cosmetic_num_options = 
-                            CosmeticsManager::GetActiveCosmetics(
+                            CosmeticsManager::GetAvailableCosmetics(
                                 cosmetic_type, menu->cosmetic_options);
 
                         menu->cosmetic_cursor_idx = 0;
