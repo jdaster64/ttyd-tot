@@ -561,10 +561,10 @@ const int8_t kBaseDifficulty[4] = { 0, 1, 5, 13 };
 
 
 // Gets the difficulty level for the given tower / floor combination.
-int32_t GetDifficulty() {
+int32_t GetDifficulty(int32_t floor = -1) {
     StateManager& state = g_Mod->state_;
     int32_t tower = state.GetOption(OPT_DIFFICULTY);
-    int32_t floor = state.floor_;
+    if (floor == -1) floor = state.floor_;
     return kBaseDifficulty[tower] + (floor - 1) / 8;
 }
 
@@ -735,41 +735,19 @@ void SelectEnemies() {
             g_NumEnemies = 1;
             return;
         }
-        
-        int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
-        int16_t weights[kNumEnemyTypes];
-        for (int32_t i = 0; i < kNumEnemyTypes; ++i) {
-            int32_t base_wt = 0;
-            const EnemyTypeInfo& ei = kEnemyInfo[i];
-            
-            // If enemy is not mid-boss eligible, ignore.
-            if (ei.midboss_eligible && ei.level >= 2 && ei.level <= 10) {
-                base_wt = kBaseWeights[difficulty][ei.level - 2];
-            }
-            weights[i] = base_wt;
+
+        // Otherwise, read the previously selected midboss from run stats.
+        int32_t boss_num = (state.floor_ / 8) - 1;
+        int32_t enemy_type = state.GetOption(STAT_RUN_MIDBOSSES_USED, boss_num);
+        // This edge case should only be necessary if save was updated mid-run.
+        if (enemy_type == 0) {
+            SelectMidboss(state.floor_, /* reroll = */ false);
+            enemy_type = state.GetOption(STAT_RUN_MIDBOSSES_USED, boss_num);
         }
         
-        // Disable picking midbosses that were already used.
-        for (int32_t i = 0; i < 7; ++i) {
-            int32_t enemy = state.GetOption(STAT_RUN_MIDBOSSES_USED, i);
-            weights[enemy] = 0;
-        }
-        
-        // Pick a single enemy to make into a mid-boss.
-        int32_t sum_weights = 0;
-        for (int32_t i = 0; i < kNumEnemyTypes; ++i) sum_weights += weights[i];
-        
-        int32_t weight = state.Rand(sum_weights, RNG_ENEMY);
-        int32_t idx = 0;
-        for (; (weight -= weights[idx]) >= 0; ++idx);
-        
-        g_Enemies[0] = idx;        
+        g_Enemies[0] = enemy_type;        
         for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
         g_NumEnemies = 1;
-        
-        // Save the enemy selected, so it won't show up again in the same run.
-        int32_t boss_num = (state.floor_ / 8) - 1;
-        state.SetOption(STAT_RUN_MIDBOSSES_USED, idx, boss_num);
         
         return;
     }
@@ -1236,6 +1214,80 @@ EVT_DEFINE_USER_FUNC(evtTot_ClearEnemyInfo) {
     return 2;
 }
 
+void SelectMidboss(int32_t floor, bool reroll) {
+    auto& state = g_Mod->state_;
+    int32_t difficulty = GetDifficulty(floor);
+    int32_t boss_num = (floor / 8) - 1;
+    int32_t rng_type = reroll ? RNG_NPC_OPTIONS : RNG_MIDBOSS_SELECT;
+    // Get how many times NPCs have already been rerolled this run.
+    int32_t reroll_count = state.GetOption(STAT_RUN_NPC_MERLON_DEALS);
+
+    // Fill in a dummy value if this is a major-boss floor.
+    if (floor % 32 == 0) {
+        state.SetOption(
+            STAT_RUN_MIDBOSSES_USED, BattleUnitType::ATOMIC_BOO, boss_num);
+        return;
+    }
+
+    int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
+    int16_t weights[kNumEnemyTypes];
+    for (int32_t i = 0; i < kNumEnemyTypes; ++i) {
+        int32_t base_wt = 0;
+        const EnemyTypeInfo& ei = kEnemyInfo[i];
+        
+        // If enemy is not mid-boss eligible, ignore.
+        if (ei.midboss_eligible && ei.level >= 2 && ei.level <= 10) {
+            base_wt = kBaseWeights[difficulty][ei.level - 2];
+        }
+        weights[i] = base_wt;
+    }
+    
+    // Disable picking midbosses that were already used.
+    if (!reroll) {
+        // Only for floors already generated.
+        for (int32_t i = 0; i < boss_num; ++i) {
+            int32_t enemy = state.GetOption(STAT_RUN_MIDBOSSES_USED, i);
+            weights[enemy] = 0;
+        }
+    } else {
+        // For all floors, including future ones.
+        for (int32_t i = 0; i < state.GetNumFloors() / 8; ++i) {
+            int32_t enemy = state.GetOption(STAT_RUN_MIDBOSSES_USED, i);
+            weights[enemy] = 0;
+        }
+        // Don't repeat up to 4 previous rerolls on the same floor.
+        for (int32_t i = 0; i < reroll_count && i < 4; ++i) {
+            int32_t enemy = state.GetOption(STAT_RUN_MIDBOSSES_REROLLED, i);
+            weights[enemy] = 0;
+        }
+    }
+    
+    // Pick a single enemy to make into a mid-boss.
+    int32_t sum_weights = 0;
+    for (int32_t i = 0; i < kNumEnemyTypes; ++i) sum_weights += weights[i];
+    
+    int32_t enemy_type = 0;
+    if (sum_weights > 0) {
+        int32_t weight = state.Rand(sum_weights, rng_type);
+        for (; (weight -= weights[enemy_type]) >= 0; ++enemy_type);
+    } else {
+        // Shouldn't ever be few enough options for this, but sanity check.
+        enemy_type = BattleUnitType::GOOMBA;
+    }
+    
+    if (reroll) {
+        // If rerolling, move the previous selected boss to the rerolls list.
+        int32_t prev_midboss =
+            state.GetOption(STAT_RUN_MIDBOSSES_USED, boss_num);
+        state.SetOption(
+            STAT_RUN_MIDBOSSES_REROLLED, prev_midboss, reroll_count % 4);
+
+        // TODO: Figure out whether to track this here or elsewhere.
+        // state.ChangeOption(STAT_RUN_NPC_MERLON_DEALS, 1);
+    }
+    state.SetOption(STAT_RUN_MIDBOSSES_USED, enemy_type, boss_num);
+}
+
 bool GetEnemyStats(
     int32_t unit_type, int32_t* out_hp, int32_t* out_atk, int32_t* out_def,
     int32_t* out_level, int32_t* out_coinlvl, int32_t base_attack_power) {
@@ -1455,7 +1507,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMinionEntries) {
         for (int32_t idx = 0; idx < 64; ++idx) {
             auto* unit = battleWork->battle_units[idx];
             if (unit && !ttyd::battle_unit::BtlUnit_CheckStatus(unit, 27) &&
-                unit->home_position.x == x) {
+                AbsF(unit->home_position.x - x) < 2.0) {
                 position_free = false;
                 break;
             }

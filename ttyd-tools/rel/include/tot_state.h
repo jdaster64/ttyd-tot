@@ -214,11 +214,13 @@ enum RngSequence {
     RNG_ENEMY_ITEM              = 2,    // Enemy held item types.
     RNG_ENEMY_CONDITION         = 3,    // Bonus challenge condition.
     RNG_ENEMY_CONDITION_ITEM    = 4,    // Bonus challenge reward.
-    
+
     // NPC generation; mangled with floor number + reset every floor.
     RNG_NPC_TYPE                = 5,    // Type of NPC(s) to spawn.
     RNG_NPC_OPTIONS             = 6,    // NPC parameters, e.g. shop items.
-    RNG_NPC_RESERVED            = 7,    //
+
+    // Used for random midboss spawns; mangled with floor number + reset every floor.
+    RNG_MIDBOSS_MOB             = 7,    // Mobs spawned by midbosses.
     
     // Choosing reward metatypes; mangled with floor number + reset every floor.
     RNG_REWARD                  = 8,    // Types of rewards.
@@ -256,8 +258,9 @@ enum RngSequence {
     RNG_STAR_PIECE_CHEST        = 33,
     RNG_MYSTERY_COOK_RESULT     = 34,
     RNG_ALTERNATE_BOSS          = 35,
+    RNG_MIDBOSS_SELECT          = 36,
     
-    RNG_SEQUENCE_MAX            = 36,
+    RNG_SEQUENCE_MAX            = 37,
 };
 
 // Different types of option values (see below for descriptions of each).
@@ -559,7 +562,10 @@ enum Options : uint32_t {
     STAT_RUN_HAMMERMAN_FAILED   = 0x065'4'00'00,
     STAT_RUN_NPC_WONKY_FLOOR    = 0x066'3'00'00,
     STAT_RUN_NPC_WONKY_TRADES   = 0x067'0'00'00,
-    // Next: 0x068
+    STAT_RUN_NPC_MERLON_DEALS   = 0x068'0'00'00,
+    // Used to make sure midboss rerolls don't repeat immediately.
+    STAT_RUN_MIDBOSSES_REROLLED = 0x069'0'01'04,
+    // Next: 0x06a
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 

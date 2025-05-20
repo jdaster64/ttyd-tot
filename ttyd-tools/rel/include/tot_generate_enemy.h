@@ -33,6 +33,9 @@ EVT_DECLARE_USER_FUNC(evtTot_SetEnemyNpcBattleInfo, 2)
 // Clears enemy loadout information.
 EVT_DECLARE_USER_FUNC(evtTot_ClearEnemyInfo, 0)
 
+// Selects the midboss that will be used for a given floor.
+void SelectMidboss(int32_t floor, bool reroll);
+
 // Gets replacement stats for an enemy, based on the enemy type and current
 // floor (determined by the mod's state).
 // Will return false if no stats were found for the given enemy type.

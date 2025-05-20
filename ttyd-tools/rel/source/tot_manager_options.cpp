@@ -2,6 +2,7 @@
 
 #include "common_functions.h"
 #include "mod.h"
+#include "tot_generate_enemy.h"
 #include "tot_generate_item.h"
 #include "tot_gon_tower_npcs.h"
 #include "tot_gsw.h"
@@ -901,6 +902,11 @@ void OptionsManager::OnRunStart() {
     if (g_Mod->state_.GetOption(OPT_OBFUSCATE_ITEMS)) {
         g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION] = 0;
         ObfuscateItems(true);
+    }
+
+    // Select the midbosses that will be used during the run.
+    for (int32_t floor = 8; floor < g_Mod->state_.GetNumFloors(); floor += 8) {
+        SelectMidboss(floor, /* reroll = */ false);
     }
 
     OnRunResumeFromFileSelect();
