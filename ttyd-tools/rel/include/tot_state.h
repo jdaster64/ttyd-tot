@@ -309,10 +309,12 @@ enum OptionsType {
 enum Options : uint32_t {
     // Flag-based options.
     // Select a set of settings all at once, or choose a custom set.
+    // TODO: Support random preset.
     OPT_PRESET                  = 0x400'3'00'02,
     OPTVAL_PRESET_CUSTOM        = 0x500'3'00'00,
     OPTVAL_PRESET_DEFAULT       = 0x500'3'00'01,
     OPTVAL_PRESET_RTA_RACE      = 0x500'3'00'02,
+    OPTVAL_PRESET_RANDOM        = 0x500'3'00'03,
     // Reserved: Space for extra presets.
 
     // Tower difficulty.
@@ -436,6 +438,7 @@ enum Options : uint32_t {
     OPTVAL_SECRET_BOSS_1        = 0x544'3'00'02,
     OPTVAL_SECRET_BOSS_2        = 0x544'3'00'03,
     OPTVAL_SECRET_BOSS_3        = 0x544'3'00'04,
+    OPTVAL_SECRET_BOSS_EQUAL    = 0x544'3'00'05,
 
     // Changes to stage hazard rates.
     OPT_STAGE_HAZARDS           = 0x447'3'00'04,
@@ -469,7 +472,7 @@ enum Options : uint32_t {
 
     // Countdown timer.
     OPT_COUNTDOWN_TIMER         = 0x451'4'00'0b,
-    OPTVAL_COUNTDOWN_OFF        = 0x451'4'00'00,
+    OPTVAL_COUNTDOWN_OFF        = 0x551'4'00'00,
 
     // Different options for how moves are offered.
     OPT_MOVE_AVAILABILITY       = 0x455'3'00'04,
@@ -479,17 +482,18 @@ enum Options : uint32_t {
     OPTVAL_MOVES_FORCED         = 0x555'3'00'03,
     OPTVAL_MOVES_CUSTOM         = 0x555'3'00'04,
 
-    // Whether chest rewards can be rerolled on the field.
+    // Whether chest rewards can be rerolled / need to be revealed on the field.
     // TODO: Add support.
-    OPT_CHEST_REROLLS           = 0x458'2'00'03,
-    OPT_CHEST_REROLLS_OFF       = 0x458'2'00'00,
-    OPT_CHEST_REROLLS_FIXED     = 0x458'2'00'01,
-    OPT_CHEST_REROLLS_FIXED_CAP = 0x458'2'00'02,
-    OPT_CHEST_REROLLS_META_CAP  = 0x458'2'00'03,
+    OPT_CHEST_CHOICE            = 0x458'3'00'04,
+    OPTVAL_CHEST_CHOICE_OFF     = 0x558'3'00'00,
+    OPTVAL_CHEST_REROLL_FIXED   = 0x558'3'00'01,
+    OPTVAL_CHEST_REROLL_REFILL  = 0x558'3'00'02,
+    OPTVAL_CHEST_REVEAL_FIXED   = 0x558'3'00'03,
+    OPTVAL_CHEST_REVEAL_REFILL  = 0x558'3'00'04,
 
     // Whether to enable Merlee curses (not supported).
-    OPT_MERLEE_CURSE            = 0x45a'1'00'01,
-    // Next: 0x45b
+    OPT_MERLEE_CURSE            = 0x45c'1'00'01,
+    // Next: 0x45c
     
     // Internal options; are not automatically reset between runs.
     OPT_RUN_STARTED             = 0x4c0'1'00'01,

@@ -107,7 +107,7 @@ const AchievementData g_AchievementData[] = {
     { "tot_achd_78", nullptr, 8, AchievementRewardType::YOSHI_COSTUME, 24 },
     { "tot_achd_79", nullptr, 12, AchievementRewardType::YOSHI_COSTUME, 25 },
     { "tot_achd_80", "tot_acho_midboss", 84, AchievementRewardType::OPTION, OPT_MIDBOSSES },
-    { "tot_achd_81", "tot_acho_rerolls", 26, AchievementRewardType::OPTION, OPT_CHEST_REROLLS },
+    { "tot_achd_81", "tot_acho_rerolls", 26, AchievementRewardType::OPTION, OPT_CHEST_CHOICE },
     { "tot_achd_82", nullptr, 82, AchievementRewardType::MARIO_COSTUME, 29 },
     { "tot_achd_83", nullptr, 7, AchievementRewardType::MARIO_COSTUME, 30 },
     { "tot_achd_84", nullptr, 81, AchievementRewardType::MARIO_COSTUME, 31 },

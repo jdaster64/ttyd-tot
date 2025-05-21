@@ -100,6 +100,7 @@ int32_t g_ChestDrawAlpha = 0;
 // Moves selected for unlocking / upgrading menus.
 int32_t g_MoveSelections[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 int32_t g_NumMovesSelected = 0;
+int32_t g_LastMoveSelectionRngType = 0;
 
 // Returns the option flag to check for whether the badge was already obtained.
 int32_t GetUniqueBadgeObtainedIndex(int32_t item_type) {
@@ -399,6 +400,7 @@ void SelectMoves(int32_t reward_type, bool is_upgrade_mode) {
         int32_t rng_type = RNG_MOVE_UPGRADE;
         if (!is_upgrade_mode) {
             rng_type = RNG_MOVE_GOOMBELLA - (reward_type + 1);
+            g_LastMoveSelectionRngType = rng_type;
         }
         
         // Select moves at random until picking the requisite number,
@@ -545,6 +547,7 @@ EVT_DECLARE_USER_FUNC(evtTot_InitializePartyMember, 2)
 EVT_DECLARE_USER_FUNC(evtTot_PartyJumpOutOfChest, 7)
 EVT_DECLARE_USER_FUNC(evtTot_PartyVictoryPose, 1)
 EVT_DECLARE_USER_FUNC(evtTot_SelectMoves, 5)
+EVT_DECLARE_USER_FUNC(evtTot_CheckForcedMoveSelection, 3)
 EVT_DECLARE_USER_FUNC(evtTot_GetStarPieceRolls, 1)
 
 // Script for health.
@@ -663,10 +666,15 @@ LBL(10)
         // Partner is already unlocked; check for unlockable moves.
         USER_FUNC(evtTot_SelectMoves, 0, LW(13), LW(0), LW(1), LW(2))
         IF_LARGE(LW(0), 0)
-            // Open menu to select a move.
-            // Note that LW(1) and LW(2) are overwritten by result.
-            USER_FUNC(evt_win_other_select,
-                (uint32_t)window_select::MenuType::MOVE_UNLOCK)
+            // Check to see if selection is forced.
+            USER_FUNC(evtTot_CheckForcedMoveSelection, LW(0), LW(1), LW(2))
+            IF_EQUAL(LW(0), 0)
+                // Open menu to select a move.
+                // Note that LW(1) and LW(2) are overwritten by result.
+                USER_FUNC(evt_win_other_select,
+                    (uint32_t)window_select::MenuType::MOVE_UNLOCK)
+            END_IF()
+            
             USER_FUNC(evtTot_UpgradeMove, LW(1))
             USER_FUNC(
                 evt_msg_print_insert, 0, PTR("tot_reward_learnmove"), 0, 0, LW(2))
@@ -1264,6 +1272,22 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectMoves) {
                 MoveManager::GetMoveData(g_MoveSelections[0])->name_msg)));
     }
     
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_CheckForcedMoveSelection) {
+    if (!g_Mod->state_.CheckOptionValue(OPTVAL_MOVES_FORCED)) {
+        evtSetValue(evt, evt->evtArguments[0], 0);
+    } else {
+        int32_t rand_value = 
+            g_Mod->state_.Rand(g_NumMovesSelected, g_LastMoveSelectionRngType);
+        int32_t move = g_MoveSelections[rand_value];
+        evtSetValue(evt, evt->evtArguments[0], 1);
+        evtSetValue(evt, evt->evtArguments[1], move);
+        evtSetValue(evt, evt->evtArguments[2],
+            PTR(ttyd::msgdrv::msgSearch(MoveManager::GetMoveData(move)->name_msg)));
+    }
+
     return 2;
 }
 

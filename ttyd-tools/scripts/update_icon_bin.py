@@ -155,6 +155,8 @@ g_NewIconDefs = [
     [(712, 0)],
     [(713, 0)],
     [(714, 0)],
+    # Question mark icon.
+    [(715, 0)],
 ]
 g_IconDefs = []
 

@@ -39,6 +39,8 @@ RunOptionMetadata g_OptionMetadata[] = {
     { OPT_TIMER_DISPLAY, 0, -1, false, false, 0 },
     { OPT_COUNTDOWN_TIMER, OPTVAL_COUNTDOWN_OFF, -1, true, false, 1 },
     { OPT_NUM_CHESTS, OPTVAL_CHESTS_DEFAULT, -1, true, false, 2 },
+    { OPT_CHEST_CHOICE, OPTVAL_CHEST_CHOICE_OFF, -1, true, false, 2 },
+    { OPT_MIDBOSSES, OPTVAL_MIDBOSSES_DEFAULT, -1, true, false, 2 },
     { OPT_BATTLE_DROPS, OPTVAL_DROP_STANDARD, -1, true, false, 2 },
     { OPT_STARTER_ITEMS, OPTVAL_STARTER_ITEMS_BASIC, -1, true, false, 2 },
     { OPT_MOVE_AVAILABILITY, OPTVAL_MOVES_DEFAULT, -1, true, false, 2 },
@@ -606,6 +608,8 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
                 case OPTVAL_MOVES_PARTNER_BONUS:
                 case OPTVAL_MOVES_RANDOM:
                     return -15;
+                case OPTVAL_MOVES_FORCED:
+                    return 15;
                 case OPTVAL_MOVES_CUSTOM:
                     return -30;
             }

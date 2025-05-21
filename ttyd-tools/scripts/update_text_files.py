@@ -2408,7 +2408,7 @@ g_GlobalStrings = {
     b"tot_acho_runaway":        b"Run Away Chance",
     b"tot_acho_stageh":         b"Stage Hazards",
     b"tot_acho_midboss":        b"Midbosses",
-    b"tot_acho_rerolls":        b"Chest Rerolls",
+    b"tot_acho_rerolls":        b"Chest Choices",
     
     b"tot_ach_usehammer":
         b"Use a Hammer to unlock an\n"
@@ -5433,6 +5433,12 @@ g_TowerLobbyStrings = {
     b"tot_optr_npc_none":           b"None",
     b"tot_optr_chests":             b"No. of Chests",
     b"tot_optr_chests_default":     b"Balanced",
+    b"tot_optr_chestch":            b"Chest Choice",
+    b"tot_optr_chestch_default":    b"Off",
+    b"tot_optr_chestch_rollf":      b"Fixed Rerolls",
+    b"tot_optr_chestch_rollr":      b"Refillable Rerolls",
+    b"tot_optr_chestch_revf":       b"Fixed Reveals",
+    b"tot_optr_chestch_revr":       b"Refillable Reveals",
     b"tot_optr_damagevar":          b"Damage Variance",
     b"tot_optr_damagevar_0":        b"0%",
     b"tot_optr_damagevar_25":       b"25%",
@@ -5447,10 +5453,12 @@ g_TowerLobbyStrings = {
     b"tot_optr_secretboss_1":       b"Secret Boss 1",
     b"tot_optr_secretboss_2":       b"Secret Boss 2",
     b"tot_optr_secretboss_3":       b"Secret Boss 3",
+    b"tot_optr_secretboss_eq":      b"Equal Chance",
     b"tot_optr_movea":              b"Move Availability",
     b"tot_optr_movea_default":      b"Default",
     b"tot_optr_movea_partner1":     b"Partners Start w/+1",
     b"tot_optr_movea_random":       b"No Tier Requirements",
+    b"tot_optr_movea_forced":       b"Forced Choice",
     b"tot_optr_movea_custom":       b"Custom Start",
     b"tot_optr_movel":              b"Move Limit",
     b"tot_optr_movel_default":      b"None",
@@ -5470,6 +5478,11 @@ g_TowerLobbyStrings = {
     b"tot_optr_runaway_on":         b"Guaranteed",
     b"tot_optr_countdown":          b"Countdown Timer",
     b"tot_optr_countdown_off":      b"Off",
+    b"tot_optr_midboss":            b"Midbosses",
+    b"tot_optr_midboss_default":    b"Balanced",
+    b"tot_optr_midboss_random":     b"Random",
+    b"tot_optr_midboss_mobtype":    b"Support Variety",
+    b"tot_optr_midboss_mobany":     b"Support Random",
     
     b"tot_optr_off":                b"Off",
     b"tot_optr_on":                 b"On",
@@ -5645,6 +5658,14 @@ g_TowerLobbyStrings = {
     b"tot_opth_countdown":
         b"Disables saving, and gives you\n"
         b"a time limit to win, or else!",
+        
+    b"tot_opth_chestch":
+        b"Press L to reroll, or reveal\n"
+        b"hidden chest rewards.",
+        
+    b"tot_opth_midboss":
+        b"Changes which midbosses or\n"
+        b"support spawns can appear.",
         
     # Map text.
         
