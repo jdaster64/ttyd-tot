@@ -2130,8 +2130,12 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 menu->achievement_log_cam_shake_offset = shake_offset;
 
                 // Allow speeding up animation if holding down the A or B button.
+                int32_t max_speedup_time = 30;
+                if (g_Mod->state_.GetOption(OPTVAL_DEBUG_MODE_ENABLED)) {
+                    max_speedup_time = 53;
+                }
                 if ((ttyd::system::keyGetButton(0) & (ButtonId::A | ButtonId::B)) &&
-                    menu->achievement_log_unlock_timer < 30) {
+                    menu->achievement_log_unlock_timer < max_speedup_time) {
                     menu->achievement_log_unlock_timer = 0;
                 }
             }

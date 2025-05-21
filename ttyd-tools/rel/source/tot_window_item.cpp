@@ -273,7 +273,7 @@ void DrawItemInventorySize(WinPauseMenu* menu, float win_x, float win_y) {
     int32_t width;
     
     // Top-left corner of the window, for reference.
-    gc::vec3 win_pos = { win_x - 268.0f, win_y + 20.0f, 0.0f };
+    gc::vec3 win_pos = { win_x - 268.0f, win_y + 28.0f, 0.0f };
     gc::vec3 win_dim = { 100.0f, 40.0f, 0.0f };
 
     // Draw recessed window for item count.
@@ -312,6 +312,65 @@ void DrawItemInventorySize(WinPauseMenu* menu, float win_x, float win_y) {
     pos.x = win_pos.x + (win_dim.x - scale.x * width) * 0.5f ;
     pos.y = win_pos.y + scale.y * 26.0f + 2.0f;
     ttyd::win_main::winFontSet(&pos, &scale, &kBlack, space_used);
+}
+
+void DrawRerollCount(WinPauseMenu* menu, float win_x, float win_y) {
+    // "Constant" colors.
+    static uint32_t kBlack = 0x000000FFU;
+    // static uint32_t kWhite = 0xFFFFFFFFU;
+    static uint32_t kRed   = 0xA00000FFU;
+
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_CHOICE_OFF)) return;
+    bool reveal_mode =
+        g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REVEAL_FIXED) ||
+        g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REVEAL_REFILL);
+    
+    // Temporary variables, used across draw calls.
+    gc::vec3 pos = { 0.0f, 0.0f, 0.0f };
+    gc::vec3 scale = { 0.9f, 0.9f, 0.9f };
+    int32_t width;
+    
+    // Top-left corner of the window, for reference.
+    gc::vec3 win_pos = { win_x - 268.0f, win_y - 34.0f, 0.0f };
+    gc::vec3 win_dim = { 100.0f, 40.0f, 0.0f };
+
+    // Draw recessed window for item count.
+    ttyd::win_root::winKirinukiGX(
+        win_pos.x, win_pos.y, win_dim.x, win_dim.y, menu, 0);
+
+    ttyd::win_main::winFontInit();
+    
+    // Draw slash between current and maximum item count.
+    width = ttyd::fontmgr::FontGetMessageWidth("/");
+    pos.x = win_pos.x + 50.0f - 0.5f * width;
+    pos.y = win_pos.y - 9.0f;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "/");
+    
+    int32_t current_rolls = g_Mod->state_.GetOption(STAT_RUN_CHEST_REROLLS);
+    int32_t max_rolls = g_Mod->state_.GetOption(STAT_RUN_CHEST_MAX_REROLLS);
+    
+    // Draw current and max inventory numbers.
+    const char* temp_current_rolls = ttyd::win_mario::winZenkakuStr(current_rolls);
+    width = ttyd::fontmgr::FontGetMessageWidth(temp_current_rolls);
+    pos.x = win_pos.x + 30.0f - 0.5f * width;
+    uint32_t* color = current_rolls > 0 ? &kBlack : &kRed;
+    ttyd::win_main::winFontSet(&pos, &scale, color, "%s", temp_current_rolls);
+
+    const char* temp_max_rolls = ttyd::win_mario::winZenkakuStr(max_rolls);
+    width = ttyd::fontmgr::FontGetMessageWidth(temp_max_rolls);
+    pos.x = win_pos.x + 70.0f - 0.5f * width;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, "%s", temp_max_rolls);
+    
+    // Draw rerolls / reveals string.
+    const char* rerolls =
+        msgSearch(reveal_mode ? "tot_menu_reveals" : "tot_menu_rerolls");
+    width = ttyd::fontmgr::FontGetMessageWidth(rerolls);
+    scale.x = 0.6f;
+    scale.y = 0.6f;
+    scale.z = 0.6f;
+    pos.x = win_pos.x + (win_dim.x - scale.x * width) * 0.5f ;
+    pos.y = win_pos.y + scale.y * 26.0f + 2.0f;
+    ttyd::win_main::winFontSet(&pos, &scale, &kBlack, rerolls);
 }
 
 void DrawUseItemDialog(WinMgrEntry* winmgr_entry) {
@@ -1710,6 +1769,7 @@ void ItemMenuDisp(
     // Only display if on the regular item inventory screen.
     if (menu->item_submenu_id != 0) return;
     DrawItemInventorySize(menu, win_x, win_y);
+    DrawRerollCount(menu, win_x, win_y);
 }
 
 void ItemSubdialogMain1(WinMgrEntry* winmgr_entry) {

@@ -342,7 +342,13 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
                         }
 
                         case OPTNUM_SUPERGUARD_SP_COST: {
-                            state.SetOption(option, state.Rand(101));
+                            // 30% chance of no cost, otherwise, min of two
+                            // random values from 0.00 to 1.00.
+                            int32_t value = 0;
+                            if (state.Rand(100) >= 30) {
+                                value = Min(state.Rand(101), state.Rand(101));
+                            }
+                            state.SetOption(option, value);
                             return true;
                         }
 
@@ -617,6 +623,20 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
         case OPT_MOVE_LIMIT:
             // Adds 5% per additional level of restriction.
             return state.GetOption(option) * 5;
+        case OPT_CHEST_CHOICE:
+            switch (state.GetOptionValue(option)) {
+                case OPTVAL_CHEST_REROLL_FIXED:
+                    return -10;
+                case OPTVAL_CHEST_REROLL_REFILL:
+                    return -20;
+                case OPTVAL_CHEST_REVEAL_FIXED:
+                    if (!state.CheckOptionValue(OPTVAL_CHESTS_1)) return 20;
+                    break;
+                case OPTVAL_CHEST_REVEAL_REFILL:
+                    if (!state.CheckOptionValue(OPTVAL_CHESTS_1)) return 15;
+                    break;
+            }
+            break;
         case OPT_COUNTDOWN_TIMER: {
             int32_t level = state.GetOption(option);
             // Adds 15%, plus 5% per additional level of restriction.
@@ -903,14 +923,21 @@ void OptionsManager::OnRunStart() {
     CosmeticsManager::PickYoshiColor();
 
     // Run item obfuscation, if enabled.
-    if (g_Mod->state_.GetOption(OPT_OBFUSCATE_ITEMS)) {
-        g_Mod->state_.rng_states_[RNG_ITEM_OBFUSCATION] = 0;
+    if (state.GetOption(OPT_OBFUSCATE_ITEMS)) {
+        state.rng_states_[RNG_ITEM_OBFUSCATION] = 0;
         ObfuscateItems(true);
     }
 
     // Select the midbosses that will be used during the run.
-    for (int32_t floor = 8; floor < g_Mod->state_.GetNumFloors(); floor += 8) {
+    for (int32_t floor = 8; floor < state.GetNumFloors(); floor += 8) {
         SelectMidboss(floor, /* reroll = */ false);
+    }
+
+    // Award the player chest rerolls if option enabled.
+    if (!state.CheckOptionValue(OPTVAL_CHEST_CHOICE_OFF)) {
+        int32_t rerolls = state.GetNumFloors() <= 32 ? 3 : 6;
+        state.SetOption(STAT_RUN_CHEST_REROLLS, rerolls);
+        state.SetOption(STAT_RUN_CHEST_MAX_REROLLS, rerolls);
     }
 
     OnRunResumeFromFileSelect();

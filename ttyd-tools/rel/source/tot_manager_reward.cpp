@@ -469,8 +469,16 @@ void DisplayIcons(CameraId camera, void* user_data) {
     for (; chest->item; ++chest) {
         gc::vec3 pos = chest->home_pos;
         pos.y += 75.f;
-        ttyd::icondrv::iconDispGxAlpha(
-            1.0f, &pos, 0, GetIcon(chest), g_ChestDrawAlpha);
+
+        int32_t icon = GetIcon(chest);
+        // Hide icons in "reveal" mode, until a reroll item is used.
+        if ((g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REVEAL_FIXED) ||
+            g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REVEAL_REFILL)) &&
+            !GetSWByte(GSW_Tower_RevealUsedThisFloor)) {
+            icon = IconType::TOT_QUESTION_MARK;
+        }
+
+        ttyd::icondrv::iconDispGxAlpha(1.0f, &pos, 0, icon, g_ChestDrawAlpha);
     }
 }
 

@@ -1,5 +1,6 @@
 #include "tot_gon_tower.h"
 
+#include "common_types.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_generate_enemy.h"
@@ -48,6 +49,7 @@
 #include <ttyd/npc_data.h>
 #include <ttyd/npcdrv.h>
 #include <ttyd/swdrv.h>
+#include <ttyd/system.h>
 
 #include <cinttypes>
 #include <cstdio>
@@ -102,6 +104,7 @@ NpcSetupInfo g_EnemyNpcSetup[3];
 
 // USER_FUNC Declarations.
 EVT_DECLARE_USER_FUNC(evtTot_AwardWinnings, 0)
+EVT_DECLARE_USER_FUNC(evtTot_CheckReroll, 1)
 EVT_DECLARE_USER_FUNC(evtTot_ClearBattleResult, 0)
 EVT_DECLARE_USER_FUNC(evtTot_GetContinueDestinationMap, 1)
 EVT_DECLARE_USER_FUNC(evtTot_HasBackupSave, 1)
@@ -302,6 +305,51 @@ EVT_BEGIN(Tower_ChestEvt_3)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Tower_HandleRerolls)
+    DO(0)
+        IF_NOT_EQUAL((int32_t)GSW_Tower_DisplayChestIcons, 1)
+            DO_BREAK()
+        END_IF()
+        
+        USER_FUNC(evtTot_CheckReroll, LW(15))
+        IF_LARGE(LW(15), 0)
+            USER_FUNC(evt_mario_key_onoff, 0)
+            USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+            USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_MOBJ_ITEM_APPEAR1"), LW(0), LW(1), LW(2), 0)
+
+            // Spawn explosions above chests.
+            SET(LW(10), 4)
+            DO(LW(10))
+                SET(LW(11), 4)
+                SUB(LW(11), LW(10))
+                USER_FUNC(evtTot_GetChestData, LW(11), LW(0), LW(1), LW(2), LW(3), EVT_NULLPTR)
+                IF_EQUAL(LW(3), 0)
+                    DO_CONTINUE()
+                END_IF()
+                ADD(LW(1), 80)
+                ADD(LW(2), 5)
+                USER_FUNC(
+                    evt_eff, PTR(""), PTR("bomb"), 0, LW(0), LW(1), LW(2), FLOAT(1.0),
+                    0, 0, 0, 0, 0, 0, 0)
+            WHILE()
+
+            WAIT_MSEC(50)
+            IF_EQUAL(LW(15), 1)
+                // Reroll only if reroll option is enabled.
+                USER_FUNC(evtTot_GenerateChestContents)
+            END_IF()
+
+            WAIT_MSEC(700)
+
+            USER_FUNC(evt_mario_key_onoff, 1)
+        END_IF()
+
+        WAIT_FRM(1)
+    WHILE()
+
+    RETURN()
+EVT_END()
+
 // Runs when exiting a regular tower floor.
 EVT_BEGIN(Tower_IncrementFloor)
     // Check for whether the player left the room with chests accessible.
@@ -417,6 +465,9 @@ EVT_BEGIN(Tower_OpenGrate)
         USER_FUNC(evt_mario_key_onoff, 1)
     END_IF()
     SET((int32_t)GSW_Tower_DisplayChestIcons, 1)
+
+    RUN_EVT(Tower_HandleRerolls)
+
     RETURN()
 EVT_END()
 
@@ -1379,9 +1430,9 @@ EVT_END()
 
 // Main room initialization event.
 EVT_BEGIN(gon_01_InitEvt)
-    // Random unused bytes, used to track chest collection and icon display.
     SET((int32_t)GSW_Tower_ChestClaimed, 0)
     SET((int32_t)GSW_Tower_DisplayChestIcons, 0)
+    SET((int32_t)GSW_Tower_RevealUsedThisFloor, 0)
     // Flags to track chest / lock opening.
     SET((int32_t)GSWF_Chest_0, 0)
     SET((int32_t)GSWF_Chest_1, 0)
@@ -1568,6 +1619,30 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeKeyTable) {
     for (; index < 3; ++index)
         keys[index] = -1;
     evtSetValue(evt, evt->evtArguments[2], PTR(&keys[0]));
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_CheckReroll) {
+    int32_t result = 0;
+
+    uint32_t buttons = ttyd::system::keyGetButtonTrg(0);
+
+    if (g_Mod->state_.GetOption(STAT_RUN_CHEST_REROLLS) &&
+        (buttons & ButtonId::L) && !(buttons & ButtonId::A)) {
+            
+        if (g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REROLL_FIXED) ||
+            g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REROLL_REFILL)) {
+            g_Mod->state_.ChangeOption(STAT_RUN_CHEST_REROLLS, -1);
+            g_Mod->state_.ChangeOption(STAT_PERM_CHEST_REROLLS, 1);
+            result = 1;
+        } else if (!GetSWByte(GSW_Tower_RevealUsedThisFloor)) {
+            g_Mod->state_.ChangeOption(STAT_RUN_CHEST_REROLLS, -1);
+            g_Mod->state_.ChangeOption(STAT_PERM_CHEST_REROLLS, 1);
+            SetSWByte(GSW_Tower_RevealUsedThisFloor, 1);
+            result = 2;
+        }
+    }
+    evtSetValue(evt, evt->evtArguments[0], result);
     return 2;
 }
 

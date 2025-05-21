@@ -157,6 +157,8 @@ g_NewIconDefs = [
     [(714, 0)],
     # Question mark icon.
     [(715, 0)],
+    # Reroll item.
+    [(716, 0)],
 ]
 g_IconDefs = []
 

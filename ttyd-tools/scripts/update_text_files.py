@@ -1300,6 +1300,8 @@ g_GlobalStrings = {
     # Menu text
     
     b"tot_menu_spaceused":        b"Items",
+    b"tot_menu_rerolls":          b"Rerolls",
+    b"tot_menu_reveals":          b"Reveals",
     
     b"tot_winsel_titlemove":      b"Move",
     b"tot_winsel_whichunlock":    b"Which move?",
@@ -5696,7 +5698,7 @@ g_TowerLobbyStrings = {
         b'<kanban>\n'
         b'Seed: <col 0000ffff>\n'
         b'%09d\n</col>\n'
-        b'Options: <col 0000ffff>\n'
+        b'Opt.: <col 0000ffff>\n'
         b'%s\n</col>\n'
         b'<k>',
     

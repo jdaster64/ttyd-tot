@@ -123,13 +123,13 @@ const char* GetRunInfoSignString(bool floor, bool options) {
         y_offset += 27;
 
         const char* options = OptionsManager::GetEncodedOptions();
-        sprintf(temp, "Options: %s", options);
+        sprintf(temp, "Opt.: %s", options);
         width = ttyd::fontmgr::FontGetMessageWidth(temp);
         x_offset = base_x_offset - width * 0.5f;
 
         ptr += sprintf(ptr,
             "<pos %" PRId32 " %" PRId32 ">\n"
-            "Options: <col 0000ccff>\n"
+            "Opt.: <col 0000ccff>\n"
             "%s\n</col>\n", x_offset, y_offset, options);
     }
 

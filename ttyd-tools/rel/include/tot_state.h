@@ -585,7 +585,10 @@ enum Options : uint32_t {
     STAT_RUN_NPC_MERLON_DEALS   = 0x068'0'00'00,
     // Used to make sure midboss rerolls don't repeat immediately.
     STAT_RUN_MIDBOSSES_REROLLED = 0x069'0'01'04,
-    // Next: 0x06a
+    // Number of chest rerolls available.
+    STAT_RUN_CHEST_REROLLS      = 0x06a'0'00'00,
+    STAT_RUN_CHEST_MAX_REROLLS  = 0x06b'0'00'00,
+    // Next: 0x06c
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 
@@ -655,7 +658,9 @@ enum Options : uint32_t {
     // Custom move loadout.
     STAT_PERM_MOVE_LOADOUT      = 0x1bf'0'01'08,
     STAT_PERM_MOVE_LOAD_SIZE    = 0x1c1'1'00'00,
-    // Next: 0x1c2
+    // Rerolls used globally.
+    STAT_PERM_CHEST_REROLLS     = 0x1c2'7'00'00,
+    // Next: 0x1c3
 };
 
 }  // namespace mod::tot
