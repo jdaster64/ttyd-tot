@@ -330,8 +330,8 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         AchievementsManager::MarkCompleted(AchievementId::SECRET_DAMAGE);
     }
     
-    if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 1000) {
-        AchievementsManager::MarkCompleted(AchievementId::SECRET_INFATUATE);
+    if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 500) {
+        AchievementsManager::MarkCompleted(AchievementId::V3_RUN_INFATUATE);
     }
 
     // Achievements that require default settings.

@@ -4,6 +4,7 @@
 #include "mod.h"
 #include "tot_generate_enemy.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
 #include "tot_state.h"
@@ -31,6 +32,7 @@ namespace MsgKey {
         MENU_MONOSIRI_DERUTOKORO,
         MSG_STAR_PIECE,
         SYS_NO_KEY,
+        TOT_ACHD_89,
         TOT_FLOOR_SIGN,
         TOT_LOBBY_BACKSIGN,
         TOT_MOVELOG_DESC_DYN,
@@ -49,6 +51,7 @@ constexpr const char* kKeyLookups[] = {
     "menu_monosiri_derutokoro",
     "msg_star_piece",
     "sys_no_key",
+    "tot_achd_89",
     "tot_floor_sign",
     "tot_lobby_backsign",
     "tot_movelog_desc_dyn",
@@ -218,6 +221,14 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                 return ttyd::msgdrv::msgSearch("msg_star_piece_inhub");
             }
             break;
+        case MsgKey::TOT_ACHD_89: {
+            // TODO: Return a redacted string before beating B&K specifically.
+            if (!g_Mod->state_.GetOption(
+                FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
+                return "Defeat ????? & ?????\nsimultaneously.";
+            }
+            return nullptr;
+        }
         case MsgKey::TOT_FLOOR_SIGN: {
             return GetRunInfoSignString(
                 /* floor = */ true,

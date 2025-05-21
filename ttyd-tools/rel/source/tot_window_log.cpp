@@ -348,13 +348,13 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
     // Draw square drop shadows.
     for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         // Skip squares that don't have a visible shadow.
-        if (i % 10 < 8 && i / 10 < 5);
+        if (i % 10 < 8 && i / 10 < 7);
         // Skip drawing secret squares if not completed.
         if (states[i] != 2 && AchievementsManager::IsSecret(grid[i])) continue;
 
         gc::vec3 position = {
             win_x + 140.0f + 32.0f * (i % 10),
-            win_y - 9.0f - 32.0f * (i / 10),
+            win_y + 12.0f - 32.0f * (i / 10),
             0.0f
         };
         gc::vec3 scale = { 0.571429f, 0.571429f, 0.571429f };
@@ -375,7 +375,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
         }
         gc::vec3 position = {
             win_x + 136.0f + 32.0f * (i % 10),
-            win_y - 5.0f - 32.0f * (i / 10),
+            win_y + 16.0f - 32.0f * (i / 10),
             0.0f
         };
         gc::vec3 scale = { 0.571429f, 0.571429f, 0.571429f };
@@ -515,7 +515,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
 
         for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
             // Skip corners and already unlocked tiles.
-            if (i == 0 || i == 9 || i == 70 || i == 79) continue;
+            if (i == 0 || i == 9 || i == 80 || i == 89) continue;
             if (states[i] == 2) continue;
             // Skip tiles that are breakable, but not currently selected.
             if (!IsUnbreakable(i) && i != menu->achievement_log_cursor_idx)
@@ -524,7 +524,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             ttyd::win_main::winIconInit();
             gc::vec3 position = {
                 win_x + 136.0f + 32.0f * (i % 10),
-                win_y - 5.0f - 32.0f * (i / 10),
+                win_y + 12.0f - 32.0f * (i / 10),
                 0.0f
             };
             gc::vec3 scale = { 1.0f, 1.0f, 1.0f };
@@ -1050,7 +1050,7 @@ void DrawRecordsLog(WinPauseMenu* menu, float win_x, float win_y) {
                     for (int32_t i = 0; i < 128; ++i) {
                         count += state.GetOption(FLAGS_MIDBOSS_DEFEATED, i);
                     }
-                    sprintf(ptr, "%" PRId32, count);
+                    sprintf(ptr, "%" PRId32 " / 75", count);
                     break;
                 }
                 case STAT_PERM_MAX_INTENSITY: {
@@ -1855,8 +1855,8 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
             } else if (menu->dirs_repeated & DirectionInputId::ANALOG_DOWN) {
-                if (cursor != -1 && cursor < 70 && 
-                    !((cursor == 60 || cursor == 69) && !states[cursor + 10])) {
+                if (cursor != -1 && cursor < 80 && 
+                    !((cursor == 70 || cursor == 79) && !states[cursor + 10])) {
                     menu->achievement_log_cursor_idx += 10;
                     cursor = menu->achievement_log_cursor_idx;
                 }
@@ -1867,7 +1867,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     menu->achievement_log_cursor_idx = -1;
                     cursor = -1;
                 } else if (cursor % 10 > 0 && 
-                    !((cursor == 1 || cursor == 71) && !states[cursor - 1])) {
+                    !((cursor == 1 || cursor == 81) && !states[cursor - 1])) {
                     cursor = --menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
@@ -1876,7 +1876,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
                     menu->achievement_log_cursor_idx = 43;
                     cursor = 43;
                 } else if (cursor % 10 < 9 && 
-                    !((cursor == 8 || cursor == 78) && !states[cursor + 1])) {
+                    !((cursor == 8 || cursor == 88) && !states[cursor + 1])) {
                     cursor = ++menu->achievement_log_cursor_idx;
                 }
                 ttyd::pmario_sound::psndSFXOn((char *)0x20035);
@@ -1928,7 +1928,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
             if (cursor != -1) {
                 // Set cursor position based on selected entry.
                 menu->main_cursor_target_x = -70.0f + 32.0f * (cursor % 10);
-                menu->main_cursor_target_y = 125.0f - 32.0f * (cursor / 10);
+                menu->main_cursor_target_y = 146.0f - 32.0f * (cursor / 10);
             }
 
             break;
@@ -2196,7 +2196,7 @@ int32_t LogMenuMain(ttyd::win_root::WinPauseMenu* menu) {
 
             // Lock cursor position based on selected entry.
             menu->main_cursor_target_x = -70.0f + 32.0f * (cursor % 10);
-            menu->main_cursor_target_y = 125.0f - 32.0f * (cursor / 10);
+            menu->main_cursor_target_y = 146.0f - 32.0f * (cursor / 10);
             menu->main_cursor_x = menu->main_cursor_target_x;
             menu->main_cursor_y = menu->main_cursor_target_y;
 

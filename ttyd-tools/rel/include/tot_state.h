@@ -429,7 +429,7 @@ enum Options : uint32_t {
     OPT_NPC_CHOICE_4            = 0x440'4'00'09,
 
     // Determines whether the secret boss will appear.
-    // TODO: Add support for other bosses, once implemented.
+    // TODO: Add full support for other bosses, and "Equal chance" option.
     OPT_SECRET_BOSS             = 0x444'3'00'04,
     OPTVAL_SECRET_BOSS_RANDOM   = 0x544'3'00'00,
     OPTVAL_SECRET_BOSS_OFF      = 0x544'3'00'01,
@@ -450,13 +450,13 @@ enum Options : uint32_t {
     OPTVAL_RUN_AWAY_DEFAULT     = 0x54a'2'00'00,
     OPTVAL_RUN_AWAY_GUARANTEED  = 0x54a'2'00'01,
 
-    // Different options for how moves are offered.
-    // TODO: Move to a different starting bit, to allow for "forced" option.
-    OPT_MOVE_AVAILABILITY       = 0x44c'2'00'03,
-    OPTVAL_MOVES_DEFAULT        = 0x54c'2'00'00,
-    OPTVAL_MOVES_PARTNER_BONUS  = 0x54c'2'00'01,
-    OPTVAL_MOVES_RANDOM         = 0x54c'2'00'02,
-    OPTVAL_MOVES_CUSTOM         = 0x54c'2'00'03,
+    // Different options for what midbosses and midboss helpers can spawn.
+    // TODO: Add support.
+    OPT_MIDBOSSES               = 0x44c'2'00'03,
+    OPTVAL_MIDBOSSES_DEFAULT    = 0x54c'2'00'00,
+    OPTVAL_MIDBOSSES_RANDOM     = 0x54c'2'00'01,
+    OPTVAL_MIDBOSSES_MOB_TYPE   = 0x54c'2'00'02,
+    OPTVAL_MIDBOSSES_MOB_ANY    = 0x54c'2'00'03,
 
     // Number of moves of each type you can be offered.
     OPT_MOVE_LIMIT              = 0x44e'3'00'05,
@@ -471,9 +471,25 @@ enum Options : uint32_t {
     OPT_COUNTDOWN_TIMER         = 0x451'4'00'0b,
     OPTVAL_COUNTDOWN_OFF        = 0x451'4'00'00,
 
+    // Different options for how moves are offered.
+    OPT_MOVE_AVAILABILITY       = 0x455'3'00'04,
+    OPTVAL_MOVES_DEFAULT        = 0x555'3'00'00,
+    OPTVAL_MOVES_PARTNER_BONUS  = 0x555'3'00'01,
+    OPTVAL_MOVES_RANDOM         = 0x555'3'00'02,
+    OPTVAL_MOVES_FORCED         = 0x555'3'00'03,
+    OPTVAL_MOVES_CUSTOM         = 0x555'3'00'04,
+
+    // Whether chest rewards can be rerolled on the field.
+    // TODO: Add support.
+    OPT_CHEST_REROLLS           = 0x458'2'00'03,
+    OPT_CHEST_REROLLS_OFF       = 0x458'2'00'00,
+    OPT_CHEST_REROLLS_FIXED     = 0x458'2'00'01,
+    OPT_CHEST_REROLLS_FIXED_CAP = 0x458'2'00'02,
+    OPT_CHEST_REROLLS_META_CAP  = 0x458'2'00'03,
+
     // Whether to enable Merlee curses (not supported).
-    OPT_MERLEE_CURSE            = 0x455'1'00'01,
-    // Next: 0x456
+    OPT_MERLEE_CURSE            = 0x45a'1'00'01,
+    // Next: 0x45b
     
     // Internal options; are not automatically reset between runs.
     OPT_RUN_STARTED             = 0x4c0'1'00'01,

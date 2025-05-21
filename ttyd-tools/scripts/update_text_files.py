@@ -2297,7 +2297,7 @@ g_GlobalStrings = {
     b"tot_achd_61":
         b"100% complete the Moves log.",
     b"tot_achd_62":
-        b"Beat the secret final boss.",
+        b"Beat an alternate final boss.",
     b"tot_achd_63":
         b"Finish 10 tower runs across\n"
         b"all difficulty settings.",
@@ -2310,8 +2310,8 @@ g_GlobalStrings = {
         b"Spend exactly 417 coins in a\n"
         b"single tower run.",
     b"tot_achd_67":
-        b"Deal 1,000 or more damage with\n"
-        b"Infatuated foes in a tower run.",
+        b"Defeat Doopliss with Jumpman\n"
+        b"and Hammerman both equipped.",
     b"tot_achd_68":
         b"Finish a run with all of Mario's\n"
         b"stats at level 0.\n"
@@ -2356,6 +2356,36 @@ g_GlobalStrings = {
     b"tot_achd_79":
         b"Defeat a single type of enemy\n"
         b"at least 100 times.",
+    b"tot_achd_80":
+        b"Use Merlon to change midbosses\n"
+        b"10 times across all tower runs.",
+    b"tot_achd_81":
+        b"Take each type of chest reward\n"
+        b"5 times across all tower runs.",
+    b"tot_achd_82":
+        b"Defeat 7 or more unique enemy\n"
+        b"types in a single battle.",
+    b"tot_achd_83":
+        b"Beat a Random preset run\n"
+        b"at 200% Intensity or higher.",
+    b"tot_achd_84":
+        b"Defeat all 75 unique midbosses.\n"
+        b"",
+    b"tot_achd_85":
+        b"Finish a set of floors with all\n"
+        b"Grubba's bonus conditions met.",
+    b"tot_achd_86":
+        b"Deal 500 or more damage with\n"
+        b"Infatuated foes in a tower run.",
+    b"tot_achd_87":
+        b"Defeat all unique final bosses\n"
+        b"on EX difficulty.",
+    b"tot_achd_88":
+        b"Fill up a max-sized inventory\n"
+        b"with 20 items.",
+    b"tot_achd_89":
+        b"Defeat Bowser & Kammy Koopa\n"
+        b"simultaneously.",
     
     # Achievement menu option names.
     
@@ -2370,13 +2400,15 @@ g_GlobalStrings = {
     b"tot_acho_bandit":         b"Bandit Escape",
     b"tot_acho_invincrease":    b"S. Sack Size",
     b"tot_acho_obfuscated":     b"Obfuscated Items",
-    b"tot_acho_secretboss":     b"Secret Boss",
+    b"tot_acho_secretboss":     b"Final Boss",
     b"tot_acho_infinitebp":     b"BP: Infinite",
     b"tot_acho_customloadout":  b"Items: Custom",
     b"tot_acho_movea":          b"Move Availability",
     b"tot_acho_movel":          b"Move Limit",
     b"tot_acho_runaway":        b"Run Away Chance",
     b"tot_acho_stageh":         b"Stage Hazards",
+    b"tot_acho_midboss":        b"Midbosses",
+    b"tot_acho_rerolls":        b"Chest Rerolls",
     
     b"tot_ach_usehammer":
         b"Use a Hammer to unlock an\n"
@@ -2667,7 +2699,7 @@ g_GlobalStrings = {
         b"Industrial colors that call back\n"
         b"to Mario's days doing odd jobs.",
     b"tot_cos1_31_h":
-        b"One-third the colors, three times\n"
+        b"One-third the color, three times\n"
         b"the eye strain!",
         
     b"tot_cos2_01_h":

@@ -36,7 +36,7 @@ using ::ttyd::evtmgr_cmd::evtSetValue;
 namespace ItemType = ::ttyd::item_data::ItemType;
 
 const int32_t kEarliestSupportedVersion = 10;
-const int32_t kCurrentVersion = 11;
+const int32_t kCurrentVersion = 12;
 
 // Holds backup save data (updated on floor 0 and after every boss floor).
 TotSaveSlot g_BackupSave;
@@ -224,6 +224,57 @@ bool StateManager::Load(TotSaveSlot* save) {
         AchievementsManager::CheckCompleted(AchievementId::V2_AGG_RUN_AWAY_30);
         // As well as achievements that've been retroactively made easier.
         AchievementsManager::CheckCompleted(AchievementId::META_TATTLE_LOG_50);
+
+        // Re-run special file setup to collect new achievements, options, etc.
+        DebugManager::SpecialFileSetup();
+    }
+
+    if (previous_version <= 11) {
+        // OPT_MOVE_AVAILABILITY got moved and now supports more options;
+        // migrate the option and set its replacement to default.
+        switch (GetOption(OPT_MIDBOSSES)) {
+            case 0: SetOption(OPTVAL_MOVES_DEFAULT);        break;
+            case 1: SetOption(OPTVAL_MOVES_PARTNER_BONUS);  break;
+            case 2: SetOption(OPTVAL_MOVES_RANDOM);         break;
+            case 3: SetOption(OPTVAL_MOVES_CUSTOM);         break;
+        }
+        SetOption(OPTVAL_MIDBOSSES_DEFAULT);
+
+        // Previously secret achievement got moved to a new id.
+        if (GetOption(FLAGS_ACHIEVEMENT, AchievementId::SECRET_BADGE_COMBO)) {
+            AchievementsManager::MarkCompleted(AchievementId::V3_RUN_INFATUATE);
+        }
+
+        // Revert achievements that are no longer true.
+        const int32_t kRevertAch[] = {
+            AchievementId::SECRET_BADGE_COMBO,
+            AchievementId::META_ALL_OPTIONS,
+            AchievementId::META_ALL_ACHIEVEMENTS,
+        };
+        for (const auto& ach : kRevertAch) {
+            achievement_flags_[ach / 0x20] &= ~(1 << (ach % 0x20));
+
+            // Also unequip respective costumes for Mario / Yoshi.
+            const auto* data = AchievementsManager::GetData(ach);
+            switch (data->reward_type) {
+                case AchievementRewardType::MARIO_COSTUME: {
+                    int32_t costume_id = data->reward_id - 1;
+                    if (GetSWByte(GSW_MarioCostume) == costume_id) {
+                        SetSWByte(GSW_MarioCostume, 0);
+                    }
+                    break;
+                }
+                case AchievementRewardType::YOSHI_COSTUME: {
+                    int32_t costume_id = data->reward_id - 1;
+                    if (GetSWF(GSWF_YoshiColors + costume_id)) {
+                        SetSWF(GSWF_YoshiColors + costume_id, 0);
+                    }
+                    break;
+                }
+            }
+        }
+
+        // TODO: Check if automatically eligible for new aggregate achievements...
 
         // Re-run special file setup to collect new achievements, options, etc.
         DebugManager::SpecialFileSetup();

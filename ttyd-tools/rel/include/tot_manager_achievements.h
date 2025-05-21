@@ -81,7 +81,7 @@ namespace AchievementId {
         META_ALL_ACHIEVEMENTS,
 
         SECRET_COINS,
-        SECRET_INFATUATE,
+        SECRET_BADGE_COMBO,
         SECRET_ZERO_STATS_3,
         SECRET_DAMAGE,
 
@@ -96,6 +96,18 @@ namespace AchievementId {
         V2_MISC_SP_TURN1,
         V2_RUN_COUNTDOWN_50,
         V2_AGG_ENEMY_TIMES_100,
+
+        // Added in 3.0.
+        V3_AGG_MERLON_10,
+        V3_AGG_REWARD_5_EACH,
+        V3_RUN_DEFEAT_7_TYPES,
+        V3_RUN_RANDOM_INTENSITY,
+        V3_AGG_MIDBOSS_TYPES_ALL,
+        V3_RUN_GRUBBA,
+        V3_RUN_INFATUATE,
+        V3_AGG_BOSS_ALL_EX,
+        V3_RUN_ITEMS_FULL,
+        V3_RUN_BOSS_SIMULTANEOUS,
 
         MAX_ACHIEVEMENT,
     };

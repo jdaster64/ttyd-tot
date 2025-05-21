@@ -452,6 +452,9 @@ const CosmeticGroupData g_MarioCostumeGroupData[] = {
     { IconType::MARIO_COSTUME_ICONS + 25,   "tot_cos1_26" },
     { IconType::MARIO_COSTUME_26,           "tot_cos1_27" },
     { IconType::MARIO_COSTUME_27,           "tot_cos1_28" },
+    { IconType::MARIO_COSTUME_28,           "tot_cos1_29" },
+    { IconType::MARIO_COSTUME_29,           "tot_cos1_30" },
+    { IconType::MARIO_COSTUME_30,           "tot_cos1_31" },
 };
 
 const MarioCostumeData g_MarioCostumeData[] = {

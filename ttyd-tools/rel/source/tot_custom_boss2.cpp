@@ -1742,7 +1742,8 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
     memset(&unit->badges_equipped, 0, sizeof(ttyd::battle_unit::BadgesEquipped));
     if (unit->current_kind != BattleUnitType::DOOPLISS_CH_8) {
         auto* pouch = ttyd::mario_pouch::pouchGetPtr();
-        uint32_t equip_flags = unit->current_kind == BattleUnitType::MARIO ? 2 : 4;
+        uint32_t equip_flags = 
+            unit->current_kind == BattleUnitType::DOOPLISS_CH_8_FAKE_MARIO ? 2 : 4;
         for (int32_t i = 0; i < 200; ++i) {
             ttyd::battle::_EquipItem(unit, equip_flags, pouch->equipped_badges[i]);
         }

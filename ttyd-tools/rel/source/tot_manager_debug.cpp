@@ -165,7 +165,7 @@ void _PurchaseAllItems() {
 }
 
 void _UnlockAchievements(bool secret) {
-    for (int32_t i = 0; i <= AchievementId::MAX_ACHIEVEMENT; ++i) {
+    for (int32_t i = 0; i < AchievementId::MAX_ACHIEVEMENT; ++i) {
         if (!AchievementsManager::IsSecret(i) || secret) {
             AchievementsManager::MarkCompleted(i);
         }
