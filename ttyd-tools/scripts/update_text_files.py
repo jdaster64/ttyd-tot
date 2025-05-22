@@ -5986,6 +5986,11 @@ g_TowerStrings = {
         b"in exchange for a Shine Sprite.\n<k>\n<p>\n"
         b"The adjustment fee will be\n"
         b"%d coins. <wait 200>Deal?\n<o>",
+    
+    b"tot_chet_confirm_free":
+        b"Your %s, eh? <wait 150>All right,\n"
+        b"it'll fall from level %d to %d\n"
+        b"for a Shine Sprite. Deal?\n<o>",
         
     b"tot_chet_decline":
         b"<p>\nThen get outta here!\n<k>",

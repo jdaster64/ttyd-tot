@@ -19,6 +19,7 @@
 #include <ttyd/evt_mario.h>
 #include <ttyd/evt_msg.h>
 #include <ttyd/evt_npc.h>
+#include <ttyd/evt_party.h>
 #include <ttyd/evt_pouch.h>
 #include <ttyd/evt_shop.h>
 #include <ttyd/evt_snd.h>
@@ -48,6 +49,7 @@ using namespace ::ttyd::evt_item;
 using namespace ::ttyd::evt_mario;
 using namespace ::ttyd::evt_msg;
 using namespace ::ttyd::evt_npc;
+using namespace ::ttyd::evt_party;
 using namespace ::ttyd::evt_pouch;
 using namespace ::ttyd::evt_shop;
 using namespace ::ttyd::evt_snd;
@@ -574,6 +576,51 @@ LBL(0)
         GOTO(99)
     END_IF()
 
+    USER_FUNC(
+        evt_msg_print_insert, 0, PTR("tot_chet_confirm_free"), 0, PTR("me"), 
+        LW(2), LW(3), LW(4))
+
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_different"))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        GOTO(0)
+    END_IF()    
+    
+    USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_LEVELS_SOLD, 1)
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::CHET_RIPPO)
+    WAIT_MSEC(200)
+
+    // Visual effects from Trial Stew.
+
+    IF_EQUAL(LW(1), 2)
+        // If decreasing partner HP.
+        USER_FUNC(evt_party_get_pos, 0, LW(10), LW(11), LW(12))
+    ELSE()
+        USER_FUNC(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+    END_IF()
+    ADD(LW(11), 18)
+    ADD(LW(12), 10)
+
+    USER_FUNC(evt_eff, 0, PTR("charge"), 1, LW(10), LW(11), LW(12), FLOAT(1.00), 120, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_ITEM_COOK_LAST1"), LW(10), LW(11), LW(12), 0)
+    USER_FUNC(evt_eff, 0, PTR("mist"), 6, LW(10), LW(11), LW(12), 0, 180, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_ITEM_COOK_LAST1"), LW(10), LW(11), LW(12), LW(13))
+    WAIT_MSEC(2000)
+    USER_FUNC(evt_snd_sfxoff, LW(13))
+    USER_FUNC(evt_eff, 0, PTR("indirect"), 0, LW(10), LW(11), LW(12), 60, 0, 0, 0, 0, 0, 0, 0)
+    SET(LW(13), 4)
+    DO(LW(13))
+        SET(LW(14), 4)
+        SUB(LW(14), LW(13))
+        USER_FUNC(evt_eff, 0, PTR("hit"), LW(14), LW(10), LW(11), LW(12), FLOAT(1.00), 3, 0, 0, 0, 0, 0, 0)
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_ITEM_COOK_LAST3"), LW(10), LW(11), LW(12), 0)
+        WAIT_MSEC(250)
+    WHILE()
+    WAIT_MSEC(750)
+
+    // Dummied out: no longer costs coins to use.
+    /*
     USER_FUNC(evt_win_coin_on, 0, LW(8))
     USER_FUNC(evtTot_GetChetCost, LW(5))
     USER_FUNC(
@@ -601,6 +648,7 @@ LBL(0)
     USER_FUNC(evt_win_coin_wait, LW(8))
     WAIT_MSEC(200)
     USER_FUNC(evt_win_coin_off, LW(8))
+    */
 
     USER_FUNC(evtTot_DowngradeStat, LW(1))
     USER_FUNC(evtTot_CheckCompletedAchievement,
@@ -1103,7 +1151,31 @@ LBL(10)
     USER_FUNC(evt_msg_print, 0, PTR("tot_merlon_confirm_2"), 0, PTR("me"))
     WAIT_MSEC(250)
 
-    // TODO: spell animation.
+    USER_FUNC(evt_npc_get_position, PTR("me"), LW(10), LW(11), LW(12))
+    BROTHER_EVT()
+        WAIT_MSEC(250)
+        DO(4)
+            USER_FUNC(
+                evt_snd_sfxon_3d, PTR("SFX_STG8_STAR_LIGHTUP2"), 
+                LW(0), LW(1), LW(2), 0)
+            WAIT_MSEC(750)
+        WHILE()
+    END_BROTHER()
+
+    SET(LW(13), LW(11))
+    ADDF(LW(13), FLOAT(18.0))
+    USER_FUNC(
+        evt_eff64, PTR("effc"), PTR("pokopi_pcharge_n64"), 2,
+        LW(10), LW(13), LW(12), FLOAT(1.00), -1, 0, 0, 0, 0, 0, 0)
+    WAIT_MSEC(2500)
+    ADDF(LW(11), FLOAT(18.0))
+    ADDF(LW(12), FLOAT(5.0))
+    USER_FUNC(
+        evt_eff, PTR(""), PTR("stardust"), 0,
+        LW(10), LW(11), LW(12), 50, 50, 20, 120, 0, 0, 0, 0)
+    WAIT_MSEC(200)
+    USER_FUNC(evt_eff_softdelete, PTR("effc"))
+    WAIT_MSEC(550)
 
     USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::MERLON)
     USER_FUNC(evtTot_GetNextMidbossName, LW(6))
