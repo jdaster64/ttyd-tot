@@ -5431,6 +5431,7 @@ g_TowerLobbyStrings = {
     b"tot_optr_npc_grubba":         b"Grubba",
     b"tot_optr_npc_mover":          b"Mover",
     b"tot_optr_npc_zess":           b"Zess T.",
+    b"tot_optr_npc_merlon":         b"Merlon",
     b"tot_optr_npc_random":         b"Random",
     b"tot_optr_npc_none":           b"None",
     b"tot_optr_chests":             b"No. of Chests",
@@ -5620,6 +5621,10 @@ g_TowerLobbyStrings = {
     b"tot_opth_npc_zess":
         b"She'll use her cooking skills to\n"
         b"turn your items into rarer ones.",
+        
+    b"tot_opth_npc_merlon":
+        b"He can tell which midboss you'll\n"
+        b"face next, or even change it!",
     
     b"tot_opth_chests":
         b"How many chests there are to\n"
@@ -5800,6 +5805,18 @@ g_TowerStrings = {
         b"She can also make signature\n"
         b"dishes with rarer items, and\n"
         b"maybe even wilder stuff!\n<k>",
+        
+    b"npc_merlon":
+        b"<keyxon>\nThat's Merlon, the magician.\n"
+        b"<dkey><wait 300></dkey>\n"
+        b"His future sight can tell us which\n"
+        b"midboss we'll fight next. <wait 150>Cool!\n<k>\n<p>\n"
+        b"For a few coins, he can alter\n"
+        b"the future, and make different\n"
+        b"midbosses show up instead!\n<k>\n<p>\n"
+        b"I wish we could get some small\n"
+        b"fry to fight, personally,<wait 150> but\n"
+        b"fate can't control everything!\n<k>",
     
     # NPC text.
     
@@ -6201,6 +6218,46 @@ g_TowerStrings = {
         b"magic, Contact Crusher!\n<k>\n<p>\n"
         b"Okay, admittedly that one\n"
         b"was a bit on the nose...\n<k>",
+        
+    b"tot_merlon_intro":
+        b"Welcome! <wait 250>You can call me\n"
+        b"Merlon, the super-magician.\n"
+        b"<wait 250>I foresaw your arrival.\n<k>\n<p>\n"
+        b"I can see that the next floor\n"
+        b"holds a formidable foe.<wait 250> Indeed,\n"
+        b"you will face %s.\n<k>\n<p>\n"
+        b"Of course, if you'd prefer,\n"
+        b"your fate might be swayed, if\n"
+        b"you could spare a bit of coin...\n<o>",
+
+    b"tot_merlon_intro_short":
+        b"Your next fight will be against\n"
+        b"%s. <wait 200>Unless you\n"
+        b"wish for another destiny...\n<o>",
+
+    b"tot_merlon_offer":
+        b"<p>\nThe fee will be %d coins.\n"
+        b"<wait 250>Do you find this agreeable?\n<o>",
+
+    b"tot_merlon_confirm_1":
+        b"<p>\nIt shall be done!\n<k>",
+
+    b"tot_merlon_confirm_2":
+        b"<dynamic 3><scale 2><shake><wave>\n"
+        b"SHA-POW!\n<k>",
+
+    b"tot_merlon_confirm_final":
+        b"Success! Your next foe shall\n"
+        b"now be %s.\n"
+        b"<wait 250>Shall I alter your fate again?\n<o>",
+
+    b"tot_merlon_nocoins":
+        b"<p>\nYou don't have enough coins!\n"
+        b"<wait 250>Begone! <wait 250>Our paths will cross\n"
+        b"again when you are ready.\n<k>",
+
+    b"tot_merlon_decline":
+        b"<p>\nThen you may go!\n<k>",
         
     # NPC-related menu / help text.
     

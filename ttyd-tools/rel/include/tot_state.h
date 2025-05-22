@@ -425,10 +425,10 @@ enum Options : uint32_t {
     OPTVAL_CHARLIETON_LIMITED   = 0x532'2'00'03,
 
     // Select which NPCs appear in a run, either specific ones, random or none.
-    OPT_NPC_CHOICE_1            = 0x434'4'00'09,
-    OPT_NPC_CHOICE_2            = 0x438'4'00'09,
-    OPT_NPC_CHOICE_3            = 0x43c'4'00'09,
-    OPT_NPC_CHOICE_4            = 0x440'4'00'09,
+    OPT_NPC_CHOICE_1            = 0x434'4'00'0a,
+    OPT_NPC_CHOICE_2            = 0x438'4'00'0a,
+    OPT_NPC_CHOICE_3            = 0x43c'4'00'0a,
+    OPT_NPC_CHOICE_4            = 0x440'4'00'0a,
 
     // Determines whether the secret boss will appear.
     // TODO: Add full support for other bosses, and "Equal chance" option.
@@ -582,13 +582,17 @@ enum Options : uint32_t {
     STAT_RUN_HAMMERMAN_FAILED   = 0x065'4'00'00,
     STAT_RUN_NPC_WONKY_FLOOR    = 0x066'3'00'00,
     STAT_RUN_NPC_WONKY_TRADES   = 0x067'0'00'00,
+    // Track number of uses per run, as well as a combo per floor
+    // to discourage repeated rerolls on one floor.
     STAT_RUN_NPC_MERLON_DEALS   = 0x068'0'00'00,
-    // Used to make sure midboss rerolls don't repeat immediately.
-    STAT_RUN_MIDBOSSES_REROLLED = 0x069'0'01'04,
+    STAT_RUN_NPC_MERLON_COMBO   = 0x069'0'00'00,
+    STAT_RUN_NPC_MERLON_FLOOR   = 0x06a'0'00'00,
+    // Circular queue of last few replaced bosses, to make them repeat less.
+    STAT_RUN_MIDBOSSES_REROLLED = 0x06b'0'01'04,
     // Number of chest rerolls available.
-    STAT_RUN_CHEST_REROLLS      = 0x06a'0'00'00,
-    STAT_RUN_CHEST_MAX_REROLLS  = 0x06b'0'00'00,
-    // Next: 0x06c
+    STAT_RUN_CHEST_REROLLS      = 0x06c'0'00'00,
+    STAT_RUN_CHEST_MAX_REROLLS  = 0x06d'0'00'00,
+    // Next: 0x06e
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 
@@ -660,7 +664,8 @@ enum Options : uint32_t {
     STAT_PERM_MOVE_LOAD_SIZE    = 0x1c1'1'00'00,
     // Rerolls used globally.
     STAT_PERM_CHEST_REROLLS     = 0x1c2'7'00'00,
-    // Next: 0x1c3
+    STAT_PERM_NPC_MERLON_DEALS  = 0x1c3'7'00'00,
+    // Next: 0x1c4
 };
 
 }  // namespace mod::tot

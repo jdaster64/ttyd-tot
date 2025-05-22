@@ -1433,6 +1433,7 @@ EVT_BEGIN(gon_01_InitEvt)
     SET((int32_t)GSW_Tower_ChestClaimed, 0)
     SET((int32_t)GSW_Tower_DisplayChestIcons, 0)
     SET((int32_t)GSW_Tower_RevealUsedThisFloor, 0)
+    SET((int32_t)GSW_Tower_NpcTalkedThisFloor, 0)
     // Flags to track chest / lock opening.
     SET((int32_t)GSWF_Chest_0, 0)
     SET((int32_t)GSWF_Chest_1, 0)

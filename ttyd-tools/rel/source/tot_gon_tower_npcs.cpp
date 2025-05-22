@@ -2,7 +2,9 @@
 
 #include "evt_cmd.h"
 #include "mod.h"
+#include "tot_generate_enemy.h"
 #include "tot_generate_item.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_options.h"
 #include "tot_manager_reward.h"
@@ -10,6 +12,7 @@
 #include "tot_state.h"
 #include "tot_window_select.h"
 
+#include <ttyd/battle_monosiri.h>
 #include <ttyd/evt_badgeshop.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_item.h>
@@ -75,6 +78,7 @@ namespace SecondaryNpcType {
         GRUBBA,
         MOVER,
         ZESS_T,
+        MERLON,
         
         NUM_NPC_TYPES,
         // Used for interpreting run options.
@@ -250,6 +254,8 @@ EVT_DECLARE_USER_FUNC(evtTot_GetWonkyTrades, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetMoverCost, 2)
 EVT_DECLARE_USER_FUNC(evtTot_GetLumpyInfo, 2)
 EVT_DECLARE_USER_FUNC(evtTot_ReturnLumpy, 0)
+EVT_DECLARE_USER_FUNC(evtTot_GetMerlonCost, 1)
+EVT_DECLARE_USER_FUNC(evtTot_GetNextMidbossName, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetRecipeOptionsString, 2)
 EVT_DECLARE_USER_FUNC(evtTot_GetSelectedRecipeMode, 3)
 EVT_DECLARE_USER_FUNC(evtTot_AddIngredient, 1)
@@ -1044,6 +1050,79 @@ LBL(99)
     RETURN()
 EVT_END()
 
+// Talk script for Merlon.
+EVT_BEGIN(TowerNpc_MerlonTalk)
+    USER_FUNC(evt_mario_key_onoff, 0)
+
+    USER_FUNC(evtTot_GetNextMidbossName, LW(6))
+
+    IF_EQUAL((int32_t)GSW_Tower_NpcTalkedThisFloor, 0)
+        USER_FUNC(
+            evt_msg_print_insert,
+            0, PTR("tot_merlon_intro"), 0, PTR("me"), LW(6))
+        SET((int32_t)GSW_Tower_NpcTalkedThisFloor, 1)
+    ELSE()
+        USER_FUNC(
+            evt_msg_print_insert,
+            0, PTR("tot_merlon_intro_short"), 0, PTR("me"), LW(6))
+    END_IF()
+
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_merlon_decline"))
+        GOTO(99)
+    END_IF()
+
+LBL(10)
+    USER_FUNC(evtTot_GetMerlonCost, LW(5))
+
+    USER_FUNC(evt_win_coin_on, 0, LW(8))
+    USER_FUNC(evt_msg_print_add_insert, 0, PTR("tot_merlon_offer"), LW(5))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_win_coin_off, LW(8))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_merlon_decline"))
+        GOTO(99)
+    END_IF()
+
+    USER_FUNC(evt_pouch_get_coin, LW(0))
+    IF_SMALL(LW(0), LW(5))
+        USER_FUNC(evt_win_coin_off, LW(8))
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_merlon_nocoins"))
+        GOTO(99)
+    END_IF()
+    
+    MUL(LW(5), -1)
+    USER_FUNC(evt_pouch_add_coin, LW(5))
+    USER_FUNC(evt_win_coin_wait, LW(8))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_win_coin_off, LW(8))
+
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_merlon_confirm_1"))
+    WAIT_MSEC(250)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_merlon_confirm_2"), 0, PTR("me"))
+    WAIT_MSEC(250)
+
+    // TODO: spell animation.
+
+    USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::MERLON)
+    USER_FUNC(evtTot_GetNextMidbossName, LW(6))
+    USER_FUNC(
+        evt_msg_print_insert,
+        0, PTR("tot_merlon_confirm_final"), 0, PTR("me"), LW(6))
+
+    USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
+    IF_EQUAL(LW(0), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_merlon_decline"))
+        GOTO(99)
+    END_IF()
+    GOTO(10)
+
+LBL(99)
+    USER_FUNC(evt_mario_key_onoff, 1)
+    RETURN()
+EVT_END()
+
 int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::WONKY,
     NpcTribeType::DAZZLE,
@@ -1053,6 +1132,7 @@ int32_t g_SecondaryNpcTribeIndices[SecondaryNpcType::NUM_NPC_TYPES] = {
     NpcTribeType::GRUBBA,
     NpcTribeType::MOVER,
     NpcTribeType::ZESS_T,
+    NpcTribeType::MERLON,
 };
 
 NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
@@ -1118,6 +1198,14 @@ NpcSetupInfo g_SecondaryNpcTemplates[SecondaryNpcType::NUM_NPC_TYPES] = {
         .initEvtCode = nullptr,
         .regularEvtCode = nullptr,
         .talkEvtCode = (void*)TowerNpc_ZessTalk,
+        .battleInfoId = -1,
+    },
+    {
+        .name = "npc_merlon",
+        .flags = 0x1000'0600,
+        .initEvtCode = nullptr,
+        .regularEvtCode = nullptr,
+        .talkEvtCode = (void*)TowerNpc_MerlonTalk,
         .battleInfoId = -1,
     },
 };
@@ -1332,6 +1420,49 @@ EVT_DEFINE_USER_FUNC(evtTot_ReturnLumpy) {
     g_Mod->state_.SetOption(STAT_RUN_NPC_LUMPY_COINS, 0);
 
     AchievementsManager::CheckCompleted(AchievementId::MISC_LUMPY_DOUBLE_2);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetMerlonCost) {
+    if (g_Mod->state_.GetOption(STAT_RUN_NPC_MERLON_FLOOR) 
+        != g_Mod->state_.floor_) {
+        g_Mod->state_.SetOption(STAT_RUN_NPC_MERLON_COMBO, 0);
+    }
+
+    int32_t price = 100 + 50 * g_Mod->state_.GetOption(STAT_RUN_NPC_MERLON_COMBO);
+    evtSetValue(evt, evt->evtArguments[0], price * GetBuyPriceScale() / 100);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetNextMidbossName) {
+    static char buf[32];
+    buf[0] = '\0';
+
+    int32_t midboss_id =
+        g_Mod->state_.GetOption(STAT_RUN_MIDBOSSES_USED, g_Mod->state_.floor_ / 8);
+
+    if (midboss_id > 0) {
+        const char* name_lookup =
+            ttyd::battle_monosiri::battleGetUnitMonosiriPtr(midboss_id)->unit_name;
+        if (name_lookup) {
+            const char* name = ttyd::msgdrv::msgSearch(name_lookup);
+            switch (name[0]) {
+                case 'A':
+                case 'E':
+                case 'I':
+                case 'O':
+                case 'U':
+                case 'X':   // X-Naut, X-Yux, etc.
+                    sprintf(buf, "%s %s", "an", name);
+                    break;
+                default:
+                    sprintf(buf, "%s %s", "a", name);
+                    break;
+            }
+        }
+    }
+
+    evtSetValue(evt, evt->evtArguments[0], PTR(buf));
     return 2;
 }
 
@@ -1633,6 +1764,17 @@ EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
             state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;
         }
+        case SecondaryNpcType::MERLON: {
+            SelectMidboss(g_Mod->state_.floor_ + 1, /* reroll */ true);
+
+            state.ChangeOption(STAT_RUN_NPC_MERLON_DEALS, 1);
+            state.ChangeOption(STAT_RUN_NPC_MERLON_COMBO, 1);
+            state.SetOption(STAT_RUN_NPC_MERLON_FLOOR, state.floor_);
+            
+            state.ChangeOption(STAT_PERM_NPC_MERLON_DEALS, 1);
+            state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
+            break;
+        }
     }
     // Set flag for having dealt with an NPC on each floor.
     state.SetOption(STAT_RUN_NPCS_DEALT_WITH, 1, floor / 8);
@@ -1684,10 +1826,10 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
 
     // Base weights for each NPC, and how much to reduce them per appearance.
     int32_t base_weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = {
-        12, 12, 10, 15, 10, 10, 10, 10, 0
+        12, 12, 10, 15, 10, 10, 10, 10, 10, 0
     };
     int32_t sub_weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = {
-        3, 3, 2, 5, 2, 2, 2, 2, 0 
+        3, 3, 2, 5, 2, 2, 2, 2, 2, 0 
     };
     // Active weights for each NPC.
     int32_t weights[SecondaryNpcType::NUM_NPC_TYPES + 1] = { 0 };
@@ -1790,6 +1932,7 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
         case SecondaryNpcType::DOOPLISS:
         case SecondaryNpcType::GRUBBA:
         case SecondaryNpcType::MOVER:
+        case SecondaryNpcType::MERLON:
             npc_pool[kNumRestFloors - 1] = SecondaryNpcType::NONE;
             break;
         case SecondaryNpcType::LUMPY:
@@ -1797,6 +1940,10 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
                 npc_pool[kNumRestFloors - 1] = SecondaryNpcType::NONE;
             }
             break;
+    }
+    // Merlon also can't help w/ the minor boss floor (32) in full-length runs.
+    if (npc_pool[3] == SecondaryNpcType::MERLON) {
+        npc_pool[3] = SecondaryNpcType::NONE;
     }
 
     // Assign NPCs.
@@ -1844,6 +1991,10 @@ void GetNpcMsgs(int32_t type, const char** out_name, const char** out_help) {
         case SecondaryNpcType::ZESS_T:
             if (out_name) *out_name = "tot_optr_npc_zess";
             if (out_help) *out_help = "tot_opth_npc_zess";
+            break;
+        case SecondaryNpcType::MERLON:
+            if (out_name) *out_name = "tot_optr_npc_merlon";
+            if (out_help) *out_help = "tot_opth_npc_merlon";
             break;
         case SecondaryNpcType::CHOICE_RANDOM:
             if (out_name) *out_name = "tot_optr_npc_random";

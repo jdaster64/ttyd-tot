@@ -22,6 +22,7 @@ enum GlobalWorkVars {
     GSW_CountdownTimerState,
     GSW_Battle_DooplissMove,
     GSW_Tower_RevealUsedThisFloor,
+    GSW_Tower_NpcTalkedThisFloor,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),

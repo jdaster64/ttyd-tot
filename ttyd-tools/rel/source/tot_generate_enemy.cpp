@@ -1281,9 +1281,6 @@ void SelectMidboss(int32_t floor, bool reroll) {
             state.GetOption(STAT_RUN_MIDBOSSES_USED, boss_num);
         state.SetOption(
             STAT_RUN_MIDBOSSES_REROLLED, prev_midboss, reroll_count % 4);
-
-        // TODO: Figure out whether to track this here or elsewhere.
-        // state.ChangeOption(STAT_RUN_NPC_MERLON_DEALS, 1);
     }
     state.SetOption(STAT_RUN_MIDBOSSES_USED, enemy_type, boss_num);
 }
