@@ -155,7 +155,7 @@ int32_t TypeSortOrderComparator(int16_t* lhs, int16_t* rhs) {
     return left_sort - right_sort;
 }
 
-int16_t g_CharlietonInventory[20 + 1] = { -1 };
+int16_t g_CharlietonInventory[20] = { -1 };
 
 int16_t* GetCharlietonInventoryPtr() {
     return g_CharlietonInventory;

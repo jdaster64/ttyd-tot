@@ -582,6 +582,18 @@ void ApplyFixedPatches() {
     itemDataTable[ItemType::TOT_MASTER_KEY].sell_price = 50;
     itemDataTable[ItemType::TOT_MASTER_KEY].icon_id = IconType::STATION_KEY;
 
+    // Placeholder items used for restocking rerolls / reveals.
+    itemDataTable[ItemType::TOT_REROLL_ITEM].name = "in_rerollitem";
+    itemDataTable[ItemType::TOT_REROLL_ITEM].description = "msg_rerollitem";
+    itemDataTable[ItemType::TOT_REROLL_ITEM].menu_description = "msg_rerollitem";
+    itemDataTable[ItemType::TOT_REROLL_ITEM].icon_id = IconType::TOT_REROLL_ICON;
+    itemDataTable[ItemType::TOT_REROLL_ITEM].buy_price = 80;
+    itemDataTable[ItemType::TOT_REVEAL_ITEM].name = "in_revealitem";
+    itemDataTable[ItemType::TOT_REVEAL_ITEM].description = "msg_revealitem";
+    itemDataTable[ItemType::TOT_REVEAL_ITEM].menu_description = "msg_revealitem";
+    itemDataTable[ItemType::TOT_REVEAL_ITEM].icon_id = IconType::TOT_REVEAL_ICON;
+    itemDataTable[ItemType::TOT_REVEAL_ITEM].buy_price = 40;
+
     // Key items...
 
     itemDataTable[ItemType::TOT_KEY_PEEKABOO].name = "in_HP_mieru";

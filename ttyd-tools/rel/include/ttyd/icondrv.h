@@ -632,7 +632,8 @@ namespace IconType {
         YOSHI_COSTUME_28_HUD,
         YOSHI_COSTUME_29_HUD,
         TOT_QUESTION_MARK,
-        TOT_REROLL_ITEM,
+        TOT_REROLL_ICON,
+        TOT_REVEAL_ICON,
     };
 }
 

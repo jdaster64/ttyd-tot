@@ -800,6 +800,11 @@ bool RewardManager::HandleRewardItemPickup(int32_t item_type) {
             MoveManager::UpgradeMove(move);
             return true;
         }
+        case ItemType::TOT_REROLL_ITEM: 
+        case ItemType::TOT_REVEAL_ITEM: {
+            g_Mod->state_.ChangeOption(STAT_RUN_CHEST_REROLLS);
+            return true;
+        }
         default:
             return false;
     }

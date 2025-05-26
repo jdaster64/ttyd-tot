@@ -247,6 +247,7 @@ int32_t g_RecipeModes[3];
 // Declarations for USER_FUNCs.
 EVT_DECLARE_USER_FUNC(evtTot_SelectCharlietonItems, 0)
 EVT_DECLARE_USER_FUNC(evtTot_CheckCharlietonSoldOut, 1)
+EVT_DECLARE_USER_FUNC(evtTot_CheckMaxRerolls, 1)
 EVT_DECLARE_USER_FUNC(evtTot_TrackNpcAction, 2)
 EVT_DECLARE_USER_FUNC(evtTot_CheckAnyStatsDowngradeable, 1)
 EVT_DECLARE_USER_FUNC(evtTot_DowngradeStat, 1)
@@ -324,13 +325,27 @@ EVT_BEGIN(TowerNpc_CharlietonTalk)
     USER_FUNC(evt_msg_continue)
 LBL(0)
     USER_FUNC(evt_win_coin_on, 0, LW(12))
-    USER_FUNC(evt_win_other_select, 
+LBL(1)
+    USER_FUNC(evt_win_other_select,
         (uint32_t)window_select::MenuType::TOT_CHARLIETON_SHOP)
     IF_EQUAL(LW(0), 0)
         USER_FUNC(evt_win_coin_off, LW(12))
         USER_FUNC(evt_msg_print, 0, PTR("tot_charlieton_decline"), 0, PTR("me"))
         RETURN()
     END_IF()
+
+    // Check for purchasing rerolls when already maxed out on them.
+    SWITCH(LW(1))
+        CASE_OR((int32_t)ItemType::TOT_REROLL_ITEM)
+        CASE_OR((int32_t)ItemType::TOT_REVEAL_ITEM)
+            USER_FUNC(evtTot_CheckMaxRerolls, LW(0))
+            IF_EQUAL(LW(0), 0)
+                USER_FUNC(evt_msg_print, 0, PTR("tot_charlieton_maxreroll"), 0, PTR("me"))
+                GOTO(1)
+            END_IF()
+            CASE_END()
+    END_SWITCH()
+
     USER_FUNC(evt_pouch_get_coin, LW(0))
     IF_SMALL(LW(0), LW(3))
         USER_FUNC(evt_win_coin_off, LW(12))
@@ -346,10 +361,12 @@ LBL(0)
         USER_FUNC(evt_msg_print_add, 0, PTR("tot_charlieton_decline"))
         RETURN()
     END_IF()
+
     IF_EQUAL(LW(1), (int32_t)ItemType::STAR_PIECE)
-        // Give item directly.
+        // Give item directly, since it pops up a secondary window.
         GOTO(10)
     END_IF()
+
     USER_FUNC(evt_pouch_add_item, LW(1), LW(0))
     IF_EQUAL(LW(0), -1)
         // Inventory full; prompt if the player wants to buy the item anyway.
@@ -1341,14 +1358,14 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
         }
     }
     
-    // Add a unique badge, and a (one-time purchase) Star Piece to the shop.
+    // Add a unique badge to the shop.
     int32_t special_badge = RewardManager::GetUniqueBadgeForShop();
     if (special_badge) {
-        inventory[total_items + 0] = special_badge;
-        inventory[total_items + 1] = -1;
+        inventory[total_items++] = special_badge;
+        inventory[total_items] = -1;
         ++badges;
     } else {
-        inventory[total_items + 0] = -1;
+        inventory[total_items] = -1;
     }
 
     // For Tiny mode specifically, fill the fifth slot with a rare item
@@ -1363,6 +1380,19 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
             rare_items = 1;
             badges = 2;
         }
+        total_items = 5;
+    }
+
+    // Add reroll or reveal item, if restocks enabled.
+    switch (g_Mod->state_.GetOptionValue(OPT_CHEST_CHOICE)) {
+        case OPTVAL_CHEST_REROLL_REFILL:
+            inventory[total_items++] = ItemType::TOT_REROLL_ITEM;
+            inventory[total_items] = -1;
+            break;
+        case OPTVAL_CHEST_REVEAL_REFILL:
+            inventory[total_items++] = ItemType::TOT_REVEAL_ITEM;
+            inventory[total_items] = -1;
+            break;
     }
     
     // Sort each category by ascending price.
@@ -1382,6 +1412,13 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
 EVT_DEFINE_USER_FUNC(evtTot_CheckCharlietonSoldOut) {
     int16_t* inventory = GetCharlietonInventoryPtr();
     evtSetValue(evt, evt->evtArguments[0], inventory[0] == -1);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_CheckMaxRerolls) {
+    int32_t rerolls = g_Mod->state_.GetOption(STAT_RUN_CHEST_REROLLS);
+    int32_t max_rerolls = g_Mod->state_.GetOption(STAT_RUN_CHEST_MAX_REROLLS);
+    evtSetValue(evt, evt->evtArguments[0], rerolls < max_rerolls);
     return 2;
 }
 

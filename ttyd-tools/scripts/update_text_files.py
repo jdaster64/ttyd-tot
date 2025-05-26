@@ -60,6 +60,8 @@ g_GlobalStrings = {
     b"in_attack_fx":            b"Attack FX",
     b"in_m_emblem":             b"M Palette",
     b"in_y_emblem":             b"Y Palette",
+    b"in_rerollitem":           b"Reroll Dial",
+    b"in_revealitem":           b"Reveal Cloak",
     
     # Special item descriptions.
     
@@ -133,6 +135,14 @@ g_GlobalStrings = {
     b'msg_m_emblem':
         b"Select what outfit Mario\n"
         b"will wear.",
+        
+    b'msg_rerollitem':
+        b"A curious item that can alter\n"
+        b"the rewards offered by chests.",
+        
+    b'msg_revealitem':
+        b"A curious item that can reveal\n"
+        b"reward chests' hidden contents.",
         
     # Normal item descriptions.
     
@@ -5893,6 +5903,11 @@ g_TowerStrings = {
         b"Ooh, you can't carry any more \n"
         b"stuff, my man. You sure you\n"
         b"want to buy this anyway?\n<o>",
+        
+    b"tot_charlieton_maxreroll":
+        b"Ooh, looks like you're full up\n"
+        b"on those, my man. <wait 200>Anything else\n"
+        b"you're interested in?\n<k>",
         
     # Other NPCs
     
