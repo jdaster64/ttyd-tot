@@ -1379,8 +1379,8 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectCharlietonItems) {
             inventory[2] = item;
             rare_items = 1;
             badges = 2;
+            total_items = 5;
         }
-        total_items = 5;
     }
 
     // Add reroll or reveal item, if restocks enabled.

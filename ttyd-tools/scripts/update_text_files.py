@@ -5493,9 +5493,9 @@ g_TowerLobbyStrings = {
     b"tot_optr_countdown_off":      b"Off",
     b"tot_optr_midboss":            b"Midbosses",
     b"tot_optr_midboss_default":    b"Balanced",
-    b"tot_optr_midboss_random":     b"Random",
-    b"tot_optr_midboss_mobtype":    b"Support Variety",
-    b"tot_optr_midboss_mobany":     b"Support Random",
+    b"tot_optr_midboss_random":     b"Random Bosses",
+    b"tot_optr_midboss_mobtype":    b"Varied Minions",
+    b"tot_optr_midboss_mobany":     b"Random Bosses + Minions",
     
     b"tot_optr_off":                b"Off",
     b"tot_optr_on":                 b"On",

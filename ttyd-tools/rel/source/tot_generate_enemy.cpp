@@ -53,12 +53,28 @@ namespace BattleUnitType = ::ttyd::battle_database_common::BattleUnitType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace NpcAiType = ::ttyd::npc_data::NpcAiType;
 
+namespace MinionType {
+    enum e {
+        INVALID = 0,
+        GOOMBA,
+        SHELLED,
+        CLOUDY,
+        PLANT,
+        SPOOKY,
+        SPIKY,
+        TECH,
+        MERCENARY,
+        EXTRA,
+    };
+}
+
 // Stats for a type of enemy (e.g. Hyper Goomba).
 struct EnemyTypeInfo {
     // Pointer to enemy type's basic parameters (usually in custom.rel).
     BattleUnitKind* kind;
-    // Whether the enemy can be used as a midboss.
-    bool            midboss_eligible;
+    // Whether the enemy can be used as a midboss + pool of minions to use.
+    int8_t          midboss_eligible;
+    int8_t          midboss_mob_type;
     // Indices into npc_data tribe and AI type tables.
     int16_t         npc_tribe_idx;
     int8_t          ai_type_idx;
@@ -66,8 +82,8 @@ struct EnemyTypeInfo {
     int8_t          tattle_idx;
     // The enemy's base HP, ATK, and DEF.
     int16_t         base_hp;
-    int16_t         base_atk;
-    int16_t         base_def;
+    int8_t          base_atk;
+    int8_t          base_def;
     // The reference point used as the enemy's "base" attack power; other
     // attacks will have the same difference in power as in the original game.
     // (e.g. a Hyper Goomba will charge by its attack power + 4).
@@ -84,6 +100,8 @@ struct EnemyTypeInfo {
     // The actor's default Y position, in and out of battle.
     uint8_t         battle_y_pos;
     uint8_t         field_y_pos;
+    // Padding struct to multiple of 4 bytes.
+    uint8_t         reserved[2];
 };
 
 PointDropData* kHpTables[] = {
@@ -101,178 +119,178 @@ const float kEnemyPartySepX = 40.0f;
 const float kEnemyPartySepZ = 10.0f;
 
 const EnemyTypeInfo kEnemyInfo[] = {
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Goomba, 1, 214, 0x04, 1, 10, 6, 0, 1, 0, 2, 10, 0, 0, 0, 0 },
-    { &custom::unit_Paragoomba, 1, 216, 0x06, 2, 10, 6, 0, 1, 0, 3, 10, 0, 0, 40, 50 },
-    { &custom::unit_SpikyGoomba, 1, 215, 0x04, 3, 10, 6, 0, 1, 1, 3, 10, 0, 0, 0, 0 },
-    { &custom::unit_Spinia, 1, 310, 0x28, 44, 13, 6, 0, 1, 0, 2, -1, 0, 0, 0, 0 },
-    { &custom::unit_Spania, 1, 309, 0x28, 45, 13, 6, 0, 1, 0, 3, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Craw, 1, 298, 0x04, 39, 14, 7, 0, 6, 0, 5, -1, 1, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Koopatrol, 1, 205, 0x2d, 18, 15, 8, 3, 4, 0, 6, 8, 3, 0, 0, 0 },
-    { &custom::unit_Magikoopa, 1, 313, 0x2a, 35, 15, 7, 0, 4, 0, 7, 3, 0, 3, 0, 0 },
-    { nullptr, 0, -1, -1, -1, 15, 7, 0, 4, 0, 7, 3, 0, 3, 0, 0 },
-    { &custom::unit_KoopaTroopa, 1, 242, 0x07, 10, 14, 7, 2, 2, 0, 3, 8, 0, 0, 0, 0 },
-    { &custom::unit_Paratroopa, 1, 243, 0x08, 11, 14, 7, 2, 2, 0, 4, 8, 0, 0, 40, 50 },
-    { &custom::unit_Fuzzy, 1, 248, 0x10, 47, 11, 5, 0, 1, 0, 2, -1, 0, 0, 0, 0 },
-    { &custom::unit_DullBones, 1, 39, 0x0e, 20, 7, 5, 1, 1, 1, 2, 4, 0, 0, 0, 0 },
-    { &custom::unit_HyperBobOmb, 0, 238, 0x04, 78, 15, 7, 2, 2, 0, 7, 9, 1, 2, 0, 0 },
-    { &custom::unit_Bristle, 1, 258, 0x17, 75, 6, 6, 4, 1, 0, 4, -1, 0, 1, 0, 0 },
-    { &custom::unit_GoldFuzzy, 0, 251, 0x10, 102, 150, 7, 0, 7, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_FuzzyHorde, 0, -1, -1, 101, 200, 7, 0, 7, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_RedBones, 1, 36, 0x0e, 21, 10, 7, 2, 3, 0, 5, 4, 0, 0, 0, 0 },
-    { &custom::unit_Hooktail, 0, 33, 0x11, 96, 80, 6, 1, 8, 0, 100, -1, 0, 0, 0, 0 },
-    { &custom::unit_DarkPuff, 1, 286, 0x1d, 62, 12, 7, 0, 2, 0, 3, -1, 0, 0, 40, 10 },
-    { &custom::unit_PalePiranha, 1, 261, 0x1c, 52, 12, 7, 0, 5, 0, 4, 11, 0, 1, 0, 0 },
-    { &custom::unit_Cleft, 1, 237, 0x16, 71, 8, 6, 5, 3, 0, 2, -1, 1, 0, 0, 0 },
-    { &custom::unit_Pider, 1, 266, 0x1b, 57, 14, 6, 0, 2, 0, 5, -1, 0, 0, 40, 140 },
-    { &custom::unit_XNaut, 1, 271, 0x04, 86, 12, 7, 0, 3, 0, 4, 1, 0, 0, 0, 0 },
-    { &custom::unit_Yux, 0, 268, 0x19, 89, 7, 5, 0, 2, 0, 6, 1, 0, 0, 40, 30 },
-    { &custom::unit_MiniYux, 0, -1, -1, 90, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, 10, 6, 0, 1, 0, 2, 10, 0, 0, 0, 0 },
-    { &custom::unit_KpKoopa, 1, 246, 0x07, 12, 16, 7, 2, 2, 0, 4, 8, 0, 0, 0, 0 },
-    { &custom::unit_KpParatroopa, 1, 247, 0x08, 13, 16, 7, 2, 2, 0, 5, 8, 0, 0, 40, 50 },
-    { &custom::unit_Pokey, 1, 233, 0x14, 50, 12, 7, 0, 3, 0, 4, -1, 1, 0, 0, 0 },
-    { &custom::unit_Lakitu, 1, 280, 0x24, 27, 13, 7, 0, 2, 0, 5, -1, 0, 1, 40, 20 },
-    { &custom::unit_Spiny, 0, 287, -1, 29, 8, 7, 4, 2, 1, 1, -1, 0, 0, 0, 0 },
-    { &custom::unit_CosmicBoo, 0, 288, 0x21, 99, 75, 6, 0, 5, 0, 50, 2, 3, 3, 20, 30 },
-    { &custom::unit_BobOmb, 0, 283, 0x04, 77, 10, 7, 2, 2, 0, 5, 9, 1, 0, 0, 0 },
-    { &custom::unit_Bandit, 0, 274, 0x04, 41, 12, 6, 0, 2, 0, 4, 5, 0, 0, 0, 0 },
-    { &custom::unit_BigBandit, 0, 129, 0x04, 42, 15, 6, 0, 2, 1, 5, 5, 0, 0, 0, 0 },
-    { nullptr, 0, 230, 0x0b, -1, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },
-    { &custom::unit_ShadyKoopa, 1, 282, 0x07, 14, 18, 7, 2, 3, 0, 6, 8, 0, 0, 0, 0 },
-    { &custom::unit_ShadyParatroopa, 1, 291, 0x08, 15, 18, 7, 2, 3, 0, 7, 8, 0, 0, 40, 50 },
-    { &custom::unit_RedMagikoopa, 0, 314, -1, 36, 15, 7, 0, 3, 1, 8, 3, 0, 3, 0, 0 },
-    { nullptr, 0, -1, -1, -1, 15, 7, 0, 3, 1, 8, 3, 0, 3, 0, 0 },
-    { &custom::unit_WhiteMagikoopa, 0, 315, -1, 37, 18, 7, 0, 4, 0, 8, 3, 0, 3, 0, 0 },
-    { nullptr, 0, -1, -1, -1, 18, 7, 0, 4, 0, 8, 3, 0, 3, 0, 0 },
-    { &custom::unit_GreenMagikoopa, 0, 316, -1, 38, 15, 7, 1, 4, 0, 8, 3, 0, 3, 0, 0 },
-    { nullptr, 0, -1, -1, -1, 15, 7, 1, 4, 0, 8, 3, 0, 3, 0, 0 },
-    { &custom::unit_DarkCraw, 1, 308, 0x04, 40, 20, 9, 0, 6, 0, 8, -1, 3, 0, 0, 0 },
-    { &custom::unit_HammerBro, 1, 206, 0x2b, 24, 16, 6, 2, 3, 1, 9, 3, 2, 1, 0, 0 },
-    { &custom::unit_BoomerangBro, 1, 294, 0x04, 25, 16, 4, 2, 2, 0, 9, 3, 2, 1, 0, 0 },
-    { &custom::unit_FireBro, 1, 293, 0x04, 26, 16, 4, 2, 1, 2, 9, 3, 2, 1, 0, 0 },
-    { &custom::unit_RedChomp, 1, 306, 0x2c, 82, 12, 10, 5, 5, 0, 8, -1, 2, 0, 0, 0 },
-    { &custom::unit_DarkKoopatrol, 1, 307, 0x2d, 19, 25, 10, 3, 5, 0, 10, 8, 3, 1, 0, 0 },
-    { &custom::unit_IronCleft, 0, 289, 0x16, 74, 6, 8, 1, 3, 0, 9, -1, 2, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_HyperGoomba, 1, 217, 0x04, 4, 15, 6, 0, 3, -1, 5, 10, 0, 0, 0, 0 },
-    { &custom::unit_HyperParagoomba, 1, 219, 0x06, 5, 15, 6, 0, 3, -1, 6, 10, 0, 0, 40, 50 },
-    { &custom::unit_HyperSpikyGoomba, 1, 218, 0x04, 6, 15, 6, 0, 3, 0, 6, 10, 0, 0, 0, 0 },
-    { &custom::unit_CrazeeDayzee, 1, 252, 0x22, 56, 14, 5, 0, 2, 0, 6, 6, 0, 2, 0, 0 },
-    { &custom::unit_AmazyDayzee, 0, 253, -1, 95, 20, 20, 1, 20, 0, 40, 6, 2, 4, 0, 0 },
-    { &custom::unit_HyperCleft, 1, 236, 0x16, 72, 10, 6, 5, 3, 0, 6, -1, 1, 0, 0, 0 },
-    { &custom::unit_BuzzyBeetle, 1, 225, 0x09, 31, 8, 6, 5, 3, 0, 4, 7, 1, 0, 0, 0 },
-    { &custom::unit_SpikeTop, 1, 226, 0x0b, 32, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },
-    { &custom::unit_Swooper, 1, 239, 0x20, 59, 14, 7, 0, 3, 0, 5, -1, 0, 0, 130, 80 },
-    { &custom::unit_Boo, 1, 146, 0x21, 66, 13, 6, 0, 2, 1, 5, 2, 0, 1, 0, 30 },
-    { &custom::unit_AtomicBoo, 0, 148, 0x21, 97, 50, 5, 0, 5, 0, 30, 2, 2, 2, 20, 30 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Ember, 1, 159, 0x24, 69, 13, 6, 0, 3, 0, 6, 2, 0, 1, 40, 20 },
-    { &custom::unit_LavaBubble, 1, 302, 0x24, 68, 10, 6, 0, 3, 1, 6, 2, 0, 1, 40, 20 },
-    { &custom::unit_GreenFuzzy, 1, 249, 0x10, 48, 13, 6, 0, 2, 1, 4, -1, 0, 0, 0, 0 },
-    { &custom::unit_FlowerFuzzy, 1, 250, 0x10, 49, 13, 6, 0, 2, 1, 6, -1, 0, 2, 0, 0 },
-    { &custom::unit_PutridPiranha, 1, 262, 0x1c, 53, 14, 6, 0, 4, 1, 6, 11, 0, 2, 0, 0 },
-    { &custom::unit_Parabuzzy, 1, 228, 0x0d, 33, 8, 6, 5, 3, 0, 5, 7, 1, 0, 40, 50 },
-    { nullptr, 0, 254, 0x12, -1, 10, 0, 3, 0, 0, 6, 9, 1, 0, 0, 0 },
-    { nullptr, 0, 255, -1, -1, 4, 7, 1, 4, 0, 0, 9, 0, 0, 40, 0 },
-    { &custom::unit_BulkyBobOmb, 0, 304, 0x25, 79, 12, 4, 2, 2, 0, 5, 9, 1, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_RuffPuff, 1, 284, 0x1d, 63, 14, 8, 0, 4, 0, 4, -1, 0, 0, 40, 10 },
-    { &custom::unit_PoisonPokey, 1, 234, 0x14, 51, 15, 7, 0, 3, 1, 6, -1, 1, 0, 0, 0 },
-    { &custom::unit_SpikyParabuzzy, 1, 227, 0x0d, 34, 8, 6, 5, 3, 0, 7, 7, 2, 0, 40, 50 },
-    { &custom::unit_DarkBoo, 1, 147, 0x21, 67, 17, 8, 0, 4, 1, 7, 2, 0, 1, 0, 30 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_IcePuff, 1, 285, 0x1d, 64, 16, 8, 0, 4, 0, 6, -1, 0, 0, 40, 10 },
-    { &custom::unit_FrostPiranha, 1, 263, 0x1c, 54, 16, 7, 0, 4, 1, 7, 11, 0, 2, 0, 0 },
-    { &custom::unit_MoonCleft, 1, 235, 0x16, 73, 12, 8, 5, 3, 0, 6, -1, 1, 0, 0, 0 },
-    { &custom::unit_ZYux, 0, 269, 0x19, 91, 9, 6, 0, 4, 0, 8, 1, 1, 1, 40, 30 },
-    { &custom::unit_MiniZYux, 0, -1, -1, 92, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    { &custom::unit_XYux, 0, 270, 0x19, 93, 11, 5, 2, 3, 0, 10, 1, 2, 2, 40, 30 },
-    { &custom::unit_MiniXYux, 0, -1, -1, 94, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-    { &custom::unit_XNautPhD, 1, 273, 0x27, 87, 14, 8, 0, 4, 0, 8, 1, 0, 2, 0, 0 },
-    { &custom::unit_EliteXNaut, 1, 272, 0x04, 88, 16, 9, 2, 5, 0, 8, 1, 2, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Swoopula, 1, 240, 0x20, 60, 14, 6, 0, 4, 0, 5, -1, 0, 0, 130, 80 },
-    { &custom::unit_PhantomEmber, 1, 303, 0x24, 70, 16, 6, 0, 3, 2, 8, 2, 0, 2, 40, 20 },
-    { nullptr, 0, 257, -1, -1, 6, 9, 2, 6, 0, 0, 9, 0, 0, 0, 0 },
-    { nullptr, 0, 256, 0x12, -1, 15, 0, 5, 0, 0, 10, 9, 2, 0, 40, 0 },
-    { &custom::unit_ChainChomp, 1, 301, 0x2c, 81, 10, 8, 4, 6, 0, 6, -1, 3, 0, 0, 0 },
-    { &custom::unit_DarkWizzerd, 1, 296, 0x26, 84, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },
-    { nullptr, 0, -1, -1, -1, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },
-    { &custom::unit_DryBones, 1, 196, 0x0f, 22, 12, 7, 3, 5, 0, 7, 4, 0, 2, 0, 0 },
-    { &custom::unit_DarkBones, 1, 197, 0x0f, 23, 20, 7, 3, 4, 1, 10, 4, 1, 2, 0, 0 },
-    { &custom::unit_Gloomtail, 0, 198, 0x11, 98, 160, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, 0x11, 105, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Doopliss, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Bowser, 0, 199, 0x11, 103, 120, 8, 2, 8, 0, 50, -1, 3, 3, 0, 0 },
-    { &custom::unit_Kammy, 0, 207, -1, 104, 90, 6, 0, 6, 0, 50, -1, 3, 3, 40, 30 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { nullptr, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Gloomba, 1, 220, 0x04, 7, 20, 6, 0, 2, 1, 5, 10, 0, 0, 0, 0 },
-    { &custom::unit_Paragloomba, 1, 222, 0x06, 8, 20, 6, 0, 2, 1, 6, 10, 0, 0, 40, 50 },
-    { &custom::unit_SpikyGloomba, 1, 221, 0x04, 9, 20, 6, 0, 2, 2, 6, 10, 0, 0, 0, 0 },
-    { &custom::unit_DarkKoopa, 1, 244, 0x07, 16, 20, 8, 3, 3, 1, 6, 8, 0, 0, 0, 0 },
-    { &custom::unit_DarkParatroopa, 1, 245, 0x08, 17, 20, 8, 3, 3, 1, 7, 8, 0, 0, 40, 50 },
-    { &custom::unit_BadgeBandit, 0, 275, 0x04, 43, 18, 6, 0, 3, 2, 6, 5, 0, 0, 0, 0 },
-    { &custom::unit_DarkLakitu, 1, 281, 0x24, 28, 19, 9, 0, 5, 0, 8, -1, 2, 0, 40, 20 },
-    { &custom::unit_SkyBlueSpiny, 0, -1, -1, 30, 10, 9, 4, 5, 1, 1, -1, 0, 0, 0, 0 },
-    { &custom::unit_Wizzerd, 1, 295, 0x26, 83, 10, 8, 3, 7, -1, 7, -1, 1, 1, 0, 20 },
-    { &custom::unit_PiranhaPlant, 1, 260, 0x1c, 55, 18, 9, 0, 4, 1, 9, 11, 0, 4, 0, 0 },
-    { &custom::unit_Spunia, 1, 311, 0x28, 46, 16, 7, 2, 6, 1, 6, -1, 3, 0, 0, 0 },
-    { &custom::unit_Arantula, 1, 267, 0x1b, 58, 18, 6, 0, 5, 2, 8, -1, 2, 2, 40, 140 },
-    { &custom::unit_DarkBristle, 1, 259, 0x17, 76, 9, 9, 4, 8, 0, 8, -1, 0, 3, 0, 0 },
-    { &custom::unit_PoisonPuff, 1, 265, 0x1d, 65, 18, 8, 0, 8, 0, 8, -1, 0, 0, 40, 10 },
-    { &custom::unit_Swampire, 1, 241, 0x20, 61, 20, 8, 0, 6, 0, 8, -1, 0, 0, 130, 80 },
-    { &custom::unit_BobUlk, 0, 305, 0x25, 80, 15, 5, 2, 4, 0, 7, 9, 3, 0, 0, 0 },
-    { &custom::unit_EliteWizzerd, 1, 297, 0x26, 85, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
-    { nullptr, 0, -1, -1, -1, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
-    { &custom::unit_Bonetail, 0, 325, 0x11, 100, 160, 10, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Goomba, 1, MinionType::GOOMBA, 214, 0x04, 1, 10, 6, 0, 1, 0, 2, 10, 0, 0, 0, 0 },
+    { &custom::unit_Paragoomba, 1, MinionType::GOOMBA, 216, 0x06, 2, 10, 6, 0, 1, 0, 3, 10, 0, 0, 40, 50 },
+    { &custom::unit_SpikyGoomba, 1, MinionType::GOOMBA, 215, 0x04, 3, 10, 6, 0, 1, 1, 3, 10, 0, 0, 0, 0 },
+    { &custom::unit_Spinia, 1, MinionType::SPIKY, 310, 0x28, 44, 13, 6, 0, 1, 0, 2, -1, 0, 0, 0, 0 },
+    { &custom::unit_Spania, 1, MinionType::SPIKY, 309, 0x28, 45, 13, 6, 0, 1, 0, 3, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Craw, 1, MinionType::MERCENARY, 298, 0x04, 39, 14, 7, 0, 6, 0, 5, -1, 1, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Koopatrol, 1, MinionType::MERCENARY, 205, 0x2d, 18, 15, 8, 3, 4, 0, 6, 8, 3, 0, 0, 0 },
+    { &custom::unit_Magikoopa, 1, MinionType::MERCENARY, 313, 0x2a, 35, 15, 7, 0, 4, 0, 7, 3, 0, 3, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, 15, 7, 0, 4, 0, 7, 3, 0, 3, 0, 0 },
+    { &custom::unit_KoopaTroopa, 1, MinionType::SHELLED, 242, 0x07, 10, 14, 7, 2, 2, 0, 3, 8, 0, 0, 0, 0 },
+    { &custom::unit_Paratroopa, 1, MinionType::SHELLED, 243, 0x08, 11, 14, 7, 2, 2, 0, 4, 8, 0, 0, 40, 50 },
+    { &custom::unit_Fuzzy, 1, MinionType::PLANT, 248, 0x10, 47, 11, 5, 0, 1, 0, 2, -1, 0, 0, 0, 0 },
+    { &custom::unit_DullBones, 1, MinionType::SPOOKY, 39, 0x0e, 20, 7, 5, 1, 1, 1, 2, 4, 0, 0, 0, 0 },
+    { &custom::unit_HyperBobOmb, 0, MinionType::EXTRA, 238, 0x04, 78, 15, 7, 2, 2, 0, 7, 9, 1, 2, 0, 0 },
+    { &custom::unit_Bristle, 1, MinionType::SPIKY, 258, 0x17, 75, 6, 6, 4, 1, 0, 4, -1, 0, 1, 0, 0 },
+    { &custom::unit_GoldFuzzy, 0, 0, 251, 0x10, 102, 150, 7, 0, 7, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_FuzzyHorde, 0, 0, -1, -1, 101, 200, 7, 0, 7, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_RedBones, 1, MinionType::SPOOKY, 36, 0x0e, 21, 10, 7, 2, 3, 0, 5, 4, 0, 0, 0, 0 },
+    { &custom::unit_Hooktail, 0, 0, 33, 0x11, 96, 80, 6, 1, 8, 0, 100, -1, 0, 0, 0, 0 },
+    { &custom::unit_DarkPuff, 1, MinionType::CLOUDY, 286, 0x1d, 62, 12, 7, 0, 2, 0, 3, -1, 0, 0, 40, 10 },
+    { &custom::unit_PalePiranha, 1, MinionType::PLANT, 261, 0x1c, 52, 12, 7, 0, 5, 0, 4, 11, 0, 1, 0, 0 },
+    { &custom::unit_Cleft, 1, MinionType::SPIKY, 237, 0x16, 71, 8, 6, 5, 3, 0, 2, -1, 1, 0, 0, 0 },
+    { &custom::unit_Pider, 1, MinionType::SPOOKY, 266, 0x1b, 57, 14, 6, 0, 2, 0, 5, -1, 0, 0, 40, 140 },
+    { &custom::unit_XNaut, 1, MinionType::TECH, 271, 0x04, 86, 12, 7, 0, 3, 0, 4, 1, 0, 0, 0, 0 },
+    { &custom::unit_Yux, 0, 0, 268, 0x19, 89, 7, 5, 0, 2, 0, 6, 1, 0, 0, 40, 30 },
+    { &custom::unit_MiniYux, 0, 0, -1, -1, 90, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, 10, 6, 0, 1, 0, 2, 10, 0, 0, 0, 0 },
+    { &custom::unit_KpKoopa, 1, MinionType::SHELLED, 246, 0x07, 12, 16, 7, 2, 2, 0, 4, 8, 0, 0, 0, 0 },
+    { &custom::unit_KpParatroopa, 1, MinionType::SHELLED, 247, 0x08, 13, 16, 7, 2, 2, 0, 5, 8, 0, 0, 40, 50 },
+    { &custom::unit_Pokey, 1, MinionType::PLANT, 233, 0x14, 50, 12, 7, 0, 3, 0, 4, -1, 1, 0, 0, 0 },
+    { &custom::unit_Lakitu, 1, MinionType::CLOUDY, 280, 0x24, 27, 13, 7, 0, 2, 0, 5, -1, 0, 1, 40, 20 },
+    { &custom::unit_Spiny, 0, MinionType::CLOUDY, 287, -1, 29, 8, 7, 4, 2, 1, 1, -1, 0, 0, 0, 0 },
+    { &custom::unit_CosmicBoo, 0, 0, 288, 0x21, 99, 75, 6, 0, 5, 0, 50, 2, 3, 3, 20, 30 },
+    { &custom::unit_BobOmb, 0, MinionType::EXTRA, 283, 0x04, 77, 10, 7, 2, 2, 0, 5, 9, 1, 0, 0, 0 },
+    { &custom::unit_Bandit, 0, 0, 274, 0x04, 41, 12, 6, 0, 2, 0, 4, 5, 0, 0, 0, 0 },
+    { &custom::unit_BigBandit, 0, 0, 129, 0x04, 42, 15, 6, 0, 2, 1, 5, 5, 0, 0, 0, 0 },
+    { nullptr, 0, 0, 230, 0x0b, -1, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },
+    { &custom::unit_ShadyKoopa, 1, MinionType::SHELLED, 282, 0x07, 14, 18, 7, 2, 3, 0, 6, 8, 0, 0, 0, 0 },
+    { &custom::unit_ShadyParatroopa, 1, MinionType::SHELLED, 291, 0x08, 15, 18, 7, 2, 3, 0, 7, 8, 0, 0, 40, 50 },
+    { &custom::unit_RedMagikoopa, 0, MinionType::MERCENARY, 314, -1, 36, 15, 7, 0, 3, 1, 8, 3, 0, 3, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, 15, 7, 0, 3, 1, 8, 3, 0, 3, 0, 0 },
+    { &custom::unit_WhiteMagikoopa, 0, MinionType::MERCENARY, 315, -1, 37, 18, 7, 0, 4, 0, 8, 3, 0, 3, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, 18, 7, 0, 4, 0, 8, 3, 0, 3, 0, 0 },
+    { &custom::unit_GreenMagikoopa, 0, MinionType::MERCENARY, 316, -1, 38, 15, 7, 1, 4, 0, 8, 3, 0, 3, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, 15, 7, 1, 4, 0, 8, 3, 0, 3, 0, 0 },
+    { &custom::unit_DarkCraw, 1, MinionType::MERCENARY, 308, 0x04, 40, 20, 9, 0, 6, 0, 8, -1, 3, 0, 0, 0 },
+    { &custom::unit_HammerBro, 1, MinionType::MERCENARY, 206, 0x2b, 24, 16, 6, 2, 3, 1, 9, 3, 2, 1, 0, 0 },
+    { &custom::unit_BoomerangBro, 1, MinionType::MERCENARY, 294, 0x04, 25, 16, 4, 2, 2, 0, 9, 3, 2, 1, 0, 0 },
+    { &custom::unit_FireBro, 1, MinionType::MERCENARY, 293, 0x04, 26, 16, 4, 2, 1, 2, 9, 3, 2, 1, 0, 0 },
+    { &custom::unit_RedChomp, 1, MinionType::SPIKY, 306, 0x2c, 82, 12, 10, 5, 5, 0, 8, -1, 2, 0, 0, 0 },
+    { &custom::unit_DarkKoopatrol, 1, MinionType::MERCENARY, 307, 0x2d, 19, 25, 10, 3, 5, 0, 10, 8, 3, 1, 0, 0 },
+    { &custom::unit_IronCleft, 0, MinionType::SPIKY, 289, 0x16, 74, 6, 8, 1, 3, 0, 9, -1, 2, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_HyperGoomba, 1, MinionType::GOOMBA, 217, 0x04, 4, 15, 6, 0, 3, -1, 5, 10, 0, 0, 0, 0 },
+    { &custom::unit_HyperParagoomba, 1, MinionType::GOOMBA, 219, 0x06, 5, 15, 6, 0, 3, -1, 6, 10, 0, 0, 40, 50 },
+    { &custom::unit_HyperSpikyGoomba, 1, MinionType::GOOMBA, 218, 0x04, 6, 15, 6, 0, 3, 0, 6, 10, 0, 0, 0, 0 },
+    { &custom::unit_CrazeeDayzee, 1, MinionType::PLANT, 252, 0x22, 56, 14, 5, 0, 2, 0, 6, 6, 0, 2, 0, 0 },
+    { &custom::unit_AmazyDayzee, 0, MinionType::PLANT, 253, -1, 95, 20, 20, 1, 20, 0, 40, 6, 2, 4, 0, 0 },
+    { &custom::unit_HyperCleft, 1, MinionType::SPIKY, 236, 0x16, 72, 10, 6, 5, 3, 0, 6, -1, 1, 0, 0, 0 },
+    { &custom::unit_BuzzyBeetle, 1, MinionType::SHELLED, 225, 0x09, 31, 8, 6, 5, 3, 0, 4, 7, 1, 0, 0, 0 },
+    { &custom::unit_SpikeTop, 1, MinionType::SHELLED, 226, 0x0b, 32, 8, 6, 5, 3, 0, 6, 7, 1, 0, 0, 0 },
+    { &custom::unit_Swooper, 1, MinionType::SPOOKY, 239, 0x20, 59, 14, 7, 0, 3, 0, 5, -1, 0, 0, 130, 80 },
+    { &custom::unit_Boo, 1, MinionType::SPOOKY, 146, 0x21, 66, 13, 6, 0, 2, 1, 5, 2, 0, 1, 0, 30 },
+    { &custom::unit_AtomicBoo, 0, 0, 148, 0x21, 97, 50, 5, 0, 5, 0, 30, 2, 2, 2, 20, 30 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Ember, 1, MinionType::SPOOKY, 159, 0x24, 69, 13, 6, 0, 3, 0, 6, 2, 0, 1, 40, 20 },
+    { &custom::unit_LavaBubble, 1, MinionType::SPOOKY, 302, 0x24, 68, 10, 6, 0, 3, 1, 6, 2, 0, 1, 40, 20 },
+    { &custom::unit_GreenFuzzy, 1, MinionType::PLANT, 249, 0x10, 48, 13, 6, 0, 2, 1, 4, -1, 0, 0, 0, 0 },
+    { &custom::unit_FlowerFuzzy, 1, MinionType::PLANT, 250, 0x10, 49, 13, 6, 0, 2, 1, 6, -1, 0, 2, 0, 0 },
+    { &custom::unit_PutridPiranha, 1, MinionType::PLANT, 262, 0x1c, 53, 14, 6, 0, 4, 1, 6, 11, 0, 2, 0, 0 },
+    { &custom::unit_Parabuzzy, 1, MinionType::SHELLED, 228, 0x0d, 33, 8, 6, 5, 3, 0, 5, 7, 1, 0, 40, 50 },
+    { nullptr, 0, 0, 254, 0x12, -1, 10, 0, 3, 0, 0, 6, 9, 1, 0, 0, 0 },
+    { nullptr, 0, 0, 255, -1, -1, 4, 7, 1, 4, 0, 0, 9, 0, 0, 40, 0 },
+    { &custom::unit_BulkyBobOmb, 0, MinionType::EXTRA, 304, 0x25, 79, 12, 4, 2, 2, 0, 5, 9, 1, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_RuffPuff, 1, MinionType::CLOUDY, 284, 0x1d, 63, 14, 8, 0, 4, 0, 4, -1, 0, 0, 40, 10 },
+    { &custom::unit_PoisonPokey, 1, MinionType::PLANT, 234, 0x14, 51, 15, 7, 0, 3, 1, 6, -1, 1, 0, 0, 0 },
+    { &custom::unit_SpikyParabuzzy, 1, MinionType::SHELLED, 227, 0x0d, 34, 8, 6, 5, 3, 0, 7, 7, 2, 0, 40, 50 },
+    { &custom::unit_DarkBoo, 1, MinionType::SPOOKY, 147, 0x21, 67, 17, 8, 0, 4, 1, 7, 2, 0, 1, 0, 30 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_IcePuff, 1, MinionType::CLOUDY, 285, 0x1d, 64, 16, 8, 0, 4, 0, 6, -1, 0, 0, 40, 10 },
+    { &custom::unit_FrostPiranha, 1, MinionType::PLANT, 263, 0x1c, 54, 16, 7, 0, 4, 1, 7, 11, 0, 2, 0, 0 },
+    { &custom::unit_MoonCleft, 1, MinionType::SPIKY, 235, 0x16, 73, 12, 8, 5, 3, 0, 6, -1, 1, 0, 0, 0 },
+    { &custom::unit_ZYux, 0, 0, 269, 0x19, 91, 9, 6, 0, 4, 0, 8, 1, 1, 1, 40, 30 },
+    { &custom::unit_MiniZYux, 0, 0, -1, -1, 92, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    { &custom::unit_XYux, 0, 0, 270, 0x19, 93, 11, 5, 2, 3, 0, 10, 1, 2, 2, 40, 30 },
+    { &custom::unit_MiniXYux, 0, 0, -1, -1, 94, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
+    { &custom::unit_XNautPhD, 1, MinionType::TECH, 273, 0x27, 87, 14, 8, 0, 4, 0, 8, 1, 0, 2, 0, 0 },
+    { &custom::unit_EliteXNaut, 1, MinionType::TECH, 272, 0x04, 88, 16, 9, 2, 5, 0, 8, 1, 2, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Swoopula, 1, MinionType::SPOOKY, 240, 0x20, 60, 14, 6, 0, 4, 0, 5, -1, 0, 0, 130, 80 },
+    { &custom::unit_PhantomEmber, 1, MinionType::SPOOKY, 303, 0x24, 70, 16, 6, 0, 3, 2, 8, 2, 0, 2, 40, 20 },
+    { nullptr, 0, 0, 257, -1, -1, 6, 9, 2, 6, 0, 0, 9, 0, 0, 0, 0 },
+    { nullptr, 0, 0, 256, 0x12, -1, 15, 0, 5, 0, 0, 10, 9, 2, 0, 40, 0 },
+    { &custom::unit_ChainChomp, 1, MinionType::SPIKY, 301, 0x2c, 81, 10, 8, 4, 6, 0, 6, -1, 3, 0, 0, 0 },
+    { &custom::unit_DarkWizzerd, 1, MinionType::TECH, 296, 0x26, 84, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },
+    { nullptr, 0, 0, -1, -1, -1, 12, 8, 4, 5, 0, 8, -1, 2, 2, 0, 20 },
+    { &custom::unit_DryBones, 1, MinionType::SPOOKY, 196, 0x0f, 22, 12, 7, 3, 5, 0, 7, 4, 0, 2, 0, 0 },
+    { &custom::unit_DarkBones, 1, MinionType::SPOOKY, 197, 0x0f, 23, 20, 7, 3, 4, 1, 10, 4, 1, 2, 0, 0 },
+    { &custom::unit_Gloomtail, 0, 0, 198, 0x11, 98, 160, 8, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, 0x11, 105, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Doopliss, 0, 0, 149, -1, -1, 200, 4, 0, 4, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Bowser, 0, 0, 199, 0x11, 103, 120, 8, 2, 8, 0, 50, -1, 3, 3, 0, 0 },
+    { &custom::unit_Kammy, 0, 0, 207, -1, 104, 90, 6, 0, 6, 0, 50, -1, 3, 3, 40, 30 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { nullptr, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Gloomba, 1, MinionType::GOOMBA, 220, 0x04, 7, 20, 6, 0, 2, 1, 5, 10, 0, 0, 0, 0 },
+    { &custom::unit_Paragloomba, 1, MinionType::GOOMBA, 222, 0x06, 8, 20, 6, 0, 2, 1, 6, 10, 0, 0, 40, 50 },
+    { &custom::unit_SpikyGloomba, 1, MinionType::GOOMBA, 221, 0x04, 9, 20, 6, 0, 2, 2, 6, 10, 0, 0, 0, 0 },
+    { &custom::unit_DarkKoopa, 1, MinionType::SHELLED, 244, 0x07, 16, 20, 8, 3, 3, 1, 6, 8, 0, 0, 0, 0 },
+    { &custom::unit_DarkParatroopa, 1, MinionType::SHELLED, 245, 0x08, 17, 20, 8, 3, 3, 1, 7, 8, 0, 0, 40, 50 },
+    { &custom::unit_BadgeBandit, 0, 0, 275, 0x04, 43, 18, 6, 0, 3, 2, 6, 5, 0, 0, 0, 0 },
+    { &custom::unit_DarkLakitu, 1, MinionType::CLOUDY, 281, 0x24, 28, 19, 9, 0, 5, 0, 8, -1, 2, 0, 40, 20 },
+    { &custom::unit_SkyBlueSpiny, 0, MinionType::CLOUDY, -1, -1, 30, 10, 9, 4, 5, 1, 1, -1, 0, 0, 0, 0 },
+    { &custom::unit_Wizzerd, 1, MinionType::TECH, 295, 0x26, 83, 10, 8, 3, 7, -1, 7, -1, 1, 1, 0, 20 },
+    { &custom::unit_PiranhaPlant, 1, MinionType::PLANT, 260, 0x1c, 55, 18, 9, 0, 4, 1, 9, 11, 0, 4, 0, 0 },
+    { &custom::unit_Spunia, 1, MinionType::SPIKY, 311, 0x28, 46, 16, 7, 2, 6, 1, 6, -1, 3, 0, 0, 0 },
+    { &custom::unit_Arantula, 1, MinionType::SPOOKY, 267, 0x1b, 58, 18, 6, 0, 5, 2, 8, -1, 2, 2, 40, 140 },
+    { &custom::unit_DarkBristle, 1, MinionType::SPIKY, 259, 0x17, 76, 9, 9, 4, 8, 0, 8, -1, 0, 3, 0, 0 },
+    { &custom::unit_PoisonPuff, 1, MinionType::CLOUDY, 265, 0x1d, 65, 18, 8, 0, 8, 0, 8, -1, 0, 0, 40, 10 },
+    { &custom::unit_Swampire, 1, MinionType::SPOOKY, 241, 0x20, 61, 20, 8, 0, 6, 0, 8, -1, 0, 0, 130, 80 },
+    { &custom::unit_BobUlk, 0, MinionType::EXTRA, 305, 0x25, 80, 15, 5, 2, 4, 0, 7, 9, 3, 0, 0, 0 },
+    { &custom::unit_EliteWizzerd, 1, MinionType::TECH, 297, 0x26, 85, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
+    { nullptr, 0, 0, -1, -1, -1, 14, 8, 5, 7, 1, 10, -1, 3, 3, 0, 20 },
+    { &custom::unit_Bonetail, 0, 0, 325, 0x11, 100, 160, 10, 2, 8, 0, 100, -1, 0, 0, 0, 0 },
 };
 
 struct PresetLoadoutInfo {
@@ -1238,6 +1256,12 @@ void SelectMidboss(int32_t floor, bool reroll) {
         // If enemy is not mid-boss eligible, ignore.
         if (ei.midboss_eligible && ei.level >= 2 && ei.level <= 10) {
             base_wt = kBaseWeights[difficulty][ei.level - 2];
+
+            // Make base weight constant if using "Random" / "Support Random".
+            if (state.CheckOptionValue(OPTVAL_MIDBOSSES_RANDOM) ||
+                state.CheckOptionValue(OPTVAL_MIDBOSSES_MOB_ANY)) {
+                base_wt = 10;
+            }
         }
         weights[i] = base_wt;
     }
@@ -1283,6 +1307,42 @@ void SelectMidboss(int32_t floor, bool reroll) {
             STAT_RUN_MIDBOSSES_REROLLED, prev_midboss, reroll_count % 4);
     }
     state.SetOption(STAT_RUN_MIDBOSSES_USED, enemy_type, boss_num);
+}
+
+int32_t SelectMidbossMinion(int32_t unit_type) {
+    int32_t kNumEnemyTypes = BattleUnitType::BONETAIL + 1;
+    int16_t weights[kNumEnemyTypes];
+    int32_t parent_mob_type = kEnemyInfo[unit_type].midboss_mob_type;
+
+    switch (g_Mod->state_.GetOptionValue(OPT_MIDBOSSES)) {
+        case OPTVAL_MIDBOSSES_MOB_TYPE: {
+            for (int32_t i = 0; i < kNumEnemyTypes; ++i) {
+                weights[i] = kEnemyInfo[i].midboss_mob_type == parent_mob_type
+                    ? 1 : 0;
+            }
+            break;
+        }
+        case OPTVAL_MIDBOSSES_MOB_ANY: {
+            for (int32_t i = 0; i < kNumEnemyTypes; ++i) {
+                weights[i] = kEnemyInfo[i].midboss_mob_type != 0 ? 1 : 0;
+            }
+            break;
+        }
+        default:
+            // Return the same type as the primary boss.
+            return unit_type;
+    }
+    
+    // Pick a single enemy to make into a mid-boss.
+    int32_t sum_weights = 0;
+    for (int32_t i = 0; i < kNumEnemyTypes; ++i) sum_weights += weights[i];
+    // Shouldn't ever happen.
+    if (sum_weights == 0) return unit_type;
+
+    int32_t enemy_type = 0;
+    int32_t weight = g_Mod->state_.Rand(sum_weights, RNG_MIDBOSS_MOB);
+    for (; (weight -= weights[enemy_type]) >= 0; ++enemy_type);
+    return enemy_type;
 }
 
 bool GetEnemyStats(
@@ -1512,21 +1572,12 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMinionEntries) {
         
         if (position_free) {
             setup = &g_MidbossMinionUnits[i];
-            FillBattleUnitSetup(*setup, &kEnemyInfo[unit_kind], x  + 250.0f, z);
+            int32_t mob_kind = SelectMidbossMinion(unit_kind);
+            FillBattleUnitSetup(*setup, &kEnemyInfo[mob_kind], x  + 250.0f, z);
         }
         
         evtSetValue(evt, evt->evtArguments[i], PTR(setup));
     }
-    return 2;
-}
-
-EVT_DECLARE_USER_FUNC(evtTot_GetMinionSpawnPos, 4)
-EVT_DEFINE_USER_FUNC(evtTot_GetMinionSpawnPos) {
-    int32_t idx = evtGetValue(evt, evt->evtArguments[0]);
-    auto& unit_setup = g_MidbossMinionUnits[idx];
-    evtSetValue(evt, evt->evtArguments[1], unit_setup.position.x);
-    evtSetValue(evt, evt->evtArguments[2], unit_setup.position.y);
-    evtSetValue(evt, evt->evtArguments[3], unit_setup.position.z);
     return 2;
 }
 

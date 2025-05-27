@@ -35,6 +35,8 @@ EVT_DECLARE_USER_FUNC(evtTot_ClearEnemyInfo, 0)
 
 // Selects the midboss that will be used for a given floor.
 void SelectMidboss(int32_t floor, bool reroll);
+// Selects the type of minion a midboss spawns.
+int32_t SelectMidbossMinion(int32_t unit_type);
 
 // Gets replacement stats for an enemy, based on the enemy type and current
 // floor (determined by the mod's state).
