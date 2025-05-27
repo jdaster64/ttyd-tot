@@ -198,6 +198,20 @@ void OptionsManager::ApplyCurrentPresetOptions(bool first_time) {
             }
             break;
         }
+        case OPTVAL_PRESET_RANDOM: {
+            if (first_time) {
+                for (const auto& data : g_OptionMetadata) {
+                    if (!data.check_for_default) continue;
+                    g_Mod->state_.SetOption(data.option, GetDefaultValue(data.option));
+                    RandomizeOption(data.option, /* explicitly = */ false);
+                }
+                g_Mod->state_.SetOption(
+                    OPT_TIMER_DISPLAY, GetDefaultValue(OPT_TIMER_DISPLAY));
+                g_Mod->state_.SetOption(
+                    OPT_SECRET_BOSS, GetDefaultValue(OPT_SECRET_BOSS));
+            }
+            break;
+        }
         case OPTVAL_PRESET_CUSTOM: {
             if (first_time) {
                 for (const auto& data : g_OptionMetadata) {
@@ -234,6 +248,22 @@ void OptionsManager::AdvanceOption(uint32_t option, int32_t change) {
             } else {
                 state.SetOption(
                     OPT_NPC_CHOICE_4, tot::gon::GetNumSecondaryNpcTypes());
+            }
+            break;
+        case OPT_NUM_CHESTS:
+            // Don't allow chests = 1 & reveals on (revert chest choice).
+            if (state.CheckOptionValue(OPTVAL_CHESTS_1) && (
+                state.CheckOptionValue(OPTVAL_CHEST_REVEAL_FIXED) ||
+                state.CheckOptionValue(OPTVAL_CHEST_REVEAL_REFILL))) {
+                state.SetOption(OPTVAL_CHEST_CHOICE_OFF);
+            }
+            break;
+        case OPT_CHEST_CHOICE:
+            // Don't allow chests = 1 & reveals on (revert chest count).
+            if (state.CheckOptionValue(OPTVAL_CHESTS_1) && (
+                state.CheckOptionValue(OPTVAL_CHEST_REVEAL_FIXED) ||
+                state.CheckOptionValue(OPTVAL_CHEST_REVEAL_REFILL))) {
+                state.SetOption(OPTVAL_CHESTS_DEFAULT);
             }
             break;
         case OPT_MARIO_BP:
@@ -315,17 +345,18 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
 
                     switch (option) {
                         case OPT_PRESET: {
-                            // Cannot randomize preset.
-                            if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM))
+                            if (state.CheckOptionValue(OPTVAL_PRESET_CUSTOM) ||
+                                state.CheckOptionValue(OPTVAL_PRESET_RANDOM)) {
+                                // Randomize all other options with
+                                // explicitly = false (only 'safe' options).
+                                for (const auto& data : g_OptionMetadata) {
+                                    if (OptionUnlocked(data.option))
+                                        RandomizeOption(data.option, false);
+                                }
+                                return true;
+                            } else {
                                 return false;
-
-                            // If preset is custom, randomize all other options
-                            // with explicitly = false (user did not ask).
-                            for (const auto& data : g_OptionMetadata) {
-                                if (OptionUnlocked(data.option))
-                                    RandomizeOption(data.option, false);
                             }
-                            return true;
                         }
                     }
 
@@ -377,6 +408,8 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
         state.SetOption(option, value);
         successful = true;
     
+        // TODO: Handle not-yet-unlocked secret boss options.
+
         // Handle invalid combinations of options by retrying.
         switch (option) {
             case OPT_MARIO_BP:
@@ -405,6 +438,15 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
                 // If partners disabled, retry on +1 move on pickup.
                 if (state.CheckOptionValue(OPTVAL_MOVES_PARTNER_BONUS) &&
                     state.GetOption(OPT_MAX_PARTNERS) == 0) {
+                    successful = false;
+                }
+                break;
+            case OPT_NUM_CHESTS:
+            case OPT_CHEST_CHOICE:
+                // Can't have combination of 1 chest / floor + reward reveals.
+                if (state.CheckOptionValue(OPTVAL_CHESTS_1) && (
+                    state.CheckOptionValue(OPTVAL_CHEST_REVEAL_FIXED) ||
+                    state.CheckOptionValue(OPTVAL_CHEST_REVEAL_REFILL))) {
                     successful = false;
                 }
                 break;

@@ -5372,6 +5372,7 @@ g_TowerLobbyStrings = {
     b"tot_optr_preset":             b"Option Preset",
     b"tot_optr_preset_custom":      b"Custom",
     b"tot_optr_preset_default":     b"Default",
+    b"tot_optr_preset_random":      b"Random",
     b"tot_optr_preset_rtarace":     b"RTA Race",
     b"tot_optr_difficulty":         b"Tower Type",
     b"tot_optr_diff_half":          b"Hooktail (32f)",
@@ -5515,6 +5516,10 @@ g_TowerLobbyStrings = {
     b"tot_opth_preset_rtarace":
         b"Settings for real-time races.\n"
         b'(Not "default" achievements.)',
+    
+    b"tot_opth_preset_random":
+        b"Picks random values for most\n"
+        b"run settings.",
     
     b"tot_opth_preset_custom":
         b"Select a custom set of run\n"

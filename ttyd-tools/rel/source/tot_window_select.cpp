@@ -243,6 +243,34 @@ bool OptionUnlocked(const OptionMenuData& data) {
     }
 }
 
+bool OptionChangeable(uint32_t option) {
+    // All presets can modify these options.
+    switch (option) {
+        case OPT_PRESET:
+        case OPT_DIFFICULTY:
+        case OPT_SECRET_BOSS:
+        case OPT_TIMER_DISPLAY:
+        case (uint32_t)WIN_SEED_SELECT:
+            return true;
+    }
+    // Only Custom can modify any others.
+    if (!g_Mod->state_.CheckOptionValue(OPTVAL_PRESET_CUSTOM)) return false;
+
+    // If in no partner mode, grey out partner-related options.
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_NO_PARTNERS) &&
+        (option == OPT_PARTNER || option == OPT_REVIVE_PARTNERS ||
+         option == OPT_PARTNER_HP)) {
+        return false;
+    }
+    // If Hooktail's tower, grey out NPC option 4.
+    if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
+        option == OPT_NPC_CHOICE_4) {
+        return false;
+    }
+
+    return true;
+}
+
 const char* OptionName(uint16_t lookup_key) {
     for (const auto& data : g_OptionMenuData) {
         if (data.lookup_key == lookup_key) {
@@ -495,14 +523,15 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                 state.SetOption(option, default_value);
                 // Play back-out sound.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x2002b);
-                // Re-enforce current preset's settings, if not custom.
-                if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM)) {
+                // Re-enforce current preset's settings, if not custom/random.
+                if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
+                    !state.CheckOptionValue(OPTVAL_PRESET_RANDOM)) {
                     OptionsManager::ApplyCurrentPresetOptions();
                 }
             }
         } else if (g_MarioSt->gamepad_buttons_pressed[0] & ButtonId::Y) {
             // Try randomizing the option, if allowed.
-            if (OptionsManager::RandomizeOption(option)) {
+            if (OptionChangeable(option) && OptionsManager::RandomizeOption(option)) {
                 // Play menu back-out sound to indicate randomization action.
                 ttyd::pmario_sound::psndSFXOn((const char*)0x2002b);
             } else {
@@ -510,11 +539,7 @@ void SelectMainOptionsWrapper(WinMgrEntry* entry) {
                 ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
             }
         } else if (change) {
-            // Allow changing only preset, difficulty and timer options if
-            // a non-custom preset is selected.
-            if (!state.CheckOptionValue(OPTVAL_PRESET_CUSTOM) &&
-                option != OPT_PRESET && option != OPT_DIFFICULTY &&
-                option != OPT_SECRET_BOSS && option != OPT_TIMER_DISPLAY) {
+            if (!OptionChangeable(option)) {
                 // Play "failure" sound.
                 ttyd::sound::SoundEfxPlayEx(0x266, 0, 0x64, 0x40);
             } else {
@@ -673,23 +698,10 @@ void DispMainWindow(WinMgrEntry* entry) {
             // For RUN_OPTIONS, set greyed-out color based on preset / option.
             if (sel_entry->type == MenuType::RUN_OPTIONS) {
                 uint32_t option = OptionLookup(row.value);
-                if (g_Mod->state_.CheckOptionValue(OPTVAL_PRESET_CUSTOM) ||
-                    option == OPT_PRESET || option == OPT_DIFFICULTY ||
-                    option == OPT_SECRET_BOSS || option == OPT_TIMER_DISPLAY || 
-                    (int32_t)option == WIN_SEED_SELECT) {
+
+                if (OptionChangeable(option)) {
                     row.flags &= ~WinMgrSelectEntryRow_Flags::GREYED_OUT;
                 } else {
-                    row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
-                }
-                // If no partner mode, grey out partner-related options.
-                if (g_Mod->state_.CheckOptionValue(OPTVAL_NO_PARTNERS) &&
-                    (option == OPT_PARTNER || option == OPT_REVIVE_PARTNERS ||
-                     option == OPT_PARTNER_HP)) {
-                    row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
-                }
-                // If half difficulty, grey out NPC option 4.
-                if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) &&
-                    option == OPT_NPC_CHOICE_4) {
                     row.flags |= WinMgrSelectEntryRow_Flags::GREYED_OUT;
                 }
 
@@ -1250,6 +1262,9 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                                 } else if (
                                     state.CheckOptionValue(OPTVAL_PRESET_RTA_RACE)) {
                                     help_msg = msgSearch("tot_opth_preset_rtarace");
+                                } else if (
+                                    state.CheckOptionValue(OPTVAL_PRESET_RANDOM)) {
+                                    help_msg = msgSearch("tot_opth_preset_random");
                                 } else {
                                     help_msg = msgSearch("tot_opth_preset_custom");
                                 }
