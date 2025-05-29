@@ -5128,13 +5128,13 @@ g_GlobalStrings = {
         b"<k>\n"
         b"%s"
         b"<p>\n"
-        b"Their breath attacks can\n"
+        b"Its breath attacks can\n"
         b"inflict a ton of different\n"
         b"status effects, so watch out!\n"
         b"<k>\n"
         b"<p>\n"
-        b"If their HP falls far enough\n"
-        b"below yours, they might heal\n"
+        b"If its HP falls far enough\n"
+        b"below yours, it might heal\n"
         b"a bunch of HP at once!\n"
         b"<k>\n"
         b"<p>\n"
@@ -6872,8 +6872,8 @@ g_TowerBossFloorStrings = {
         b"<k>",
     b"tot_di051100_01_kur":
         b"Mario, look! I think we've worn\n"
-        b"them down... <wait 250>just a bit more, and\n"
-        b"they oughtta be finished!\n"
+        b"it down... <wait 250>just a bit more, and it\n"
+        b"oughtta be finished!\n"
         b"<k>",
     b"tot_di051100_01_nok":
         b"Boy, that thing's looking pretty\n"
@@ -6883,7 +6883,7 @@ g_TowerBossFloorStrings = {
     b"tot_di051100_01_win":
         b"That poor beast looks quite\n"
         b"worn out, dear. Let's hurry it up\n"
-        b"and give them some rest!\n"
+        b"and give it some rest!\n"
         b"<k>",
     b"tot_di051100_01_yos":
         b"Come on, Gonzales, we've got\n"
@@ -6891,9 +6891,8 @@ g_TowerBossFloorStrings = {
         b"give up now!\n"
         b"<k>",
     b"tot_di051100_01_viv":
-        b"It seems that they're getting\n"
-        b"quite tired... <wait 250>Don't give up now,\n"
-        b"Mario!\n"
+        b"It seems to be tiring out...\n"
+        b"<wait 250>Don't give up now, Mario!\n"
         b"<k>",
     b"tot_di051100_01_bom":
         b"Come on, old boy! <wait 250>We're this\n"
@@ -6901,9 +6900,9 @@ g_TowerBossFloorStrings = {
         b"to its knees!\n"
         b"<k>",
     b"tot_di051100_01_chu":
-        b"It appears we're wearing them\n"
+        b"It appears we're wearing it\n"
         b"down, dearie. <wait 250>Let's keep it up,\n"
-        b"and dispose of them quickly!\n"
+        b"and dispose of it quickly!\n"
         b"<k>",
     
     # Bonetail phase 2 start.
@@ -7298,6 +7297,52 @@ g_PetalburgWestStrings = {
         b"Man, those things can be\n"
         b"dangerous, I get it. <wait 250>Maybe try\n"
         b"to be more careful next time!\n"
+        b"<k>",
+
+    b"tot_di011406_00":
+        b"<p>\n"
+        b"How'd it go this time, Mario?\n"
+        b"<wait 250>You look a little shook...\n"
+        b"<wait 150>What got you this time?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"<shake>*Gulp*</shake> <wait 250>King Bowser, you say?\n"
+        b"<wait 250>That must have certainly\n"
+        b"been a nasty run-in...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You've licked him before,\n"
+        b"though, <wait 150>so I'm sure you'll best\n"
+        b"him if he shows up again!\n"
+        b"<k>",
+
+    b"tot_di011407_00":
+        b"<p>\n"
+        b"How's it going, Mario?\n"
+        b"<wait 250>Yow, <wait 150>Bowser and Kammy were\n"
+        b"waiting up there this time?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And Kammy's magic did you\n"
+        b"in, eh? <wait 150>Figures, I guess... <wait 150>she's\n"
+        b"quite the tricky sort!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You'll get the better of her\n"
+        b"yet, though, <wait 150>I know it!\n"
+        b"<wait 150>Keep it up, Mario!\n"
+        b"<k>",
+
+    b"tot_di011408_00":
+        b"<p>\n"
+        b"How's it going, Mario?\n"
+        b"<wait 250>Ah, that trickster Doopliss\n"
+        b"turned turncoat on you, eh?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, <wait 150>there's nothing in his\n"
+        b"bag of tricks he didn't learn\n"
+        b"from you! <wait 250>Go and show him up!\n"
         b"<k>",
 
     b"tot_di011410_00":
@@ -8807,6 +8852,37 @@ g_PetalburgWestStrings = {
         b"If all else fails, and if you've\n"
         b"got a lot of max Star Power,\n"
         b"Mystic Eggs will do the trick!\n"
+        b"<k>",
+        
+    b"tot_di009182_00":
+        b"Oh, it's you again. <wait 250>You want\n"
+        b"to beat 7 or more enemy\n"
+        b"types in one fight, you say?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Sounds like you'll need to\n"
+        b"get a pretty varied group of\n"
+        b"enemies for that, I guess...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Even a big group, with five\n"
+        b"different types of enemies,\n"
+        b"still isn't going to cut it.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Unless a couple of them can\n"
+        b"call in supporting foes of\n"
+        b"different types, that is...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You might want to be on\n"
+        b"the lookout for Lakitus,\n"
+        b"Red Bones, Yuxes, and such.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"There might be options that\n"
+        b"could help as well; <wait 250>you should\n"
+        b"chat up Merlon if you see him!\n"
         b"<k>",
 
     b"tot_di009300_00":

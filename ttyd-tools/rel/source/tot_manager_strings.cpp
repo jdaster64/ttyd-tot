@@ -235,7 +235,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
                             partner_unit->unit_work[1];
                     if (tattle_work) {
                         int32_t idx = GetCustomTattleIndex(tattle_work->enemy_id);
-                        if (idx >= 1 && idx <= 102) {
+                        if (idx >= 1 && idx <= 105) {
                             char* ptr = buf;
                             ptr += sprintf(buf, "Times Defeated: ");
                             ptr += IntegerToFmtString(

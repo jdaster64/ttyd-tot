@@ -120,7 +120,7 @@ void UpdateMainMenuPos(int32_t change) {
     }
 }
 
-void _CompleteAllLogs(int32_t max_tattle_index = 102) {
+void _CompleteAllLogs(int32_t max_tattle_index = 105) {
     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
         // Set Tattle flags for only enemies in ToT, and up through max index.
         if (int32_t custom_index = GetCustomTattleIndex(i);

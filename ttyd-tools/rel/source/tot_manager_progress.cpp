@@ -2,6 +2,7 @@
 
 #include "mod.h"
 #include "tot_generate_enemy.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_move.h"
@@ -95,7 +96,7 @@ int32_t ProgressManager::GetOverallProgression() {
 
         score += 3000 * a_cur / a_tot;
         score += 1500 * data.moves_score / 10000;
-        score += 1500 * data.tattles_current / 102;
+        score += 1500 * data.tattles_current / 105;
         score += 750 * data.items_current / data.items_total;
         score += 750 * data.badges_current / data.badges_total;
         score += data.hub_score / 4;
@@ -235,6 +236,12 @@ void ProgressManager::GetTattleLogProgress(int32_t* cur, int32_t* tot) {
         }
         if (state.GetOption(FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
             total = 102;
+        }
+        if (GetSWF(GSWF_SecretBoss2_Beaten)) {
+            total = 104;
+        }
+        if (GetSWF(GSWF_SecretBoss3_Beaten)) {
+            total = 105;
         }
 
         // Count valid ToT enemies that were Tattled; if any enemy's index is

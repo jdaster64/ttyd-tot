@@ -202,6 +202,8 @@ extern const int32_t g_winPartyMain_OverrideMoveTextCursor_BH;
 extern const int32_t g_winPartyMain_OverrideMoveTextCursor_EH;
 extern const int32_t g_winBadge_mario_change_Patch_SkipMapAnim1;
 extern const int32_t g_winBadge_mario_change_Patch_SkipMapAnim2;
+extern const int32_t g_monosiri_disp_Patch_SkipDooplissNameCheck;
+extern const int32_t g_monoshiriGX_Patch_SkipDooplissNameCheck;
 extern const int32_t g_itemUseDisp_FixPartyOrder_BH;
 extern const int32_t g_itemUseDisp_FixPartyOrder_EH;
 extern const int32_t g_winItemDisp_DispInventorySize_BH;
@@ -641,6 +643,14 @@ void ApplyFixedPatches() {
         ttyd::battle_monosiri::battleGetUnitMonosiriPtr(i)->location_name =
             "custom_tattle_killcount";
     }
+
+    // Skip logic that replaces Doopliss's name with "?????" in Tattle log.
+    mod::writePatch(
+        reinterpret_cast<void*>(g_monosiri_disp_Patch_SkipDooplissNameCheck),
+        0x2c030000U  /* cmpwi r3, 0 */);
+    mod::writePatch(
+        reinterpret_cast<void*>(g_monoshiriGX_Patch_SkipDooplissNameCheck),
+        0x2c030000U  /* cmpwi r3, 0 */);
 
     // winHakoGX (Item / Badge log box drawing function) patches:
     // References new WinPauseMenu field locations in initialization. 

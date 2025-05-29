@@ -124,23 +124,25 @@ void DialogueManager::SetConversation(int32_t id) {
                             break;
                         case BattleUnitType::GOLD_FUZZY:
                         case BattleUnitType::FUZZY_HORDE:
-                            g_ConversationId = ConversationId::NPC_A_L_SECRET;
+                            g_ConversationId = ConversationId::NPC_A_L_SBOSS1;
                             break;
-                        // TODO: Add unique conversations for other bosses.
-                        // case BattleUnitType::BOWSER_CH_8:
-                        //     break;
-                        // case BattleUnitType::KAMMY_KOOPA:
-                        //     break;
-                        // case BattleUnitType::DOOPLISS_CH_8:
-                        // case BattleUnitType::DOOPLISS_CH_8_FAKE_MARIO:
-                        // case BattleUnitType::DOOPLISS_CH_8_GOOMBELLA:
-                        // case BattleUnitType::DOOPLISS_CH_8_KOOPS:
-                        // case BattleUnitType::DOOPLISS_CH_8_FLURRIE:
-                        // case BattleUnitType::DOOPLISS_CH_8_YOSHI:
-                        // case BattleUnitType::DOOPLISS_CH_8_VIVIAN:
-                        // case BattleUnitType::DOOPLISS_CH_8_BOBBERY:
-                        // case BattleUnitType::DOOPLISS_CH_8_MS_MOWZ:
-                        //     break;
+                        case BattleUnitType::BOWSER_CH_8:
+                            g_ConversationId = ConversationId::NPC_A_L_SBOSS2A;
+                            break;
+                        case BattleUnitType::KAMMY_KOOPA:
+                            g_ConversationId = ConversationId::NPC_A_L_SBOSS2B;
+                            break;
+                        case BattleUnitType::DOOPLISS_CH_8:
+                        case BattleUnitType::DOOPLISS_CH_8_FAKE_MARIO:
+                        case BattleUnitType::DOOPLISS_CH_8_GOOMBELLA:
+                        case BattleUnitType::DOOPLISS_CH_8_KOOPS:
+                        case BattleUnitType::DOOPLISS_CH_8_FLURRIE:
+                        case BattleUnitType::DOOPLISS_CH_8_YOSHI:
+                        case BattleUnitType::DOOPLISS_CH_8_VIVIAN:
+                        case BattleUnitType::DOOPLISS_CH_8_BOBBERY:
+                        case BattleUnitType::DOOPLISS_CH_8_MS_MOWZ:
+                            g_ConversationId = ConversationId::NPC_A_L_SBOSS3;
+                            break;
                         case BattleUnitType::BOMB_SQUAD_BOMB:
                             g_ConversationId = ConversationId::NPC_A_L_BOMB;
                             break;
@@ -265,6 +267,7 @@ void DialogueManager::SetConversation(int32_t id) {
                         case AchievementId::MISC_SHINES_10:
                         case AchievementId::MISC_RUN_COINS_999:
                         case AchievementId::V2_MISC_SP_TURN1:
+                        case AchievementId::V3_RUN_DEFEAT_7_TYPES:
                             ids[num_cvs++] =
                                 ConversationId::NPC_D_CVS_BASE + grid[i];
                             break;

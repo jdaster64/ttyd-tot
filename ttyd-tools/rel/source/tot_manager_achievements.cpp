@@ -271,7 +271,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
     switch (ach) {
         case AchievementId::V2_AGG_ENEMY_TIMES_100: {
             // Only checked here when updating a file from pre-v2.00.
-            for (int32_t i = 1; i <= 102; ++i) {
+            for (int32_t i = 1; i <= 105; ++i) {
                 if (state.GetOption(STAT_PERM_ENEMY_KILLS, i) >= 100) {
                     MarkCompleted(ach);
                     return;
@@ -421,7 +421,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
             int32_t tattles = 0;
             for (int32_t i = 1; i < 0xd8; ++i) {
                 int32_t custom_tattle_idx = GetCustomTattleIndex(i);
-                if (custom_tattle_idx >= 1 && custom_tattle_idx <= 102) {
+                if (custom_tattle_idx >= 1 && custom_tattle_idx <= 105) {
                     if (ttyd::swdrv::swGet(i + 0x117a)) ++tattles;
                 }
             }
@@ -431,7 +431,7 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
         case AchievementId::META_TATTLE_LOG_ALL: {
             for (int32_t i = 1; i < 0xd8; ++i) {
                 int32_t custom_tattle_idx = GetCustomTattleIndex(i);
-                if (custom_tattle_idx >= 1 && custom_tattle_idx <= 102) {
+                if (custom_tattle_idx >= 1 && custom_tattle_idx <= 105) {
                     if (!ttyd::swdrv::swGet(i + 0x117a)) return;
                 }
             }
