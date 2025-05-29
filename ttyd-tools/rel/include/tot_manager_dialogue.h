@@ -87,6 +87,11 @@ namespace ConversationId {
         NPC_G_ENDING_LOW,
         NPC_G_ENDING_MED,
         NPC_G_ENDING_HIGH,
+        // Follow-ups where player can ask about stats for any reward.
+        NPC_G_STATS         = 10400,
+        NPC_G_STATS_UNLOCK  = 10500,
+        NPC_G_STATS_NEW     = 10600,
+        NPC_G_STATS_AFTER   = 10700,
 
         // NPC A - West Petalburg Koopa.
         NPC_A               = 11000,

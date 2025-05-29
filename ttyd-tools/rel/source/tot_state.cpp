@@ -10,6 +10,7 @@
 #include "tot_manager_debug.h"
 #include "tot_manager_options.h"
 #include "tot_manager_progress.h"
+#include "tot_manager_reward.h"
 
 #include <gc/OSLink.h>
 #include <gc/OSTime.h>
@@ -280,6 +281,20 @@ bool StateManager::Load(TotSaveSlot* save) {
         if (GetOption(FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
             SetSWF(GSWF_SecretBoss1_Beaten);
         }
+
+        // Note: HP chests weren't properly tracked before v3.0 release,
+        // so unfortunately the starting numbers are a wild guess.
+        int32_t fake_hp_offered = (
+            GetOption(STAT_PERM_REWARDS_OFFERED, RewardStatId::STAT_FP) +
+            GetOption(STAT_PERM_REWARDS_OFFERED, RewardStatId::STAT_BP)) *
+            (90 + Rand(21)) / 200;
+        SetOption(STAT_PERM_REWARDS_OFFERED, fake_hp_offered, RewardStatId::STAT_HP);
+        int32_t fake_hp_taken = (
+            GetOption(STAT_PERM_REWARDS_TAKEN, RewardStatId::STAT_FP) +
+            GetOption(STAT_PERM_REWARDS_TAKEN, RewardStatId::STAT_BP)) *
+            (80 + Rand(41)) / 200;
+        if (fake_hp_taken > fake_hp_offered) fake_hp_taken = fake_hp_offered;
+        SetOption(STAT_PERM_REWARDS_TAKEN, fake_hp_taken, RewardStatId::STAT_HP);
 
         // Re-run special file setup to collect new achievements, options, etc.
         DebugManager::SpecialFileSetup();

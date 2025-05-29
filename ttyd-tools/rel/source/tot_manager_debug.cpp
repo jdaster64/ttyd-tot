@@ -11,6 +11,7 @@
 #include "tot_manager_achievements.h"
 #include "tot_manager_move.h"
 #include "tot_manager_options.h"
+#include "tot_manager_reward.h"
 #include "tot_state.h"
 
 #include <gc/OSTime.h>
@@ -151,6 +152,11 @@ void _CompleteTutorialFlags() {
     SetSWF(GSWF_SecretBoss1_Beaten);
     SetSWF(GSWF_SecretBoss2_Beaten);
     SetSWF(GSWF_SecretBoss3_Beaten);
+
+    for (int32_t i = 0; i < RewardStatId::MAX_REWARD_STAT; ++i) {
+        if (g_Mod->state_.GetOption(STAT_PERM_REWARDS_OFFERED, i) < 1)
+            g_Mod->state_.SetOption(STAT_PERM_REWARDS_OFFERED, 1, i);
+    }
 }
 
 void _PurchaseAllCosmetics() {

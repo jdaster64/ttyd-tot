@@ -48,7 +48,7 @@ int32_t g_ConversationStep = 0;
 
 // Used to indicate where the next conversation should pick up, for
 // conversations with programmatic beginnings / endings like NPC G's.
-int32_t g_ConversationContinueId = 0;
+int32_t g_ConversationContinueId[3] = { 0, 0, 0 };
 
 }  // namespace
 
@@ -78,10 +78,10 @@ void DialogueManager::SetConversation(int32_t id) {
     // pseudo-random factors like run stats, or other conditions.
     switch (id) {
         case ConversationId::NPC_A: {
-            if (g_ConversationContinueId) {
+            if (g_ConversationContinueId[0]) {
                 // Add predetermined ending to previous conversation.
-                g_ConversationId = g_ConversationContinueId;
-                g_ConversationContinueId = 0;
+                g_ConversationId = g_ConversationContinueId[0];
+                g_ConversationContinueId[0] = 0;
                 break;
             }
 
@@ -128,6 +128,7 @@ void DialogueManager::SetConversation(int32_t id) {
                             break;
                         // TODO: Add unique conversations for other bosses.
                         // case BattleUnitType::BOWSER_CH_8:
+                        //     break;
                         // case BattleUnitType::KAMMY_KOOPA:
                         //     break;
                         // case BattleUnitType::DOOPLISS_CH_8:
@@ -175,7 +176,7 @@ void DialogueManager::SetConversation(int32_t id) {
                             level = (level + ttyd::system::irand(5) - 2) / 2;
                             if (level >= num_endings) level = num_endings - 1;
                             // Cue response for after this conversation ends.
-                            g_ConversationContinueId =
+                            g_ConversationContinueId[0] =
                                 ConversationId::NPC_A_L_RESP_START + level;
 
                             break;
@@ -336,15 +337,17 @@ void DialogueManager::SetConversation(int32_t id) {
                 g_ConversationId = ConversationId::NPC_G_FIRST_CLEAR;
                 SetSWF(GSWF_NpcG_PostTutorialChat);
                 break;
-            } else if (g_ConversationContinueId) {
-                // Add predetermined ending to previous conversation.
-                g_ConversationId = g_ConversationContinueId;
-                g_ConversationContinueId = 0;
+            } else if (g_ConversationContinueId[0]) {
+                // Queue next conversation.
+                g_ConversationId = g_ConversationContinueId[0];
+                g_ConversationContinueId[0] = g_ConversationContinueId[1];
+                g_ConversationContinueId[1] = 0;
                 break;
             }
 
             NpcGStats stats[RewardStatId::MAX_REWARD_STAT];
             int32_t num_stats = 0;
+            bool all_offered = true;
 
             for (int32_t i = 0; i < RewardStatId::MAX_REWARD_STAT; ++i) {
                 switch (i) {
@@ -365,6 +368,8 @@ void DialogueManager::SetConversation(int32_t id) {
                         stats[num_stats].reward_rate_taken =
                             num_offered ? num_taken * 10000LL / num_offered : 0;
                         ++num_stats;
+
+                        if (!num_offered) all_offered = false;
                             
                         break;
                     }
@@ -386,16 +391,76 @@ void DialogueManager::SetConversation(int32_t id) {
             // frequently you've picked a particular type of reward.
             if (stats[index].reward_rate_taken < 500) {
                 // If taken < 5% of the time:
-                g_ConversationContinueId = ConversationId::NPC_G_ENDING_NONE;
+                g_ConversationContinueId[0] = ConversationId::NPC_G_ENDING_NONE;
             } else if (stats[index].reward_rate_taken > 7500 || num_stats - index <= 3) {
                 // If taken > 75% of the time, or in top three types taken:
-                g_ConversationContinueId = ConversationId::NPC_G_ENDING_HIGH;
+                g_ConversationContinueId[0] = ConversationId::NPC_G_ENDING_HIGH;
             } else if (stats[index].reward_rate_taken < 2000 || index < 8) {
                 // If taken < 20% of the time, or in bottom 40% of types:
-                g_ConversationContinueId = ConversationId::NPC_G_ENDING_LOW;
+                g_ConversationContinueId[0] = ConversationId::NPC_G_ENDING_LOW;
             } else {
-                g_ConversationContinueId = ConversationId::NPC_G_ENDING_MED;
+                g_ConversationContinueId[0] = ConversationId::NPC_G_ENDING_MED;
             }
+
+            // Prompt follow-up conversation, asking about individual stats.
+            if (completed_runs >= 2 && !GetSWF(GSWF_NpcG_UnlockedRewardStats)) {
+                if (all_offered) {
+                    g_ConversationContinueId[1] = ConversationId::NPC_G_STATS_UNLOCK;
+                    SetSWF(GSWF_NpcG_UnlockedRewardStats, 1);
+                }
+            } else if (GetSWF(GSWF_NpcG_UnlockedRewardStats)) {
+                g_ConversationContinueId[1] = ConversationId::NPC_G_STATS_AFTER;
+            }
+
+            break;
+        }
+        case ConversationId::NPC_G_STATS: {
+            if (g_ConversationContinueId[0]) {
+                // Queue next conversation.
+                g_ConversationId = g_ConversationContinueId[0];
+                g_ConversationContinueId[0] = 0;
+                break;
+            }
+
+            NpcGStats stats[RewardStatId::MAX_REWARD_STAT];
+            int32_t num_stats = 0;
+
+            for (int32_t i = 0; i < RewardStatId::MAX_REWARD_STAT; ++i) {
+                // Calculate how often this reward was taken.
+                int32_t num_offered =
+                    state.GetOption(STAT_PERM_REWARDS_OFFERED, i);
+                int32_t num_taken =
+                    state.GetOption(STAT_PERM_REWARDS_TAKEN, i);
+
+                stats[num_stats].reward_type = i;
+                stats[num_stats].reward_rate_taken =
+                    num_offered ? num_taken * 10000LL / num_offered : 0;
+                ++num_stats;
+            }
+
+            // Sort reward types by frequency taken, and find index.
+            ttyd::system::qqsort(
+                stats, num_stats, sizeof(NpcGStats), (void*)comp_NpcGStats);
+            int32_t index = 0;
+            for (; stats[index].reward_type != GetSWByte(GSW_NpcG_CurrentStatBreakdown); ++index);
+            
+            // Set which ending the conversation should use based on how
+            // frequently you've picked a particular type of reward.
+            g_ConversationId = ConversationId::NPC_G_ENDING_MED;
+
+            if (stats[index].reward_rate_taken < 500) {
+                // If taken < 5% of the time:
+                g_ConversationId = ConversationId::NPC_G_ENDING_NONE;
+            } else if (stats[index].reward_rate_taken > 7500 || num_stats - index <= 3) {
+                // If taken > 75% of the time, or in top three types taken:
+                g_ConversationId = ConversationId::NPC_G_ENDING_HIGH;
+            } else if (stats[index].reward_rate_taken < 2000 || index < 8) {
+                // If taken < 20% of the time, or in bottom 40% of types:
+                g_ConversationId = ConversationId::NPC_G_ENDING_LOW;
+            }
+
+            // Follow-up conversation asking about other stats.
+            g_ConversationContinueId[0] = ConversationId::NPC_G_STATS_AFTER;
 
             break;
         }
@@ -647,7 +712,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetNextMessage) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_HasConversationQueued) {
-    evtSetValue(evt, evt->evtArguments[0], g_ConversationContinueId != 0);
+    evtSetValue(evt, evt->evtArguments[0], g_ConversationContinueId[0] != 0);
     return 2;
 }
 

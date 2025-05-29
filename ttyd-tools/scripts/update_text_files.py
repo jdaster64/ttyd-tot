@@ -9536,7 +9536,7 @@ g_PetalburgEastStrings = {
         b"Well, <wait 200>perhaps you know better,\n"
         b"<wait 150>but I believe it couldn't hurt to\n"
         b"explore new things.\n"
-        b"<k>",
+        b"<k>\n<o>",
 
     b"tot_di010301_00":
         b"<p>\n"
@@ -9548,7 +9548,7 @@ g_PetalburgEastStrings = {
         b"Well, <wait 200>perhaps you know better,\n"
         b"<wait 150>but I believe it couldn't hurt to\n"
         b"explore new things.\n"
-        b"<k>",
+        b"<k>\n<o>",
 
     b"tot_di010302_00":
         b"<p>\n"
@@ -9560,7 +9560,7 @@ g_PetalburgEastStrings = {
         b"All the same, <wait 200>I believe it's\n"
         b"always worth trying to explore\n"
         b"new things...\n"
-        b"<k>",
+        b"<k>\n<o>",
 
     b"tot_di010303_00":
         b"<p>\n"
@@ -9572,7 +9572,78 @@ g_PetalburgEastStrings = {
         b"All the same, <wait 200>I believe it's\n"
         b"always worth trying to explore\n"
         b"new things...\n"
-        b"<k>",
+        b"<k>\n<o>",
+        
+    # NPC G stat-related conversations.
+    
+    b"tot_di010400_00":
+        # Should never appear; default stat breakdown message.
+        b"<p>\nI don't know, sorry.\n<k>\n<o>",
+    
+    b"tot_di010500_00":
+        # Unlocking ability to ask about individual stats. 
+        b"<p>\n"
+        b"Oh, by the by, <wait 150>if you want\n"
+        b"to know how much anything\n"
+        b"strikes your fancy, just ask!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Go ahead, do you want to\n"
+        b"hear about how much you've\n"
+        b"taken any treasures?\n<o>",
+    
+    b"tot_di010600_00":
+        # New conversation asking about stats.
+        b"Are you curious how often\n"
+        b"you've taken any particular\n"
+        b"treasures in the tower?\n<o>",
+    
+    b"tot_di010700_00":
+        # Follow-up conversation asking about stats.
+        b"<p>\n"
+        b"Anything else you want me\n"
+        b"to tell you about?\n<o>",
+        
+    b"tot_gstat_which":
+        b"Which treasures do you\n"
+        b"want me to tell you about?\n<o>",
+        
+    b"tot_gstat_main":
+        b"<select 0 4 0 60>\n"
+        b"Mario's moves\nPartner moves\nStats\nOthers\nNever mind",
+        
+    b"tot_gstat_mario":
+        b"<select 0 3 0 40>\n"
+        b"Jump moves\nHammer moves\nSpecial moves",
+        
+    b"tot_gstat_party1":
+        b"<select 0 4 0 40>\n"
+        b"Goombella\nKoops\nFlurrie\nOthers...",
+        
+    b"tot_gstat_party2":
+        b"<select 0 4 0 40>\n"
+        b"Yoshi\nVivian\nBobbery\nMs. Mowz",
+        
+    b"tot_gstat_level":
+        b"<select 0 5 0 60>\n"
+        b"HP\nPartner HP\nFP\nBP\nStrange Sacks",
+        
+    b"tot_gstat_misc":
+        b"<select 0 5 0 60>\n"
+        b"Coins\nStar Pieces\nShine Sprites\nUnique badges\nOther badges",
+        
+    b"tot_gstat_result":
+        # Should never appear; default stat breakdown message.
+        b"<p>\nI don't know, sorry.\n<k>\n<o>",
+        
+    b"tot_gstat_result_base":
+        b"<p>\n"
+        b"You've seen %s\n"
+        b"%d time%s, <wait 250>and taken them\n"
+        b"%d time%s, or %.2f%%.\n<k>\n<o>",
+    
+    b"tot_gstat_decline":
+        b"<p>\nSee you later!\n<k>",
 
     # NPC H (Koopa).
     

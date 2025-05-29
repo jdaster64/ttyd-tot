@@ -34,6 +34,7 @@ namespace MsgKey {
         SYS_NO_KEY,
         TOT_ACHD_89,
         TOT_FLOOR_SIGN,
+        TOT_GSTAT_RESULT,
         TOT_LOBBY_BACKSIGN,
         TOT_MOVELOG_DESC_DYN,
         TOT_UPG_SMOOCH,
@@ -53,21 +54,25 @@ constexpr const char* kKeyLookups[] = {
     "sys_no_key",
     "tot_achd_89",
     "tot_floor_sign",
+    "tot_gstat_result",
     "tot_lobby_backsign",
     "tot_movelog_desc_dyn",
     "tot_upg_smooch",
 };
 
+// Shared across multiple functions.
+char g_Buf[512] = { 0 };
+
 // Determines the info printed on lobby / floor signs dynamically.
 // "floor" = On floor sign (otherwise, on lobby sign)
 // "options" = Is the ability to set options unlocked?
 const char* GetRunInfoSignString(bool floor, bool options) {
-    static char buf[512], temp[64];
+    static char temp[64];
 
     const int32_t base_x_offset = 210;
     int32_t y_offset = options ? 0 : 27;
 
-    char* ptr = buf;
+    char* ptr = g_Buf;
     ptr += sprintf(ptr, "<kanban>\n");
 
     if (floor) {
@@ -135,7 +140,46 @@ const char* GetRunInfoSignString(bool floor, bool options) {
 
     ptr += sprintf(ptr, "<k>");
 
-    return buf;
+    return g_Buf;
+}
+
+// Should match the RewardStatId order.
+constexpr const char* kRewardsText[] = {
+    "Goombella's moves",
+    "Koops's moves",
+    "Flurrie's moves",
+    "Yoshi's moves",
+    "Vivian's moves",
+    "Bobbery's moves",
+    "Ms. Mowz's moves",
+    "jump moves",
+    "hammer moves",
+    "Special moves",
+    "HP level-ups",
+    "partner HP levels",
+    "FP level-ups",
+    "BP level-ups",
+    "Strange Sacks",
+    "coin chests",
+    "Star Pieces",
+    "Shine Sprites",
+    "unique badges",
+    "random badges"
+};
+
+const char* GetStatBreakdown() {
+    int32_t stat = GetSWByte(GSW_NpcG_CurrentStatBreakdown);
+    int32_t num_offered = g_Mod->state_.GetOption(STAT_PERM_REWARDS_OFFERED, stat);
+    int32_t num_taken = g_Mod->state_.GetOption(STAT_PERM_REWARDS_TAKEN, stat);
+    float rate = num_offered ? 100.0f * num_taken / num_offered : 0.0f;
+
+    sprintf(
+        g_Buf, ttyd::msgdrv::msgSearch("tot_gstat_result_base"), 
+        kRewardsText[stat], 
+        num_offered, num_offered == 1 ? "" : "s",
+        num_taken, num_taken == 1 ? "" : "s", 
+        rate);
+    return g_Buf;
 }
 
 }
@@ -222,9 +266,7 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
             }
             break;
         case MsgKey::TOT_ACHD_89: {
-            // TODO: Return a redacted string before beating B&K specifically.
-            if (!g_Mod->state_.GetOption(
-                FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
+            if (!GetSWF(GSWF_SecretBoss2_Beaten)) {
                 return "Defeat ????? & ?????\nsimultaneously.";
             }
             return nullptr;
@@ -233,6 +275,9 @@ const char* StringsManager::LookupReplacement(const char* msg_key) {
             return GetRunInfoSignString(
                 /* floor = */ true,
                 /* options = */ GetSWByte(GSW_Tower_TutorialClears) >= 2);
+        }
+        case MsgKey::TOT_GSTAT_RESULT: {
+            return GetStatBreakdown();
         }
         case MsgKey::TOT_LOBBY_BACKSIGN: {
             return GetRunInfoSignString(

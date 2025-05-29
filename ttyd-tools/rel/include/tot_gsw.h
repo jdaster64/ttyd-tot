@@ -24,6 +24,7 @@ enum GlobalWorkVars {
     GSW_Tower_RevealUsedThisFloor,
     GSW_Tower_NpcTalkedThisFloor,
     GSW_Tower_FinalBossType,
+    GSW_NpcG_CurrentStatBreakdown,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),
@@ -74,6 +75,9 @@ enum GlobalWorkVars {
     GSWF_SecretBoss1_Beaten,
     GSWF_SecretBoss2_Beaten,
     GSWF_SecretBoss3_Beaten,
+    // Flags for talking to NPC G about reward breakdowns.
+    GSWF_NpcG_UnlockedRewardStats,
+    GSWF_NpcG_TalkedThisVisit,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

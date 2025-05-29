@@ -507,6 +507,8 @@ void TrackChestReward(int32_t reward_type, int32_t collected) {
             track_id = RewardStatId::MOVE_HAMMER;           break;
         case REWARD_SPECIAL_MOVE:
             track_id = RewardStatId::MOVE_SPECIAL;          break;
+        case REWARD_HP_UP:
+            track_id = RewardStatId::STAT_HP;               break;
         case REWARD_FP_UP:
             track_id = RewardStatId::STAT_FP;               break;
         case REWARD_BP_UP:

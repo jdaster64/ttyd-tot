@@ -638,7 +638,6 @@ LBL(0)
     END_IF()
 
     MUL(LW(5), -1)
-    // TODO: Play a sound effect or visual effect?
     USER_FUNC(evt_pouch_add_coin, LW(5))
     USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_LEVELS_SOLD, 1)
     USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::CHET_RIPPO)

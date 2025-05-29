@@ -8,6 +8,7 @@
 #include "tot_manager_cosmetics.h"
 #include "tot_manager_dialogue.h"
 #include "tot_manager_options.h"
+#include "tot_manager_reward.h"
 #include "tot_state.h"
 #include "tot_window_select.h"
 
@@ -400,18 +401,149 @@ EVT_BEGIN(Npc_D_Talk)
     RETURN()
 EVT_END()
 
+EVT_BEGIN(Npc_G_Stathead)
+LBL(1)
+    USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_yesno"))
+    IF_EQUAL(LW(0), 1)
+        GOTO(99)
+    END_IF()
+
+    // Refresh dialog box to make sure it doesn't grow infinitely.
+    USER_FUNC(evt_msg_continue)
+    WAIT_MSEC(100)
+    USER_FUNC(evt_msg_print, 0, PTR("tot_gstat_which"), 0, PTR("me"))
+
+    // Main menu
+    USER_FUNC(evt_msg_select, 0, PTR("tot_gstat_main"))
+    SWITCH(LW(0))
+        CASE_EQUAL(0) GOTO(10)
+        CASE_EQUAL(1) GOTO(20)
+        CASE_EQUAL(2) GOTO(40)
+        CASE_EQUAL(3) GOTO(50)
+        CASE_ETC()    GOTO(99)
+    END_SWITCH()
+    
+LBL(10)
+    // Mario's moves
+    USER_FUNC(evt_msg_select, 0, PTR("tot_gstat_mario"))
+    SWITCH(LW(0))
+        CASE_BETWEEN(0, 2)
+            ADD(LW(0), (int32_t)RewardStatId::MOVE_JUMP)
+            GOTO(70)
+        CASE_ETC()
+            GOTO(99)
+    END_SWITCH()
+
+LBL(20)
+    // Partners 1
+    USER_FUNC(evt_msg_select, 0, PTR("tot_gstat_party1"))
+    SWITCH(LW(0))
+        CASE_BETWEEN(0, 2)
+            ADD(LW(0), (int32_t)RewardStatId::MOVE_GOOMBELLA)
+            GOTO(70)
+        CASE_EQUAL(3)
+            GOTO(30)
+        CASE_ETC()
+            GOTO(99)
+    END_SWITCH()
+
+LBL(30)
+    // Partners 2
+    USER_FUNC(evt_msg_select, 0, PTR("tot_gstat_party2"))
+    SWITCH(LW(0))
+        CASE_BETWEEN(0, 3)
+            ADD(LW(0), (int32_t)RewardStatId::MOVE_YOSHI)
+            GOTO(70)
+        CASE_ETC()
+            GOTO(99)
+    END_SWITCH()
+
+LBL(40)
+    // Stat increases
+    USER_FUNC(evt_msg_select, 0, PTR("tot_gstat_level"))
+    SWITCH(LW(0))
+        CASE_BETWEEN(0, 4)
+            ADD(LW(0), (int32_t)RewardStatId::STAT_HP)
+            GOTO(70)
+        CASE_ETC()
+            GOTO(99)
+    END_SWITCH()
+
+LBL(50)
+    // Others
+    USER_FUNC(evt_msg_select, 0, PTR("tot_gstat_misc"))
+    SWITCH(LW(0))
+        CASE_BETWEEN(0, 4)
+            ADD(LW(0), (int32_t)RewardStatId::MISC_COINS)
+            GOTO(70)
+        CASE_ETC()
+            GOTO(99)
+    END_SWITCH()
+
+LBL(70)
+    // Give the stats breakdown, including player's relative favor to others,
+    // and ask to do another breakdown.
+    SET((int32_t)GSW_NpcG_CurrentStatBreakdown, LW(0))
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_gstat_result"))
+
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G_STATS)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print_add, 0, LW(0))
+    USER_FUNC(evtTot_HasConversationQueued, LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G_STATS)
+        USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+        USER_FUNC(evt_msg_print_add, 0, LW(0))
+        GOTO(1)
+    END_IF()
+
+LBL(99)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_gstat_decline"))
+
+    RETURN()
+EVT_END()
+
 EVT_BEGIN(Npc_G_Talk)
+    // Check for skipping straight to 'stat-head' dialog tree.
+    IF_EQUAL((int32_t)GSWF_NpcG_TalkedThisVisit, 1)
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G_STATS_NEW)
+        USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+        USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+        RUN_CHILD_EVT(Npc_G_Stathead)
+        RETURN()
+    END_IF()
+
     // Print initial dialogue.
     USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G)
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
     USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+
     // If dialogue has a programmatic ending attached, also display it.
     USER_FUNC(evtTot_HasConversationQueued, LW(0))
     IF_NOT_EQUAL(LW(0), 0)
         USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G)
         USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
         USER_FUNC(evt_msg_print_add, 0, LW(0))
+    ELSE()
+        GOTO(99)
     END_IF()
+
+    // Check for unlocking / advancing to stat-head dialogue prompt.
+    USER_FUNC(evtTot_HasConversationQueued, LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        IF_EQUAL((int32_t)GSWF_NpcG_UnlockedRewardStats, 1)
+            SET((int32_t)GSWF_NpcG_TalkedThisVisit, 1)
+        END_IF()
+
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G)
+        USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+        USER_FUNC(evt_msg_print_add, 0, LW(0))
+        RUN_CHILD_EVT(Npc_G_Stathead)
+    ELSE()
+        USER_FUNC(evt_msg_continue)
+    END_IF()
+
+LBL(99)
     RETURN()
 EVT_END()
 
