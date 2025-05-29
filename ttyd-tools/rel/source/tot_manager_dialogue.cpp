@@ -5,6 +5,7 @@
 #include "tot_generate_enemy.h"
 #include "tot_gsw.h"
 #include "tot_manager_achievements.h"
+#include "tot_manager_move.h"
 #include "tot_manager_reward.h"
 #include "tot_state.h"
 
@@ -503,12 +504,21 @@ void DialogueManager::SetConversation(int32_t id) {
                 break;
             }
 
-            if (!GetSWF(GSWF_NpcK_CustomMovesUnlocked) &&
-                state.GetOption(
-                    FLAGS_ACHIEVEMENT, AchievementId::V2_META_USE_ALL_MOVES)) {
-                g_ConversationId = ConversationId::NPC_K_OPTION_UNLOCK;
-                SetSWF(GSWF_NpcK_CustomMovesUnlocked);
-                break;
+            // Unlock move selector once all moves have been used.
+            if (!GetSWF(GSWF_NpcK_CustomMovesUnlocked)) {
+                bool all_moves_used = true;
+                for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+                    uint32_t flags = state.GetOption(STAT_PERM_MOVE_LOG, i);
+                    if (!(flags & MoveLogFlags::USED_ALL)) {
+                        all_moves_used = false;
+                        break;
+                    }
+                }
+                if (all_moves_used) {
+                    g_ConversationId = ConversationId::NPC_K_OPTION_UNLOCK;
+                    SetSWF(GSWF_NpcK_CustomMovesUnlocked);
+                    break;
+                }
             }
 
             int32_t ids[10] = { ConversationId::NPC_K_BADGE_MOVES };

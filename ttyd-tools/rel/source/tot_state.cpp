@@ -220,7 +220,6 @@ bool StateManager::Load(TotSaveSlot* save) {
         }
 
         // Check if automatically eligible for new aggregate achievements.
-        AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_ALL_MOVES);
         AchievementsManager::CheckCompleted(AchievementId::V2_AGG_ENEMY_TIMES_100);
         AchievementsManager::CheckCompleted(AchievementId::V2_AGG_RUN_AWAY_30);
         // As well as achievements that've been retroactively made easier.
@@ -249,6 +248,7 @@ bool StateManager::Load(TotSaveSlot* save) {
         // Revert achievements that are no longer true.
         const int32_t kRevertAch[] = {
             AchievementId::SECRET_BADGE_COMBO,
+            AchievementId::META_TATTLE_LOG_ALL,
             AchievementId::META_ALL_OPTIONS,
             AchievementId::META_ALL_ACHIEVEMENTS,
         };
@@ -275,7 +275,8 @@ bool StateManager::Load(TotSaveSlot* save) {
             }
         }
 
-        // TODO: Check if automatically eligible for new aggregate achievements...
+        // Check if automatically eligible for new aggregate achievements.
+        AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_50_MOVES);
 
         // Set flag for secret boss 1, if already beaten on a previous file.
         if (GetOption(FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {

@@ -396,7 +396,7 @@ void MoveManager::LogMoveUse(int32_t move_type) {
     }
 
     // Check for move log completion.
-    AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_ALL_MOVES);
+    AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_50_MOVES);
     AchievementsManager::CheckCompleted(AchievementId::META_MOVE_LOG_ALL);
 }
 

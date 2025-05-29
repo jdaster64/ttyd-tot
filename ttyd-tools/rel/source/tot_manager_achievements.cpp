@@ -438,13 +438,14 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
             MarkCompleted(ach);
             break;
         }
-        case AchievementId::V2_META_USE_ALL_MOVES: {
+        case AchievementId::V2_META_USE_50_MOVES: {
+            int32_t moves_used = 0;
             for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
                 uint32_t flags = state.GetOption(STAT_PERM_MOVE_LOG, i);
                 // Check if any of the "used" flags are set.
-                if (!(flags & MoveLogFlags::USED_ALL)) return;
+                if ((flags & MoveLogFlags::USED_ALL)) ++moves_used;
             }
-            MarkCompleted(ach);
+            if (moves_used >= 50) MarkCompleted(ach);
             break;
         }
         case AchievementId::META_MOVE_LOG_ALL: {

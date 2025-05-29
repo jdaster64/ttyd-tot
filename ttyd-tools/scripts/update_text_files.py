@@ -2335,7 +2335,7 @@ g_GlobalStrings = {
         b"Take exactly 654 total damage\n"
         b"in a single tower run.",
     b"tot_achd_70":
-        b"Use all moves at least once\n"
+        b"Use 50 moves at least once\n"
         b"across all tower runs.",
     b"tot_achd_71":
         b"Finish a tower run without\n"

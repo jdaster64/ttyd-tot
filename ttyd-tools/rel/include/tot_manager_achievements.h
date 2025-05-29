@@ -86,7 +86,7 @@ namespace AchievementId {
         SECRET_DAMAGE,
 
         // Added in 2.0.
-        V2_META_USE_ALL_MOVES,
+        V2_META_USE_50_MOVES,
         V2_RUN_BASE_MOVES_ONLY,
         V2_AGG_RUN_AWAY_30,
         V2_MISC_STATUS_5,
