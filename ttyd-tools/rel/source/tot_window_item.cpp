@@ -1484,6 +1484,7 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
         case 400:
         case 401:
         case 402: {
+            int32_t cosmetic_class = menu->item_menu_state - 400;
             int32_t type = menu->cosmetic_options[menu->cosmetic_cursor_idx];
 
             if (menu->buttons_pressed & ButtonId::START) {
@@ -1496,15 +1497,69 @@ int32_t ItemMenuMain(WinPauseMenu* menu) {
                 menu->item_menu_state = 10;
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_1);
                 ttyd::winmgr::winMgrClose(menu->winmgr_entry_2);
+            } else if (menu->buttons_pressed & ButtonId::X &&
+                       cosmetic_class != CosmeticType::MARIO_COSTUME) {
+                // Equip or unequip all cosmetics (Yoshi + FX only).
+                int32_t num_equipped = 0;
+                for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
+                    int32_t c = menu->cosmetic_options[i];
+                    if (CosmeticsManager::IsEquipped(cosmetic_class, c)) {
+                        ++num_equipped;
+                    }
+                }
+                for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
+                    int32_t c = menu->cosmetic_options[i];
+                    if (CosmeticsManager::IsEquipped(cosmetic_class, c) ||
+                        num_equipped == 0) {
+                        CosmeticsManager::ToggleEquipped(cosmetic_class, c);
+                    }
+                }
+
+                if (num_equipped == 0) {
+                    ttyd::pmario_sound::psndSFXOn((char *)0x20038);
+                } else {
+                    ttyd::pmario_sound::psndSFXOn((char *)0x20039);
+                }
+            } else if (menu->buttons_pressed & ButtonId::Y) {
+                int32_t rc = menu->cosmetic_options[
+                    g_Mod->state_.Rand(menu->cosmetic_num_options)];
+
+                ttyd::pmario_sound::psndSFXOn((char *)0x2002b);
+
+                // Equip one randomly selected cosmetic option.
+                if (cosmetic_class == CosmeticType::MARIO_COSTUME) {
+                    CosmeticsManager::ToggleEquipped(cosmetic_class, rc);
+                    
+                    // For Mario clothes specifically, reload models.
+                    if (menu->mario_anim_pose_id != -1) {
+                        ttyd::animdrv::animPoseRelease(menu->mario_anim_pose_id);
+                        ttyd::mario::marioSetCharMode(0);
+                        menu->mario_anim_pose_id =
+                            ttyd::animdrv::animPoseEntry("a_mario", 0);
+                        ttyd::animdrv::animPoseSetAnim(
+                            menu->mario_anim_pose_id, "M_S_1", 1);
+                        ttyd::animdrv::animPoseSetMaterialFlagOn(
+                            menu->mario_anim_pose_id, 0x1800);
+                    } else {
+                        ttyd::mario::marioSetCharMode(0);
+                    }
+                } else {
+                    for (int32_t i = 0; i < menu->cosmetic_num_options; ++i) {
+                        int32_t c = menu->cosmetic_options[i];
+                        if (CosmeticsManager::IsEquipped(cosmetic_class, c) !=
+                            (rc == c)) {
+                            CosmeticsManager::ToggleEquipped(cosmetic_class, c);
+                        }
+                    }
+                }
             } else if (menu->buttons_pressed & ButtonId::A) {
-                if (CosmeticsManager::ToggleEquipped(
-                    menu->item_menu_state - 400, type)) {
+                if (CosmeticsManager::ToggleEquipped(cosmetic_class, type)) {
                     ttyd::pmario_sound::psndSFXOn((char *)0x20038);
                 } else {
                     ttyd::pmario_sound::psndSFXOn((char *)0x20039);
                 }
                 // For Mario clothes specifically, reload models.
-                if (menu->item_menu_state == 401) {
+                if (cosmetic_class == CosmeticType::MARIO_COSTUME) {
                     if (menu->mario_anim_pose_id != -1) {
                         ttyd::animdrv::animPoseRelease(menu->mario_anim_pose_id);
                         ttyd::mario::marioSetCharMode(0);
