@@ -23,6 +23,7 @@ enum GlobalWorkVars {
     GSW_Battle_DooplissMove,
     GSW_Tower_RevealUsedThisFloor,
     GSW_Tower_NpcTalkedThisFloor,
+    GSW_Tower_FinalBossType,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),
@@ -69,6 +70,10 @@ enum GlobalWorkVars {
     // Flags for first + option unlock conversation with General White.
     GSWF_White_FirstTimeChat,
     GSWF_White_CountdownUnlocked,
+    // Flags for beating each of the secret bosses.
+    GSWF_SecretBoss1_Beaten,
+    GSWF_SecretBoss2_Beaten,
+    GSWF_SecretBoss3_Beaten,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

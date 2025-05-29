@@ -164,6 +164,7 @@ void SetBaseStats() {
     }
 }
 
+// Return whether an option or OPTVAL is unlocked.
 bool OptionUnlocked(uint32_t option) {
     switch (option) {
         case OPT_COUNTDOWN_TIMER:
@@ -177,6 +178,23 @@ bool OptionUnlocked(uint32_t option) {
         default:
             return AchievementsManager::CheckOptionUnlocked(option);
     }
+}
+
+bool OptvalUnlocked(uint32_t option) {
+    switch (option) {
+        case OPTVAL_SECRET_BOSS_1:
+            return GetSWF(GSWF_SecretBoss1_Beaten);
+        case OPTVAL_SECRET_BOSS_2:
+            return GetSWF(GSWF_SecretBoss2_Beaten);
+        case OPTVAL_SECRET_BOSS_3:
+            return GetSWF(GSWF_SecretBoss3_Beaten);
+        case OPTVAL_SECRET_BOSS_EQUAL:
+            return GetSWF(GSWF_SecretBoss1_Beaten) &&
+                   GetSWF(GSWF_SecretBoss2_Beaten) &&
+                   GetSWF(GSWF_SecretBoss3_Beaten);
+    }
+
+    return true;
 }
     
 }
@@ -244,10 +262,10 @@ void OptionsManager::AdvanceOption(uint32_t option, int32_t change) {
             // swapping difficulties.
             if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF)) {
                 state.SetOption(
-                    OPT_NPC_CHOICE_4, tot::gon::GetNumSecondaryNpcTypes() + 1);
+                    OPT_NPC_CHOICE_4, tot::gon::SecondaryNpcType::CHOICE_NONE);
             } else {
                 state.SetOption(
-                    OPT_NPC_CHOICE_4, tot::gon::GetNumSecondaryNpcTypes());
+                    OPT_NPC_CHOICE_4, tot::gon::SecondaryNpcType::CHOICE_RANDOM);
             }
             break;
         case OPT_NUM_CHESTS:
@@ -266,6 +284,11 @@ void OptionsManager::AdvanceOption(uint32_t option, int32_t change) {
                 state.SetOption(OPTVAL_CHESTS_DEFAULT);
             }
             break;
+        case OPT_SECRET_BOSS:
+            // Skip bosses that haven't been unlocked.
+            while (!OptvalUnlocked(state.GetOptionValue(OPT_SECRET_BOSS))) {
+                state.NextOption(option, change);
+            }
         case OPT_MARIO_BP:
             // If Infinite BP isn't unlocked, skip it.
             if (state.CheckOptionValue(OPTVAL_INFINITE_BP) &&
@@ -314,7 +337,7 @@ void OptionsManager::AdvanceOption(uint32_t option, int32_t change) {
             do {
                 matches = 0;
                 int32_t cur = state.GetOption(option);
-                if (cur < tot::gon::GetNumSecondaryNpcTypes()) {
+                if (cur < tot::gon::SecondaryNpcType::NUM_NPC_TYPES) {
                     matches += 
                         state.GetOption(OPT_NPC_CHOICE_1) == cur ? 1 : 0;
                     matches += 
@@ -407,11 +430,15 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
         int32_t value = state.Rand((option & 0xff) + 1);
         state.SetOption(option, value);
         successful = true;
-    
-        // TODO: Handle not-yet-unlocked secret boss options.
 
         // Handle invalid combinations of options by retrying.
         switch (option) {
+            case OPT_SECRET_BOSS:
+                // If secret boss not unlocked, retry.
+                if (!OptvalUnlocked(state.GetOptionValue(OPT_SECRET_BOSS))) {
+                    successful = false;
+                }
+                break;
             case OPT_MARIO_BP:
                 // If Infinite BP isn't unlocked, retry.
                 if (state.CheckOptionValue(OPTVAL_INFINITE_BP) &&
@@ -463,7 +490,7 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
             case OPT_NPC_CHOICE_4: {
                 // If NPC type is duplicated, retry.
                 int32_t matches = 0;
-                if (value < tot::gon::GetNumSecondaryNpcTypes()) {
+                if (value < tot::gon::SecondaryNpcType::NUM_NPC_TYPES) {
                     matches +=
                         state.GetOption(OPT_NPC_CHOICE_1) == value ? 1 : 0;
                     matches += 
@@ -508,11 +535,11 @@ int32_t OptionsManager::GetDefaultValue(uint32_t option) {
         case OPT_NPC_CHOICE_1:
         case OPT_NPC_CHOICE_2:
         case OPT_NPC_CHOICE_3:
-            return gon::GetNumSecondaryNpcTypes();
+            return gon::SecondaryNpcType::CHOICE_RANDOM;
         case OPT_NPC_CHOICE_4:
             if (g_Mod->state_.CheckOptionValue(OPTVAL_DIFFICULTY_HALF))
-                return gon::GetNumSecondaryNpcTypes() + 1;
-            return gon::GetNumSecondaryNpcTypes();
+                return gon::SecondaryNpcType::CHOICE_NONE;
+            return gon::SecondaryNpcType::CHOICE_RANDOM;
         default: {
             for (const auto& data : g_OptionMetadata) {
                 if (data.option == option) {
@@ -727,6 +754,8 @@ const char* OptionsManager::GetEncodedOptions() {
                 boss_option = "SB:2, ";    break;
             case OPTVAL_SECRET_BOSS_3:
                 boss_option = "SB:3, ";    break;
+            case OPTVAL_SECRET_BOSS_EQUAL:
+                boss_option = "SB:E, ";    break;
             case OPTVAL_SECRET_BOSS_RANDOM:
                 boss_option = "SB:?, ";    break;
         }
@@ -858,10 +887,10 @@ void OptionsManager::OnRunStart() {
             // Always start with Goombella.
             state.SetOption(OPTVAL_PARTNER_GOOMBELLA);
             // Disable NPCs.
-            state.SetOption(OPT_NPC_CHOICE_1, gon::GetNumSecondaryNpcTypes() + 1);
-            state.SetOption(OPT_NPC_CHOICE_2, gon::GetNumSecondaryNpcTypes() + 1);
-            state.SetOption(OPT_NPC_CHOICE_3, gon::GetNumSecondaryNpcTypes() + 1);
-            state.SetOption(OPT_NPC_CHOICE_4, gon::GetNumSecondaryNpcTypes() + 1);
+            state.SetOption(OPT_NPC_CHOICE_1, gon::SecondaryNpcType::CHOICE_NONE);
+            state.SetOption(OPT_NPC_CHOICE_2, gon::SecondaryNpcType::CHOICE_NONE);
+            state.SetOption(OPT_NPC_CHOICE_3, gon::SecondaryNpcType::CHOICE_NONE);
+            state.SetOption(OPT_NPC_CHOICE_4, gon::SecondaryNpcType::CHOICE_NONE);
             // Disable secret boss.
             state.SetOption(OPTVAL_SECRET_BOSS_OFF);
             break;
@@ -870,11 +899,11 @@ void OptionsManager::OnRunStart() {
             // Gloomtail's tower.
             state.SetOption(OPTVAL_DIFFICULTY_FULL);
             state.SetOption(OPT_MAX_PARTNERS, 4);
-            // Force the first four NPC types to ease the player into mechanics.
-            state.SetOption(OPT_NPC_CHOICE_1, 0);
-            state.SetOption(OPT_NPC_CHOICE_2, 1);
-            state.SetOption(OPT_NPC_CHOICE_3, 2);
-            state.SetOption(OPT_NPC_CHOICE_4, 3);
+            // Force secondary NPC types to ease the player into mechanics.
+            state.SetOption(OPT_NPC_CHOICE_1, gon::SecondaryNpcType::WONKY);
+            state.SetOption(OPT_NPC_CHOICE_2, gon::SecondaryNpcType::DAZZLE);
+            state.SetOption(OPT_NPC_CHOICE_3, gon::SecondaryNpcType::CHET_RIPPO);
+            state.SetOption(OPT_NPC_CHOICE_4, gon::SecondaryNpcType::LUMPY);
             // Disable secret boss.
             state.SetOption(OPTVAL_SECRET_BOSS_OFF);
             break;

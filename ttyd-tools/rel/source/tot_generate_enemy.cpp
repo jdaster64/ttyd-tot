@@ -6,7 +6,10 @@
 #include "tot_custom_rel.h"
 #include "tot_generate_condition.h"
 #include "tot_generate_item.h"
+#include "tot_gon_tower_npcs.h"
+#include "tot_gsw.h"
 #include "tot_manager_achievements.h"
+#include "tot_manager_cosmetics.h"
 #include "tot_manager_debug.h"
 
 #include <ttyd/battle.h>
@@ -521,9 +524,6 @@ BattleGroupSetup g_CustomBattleParty;
 int8_t g_CustomAudienceWeights[12];
 NpcTribeDescription* g_LastMidbossTribe = nullptr;
 
-// TODO: Remove this when no longer necessary.
-bool g_isAlternateFinalBoss = false;
-
 // Base enemy weights at level 2 ~ 10, per difficulty level.
 const int8_t kBaseWeights[21][9] = {
     // Tutorial 
@@ -654,44 +654,52 @@ void SelectEnemies() {
     int32_t target_level_sum = kTargetLevelSums[difficulty];
     int32_t* debug_enemies = DebugManager::GetEnemies();
     
-    // Handle dragon / Atomic Boo bosses.
     if (state.IsFinalBossFloor()) {
-        int32_t enemy_type;
+        int32_t final_bosses[4] = {
+            BattleUnitType::GLOOMTAIL,
+            BattleUnitType::GOLD_FUZZY,
+            BattleUnitType::BOWSER_CH_8,
+            BattleUnitType::DOOPLISS_CH_8
+        };
+
         switch (state.GetOptionValue(OPT_DIFFICULTY)) {
             case OPTVAL_DIFFICULTY_HALF:
-                enemy_type = BattleUnitType::HOOKTAIL;
+                final_bosses[0] = BattleUnitType::HOOKTAIL;
                 break;
             default:
-                // On EX, you fight Gloomtail, then Bonetail.
-                enemy_type = BattleUnitType::GLOOMTAIL;
+                // Else, Gloomtail (on EX, you fight Gloomtail, then Bonetail).
                 break;
         }
-
-        g_isAlternateFinalBoss = false;
+        
+        // By default, use the regular final boss.
+        int32_t boss_type = 0;
 
         // Determine whether to use alternate final boss.
         switch (state.GetOptionValue(OPT_SECRET_BOSS)) {
             case OPTVAL_SECRET_BOSS_1:
-                enemy_type = BattleUnitType::GOLD_FUZZY;
-                g_isAlternateFinalBoss = true;
+                boss_type = 1;
                 break;
             case OPTVAL_SECRET_BOSS_2:
-                // Kammy is spawned dynamically in-battle.
-                enemy_type = BattleUnitType::BOWSER_CH_8;
-                g_isAlternateFinalBoss = true;
+                boss_type = 2;
                 break;
             case OPTVAL_SECRET_BOSS_3:
-                enemy_type = BattleUnitType::DOOPLISS_CH_8;
-                g_isAlternateFinalBoss = true;
+                boss_type = 3;
+                break;
+            case OPTVAL_SECRET_BOSS_EQUAL:
+                boss_type = state.Rand(4, RNG_ALTERNATE_BOSS);
                 break;
             case OPTVAL_SECRET_BOSS_RANDOM: {
+                const int32_t kBeatenFlags[4] = {
+                    0,
+                    GSWF_SecretBoss1_Beaten,
+                    GSWF_SecretBoss2_Beaten,
+                    GSWF_SecretBoss3_Beaten
+                };
+                const int32_t kFxTypes[4] = { 0, 7, 26, 8 };
+                const int32_t kMinimumClears[4] = { 0, 6, 9, 12 };
+                int32_t boss_weights[4] = { 0, 0, 0, 0 };
 
-                // TODO: Change logic for picking final bosses.
-
-                // Base chance of using the alternate boss, out of 100.
-                int32_t boss_chance = 20;
-
-                // Don't allow secret boss on the 1st clear of a difficulty,
+                // Don't allow secret bosses on the 1st clear of a difficulty,
                 // unless forced by player by turning the option 'on'.
                 if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
                     !state.GetOption(STAT_PERM_HALF_FINISHES)) break;
@@ -700,33 +708,71 @@ void SelectEnemies() {
                 if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) && 
                     !state.GetOption(STAT_PERM_EX_FINISHES)) break;
 
-                if (!state.GetOption(
-                    FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
+                int32_t total_clears =
+                    state.GetOption(STAT_PERM_HALF_FINISHES) +
+                    state.GetOption(STAT_PERM_FULL_FINISHES) +
+                    state.GetOption(STAT_PERM_EX_FINISHES);
 
-                    int32_t total_clears =
-                        state.GetOption(STAT_PERM_HALF_FINISHES) +
-                        state.GetOption(STAT_PERM_FULL_FINISHES) +
-                        state.GetOption(STAT_PERM_EX_FINISHES);
-
-                    // Don't allow the alternate boss before 6 total clears.
-                    if (total_clears < 6) break;
-
-                    // If secret boss not beaten in over 12 total clears,
-                    // double the chance of it appearing.
-                    if (total_clears > 12) boss_chance = 40;
+                int32_t num_fx_equipped = 0;
+                for (int32_t i = 1; i < 32; ++i) {
+                    num_fx_equipped += 
+                        CosmeticsManager::IsEquipped(CosmeticType::ATTACK_FX, i);
                 }
 
-                if (static_cast<int32_t>(state.Rand(100, RNG_ALTERNATE_BOSS)) 
-                    < boss_chance) {
-                    enemy_type = BattleUnitType::GOLD_FUZZY;
+                for (int32_t i = 1; i <= 3; ++i) {
+                    // Only allow bosses to randomly appear if already beaten,
+                    // or after a minimum number of total tower clears apiece.
+                    if (GetSWF(kBeatenFlags[i]) || 
+                        total_clears > kMinimumClears[i])
+                        boss_weights[i] = 10;
+
+                    // If the boss hasn't been beaten yet, increase chance of
+                    // encountering them when their corresponding FX is in use,
+                    // or guarantee it, if _only_ their FX is in use.
+                    if (!GetSWF(kBeatenFlags[i]) &&
+                        CosmeticsManager::IsEquipped(
+                            CosmeticType::ATTACK_FX, kFxTypes[i])) {
+                        if (num_fx_equipped == 1) {
+                            boss_type = i;
+                            break;
+                        }
+                        boss_weights[i] = 30;
+                    }
+                }
+
+                // If Doopliss is already eligible to appear, make him more
+                // likely if you've turned his NPC deal down repeatedly.
+                int32_t num_snubs = 0;
+                for (int32_t i = 0; i < state.GetNumFloors() / 8; ++i) {
+                    if (state.GetOption(STAT_RUN_NPCS_SELECTED, i) != 
+                        tot::gon::SecondaryNpcType::DOOPLISS)
+                        continue;
+
+                    if (state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i)) {
+                        num_snubs = 0;
+                        break;
+                    }
+                    ++num_snubs;
+                }
+                if (boss_weights[3] > 0 && num_snubs >= 2) 
+                    boss_weights[3] = 30;
+
+                int32_t rand_value = state.Rand(100, RNG_ALTERNATE_BOSS);
+                if (rand_value >= 0 && rand_value < boss_weights[1]) {
+                    boss_type = 1;
+                } else if (rand_value >= 30 && rand_value < 30 + boss_weights[2]) {
+                    boss_type = 2;
+                } else if (rand_value >= 60 && rand_value < 60 + boss_weights[3]) {
+                    boss_type = 3;
                 }
                 break;
             }
         }
 
         for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
-        g_Enemies[0] = enemy_type;
+        g_Enemies[0] = final_bosses[boss_type];
         g_NumEnemies = 1;
+        SetSWByte(GSW_Tower_FinalBossType, boss_type);
         return;
     } else if (state.floor_ == 32) {
         int32_t enemy_type;
@@ -978,8 +1024,8 @@ void BuildBattle(
         // Always set bosses to basic "Gold Fuzzy" AI type.
         npc_ai = &ttyd::npc_data::npc_ai_type_table[NpcAiType::GOLD_FUZZY];
 
-        // TODO: remove when no longer using dummy cutscenes for new bosses.
-        if (g_isAlternateFinalBoss) {
+        // TODO: Add support for different alternate bosses.
+        if (GetSWByte(GSW_Tower_FinalBossType) != 0) {
             npc_tribe =
                 ttyd::npc_data::npcTribe + 
                 kEnemyInfo[BattleUnitType::GOLD_FUZZY].npc_tribe_idx;
@@ -1171,12 +1217,6 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     evtSetValue(evt, evt->evtArguments[4], x_pos);
     evtSetValue(evt, evt->evtArguments[5], y_pos);
     evtSetValue(evt, evt->evtArguments[6], z_pos);
-
-    // TODO: Remove when not using dummy cutscenes for new bosses.
-    evtSetValue(evt, evt->evtArguments[7], g_isAlternateFinalBoss);
-
-    // TODO: Set to different values for other optional bosses.
-    // evtSetValue(evt, evt->evtArguments[7], g_Enemies[0] == BattleUnitType::GOLD_FUZZY);
 
     // Double effective height of midboss field NPCs (for "!" indicator, mostly).
     if (IsMidbossFloor(g_Mod->state_.floor_)) {

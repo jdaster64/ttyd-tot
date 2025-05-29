@@ -148,6 +148,9 @@ void _CompleteTutorialFlags() {
     SetSWF(GSWF_NpcF_SeedUnlocked);
     SetSWF(GSWF_NpcK_CustomMovesUnlocked);
     SetSWF(GSWF_White_CountdownUnlocked);
+    SetSWF(GSWF_SecretBoss1_Beaten);
+    SetSWF(GSWF_SecretBoss2_Beaten);
+    SetSWF(GSWF_SecretBoss3_Beaten);
 }
 
 void _PurchaseAllCosmetics() {

@@ -432,7 +432,7 @@ enum Options : uint32_t {
 
     // Determines whether the secret boss will appear.
     // TODO: Add full support for other bosses, and "Equal chance" option.
-    OPT_SECRET_BOSS             = 0x444'3'00'04,
+    OPT_SECRET_BOSS             = 0x444'3'00'05,
     OPTVAL_SECRET_BOSS_RANDOM   = 0x544'3'00'00,
     OPTVAL_SECRET_BOSS_OFF      = 0x544'3'00'01,
     OPTVAL_SECRET_BOSS_1        = 0x544'3'00'02,

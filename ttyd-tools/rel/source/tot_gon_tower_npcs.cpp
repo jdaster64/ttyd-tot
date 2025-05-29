@@ -69,26 +69,6 @@ namespace NpcTribeType = ::ttyd::npc_data::NpcTribeType;
 
 }  // namespace
 
-namespace SecondaryNpcType {
-    enum e {
-        NONE = -1,
-        WONKY = 0,
-        DAZZLE,
-        CHET_RIPPO,
-        LUMPY,
-        DOOPLISS,
-        GRUBBA,
-        MOVER,
-        ZESS_T,
-        MERLON,
-        
-        NUM_NPC_TYPES,
-        // Used for interpreting run options.
-        CHOICE_RANDOM   = NUM_NPC_TYPES,
-        CHOICE_NONE     = NUM_NPC_TYPES + 1,
-    };
-}
-
 namespace RecipeItemRarity {
     enum e {
         INVALID = 0,
@@ -2061,10 +2041,6 @@ EVT_DEFINE_USER_FUNC(evtTot_SelectSecondaryNpcs) {
     }
 
     return 2;
-}
-
-int32_t GetNumSecondaryNpcTypes() {
-    return SecondaryNpcType::NUM_NPC_TYPES;
 }
 
 void GetNpcMsgs(int32_t type, const char** out_name, const char** out_help) {

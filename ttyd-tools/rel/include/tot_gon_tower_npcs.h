@@ -8,7 +8,26 @@
 
 namespace mod::tot::gon {
 
-int32_t GetNumSecondaryNpcTypes();
+namespace SecondaryNpcType {
+    enum e {
+        NONE = -1,
+        WONKY = 0,
+        DAZZLE,
+        CHET_RIPPO,
+        LUMPY,
+        DOOPLISS,
+        GRUBBA,
+        MOVER,
+        ZESS_T,
+        MERLON,
+        
+        NUM_NPC_TYPES,
+        // Used for interpreting run options.
+        CHOICE_RANDOM   = NUM_NPC_TYPES,
+        CHOICE_NONE     = NUM_NPC_TYPES + 1,
+    };
+}
+
 void GetNpcMsgs(int32_t type, const char** out_name, const char** out_help);
 
 // Returns setup info for NPCs.

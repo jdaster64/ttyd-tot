@@ -276,6 +276,11 @@ bool StateManager::Load(TotSaveSlot* save) {
 
         // TODO: Check if automatically eligible for new aggregate achievements...
 
+        // Set flag for secret boss 1, if already beaten on a previous file.
+        if (GetOption(FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
+            SetSWF(GSWF_SecretBoss1_Beaten);
+        }
+
         // Re-run special file setup to collect new achievements, options, etc.
         DebugManager::SpecialFileSetup();
     }

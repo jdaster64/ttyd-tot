@@ -1216,13 +1216,14 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
     SET(LW(1), PTR(g_EnemyNpcSetup))
     USER_FUNC(evtTot_GetEnemyNpcInfo,
-        LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), LW(7))
+        LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
 
     // If in EX mode, a second NPC is needed for swapping to Bonetail.
     SET(LW(9), PTR(npcTribe[NpcTribeType::BONETAIL].modelName))
     SET(LW(10), PTR(npcTribe[NpcTribeType::BONETAIL].nameJp))
+
     // If using alternate boss, second NPC should be the regular boss instead.
-    IF_EQUAL(LW(7), 1)
+    IF_LARGE((int32_t)GSW_Tower_FinalBossType, 0)
         USER_FUNC(evtTot_GetDifficulty, LW(8))
         SWITCH(LW(8))
             CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_HALF)
@@ -1247,7 +1248,7 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 33554496)
     USER_FUNC(evt_npc_pera_onoff, PTR(kPitNpcName), 0)
     USER_FUNC(evt_npc_set_ry, PTR(kPitNpcName), 0)
-    IF_EQUAL(LW(7), 0)
+    IF_EQUAL((int32_t)GSW_Tower_FinalBossType, 0)
         USER_FUNC(
             evt_npc_set_scale, PTR(kPitNpcName), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
     END_IF()
@@ -1259,7 +1260,8 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evt_npc_set_ry, PTR(kPitBossNpc2Name), 0)
     USER_FUNC(evt_npc_set_scale, PTR(kPitBossNpc2Name), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
     
-    IF_EQUAL(LW(7), 0)
+    // TODO: Add support for different events for other alternate bosses.
+    IF_EQUAL((int32_t)GSW_Tower_FinalBossType, 0)
         RUN_EVT(&Tower_FinalBossEvent)
     ELSE()
         RUN_EVT(&Tower_GoldFuzzyBossEvent)
@@ -1297,7 +1299,7 @@ EVT_BEGIN(Tower_EnemySetup)
         USER_FUNC(evtTot_GetGonBattleDatabasePtr, LW(0))
         SET(LW(1), PTR(g_EnemyNpcSetup))
         USER_FUNC(evtTot_GetEnemyNpcInfo,
-            LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), EVT_NULLPTR)
+            LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6))
         
         USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
         USER_FUNC(evt_npc_set_tribe, PTR(kPitNpcName), LW(3))
