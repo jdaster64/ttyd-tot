@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_dialogue.h"
 #include "tot_party_bobbery.h"
 #include "tot_party_flurrie.h"
@@ -820,6 +821,7 @@ EVT_BEGIN(unitDoopliss_attack_event)
 
         USER_FUNC(btlevtcmd_StatusWindowOnOff, 1)
         USER_FUNC(evtTot_Doopliss_DisableNJNH)
+        USER_FUNC(evtTot_MarkCompletedAchievement, (int32_t)AchievementId::SECRET_BADGE_COMBO)
     END_IF()
 
 LBL(99)

@@ -5,6 +5,7 @@
 #include "tot_generate_enemy.h"
 #include "tot_gsw.h"
 #include "tot_manager_cosmetics.h"
+#include "tot_manager_reward.h"
 #include "tot_state.h"
 
 #include <ttyd/evtmgr.h>
@@ -309,6 +310,18 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
                     ++lumpy_deals;
             }
             if (lumpy_deals >= 2) MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::V3_AGG_MERLON_10: {
+            if (state.GetOption(STAT_PERM_NPC_MERLON_DEALS) >= 10)
+                MarkCompleted(ach);
+            break;
+        }
+        case AchievementId::V3_AGG_REWARD_5_EACH: {
+            for (int32_t i = 0; i < RewardStatId::MAX_REWARD_STAT; ++i) {
+                if (state.GetOption(STAT_PERM_REWARDS_TAKEN, i) < 5) return;
+            }
+            MarkCompleted(ach);
             break;
         }
         case AchievementId::META_COSMETICS_5: {

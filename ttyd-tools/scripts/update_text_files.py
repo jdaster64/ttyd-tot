@@ -2322,8 +2322,8 @@ g_GlobalStrings = {
         b"Spend exactly 417 coins in a\n"
         b"single tower run.",
     b"tot_achd_67":
-        b"Defeat Doopliss with Jumpman\n"
-        b"and Hammerman both equipped.",
+        b"Let Doopliss try to attack with\n"
+        b"Jumpman & Hammerman both on.",
     b"tot_achd_68":
         b"Finish a run with all of Mario's\n"
         b"stats at level 0.\n"
@@ -2391,7 +2391,9 @@ g_GlobalStrings = {
         b"Infatuated foes in a tower run.",
     b"tot_achd_87":
         b"Defeat all unique final bosses\n"
-        b"on EX difficulty.",
+        b"on EX difficulty.\n"
+        b"Cannot use any run option\n"
+        b"that lowers total Intensity.",
     b"tot_achd_88":
         b"Fill up a max-sized inventory\n"
         b"with 20 items.",

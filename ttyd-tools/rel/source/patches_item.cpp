@@ -1170,8 +1170,13 @@ void ApplyFixedPatches() {
                 }
             }
 
-            // Mark unique items as being collected.
             if (return_value) {
+                if (ttyd::mario_pouch::pouchGetHaveItemCnt() == 20) {
+                    AchievementsManager::MarkCompleted(
+                        AchievementId::V3_RUN_ITEMS_FULL);
+                }
+                
+                // Mark unique badges as being collected.
                 RewardManager::MarkUniqueItemCollected(item_type);
             }
 

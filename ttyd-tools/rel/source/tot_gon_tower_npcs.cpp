@@ -1174,6 +1174,8 @@ LBL(10)
     WAIT_MSEC(550)
 
     USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::MERLON)
+    USER_FUNC(evtTot_CheckCompletedAchievement,
+        AchievementId::V3_AGG_MERLON_10, EVT_NULLPTR, EVT_NULLPTR)
     USER_FUNC(evtTot_GetNextMidbossName, LW(6))
     USER_FUNC(
         evt_msg_print_insert,
@@ -1831,6 +1833,7 @@ EVT_DEFINE_USER_FUNC(evtTot_EnableNpcEffect) {
         }
         case SecondaryNpcType::GRUBBA: {
             state.SetOption(STAT_RUN_NPC_GRUBBA_FLOOR, floor);
+            state.SetOption(STAT_RUN_NPC_GRUBBA_COMBO, 0);
             state.ChangeOption(STAT_PERM_NPC_GRUBBA_DEAL, 1);
             state.ChangeOption(STAT_PERM_NPC_DEALS_TOTAL, 1);
             break;

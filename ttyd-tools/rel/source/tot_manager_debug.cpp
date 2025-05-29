@@ -123,9 +123,13 @@ void UpdateMainMenuPos(int32_t change) {
 void _CompleteAllLogs(int32_t max_tattle_index = 105) {
     for (int32_t i = 0; i <= BattleUnitType::BONETAIL; ++i) {
         // Set Tattle flags for only enemies in ToT, and up through max index.
-        if (int32_t custom_index = GetCustomTattleIndex(i);
-            custom_index > 0 && custom_index <= max_tattle_index) {
+        int32_t custom_index = GetCustomTattleIndex(i);
+        if (custom_index > 0 && custom_index <= max_tattle_index) {
             ttyd::swdrv::swSet(0x117a + i);
+        }
+        // Mark all midbosses as defeated.
+        if (IsEligibleMidboss(i)) {
+            g_Mod->state_.SetOption(FLAGS_MIDBOSS_DEFEATED, custom_index);
         }
     }
     for (int32_t i = 0; i < 256; ++i) {

@@ -75,6 +75,10 @@ enum GlobalWorkVars {
     GSWF_SecretBoss1_Beaten,
     GSWF_SecretBoss2_Beaten,
     GSWF_SecretBoss3_Beaten,
+    GSWF_RegularBoss_BeatenEX,
+    GSWF_SecretBoss1_BeatenEX,
+    GSWF_SecretBoss2_BeatenEX,
+    GSWF_SecretBoss3_BeatenEX,
     // Flags for talking to NPC G about reward breakdowns.
     GSWF_NpcG_UnlockedRewardStats,
     GSWF_NpcG_TalkedThisVisit,

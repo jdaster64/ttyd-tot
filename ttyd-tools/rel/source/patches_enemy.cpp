@@ -213,6 +213,7 @@ void ApplyFixedPatches() {
     // Track enemy kills on deletion.
     g_BtlUnit_Delete_trampoline = mod::hookFunction(
         ttyd::battle_unit::BtlUnit_Delete, [](BattleWorkUnit* unit) {
+            auto& state = g_Mod->state_;
             int32_t idx = GetCustomTattleIndex(unit->true_kind);
 
             // Only count valid ToT enemy types, and only count enemies defeated
@@ -220,23 +221,38 @@ void ApplyFixedPatches() {
             if (idx >= 0 && (
                 ttyd::seqdrv::seqGetNextSeq() == SeqIndex::kBattle ||
                 ttyd::battle::g_BattleWork->fbat_info->wResult == 1)) {
-                g_Mod->state_.ChangeOption(STAT_PERM_ENEMIES_DEFEATED, 1);
+                state.ChangeOption(STAT_PERM_ENEMIES_DEFEATED, 1);
 
                 // Track kills, giving achievement if 100+ of a type defeated.
-                if (g_Mod->state_.GetOption(STAT_PERM_ENEMY_KILLS, idx) < 9999)
-                    g_Mod->state_.ChangeOption(STAT_PERM_ENEMY_KILLS, 1, idx);
+                if (state.GetOption(STAT_PERM_ENEMY_KILLS, idx) < 9999)
+                    state.ChangeOption(STAT_PERM_ENEMY_KILLS, 1, idx);
                     
-                if (g_Mod->state_.GetOption(STAT_PERM_ENEMY_KILLS, idx) >= 100)
+                if (state.GetOption(STAT_PERM_ENEMY_KILLS, idx) >= 100)
                     AchievementsManager::MarkCompleted(
                         AchievementId::V2_AGG_ENEMY_TIMES_100);
 
+                // Track unique types of enemies defeated in one fight.
+                int32_t types = 0;
+                for (; types < 7; ++types) {
+                    int32_t last_type =
+                        state.GetOption(STAT_RUN_TYPES_THIS_FIGHT, types);
+                    if (last_type == idx || last_type == 0) break;
+                }
+                if (types < 7) {
+                    state.SetOption(STAT_RUN_TYPES_THIS_FIGHT, idx, types);
+                    if (types == 6) {
+                        AchievementsManager::MarkCompleted(
+                            AchievementId::V3_RUN_DEFEAT_7_TYPES);
+                    }
+                }
+
                 // If a midboss, check off its flag and check if 30 types met.
                 if (unit->status_flags & BattleUnitStatus_Flags::MIDBOSS) {
-                    g_Mod->state_.SetOption(FLAGS_MIDBOSS_DEFEATED, idx);
+                    state.SetOption(FLAGS_MIDBOSS_DEFEATED, idx);
 
                     int32_t num_midbosses_defeated = 0;
                     for (int32_t i = 0; i < 128; ++i) {
-                        if (g_Mod->state_.GetOption(FLAGS_MIDBOSS_DEFEATED, i)) {
+                        if (state.GetOption(FLAGS_MIDBOSS_DEFEATED, i)) {
                             ++num_midbosses_defeated;
                         }
                     }
@@ -244,18 +260,15 @@ void ApplyFixedPatches() {
                         AchievementsManager::MarkCompleted(
                             AchievementId::AGG_MIDBOSS_TYPES_30);
                     }
+                    if (num_midbosses_defeated == 75) {
+                        AchievementsManager::MarkCompleted(
+                            AchievementId::V3_AGG_MIDBOSS_TYPES_ALL);
+                    }
                 }
 
                 if (unit->poison_damage >= 50) {
                     AchievementsManager::MarkCompleted(
                         AchievementId::MISC_POISON_50);
-                }
-
-                // TODO: Move this check to "run finished" script, as it won't
-                // work for the Bowser / Kammy fight.
-                if (unit->true_kind == BattleUnitType::GOLD_FUZZY) {
-                    AchievementsManager::MarkCompleted(
-                        AchievementId::META_SECRET_BOSS);
                 }
             }
             // Run original logic.

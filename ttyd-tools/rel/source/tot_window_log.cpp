@@ -2521,8 +2521,9 @@ void TattleMenuDrawMidbossRibbon(
 
     if (!IsEligibleMidboss(tattle_work->enemy_id)) return;
 
+    int32_t custom_tattle_idx = GetCustomTattleIndex(tattle_work->enemy_id);
     bool defeated =
-        g_Mod->state_.GetOption(FLAGS_MIDBOSS_DEFEATED, tattle_work->enemy_id);
+        g_Mod->state_.GetOption(FLAGS_MIDBOSS_DEFEATED, custom_tattle_idx);
     
     // Draw ribbon next to enemy name / defeated count if midboss defeated.
     ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);

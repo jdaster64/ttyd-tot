@@ -522,6 +522,7 @@ enum Options : uint32_t {
     FLAGS_OPTION_UNLOCKED       = 0x800'0'00'00U,
     FLAGS_ITEM_ENCOUNTERED      = 0x900'0'00'00U,
     FLAGS_ITEM_PURCHASED        = 0xa00'0'00'00U,
+    // NOTE: Uses ToT Tattle indices, not internal enemy ids.
     FLAGS_MIDBOSS_DEFEATED      = 0xb00'0'00'00U,
     FLAGS_COSMETIC_PURCHASED    = 0xc00'0'00'00U,
     
@@ -589,10 +590,14 @@ enum Options : uint32_t {
     STAT_RUN_NPC_MERLON_FLOOR   = 0x06a'0'00'00,
     // Circular queue of last few replaced bosses, to make them repeat less.
     STAT_RUN_MIDBOSSES_REROLLED = 0x06b'0'01'04,
-    // Number of chest rerolls available.
-    STAT_RUN_CHEST_REROLLS      = 0x06c'0'00'00,
-    STAT_RUN_CHEST_MAX_REROLLS  = 0x06d'0'00'00,
-    // Next: 0x06e
+    // Array of types of enemies defeated this fight.
+    STAT_RUN_TYPES_THIS_FIGHT   = 0x06c'0'01'08,
+    // Number of chest rerolls / reveals available.
+    STAT_RUN_CHEST_REROLLS      = 0x06e'0'00'00,
+    STAT_RUN_CHEST_MAX_REROLLS  = 0x06f'0'00'00,
+    // Number of conditions met since last Grubba taken.
+    STAT_RUN_NPC_GRUBBA_COMBO   = 0x070'0'00'00,
+    // Next: 0x071
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 

@@ -3,6 +3,7 @@
 #include "evt_cmd.h"
 #include "mod.h"
 #include "tot_gsw.h"
+#include "tot_manager_achievements.h"
 #include "tot_manager_dialogue.h"
 #include "tot_state.h"
 
@@ -1160,6 +1161,13 @@ EVT_END()
 
 EVT_BEGIN(unitKammy_dead_event)
     SET(GW(11), 1)
+
+    // Check for GW(10) and GW(11) being set to 1 both at once.
+    IF_EQUAL(GW(10), 1)
+        USER_FUNC(evtTot_MarkCompletedAchievement,
+            (int32_t)AchievementId::V3_RUN_BOSS_SIMULTANEOUS)
+    END_IF()
+
     WAIT_FRM(1)
     USER_FUNC(btlevtcmd_WaitAttackEnd)
     USER_FUNC(btlevtcmd_GetUnitWork, LW(10), UW_Kammy_IsFlying, LW(0))
@@ -2347,6 +2355,12 @@ EVT_BEGIN(unitBowser_damage_event)
     USER_FUNC(btlevtcmd_CheckDamageCode, -2, 1024, LW(0))
     IF_NOT_EQUAL(LW(0), 0)
         SET(GW(10), 1)
+
+        // Check for GW(10) and GW(11) being set to 1 both at once.
+        IF_EQUAL(GW(11), 1)
+            USER_FUNC(evtTot_MarkCompletedAchievement,
+                (int32_t)AchievementId::V3_RUN_BOSS_SIMULTANEOUS)
+        END_IF()
     END_IF()
     SET(LW(10), -2)
     SET(LW(11), 1)

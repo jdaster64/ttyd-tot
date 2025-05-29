@@ -274,6 +274,11 @@ EVT_BEGIN(Tower_ChestEvt_Core)
         USER_FUNC(evt_mario_key_onoff, 1)
         SET((int32_t)GSW_Tower_ChestClaimed, 1)
     END_IF()
+
+    // Check for getting aggregate 5 of each type of reward.
+    USER_FUNC(evtTot_CheckCompletedAchievement,
+        AchievementId::V3_AGG_REWARD_5_EACH, EVT_NULLPTR, EVT_NULLPTR)
+
     RETURN()
 EVT_END()
 

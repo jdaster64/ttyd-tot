@@ -303,6 +303,15 @@ void CheckBattleCondition() {
         // Increment the count of successful challenges.
         state.ChangeOption(STAT_RUN_CONDITIONS_MET);
         state.ChangeOption(STAT_PERM_CONDITIONS_MET);
+
+        // Track whether all of Grubba's conditions for a set have been met.
+        int32_t grubba_floor = state.GetOption(STAT_RUN_NPC_GRUBBA_FLOOR);
+        if (grubba_floor && state.floor_ - grubba_floor < 8) {
+            state.ChangeOption(STAT_RUN_NPC_GRUBBA_COMBO);
+            if (state.GetOption(STAT_RUN_NPC_GRUBBA_COMBO) == 7) {
+                AchievementsManager::MarkCompleted(AchievementId::V3_RUN_GRUBBA);
+            }
+        }
     }
     
     // If battle reward mode is "drop all held", award items other than the
@@ -405,6 +414,11 @@ void ApplyFixedPatches() {
                     ItemType::TOT_SUPER_START) * 50,
                 static_cast<int32_t>(ttyd::mario_pouch::pouchGetPtr()->max_sp));
             ttyd::mario_pouch::pouchGetPtr()->current_sp = sp;
+            // Reset types of enemies defeated this fight.
+            for (int32_t i = 0; i < 8; ++i) {
+                g_Mod->state_.SetOption(STAT_RUN_TYPES_THIS_FIGHT, 0, i);
+            }
+
             g_seq_battleInit_trampoline();
         });
 

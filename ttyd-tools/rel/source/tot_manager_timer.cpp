@@ -411,11 +411,52 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
     if (intensity >= 200) {
         AchievementsManager::MarkCompleted(AchievementId::RUN_HIGH_INTENSITY);
     }
+    if (intensity >= 200 && state.CheckOptionValue(OPTVAL_PRESET_RANDOM)) {
+        AchievementsManager::MarkCompleted(AchievementId::V3_RUN_RANDOM_INTENSITY);
+    }
 
     // Update highest intensity cleared.
     if (intensity > state.GetOption(STAT_PERM_MAX_INTENSITY)) {
         state.SetOption(STAT_PERM_MAX_INTENSITY, intensity);
         is_new_intensity_record = true;
+    }
+
+    // Mark alternate final boss clears + EX clears for each boss.
+    switch (GetSWByte(GSW_Tower_FinalBossType)) {
+        case 1:
+            AchievementsManager::MarkCompleted(AchievementId::META_SECRET_BOSS);
+            SetSWF(GSWF_SecretBoss1_Beaten);
+            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) &&
+                OptionsManager::NoIntensityReduction()) {
+                SetSWF(GSWF_SecretBoss1_BeatenEX);
+            }
+            break;
+        case 2:
+            AchievementsManager::MarkCompleted(AchievementId::META_SECRET_BOSS);
+            SetSWF(GSWF_SecretBoss2_Beaten);
+            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) &&
+                OptionsManager::NoIntensityReduction()) {
+                SetSWF(GSWF_SecretBoss2_BeatenEX);
+            }
+            break;
+        case 3:
+            AchievementsManager::MarkCompleted(AchievementId::META_SECRET_BOSS);
+            SetSWF(GSWF_SecretBoss3_Beaten);
+            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) &&
+                OptionsManager::NoIntensityReduction()) {
+                SetSWF(GSWF_SecretBoss3_BeatenEX);
+            }
+            break;
+        default:
+            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) &&
+                OptionsManager::NoIntensityReduction()) {
+                SetSWF(GSWF_RegularBoss_BeatenEX);
+            }
+            break;
+    }
+    if (GetSWF(GSWF_RegularBoss_BeatenEX) && GetSWF(GSWF_SecretBoss1_BeatenEX) &&
+        GetSWF(GSWF_SecretBoss2_BeatenEX) && GetSWF(GSWF_SecretBoss3_BeatenEX)) {
+        AchievementsManager::MarkCompleted(AchievementId::V3_AGG_BOSS_ALL_EX);
     }
 
     // Update number of 'tutorial' tower run clears.
