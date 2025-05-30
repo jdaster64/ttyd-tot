@@ -5341,9 +5341,17 @@ g_TowerLobbyStrings = {
         
     # General lobby text.
     
-    b"tot_lobby_confirmstart_noopt":
+    b"tot_lobby_confirmstart_1st":
         b"<system>\n<p>\n"
-        b"Are you prepared to start?\n<o>",
+        b"The spire of Hooktail's castle\n"
+        b"disappears into low-lying clouds.\n"
+        b"Are you prepared to ascend?\n<o>",
+    
+    b"tot_lobby_confirmstart_2nd":
+        b"<system>\n<p>\n"
+        b"Gloomtail's keep looms overhead,\n"
+        b"twice as high as his sister's.\n"
+        b"Are you prepared to ascend?\n<o>",
     
     b"tot_lobby_confirmstart":
         b"<system>\n<p>\n"
