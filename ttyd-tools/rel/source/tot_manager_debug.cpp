@@ -393,10 +393,10 @@ void DebugManager::Update() {
                     break;
                 }
             } else {
-                // If valid back enemy (and the front enemy isn't a boss),
-                // change only the selected slot.
-                if (IsEligibleBackEnemy(enemy_type) && 
-                    !IsEligibleBackEnemy(g_DebugEnemies[0])) {
+                // If both this and the front enemy are valid back enemies
+                // (i.e. not bosses), change only the selected slot.
+                if (IsEligibleBackEnemy(enemy_type) &&
+                    IsEligibleBackEnemy(g_DebugEnemies[0])) {
                     g_DebugEnemies[g_CursorPos] = enemy_type;
                     break;
                 }

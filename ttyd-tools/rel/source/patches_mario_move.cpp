@@ -70,6 +70,9 @@ namespace mod::tot::patch {
 
 namespace {
 
+// For convenience.
+using namespace ::ttyd::battle_event_cmd;
+
 using ::ttyd::battle::BattleWorkCommandCursor;
 using ::ttyd::battle::BattleWorkCommandOperation;
 using ::ttyd::battle::BattleWorkCommandWeapon;
@@ -111,6 +114,7 @@ extern const int32_t g_sac_genki_main_base_BlinkNumbers_EH;
 extern const int32_t g_sac_genki_main_base_SetupTargets_BH;
 extern const int32_t g_sac_genki_main_base_SetupTargets_EH;
 extern const int32_t g_sac_genki_main_base_Patch_TargetAlloc;
+extern const int32_t g_hitCheck_EnemyTeam_Patch_ClockOutHitEnemies;
 extern const int32_t g_genki_evt_common_Patch_SweetTreatFeastResult;
 extern const int32_t g_genki_evt_common_SweetTreatResultJumpPoint;
 extern const int32_t g_sac_deka_main_base_GetNumberOfBars_BH;
@@ -124,14 +128,6 @@ namespace {
 
 // Buffer for showing move names with levels.
 char g_MoveBadgeTextBuffer[24];
-
-// Patch to disable getting Star Power early from certain attacks;
-// battle::AwardStarPowerAndResetFaceDirection will be used to award it
-// at the end of the attack instead, to make sure Stylishes are counted.
-EVT_BEGIN(DeclareStarPowerPatch)
-DEBUG_REM(0) DEBUG_REM(0)
-EVT_PATCH_END()
-static_assert(sizeof(DeclareStarPowerPatch) == 0x10);
 
 // Gets the FP cost of a move, factoring in stackability of Charge / Toughen Up
 // and Flower Savers if necessary.
@@ -376,7 +372,24 @@ void* GetSacWorkPtr() {
 }
 
 // Declarations for USER_FUNCs.
-EVT_DECLARE_USER_FUNC(SetSweetFeastWeapon, 3)
+EVT_DECLARE_USER_FUNC(evtTot_AddNoTargetingPlayerFlags, 1)
+EVT_DECLARE_USER_FUNC(evtTot_SetSweetFeastWeapon, 3)
+
+// Patch to Clock Out hitCheck_EnemyTeam to make it hit all enemies,
+// including Infatuated ones.
+EVT_BEGIN(ClockOutHitEnemiesFix)
+    USER_FUNC(evtTot_AddNoTargetingPlayerFlags, LW(9))
+    USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(ClockOutHitEnemiesEvtHook)
+    RUN_CHILD_EVT(ClockOutHitEnemiesFix)
+    DEBUG_REM(0)
+EVT_PATCH_END()
+static_assert(sizeof(ClockOutHitEnemiesEvtHook) == 0x10);
 
 // Event for the results of Sweet Treat/Feast.
 EVT_BEGIN(SweetTreatFeastResultEvt)
@@ -407,7 +420,7 @@ ELSE()
         // Apply FP-Regen status a bit later than HP-Regen.
         WAIT_MSEC(400)
         IF_LARGE_EQUAL(LW(12), 1)
-            USER_FUNC(SetSweetFeastWeapon, 2, LW(12), LW(9))
+            USER_FUNC(evtTot_SetSweetFeastWeapon, 2, LW(12), LW(9))
             USER_FUNC(
                 ttyd::battle_event_cmd::btlevtcmd_CheckDamage,
                 -2, -2, 1, LW(9), 256, LW(5))
@@ -419,7 +432,7 @@ ELSE()
         RUN_CHILD_EVT(ttyd::sac_genki::status_recover_evt)
         IF_LARGE_EQUAL(LW(11), 1)
             // Apply HP-Regen status to partner.
-            USER_FUNC(SetSweetFeastWeapon, 1, LW(11), LW(9))
+            USER_FUNC(evtTot_SetSweetFeastWeapon, 1, LW(11), LW(9))
             USER_FUNC(
                 ttyd::battle_event_cmd::btlevtcmd_CheckDamage,
                 -2, LW(13), LW(14), LW(9), 256, LW(5))
@@ -430,7 +443,7 @@ ELSE()
     RUN_CHILD_EVT(ttyd::sac_genki::status_recover_evt)
     IF_LARGE_EQUAL(LW(10), 1)
         // Apply HP-Regen status to Mario.
-        USER_FUNC(SetSweetFeastWeapon, 0, LW(10), LW(9))
+        USER_FUNC(evtTot_SetSweetFeastWeapon, 0, LW(10), LW(9))
         USER_FUNC(
             ttyd::battle_event_cmd::btlevtcmd_CheckDamage,
             -2, -2, 1, LW(9), 256, LW(5))
@@ -445,8 +458,24 @@ RUN_CHILD_EVT(SweetTreatFeastResultEvt)
 RETURN()
 EVT_END()
 
+// Patch to disable getting Star Power early from certain attacks;
+// battle::AwardStarPowerAndResetFaceDirection will be used to award it
+// at the end of the attack instead, to make sure Stylishes are counted.
+EVT_BEGIN(DeclareStarPowerPatch)
+    DEBUG_REM(0) DEBUG_REM(0)
+EVT_PATCH_END()
+static_assert(sizeof(DeclareStarPowerPatch) == 0x10);
+
+EVT_DEFINE_USER_FUNC(evtTot_AddNoTargetingPlayerFlags) {
+    auto* weapon = 
+        reinterpret_cast<BattleWeapon*>(evtGetValue(evt, evt->evtArguments[0]));
+    weapon->target_class_flags |= AttackTargetClass_Flags::CANNOT_TARGET_MARIO;
+    weapon->target_class_flags |= AttackTargetClass_Flags::CANNOT_TARGET_PARTNER;
+    return 2;
+}
+
 // Constructs a weapon granting HP, partner HP or FP regen status.
-EVT_DEFINE_USER_FUNC(SetSweetFeastWeapon) {
+EVT_DEFINE_USER_FUNC(evtTot_SetSweetFeastWeapon) {
     int32_t weapon_type = evtGetValue(evt, evt->evtArguments[0]);
     int32_t strength    = evtGetValue(evt, evt->evtArguments[1]);
     // Build a weapon based on the base weapon for Power Lift.
@@ -563,6 +592,11 @@ void ApplyFixedPatches() {
                 MoveManager::GetSelectedLevel(MoveType::SP_EARTH_TREMOR)
                 + bars_full);
         });
+
+    // Make Clock Out hit all targets on enemy side, including friendlies.
+    mod::writePatch(
+        reinterpret_cast<void*>(g_hitCheck_EnemyTeam_Patch_ClockOutHitEnemies),
+        ClockOutHitEnemiesEvtHook, sizeof(ClockOutHitEnemiesEvtHook));
         
     // Change Clock Out's turn count based on power level.
     g_bakuGameDecideWeapon_trampoline = mod::hookFunction(

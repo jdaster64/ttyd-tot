@@ -576,6 +576,7 @@ extern const int32_t g_koura_damage_core_Patch_HeavyDmg = 0x8039c190;
 extern const int32_t g_koura_damage_core_Patch_LightDmg = 0x8039c1ec;
 extern const int32_t g_koura_pose_tbl_reset_Patch_HeavyDmg = 0x8039c2ec;
 extern const int32_t g_koura_pose_tbl_reset_Patch_LightDmg = 0x8039c338;
+extern const int32_t g_hitCheck_EnemyTeam_Patch_ClockOutHitEnemies = 0x803b4244;
 extern const int32_t g_genki_evt_common_Patch_SweetTreatFeastResult = 0x803b6bac;
 extern const int32_t g_genki_evt_common_SweetTreatResultJumpPoint = 0x803b6be8;
 extern const int32_t g_ac_power_gauge_lv2_LipLockPower = 0x8041dbf0;

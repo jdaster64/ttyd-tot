@@ -202,7 +202,8 @@ BattleWeapon unitFuzzyHorde_weapon = {
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::UNKNOWN_0x2 |
+        // Originally couldn't target floating (Vivian / Flurrie); changed.
+        // AttackTargetProperty_Flags::UNKNOWN_0x2 |
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0,
