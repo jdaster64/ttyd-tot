@@ -81,6 +81,7 @@ using namespace ::ttyd::evt_window;
 
 using ::ttyd::dispdrv::CameraId;
 using ::ttyd::evt_bero::BeroEntry;
+using ::ttyd::evtmgr_cmd::evtGetFloat;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 using ::ttyd::item_data::itemDataTable;
@@ -912,7 +913,6 @@ EVT_END()
 // Runs event for encountering final boss.
 EVT_BEGIN(Tower_FinalBossEvent)
     // Entry animation.
-    USER_FUNC(evt_hitobj_onoff, PTR("baba"), 1, 0)
     USER_FUNC(evt_map_set_fog, 2, 400, 1000, 0, 10, 40)
     USER_FUNC(evt_map_fog_onoff, 1)
     USER_FUNC(evt_mario_key_onoff, 0)
@@ -1073,10 +1073,361 @@ EVT_BEGIN(Tower_GoldFuzzyIdleSfx)
     RETURN()
 EVT_END()
 
-// Runs event for encountering final boss.
-EVT_BEGIN(Tower_GoldFuzzyBossEvent)
+EVT_BEGIN(Tower_AltBoss1Event)
     // Entry animation.
-    USER_FUNC(evt_hitobj_onoff, PTR("baba"), 1, 0)
+    USER_FUNC(evt_map_set_fog, 2, 400, 1000, 0, 10, 40)
+    USER_FUNC(evt_map_fog_onoff, 1)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mario_normalize)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 10, 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("CBN_S_1"))
+    USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 150, 0, -150)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitBossNpc2Name), PTR("GNB_H_3"))
+    USER_FUNC(evt_cam3d_evt_set, -480, 150, 459, -480, 67, -13, 0, 11)
+    USER_FUNC(evt_mario_set_pos, -560, 10, 0)
+    USER_FUNC(evt_party_set_pos, 0, -600, 10, 0)
+    USER_FUNC(evt_seq_wait, 2)
+
+    INLINE_EVT()
+        SET(LW(1), 0)
+        RUN_EVT(bero_close_door_play_se)
+        USER_FUNC(evt_sub_intpl_msec_init, 11, 180, 0, 500)
+        DO(0)
+            USER_FUNC(evt_sub_intpl_msec_get_value)
+            RUN_CHILD_EVT(Tower_BossDoor_Close)
+            IF_EQUAL(LW(1), 0)
+                DO_BREAK()
+            END_IF()
+        WHILE()
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.00), 200)
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.00), 100)
+    END_INLINE()
+    INLINE_EVT()
+        USER_FUNC(evt_party_move_pos2, 0, -490, 0, FLOAT(120.0))
+    END_INLINE()
+    USER_FUNC(evt_mario_mov_pos2, -450, 0, FLOAT(120.0))
+    RUN_EVT(bero_case_entry)
+    WAIT_MSEC(1300)
+
+    // Print dragon already-felled message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::HOOK_F3)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, 0)
+
+    USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_eff_fukidashi, 0, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
+    USER_FUNC(evt_eff_fukidashi, 3, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
+    USER_FUNC(evt_mario_set_pose, PTR("M_N_5B"))
+    WAIT_MSEC(2000)
+    USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
+    USER_FUNC(evt_mario_set_dir_npc, PTR(kPitNpcName))
+    USER_FUNC(evt_party_set_dir_npc, 0, PTR(kPitNpcName))
+
+    // Pan camera over.
+    RUN_EVT_ID(Tower_GoldFuzzyIdleSfx, LW(15))
+    USER_FUNC(evt_cam3d_evt_set, 0, 75, 230, 0, 25, -70, 250, 11)
+    WAIT_MSEC(500)
+    // Print Gold Fuzzy message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::SBOSS_F1)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitNpcName))
+
+    DELETE_EVT(LW(15))
+    BROTHER_EVT()
+        // Slow camera pan.
+        USER_FUNC(evt_cam3d_evt_set, -450, 75, 230, -450, 25, -70, 2000, 11)
+    END_BROTHER()
+
+    // Should be three quick, low hops and a higher jump.
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("CBN_W_1"))
+    USER_FUNC(evt_npc_get_position, PTR(kPitNpcName), LW(0), LW(1), LW(2))
+    DO(3)
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_CHORO_MOVE1"), LW(0), LW(1), LW(2), 0)
+        SUB(LW(0), 115)
+        USER_FUNC(evt_npc_jump_position_nohit, PTR(kPitNpcName), LW(0), LW(1), LW(2), 500, FLOAT(35.0))
+    WHILE()
+    BROTHER_EVT()
+        WAIT_MSEC(160)
+        USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_2"), LW(0), LW(1), LW(2), 0)
+        USER_FUNC(evt_mario_set_pose, PTR("M_N_7"))
+    END_BROTHER()
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_CHORO_MOVE1"), LW(0), LW(1), LW(2), 0)
+    SET(LW(0), -445)
+    ADD(LW(1), 5)
+    USER_FUNC(evt_npc_jump_position_nohit, PTR(kPitNpcName), LW(0), LW(1), LW(2), 950, FLOAT(75.0))
+
+    USER_FUNC(evt_npc_battle_start, PTR(kPitNpcName))
+    
+    // Handle game over sequence.
+    USER_FUNC(evt_npc_wait_battle_end)
+    USER_FUNC(evt_npc_get_battle_result, LW(0))
+    IF_EQUAL(LW(0), 3)
+        // Turn on red fog, despawn NPCs, and point at player.
+        USER_FUNC(evt_map_set_fog, 2, 400, 1000, 40, 0, 20)
+        USER_FUNC(evt_map_fog_onoff, 1)
+        USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
+        USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
+        USER_FUNC(evt_cam3d_evt_off, 0, 11)
+        RUN_CHILD_EVT(&Tower_GameOverScript)
+        RETURN()
+    END_IF()
+    
+    // Otherwise, play boss death animation.
+
+    // Spawn Mario + partner in room, dragon already felled in background.
+    USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
+    SET(LW(13), PTR(kPitBossNpc2Name))
+    USER_FUNC(evt_cam3d_evt_set, 0, 30, 842, 0, 135, 150, 0, 11)
+    USER_FUNC(evt_npc_set_position, LW(13), 0, 0, -140)
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("GNB_H_3"))
+    USER_FUNC(evt_map_fog_onoff, 0)
+    USER_FUNC(evt_mario_set_pos, 25, 10, 150)
+    USER_FUNC(evt_mario_set_dir, 270, 0, 0)
+    USER_FUNC(evt_party_set_pos, 0, -25, 10, 150)
+    USER_FUNC(evt_party_set_dir, 0, 90, -1)
+
+    // Make Fuzzy do regular death animation.
+    SET(LW(13), PTR(kPitNpcName))
+    USER_FUNC(evt_npc_set_position, LW(13), 0, 5, 0)
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("CBN_Y_1"))
+    WAIT_MSEC(550)
+    // Print Gold Fuzzy death message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::SBOSS_F3)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitNpcName))
+    WAIT_MSEC(300)
+    USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
+    USER_FUNC(evt_eff, 
+        0, PTR("kemuri_test"), 4, LW(0), LW(1), LW(2), 
+        FLOAT(0.80), 0, 0, 0, 0, 0, 0, 0)
+    USER_FUNC(evt_snd_sfxon, PTR("SFX_ENEMY_DIE1"), 0)
+    USER_FUNC(evt_npc_delete, LW(13))
+    USER_FUNC(evt_npc_return_interrupt, LW(13))
+
+    // Handle stopping timer, triggering achievements, results screens, etc.
+    SET(LW(15), 2000)
+    RUN_CHILD_EVT(Tower_VictorySequence)
+
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_KammyLocomotion)
+    DO(0)
+        IF_NOT_EQUAL(GF(0), 0)
+            DO_BREAK()
+        END_IF()
+        USER_FUNC(evt_npc_get_position, PTR(kPitBossNpc2Name), LW(0), LW(1), LW(2))
+        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_KUPPA_KAMEBABA_FLY1"), LW(0), LW(1), LW(2), 0)
+        WAIT_FRM(10)
+    WHILE()
+    RETURN()
+EVT_END()
+
+// Runs event for encountering final boss.
+EVT_BEGIN(Tower_AltBoss2Event)
+    // Entry animation.
+    USER_FUNC(evt_map_set_fog, 2, 400, 1000, 0, 10, 40)
+    USER_FUNC(evt_map_fog_onoff, 1)
+    USER_FUNC(evt_mario_key_onoff, 0)
+    USER_FUNC(evt_mario_normalize)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
+    USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
+    USER_FUNC(evt_cam3d_evt_set, -480, 150, 459, -480, 67, -13, 0, 11)
+    USER_FUNC(evt_mario_set_pos, -560, 10, 0)
+    USER_FUNC(evt_party_set_pos, 0, -600, 10, 0)
+    USER_FUNC(evt_seq_wait, 2)
+
+    INLINE_EVT()
+        SET(LW(1), 0)
+        RUN_EVT(bero_close_door_play_se)
+        USER_FUNC(evt_sub_intpl_msec_init, 11, 180, 0, 500)
+        DO(0)
+            USER_FUNC(evt_sub_intpl_msec_get_value)
+            RUN_CHILD_EVT(Tower_BossDoor_Close)
+            IF_EQUAL(LW(1), 0)
+                DO_BREAK()
+            END_IF()
+        WHILE()
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.00), 200)
+        USER_FUNC(evt_cam_shake, 4, FLOAT(0.01), FLOAT(0.00), 100)
+    END_INLINE()
+    INLINE_EVT()
+        USER_FUNC(evt_party_move_pos2, 0, -490, 0, FLOAT(120.0))
+    END_INLINE()
+    USER_FUNC(evt_mario_mov_pos2, -450, 0, FLOAT(120.0))
+    RUN_EVT(bero_case_entry)
+    WAIT_MSEC(1300)
+
+    // Print Bowser's first message.
+    // TODO: Play a voice grunt?
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2_F)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, 0)
+
+    USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_eff_fukidashi, 0, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
+    USER_FUNC(evt_eff_fukidashi, 3, PTR(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
+    USER_FUNC(evt_mario_set_pose, PTR("M_N_5B"))
+    WAIT_MSEC(2000)
+    USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
+    USER_FUNC(evt_mario_set_dir_npc, PTR(kPitNpcName))
+    USER_FUNC(evt_party_set_dir_npc, 0, PTR(kPitNpcName))
+
+    // Pan camera over.
+    // USER_FUNC(evt_cam3d_evt_set, -480, 150, 459, -480, 67, -13, 0, 11)
+    USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_STGK_CASTLE1"))
+    USER_FUNC(evt_cam3d_evt_set, 80, 150, 459, 80, 67, -13, 350, 11)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 160, 10, 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("KPA_W_1"))
+    WAIT_FRM(1)
+    USER_FUNC(evt_npc_move_position, PTR(kPitNpcName), 80, 0, 0, FLOAT(60.0), 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("KPA_S_4"))
+    WAIT_MSEC(50)
+    // Print Bowser message ii.
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitNpcName))
+
+    // Print Bowser/Kammy message iii.
+    USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 270, 50, 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitBossNpc2Name), PTR("S_2"))
+    USER_FUNC(evt_npc_set_autotalkpose, PTR(kPitBossNpc2Name), PTR("S_2"), PTR("T_2"))
+    WAIT_MSEC(200)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitBossNpc2Name))
+
+    // Have Kammy fly over.
+    SET(GF(0), 0)
+    RUN_EVT(Tower_KammyLocomotion)
+    USER_FUNC(evt_npc_kamek_move_position, PTR(kPitBossNpc2Name), 130, 50, 0, 0, FLOAT(60.0), 0)
+    SET(GF(0), 1)
+
+    // Print Bowser message iv.
+    WAIT_MSEC(200)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitNpcName))
+
+    // Move everyone towards the center of the room.
+    INLINE_EVT()
+        // Slow camera pan.
+        USER_FUNC(evt_cam3d_evt_set, -45, 150, 459, -45, 67, -13, 1200, 11)
+    END_INLINE()
+
+    INLINE_EVT()
+        USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("KPA_W_1"))
+        USER_FUNC(evt_npc_move_position, PTR(kPitNpcName), -10, 0, 0, FLOAT(60.0), 0)
+        USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("KPA_S_4"))
+    END_INLINE()
+
+    INLINE_EVT()
+        SET(GF(0), 0)
+        RUN_EVT(Tower_KammyLocomotion)
+        USER_FUNC(evt_npc_kamek_move_position, PTR(kPitBossNpc2Name), 30, 50, 0, 0, FLOAT(60.0), 0)
+        SET(GF(0), 1)
+    END_INLINE()
+
+    INLINE_EVT()
+        USER_FUNC(evt_party_set_pos, 0, -235, 10, 0)
+        USER_FUNC(evt_party_move_pos2, 0, -115, 0, FLOAT(80.0))
+    END_INLINE()
+
+    USER_FUNC(evt_mario_set_pos, -200, 10, 0)
+    USER_FUNC(evt_mario_mov_pos2, -80, 0, FLOAT(80.0))
+    INLINE_EVT()
+        WAIT_MSEC(150)
+        USER_FUNC(evt_mario_set_pose, PTR("M_I_Y"))
+    END_INLINE()
+    WAIT_MSEC(500)
+    
+    USER_FUNC(evt_snd_bgmoff, 512)
+    USER_FUNC(evt_npc_battle_start, PTR(kPitNpcName))
+    
+    // Handle game over sequence.
+    USER_FUNC(evt_npc_wait_battle_end)
+    USER_FUNC(evt_npc_get_battle_result, LW(0))
+    IF_EQUAL(LW(0), 3)
+        // Turn on red fog, despawn NPCs, and point at player.
+        USER_FUNC(evt_map_set_fog, 2, 400, 1000, 40, 0, 20)
+        USER_FUNC(evt_map_fog_onoff, 1)
+        USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
+        USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
+        USER_FUNC(evt_cam3d_evt_off, 0, 11)
+        RUN_CHILD_EVT(&Tower_GameOverScript)
+        RETURN()
+    END_IF()
+    
+    // Otherwise, play boss death animation.
+
+    // Zoom out a bit, with party + Bowser/Kammy's faces on rough eyeline.
+    USER_FUNC(evt_cam3d_evt_set, 0, 30, 842, 0, 135, 150, 0, 11)
+    USER_FUNC(evt_map_fog_onoff, 0)
+    USER_FUNC(evt_mario_set_pos, -40, 10, 150)
+    USER_FUNC(evt_mario_set_dir, 90, 0, 0)
+    USER_FUNC(evt_party_set_pos, 0, -80, 10, 150)
+    USER_FUNC(evt_party_set_dir, 0, 90, -1)
+
+    USER_FUNC(evt_mario_set_pose, PTR("M_J_1A"))
+
+    // INLINE_EVT()
+    //     USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
+    //     WAIT_MSEC(150)
+    //     USER_FUNC(evt_mario_set_pose, PTR("M_I_Y"))
+    // END_INLINE()
+
+    // Spawn Bowser and Kammy defeated, with dizzy stars.
+    SET(LW(13), PTR(kPitBossNpc2Name))
+    USER_FUNC(evt_npc_set_position, LW(13), 90, 10, 150)
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("D_3"))
+    USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
+    ADD(LW(1), 40)
+    USER_FUNC(
+        evt_eff64, PTR("gur0"), PTR("guruguru_n64"), 0, LW(0), LW(1), LW(2), FLOAT(20.0),
+        3, 0, 0, 0, 0, 0, 0)
+
+    SET(LW(13), PTR(kPitNpcName))
+    USER_FUNC(evt_npc_set_position, LW(13), 60, 10, 120)
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("KPA_D_2"))
+    USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
+    ADD(LW(1), 60)
+    ADD(LW(0), -20)
+    USER_FUNC(
+        evt_eff64, PTR("gur1"), PTR("guruguru_n64"), 0, LW(0), LW(1), LW(2), FLOAT(25.0),
+        3, 0, 0, 0, 0, 0, 0)
+
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG8_WITCH_PIYO1"), LW(0), LW(1), LW(2), LW(14))
+    WAIT_MSEC(550)
+
+    // Print death message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2_F_END)
+    USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, LW(13))
+
+    INLINE_EVT()
+        WAIT_MSEC(1000)
+        USER_FUNC(evt_sub_intpl_msec_init, 0, 100, 0, 2000)
+    LBL(0)
+        USER_FUNC(evt_sub_intpl_msec_get_value)
+        USER_FUNC(evt_snd_sfx_vol, LW(14), LW(0))
+        WAIT_FRM(1)
+        IF_EQUAL(LW(1), 1)
+            GOTO(0)
+        END_IF()
+        USER_FUNC(evt_snd_sfxoff, LW(14))
+    END_INLINE()
+
+    // Handle stopping timer, triggering achievements, results screens, etc.
+    SET(LW(15), 2000)
+    RUN_CHILD_EVT(Tower_VictorySequence)
+    USER_FUNC(evt_eff_softdelete, PTR("gur0"))
+    USER_FUNC(evt_eff_softdelete, PTR("gur1"))
+
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(Tower_AltBoss3Event)
+    // Entry animation.
     USER_FUNC(evt_map_set_fog, 2, 400, 1000, 0, 10, 40)
     USER_FUNC(evt_map_fog_onoff, 1)
     USER_FUNC(evt_mario_key_onoff, 0)
@@ -1227,18 +1578,23 @@ EVT_BEGIN(Tower_FinalBossSetup)
     SET(LW(9), PTR(npcTribe[NpcTribeType::BONETAIL].modelName))
     SET(LW(10), PTR(npcTribe[NpcTribeType::BONETAIL].nameJp))
 
-    // If using alternate boss, second NPC should be the regular boss instead.
-    IF_LARGE((int32_t)GSW_Tower_FinalBossType, 0)
-        USER_FUNC(evtTot_GetDifficulty, LW(8))
-        SWITCH(LW(8))
-            CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_HALF)
-                SET(LW(9), PTR(npcTribe[NpcTribeType::HOOKTAIL].modelName))
-                SET(LW(10), PTR(npcTribe[NpcTribeType::HOOKTAIL].nameJp))
-            CASE_ETC()
-                SET(LW(9), PTR(npcTribe[NpcTribeType::GLOOMTAIL].modelName))
-                SET(LW(10), PTR(npcTribe[NpcTribeType::GLOOMTAIL].nameJp))
-        END_SWITCH()
-    END_IF()
+    SWITCH((int32_t)GSW_Tower_FinalBossType)
+        CASE_EQUAL(1)
+            // For Gold Fuzzy, second NPC should be the regular boss.
+            USER_FUNC(evtTot_GetDifficulty, LW(8))
+            SWITCH(LW(8))
+                CASE_EQUAL((int32_t)OPTVAL_DIFFICULTY_HALF)
+                    SET(LW(9), PTR(npcTribe[NpcTribeType::HOOKTAIL].modelName))
+                    SET(LW(10), PTR(npcTribe[NpcTribeType::HOOKTAIL].nameJp))
+                CASE_ETC()
+                    SET(LW(9), PTR(npcTribe[NpcTribeType::GLOOMTAIL].modelName))
+                    SET(LW(10), PTR(npcTribe[NpcTribeType::GLOOMTAIL].nameJp))
+            END_SWITCH()
+        CASE_EQUAL(2)
+            // For Bowser fight, second NPC should be Kammy.
+            SET(LW(9), PTR(npcTribe[NpcTribeType::KAMMY_FLYING].modelName))
+            SET(LW(10), PTR(npcTribe[NpcTribeType::KAMMY_FLYING].nameJp))
+    END_SWITCH()
     
     // Set up main NPC, and Bonetail NPC to swap to for EX difficulty.
     USER_FUNC(evt_npc_entry, PTR(kPitNpcName), LW(2))
@@ -1249,13 +1605,12 @@ EVT_BEGIN(Tower_FinalBossSetup)
 
     USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 0, 0)
     USER_FUNC(evtTot_SetEnemyNpcBattleInfo, PTR(kPitNpcName), /* battle id */ 1)
-    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_3"))
     USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitNpcName), 33554496)
     USER_FUNC(evt_npc_pera_onoff, PTR(kPitNpcName), 0)
     USER_FUNC(evt_npc_set_ry, PTR(kPitNpcName), 0)
     IF_EQUAL((int32_t)GSW_Tower_FinalBossType, 0)
-        USER_FUNC(
-            evt_npc_set_scale, PTR(kPitNpcName), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
+        USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("GNB_H_3"))
+        USER_FUNC(evt_npc_set_scale, PTR(kPitNpcName), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
     END_IF()
 
     USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
@@ -1263,14 +1618,26 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evt_npc_flag_onoff, 1, PTR(kPitBossNpc2Name), 33554496)
     USER_FUNC(evt_npc_pera_onoff, PTR(kPitBossNpc2Name), 0)
     USER_FUNC(evt_npc_set_ry, PTR(kPitBossNpc2Name), 0)
-    USER_FUNC(evt_npc_set_scale, PTR(kPitBossNpc2Name), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
-    
-    // TODO: Add support for different events for other alternate bosses.
-    IF_EQUAL((int32_t)GSW_Tower_FinalBossType, 0)
-        RUN_EVT(&Tower_FinalBossEvent)
-    ELSE()
-        RUN_EVT(&Tower_GoldFuzzyBossEvent)
+    IF_NOT_EQUAL((int32_t)GSW_Tower_FinalBossType, 2)
+        USER_FUNC(evt_npc_set_scale, PTR(kPitBossNpc2Name), FLOAT(1.3), FLOAT(1.3), FLOAT(1.3))
     END_IF()
+
+    // Turn off bits of map collision that never need to be on.
+    USER_FUNC(evt_hitobj_onoff, PTR("baba"), 1, 0)
+    USER_FUNC(evt_hitobj_onoff, PTR("A_taka"), 1, 0)
+    USER_FUNC(evt_hitobj_onoff, PTR("A_kura"), 1, 0)
+    
+    // TODO: Polish Bowser event, finish at least draft of Doopliss event.
+    SWITCH((int32_t)GSW_Tower_FinalBossType)
+        CASE_EQUAL(1)
+            RUN_EVT(&Tower_AltBoss1Event)
+        CASE_EQUAL(2)
+            RUN_EVT(&Tower_AltBoss2Event)
+        CASE_EQUAL(3)
+            RUN_EVT(&Tower_AltBoss3Event)
+        CASE_ETC()
+            RUN_EVT(&Tower_FinalBossEvent)
+    END_SWITCH()
     RETURN()
 EVT_END()
 

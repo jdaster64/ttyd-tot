@@ -309,7 +309,6 @@ enum OptionsType {
 enum Options : uint32_t {
     // Flag-based options.
     // Select a set of settings all at once, or choose a custom set.
-    // TODO: Support random preset.
     OPT_PRESET                  = 0x400'3'00'03,
     OPTVAL_PRESET_CUSTOM        = 0x500'3'00'00,
     OPTVAL_PRESET_DEFAULT       = 0x500'3'00'01,
@@ -430,8 +429,7 @@ enum Options : uint32_t {
     OPT_NPC_CHOICE_3            = 0x43c'4'00'0a,
     OPT_NPC_CHOICE_4            = 0x440'4'00'0a,
 
-    // Determines whether the secret boss will appear.
-    // TODO: Add full support for other bosses, and "Equal chance" option.
+    // Determines whether an alternate final boss will appear.
     OPT_SECRET_BOSS             = 0x444'3'00'05,
     OPTVAL_SECRET_BOSS_RANDOM   = 0x544'3'00'00,
     OPTVAL_SECRET_BOSS_OFF      = 0x544'3'00'01,
@@ -454,7 +452,6 @@ enum Options : uint32_t {
     OPTVAL_RUN_AWAY_GUARANTEED  = 0x54a'2'00'01,
 
     // Different options for what midbosses and midboss helpers can spawn.
-    // TODO: Add support.
     OPT_MIDBOSSES               = 0x44c'2'00'03,
     OPTVAL_MIDBOSSES_DEFAULT    = 0x54c'2'00'00,
     OPTVAL_MIDBOSSES_RANDOM     = 0x54c'2'00'01,
@@ -483,7 +480,6 @@ enum Options : uint32_t {
     OPTVAL_MOVES_CUSTOM         = 0x555'3'00'04,
 
     // Whether chest rewards can be rerolled / need to be revealed on the field.
-    // TODO: Add support.
     OPT_CHEST_CHOICE            = 0x458'3'00'04,
     OPTVAL_CHEST_CHOICE_OFF     = 0x558'3'00'00,
     OPTVAL_CHEST_REROLL_FIXED   = 0x558'3'00'01,

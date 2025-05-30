@@ -6950,6 +6950,19 @@ g_TowerBossFloorStrings = {
         b"But I'm not through yet!\n<wait 250>\n"
         b"Everyone! GET 'EM!!!\n<k>",
         
+    # TODO: Field placeholder text for new boss fights.
+    
+    b"tot_di079000_00":
+        b"Boss2 Message F00\n<k>",
+    b"tot_di079000_01":
+        b"Boss2 Message F01\n<k>",
+    b"tot_di079000_02":
+        b"Boss2 Message F02\n<k>",
+    b"tot_di079000_03":
+        b"Boss2 Message F03\n<k>",
+    b"tot_di079500_00":
+        b"Boss2 Defeated\n<k>",
+        
     # TODO: In-battle placeholder text for new boss fights.
     
     b"tot_di070000_00":

@@ -1023,13 +1023,6 @@ void BuildBattle(
         num_npcs = 2;
         // Always set bosses to basic "Gold Fuzzy" AI type.
         npc_ai = &ttyd::npc_data::npc_ai_type_table[NpcAiType::GOLD_FUZZY];
-
-        // TODO: Add support for different alternate bosses.
-        if (GetSWByte(GSW_Tower_FinalBossType) != 0) {
-            npc_tribe =
-                ttyd::npc_data::npcTribe + 
-                kEnemyInfo[BattleUnitType::GOLD_FUZZY].npc_tribe_idx;
-        }
     }
     
     memset(npc_setup_info, 0, sizeof(NpcSetupInfo) * 3);
@@ -1073,7 +1066,7 @@ void BuildBattle(
         float x = kEnemyPartyCenterX + offset * kEnemyPartySepX;
         float z = offset * kEnemyPartySepZ;
         
-        // Make sure bosses appear in the right position, if not standard.
+        // Override positioning for specific bosses.
         switch (g_Enemies[i]) {
             case BattleUnitType::GOLD_FUZZY:
                 x = 125.0f;

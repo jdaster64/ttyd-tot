@@ -659,6 +659,14 @@ void DialogueManager::SetConversation(int32_t id) {
             }
             break;
         }
+        case ConversationId::BOSS_2_F:
+        case ConversationId::BOSS_3_F: {
+            // TODO: Adjust as necessary, add variants for FX encounters, etc.
+            // Boss 2 and 3 cutscenes support up to four dialogue boxes.
+            static int8_t AltBosses_CutsceneConversation[] =  { 0, 0, 0, 0, 0, -1 };
+            g_ConversationPtr = AltBosses_CutsceneConversation;
+            break;
+        }
     }
 }
 

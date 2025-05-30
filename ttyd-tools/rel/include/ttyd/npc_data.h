@@ -94,6 +94,7 @@ namespace NpcTribeType {
         TOAD_SISTER_G   = 0x7b,
         DOOPLISS        = 0x95,
         GLOOMTAIL       = 0xc6,
+        KAMMY_FLYING    = 0xcf,
         PIDER           = 0x10a,
         ARANTULA        = 0x10b,
         BONETAIL        = 0x145,

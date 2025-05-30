@@ -98,7 +98,6 @@ EVT_BEGIN(Lobby_ConfirmStart)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_set_mov_spd, FLOAT(0.00))
 
-    // TODO: Change text for first Gloomtail?
     SWITCH((int32_t)GSW_Tower_TutorialClears)
         CASE_EQUAL(0)
             USER_FUNC(evt_msg_print, 0, PTR("tot_lobby_confirmstart_1st"), 0, 0)
