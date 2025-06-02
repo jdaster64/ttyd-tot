@@ -665,6 +665,11 @@ LBL(5)
     USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
     USER_FUNC(btlevtcmd_GetResultACDefence, LW(7))
     IF_LARGE_EQUAL(LW(7), 4)
+        // Reset camera if Superguarded successfully.
+        IF_LARGE_EQUAL(LW(7), 5)
+            USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+        END_IF()
+
         USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&customWeapon_YoshiGulp_Dmg0), int(0x80000100U), LW(5))
         WAIT_FRM(43)
         GOTO(90)

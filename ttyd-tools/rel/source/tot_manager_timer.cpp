@@ -458,6 +458,8 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         GetSWF(GSWF_SecretBoss2_BeatenEX) && GetSWF(GSWF_SecretBoss3_BeatenEX)) {
         AchievementsManager::MarkCompleted(AchievementId::V3_AGG_BOSS_ALL_EX);
     }
+    // Check for "all options" after beating a secret boss.
+    AchievementsManager::CheckCompleted(AchievementId::META_ALL_OPTIONS);
 
     // Update number of 'tutorial' tower run clears.
     int32_t tut_clears = GetSWByte(GSW_Tower_TutorialClears);

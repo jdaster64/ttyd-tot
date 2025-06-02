@@ -278,7 +278,7 @@ void DialogueManager::SetConversation(int32_t id) {
                                 ids[num_cvs++] =
                                     ConversationId::NPC_D_CVS_BASE + grid[i];
                             break;
-                        case AchievementId::META_ALL_OPTIONS:
+                        case AchievementId::META_ALL_OPTIONS: {
                             // Give individual hints for NPC options that
                             // aren't yet unlocked.
                             if (!GetSWF(GSWF_NpcF_SeedUnlocked)) {
@@ -293,7 +293,18 @@ void DialogueManager::SetConversation(int32_t id) {
                                 ids[num_cvs++] =
                                     ConversationId::NPC_D_OPTIONS_TIMER;
                             }
+                            
+                            int32_t bosses_beaten =
+                                GetSWF(GSWF_SecretBoss1_Beaten) +
+                                GetSWF(GSWF_SecretBoss2_Beaten) +
+                                GetSWF(GSWF_SecretBoss3_Beaten);
+                            if (bosses_beaten > 0 && bosses_beaten < 3) {
+                                ids[num_cvs++] =
+                                    ConversationId::NPC_D_OPTIONS_BOSS;
+                            }
+
                             break;
+                        }
                         default:
                             break;
                     }

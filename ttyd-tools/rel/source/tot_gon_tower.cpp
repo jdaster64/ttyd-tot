@@ -1432,10 +1432,8 @@ EVT_BEGIN(Tower_AltBoss3Event)
     USER_FUNC(evt_map_fog_onoff, 1)
     USER_FUNC(evt_mario_key_onoff, 0)
     USER_FUNC(evt_mario_normalize)
-    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, 10, 0)
-    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("CBN_S_1"))
-    USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 150, 0, -150)
-    USER_FUNC(evt_npc_set_anim, PTR(kPitBossNpc2Name), PTR("GNB_H_3"))
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 0, -1000, 0)
+    USER_FUNC(evt_npc_set_position, PTR(kPitBossNpc2Name), 0, -1000, 0)
     USER_FUNC(evt_cam3d_evt_set, -480, 150, 459, -480, 67, -13, 0, 11)
     USER_FUNC(evt_mario_set_pos, -560, 10, 0)
     USER_FUNC(evt_party_set_pos, 0, -600, 10, 0)
@@ -1462,8 +1460,8 @@ EVT_BEGIN(Tower_AltBoss3Event)
     RUN_EVT(bero_case_entry)
     WAIT_MSEC(1300)
 
-    // Print dragon already-felled message.
-    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::HOOK_F3)
+    // Print Bowser's first message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_F)
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
     USER_FUNC(evt_msg_print, 0, LW(0), 0, 0)
 
@@ -1478,39 +1476,71 @@ EVT_BEGIN(Tower_AltBoss3Event)
     USER_FUNC(evt_party_set_dir_npc, 0, PTR(kPitNpcName))
 
     // Pan camera over.
-    RUN_EVT_ID(Tower_GoldFuzzyIdleSfx, LW(15))
-    USER_FUNC(evt_cam3d_evt_set, 0, 75, 230, 0, 25, -70, 250, 11)
-    WAIT_MSEC(500)
-    // Print Gold Fuzzy message.
-    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::SBOSS_F1)
+    // USER_FUNC(evt_cam3d_evt_set, -480, 150, 459, -480, 67, -13, 0, 11)
+    // USER_FUNC(evt_cam3d_evt_set, 0, 75, 230, 0, 25, -70, 250, 11)
+    USER_FUNC(evt_snd_bgmon, 512, PTR("BGM_FF_ENV_RPL_APPEAR1"))
+    USER_FUNC(evt_cam3d_evt_set, 30, 112, 345, 30, 50, -40, 250, 11)
+    USER_FUNC(evt_npc_set_position, PTR(kPitNpcName), 30, 10, 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("S_1"))
+    USER_FUNC(evt_npc_set_autotalkpose, PTR(kPitNpcName), PTR("S_1"), PTR("T_1"))
+    WAIT_MSEC(300)
+    // Print message ii.
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
     USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitNpcName))
 
-    DELETE_EVT(LW(15))
-    BROTHER_EVT()
+    // Move everyone towards the center of the room.
+    INLINE_EVT()
         // Slow camera pan.
-        USER_FUNC(evt_cam3d_evt_set, -450, 75, 230, -450, 25, -70, 2000, 11)
-    END_BROTHER()
+        USER_FUNC(evt_cam3d_evt_set, -5, 112, 345, -5, 50, -40, 880, 11)
+    END_INLINE()
 
-    // Should be three quick, low hops and a higher jump.
-    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("CBN_W_1"))
+    INLINE_EVT()
+        USER_FUNC(evt_party_set_pos, 0, -180, 10, 0)
+        USER_FUNC(evt_party_move_pos2, 0, -60, 0, FLOAT(70.0))
+    END_INLINE()
+
+    INLINE_EVT()
+        USER_FUNC(evt_mario_set_pos, -145, 10, 0)
+        USER_FUNC(evt_mario_mov_pos2, -25, 0, FLOAT(70.0))
+        WAIT_MSEC(450)
+        USER_FUNC(evt_mario_set_pose, PTR("M_I_Y"))
+    END_INLINE()
+
+    // Have Doopliss laugh.
+    USER_FUNC(evt_npc_get_dir, PTR(kPitNpcName), LW(3))
+    IF_SMALL(LW(3), 180)
+        SET(LW(3), 1)
+    ELSE()
+        SET(LW(3), -1)
+    END_IF()
+    WAIT_MSEC(200)
     USER_FUNC(evt_npc_get_position, PTR(kPitNpcName), LW(0), LW(1), LW(2))
-    DO(3)
-        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_CHORO_MOVE1"), LW(0), LW(1), LW(2), 0)
-        SUB(LW(0), 115)
-        USER_FUNC(evt_npc_jump_position_nohit, PTR(kPitNpcName), LW(0), LW(1), LW(2), 500, FLOAT(35.0))
-    WHILE()
-    BROTHER_EVT()
-        WAIT_MSEC(160)
-        USER_FUNC(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-        USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_MARIO_SURPRISED2_2"), LW(0), LW(1), LW(2), 0)
-        USER_FUNC(evt_mario_set_pose, PTR("M_N_7"))
-    END_BROTHER()
-    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_STG1_CHORO_MOVE1"), LW(0), LW(1), LW(2), 0)
-    SET(LW(0), -445)
-    ADD(LW(1), 5)
-    USER_FUNC(evt_npc_jump_position_nohit, PTR(kPitNpcName), LW(0), LW(1), LW(2), 950, FLOAT(75.0))
-
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_ARM_UP1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("A_3A"))
+    WAIT_MSEC(600)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_ARM_UP1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("A_3A"))
+    WAIT_MSEC(600)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_ARM_UP1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("A_3A"))
+    WAIT_MSEC(200)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_LAUGH1"), LW(0), LW(1), LW(2), 0)
+    USER_FUNC(evt_npc_set_anim, PTR(kPitNpcName), PTR("A_3B"))
+    WAIT_MSEC(800)
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_BOSS_RNPL_EYE_SHINE1"), LW(0), LW(1), LW(2), 0)
+    SET(LW(4), 1)
+    MUL(LW(4), LW(3))
+    ADD(LW(0), LW(4))
+    ADD(LW(1), 32)
+    USER_FUNC(evt_eff, PTR(""), PTR("toge_flush"), 3, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+    SET(LW(4), -7)
+    MUL(LW(4), LW(3))
+    ADD(LW(0), LW(4))
+    ADD(LW(1), 1)
+    USER_FUNC(evt_eff, PTR(""), PTR("toge_flush"), 3, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MSEC(600)
+    
+    USER_FUNC(evt_snd_bgmoff, 512)
     USER_FUNC(evt_npc_battle_start, PTR(kPitNpcName))
     
     // Handle game over sequence.
@@ -1529,35 +1559,43 @@ EVT_BEGIN(Tower_AltBoss3Event)
     
     // Otherwise, play boss death animation.
 
-    // Spawn Mario + partner in room, dragon already felled in background.
-    USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
-    SET(LW(13), PTR(kPitBossNpc2Name))
+    // Zoom out a bit, have party facing Doopliss.
     USER_FUNC(evt_cam3d_evt_set, 0, 30, 842, 0, 135, 150, 0, 11)
-    USER_FUNC(evt_npc_set_position, LW(13), 0, 0, -140)
-    USER_FUNC(evt_npc_set_anim, LW(13), PTR("GNB_H_3"))
     USER_FUNC(evt_map_fog_onoff, 0)
-    USER_FUNC(evt_mario_set_pos, 25, 10, 150)
-    USER_FUNC(evt_mario_set_dir, 270, 0, 0)
-    USER_FUNC(evt_party_set_pos, 0, -25, 10, 150)
+    USER_FUNC(evt_mario_set_pos, -40, 10, 150)
+    USER_FUNC(evt_mario_set_dir, 90, 0, 0)
+    USER_FUNC(evt_party_set_pos, 0, -80, 10, 150)
     USER_FUNC(evt_party_set_dir, 0, 90, -1)
 
-    // Make Fuzzy do regular death animation.
+    USER_FUNC(evt_mario_set_pose, PTR("M_S_1"))
+
     SET(LW(13), PTR(kPitNpcName))
-    USER_FUNC(evt_npc_set_position, LW(13), 0, 5, 0)
-    USER_FUNC(evt_npc_set_anim, LW(13), PTR("CBN_Y_1"))
-    WAIT_MSEC(550)
-    // Print Gold Fuzzy death message.
-    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::SBOSS_F3)
+    USER_FUNC(evt_npc_set_position, LW(13), 60, 10, 150)
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("S_3"))
+    WAIT_MSEC(200)
+
+    // Print death message.
+    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_F_END)
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
-    USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR(kPitNpcName))
+    USER_FUNC(evt_msg_print, 0, LW(0), 0, LW(13))
+
+    INLINE_EVT()
+        WAIT_MSEC(1070)
+        USER_FUNC(evt_mario_set_reardir)
+    END_INLINE()
+
     WAIT_MSEC(300)
-    USER_FUNC(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
-    USER_FUNC(evt_eff, 
-        0, PTR("kemuri_test"), 4, LW(0), LW(1), LW(2), 
-        FLOAT(0.80), 0, 0, 0, 0, 0, 0, 0)
-    USER_FUNC(evt_snd_sfxon, PTR("SFX_ENEMY_DIE1"), 0)
-    USER_FUNC(evt_npc_delete, LW(13))
-    USER_FUNC(evt_npc_return_interrupt, LW(13))
+    USER_FUNC(evt_npc_set_anim, LW(13), PTR("R_2"))
+    USER_FUNC(evt_npc_reverse_ry, LW(13))
+    WAIT_FRM(2)
+    USER_FUNC(evt_npc_jump_position_nohit, LW(13), 130, 10, -50, 750, 80)
+    USER_FUNC(evt_npc_reverse_ry, LW(13))
+    WAIT_FRM(2)
+    USER_FUNC(evt_npc_jump_position_nohit, LW(13), 60, 10, -320, 750, 80)
+    USER_FUNC(evt_npc_reverse_ry, LW(13))
+    WAIT_FRM(2)
+    USER_FUNC(evt_npc_jump_position_nohit, LW(13), 90, -40, -800, 900, 170)
+    USER_FUNC(evt_npc_set_position, LW(13), 0, -1000, 0)
 
     // Handle stopping timer, triggering achievements, results screens, etc.
     SET(LW(15), 2000)

@@ -76,6 +76,7 @@ namespace ConversationId {
         NPC_D_OPTIONS_SEED  = 9400,
         NPC_D_OPTIONS_MOVES = 9401,
         NPC_D_OPTIONS_TIMER = 9402,
+        NPC_D_OPTIONS_BOSS  = 9403,
 
         // NPC G (Blue Bub-ulb)
         NPC_G               = 10000,

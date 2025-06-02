@@ -1073,9 +1073,9 @@ EVT_BEGIN(partySandersAttack_TimeBombSet)
                     USER_FUNC(btlevtcmd_AcGetOutputParam, 1, LW(1))
                     ADD(LW(1), 20)
                 ELSE()
-                    // Choose random angle from 20-60 degrees to shoot at.
-                    USER_FUNC(evt_sub_random, 40, LW(0))
-                    SUB(LW(0), 60)
+                    // Choose random angle from 20-45 degrees to shoot at.
+                    USER_FUNC(evt_sub_random, 25, LW(0))
+                    SUB(LW(0), 45)
                     SET(LW(1), 100)
                 END_IF()
 

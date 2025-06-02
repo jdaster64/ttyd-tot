@@ -6962,6 +6962,17 @@ g_TowerBossFloorStrings = {
         b"Boss2 Message F03\n<k>",
     b"tot_di079500_00":
         b"Boss2 Defeated\n<k>",
+    
+    b"tot_di089000_00":
+        b"Boss3 Message F00\n<k>",
+    b"tot_di089000_01":
+        b"Boss3 Message F01\n<k>",
+    b"tot_di089000_02":
+        b"Boss3 Message F02\n<k>",
+    b"tot_di089000_03":
+        b"Boss3 Message F03\n<k>",
+    b"tot_di089500_00":
+        b"Boss3 Defeated\n<k>",
         
     # TODO: In-battle placeholder text for new boss fights.
     
@@ -9011,6 +9022,37 @@ g_PetalburgWestStrings = {
         b"<p>\n"
         b"Perhaps you could talk to\n"
         b"him and see what he's up to!\n"
+        b"<k>",
+
+    b"tot_di009403_00":
+        b"Oh, it's you again. <wait 250>You say\n"
+        b"you want to get access to\n"
+        b"every tower run option?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, most of them are locked\n"
+        b"behind achievements. <wait 250>But you\n"
+        b"probably knew that already...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Hmm... <wait 250>Well, remember that\n"
+        b"time you fought a different\n"
+        b"boss than you expected?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Maybe there are other\n"
+        b"rare encounters that you\n"
+        b"haven't run into yet...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I wonder if they'd be more\n"
+        b"likely to show up if you made\n"
+        b"an attention-grabbing noise...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Ehh... <wait 150>probably a bit of a\n"
+        b"stretch, <wait 150>but who knows?\n"
+        b"<wait 250>You might get lucky!\n"
         b"<k>",
         
     # General White.

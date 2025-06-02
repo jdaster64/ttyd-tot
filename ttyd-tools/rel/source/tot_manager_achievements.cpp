@@ -345,10 +345,16 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
                     if (!state.GetOption(FLAGS_OPTION_UNLOCKED, i)) return;
                 }
             }
+
             // Check for having unlocked options tied to NPCs.
             if (!GetSWF(GSWF_NpcF_SeedUnlocked)) return;
             if (!GetSWF(GSWF_NpcK_CustomMovesUnlocked)) return;
             if (!GetSWF(GSWF_White_CountdownUnlocked)) return;
+            // Check for having beaten each secret boss once.
+            if (!GetSWF(GSWF_SecretBoss1_Beaten)) return;
+            if (!GetSWF(GSWF_SecretBoss2_Beaten)) return;
+            if (!GetSWF(GSWF_SecretBoss3_Beaten)) return;
+
             MarkCompleted(ach);
             break;
         }
