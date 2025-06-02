@@ -275,9 +275,6 @@ bool StateManager::Load(TotSaveSlot* save) {
             }
         }
 
-        // Check if automatically eligible for new aggregate achievements.
-        AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_50_MOVES);
-
         // Set flag for secret boss 1, if already beaten on a previous file.
         if (GetOption(FLAGS_ACHIEVEMENT, AchievementId::META_SECRET_BOSS)) {
             SetSWF(GSWF_SecretBoss1_Beaten);
@@ -296,6 +293,10 @@ bool StateManager::Load(TotSaveSlot* save) {
             (80 + Rand(41)) / 200;
         if (fake_hp_taken > fake_hp_offered) fake_hp_taken = fake_hp_offered;
         SetOption(STAT_PERM_REWARDS_TAKEN, fake_hp_taken, RewardStatId::STAT_HP);
+
+        // Check if automatically eligible for new aggregate achievements.
+        AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_50_MOVES);
+        AchievementsManager::CheckCompleted(AchievementId::V3_AGG_REWARD_5_EACH);
 
         // Re-run special file setup to collect new achievements, options, etc.
         DebugManager::SpecialFileSetup();
