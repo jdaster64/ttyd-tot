@@ -1162,6 +1162,7 @@ const CosmeticGroupData* CosmeticsManager::GetGroupData(
 bool CosmeticsManager::IsEquipped(int32_t type, int32_t id) {
     switch (type) {
         case CosmeticType::ATTACK_FX:
+            if (id >= g_NumAttackFx) return 0;  // Hard cap of 30
             return GetSWF(GSWF_AttackFxFlags + id);
         case CosmeticType::MARIO_COSTUME:
             return GetSWByte(GSW_MarioCostume) == id;
@@ -1174,6 +1175,7 @@ bool CosmeticsManager::IsEquipped(int32_t type, int32_t id) {
 bool CosmeticsManager::ToggleEquipped(int32_t type, int32_t id) {
     switch (type) {
         case CosmeticType::ATTACK_FX:
+            if (id >= g_NumAttackFx) return false;  // Hard cap of 30
             return ToggleSWF(GSWF_AttackFxFlags + id);
         case CosmeticType::MARIO_COSTUME:
             SetSWByte(GSW_MarioCostume, id);
@@ -1337,10 +1339,11 @@ void CosmeticsManager::PickYoshiColor() {
 }
     
 int32_t CosmeticsManager::PickActiveFX() {
-    int32_t sounds[32] = { 0 };
+    // Hard cap of 30 sounds, to match GSW flag allotment.
+    int32_t sounds[30] = { 0 };
     int32_t num_sounds = 0;
     
-    for (int32_t i = 1; i < 32; ++i) {
+    for (int32_t i = 1; i < g_NumAttackFx; ++i) {
         if (GetSWF(GSWF_AttackFxFlags + i)) {
             sounds[num_sounds++] = i;
         }
