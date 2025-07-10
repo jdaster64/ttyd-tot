@@ -732,6 +732,7 @@ void SelectEnemies() {
                     if (!GetSWF(kBeatenFlags[i]) &&
                         CosmeticsManager::IsEquipped(
                             CosmeticType::ATTACK_FX, kFxTypes[i])) {
+                        SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 1);
                         if (num_fx_equipped == 1) {
                             boss_type = i;
                             break;
@@ -754,8 +755,10 @@ void SelectEnemies() {
                     }
                     ++num_snubs;
                 }
-                if (boss_weights[3] > 0 && num_snubs >= 2) 
+                if (boss_weights[3] > 0 && num_snubs >= 2) {
                     boss_weights[3] = 30;
+                    SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 2);
+                }
 
                 int32_t rand_value = state.Rand(100, RNG_ALTERNATE_BOSS);
                 if (rand_value >= 0 && rand_value < boss_weights[1]) {
@@ -764,6 +767,14 @@ void SelectEnemies() {
                     boss_type = 2;
                 } else if (rand_value >= 60 && rand_value < 60 + boss_weights[3]) {
                     boss_type = 3;
+
+                    // Small chance to have rare dialogue override if certain
+                    // bosses have already been beaten.
+                    if (!GetSWByte(GSW_Tower_FinalBossSpecialDialogue) &&
+                        GetSWF(GSWF_SecretBoss1_Beaten) &&
+                        GetSWF(GSWF_SecretBoss3_Beaten) && state.Rand(100) < 10) {
+                        SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 3);
+                    }
                 }
                 break;
             }

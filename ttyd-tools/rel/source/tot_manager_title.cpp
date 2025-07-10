@@ -14,12 +14,12 @@ namespace mod::tot {
 
 namespace {
 
-constexpr const char* kVersion = "v3-wip-r50";
-constexpr const char* kTitleInfo = "v3-wip-r50" "\n" "winter 2014";
+constexpr const char* kVersion = "v3.00-b";
+constexpr const char* kTitleInfo = "v3.00-beta r50" "\n" "2025-07-10";
 
 // constexpr const char* kVersion = "v2.03.1";
 // constexpr const char* kTitleInfo = "v2.03.1 r49" "\n" "2025-01-29";
-    
+
 }
 
 void TitleScreenManager::Update() {}

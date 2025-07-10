@@ -1043,6 +1043,9 @@ void OptionsManager::OnRunStart() {
     // Set initial state of countdown timer.
     int32_t countdown_timer = g_Mod->state_.GetOption(OPT_COUNTDOWN_TIMER);
     SetSWByte(GSW_CountdownTimerState, countdown_timer ? 1 : 0);
+    // Clear state of final boss options.
+    SetSWByte(GSW_Tower_FinalBossType, 0);
+    SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 0);
     
     // Start timers and mark run as started.
     state.SetOption(OPT_RUN_STARTED, 1);

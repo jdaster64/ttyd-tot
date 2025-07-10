@@ -1260,8 +1260,8 @@ EVT_BEGIN(Tower_AltBoss2Event)
     RUN_EVT(bero_case_entry)
     WAIT_MSEC(1300)
 
-    // Print Bowser's first message.
-    // TODO: Play a voice grunt?
+    // Print Bowser's first message + play voice grunt.
+    USER_FUNC(evt_snd_sfxon_3d, PTR("SFX_VOICE_KOOPA_SURPRISED1_1"), 0, 0, 0, 0)
     USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_2_F)
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
     USER_FUNC(evt_msg_print, 0, LW(0), 0, 0)
@@ -1460,7 +1460,7 @@ EVT_BEGIN(Tower_AltBoss3Event)
     RUN_EVT(bero_case_entry)
     WAIT_MSEC(1300)
 
-    // Print Bowser's first message.
+    // Print Doopliss's first message.
     USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_F)
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
     USER_FUNC(evt_msg_print, 0, LW(0), 0, 0)
@@ -1665,7 +1665,6 @@ EVT_BEGIN(Tower_FinalBossSetup)
     USER_FUNC(evt_hitobj_onoff, PTR("A_taka"), 1, 0)
     USER_FUNC(evt_hitobj_onoff, PTR("A_kura"), 1, 0)
     
-    // TODO: Polish Bowser event, finish at least draft of Doopliss event.
     SWITCH((int32_t)GSW_Tower_FinalBossType)
         CASE_EQUAL(1)
             RUN_EVT(&Tower_AltBoss1Event)

@@ -834,7 +834,11 @@ EVT_BEGIN(unitDoopliss_pre_transform_event)
     WAIT_FRM(50)
     RUN_CHILD_EVT(PTR(&unitDoopliss_self_camera_focus_event))
 
-    USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_INTRO)
+    IF_EQUAL(GW(10), 1)
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_INTRO_EARLY)
+    ELSE()
+        USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::BOSS_3_INTRO)
+    END_IF()
     USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
     USER_FUNC(evt_msg_print, 2, LW(0), 0, -2)
     
@@ -1081,6 +1085,7 @@ EVT_BEGIN(unitDoopliss_phase_event)
         // Check for instant transformation at < 90% of health,
         // if hasn't transformed yet.
         IF_SMALL(LW(11), 90)
+            SET(GW(10), 1)
             GOTO(80)
         END_IF()
     ELSE()
@@ -1289,6 +1294,9 @@ EVT_BEGIN(unitDoopliss_init_event)
 
     // Necessary for some attacks that have variable success (e.g. Tease).
     USER_FUNC(evtTot_Doopliss_MakeExtraWorkArea)
+
+    // For determining whether untransformed phase ended early.
+    SET(GW(10), 0)
     
     USER_FUNC(btlevtcmd_SetWalkSound, -2, PTR("SFX_BOSS_RNPL_MOVE1L"), PTR("SFX_BOSS_RNPL_MOVE1R"), 0, 15, 15)
     USER_FUNC(btlevtcmd_SetRunSound, -2, PTR("SFX_BOSS_RNPL_MOVE1L"), PTR("SFX_BOSS_RNPL_MOVE1R"), 0, 8, 8)
@@ -1759,20 +1767,17 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_HandleTransform) {
     
     unit->unit_flags |= 4;
 
-    // Equip copies of Mario or partner's current badge loadout.
+    // Equip copies of Mario or partner's current badge loadout, unless
+    // Doopliss already remarked on having Jumpman and Hammerman both on,
+    // in which case, ignore all badges for the rest of the fight.
     memset(&unit->badges_equipped, 0, sizeof(ttyd::battle_unit::BadgesEquipped));
-    if (unit->current_kind != BattleUnitType::DOOPLISS_CH_8) {
+    if (unit->current_kind != BattleUnitType::DOOPLISS_CH_8 &&
+        unit->unit_work[UW_Doopliss_DisabledNJNH] != 1) {
         auto* pouch = ttyd::mario_pouch::pouchGetPtr();
         uint32_t equip_flags = 
             unit->current_kind == BattleUnitType::DOOPLISS_CH_8_FAKE_MARIO ? 2 : 4;
         for (int32_t i = 0; i < 200; ++i) {
             ttyd::battle::_EquipItem(unit, equip_flags, pouch->equipped_badges[i]);
-        }
-        // If Doopliss already remarked on having Jumpman and Hammerman both on,
-        // ignore those badges for the rest of the fight.
-        if (unit->unit_work[UW_Doopliss_DisabledNJNH] == 1) {
-            unit->badges_equipped.jumpman = 0;
-            unit->badges_equipped.hammerman = 0;
         }
     }
     
@@ -1784,8 +1789,7 @@ EVT_DEFINE_USER_FUNC(evtTot_Doopliss_DisableNJNH) {
     int32_t id = ttyd::battle_sub::BattleTransID(evt, -2);
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
 
-    unit->badges_equipped.jumpman = 0;
-    unit->badges_equipped.hammerman = 0;
+    memset(&unit->badges_equipped, 0, sizeof(ttyd::battle_unit::BadgesEquipped));
 
     return 2;
 }

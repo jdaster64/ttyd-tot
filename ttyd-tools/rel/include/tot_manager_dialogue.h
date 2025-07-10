@@ -210,15 +210,24 @@ namespace ConversationId {
         BOSS_2B_DEATH_A     = 75300,
         BOSS_2B_DEATH_B     = 75400,
         BOSS_2_F            = 79000,
+            BOSS_2_F_SFX        = 79010,
         BOSS_2_F_END        = 79500,
+            BOSS_2_F_END_START  = 79510,
+            BOSS_2_F_END_END    = BOSS_2_F_END_START + 3,
         // Extra 3
         BOSS_3_INTRO        = 80000,
+        BOSS_3_INTRO_EARLY  = 80010,
         BOSS_3_P2           = 80100,
         BOSS_3_P3           = 80200,
         BOSS_3_DISABLE      = 80300,
         BOSS_3_DEATH        = 80400,
         BOSS_3_F            = 89000,
+            BOSS_3_F_SFX        = 89010,
+            BOSS_3_F_SPURNED    = 89020,
+            BOSS_3_F_RARE       = 89030,
         BOSS_3_F_END        = 89500,
+            BOSS_3_F_END_START  = 89510,
+            BOSS_3_F_END_END    = BOSS_3_F_END_START + 3,
     };
 }
 

@@ -280,19 +280,42 @@ bool StateManager::Load(TotSaveSlot* save) {
             SetSWF(GSWF_SecretBoss1_Beaten);
         }
 
-        // Note: HP chests weren't properly tracked before v3.0 release,
-        // so unfortunately the starting numbers are a wild guess.
-        int32_t fake_hp_offered = (
-            GetOption(STAT_PERM_REWARDS_OFFERED, RewardStatId::STAT_FP) +
-            GetOption(STAT_PERM_REWARDS_OFFERED, RewardStatId::STAT_BP)) *
-            (90 + Rand(21)) / 200;
-        SetOption(STAT_PERM_REWARDS_OFFERED, fake_hp_offered, RewardStatId::STAT_HP);
-        int32_t fake_hp_taken = (
-            GetOption(STAT_PERM_REWARDS_TAKEN, RewardStatId::STAT_FP) +
-            GetOption(STAT_PERM_REWARDS_TAKEN, RewardStatId::STAT_BP)) *
-            (80 + Rand(41)) / 200;
-        if (fake_hp_taken > fake_hp_offered) fake_hp_taken = fake_hp_offered;
-        SetOption(STAT_PERM_REWARDS_TAKEN, fake_hp_taken, RewardStatId::STAT_HP);
+        // Note: HP chests weren't properly tracked before v3.0 release, so
+        // unfortunately the starting numbers for HP + "random badges" need to
+        // be guessed at based on FP, BP, badge pick rates + offers in the past.
+        int32_t badges_taken = 
+            GetOption(STAT_PERM_REWARDS_TAKEN, RewardStatId::MISC_BADGE_OTHER);
+        int32_t badges_offered = 
+            GetOption(STAT_PERM_REWARDS_OFFERED, RewardStatId::MISC_BADGE_OTHER);
+
+        if (badges_offered > 0) {
+            // Assume HP offered similarly often to FP + BP, so long as that
+            // isn't several times more often than random badges.
+            int32_t fake_hp_offered = (
+                GetOption(STAT_PERM_REWARDS_OFFERED, RewardStatId::STAT_FP) +
+                GetOption(STAT_PERM_REWARDS_OFFERED, RewardStatId::STAT_BP)) *
+                (90 + Rand(21)) / 200;
+            if (fake_hp_offered > badges_offered * 80 / 100)
+                fake_hp_offered = badges_offered * 80 / 100;
+
+            // Arbitrary assumption that badges are somewhere between 40-100%
+            // as likely to be picked as HP chests.
+            int32_t fake_badges_offered = badges_offered - fake_hp_offered;
+            int32_t fake_badges_taken =
+                fake_badges_offered
+                * badges_taken / badges_offered * (40 + Rand(61)) / 100;
+
+            int32_t fake_hp_taken = badges_taken - fake_badges_taken;
+            if (fake_hp_taken > fake_hp_offered) {
+                fake_badges_taken += fake_hp_taken - fake_hp_offered;
+                fake_hp_taken = fake_hp_offered;
+            }
+
+            SetOption(STAT_PERM_REWARDS_OFFERED, fake_hp_offered, RewardStatId::STAT_HP);
+            SetOption(STAT_PERM_REWARDS_TAKEN, fake_hp_taken, RewardStatId::STAT_HP);
+            SetOption(STAT_PERM_REWARDS_OFFERED, fake_badges_offered, RewardStatId::MISC_BADGE_OTHER);
+            SetOption(STAT_PERM_REWARDS_TAKEN, fake_badges_taken, RewardStatId::MISC_BADGE_OTHER);
+        }
 
         // Check if automatically eligible for new aggregate achievements.
         AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_50_MOVES);

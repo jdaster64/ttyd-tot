@@ -670,12 +670,41 @@ void DialogueManager::SetConversation(int32_t id) {
             }
             break;
         }
+        case ConversationId::BOSS_2_F_END: {
+            const int32_t num_cvs =
+                ConversationId::BOSS_2_F_END_END -
+                ConversationId::BOSS_2_F_END_START;
+            int32_t rand = state.Rand(num_cvs);
+            g_ConversationId = ConversationId::BOSS_2_F_END_START + rand;
+            break;
+        }
+        case ConversationId::BOSS_3_F_END: {
+            const int32_t num_cvs =
+                ConversationId::BOSS_3_F_END_END -
+                ConversationId::BOSS_3_F_END_START;
+            int32_t rand = state.Rand(num_cvs);
+            g_ConversationId = ConversationId::BOSS_3_F_END_START + rand;
+            break;
+        }
         case ConversationId::BOSS_2_F:
         case ConversationId::BOSS_3_F: {
-            // TODO: Adjust as necessary, add variants for FX encounters, etc.
+            // Handle special field dialogue, if it exists.
+            switch (GetSWByte(GSW_Tower_FinalBossSpecialDialogue)) {
+                case 1:
+                    g_ConversationId += 10;
+                    break;
+                case 2:
+                    if (id == ConversationId::BOSS_3_F) g_ConversationId += 20;
+                    break;
+                case 3:
+                    if (id == ConversationId::BOSS_3_F) g_ConversationId += 30;
+                    break;
+            }
+
             // Boss 2 and 3 cutscenes support up to four dialogue boxes.
             static int8_t AltBosses_CutsceneConversation[] =  { 0, 0, 0, 0, 0, -1 };
             g_ConversationPtr = AltBosses_CutsceneConversation;
+
             break;
         }
     }

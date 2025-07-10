@@ -24,6 +24,7 @@ enum GlobalWorkVars {
     GSW_Tower_RevealUsedThisFloor,
     GSW_Tower_NpcTalkedThisFloor,
     GSW_Tower_FinalBossType,
+    GSW_Tower_FinalBossSpecialDialogue,
     GSW_NpcG_CurrentStatBreakdown,
 
     // Used for cosmetic choices that persist across runs.

@@ -6529,35 +6529,6 @@ g_TowerBossFloorStrings = {
         b"Gack!\n"
         b"<k>",
         
-    # TODO: Field placeholder text for new boss fights.
-    
-    b"tot_di074000_00":
-        b"2A Field 1\n<k>",
-    b"tot_di074100_00":
-        b"2A Field 2\n<k>",
-    b"tot_di074200_00":
-        b"2A Field 3\n<k>",
-    b"tot_di074300_00":
-        b"2A Field Death\n<k>",
-    
-    b"tot_di079000_00":
-        b"2B Field 1\n<k>",
-    b"tot_di079100_00":
-        b"2B Field 2\n<k>",
-    b"tot_di079200_00":
-        b"2B Field 3\n<k>",
-    b"tot_di079300_00":
-        b"2B Field Death\n<k>",
-    
-    b"tot_di084000_00":
-        b"3 Field 1\n<k>",
-    b"tot_di084100_00":
-        b"3 Field 2\n<k>",
-    b"tot_di084200_00":
-        b"3 Field 3\n<k>",
-    b"tot_di084300_00":
-        b"3 Field Death\n<k>",
-        
     
     # Boss battle dialogue.
     
@@ -6950,64 +6921,349 @@ g_TowerBossFloorStrings = {
         b"But I'm not through yet!\n<wait 250>\n"
         b"Everyone! GET 'EM!!!\n<k>",
         
-    # TODO: Field placeholder text for new boss fights.
+    # Field text for Bowser & Kammy fight.
     
+    # Default Bowser & Kammy encounter text.
     b"tot_di079000_00":
-        b"Boss2 Message F00\n<k>",
+        b"GWAAAH! <wait 250>That 'stache\n"
+        b"had better not belong to\n"
+        b"who I think it does...\n"
+        b"<k>",
     b"tot_di079000_01":
-        b"Boss2 Message F01\n<k>",
+        b"Gah, it is you! <wait 250>You've got\n"
+        b"a lot of nerve trying to loot\n"
+        b"this joint before me, Mario!\n"
+        b"<k>",
     b"tot_di079000_02":
-        b"Boss2 Message F02\n<k>",
+        b"You tell him, Lord Bowser!\n"
+        b"<wave>\n"
+        b"<wait 250>Mmm-wee hee hee...\n"
+        b"</wave>\n"
+        b"<k>",
     b"tot_di079000_03":
-        b"Boss2 Message F03\n<k>",
-    b"tot_di079500_00":
-        b"Boss2 Defeated\n<k>",
+        b"Look here, Mario, <wait 150>both of us\n"
+        b"know only one of us's leaving\n"
+        b"here with any treasure...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"So let's get to the part\n"
+        b"where I pound you, already!\n"
+        b"<wait 150><dynamic 3>GRAAAHHH!!!</dynamic>\n"
+        b"<k>",
     
-    b"tot_di089000_00":
-        b"Boss3 Message F00\n<k>",
-    b"tot_di089000_01":
-        b"Boss3 Message F01\n<k>",
-    b"tot_di089000_02":
-        b"Boss3 Message F02\n<k>",
-    b"tot_di089000_03":
-        b"Boss3 Message F03\n<k>",
-    b"tot_di089500_00":
-        b"Boss3 Defeated\n<k>",
+    # SFX Bowser & Kammy encounter text.
+    b"tot_di079010_00":
+        b"Oh, my sweet Peach...\n"
+        b"<wait 200>I knew you'd find your way\n"
+        b"to old Bowser again!\n<k>",
+    b"tot_di079010_01":
+        b"<dynamic 3>\n"
+        b"What? <wait 250>MARIO?!?</dynamic>\n"
+        b" <wait 250>Graaaah...\n"
+        b"<wait 250>Impersonating my sweetie's\n"
+        b"a new low, even for you!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I don't know what you're\n"
+        b"doing here, anyway, <wait 200>but I <dynamic 2>DO</dynamic>\n"
+        b"\n"
+        b"know you're in for a pounding!\n"
+        b"<k>",
+    b"tot_di079010_02":
+        b"I've been keeping tabs on\n"
+        b"him, your Lordliness!\n"
+        b"<wave>\n"
+        b"<wait 250>Mweh heh heh...\n"
+        b"</wave>\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"He's been fighting his way\n"
+        b"up here, <wait 150>grabbing a bunch of\n"
+        b"goodies from chests!\n"
+        b"<k>",
+    b"tot_di079010_03":
+        b"Goodies? <wait 250>Bah, why wasn't\n"
+        b"I invited? <wait 250>The Koopa coffers\n"
+        b"aren't going to fill themselves...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"That's it, Greedy 'Stache!\n"
+        b"<wait 250>Cough it up, or I'll have to\n"
+        b"pound it out of you!\n"
+        b"<k>",
+
+    # Defeated dialogue.
+    b"tot_di079510_00":
+        b"<scale 0.67>\n"
+        b"Mrrrrrrrrrgh... <wait 450>Dang it!\n"
+        b"<k>",
+    b"tot_di079511_00":
+        b"<scale 0.67>\n"
+        b"Mrrrrrrrrrgh... <wait 450>Shoot!\n"
+        b"<k>",
+    b"tot_di079512_00":
+        b"<scale 0.67>\n"
+        b"Mrrrrrrrrrgh... <wait 450>Ugh!\n"
+        b"<k>",
         
-    # TODO: In-battle placeholder text for new boss fights.
+    # In-battle Bowser & Kammy dialogue.
     
     b"tot_di070000_00":
-        b"2A Intro\n<k>",
+        b"Gwar har har har har har!\n"
+        b"<wait 250>\n"
+        b"This's just too rich! <wait 250>You're all\n"
+        b"worn out from the trip up...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"My sweet Peach might not\n"
+        b"be around,<wait 150> but a tower full of\n"
+        b"treasure's not shabby either!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And you've even gone and\n"
+        b"gift-wrapped it for me, Mario!\n"
+        b"<wait 250>Gwar har!\n"
+        b"<k>",
+
     b"tot_di070100_00":
-        b"2A Taunt\n<k>",
+        b"<dynamic 3>\n"
+        b"Gwar har har har har har!\n"
+        b"</dynamic>\n"
+        b"<wait 250>\n"
+        b"I sure do feel good today!\n"
+        b"<wait 250>\n"
+        b"I am FEELING IT!!!\n"
+        b"<k>",
+
     b"tot_di070200_00":
-        b"2A Phase 2\n<k>",
+        b"OOOF!<wait 250> So, Mario...\n"
+        b"<wait 250>\n"
+        b"You still have some fight\n"
+        b"in you!<wait 250> Not bad!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Don't get to thinking this\n"
+        b"is over, though! <wait 150>I've got way\n"
+        b"more pain coming your way!\n"
+        b"<k>",
+
     b"tot_di070300_00":
-        b"2A Death A\n<k>",
+        b"Graaaaaaaaaaaagh!\n"
+        b"<wait 250>\n"
+        b"No more!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Kammy!<wait 250> Take care of this,\n"
+        b"you burly hag, you...\n"
+        b"<k>",
+
     b"tot_di070400_00":
-        b"2A Death B\n<k>",
+        b"<dynamic 3><shake>\n\nGRAAAAAAAAAAAAAGH!\n<k>",
     
     b"tot_di075000_00":
-        b"2B Intro\n<k>",
+        b"Mario! <wait 250>There's nowhere to\n"
+        b"run off to, you pestiferous\n"
+        b"little plumber!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I'll hex you all to bits!\n"
+        b"<wave>\n"
+        b"Mweh heh heh heh heh!\n"
+        b"</wave>\n"
+        b"<k>",
+
     b"tot_di075100_00":
-        b"2B Taunt\n<k>",
+        b"Lord Bowser!<wait 250> Lord Bowser!\n"
+        b"<wait 250>\n"
+        b"Rah!<wait 100> Rah!<wait 100> Rah!<wait 100> Get 'em!\n"
+        b"<k>",
+
+    # Unused.
     b"tot_di075200_00":
         b"2B Phase 2\n<k>",
+
     b"tot_di075300_00":
-        b"2B Death A\n<k>",
+        b"Forgive me, Lord Bowser!\n"
+        b"<wait 250>\n"
+        b"I have nothing left...\n"
+        b"<k>",
+
     b"tot_di075400_00":
-        b"2B Death B\n<k>",
+        b"<dynamic 3><shake>\n\nYAAAAAAAAAAACK!\n<k>",
+        
+    # Doopliss field dialogue.
+    
+    # Default Doopliss encounter text.
+    b"tot_di089000_00":
+        b"'Sup, ol' buddy?\n<k>",
+    b"tot_di089000_01":
+        b"It seems ol' Wing-a-ling's\n"
+        b"stepped out for a bit, so I\n"
+        b"thought I'd drop on in.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Anyhow, so long as we're up\n"
+        b"here, I've gotten a lot of\n"
+        b"practice playing you guys...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"What say we shake things\n"
+        b"up and have a good tussle,\n"
+        b"eh, Slick?\n"
+        b"<k>",
+    
+    # Dialogue for if you wore Doopliss FX.
+    b"tot_di089010_00":
+        b"Hey there, Slick!\n<k>",
+    b"tot_di089010_01":
+        b"Man, I know you must get\n"
+        b"a kick out of beating these\n"
+        b"poor saps up over and over...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"But that incessant cackling\n"
+        b"sound, man... <wait 250><dynamic 3>GAH, </dynamic>\n"
+        b"<wait 200>that's\n"
+        b"annoying to listen to.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Anyhow, so long as we're up\n"
+        b"here, I've gotten a lot of\n"
+        b"practice playing you guys...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"What say we shake things\n"
+        b"up and have a good tussle,\n"
+        b"eh, Slick?\n"
+        b"<k>",
+    
+    # Dialogue for if you turned down his deals.
+    b"tot_di089020_00":
+        b"Yo, Slick! <wait 200>What's the deal?\n<k>",
+    b"tot_di089020_01":
+        b"I go through all the effort\n"
+        b"of trying to play nice, <wait 150>offering\n"
+        b"you my help for nothing...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"And you just waltz on by,\n"
+        b'<wait 150>without so much as a "no,\n'
+        b'thank you!" <wait 250>Gack!\n'
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, I'm not feeling it today,\n"
+        b"bud! <wait 250>It's time your ol' buddy\n"
+        b"Doopliss gets some payback!\n"
+        b"<k>",
+    
+    # Rare alternate dialogue (for rematches only).
+    b"tot_di089030_00":
+        b"<boss>\n"
+        b"Oog...\n"
+        b"<k>",
+    b"tot_di089030_01":
+        b"Nah, it's just me, Slick!\n"
+        b"<wait 250>Yuk, yuk... <wait 150>Gotcha good, eh?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"<wave>Anyway<wait 100>.<wait 100>.<wait 100>.<wait 100>.<wait 100>.</wave>\n"
+        b"\n"
+        b"How 'bout another rumble?\n"
+        b"<k>",
+
+    # Defeated dialogue.
+    b"tot_di089510_00":
+        b"<shake>\n"
+        b"Rats!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"YOU KILLJOYS!!!\n"
+        b"</shake>\n"
+        b"<k>",
+    b"tot_di089511_00":
+        b"<shake>\n"
+        b"Ugh!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You guys are no fun at all,\n"
+        b"<wait 150>you know that?</shake>\n"
+        b"<k>",
+    b"tot_di089512_00":
+        b"<shake>\n"
+        b"Blast it all!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Next time, Slick, I swear!\n"
+        b"</shake>\n"
+        b"<k>",
+        
+    # In-battle Doopliss dialogue.
     
     b"tot_di080000_00":
-        b"3 Intro\n<k>",
+        b"All right, Slick, <wait 150>this is going\n"
+        b"nowhere fast. <wait 250>I didn't wanna\n"
+        b"have to do this...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Just kidding! <wait 250>I wouldn't\n"
+        b"dream of missing the chance\n"
+        b"to show you jokers up!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Let's see if you can take\n"
+        b"what you're dishing out!\n"
+        b"<wait 250>Yuk yuk yuk yuk!\n"
+        b"<k>",
+        
+    # If ended untransformed phase early by dealing damage.
+    b"tot_di080010_00":
+        b"Not pulling your punches,\n"
+        b"huh, Slick? <wait 250>Fine, <wait 150>two can play\n"
+        b"at that game!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Let's see if you can take\n"
+        b"what you're dishing out!\n"
+        b"<wait 250>Yuk yuk yuk yuk!\n"
+        b"<k>",
+
     b"tot_di080100_00":
-        b"3 Phase 2\n<k>",
+        b"Not bad, suckers! <wait 250>But I'm\n"
+        b"just getting started...\n"
+        b"<wait 250>Get a load of this!\n"
+        b"<k>",
+
     b"tot_di080200_00":
-        b"3 Phase 3\n<k>",
+        b"Ack... <wait 150>not bad, Slick!\n"
+        b"<wait 250>But it's not over yet! <wait 150>I've still\n"
+        b"got a few tricks up my sleeve...\n"
+        b"<k>",
+
     b"tot_di080300_00":
-        b"3 Jumpman Hammerman\n<k>",
+        b"<dynamic 3>\n"
+        b"Yah!</dynamic>\n"
+        b" <wait 250>Here comes the great\n"
+        b"Super... <wait 250>Wait, hold on... <wait 350>why\n"
+        b"can't I attack?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Wait, <wait 100>is it these stupid\n"
+        b"badge doodads you've\n"
+        b"slapped all over yourself?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Yeah, that's gotta be it...\n"
+        b"<wait 250>What trick're you even trying\n"
+        b"to pull with these, anyway?\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Well, whatever it was, Slick,\n"
+        b"<wait 150>I'm not falling for it again!\n"
+        b"<wait 250>Lemme just get rid of these...\n"
+        b"<k>",
+
     b"tot_di080400_00":
-        b"3 Death\n<k>",
+        b"Ughhhh...\n<k>",
 }
 
 g_PetalburgWestStrings = {
