@@ -418,6 +418,8 @@ void ApplyFixedPatches() {
             for (int32_t i = 0; i < 8; ++i) {
                 g_Mod->state_.SetOption(STAT_RUN_TYPES_THIS_FIGHT, 0, i);
             }
+            // Reset midboss helper spawn RNG.
+            g_Mod->state_.rng_states_[RNG_MIDBOSS_MOB] = 0;
 
             g_seq_battleInit_trampoline();
         });

@@ -321,6 +321,16 @@ bool StateManager::Load(TotSaveSlot* save) {
         AchievementsManager::CheckCompleted(AchievementId::V2_META_USE_50_MOVES);
         AchievementsManager::CheckCompleted(AchievementId::V3_AGG_REWARD_5_EACH);
 
+        // Update run settings for NPCs if previously set to random / none.
+        if (GetOption(OPT_NPC_CHOICE_1) > tot::gon::SecondaryNpcType::ZESS_T)
+            ChangeOption(OPT_NPC_CHOICE_1);
+        if (GetOption(OPT_NPC_CHOICE_2) > tot::gon::SecondaryNpcType::ZESS_T)
+            ChangeOption(OPT_NPC_CHOICE_2);
+        if (GetOption(OPT_NPC_CHOICE_3) > tot::gon::SecondaryNpcType::ZESS_T)
+            ChangeOption(OPT_NPC_CHOICE_3);
+        if (GetOption(OPT_NPC_CHOICE_4) > tot::gon::SecondaryNpcType::ZESS_T)
+            ChangeOption(OPT_NPC_CHOICE_4);
+
         // Re-run special file setup to collect new achievements, options, etc.
         DebugManager::SpecialFileSetup();
     }

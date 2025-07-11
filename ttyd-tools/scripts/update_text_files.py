@@ -10002,6 +10002,7 @@ g_PetalburgEastStrings = {
         b"to tell you about?\n<o>",
         
     b"tot_gstat_which":
+        # b"<p>\n"  # Remove this line if making it a new box.
         b"Which treasures do you\n"
         b"want me to tell you about?\n<o>",
         

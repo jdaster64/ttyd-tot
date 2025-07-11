@@ -402,15 +402,18 @@ EVT_BEGIN(Npc_D_Talk)
 EVT_END()
 
 EVT_BEGIN(Npc_G_Stathead)
-LBL(1)
-    USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_yesno"))
-    IF_EQUAL(LW(0), 1)
-        GOTO(99)
-    END_IF()
 
-    // Refresh dialog box to make sure it doesn't grow infinitely.
-    USER_FUNC(evt_msg_continue)
-    WAIT_MSEC(100)
+LBL(1)
+    
+    // Dummied out: yes/no prompt at start of conversation.
+    // USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_yesno"))
+    // IF_EQUAL(LW(0), 1)
+    //     GOTO(99)
+    // END_IF()
+
+    // Dummied out: Refresh dialog box to make sure it doesn't grow infinitely.
+    // USER_FUNC(evt_msg_continue)
+    // WAIT_MSEC(100)
     USER_FUNC(evt_msg_print, 0, PTR("tot_gstat_which"), 0, PTR("me"))
 
     // Main menu
@@ -482,7 +485,7 @@ LBL(50)
 
 LBL(70)
     // Give the stats breakdown, including player's relative favor to others,
-    // and ask to do another breakdown.
+    // and (dummied out) ask to do another breakdown.
     SET((int32_t)GSW_NpcG_CurrentStatBreakdown, LW(0))
     USER_FUNC(evt_msg_print_add, 0, PTR("tot_gstat_result"))
 
@@ -493,8 +496,8 @@ LBL(70)
     IF_NOT_EQUAL(LW(0), 0)
         USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G_STATS)
         USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
-        USER_FUNC(evt_msg_print_add, 0, LW(0))
-        GOTO(1)
+        // USER_FUNC(evt_msg_print_add, 0, LW(0))
+        // GOTO(1)
     END_IF()
 
 LBL(99)
@@ -508,7 +511,10 @@ EVT_BEGIN(Npc_G_Talk)
     IF_EQUAL((int32_t)GSWF_NpcG_TalkedThisVisit, 1)
         USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G_STATS_NEW)
         USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
-        USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+
+        // Dummied out: no longer has initial yes/no prompt.
+        // USER_FUNC(evt_msg_print, 0, LW(0), 0, PTR("me"))
+
         RUN_CHILD_EVT(Npc_G_Stathead)
         RETURN()
     END_IF()
@@ -538,7 +544,16 @@ EVT_BEGIN(Npc_G_Talk)
         USER_FUNC(evtTot_SetConversation, (int32_t)ConversationId::NPC_G)
         USER_FUNC(evtTot_GetNextMessage, LW(0), LW(1))
         USER_FUNC(evt_msg_print_add, 0, LW(0))
-        RUN_CHILD_EVT(Npc_G_Stathead)
+
+        USER_FUNC(evt_msg_select, 0, PTR("tot_shopkeep_yesno"))
+        IF_EQUAL(LW(0), 0)
+            USER_FUNC(evt_msg_continue)
+            WAIT_MSEC(100)
+            RUN_CHILD_EVT(Npc_G_Stathead)
+        ELSE()
+            USER_FUNC(evt_msg_print_add, 0, PTR("tot_gstat_decline"))
+        END_IF()
+
     ELSE()
         USER_FUNC(evt_msg_continue)
     END_IF()
