@@ -183,12 +183,16 @@ extern ttyd::battle_database_common::BattleWeapon unitWhiteMagikoopa_weaponDef;
 extern ttyd::battle_database_common::BattleWeapon unitXNaut_weaponPotion;
 extern ttyd::battle_database_common::BattleWeapon unitEliteXNaut_weaponPotion;
 extern ttyd::battle_database_common::BattleWeapon unitXNautPhD_weaponPotion;
+extern ttyd::battle_database_common::BattleWeapon unitBoomerangBros_weaponNormal;
+extern ttyd::battle_database_common::BattleWeapon unitBoomerangBros_weaponRenzoku;
 
 // Individual evt instructions referenced by patches, etc.
 extern int32_t evt_Koopatrol_NormalAttackReturnLbl_PatchLoc[1];
 extern int32_t evt_DarkKoopatrol_NormalAttackReturnLbl_PatchLoc[1];
 extern int32_t evt_HammerBros_CheckHp_PatchLoc[1];
 extern int32_t evt_BoomerangBros_CheckHp_PatchLoc[1];
+extern int32_t evt_BoomerangBros_CheckEnemyN_PatchLoc[1];
+extern int32_t evt_BoomerangBros_CheckEnemyR_PatchLoc[1];
 extern int32_t evt_FireBros_CheckHp_PatchLoc[1];
 extern int32_t evt_Magikoopa_CheckNumEnemies_PatchLoc[1];
 extern int32_t evt_Magikoopa_GaleForceDeath_PatchLoc[1];

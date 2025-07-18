@@ -4212,7 +4212,11 @@
 40,5,0007eff8:evt_Magikoopa_GaleForceDeath_PatchLoc
 40,5,0007f48c:evt_Magikoopa_CheckNumEnemies_PatchLoc
 40,5,00082758:evt_Koopatrol_NormalAttackReturnLbl_PatchLoc
+40,5,00083e0c:unitBoomerangBros_weaponNormal
+40,5,00083ecc:unitBoomerangBros_weaponRenzoku
 40,5,00084084:evt_BoomerangBros_CheckHp_PatchLoc
+40,5,000849c8:evt_BoomerangBros_CheckEnemyN_PatchLoc
+40,5,00084c4c:evt_BoomerangBros_CheckEnemyR_PatchLoc
 40,5,00085fdc:evt_FireBros_CheckHp_PatchLoc
 40,5,00089c04:evt_HammerBros_CheckHp_PatchLoc
 40,5,00091ee8:evt_GreenMagikoopa_GaleForceDeath_PatchLoc

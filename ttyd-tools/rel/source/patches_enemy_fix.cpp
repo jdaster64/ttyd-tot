@@ -107,6 +107,8 @@ namespace {
 
 // Returns the percentage of max HP a battle unit currently has.
 EVT_DECLARE_USER_FUNC(GetPercentOfMaxHP, 2)
+// Returns whether a battle unit is of an enemy species, regardless of alliance.
+EVT_DECLARE_USER_FUNC(CheckTargetKindIsNotEnemy, 2)
     
 // Patch to disable the coins / EXP from Gale Force (replace with no-ops).
 EVT_BEGIN(GaleForceKillPatch)
@@ -161,6 +163,15 @@ EVT_DEFINE_USER_FUNC(GetPercentOfMaxHP) {
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
     evtSetValue(
         evt, evt->evtArguments[1], unit->current_hp * 100 / unit->max_hp);
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(CheckTargetKindIsNotEnemy) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t id = evtGetValue(evt, evt->evtArguments[0]);
+    id = ttyd::battle_sub::BattleTransID(evt, id);
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
+    evtSetValue(evt, evt->evtArguments[1], unit->true_kind > BattleUnitType::BONETAIL);
     return 2;
 }
 
@@ -397,6 +408,12 @@ void ApplyFixedPatches() {
         |= AttackSpecialProperty_Flags::UNGUARDABLE;
     unitXNautPhD_weaponPotion.special_property_flags
         |= AttackSpecialProperty_Flags::UNGUARDABLE;
+
+    // Force Boomerang Bros. to target the frontmost enemy.
+    unitBoomerangBros_weaponNormal.target_weighting_flags
+        = AttackTargetWeighting_Flags::PREFER_FRONT;
+    unitBoomerangBros_weaponRenzoku.target_weighting_flags
+        = AttackTargetWeighting_Flags::PREFER_FRONT;
     
     // Patch Gale Force coins / EXP out for enemies that had special logic
     // for handling it in the original game (mostly cloning enemies).
@@ -467,6 +484,16 @@ void ApplyFixedPatches() {
     mod::writePatch(
         reinterpret_cast<void*>(evt_FireBros_CheckHp_PatchLoc),
         HammerBrosHpCheck, sizeof(HammerBrosHpCheck));
+
+    // Make Boomerang Bros. check for target being an enemy unit type,
+    // rather than on the enemy team, that way Infatuated enemy targeting works
+    // the same way as Confusion.
+    mod::writePatch(
+        reinterpret_cast<void*>(evt_BoomerangBros_CheckEnemyN_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckTargetKindIsNotEnemy));
+    mod::writePatch(
+        reinterpret_cast<void*>(evt_BoomerangBros_CheckEnemyR_PatchLoc),
+        reinterpret_cast<uint32_t>(CheckTargetKindIsNotEnemy));
         
     // Fix branch labels for attacks that softlock if there are no valid targets.
     mod::writePatch(
