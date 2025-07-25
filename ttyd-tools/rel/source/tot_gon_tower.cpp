@@ -15,6 +15,7 @@
 #include "tot_state.h"
 #include "tot_window_select.h"
 
+#include <gc/mtx.h>
 #include <gc/types.h>
 #include <ttyd/animdrv.h>
 #include <ttyd/battle_database_common.h>
@@ -41,9 +42,11 @@
 #include <ttyd/evt_window.h>
 #include <ttyd/evtmgr.h>
 #include <ttyd/evtmgr_cmd.h>
+#include <ttyd/hitdrv.h>
 #include <ttyd/icondrv.h>
 #include <ttyd/item_data.h>
 #include <ttyd/mapdata.h>
+#include <ttyd/mapdrv.h>
 #include <ttyd/mario.h>
 #include <ttyd/mobjdrv.h>
 #include <ttyd/npc_data.h>
@@ -92,6 +95,7 @@ using ::ttyd::npcdrv::NpcTribeDescription;
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
 namespace BeroType = ::ttyd::evt_bero::BeroType;
+namespace IconType = ::ttyd::icondrv::IconType;
 namespace ItemType = ::ttyd::item_data::ItemType;
 namespace NpcTribeType = ::ttyd::npc_data::NpcTribeType;
 
@@ -2034,26 +2038,77 @@ EVT_DEFINE_USER_FUNC(evtTot_MakeKeyTable) {
     return 2;
 }
 
+bool IsPlayerCheckingChest(ttyd::mario::Player* player) {
+    auto* hit = player->wObjInteract;
+    if (!hit) return false;
+    auto* joint = hit->joint;
+    if (!joint) return false;
+    auto* name = joint->name;
+    if (!name) return false;
+
+    return !strcmp(name, "MOBJ_box_0") ||
+        !strcmp(name, "MOBJ_box_1") ||
+        !strcmp(name, "MOBJ_box_2") ||
+        !strcmp(name, "MOBJ_box_3");
+}
+
+void DisplayRerollTooltip(CameraId camera, void* user_data) {
+    int32_t num_rerolls = g_Mod->state_.GetOption(STAT_RUN_CHEST_REROLLS);
+    if (num_rerolls < 1) return;
+
+    int32_t icon =
+        g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REROLL_FIXED) ||
+        g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REROLL_REFILL)
+            ? IconType::TOT_REROLL_ICON : IconType::TOT_REVEAL_ICON;
+    
+    // Get Mario's position in screen, relative to the center.
+    auto* player = ttyd::mario::marioGetPtr();
+    gc::vec3 screen_pos;
+    ttyd::mario::marioGetScreenPos(
+        reinterpret_cast<gc::vec3*>(&player->playerPosition),
+        &screen_pos.x, &screen_pos.y, &screen_pos.z);
+    screen_pos.x -= 304.0f;
+    screen_pos.y -= 240.0f;
+    screen_pos.z = 0.0f;
+
+    screen_pos.x -= 10.0f;
+    screen_pos.y -= 155.0f;
+    ttyd::icondrv::iconDispGx(1.0, &screen_pos, 0, icon);
+
+    screen_pos.x += 25.0f;
+    gc::mtx34 mtx;
+    gc::mtx::PSMTXIdentity(&mtx);
+    gc::mtx::PSMTXTrans(&mtx, screen_pos.x, screen_pos.y, screen_pos.z);
+    uint32_t color = num_rerolls <= 1 ? 0xffa0a0ffU : 0xffffffffU;
+    ttyd::icondrv::iconNumberDispGx(&mtx, num_rerolls, 1, &color);
+}
+
 EVT_DEFINE_USER_FUNC(evtTot_CheckReroll) {
     int32_t result = 0;
 
-    uint32_t buttons = ttyd::system::keyGetButtonTrg(0);
+    if (IsPlayerCheckingChest(ttyd::mario::marioGetPtr())) {
+        if (g_Mod->state_.GetOption(STAT_RUN_CHEST_REROLLS)) {
+            ttyd::dispdrv::dispEntry(
+                CameraId::k2d, 1, /* order = */ 900.f, DisplayRerollTooltip, nullptr);
 
-    if (g_Mod->state_.GetOption(STAT_RUN_CHEST_REROLLS) &&
-        (buttons & ButtonId::L) && !(buttons & ButtonId::A)) {
-            
-        if (g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REROLL_FIXED) ||
-            g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REROLL_REFILL)) {
-            g_Mod->state_.ChangeOption(STAT_RUN_CHEST_REROLLS, -1);
-            g_Mod->state_.ChangeOption(STAT_PERM_CHEST_REROLLS, 1);
-            result = 1;
-        } else if (!GetSWByte(GSW_Tower_RevealUsedThisFloor)) {
-            g_Mod->state_.ChangeOption(STAT_RUN_CHEST_REROLLS, -1);
-            g_Mod->state_.ChangeOption(STAT_PERM_CHEST_REROLLS, 1);
-            SetSWByte(GSW_Tower_RevealUsedThisFloor, 1);
-            result = 2;
+            if (uint32_t buttons = ttyd::system::keyGetButtonTrg(0);
+                (buttons & ButtonId::L) && !(buttons & ButtonId::A)) {
+
+                if (g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REROLL_FIXED) ||
+                    g_Mod->state_.CheckOptionValue(OPTVAL_CHEST_REROLL_REFILL)) {
+                    g_Mod->state_.ChangeOption(STAT_RUN_CHEST_REROLLS, -1);
+                    g_Mod->state_.ChangeOption(STAT_PERM_CHEST_REROLLS, 1);
+                    result = 1;
+                } else if (!GetSWByte(GSW_Tower_RevealUsedThisFloor)) {
+                    g_Mod->state_.ChangeOption(STAT_RUN_CHEST_REROLLS, -1);
+                    g_Mod->state_.ChangeOption(STAT_PERM_CHEST_REROLLS, 1);
+                    SetSWByte(GSW_Tower_RevealUsedThisFloor, 1);
+                    result = 2;
+                }
+            }
         }
     }
+    
     evtSetValue(evt, evt->evtArguments[0], result);
     return 2;
 }

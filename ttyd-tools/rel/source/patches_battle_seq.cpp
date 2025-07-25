@@ -408,12 +408,15 @@ void ApplyFixedPatches() {
             battle::ResetPartySwitchCost();
             // Reset SP regen status from prior fights.
             g_GradualSpRecoveryTurns = 0;
-            // Reset current Star Power to 0 + 50 per copy of Super Start.
-            const int32_t sp = Min(
-                ttyd::mario_pouch::pouchEquipCheckBadge(
-                    ItemType::TOT_SUPER_START) * 50,
+            // Reset Star Power to 0, or 50 + 25 per extra copy of Super Start.
+            int32_t starting_sp = 0;
+            if (int32_t super_starts = ttyd::mario_pouch::pouchEquipCheckBadge(
+                    ItemType::TOT_SUPER_START); super_starts > 0) {
+                starting_sp = (super_starts + 1) * 25;
+            }
+            ttyd::mario_pouch::pouchGetPtr()->current_sp = Min(
+                starting_sp,
                 static_cast<int32_t>(ttyd::mario_pouch::pouchGetPtr()->max_sp));
-            ttyd::mario_pouch::pouchGetPtr()->current_sp = sp;
             // Reset types of enemies defeated this fight.
             for (int32_t i = 0; i < 8; ++i) {
                 g_Mod->state_.SetOption(STAT_RUN_TYPES_THIS_FIGHT, 0, i);

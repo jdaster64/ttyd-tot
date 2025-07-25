@@ -1,7 +1,11 @@
 #pragma once
 
+#include <gc/types.h>
+
 #include <cstdint>
 #include <cstddef>
+
+namespace ttyd::hitdrv { struct HitObj; }
 
 namespace ttyd::mario {
 
@@ -77,7 +81,7 @@ struct Player
 	float wPlayerCollisionBox[3];
 	float wPlayerCollisionRelated[3];
 	uint8_t gap_1d0[20];
-	void *wObjInteract;
+	ttyd::hitdrv::HitObj* wObjInteract;
 	void *wObjStandOn;
 	void *wObjJumpFrom;
 	void *wUnkObj1;
@@ -129,7 +133,7 @@ extern "C" {
 // marioMakeDispDir
 // marioGetScale
 // marioChkInScreen
-// marioGetScreenPos
+void marioGetScreenPos(gc::vec3* worldPos, float* x, float* y, float* z);
 // marioPaperLightOff
 // marioPaperOff
 // marioPaperOn
