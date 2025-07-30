@@ -218,11 +218,12 @@ void OptionsManager::ApplyCurrentPresetOptions(bool first_time) {
         }
         case OPTVAL_PRESET_RANDOM: {
             if (first_time) {
+                // Reset all options to default, then randomize preset.
                 for (const auto& data : g_OptionMetadata) {
                     if (!data.check_for_default) continue;
                     g_Mod->state_.SetOption(data.option, GetDefaultValue(data.option));
-                    RandomizeOption(data.option, /* explicitly = */ false);
                 }
+                RandomizeOption(OPT_PRESET);
                 g_Mod->state_.SetOption(
                     OPT_TIMER_DISPLAY, GetDefaultValue(OPT_TIMER_DISPLAY));
                 g_Mod->state_.SetOption(
