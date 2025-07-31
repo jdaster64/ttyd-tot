@@ -593,7 +593,8 @@ enum Options : uint32_t {
     STAT_RUN_CHEST_MAX_REROLLS  = 0x06f'0'00'00,
     // Number of conditions met since last Grubba taken.
     STAT_RUN_NPC_GRUBBA_COMBO   = 0x070'0'00'00,
-    // Next: 0x071
+    STAT_RUN_CONDITIONS_FAILED  = 0x071'0'00'00,
+    // Next: 0x072
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 

@@ -285,7 +285,7 @@ void SortItemLogType(WinPauseMenu* menu) {
 bool IsUnbreakable(int32_t cursor) {
     int32_t row = cursor / 10;
     int32_t col = cursor % 10;
-    return (row <= 1 || row >= 6) && (col <= 1 || col >= 8);
+    return (row <= 1 || row >= 7) && (col <= 1 || col >= 8);
 }
 
 void GetAchievementRewardDetails(
@@ -428,8 +428,21 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             ttyd::win_root::winNameGX(
                 position.x - 85.0f, position.y - 42.0f, 170.0f, 0.0f, menu, 1);
 
+            // If not finished yet, by default, print string "???".
             if (cursor_state < 2) name_msg = "msg_menu_stone_none_help";
             const char* name = msgSearch(name_msg);
+
+            // If there's a progression component, show current progress instead.
+            if (cursor_state < 2) {
+                int32_t progress, total;
+                AchievementsManager::GetProgress(grid[cursor], progress, total);
+                if (progress > 0 && total > 0) {
+                    static char buf[24];
+                    sprintf(buf, "%" PRId32 "/%" PRId32, progress, total);
+                    name = buf;
+                }
+            }
+
             int32_t width = ttyd::fontmgr::FontGetMessageWidth(name);
             float x_scale = 1.0f;
             float max_width = 180.0f;
@@ -524,7 +537,7 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             ttyd::win_main::winIconInit();
             gc::vec3 position = {
                 win_x + 136.0f + 32.0f * (i % 10),
-                win_y + 12.0f - 32.0f * (i / 10),
+                win_y + 16.0f - 32.0f * (i / 10),
                 0.0f
             };
             gc::vec3 scale = { 1.0f, 1.0f, 1.0f };

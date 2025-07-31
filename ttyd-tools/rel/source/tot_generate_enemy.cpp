@@ -648,6 +648,142 @@ void SelectPresetLoadout(StateManager& state) {
     g_NumEnemies = size;
 }
 
+void SelectFinalBossType(int32_t& boss_index, int32_t& final_boss) {
+    auto& state = g_Mod->state_;
+
+    int32_t final_bosses[4] = {
+        BattleUnitType::GLOOMTAIL,
+        BattleUnitType::GOLD_FUZZY,
+        BattleUnitType::BOWSER_CH_8,
+        BattleUnitType::DOOPLISS_CH_8
+    };
+
+    switch (state.GetOptionValue(OPT_DIFFICULTY)) {
+        case OPTVAL_DIFFICULTY_HALF:
+            final_bosses[0] = BattleUnitType::HOOKTAIL;
+            break;
+        default:
+            // Else, Gloomtail (on EX, you fight Gloomtail, then Bonetail).
+            break;
+    }
+    
+    // By default, use the regular final boss.
+    boss_index = 0;
+
+    // Determine whether to use alternate final boss.
+    switch (state.GetOptionValue(OPT_SECRET_BOSS)) {
+        case OPTVAL_SECRET_BOSS_1:
+            boss_index = 1;
+            final_boss = final_bosses[boss_index];
+            return;
+        case OPTVAL_SECRET_BOSS_2:
+            boss_index = 2;
+            final_boss = final_bosses[boss_index];
+            return;
+        case OPTVAL_SECRET_BOSS_3:
+            boss_index = 3;
+            final_boss = final_bosses[boss_index];
+            return;
+        case OPTVAL_SECRET_BOSS_EQUAL:
+            boss_index = state.Rand(4, RNG_ALTERNATE_BOSS);
+            final_boss = final_bosses[boss_index];
+            return;
+        case OPTVAL_SECRET_BOSS_RANDOM: {
+            const int32_t kBeatenFlags[4] = {
+                0,
+                GSWF_SecretBoss1_Beaten,
+                GSWF_SecretBoss2_Beaten,
+                GSWF_SecretBoss3_Beaten
+            };
+            const int32_t kFxTypes[4] = { 0, 7, 26, 8 };
+            const int32_t kMinimumClears[4] = { 0, 6, 9, 12 };
+            int32_t boss_weights[4] = { 0, 0, 0, 0 };
+
+            // Don't allow secret bosses on the 1st clear of a difficulty,
+            // unless forced by player by turning the option 'on'.
+            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
+                !state.GetOption(STAT_PERM_HALF_FINISHES)) break;
+            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL) && 
+                !state.GetOption(STAT_PERM_FULL_FINISHES)) break;
+            if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) && 
+                !state.GetOption(STAT_PERM_EX_FINISHES)) break;
+
+            int32_t total_clears =
+                state.GetOption(STAT_PERM_HALF_FINISHES) +
+                state.GetOption(STAT_PERM_FULL_FINISHES) +
+                state.GetOption(STAT_PERM_EX_FINISHES);
+
+            int32_t num_fx_equipped = 0;
+            for (int32_t i = 1; i < 32; ++i) {
+                num_fx_equipped += 
+                    CosmeticsManager::IsEquipped(CosmeticType::ATTACK_FX, i);
+            }
+
+            for (int32_t i = 1; i <= 3; ++i) {
+                // Only allow bosses to randomly appear if already beaten,
+                // or after a minimum number of total tower clears apiece.
+                if (GetSWF(kBeatenFlags[i]) || 
+                    total_clears > kMinimumClears[i])
+                    boss_weights[i] = 10;
+
+                // If the boss hasn't been beaten yet, increase chance of
+                // encountering them when their corresponding FX is in use,
+                // or guarantee it, if _only_ their FX is in use.
+                if (!GetSWF(kBeatenFlags[i]) &&
+                    CosmeticsManager::IsEquipped(
+                        CosmeticType::ATTACK_FX, kFxTypes[i])) {
+                    SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 1);
+                    if (num_fx_equipped == 1) {
+                        boss_index = i;
+                        final_boss = final_bosses[boss_index];
+                        return;
+                    }
+                    boss_weights[i] = 30;
+                }
+            }
+
+            // If Doopliss is already eligible to appear, make him more
+            // likely if you've turned his NPC deal down repeatedly.
+            int32_t num_snubs = 0;
+            for (int32_t i = 0; i < state.GetNumFloors() / 8; ++i) {
+                if (state.GetOption(STAT_RUN_NPCS_SELECTED, i) != 
+                    tot::gon::SecondaryNpcType::DOOPLISS)
+                    continue;
+
+                if (state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i)) {
+                    num_snubs = 0;
+                    break;
+                }
+                ++num_snubs;
+            }
+            if (boss_weights[3] > 0 && num_snubs >= 2) {
+                boss_weights[3] = 30;
+                SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 2);
+            }
+
+            int32_t rand_value = state.Rand(100, RNG_ALTERNATE_BOSS);
+            if (rand_value >= 0 && rand_value < boss_weights[1]) {
+                boss_index = 1;
+            } else if (rand_value >= 30 && rand_value < 30 + boss_weights[2]) {
+                boss_index = 2;
+            } else if (rand_value >= 60 && rand_value < 60 + boss_weights[3]) {
+                boss_index = 3;
+
+                // Small chance to have rare dialogue override if certain
+                // bosses have already been beaten.
+                if (!GetSWByte(GSW_Tower_FinalBossSpecialDialogue) &&
+                    GetSWF(GSWF_SecretBoss1_Beaten) &&
+                    GetSWF(GSWF_SecretBoss3_Beaten) && state.Rand(100) < 10) {
+                    SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 3);
+                }
+            }
+            break;
+        }
+    }
+
+    final_boss = final_bosses[boss_index];
+}
+
 void SelectEnemies() {
     auto& state = g_Mod->state_;
     int32_t difficulty = GetDifficulty();
@@ -655,135 +791,13 @@ void SelectEnemies() {
     int32_t* debug_enemies = DebugManager::GetEnemies();
     
     if (state.IsFinalBossFloor()) {
-        int32_t final_bosses[4] = {
-            BattleUnitType::GLOOMTAIL,
-            BattleUnitType::GOLD_FUZZY,
-            BattleUnitType::BOWSER_CH_8,
-            BattleUnitType::DOOPLISS_CH_8
-        };
-
-        switch (state.GetOptionValue(OPT_DIFFICULTY)) {
-            case OPTVAL_DIFFICULTY_HALF:
-                final_bosses[0] = BattleUnitType::HOOKTAIL;
-                break;
-            default:
-                // Else, Gloomtail (on EX, you fight Gloomtail, then Bonetail).
-                break;
-        }
-        
-        // By default, use the regular final boss.
-        int32_t boss_type = 0;
-
-        // Determine whether to use alternate final boss.
-        switch (state.GetOptionValue(OPT_SECRET_BOSS)) {
-            case OPTVAL_SECRET_BOSS_1:
-                boss_type = 1;
-                break;
-            case OPTVAL_SECRET_BOSS_2:
-                boss_type = 2;
-                break;
-            case OPTVAL_SECRET_BOSS_3:
-                boss_type = 3;
-                break;
-            case OPTVAL_SECRET_BOSS_EQUAL:
-                boss_type = state.Rand(4, RNG_ALTERNATE_BOSS);
-                break;
-            case OPTVAL_SECRET_BOSS_RANDOM: {
-                const int32_t kBeatenFlags[4] = {
-                    0,
-                    GSWF_SecretBoss1_Beaten,
-                    GSWF_SecretBoss2_Beaten,
-                    GSWF_SecretBoss3_Beaten
-                };
-                const int32_t kFxTypes[4] = { 0, 7, 26, 8 };
-                const int32_t kMinimumClears[4] = { 0, 6, 9, 12 };
-                int32_t boss_weights[4] = { 0, 0, 0, 0 };
-
-                // Don't allow secret bosses on the 1st clear of a difficulty,
-                // unless forced by player by turning the option 'on'.
-                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_HALF) && 
-                    !state.GetOption(STAT_PERM_HALF_FINISHES)) break;
-                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL) && 
-                    !state.GetOption(STAT_PERM_FULL_FINISHES)) break;
-                if (state.CheckOptionValue(OPTVAL_DIFFICULTY_FULL_EX) && 
-                    !state.GetOption(STAT_PERM_EX_FINISHES)) break;
-
-                int32_t total_clears =
-                    state.GetOption(STAT_PERM_HALF_FINISHES) +
-                    state.GetOption(STAT_PERM_FULL_FINISHES) +
-                    state.GetOption(STAT_PERM_EX_FINISHES);
-
-                int32_t num_fx_equipped = 0;
-                for (int32_t i = 1; i < 32; ++i) {
-                    num_fx_equipped += 
-                        CosmeticsManager::IsEquipped(CosmeticType::ATTACK_FX, i);
-                }
-
-                for (int32_t i = 1; i <= 3; ++i) {
-                    // Only allow bosses to randomly appear if already beaten,
-                    // or after a minimum number of total tower clears apiece.
-                    if (GetSWF(kBeatenFlags[i]) || 
-                        total_clears > kMinimumClears[i])
-                        boss_weights[i] = 10;
-
-                    // If the boss hasn't been beaten yet, increase chance of
-                    // encountering them when their corresponding FX is in use,
-                    // or guarantee it, if _only_ their FX is in use.
-                    if (!GetSWF(kBeatenFlags[i]) &&
-                        CosmeticsManager::IsEquipped(
-                            CosmeticType::ATTACK_FX, kFxTypes[i])) {
-                        SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 1);
-                        if (num_fx_equipped == 1) {
-                            boss_type = i;
-                            break;
-                        }
-                        boss_weights[i] = 30;
-                    }
-                }
-
-                // If Doopliss is already eligible to appear, make him more
-                // likely if you've turned his NPC deal down repeatedly.
-                int32_t num_snubs = 0;
-                for (int32_t i = 0; i < state.GetNumFloors() / 8; ++i) {
-                    if (state.GetOption(STAT_RUN_NPCS_SELECTED, i) != 
-                        tot::gon::SecondaryNpcType::DOOPLISS)
-                        continue;
-
-                    if (state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i)) {
-                        num_snubs = 0;
-                        break;
-                    }
-                    ++num_snubs;
-                }
-                if (boss_weights[3] > 0 && num_snubs >= 2) {
-                    boss_weights[3] = 30;
-                    SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 2);
-                }
-
-                int32_t rand_value = state.Rand(100, RNG_ALTERNATE_BOSS);
-                if (rand_value >= 0 && rand_value < boss_weights[1]) {
-                    boss_type = 1;
-                } else if (rand_value >= 30 && rand_value < 30 + boss_weights[2]) {
-                    boss_type = 2;
-                } else if (rand_value >= 60 && rand_value < 60 + boss_weights[3]) {
-                    boss_type = 3;
-
-                    // Small chance to have rare dialogue override if certain
-                    // bosses have already been beaten.
-                    if (!GetSWByte(GSW_Tower_FinalBossSpecialDialogue) &&
-                        GetSWF(GSWF_SecretBoss1_Beaten) &&
-                        GetSWF(GSWF_SecretBoss3_Beaten) && state.Rand(100) < 10) {
-                        SetSWByte(GSW_Tower_FinalBossSpecialDialogue, 3);
-                    }
-                }
-                break;
-            }
-        }
+        int32_t boss_index, final_boss;
+        SelectFinalBossType(boss_index, final_boss);
 
         for (int32_t i = 1; i < 5; ++i) g_Enemies[i] = -1;
-        g_Enemies[0] = final_bosses[boss_type];
+        g_Enemies[0] = final_boss;
         g_NumEnemies = 1;
-        SetSWByte(GSW_Tower_FinalBossType, boss_type);
+        SetSWByte(GSW_Tower_FinalBossType, boss_index);
         return;
     } else if (state.floor_ == 32) {
         int32_t enemy_type;

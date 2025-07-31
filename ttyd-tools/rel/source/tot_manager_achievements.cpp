@@ -499,6 +499,206 @@ void AchievementsManager::CheckCompleted(int32_t ach) {
     }
 }
 
+void AchievementsManager::GetProgress(
+    int32_t ach, int32_t& progress, int32_t& total) {
+    const auto& state = g_Mod->state_;
+
+    // By default, set both to a sentinel of -1.
+    progress = -1;
+    total = -1;
+
+    switch (ach) {
+        // Single-run progression achievements.
+        case AchievementId::V3_RUN_INFATUATE: {
+            progress = state.GetOption(STAT_RUN_INFATUATE_DAMAGE);
+            total = 500;
+            break;
+        }
+        case AchievementId::RUN_NPC_DEALS_7: {
+            total = 7;
+            progress = 0;
+            for (int32_t i = 0; i < 8; ++i) {
+                if (state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i)) ++progress;
+            }
+            break;
+        }
+        case AchievementId::RUN_ALL_FLOORS_3_TURN: {
+            // If currently haven't failed, print the floor progress.
+            if (state.GetOption(STAT_RUN_MOST_TURNS_RECORD) <= 3) {
+                total = state.GetNumFloors();
+                progress =
+                    state.floor_ - (GetSWByte(GSW_Tower_ChestClaimed) ? 0 : 1);
+            }
+            break;
+        }
+        case AchievementId::RUN_ALL_CONDITIONS_MET: {
+            // If currently haven't failed, print the number of met conditions.
+            if (!state.GetOption(STAT_RUN_CONDITIONS_FAILED)) {
+                total = 10;
+                progress = state.GetOption(STAT_RUN_CONDITIONS_MET);
+            }
+            break;
+        }
+        case AchievementId::V2_RUN_HAMMERMAN: {
+            // If currently haven't failed, print the floor progress.
+            if (!state.GetOption(STAT_RUN_HAMMERMAN_FAILED)) {
+                total = state.GetNumFloors();
+                progress =
+                    state.floor_ - (GetSWByte(GSW_Tower_ChestClaimed) ? 0 : 1);
+            }
+            break;
+        }
+        case AchievementId::V3_RUN_GRUBBA: {
+            // If Grubba active and streak hasn't ended, print progress.
+            if (state.GetOption(STAT_RUN_NPC_GRUBBA_FLOOR)) {
+                int32_t grubba_combo = state.GetOption(STAT_RUN_NPC_GRUBBA_COMBO);
+                if (grubba_combo <= 7) {
+                    progress = grubba_combo;
+                    total = 7;
+                }
+            }
+            break;
+        }
+
+        // Multiple-run progression achievements.
+        case AchievementId::META_RUNS_10: {
+            total = 10;
+            progress = 0;
+            progress += state.GetOption(STAT_PERM_HALF_FINISHES);
+            progress += state.GetOption(STAT_PERM_FULL_FINISHES);
+            progress += state.GetOption(STAT_PERM_EX_FINISHES);
+            break;
+        }
+        case AchievementId::META_RUNS_25: {
+            total = 25;
+            progress = 0;
+            progress += state.GetOption(STAT_PERM_HALF_FINISHES);
+            progress += state.GetOption(STAT_PERM_FULL_FINISHES);
+            progress += state.GetOption(STAT_PERM_EX_FINISHES);
+            break;
+        }
+        case AchievementId::AGG_NPC_DEALS_10: {
+            progress = state.GetOption(STAT_PERM_NPC_DEALS_TOTAL);
+            total = 10;
+            break;
+        }
+        case AchievementId::V3_AGG_MERLON_10: {
+            progress = state.GetOption(STAT_PERM_NPC_MERLON_DEALS);
+            total = 10;
+            break;
+        }
+        case AchievementId::AGG_BUY_ITEMS_25: {
+            progress = state.GetOption(STAT_PERM_ITEMS_BOUGHT);
+            total = 25;
+            break;
+        }
+        case AchievementId::AGG_SUPERGUARD_100: {
+            progress = state.GetOption(STAT_PERM_SUPERGUARDS);
+            total = 100;
+            break;
+        }
+        case AchievementId::AGG_COINS_10000: {
+            progress = state.GetOption(STAT_PERM_META_COINS_EARNED);
+            total = 10000;
+            break;
+        }
+        case AchievementId::AGG_DAMAGE_15000: {
+            progress = state.GetOption(STAT_PERM_ENEMY_DAMAGE);
+            total = 15000;
+            break;
+        }
+        case AchievementId::V2_AGG_RUN_AWAY_30: {
+            progress = state.GetOption(STAT_PERM_TIMES_RAN_AWAY);
+            total = 30;
+            break;
+        }
+        case AchievementId::V3_AGG_REWARD_5_EACH: {
+            total = RewardStatId::MAX_REWARD_STAT;
+            progress = 0;
+            for (int32_t i = 0; i < RewardStatId::MAX_REWARD_STAT; ++i) {
+                if (state.GetOption(STAT_PERM_REWARDS_TAKEN, i) >= 5) ++progress;
+            }
+            break;
+        }
+        case AchievementId::AGG_ALL_PARTNERS: {
+            total = 7;
+            progress = 0;
+            int32_t obtained = state.GetOption(STAT_PERM_PARTNERS_OBTAINED);
+            for (int32_t i = 1; i <= 7; ++i) {
+                progress += (obtained & (1 << i)) ? 1 : 0;
+            }
+            break;
+        }
+        case AchievementId::V3_AGG_BOSS_ALL_EX: {
+            total = 4;
+            progress = 0;
+            progress += GetSWF(GSWF_RegularBoss_BeatenEX) ? 1 : 0;
+            progress += GetSWF(GSWF_SecretBoss1_BeatenEX) ? 1 : 0;
+            progress += GetSWF(GSWF_SecretBoss2_BeatenEX) ? 1 : 0;
+            progress += GetSWF(GSWF_SecretBoss3_BeatenEX) ? 1 : 0;
+            break;
+        }
+
+        // Move, midboss, etc. Journal progression.
+        case AchievementId::V2_META_USE_50_MOVES: {
+            total = 50;
+            progress = 0;
+            for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+                uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, i);
+                if (value & MoveLogFlags::USED_ALL) ++progress;
+            }
+            break;
+        }
+        case AchievementId::AGG_USE_LV_3_MOVES_10: {
+            total = 10;
+            progress = 0;
+            for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+                uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, i);
+                if (value & MoveLogFlags::USED_LV_3) ++progress;
+            }
+            break;
+        }
+        case AchievementId::AGG_STYLISH_15: {
+            total = 15;
+            progress = 0;
+            for (int32_t i = 0; i < MoveType::MOVE_TYPE_MAX; ++i) {
+                uint32_t value = g_Mod->state_.GetOption(STAT_PERM_MOVE_LOG, i);
+                if ((value & MoveLogFlags::STYLISH_ALL) == MoveLogFlags::STYLISH_ALL) {
+                    ++progress;
+                }
+            }
+            break;
+        }
+        case AchievementId::V2_AGG_ENEMY_TIMES_100: {
+            total = 100;
+            progress = 0;
+            for (int32_t i = 0; i < 128; ++i) {
+                int32_t kills = state.GetOption(STAT_PERM_ENEMY_KILLS, i);
+                if (kills > progress) progress = kills;
+            }
+            break;
+        }
+        case AchievementId::AGG_MIDBOSS_TYPES_30: {
+            total = 30;
+            progress = 0;
+            for (int32_t i = 0; i < 128; ++i) {
+                if (state.GetOption(FLAGS_MIDBOSS_DEFEATED, i)) ++progress;
+            }
+            break;
+        }
+        case AchievementId::V3_AGG_MIDBOSS_TYPES_ALL: {
+            total = 75;
+            progress = 0;
+            for (int32_t i = 0; i < 128; ++i) {
+                if (state.GetOption(FLAGS_MIDBOSS_DEFEATED, i)) ++progress;
+            }
+            break;
+        }
+
+        // default: no progress to track.
+    }
+}
+
 // Backing arrays for "achievement grid" interface.
 int8_t g_AchievementGrid[AchievementId::MAX_ACHIEVEMENT + 1] = { -1 };
 int8_t g_AchievementStates[AchievementId::MAX_ACHIEVEMENT + 1] = { -1 };

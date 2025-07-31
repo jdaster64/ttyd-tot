@@ -153,6 +153,8 @@ public:
     static void UnlockReward(int32_t ach);
     // Checks whether an achievement should be newly met, and marks it if so.
     static void CheckCompleted(int32_t ach);
+    // Gets the progress of an achievement, if it's not already finished.
+    static void GetProgress(int32_t ach, int32_t& progress, int32_t& total);
 
     // Checks whether a run option is unlocked.
     static bool CheckOptionUnlocked(uint32_t option);

@@ -2067,12 +2067,14 @@ void DisplayRerollTooltip(CameraId camera, void* user_data) {
     ttyd::mario::marioGetScreenPos(
         reinterpret_cast<gc::vec3*>(&player->playerPosition),
         &screen_pos.x, &screen_pos.y, &screen_pos.z);
+    // Change coordinate system (flip Y, center = 0, 0 instead of bottom-left).
+    screen_pos.y *= -1.0f;
     screen_pos.x -= 304.0f;
-    screen_pos.y -= 240.0f;
+    screen_pos.y += 240.0f;
     screen_pos.z = 0.0f;
 
     screen_pos.x -= 10.0f;
-    screen_pos.y -= 155.0f;
+    screen_pos.y -= 25.0f;
     ttyd::icondrv::iconDispGx(1.0, &screen_pos, 0, icon);
 
     screen_pos.x += 25.0f;

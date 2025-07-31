@@ -2384,7 +2384,7 @@ g_GlobalStrings = {
         b"Defeat all 75 unique midbosses.\n"
         b"",
     b"tot_achd_85":
-        b"Finish a set of floors with all\n"
+        b"Finish a set of floors with all of\n"
         b"Grubba's bonus conditions met.",
     b"tot_achd_86":
         b"Deal 500 or more damage with\n"
@@ -5459,10 +5459,10 @@ g_TowerLobbyStrings = {
     b"tot_optr_chests_default":     b"Balanced",
     b"tot_optr_chestch":            b"Chest Choice",
     b"tot_optr_chestch_default":    b"Off",
-    b"tot_optr_chestch_rollf":      b"Fixed Rerolls",
-    b"tot_optr_chestch_rollr":      b"Refillable Rerolls",
-    b"tot_optr_chestch_revf":       b"Fixed Reveals",
-    b"tot_optr_chestch_revr":       b"Refillable Reveals",
+    b"tot_optr_chestch_rollf":      b"Rerolls (Limited)",
+    b"tot_optr_chestch_rollr":      b"Rerolls (Restockable)",
+    b"tot_optr_chestch_revf":       b"Reveals (Limited)",
+    b"tot_optr_chestch_revr":       b"Reveals (Restockable)",
     b"tot_optr_damagevar":          b"Damage Variance",
     b"tot_optr_damagevar_0":        b"0%",
     b"tot_optr_damagevar_25":       b"25%",
