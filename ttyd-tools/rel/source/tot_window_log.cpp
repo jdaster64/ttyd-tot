@@ -436,9 +436,13 @@ void DrawAchievementLog(WinPauseMenu* menu, float win_x, float win_y) {
             if (cursor_state < 2) {
                 int32_t progress, total;
                 AchievementsManager::GetProgress(grid[cursor], progress, total);
-                if (progress > 0 && total > 0) {
+                if (progress >= 0) {
                     static char buf[24];
-                    sprintf(buf, "%" PRId32 "/%" PRId32, progress, total);
+                    if (total > 0) {
+                        sprintf(buf, "%" PRId32 "/%" PRId32, progress, total);
+                    } else {
+                        sprintf(buf, "%" PRId32 "/?", progress);
+                    }
                     name = buf;
                 }
             }

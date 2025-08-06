@@ -510,11 +510,14 @@ void AchievementsManager::GetProgress(
     switch (ach) {
         // Single-run progression achievements.
         case AchievementId::V3_RUN_INFATUATE: {
+            if (!state.GetOption(OPT_RUN_STARTED)) break;
             progress = state.GetOption(STAT_RUN_INFATUATE_DAMAGE);
             total = 500;
             break;
         }
         case AchievementId::RUN_NPC_DEALS_7: {
+            if (!state.GetOption(OPT_RUN_STARTED) || state.GetNumFloors() < 64) 
+                break;
             total = 7;
             progress = 0;
             for (int32_t i = 0; i < 8; ++i) {
@@ -523,17 +526,20 @@ void AchievementsManager::GetProgress(
             break;
         }
         case AchievementId::RUN_ALL_FLOORS_3_TURN: {
+            if (!state.GetOption(OPT_RUN_STARTED)) break;
             // If currently haven't failed, print the floor progress.
             if (state.GetOption(STAT_RUN_MOST_TURNS_RECORD) <= 3) {
                 total = state.GetNumFloors();
-                progress =
-                    state.floor_ - (GetSWByte(GSW_Tower_ChestClaimed) ? 0 : 1);
+                progress = Max(
+                    state.floor_ - (GetSWByte(GSW_Tower_ChestClaimed) ? 0 : 1),
+                    0);
             }
             break;
         }
         case AchievementId::RUN_ALL_CONDITIONS_MET: {
             // If currently haven't failed, print the number of met conditions.
-            if (!state.GetOption(STAT_RUN_CONDITIONS_FAILED)) {
+            if (state.GetOption(OPT_RUN_STARTED) && 
+                !state.GetOption(STAT_RUN_CONDITIONS_FAILED)) {
                 total = 10;
                 progress = state.GetOption(STAT_RUN_CONDITIONS_MET);
             }
@@ -541,16 +547,19 @@ void AchievementsManager::GetProgress(
         }
         case AchievementId::V2_RUN_HAMMERMAN: {
             // If currently haven't failed, print the floor progress.
-            if (!state.GetOption(STAT_RUN_HAMMERMAN_FAILED)) {
+            if (state.GetOption(OPT_RUN_STARTED) && 
+                !state.GetOption(STAT_RUN_HAMMERMAN_FAILED)) {
                 total = state.GetNumFloors();
-                progress =
-                    state.floor_ - (GetSWByte(GSW_Tower_ChestClaimed) ? 0 : 1);
+                progress = Max(
+                    state.floor_ - (GetSWByte(GSW_Tower_ChestClaimed) ? 0 : 1),
+                    0);
             }
             break;
         }
         case AchievementId::V3_RUN_GRUBBA: {
             // If Grubba active and streak hasn't ended, print progress.
-            if (state.GetOption(STAT_RUN_NPC_GRUBBA_FLOOR)) {
+            int32_t grubba_floor = state.GetOption(STAT_RUN_NPC_GRUBBA_FLOOR);
+            if (grubba_floor && state.floor_ - grubba_floor < 8) {
                 int32_t grubba_combo = state.GetOption(STAT_RUN_NPC_GRUBBA_COMBO);
                 if (grubba_combo <= 7) {
                     progress = grubba_combo;
@@ -630,7 +639,12 @@ void AchievementsManager::GetProgress(
             break;
         }
         case AchievementId::V3_AGG_BOSS_ALL_EX: {
-            total = 4;
+            // Only show total if all bosses have been beaten.
+            if (GetSWF(GSWF_SecretBoss1_Beaten) &&
+                GetSWF(GSWF_SecretBoss2_Beaten) &&
+                GetSWF(GSWF_SecretBoss3_Beaten))
+                total = 4;
+            
             progress = 0;
             progress += GetSWF(GSWF_RegularBoss_BeatenEX) ? 1 : 0;
             progress += GetSWF(GSWF_SecretBoss1_BeatenEX) ? 1 : 0;

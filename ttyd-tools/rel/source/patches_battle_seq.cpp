@@ -312,10 +312,10 @@ void CheckBattleCondition() {
                 AchievementsManager::MarkCompleted(AchievementId::V3_RUN_GRUBBA);
             }
         }
-    } else {
-        // Set to placeholder so progress on achievement isn't shown.
-        state.SetOption(STAT_RUN_NPC_GRUBBA_COMBO, 99);
+    } else if (fbat_info->wBtlActRecCondition) {
         state.ChangeOption(STAT_RUN_CONDITIONS_FAILED);
+        // Set to sentinel so progress on achievement isn't shown.
+        state.SetOption(STAT_RUN_NPC_GRUBBA_COMBO, 99);
     }
     
     // If battle reward mode is "drop all held", award items other than the

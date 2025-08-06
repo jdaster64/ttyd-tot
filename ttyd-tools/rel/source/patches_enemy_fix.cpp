@@ -29,6 +29,8 @@ extern "C" {
     void StartAudienceCheckPlayerTarget();
     void BranchBackAudienceCheckPlayerTarget();
     // enemy_sampling_patches.s
+    void StartFixScreenNukeTarget();
+    void BranchBackFixScreenNukeTarget();
     void StartSampleRandomTarget();
     void BranchBackSampleRandomTarget();
     // held_item_disp_patches.s
@@ -96,6 +98,8 @@ extern int32_t (*g_unitDarkBoo_teresa_check_trans_trampoline)(EvtEntry*, bool);
 // Patch addresses.
 extern const int32_t g_BattleAudienceDetectTargetPlayer_CheckPlayer_BH;
 extern const int32_t g_BattleAudienceDetectTargetPlayer_CheckPlayer_EH;
+extern const int32_t g_BattleChoiceSamplingEnemy_ScreenNukeFix_BH;
+extern const int32_t g_BattleChoiceSamplingEnemy_ScreenNukeFix_EH;
 extern const int32_t g_BattleChoiceSamplingEnemy_SumRandWeights_BH;
 extern const int32_t g_BattleChoiceSamplingEnemy_SumRandWeights_EH;
 extern const int32_t g_btlDispMain_DrawNormalHeldItem_BH;
@@ -218,6 +222,14 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_btlDispMain_DrawNormalHeldItem_BH),
         reinterpret_cast<void*>(StartDispEnemyHeldItem),
         reinterpret_cast<void*>(BranchBackDispEnemyHeldItem));
+
+    // Makes it so dead Dry Bones are no longer considered impossible targets
+    // for multi-target attacks like Bob-ulks' explosions.
+    mod::writeBranchPair(
+        reinterpret_cast<void*>(g_BattleChoiceSamplingEnemy_ScreenNukeFix_BH),
+        reinterpret_cast<void*>(g_BattleChoiceSamplingEnemy_ScreenNukeFix_EH),
+        reinterpret_cast<void*>(StartFixScreenNukeTarget),
+        reinterpret_cast<void*>(BranchBackFixScreenNukeTarget));
 
     // Sums weapon targets' random weights, ensuring that each weight is > 0.
     mod::writeBranchPair(
