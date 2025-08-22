@@ -20,6 +20,7 @@
 #include <ttyd/evt_window.h>
 #include <ttyd/evtmgr_cmd.h>
 #include <ttyd/mapdata.h>
+#include <ttyd/npcdrv.h>
 
 namespace mod::tot::gon {
 
@@ -38,6 +39,7 @@ using namespace ::ttyd::evt_window;
 using ::ttyd::evt_bero::BeroEntry;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
+using ::ttyd::npcdrv::NpcSetupInfo;
 
 namespace BeroAnimType = ::ttyd::evt_bero::BeroAnimType;
 namespace BeroDirection = ::ttyd::evt_bero::BeroDirection;
@@ -45,10 +47,64 @@ namespace BeroType = ::ttyd::evt_bero::BeroType;
 
 }  // namespace
 
-extern const BeroEntry gon_00_entry_data[4];
+constexpr char g_NpcKoopley[] = "\x83\x6d\x83\x52\x83\x5e\x83\x8d\x83\x45\x95\x83";
 
+extern const BeroEntry gon_00_entry_data[4];
+extern const NpcSetupInfo gon_00_npc_data[2];
+
+EVT_DECLARE_USER_FUNC(evtTot_SaveOrLoadUserPreset, 3)
 EVT_DECLARE_USER_FUNC(evtTot_TowerInitFromOptions, 0)
 EVT_DECLARE_USER_FUNC(evtTot_InConfirmTriggerVolume, 4)
+
+EVT_BEGIN(Npc_Koopley_Talk)
+    IF_EQUAL((int32_t)GSWF_NpcPreset_FirstTimeChat, 0)
+        USER_FUNC(evt_msg_print, 0, PTR("tot_optnpc_intro1st"), 0, PTR("me"))
+        SET((int32_t)GSWF_NpcPreset_FirstTimeChat, 1)
+    ELSE()
+        USER_FUNC(evt_msg_print, 0, PTR("tot_optnpc_intro"), 0, PTR("me"))
+    END_IF()
+    USER_FUNC(evt_msg_select, 0, PTR("tot_optnpc_optsaveload"))
+
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+            GOTO(10)
+        CASE_EQUAL(1)
+            GOTO(20)
+        CASE_ETC()
+            GOTO(90)
+    END_SWITCH()
+
+LBL(10)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_optnpc_whichload"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_optnpc_optwhichload"))
+    IF_LARGE_EQUAL(LW(0), 3)
+        GOTO(90)
+    END_IF()
+    USER_FUNC(evtTot_SaveOrLoadUserPreset, 0, LW(0), LW(1))
+    IF_EQUAL(LW(1), 1)
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_optnpc_confirm"))
+    ELSE()
+        USER_FUNC(evt_msg_print_add, 0, PTR("tot_optnpc_nosaved"))
+    END_IF()
+    GOTO(99)
+
+LBL(20)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_optnpc_whichsave"))
+    USER_FUNC(evt_msg_select, 0, PTR("tot_optnpc_optwhichsave"))
+    IF_LARGE_EQUAL(LW(0), 3)
+        GOTO(90)
+    END_IF()
+    USER_FUNC(evtTot_SaveOrLoadUserPreset, 1, LW(0), LW(1))
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_optnpc_confirm"))
+    GOTO(99)
+
+LBL(90)
+    USER_FUNC(evt_msg_print_add, 0, PTR("tot_optnpc_decline"))
+
+LBL(99)
+    RETURN()
+
+EVT_END()
 
 EVT_BEGIN(Lobby_EnterTowerEvt)
     // Initialize stats, etc. based on selected options.
@@ -150,6 +206,11 @@ EVT_BEGIN(gon_00_InitEvt)
     USER_FUNC(evt_snd_bgmoff, 512)
     USER_FUNC(evt_snd_envon, 272, PTR("ENV_STG1_GON1"))
     USER_FUNC(evt_snd_set_rev_mode, 2)
+    USER_FUNC(evt_npc_setup, PTR(&gon_00_npc_data))
+
+    IF_EQUAL((int32_t)GSWF_NpcPreset_Enabled, 1)
+        USER_FUNC(evt_npc_set_position, PTR(g_NpcKoopley), -40, 0, -50)
+    END_IF()
     
     SET(LW(0), PTR(&gon_00_entry_data))
     USER_FUNC(evt_bero_get_info)
@@ -223,8 +284,26 @@ const BeroEntry gon_00_entry_data[4] = {
     { /* null-terminator */ },
 };
 
+const NpcSetupInfo gon_00_npc_data[2] = {
+    {
+        .name = g_NpcKoopley,
+        .flags = 0,
+        .initEvtCode = npc_init_evt,
+        .talkEvtCode = (void*)Npc_Koopley_Talk,
+    },
+    { /* null-terminator */ },
+};
+
 const int32_t* GetLobbyInitEvt() {
     return gon_00_InitEvt;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_SaveOrLoadUserPreset) {
+    bool save = evtGetValue(evt, evt->evtArguments[0]);
+    int32_t slot = evtGetValue(evt, evt->evtArguments[1]);
+    bool success = OptionsManager::SaveOrLoadUserPreset(save, slot);
+    evtSetValue(evt, evt->evtArguments[2], success);
+    return 2;
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_TowerInitFromOptions) {

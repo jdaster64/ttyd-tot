@@ -83,6 +83,9 @@ enum GlobalWorkVars {
     // Flags for talking to NPC G about reward breakdowns.
     GSWF_NpcG_UnlockedRewardStats,
     GSWF_NpcG_TalkedThisVisit,
+    // Flag for enabling NPC to save custom presets.
+    GSWF_NpcPreset_Enabled,
+    GSWF_NpcPreset_FirstTimeChat,
 
     // Used for tracking things that persist across runs.
     GSWF_PeekabooEnabled                    = GSWF(7000),

@@ -266,6 +266,13 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         AchievementsManager::MarkCompleted(AchievementId::META_RUNS_25);
     }
 
+    // Enable Koopley NPC if Koops has been used, and the player has finished
+    // 5 runs in total, or any run with custom settings.
+    if ((runs_completed >= 5 || state.CheckOptionValue(OPTVAL_PRESET_CUSTOM)) &&
+        (state.GetOption(STAT_PERM_PARTNERS_OBTAINED) & 4)) {
+        SetSWF(GSWF_NpcPreset_Enabled);
+    }
+
     int32_t num_npc_deals = 0;
     for (int32_t i = 0; i < 8; ++i) {
         if (state.GetOption(STAT_RUN_NPCS_DEALT_WITH, i)) ++num_npc_deals;

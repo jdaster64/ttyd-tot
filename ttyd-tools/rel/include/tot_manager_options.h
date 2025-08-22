@@ -46,6 +46,9 @@ public:
     // For applying run options when starting, resuming or ending a run.
     // Resets options, stats, etc. from cold boot / when loading lobby or hub.
     static void ResetAfterRun();
+    // Saves or loads options from a user-defined preset.
+    // Returns false if attempting to load from an undefined preset.
+    static bool SaveOrLoadUserPreset(bool save, int32_t slot);
     // Sets up options, stats, etc. on run start.
     static void OnRunStart();
     // Sets up internal data when continuing a run from an auto-save.

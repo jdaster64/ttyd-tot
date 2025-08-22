@@ -1992,7 +1992,7 @@ g_GlobalStrings = {
     b"tot_recn_playtime":           b"Total Play Time",
     b"tot_recn_completion_pct":     b"Completion %",
     b"tot_recn_achievement_pct":    b"Achievements",
-    b"tot_recn_item_pct":           b"Items Log",
+    b"tot_recn_item_pct":           b"Item Log",
     b"tot_recn_badge_pct":          b"Badge Log",
     b"tot_recn_tattle_pct":         b"Tattle Log",
     b"tot_recn_move_pct":           b"Moves Obtained",
@@ -5735,6 +5735,64 @@ g_TowerLobbyStrings = {
     b"tot_lobby_reentry":
         b"<system>\n<p>\n"
         b"You can't re-enter that way!\n<k>",
+    
+    b"tot_lobby_confirmstart":
+        b"<system>\n<p>\n"
+        b"Are you prepared to start with\n"
+        b"the options selected?\n<o>",
+        
+    b"tot_optnpc_intro1st":
+        b"Well, hi, Mario! <wait 250>I heard you\n"
+        b"and Koops have been sparring\n"
+        b"with that trickster, Hooktail...\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"I can't say I condone that...\n"
+        b"<wait 250>but if you intend to keep it up,\n"
+        b"I'll make sure she fights fair!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"You tell me what rules you\n"
+        b"plan to abide by, <wait 100>and I'll make\n"
+        b"sure to remember them!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"Now then, Mario, <wait 200>want me to\n"
+        b"keep track of your settings?\n"
+        b"<o>",
+        
+    b"tot_optnpc_intro":
+        b"Hi there, Mario! <wait 250>Want me to\n"
+        b"keep track of your settings?\n"
+        b"<o>",
+        
+    b"tot_optnpc_whichload":
+        b"<p>\nGotcha, <wait 200>which settings do\n"
+        b"you want to use?\n<o>",
+        
+    b"tot_optnpc_whichsave":
+        b"<p>\nMm-kay, <wait 250>which of these do\n"
+        b"you want to overwrite?\n<o>",
+        
+    b"tot_optnpc_confirm":
+        b"<p>\nGot it! <wait 250>Now go show that\n"
+        b"troublemaker what for!<k>",
+        
+    b"tot_optnpc_decline":
+        b"<p>\nSee you around!\n<k>",
+        
+    b"tot_optnpc_nosaved":
+        b"<p>\n'Fraid I don't remember you\n"
+        b"saving anything there, Mario!<k>",
+        
+    b"tot_optnpc_optsaveload":
+        b"<select 0 2 0 40>\nLoad\nSave\nNever mind",
+        
+    b"tot_optnpc_optwhichload":
+        b"<select 0 3 0 40>\nPreset 1\nPreset 2\nPreset 3\nNever mind",
+        
+    b"tot_optnpc_optwhichsave":
+        b"<select 0 3 0 40>\nPreset 1\nPreset 2\nPreset 3\nNever mind",
 }
 
 g_TowerStrings = {

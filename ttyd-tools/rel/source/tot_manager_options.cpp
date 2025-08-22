@@ -866,6 +866,118 @@ void OptionsManager::ResetAfterRun() {
     SetSWF(GSWF_RunSettingsCleared, 1);
 }
 
+bool OptionsManager::SaveOrLoadUserPreset(bool save, int32_t slot) {
+    auto& state = g_Mod->state_;
+
+    uint32_t option = 0;
+    switch (slot) {
+        case 0:
+            option = STAT_PERM_OPTION_PRESET_1;
+            break;
+        case 1:
+            option = STAT_PERM_OPTION_PRESET_2;
+            break;
+        case 2:
+            option = STAT_PERM_OPTION_PRESET_3;
+            break;
+        default:
+            // Should not be reached.
+            return false;
+    }
+
+    if (save) {
+        int32_t offset = 0;
+        // Mark preset as saved.
+        state.SetOption(option, 1, offset++);
+
+        // Save basic options.
+        for (int32_t i = 0; i < 8; ++i) {
+            uint32_t flags = state.option_flags_[i];
+            state.SetOption(option, (flags >> 24) & 0xff, offset++);
+            state.SetOption(option, (flags >> 16) & 0xff, offset++);
+            state.SetOption(option, (flags >>  8) & 0xff, offset++);
+            state.SetOption(option, (flags)       & 0xff, offset++);
+        }
+        for (int32_t i = 0; i < 64; ++i) {
+            state.SetOption(option, state.option_bytes_[i], offset++);
+        }
+
+        // Save seed information.
+        uint32_t seed_num = state.seed_;
+        state.SetOption(option, (seed_num >> 24) & 0xff, offset++);
+        state.SetOption(option, (seed_num >> 16) & 0xff, offset++);
+        state.SetOption(option, (seed_num >>  8) & 0xff, offset++);
+        state.SetOption(option, (seed_num)       & 0xff, offset++);
+
+        for (int32_t i = 0; i < 12; ++i) {
+            state.SetOption(option, state.seed_name_[i], offset++);
+        }
+
+        // Save custom items, badges, and moveset.
+        state.SetOption(option, state.GetOption(STAT_PERM_ITEM_LOAD_SIZE), offset++);
+        for (int32_t i = 0; i < 6; ++i) {
+            state.SetOption(
+                option, state.GetOption(STAT_PERM_ITEM_LOADOUT, i), offset++);
+        }
+        state.SetOption(option, state.GetOption(STAT_PERM_BADGE_LOAD_SIZE), offset++);
+        for (int32_t i = 0; i < 6; ++i) {
+            state.SetOption(
+                option, state.GetOption(STAT_PERM_BADGE_LOADOUT, i), offset++);
+        }
+        state.SetOption(option, state.GetOption(STAT_PERM_MOVE_LOAD_SIZE), offset++);
+        for (int32_t i = 0; i < 6; ++i) {
+            state.SetOption(
+                option, state.GetOption(STAT_PERM_MOVE_LOADOUT, i), offset++);
+        }
+    } else {
+        int32_t offset = 0;
+        // Check that a preset was previously saved in this slot.
+        if (!state.GetOption(option, offset++)) return false;
+
+        // Load basic options.
+        for (int32_t i = 0; i < 8; ++i) {
+            uint32_t flags =       state.GetOption(option, offset++);
+            flags = (flags << 8) + state.GetOption(option, offset++);
+            flags = (flags << 8) + state.GetOption(option, offset++);
+            flags = (flags << 8) + state.GetOption(option, offset++);
+            state.option_flags_[i] = flags;
+        }
+        for (int32_t i = 0; i < 64; ++i) {
+            state.option_bytes_[i] = state.GetOption(option, offset++);
+        }
+
+        // Load seed information.
+        uint32_t seed_num =          state.GetOption(option, offset++);
+        seed_num = (seed_num << 8) + state.GetOption(option, offset++);
+        seed_num = (seed_num << 8) + state.GetOption(option, offset++);
+        seed_num = (seed_num << 8) + state.GetOption(option, offset++);
+        state.seed_ = seed_num;
+
+        for (int32_t i = 0; i < 12; ++i) {
+            state.seed_name_[i] = state.GetOption(option, offset++);
+        }
+
+        // Load custom items, badges, and moveset.
+        state.SetOption(STAT_PERM_ITEM_LOAD_SIZE, state.GetOption(option, offset++));
+        for (int32_t i = 0; i < 6; ++i) {
+            state.SetOption(
+                STAT_PERM_ITEM_LOADOUT, state.GetOption(option, offset++), i);
+        }
+        state.SetOption(STAT_PERM_BADGE_LOAD_SIZE, state.GetOption(option, offset++));
+        for (int32_t i = 0; i < 6; ++i) {
+            state.SetOption(
+                STAT_PERM_BADGE_LOADOUT, state.GetOption(option, offset++), i);
+        }
+        state.SetOption(STAT_PERM_MOVE_LOAD_SIZE, state.GetOption(option, offset++));
+        for (int32_t i = 0; i < 6; ++i) {
+            state.SetOption(
+                STAT_PERM_MOVE_LOADOUT, state.GetOption(option, offset++), i);
+        }
+    }
+
+    return true;
+}
+
 void OptionsManager::OnRunStart() {
     auto& state = g_Mod->state_;
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();

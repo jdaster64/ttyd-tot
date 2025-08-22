@@ -83,6 +83,7 @@ namespace NpcTribeType {
         GRIFTY          = 0x16,
         CHARLIETON      = 0x17,
         HOWZ_SELLER     = 0x1a,
+        KOOPLEY         = 0x1e,
         HOOKTAIL        = 0x21,
         LUMPY           = 0x35,
         ZESS_T          = 0x51,

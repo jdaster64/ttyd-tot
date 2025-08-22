@@ -156,6 +156,7 @@ void _CompleteTutorialFlags() {
     SetSWF(GSWF_SecretBoss1_Beaten);
     SetSWF(GSWF_SecretBoss2_Beaten);
     SetSWF(GSWF_SecretBoss3_Beaten);
+    SetSWF(GSWF_NpcPreset_Enabled);
 
     for (int32_t i = 0; i < RewardStatId::MAX_REWARD_STAT; ++i) {
         if (g_Mod->state_.GetOption(STAT_PERM_REWARDS_OFFERED, i) < 1)

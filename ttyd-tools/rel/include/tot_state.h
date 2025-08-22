@@ -667,7 +667,11 @@ enum Options : uint32_t {
     // Rerolls used globally.
     STAT_PERM_CHEST_REROLLS     = 0x1c2'7'00'00,
     STAT_PERM_NPC_MERLON_DEALS  = 0x1c3'7'00'00,
-    // Next: 0x1c4
+    // Added in v3.10; Three sets of option presets, seeds, etc.
+    STAT_PERM_OPTION_PRESET_1   = 0x1c4'0'01'c0,
+    STAT_PERM_OPTION_PRESET_2   = 0x1f4'0'01'c0,
+    STAT_PERM_OPTION_PRESET_3   = 0x224'0'01'c0,
+    // Next: 0x254
 };
 
 }  // namespace mod::tot
