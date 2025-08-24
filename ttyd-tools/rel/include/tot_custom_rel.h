@@ -141,7 +141,9 @@ extern int8_t defense_GreenMagikoopa[5];
 extern ttyd::battle_database_common::BattleWeapon* unitDoopliss_weaponSelected;
 
 // Hooked / patched for Infatuate reasons.
+EVT_DECLARE_USER_FUNC(unitBoo_teresa_check_move, 1);
 EVT_DECLARE_USER_FUNC(unitBoo_teresa_check_trans, 1);
+EVT_DECLARE_USER_FUNC(unitDarkBoo_teresa_check_move, 1);
 EVT_DECLARE_USER_FUNC(unitDarkBoo_teresa_check_trans, 1);
 
 extern ttyd::battle_database_common::BattleWeapon unitHyperGoomba_weaponCharge;

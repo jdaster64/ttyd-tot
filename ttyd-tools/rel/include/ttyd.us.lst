@@ -4255,7 +4255,9 @@
 40,5,0008d100:defense_GreenMagikoopa
 
 // functions / weapons to patch for Infatuate reasons
+40,1,000099bc:unitBoo_teresa_check_move
 40,1,00009a7c:unitBoo_teresa_check_trans
+40,1,0000b440:unitDarkBoo_teresa_check_move
 40,1,0000b500:unitDarkBoo_teresa_check_trans
 40,5,0001ac00:unitHyperGoomba_weaponCharge
 40,5,0001b9bc:unitHyperParagoomba_weaponChargePara

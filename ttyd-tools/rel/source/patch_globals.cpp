@@ -283,8 +283,10 @@ int32_t (*g_memcard_code_trampoline)(EvtEntry*, bool) = nullptr;
 bool (*g_OSLink_trampoline)(OSModuleInfo*, void*) = nullptr;
 
 // custom REL unit_teresa
+int32_t (*g_unitBoo_teresa_check_move_trampoline)(EvtEntry*, bool) = nullptr;
 int32_t (*g_unitBoo_teresa_check_trans_trampoline)(EvtEntry*, bool) = nullptr;
 // custom REL unit_purple_teresa
+int32_t (*g_unitDarkBoo_teresa_check_move_trampoline)(EvtEntry*, bool) = nullptr;
 int32_t (*g_unitDarkBoo_teresa_check_trans_trampoline)(EvtEntry*, bool) = nullptr;
 
 // Branch / patch addresses (BH / EH / CH# = begin / end / conditional hooks).

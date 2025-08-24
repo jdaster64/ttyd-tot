@@ -93,7 +93,9 @@ namespace ItemType = ::ttyd::item_data::ItemType;
 // Function hooks.
 extern int32_t (*g_btlevtcmd_CheckSpace_trampoline)(EvtEntry*, bool);
 extern uint32_t (*g_BattleCheckConcluded_trampoline)(BattleWork*);
+extern int32_t (*g_unitBoo_teresa_check_move_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_unitBoo_teresa_check_trans_trampoline)(EvtEntry*, bool);
+extern int32_t (*g_unitDarkBoo_teresa_check_move_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_unitDarkBoo_teresa_check_trans_trampoline)(EvtEntry*, bool);
 // Patch addresses.
 extern const int32_t g_BattleAudienceDetectTargetPlayer_CheckPlayer_BH;
@@ -176,6 +178,61 @@ EVT_DEFINE_USER_FUNC(CheckTargetKindIsNotEnemy) {
     id = ttyd::battle_sub::BattleTransID(evt, id);
     auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, id);
     evtSetValue(evt, evt->evtArguments[1], unit->true_kind > BattleUnitType::BONETAIL);
+    return 2;
+}
+
+// Checks whether there are any valid targets for a Boo to move upward.
+int32_t CheckIfBooHasMoveTargets(EvtEntry* evt, bool isFirstCall) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t self_id = ttyd::battle_sub::BattleTransID(evt, -2);
+
+    // Cannot target anything else if Infatuated, return early.
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, self_id);
+    int32_t alliance = unit->alliance;
+    
+    int32_t num_targets = 0;
+    for (int32_t i = 0; i < 64; ++i) {
+        auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, i);
+        
+        // Valid targets must be Boos on my alliance that haven't already moved.
+        if (!unit || unit->alliance != alliance ||
+            !(unit->current_kind == BattleUnitType::BOO ||
+              unit->current_kind == BattleUnitType::DARK_BOO) ||
+            unit->unit_work[0] != 0)
+            continue;
+            
+        ++num_targets;
+    }
+    evtSetValue(evt, evt->evtArguments[0], num_targets > 0);
+    return 2;
+}
+
+// Checks whether there are any valid other targets for a Boo to turn invisible.
+int32_t CheckIfBooHasInvisTargets(EvtEntry* evt, bool isFirstCall) {
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    int32_t self_id = ttyd::battle_sub::BattleTransID(evt, -2);
+
+    // Cannot target anything else if Infatuated, return early.
+    auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, self_id);
+    if (unit->alliance == 0) {
+        evtSetValue(evt, evt->evtArguments[1], 0);
+        return 2;
+    }
+    
+    int32_t num_targets = 0;
+    for (int32_t i = 0; i < 64; ++i) {
+        auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, i);
+        
+        // Valid targets must be other enemy Boos that aren't already invisible.
+        if (!unit || i == self_id || unit->alliance != 1 ||
+            !(unit->current_kind == BattleUnitType::BOO ||
+              unit->current_kind == BattleUnitType::DARK_BOO) ||
+            ttyd::battle_unit::BtlUnit_CheckStatus(unit, StatusEffectType::INVISIBLE))
+            continue;
+            
+        ++num_targets;
+    }
+    evtSetValue(evt, evt->evtArguments[1], num_targets > 0);
     return 2;
 }
 
@@ -311,33 +368,30 @@ void ApplyFixedPatches() {
         
     // Individual enemy behavior, etc. patches.
 
-    // Boo and Dark Boo should not try to use team-invis attack when Infatuated.
-    // (They already don't try to use it in Confusion)
+    // Boo and Dark Boo should ignore the other alliance when checking if any
+    // Boos need to be moved upward.
+    g_unitBoo_teresa_check_move_trampoline = mod::hookFunction(
+        unitBoo_teresa_check_move, [](EvtEntry* evt, bool isFirstCall) {
+            // Replace original logic.
+            return CheckIfBooHasMoveTargets(evt, isFirstCall);
+        });
+    g_unitDarkBoo_teresa_check_trans_trampoline = mod::hookFunction(
+        unitDarkBoo_teresa_check_move, [](EvtEntry* evt, bool isFirstCall) {
+            // Replace original logic.
+            return CheckIfBooHasMoveTargets(evt, isFirstCall);
+        });
+
+    // Boo and Dark Boo should not try to use team-invis attack when Infatuated,
+    // or on Infatuated targets (they already don't try to use it in Confusion).
     g_unitBoo_teresa_check_trans_trampoline = mod::hookFunction(
         unitBoo_teresa_check_trans, [](EvtEntry* evt, bool isFirstCall) {
-            // Check for Infatuation first.
-            auto* battleWork = ttyd::battle::g_BattleWork;
-            int32_t self_id = ttyd::battle_sub::BattleTransID(evt, -2);
-            auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, self_id);
-            if (unit->alliance == 0) {
-                evtSetValue(evt, evt->evtArguments[1], 0);
-                return 2;
-            }
-            // Run original logic.
-            return g_unitBoo_teresa_check_trans_trampoline(evt, isFirstCall);
+            // Replace original logic.
+            return CheckIfBooHasInvisTargets(evt, isFirstCall);
         });
     g_unitDarkBoo_teresa_check_trans_trampoline = mod::hookFunction(
         unitDarkBoo_teresa_check_trans, [](EvtEntry* evt, bool isFirstCall) {
-            // Check for Infatuation first.
-            auto* battleWork = ttyd::battle::g_BattleWork;
-            int32_t self_id = ttyd::battle_sub::BattleTransID(evt, -2);
-            auto* unit = ttyd::battle::BattleGetUnitPtr(battleWork, self_id);
-            if (unit->alliance == 0) {
-                evtSetValue(evt, evt->evtArguments[1], 0);
-                return 2;
-            }
-            // Run original logic.
-            return g_unitDarkBoo_teresa_check_trans_trampoline(evt, isFirstCall);
+            // Replace original logic.
+            return CheckIfBooHasInvisTargets(evt, isFirstCall);
         });
 
     // Make a bunch of enemy self-targeting attacks unguardable, so they
