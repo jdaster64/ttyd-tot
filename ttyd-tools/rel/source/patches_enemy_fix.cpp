@@ -375,7 +375,7 @@ void ApplyFixedPatches() {
             // Replace original logic.
             return CheckIfBooHasMoveTargets(evt, isFirstCall);
         });
-    g_unitDarkBoo_teresa_check_trans_trampoline = mod::hookFunction(
+    g_unitDarkBoo_teresa_check_move_trampoline = mod::hookFunction(
         unitDarkBoo_teresa_check_move, [](EvtEntry* evt, bool isFirstCall) {
             // Replace original logic.
             return CheckIfBooHasMoveTargets(evt, isFirstCall);
