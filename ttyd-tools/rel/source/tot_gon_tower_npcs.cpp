@@ -578,11 +578,10 @@ LBL(0)
         LW(2), LW(3), LW(4))
 
     USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
-    IF_EQUAL(LW(0), 1)
+    IF_NOT_EQUAL(LW(0), 0)
         USER_FUNC(evt_msg_print_add, 0, PTR("tot_chet_different"))
-        USER_FUNC(evt_win_coin_off, LW(8))
         GOTO(0)
-    END_IF()    
+    END_IF()
     
     USER_FUNC(evtTot_TrackNpcAction, (int32_t)STAT_RUN_NPC_LEVELS_SOLD, 1)
     USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::CHET_RIPPO)
