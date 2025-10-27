@@ -663,10 +663,10 @@ LBL(5)
         GOTO(90)
     END_IF()
     USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    USER_FUNC(btlevtcmd_GetResultACDefence, LW(7))
-    IF_LARGE_EQUAL(LW(7), 4)
+    USER_FUNC(btlevtcmd_GetResultACDefence, LW(8))
+    IF_LARGE_EQUAL(LW(8), 4)
         // Reset camera if Superguarded successfully.
-        IF_LARGE_EQUAL(LW(7), 5)
+        IF_LARGE_EQUAL(LW(8), 5)
             USER_FUNC(evt_btl_camera_set_mode, 0, 0)
         END_IF()
 

@@ -26,6 +26,10 @@ enum GlobalWorkVars {
     GSW_Tower_FinalBossType,
     GSW_Tower_FinalBossSpecialDialogue,
     GSW_NpcG_CurrentStatBreakdown,
+    GSW_Boss_Target1_Unit,
+    GSW_Boss_Target1_Part,
+    GSW_Boss_Target2_Unit,
+    GSW_Boss_Target2_Part,
 
     // Used for cosmetic choices that persist across runs.
     GSW_MarioCostume                        = GSW(1500),
