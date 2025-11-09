@@ -670,42 +670,28 @@ uint32_t StatusEffectTick(BattleWorkUnit* unit, int8_t status_type) {
 
 // Handles Lucky chance from evasion badges.
 bool CheckEvasionBadges(BattleWorkUnit* unit) {
+    // Note: this is no longer supported as an option, left over from InfPit.
+    // Would cap the player's evasion at 80.0%, if enabled.
     bool cap_badge_evasion = false;
-    if (cap_badge_evasion) {
-        float hit_chance = 100.f;
-        for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
-            hit_chance *= 0.875f;
-        }
-        for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
-            hit_chance *= 0.75f;
-        }
-        // Will not activate if the actor is at 1/1 (max) HP.
-        if (unit->current_hp < unit->max_hp &&
-            unit->current_hp <= options::GetPinchThresholdForMaxHp(
-                unit->max_hp, /* peril = */ false)) {
-            for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
-                hit_chance *= 0.67f;
-            }
-        }
-        if (hit_chance < 20.f) hit_chance = 20.f;
-        return ttyd::system::irand(100) >= hit_chance;
-    } else {
-        for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
-            if (ttyd::system::irand(100) < 10) return true;
-        }
-        for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
-            if (ttyd::system::irand(100) < 25) return true;
-        }
-        // Will not activate if the actor is at 1/1 (max) HP.
-        if (unit->current_hp < unit->max_hp &&
-            unit->current_hp <= options::GetPinchThresholdForMaxHp(
-                unit->max_hp, /* peril = */ false)) {
-            for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
-                if (ttyd::system::irand(100) < 33) return true;
-            }
+    
+    float hit_chance = 1000.f;
+    for (int32_t i = 0; i < unit->badges_equipped.pretty_lucky; ++i) {
+        hit_chance *= 0.875f; // 12.5% evasion
+    }
+    for (int32_t i = 0; i < unit->badges_equipped.lucky_day; ++i) {
+        hit_chance *= 0.75f;  // 25% evasion
+    }
+    // Will not activate if the actor is at 1/1 (max) HP.
+    if (unit->current_hp < unit->max_hp &&
+        unit->current_hp <= options::GetPinchThresholdForMaxHp(
+            unit->max_hp, /* peril = */ false)) {
+        for (int32_t i = 0; i < unit->badges_equipped.close_call; ++i) {
+            hit_chance *= 0.67f;  // 33% evasion
         }
     }
-    return false;
+
+    if (cap_badge_evasion && hit_chance < 200.f) hit_chance = 200.f;
+    return ttyd::system::irand(1000) >= hit_chance;
 }
 
 // Checks whether an attack should connect, or what caused it to miss.
