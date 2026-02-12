@@ -115,6 +115,7 @@ namespace BattleUnitStatus_Flags {
         HAS_MOVES_REMAINING     = 0x200'0000U,
         IN_DANGER               = 0x1000'0000U,
         IN_PERIL                = 0x2000'0000U,
+        HAS_STOLEN_ITEM         = 0x4000'0000U,
         
         // Custom statuses for ToT.
         SCOPED                  = 0x400U,
@@ -187,9 +188,24 @@ struct MovementParams {
     float           jump_current_position_y;  // ?
     int8_t          unk_78[4];
     MovementSoundData sound_data_table;
-} ;
+};
 
 static_assert(sizeof(MovementParams) == 0xb4);
+
+struct HpGaugeParams {
+    int16_t unk_00;     // 1 = longer deplete animation?
+    int16_t state;      // 1 = currently animating?
+    int16_t deplete_timer;
+    int16_t deplete_timer_max;
+    int16_t linger_timer;
+    int16_t linger_timer_max;
+    int32_t previous_hp;
+    int32_t target_hp;
+    float fullness;
+    float fullness_target; 
+};
+
+static_assert(sizeof(HpGaugeParams) == 0x1c);
 
 struct BadgesEquipped {
     int8_t      close_call;
@@ -398,7 +414,7 @@ struct BattleWorkUnit {
     uint32_t        protect_unit_idx;   // related to Shell Shield?
     battle_database_common::StatusVulnerability* status_vulnerability;
     MovementParams  movement_params;
-    int8_t          hp_gauge_params[0x1c];
+    HpGaugeParams   hp_gauge_params;
     uint32_t        unit_work[16];
     
     // Parameters used during a single "act" (attack).
@@ -445,8 +461,9 @@ struct BattleWorkUnit {
     BadgesEquipped  badges_equipped;
     int32_t         held_item;
     battle_database_common::ItemDropData* held_item_table;
+    int8_t          stolen_coins;
     
-    int8_t          misc_0x310[4];
+    int8_t          misc_0x311[3];
     void*           extra_work;
     int8_t          misc_0x318[0x81c];
 
@@ -471,7 +488,8 @@ int32_t BtlUnit_CheckShadowGuard(BattleWorkUnit* unit);
 // BtlUnit_HpGaugeInit
 int32_t BtlUnit_snd_se_pos(
     BattleWorkUnit* unit, const char* sfx, int32_t vol, int32_t pit, gc::vec3* pos);
-// BtlUnit_snd_se
+int32_t BtlUnit_snd_se(
+    BattleWorkUnit* unit, const char* sfx, int32_t vol, int32_t pit);
 // BtlUnit_ControlPoseSoundMain
 // BtlUnit_PoseSoundInit
 // BtlUnit_SetCommandAnimPose
@@ -510,7 +528,7 @@ uint32_t BtlUnit_GetData(BattleWorkUnit* unit, int32_t data_type);
 // BtlUnit_ChangeTalkAnim
 // BtlUnit_SetBodyAnim
 // BtlUnit_SetBodyAnimType
-// BtlUnit_SetAnim
+void BtlUnit_SetAnim(BattleWorkUnitPart* part, const char* pose_name);
 // BtlUnit_SetAnimType
 // BtlUnit_GetPoseNameFromType
 void BtlUnit_OffUnitFlag(BattleWorkUnit* unit, uint32_t flag);
@@ -548,9 +566,9 @@ void BtlUnit_GetStatus(
 // BtlUnit_SetOffsetPos
 // BtlUnit_SetHeight
 int32_t BtlUnit_GetHeight(BattleWorkUnit* unit);
-// BtlUnit_GetWidth
-// BtlUnit_AddPartsScale
-// BtlUnit_SetPartsScale
+int32_t BtlUnit_GetWidth(BattleWorkUnit* unit);
+void BtlUnit_AddPartsScale(BattleWorkUnitPart* part, float x, float y, float z);
+void BtlUnit_SetPartsScale(BattleWorkUnitPart* part, float x, float y, float z);
 // BtlUnit_SetPartsBaseScale
 // BtlUnit_AddScale
 void BtlUnit_SetScale(BattleWorkUnit* unit, float x, float y, float z);
@@ -571,18 +589,18 @@ void BtlUnit_SetPartsRotate(BattleWorkUnitPart* part, float x, float y, float z)
 // BtlUnit_SetRotate
 // BtlUnit_SetPartsHomePos
 // BtlUnit_AddHomePos
-// BtlUnit_SetHomePos
-// BtlUnit_GetHomePos
+void BtlUnit_SetHomePos(BattleWorkUnit* unit, float x, float y, float z);
+void BtlUnit_GetHomePos(BattleWorkUnit* unit, float* x, float* y, float* z);
 // BtlUnit_SetHitCursorOffset
 // BtlUnit_SetHitOffset
 void BtlUnit_GetHitPos(
     BattleWorkUnit* unit, BattleWorkUnitPart* part, float* x, float* y, float* z);
 // BtlUnit_GetPartsWorldPos
 // BtlUnit_AddPartsPos
-// BtlUnit_SetPartsPos
-// BtlUnit_GetPartsPos
+void BtlUnit_SetPartsPos(BattleWorkUnitPart* part, float x, float y, float z);
+void BtlUnit_GetPartsPos(BattleWorkUnitPart* part, float* x, float* y, float* z);
 // BtlUnit_AddPos
-// BtlUnit_SetPos
+void BtlUnit_SetPos(BattleWorkUnit* unit, float x, float y, float z);
 void BtlUnit_GetPos(BattleWorkUnit* unit, float* x, float* y, float* z);
 int32_t BtlUnit_GetBodyPartsId(BattleWorkUnit* unit);
 BattleWorkUnitPart* BtlUnit_GetPartsPtr(BattleWorkUnit* unit, int part_idx);

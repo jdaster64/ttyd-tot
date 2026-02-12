@@ -85,7 +85,7 @@ int32_t pouchEquipCheckBadge(int16_t badge_id);
 // pouchUnEquipBadgeIndex
 int32_t pouchEquipBadgeIndex(int32_t index);
 // pouchGetStarPoint
-// pouchRevisePartyParam
+void pouchRevisePartyParam();
 void pouchReviseMarioParam();
 // pouchRemoveKeepItem
 // pouchAddKeepItem

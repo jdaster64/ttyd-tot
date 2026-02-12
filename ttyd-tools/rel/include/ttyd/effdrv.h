@@ -27,7 +27,7 @@ extern "C" {
 // effGetSet
 // effNameToPtr
 // effSoftDelete
-// effDelete
+void effDelete(EffEntry* eff);
 // effMain
 // effSetName
 // effEntry

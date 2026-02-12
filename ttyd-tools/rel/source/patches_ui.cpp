@@ -132,7 +132,7 @@ namespace mod::tot::patch {
 namespace {
 
 // For convenience.
-using namespace ::ttyd::gx::GXTev;
+using namespace ::ttyd::gx;
     
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::dispdrv::CameraId;
@@ -1070,8 +1070,8 @@ void PartyMenuDispStats(WinPauseMenu* menu) {
 
     // Draw pink blob behind "HP" text.
     ttyd::win_main::winTexInit(*menu->win_tpl->mpFileData);
-    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
-    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+    ttyd::gx::GXTev::GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    ttyd::gx::GXTev::GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     pos.x = hp_win.x + 45.0f - 2.0f;
     pos.y = hp_win.y - 26.0f - 4.0f;
     scale.x = 1.0f;

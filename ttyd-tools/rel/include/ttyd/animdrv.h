@@ -65,11 +65,11 @@ static_assert(sizeof(AnimPose) == 0x170);
 
 extern "C" {
 
-// animPoseGetGroupName
+const char* animPoseGetGroupName(int32_t pose_idx, int32_t group_idx);
 // animPoseGetGroupIdx
-// animPoseGetShapeIdx
-// animPoseDrawShape
-// animPoseSetDispCallBack
+int32_t animPoseGetShapeIdx(int32_t pose_idx, const char* shape_name);
+void animPoseDrawShape(int32_t pose_idx, int32_t shape_idx);
+void animPoseSetDispCallBack(int32_t pose_idx, void* callback_fn, void* user_data);
 // animPoseGetVivianType
 // animPoseVivianMain
 // animPoseWorldMatrixEvalOn

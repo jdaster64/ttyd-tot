@@ -37,7 +37,7 @@ namespace mod::tot::win {
 namespace {
 
 // For convenience.
-using namespace ::ttyd::gx::GXTev;
+using namespace ::ttyd::gx;
 
 using ::ttyd::dispdrv::CameraId;
 using ::ttyd::item_data::itemDataTable;

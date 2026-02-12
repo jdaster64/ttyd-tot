@@ -16,6 +16,7 @@ namespace mod::infinite_pit {
 namespace {
     
 // Include everything for convenience.
+using namespace ::ttyd::gx;
 using namespace ::ttyd::gx::GXAttr;
 using namespace ::ttyd::gx::GXDisplayList;
 using namespace ::ttyd::gx::GXLight;

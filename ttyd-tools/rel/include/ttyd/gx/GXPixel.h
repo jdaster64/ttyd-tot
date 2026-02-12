@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ttyd/gx/GXCommon.h>
+
 #include <cstdint>
 
 namespace ttyd::gx::GXPixel {

@@ -162,8 +162,11 @@ typedef struct MapWork {
 // mapObjFlushOn
 // mapSetTevCallback
 // mapTestXLU
-// spline_getvalue
-// spline_maketable
+void spline_getvalue(
+    float spline_dist, gc::vec3* spline_result, int32_t unk0,
+    const float* spline_table, float* work_1, float* work_2);
+void spline_maketable(
+    int32_t num_segments, const float* spline_table, float* out_1, float* out_2);
 // mapSetProjgc::mtx34
 // mapSetProjTexObj
 // mapGrpSetColor

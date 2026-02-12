@@ -30,7 +30,7 @@ EVT_DECLARE_USER_FUNC(evt_map_fog_onoff, 1)
 EVT_DECLARE_USER_FUNC(evt_map_set_blend, 5)
 
 // evt_map_blend_off(int use_blend2)
-EVT_DECLARE_USER_FUNC(evt_map_blend_off, 2)
+EVT_DECLARE_USER_FUNC(evt_map_blend_off, 1)
 
 // evt_map_set_flag(int on, char *name, int flags)
 EVT_DECLARE_USER_FUNC(evt_map_set_flag, 3)
