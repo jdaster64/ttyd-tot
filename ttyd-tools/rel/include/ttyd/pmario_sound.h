@@ -29,15 +29,15 @@ extern "C" {
 // psndENV_stop
 // psndSFX_get_vol
 // psndSFXChk
-// psndSFXOff
+void psndSFXOff(uint32_t sfxIndex);
 // psndSFX_dist
-// psndSFX_pos
+void psndSFX_pos(uint32_t sfxIndex, gc::vec3* position);
 void psndSFX_pit(uint32_t sfxIndex, int16_t pitch);
 // psndSFX_vol
 // psndSFXOnEx_3D
 uint32_t psndSFXOn_3D(const char* id, gc::vec3* position);
 // psndSFXOnVol
-void psndSFXOn(const char* id);
+uint32_t psndSFXOn(const char* id);
 // psndSFXOn_
 // __psndSFXOn
 // psndSFXMain

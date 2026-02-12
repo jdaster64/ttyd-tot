@@ -42,7 +42,9 @@ void btlDispEntAnime(battle_unit::BattleWorkUnit* unit);
 // btlDispGetTexSize
 // btlDispTexPlane3
 // btlDispTexPlane2
-// btlDispTexPlane
+void btlDispTexPlane(
+    float x, float y, float z, float x_scale, float y_scale,
+    int32_t frame, uint32_t* color);
 // btlDispTexPlainGX
 // btlDispTexPlaneInit
 // btlDispGXQuads2D

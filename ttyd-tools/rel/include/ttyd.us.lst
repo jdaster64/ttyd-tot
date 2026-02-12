@@ -1315,11 +1315,56 @@
 
 // pmario_sound.o
 // .text
+800d7428:psndENV_LPF
+800d7470:psndENVOff_f_d
+800d76b8:psndENVOff
+800d76e0:psndENVOn_f_d
+800d7b3c:psndENVOn
+800d7b64:psndENVMain
+800d91e8:psndENV_stop
+800d9558:psndSFX_get_vol
+800d95a0:psndSFXChk
+800d95f8:psndSFXOff
+800d96c0:psndSFX_dist
+800d96f8:psndSFX_pos
 800d9744:psndSFX_pit
+800d97d0:psndSFX_vol
+800d9808:psndSFXOnEx_3D
 800d9848:psndSFXOn_3D
+800d9884:psndSFXOnVol
 800d98bc:psndSFXOn
+800d98f8:psndSFXOn_
+800d9934:__psndSFXOn
+800d9e74:psndSFXMain
+800daa08:psndBGMPlayTime
+800daa98:psndBGMStartCheck
+800daaec:psndBGMScope
+800dab44:psndBGMChkSilent
+800dab84:psndBGMChk
+800dabac:psndBGMOff_f_d
+800daefc:psndBGMOff
 800daf24:psndBGMOn_f_d
+800db778:unk_800db778
+800db7a0:psndBGMOn
+800db7cc:psndBGMMain
+800dbc60:psndBGM_rate
+800dbcc4:L_psndBGM_stop
+800dbdf0:psndSFXAllOff
+800dbf38:psndMapChange
+800dc0e8:psndGetFlag
+800dc0f8:psndClearFlag
+800dc110:psndSetFlag
+800dc19c:psndSetReverb
 800dc214:psndStopAllFadeOut
+800dc380:psndSetPosDirListener
+800dc3a8:psndPushGroup
+800dc430:psndExit
+800dc460:psndMainInt
+800dc48c:psndMain
+800dc4e0:psndInit
+800dc650:searchPSSFXList
+800dc6d4:calc3D
+// 800dcbc8:angleABf
 // .data
 80316b28:pssfxlist
 
@@ -1869,8 +1914,48 @@
 800fdfd4:BattleDamageDirect
 
 // battle_disp.o
+80100258:_btlStockExpDisp
+8010045c:BattleStockExpDisp
+801004d8:_btlDispTex4
+80100644:btlDispTex4
+801009b4:btlGetScreenPoint
+80100a4c:btlDispAnimeSpeed
+80100a80:_pose_two_pattern
+80100d28:_pose_one_pattern
+80100e00:_pose_def
+80100e6c:statusPoseControl
+80100ed0:getFloatDispOffset
+80100f34:floatOffsetControl
+80100ffc:getGravityDispOffset
+80101060:gravityOffsetControl
 801010f4:btlDispPoseAnime
+8010112c:btlDispChangePeraAnime
+80101168:btlDispChangeAnime
 801011fc:btlDispEntAnime
+8010128c:btlUnitPartsBlurDisp
+80101428:_partsBlurControl
+801014f4:btlUnitPartsBlurControl
+80101548:btlUnitStolenItemDisp
+801015ec:btlUnitItemDisp2
+80101678:btlUnitItemDisp
+80101774:btlUnitPartsDisp
+801024f0:btlDispMain
+80103084:_GetStatusPoseType
+801030f8:btlDispInit
+80103134:btlDispGetTexSize
+80103198:btlDispTexPlane3
+8010323c:btlDispTexPlane2
+801032c8:btlDispTexPlane
+801033e4:btlDispTexPlainGX
+801036e4:btlDispTexPlaneInit
+801037c4:btlDispGXQuads2D
+801038e8:btlDispGXPoint2D
+80103918:btlDispGXQuads2DRasta
+801039ec:btlDispGXPoint2DRasta
+80103a14:btlDispGXInit2D
+80103b48:btlDispGXInit2DRasta
+80103c3c:btlDispGXInit2DSub
+80103cd0:searchPoseTbl
 
 // battle_event_cmd.o
 80103d14:btlevtcmd_ftof
@@ -3696,6 +3781,13 @@
 // 8020a874:battleAcMain_PendulumCraneTiming
 // .data
 8041a070:pendulumCrane_hp_tbl
+
+// eff_kemutest.o
+8020cf08:effKemuTestSetRxRz
+8020cf18:effKemuTestDrawCam
+8020cf24:effKemuTestDisp
+8020d654:effKemuTestMain
+8020de74:effKemuTestEntry
 
 // battle_seq_end.o
 // .text

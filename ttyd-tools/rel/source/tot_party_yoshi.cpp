@@ -11,6 +11,7 @@
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
+#include <ttyd/battle_disp.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
@@ -19,6 +20,8 @@
 #include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
+#include <ttyd/dispdrv.h>
+#include <ttyd/eff_kemutest.h>
 #include <ttyd/evt_audience.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_env.h>
@@ -30,7 +33,11 @@
 #include <ttyd/mario_pouch.h>
 #include <ttyd/msgdrv.h>
 #include <ttyd/npcdrv.h>
+#include <ttyd/pmario_sound.h>
+#include <ttyd/system.h>
 #include <ttyd/unit_party_yoshi.h>
+
+#include <cstring>
 
 namespace mod::tot::party_yoshi {
 
@@ -52,6 +59,8 @@ using namespace ::ttyd::evt_snd;
 using namespace ::ttyd::evt_sub;
 using namespace ::ttyd::unit_party_yoshi;
 
+using ::ttyd::battle::g_BattleWork;
+using ::ttyd::dispdrv::CameraId;
 using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 
@@ -217,6 +226,203 @@ EVT_DEFINE_USER_FUNC(evtTot_SetGulpStruggleParam) {
     evtSetValue(evt, evt->evtArguments[1], param);
     return 2;
 }
+
+const int8_t kYoshiTplFrames[] = { 0x5c, 0x5f, 0x5d, 0x5c, 0x60, 0x5e, 0 };
+
+struct StampedeYoshiWork {
+    gc::vec3 position;
+    gc::vec3 velocity;
+    float scale;
+    int8_t state;
+    int8_t frame;
+    int8_t anim_timer;
+    int8_t frames_before_active;
+};
+static_assert(sizeof(StampedeYoshiWork) % 4 == 0);
+
+struct StampedeExtWork {
+    int32_t state;
+    StampedeYoshiWork yoshis[256];
+    int32_t max_yoshis;
+    int32_t direction;
+    int32_t yoshis_past_center;
+    float average_position;
+};
+
+void _DrawStampedeYoshi(CameraId camera_id, void* user_data) {
+    auto* yoshi = reinterpret_cast<StampedeYoshiWork*>(user_data);
+    float x_scale = (yoshi->velocity.x < 0.0) ? yoshi->scale : -yoshi->scale;
+    float y_offset = 50.0f * yoshi->scale;
+    static uint32_t color = ~0U;
+    
+    ttyd::battle_disp::btlDispTexPlane(
+        yoshi->position.x, yoshi->position.y + y_offset, yoshi->position.z,
+        x_scale, yoshi->scale, kYoshiTplFrames[yoshi->frame], &color);
+}
+
+EVT_DECLARE_USER_FUNC(evtTot_HandleStampedeEffs, 3)
+EVT_DEFINE_USER_FUNC(evtTot_HandleStampedeEffs) {
+    int32_t idx = ttyd::battle_sub::BattleTransID(
+        evt, evtGetValue(evt, evt->evtArguments[0]));
+    auto* unit = ttyd::battle::BattleGetUnitPtr(g_BattleWork, idx);
+    StampedeExtWork* work;
+    
+    if (isFirstCall) {
+        work = reinterpret_cast<StampedeExtWork*>(
+            ttyd::battle::BattleAlloc(sizeof(StampedeExtWork)));
+        memset(work, 0, sizeof(StampedeExtWork));
+
+        work->state = 0;
+        work->average_position = 0.0f;
+        work->direction = evtGetValue(evt, evt->evtArguments[1]);
+        work->max_yoshis = evtGetValue(evt, evt->evtArguments[2]) * 42;
+        work->yoshis_past_center = 0;
+
+        *reinterpret_cast<int32_t*>(evt->userData) = 0;
+        *reinterpret_cast<int32_t*>(evt->userData + 4) =
+            ttyd::pmario_sound::psndSFXOn("SFX_BTL_YOSHI_TAIGUN1");
+            
+        unit->extra_work = work;
+    } else {
+        work = reinterpret_cast<StampedeExtWork*>(unit->extra_work);
+    }
+    
+    if (work->state == 999) {
+        ttyd::pmario_sound::psndSFXOff(
+            *reinterpret_cast<int32_t*>(evt->userData + 4));
+        ttyd::battle::BattleFree(unit->extra_work);
+        unit->extra_work = nullptr;
+        return 2;
+    }
+
+    bool yoshis_processed = false;
+    work->average_position = 0.0f;
+    work->yoshis_past_center = 0;
+    
+    for (int32_t i = 0; i < work->max_yoshis; ++i) {
+        auto& yoshi = work->yoshis[i];
+        
+        switch (yoshi.state) {
+            case 0: {
+                ++yoshi.state;
+                yoshi.frames_before_active = ttyd::system::irand(3);
+                
+                yoshi.anim_timer = ttyd::system::irand(5);
+                yoshi.frame = ttyd::system::irand(6);
+                
+                yoshi.position.x = -300.0f - (i / 16) * 30.0f + ttyd::system::irand(10);
+                yoshi.position.y = 0;
+                yoshi.position.z = -80.0f + (i & 15);
+                
+                yoshi.velocity.x = 5.3f + 0.1f * ttyd::system::irand(10);
+                yoshi.velocity.y = 0.0f;
+                yoshi.velocity.z = 0.001f * (ttyd::system::irand(2000) - 1000.0f);
+
+                yoshi.scale = ttyd::system::irand(100) * 0.001f + (i > 128 ? 0.55f : 0.35f);
+
+                yoshi.position.x *= work->direction;
+                yoshi.velocity.x *= work->direction;
+                
+                // fallthrough
+            }
+            case 1: {
+                if (yoshi.frames_before_active < 1) {
+                    yoshi.position.x += yoshi.velocity.x;
+                    if (yoshi.position.x * work->direction >= 300.0f) {
+                        yoshi.position.x = 300.0f * work->direction;
+                        yoshi.velocity.x = 0.0f;
+                        yoshi.state = 99;
+                    }
+                    if (yoshi.position.x * work->direction >= 0.0f) {
+                        ++work->yoshis_past_center;
+                    }
+                    
+                    yoshi.position.z = yoshi.position.z + yoshi.velocity.z;
+                    if (yoshi.position.z >= 65.0f) {
+                        yoshi.position.z = 65.0f;
+                        yoshi.velocity.z *= -1.0f;
+                    }
+                    if (yoshi.position.z <= -80.0f) {
+                        yoshi.position.z = -80.0f;
+                        yoshi.velocity.z *= -1.0f;
+                    }
+                } else {
+                    --yoshi.frames_before_active;
+                }
+                yoshis_processed = true;
+                break;
+            }
+        }
+        
+        if (++yoshi.anim_timer > 2) {
+            yoshi.anim_timer = 0;
+            if (++yoshi.frame > 5) yoshi.frame = 0;
+        }
+        
+        work->average_position += yoshi.position.x;
+    }
+    
+    // Move sound's position to average position of all Yoshis.
+    work->average_position /= static_cast<float>(work->max_yoshis);
+    gc::vec3 sound_pos = { work->average_position, 0.0f, 0.0f };
+    ttyd::pmario_sound::psndSFX_pos(
+        *reinterpret_cast<int32_t*>(evt->userData + 4), &sound_pos);
+    
+    // Draw smoke puff in front of a random Yoshi (happens every frame?)
+    if (*reinterpret_cast<int32_t*>(evt->userData) < 1) {
+        auto& yoshi = work->yoshis[ttyd::system::irand(work->max_yoshis)];
+        
+        ttyd::eff_kemutest::effKemuTestEntry(
+            yoshi.position.x,
+            yoshi.position.y + 5.0f + ttyd::system::irand(15),
+            65.0f,
+            0.05f * ttyd::system::irand(20) + 1.0f, 0);
+    } else {
+        --*reinterpret_cast<int32_t*>(evt->userData);
+    }
+    
+    if (!yoshis_processed) work->state = 999;
+    
+    for (int32_t i = 0; i < work->max_yoshis; ++i) {
+        ttyd::dispdrv::dispEntry(
+            CameraId::k3d, 1, ttyd::dispdrv::dispCalcZ(&work->yoshis[i].position),
+            _DrawStampedeYoshi, &work->yoshis[i]);
+    }
+    
+    return 0;
+}
+
+EVT_DECLARE_USER_FUNC(evtTot_WaitForStampedeHit, 1)
+EVT_DEFINE_USER_FUNC(evtTot_WaitForStampedeHit) {
+    int32_t idx = ttyd::battle_sub::BattleTransID(
+        evt, evtGetValue(evt, evt->evtArguments[0]));
+    auto* unit = BattleGetUnitPtr(g_BattleWork, idx);
+    
+    if (unit && unit->extra_work) {
+        auto* work = reinterpret_cast<StampedeExtWork*>(unit->extra_work);
+        if (work->yoshis_past_center > 40)
+            return 2;
+    }
+    
+    return 0;
+}
+
+EVT_DECLARE_USER_FUNC(evtTot_InStampedeRange, 4)
+EVT_DEFINE_USER_FUNC(evtTot_InStampedeRange) {
+    int32_t idx = ttyd::battle_sub::BattleTransID(
+        evt, evtGetValue(evt, evt->evtArguments[0]));
+    auto* unit = BattleGetUnitPtr(g_BattleWork, idx);
+    auto* part = BtlUnit_GetPartsPtr(unit, evtGetValue(evt, evt->evtArguments[1]));
+    int32_t num_hits = evtGetValue(evt, evt->evtArguments[2]);
+
+    bool in_range = num_hits > 3 || 
+        !(part->part_attribute_flags & PartsAttribute_Flags::HAMMERLIKE_CANNOT_TARGET);
+    evtSetValue(evt, evt->evtArguments[3], in_range);
+
+    return 2;
+}
+
+// Evts.
 
 EVT_BEGIN(partyYoshiAttack_NormalAttack)
     USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
@@ -1454,15 +1660,18 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     END_SWITCH()
 
     INLINE_EVT_ID(LW(9))
-        WAIT_MSEC(1000)
-        USER_FUNC(_gundan_yoshi_run_effect, -2)
+        WAIT_MSEC(500)
+        // _gundan_yoshi_run_effect
+        USER_FUNC(btlevtcmd_GetFaceDirection, -2, LW(0))
+        USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(1))
+        USER_FUNC(evtTot_HandleStampedeEffs, -2, LW(0), LW(1))
     END_INLINE()
     WAIT_MSEC(166)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
     USER_FUNC(evt_btl_camera_shake_h, 0, 1, 0, 6000, 0)
-    WAIT_MSEC(1000)
-    USER_FUNC(_wait_yoshig_run, -2)
+    WAIT_MSEC(500)
+    USER_FUNC(evtTot_WaitForStampedeHit, -2)
     SET(LW(15), 0)
     
     SET((int32_t)GSW_Battle_Multihit_GuardCount, 0)
@@ -1499,6 +1708,13 @@ LBL(70)
                 SET((int32_t)GSW_Battle_Multihit_GuardCount, LW(11))
             END_IF()
 
+            // Skip checking for damage on initial hits for flying enemies.
+            USER_FUNC(evtTot_InStampedeRange, LW(3), LW(4), LW(11), LW(0))
+            IF_EQUAL(LW(0), 0)
+                WAIT_FRM(12)
+                DO_CONTINUE()
+            END_IF()
+
             IF_LARGE_EQUAL(LW(14), 2)
                 USER_FUNC(btlevtcmd_AcGetOutputParam, 2, LW(0))
                 IF_LARGE_EQUAL(LW(0), 2)
@@ -1533,7 +1749,7 @@ LBL(70)
                     USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 131328, LW(5))
                 END_IF()
             END_IF()
-            WAIT_FRM(10)
+            WAIT_FRM(12)
         WHILE()
     END_BROTHER()
 LBL(75)
@@ -2305,9 +2521,7 @@ BattleWeapon customWeapon_YoshiStampede = {
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
         AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
     .target_property_flags =
-        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
-        // Cannot target flying enemies.
-        AttackTargetProperty_Flags::HAMMERLIKE,
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
     .damage_pattern = 0,
     .weapon_ac_level = 3,

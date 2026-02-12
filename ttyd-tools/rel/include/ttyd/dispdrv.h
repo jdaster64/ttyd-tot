@@ -40,7 +40,7 @@ void dispReInit();
 void dispEntry(CameraId cameraId, uint8_t renderMode, float order, PFN_dispCallback callback, void *user);
 void dispSort();
 void dispDraw(CameraId cameraId);
-// float dispCalcZ(void *vecUnk);
+float dispCalcZ(void *vecUnk);
 DisplayWork *dispGetCurWork();
 
 }
