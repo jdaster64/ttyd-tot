@@ -6044,6 +6044,11 @@ g_TowerStrings = {
         b"your <ITEM> is\n"
         b"worth... <NUM> coin<S>, <wait 150>yes?\n<o>",
         
+    b"tot_wonky_itemokless":
+        b"That's nice! <wait 300>Hmm<wait 100>.<wait 100>.<wait 100>. <wait 200>but in this\n"
+        b"economy, your <ITEM>'s\n"
+        b"only worth... <NUM> coin<S>.<wait 150> Ok?\n<o>",
+        
     b"tot_wonky_itemdifferent":
         b"<p>\nIs that so? How very sad...\n"
         b"<wait 250>Perhaps something else?\n<k>",

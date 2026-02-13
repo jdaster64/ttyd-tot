@@ -19,6 +19,7 @@ namespace mod::tot {
 
 namespace {
 
+using ::ttyd::evtmgr_cmd::evtGetValue;
 using ::ttyd::evtmgr_cmd::evtSetValue;
 
 namespace ItemType = ::ttyd::item_data::ItemType;
@@ -161,10 +162,11 @@ int16_t* GetCharlietonInventoryPtr() {
     return g_CharlietonInventory;
 }
 
-int32_t GetScaledPrice(int32_t base_price) {
+int32_t GetScaledPrice(int32_t base_price, bool shop_scale) {
     // 20% for first shop, 30% for second, etc.
     int32_t shop_index = (g_Mod->state_.floor_ + 1) / 8;
     int32_t progress_scale = (shop_index + 1) * 10;
+    if (!shop_scale) progress_scale = 100;
 
     return Clamp(
         base_price * progress_scale * 
@@ -347,6 +349,15 @@ EVT_DEFINE_USER_FUNC(evtTot_GetUniqueItemName) {
     id = (id + 1) % 1000;
     sprintf(name, "item_t%03" PRId32, id);
     evtSetValue(evt, evt->evtArguments[0], PTR(name));
+    return 2;
+}
+
+EVT_DEFINE_USER_FUNC(evtTot_GetScaledPrice) {
+    int32_t result = GetScaledPrice(
+        evtGetValue(evt, evt->evtArguments[0]),
+        evtGetValue(evt, evt->evtArguments[1]));
+
+    evtSetValue(evt, evt->evtArguments[2], result);
     return 2;
 }
 

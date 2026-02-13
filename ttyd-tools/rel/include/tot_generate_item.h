@@ -26,7 +26,7 @@ int32_t TypeSortOrderComparator(int16_t* lhs, int16_t* rhs);
 int16_t* GetCharlietonInventoryPtr();
 // Returns the price for an item or NPC service, scaled based on tower progress
 // and the overall coin price scaling option.
-int32_t GetScaledPrice(int32_t base_price);
+int32_t GetScaledPrice(int32_t base_price, bool shop_scale = true);
     
 // Obfuscates or un-obfuscates the appearance and description of items.
 void ObfuscateItems(bool enable);
@@ -37,5 +37,8 @@ void GenerateHubShopItems();
 // Generates a globally unique name to use to identify item pickups.
 // This is necessary to avoid softlocks with full inventory.
 EVT_DECLARE_USER_FUNC(evtTot_GetUniqueItemName, 1)
+
+// Scales an input price, using the same parameters as GetScaledPrice.
+EVT_DECLARE_USER_FUNC(evtTot_GetScaledPrice, 3)
 
 }
