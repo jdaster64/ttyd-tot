@@ -100,7 +100,7 @@ const MoveData g_MoveData[] = {
     { { 2, 4, 6 }, 3, 1, 3, IconType::PARTNER_MOVE_1, "btl_wn_pbm_lv1", "tot_ptr6_bsquad_abb", "msg_pbm_jigen_bakudan", "msg_ac_jigen_bakudan", "tot_upg_bombs", },
     { { 4, 4, 4 }, 1, 1, 3, IconType::PARTNER_MOVE_1, "btl_wn_pbm_lv2", nullptr, "msg_pbm_counter", "msg_ac_bom_counter", "tot_upg_none", },
     { { 2, 4, 6 }, 3, 2, 3, IconType::PARTNER_MOVE_2, "tot_ptr6_poisonbomb", "tot_ptr6_poison_abb", "tot_ptr6_poisonbomb_desc", "msg_ac_jigen_bakudan", "tot_upg_bombs", },
-    { { 6, 8, 10 }, 3, 2, 3, IconType::PARTNER_MOVE_2, "btl_wn_pbm_lv3", nullptr, "msg_pbm_sungoi_bakuhatsu", "msg_ac_super_bakuhatsu", "tot_upg_damage", },
+    { { 6, 8, 10 }, 3, 2, 3, IconType::PARTNER_MOVE_2, "btl_wn_pbm_lv3", nullptr, "msg_pbm_sungoi_bakuhatsu", "msg_ac_super_bakuhatsu", "tot_upg_bobombast", },
     { { 10, 10, 10 }, 1, 3, 3, IconType::PARTNER_MOVE_3, "tot_ptr6_megatonbomb", nullptr, "tot_ptr6_megatonbomb_desc", "msg_ac_heart_catch", "tot_upg_none", },
     { { 0, 2, 4 }, 3, 0, 7, IconType::PARTNER_MOVE_0, "btl_wn_pcr_normal", nullptr, "msg_pch_binta", "msg_ac_binta", "tot_upg_hits", },
     { { 5, 5, 5 }, 1, 1, 7, IconType::PARTNER_MOVE_1, "btl_wn_pcr_steal", nullptr, "msg_pch_heart_catch", "msg_ac_heart_catch", "tot_upg_none", },

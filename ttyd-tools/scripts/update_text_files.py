@@ -1154,6 +1154,10 @@ g_GlobalStrings = {
         b"Swallow an enemy in one gulp,\n"
         b"stealing their held item.",
         
+    b"msg_pys_taigun_yoshi":
+        b"Call a herd of Yoshis to trample\n"
+        b"foes, especially grounded ones.",
+        
     b"tot_ptr5_curse_desc":
         b"Cast a hex on the enemy to\n"
         b"slow their movements.",
@@ -1173,6 +1177,10 @@ g_GlobalStrings = {
     b"tot_ptr6_poisonbomb_desc":
         b"Throw a volley of bombs that\n"
         b"explode in a noxious blast.",
+
+    b"msg_pbm_sungoi_bakuhatsu":
+        b"Attack all foes with a massive\n"
+        b"blast, dropping their defenses.",
         
     b"tot_ptr6_megatonbomb_desc":
         b"Arm a bomb that does massive\n"
@@ -1270,6 +1278,10 @@ g_GlobalStrings = {
     b"tot_upg_blizzard":
         b"Upgrading this move ups its\n"
         b"damage and freeze duration.",
+    
+    b"tot_upg_bobombast":
+        b"Upgrading this move ups its\n"
+        b"damage and DEF reduction.",
         
     b"tot_upg_scope_out":
         b"Upgrading this move makes it\n"
@@ -1924,14 +1936,14 @@ g_GlobalStrings = {
         b"\nLv. 3: Throw four bombs, which\n"
         b"inflict 5-Turn Poison, for 6 FP.",
     b"tot_movelog_d851":
-        b"\nLv. 1: Deals 5 damage to all\n"
-        b"enemies for 6 FP.",
+        b"\nLv. 1: Deals 5 damage, and\n"
+        b"3-turn, -1 DEF Soft for 6 FP.",
     b"tot_movelog_d852":
-        b"\nLv. 2: Deals 7 damage to all\n"
-        b"enemies for 8 FP.",
+        b"\nLv. 2: Deals 7 damage, and\n"
+        b"3-turn, -2 DEF Soft for 8 FP.",
     b"tot_movelog_d853":
-        b"\nLv. 3: Deals 9 damage to all\n"
-        b"enemies for 10 FP.",
+        b"\nLv. 3: Deals 9 damage, and\n"
+        b"3-turn, -3 DEF Soft for 10 FP.",
     b"tot_movelog_d861":
         b"\nDeals up to 20 damage to all\n"
         b"combatants for 10 FP.",

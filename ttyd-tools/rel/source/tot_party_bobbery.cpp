@@ -92,6 +92,18 @@ uint32_t GetPoisonBombPower(
     return target->current_kind == BattleUnitType::BOMB_SQUAD_BOMB;
 }
 
+EVT_DECLARE_USER_FUNC(evtTot_SetBobombastStatus, 1)
+EVT_DEFINE_USER_FUNC(evtTot_SetBobombastStatus) {
+    auto* weapon = (BattleWeapon*)evtGetValue(evt, evt->evtArguments[0]);
+    int32_t move_level = MoveManager::GetSelectedLevel(MoveType::BOBBERY_BOBOMBAST);
+
+    weapon->def_change_chance = 100;
+    weapon->def_change_strength = -move_level;
+    weapon->def_change_time = 3;
+    
+    return 2;
+}
+
 EVT_DECLARE_USER_FUNC(evtTot_CheckPlayerMegatonHit, 1)
 EVT_DEFINE_USER_FUNC(evtTot_CheckPlayerMegatonHit) {
     int32_t self_id = BattleTransID(evt, -2);
@@ -1211,6 +1223,7 @@ EVT_END()
 
 EVT_BEGIN(partySandersAttack_SuperBombAttack)
     USER_FUNC(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    USER_FUNC(evtTot_SetBobombastStatus, LW(12))
     IF_EQUAL((int32_t)GSW_Battle_DooplissMove, 0)
         USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     ELSE()
