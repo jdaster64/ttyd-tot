@@ -5519,6 +5519,13 @@ g_TowerLobbyStrings = {
     b"tot_optr_midboss_random":     b"Random Bosses",
     b"tot_optr_midboss_mobtype":    b"Varied Minions",
     b"tot_optr_midboss_mobany":     b"Random Bosses & Minions",
+    b"tot_optr_coinprice":          b"Coin Price %",
+    b"tot_optr_sstats":             b"Starting Levels",
+    b"tot_optr_sstats_default":     b"Default",
+    b"tot_optr_sstats_3":           b"3 in all",
+    b"tot_optr_sstats_2":           b"2 in all",
+    b"tot_optr_sstats_1":           b"1 in all",
+    b"tot_optr_sstats_0":           b"0 in all",
     
     b"tot_optr_off":                b"Off",
     b"tot_optr_on":                 b"On",
@@ -5710,6 +5717,14 @@ g_TowerLobbyStrings = {
     b"tot_opth_midboss":
         b"Changes which midbosses or\n"
         b"support spawns can appear.",
+        
+    b"tot_opth_coinprice":
+        b"Scales the price of items in\n"
+        b"shops and guest NPC services.",
+        
+    b"tot_opth_sstats":
+        b"How many levels of each stat\n"
+        b"(HP, FP, BP) you start with.",
         
     # Map text.
         

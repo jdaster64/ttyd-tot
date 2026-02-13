@@ -43,6 +43,7 @@ RunOptionMetadata g_OptionMetadata[] = {
     { OPT_MIDBOSSES, OPTVAL_MIDBOSSES_DEFAULT, -1, true, false, 2 },
     { OPT_BATTLE_DROPS, OPTVAL_DROP_STANDARD, -1, true, false, 2 },
     { OPT_STARTER_ITEMS, OPTVAL_STARTER_ITEMS_BASIC, -1, true, false, 2 },
+    { OPTNUM_COIN_PRICES, 0, 100, true, false, 2 },
     { OPT_MOVE_AVAILABILITY, OPTVAL_MOVES_DEFAULT, -1, true, false, 2 },
     { OPT_MOVE_LIMIT, OPTVAL_MOVE_LIMIT_DEFAULT, -1, true, false, 2 },
     { OPT_MAX_PARTNERS, 0, -1, true, false, 2 },
@@ -52,6 +53,7 @@ RunOptionMetadata g_OptionMetadata[] = {
     { OPT_MARIO_FP, 0, 5, true, true, 2 },
     { OPT_MARIO_BP, 0, 5, true, true, 2 },
     { OPT_PARTNER_HP, 0, 5, true, true, 2 },
+    { OPT_STARTING_STAT_LEVEL, OPTVAL_STARTING_STAT_DEFAULT, -1, true, false, 2 },
     { OPT_INVENTORY_SACK_SIZE, 0, 2, true, false, 2 },
     { OPTNUM_ENEMY_HP, 0, 100, true, false, 2 },
     { OPTNUM_ENEMY_ATK, 0, 100, true, false, 2 },
@@ -388,8 +390,20 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
                 }
                 case 2: {   // Randomize always.
                     switch (option) {
+                        case OPT_STARTING_STAT_LEVEL: {
+                            // Reroll once if starting stats hit either extreme.
+                            int32_t value = state.Rand((option & 0xff) + 1);
+                            state.SetOption(option, value);
+                            if (state.CheckOptionValue(OPTVAL_STARTING_STAT_0) ||
+                                state.CheckOptionValue(OPTVAL_STARTING_STAT_3)) {
+                                value = state.Rand((option & 0xff) + 1);
+                                state.SetOption(option, value);
+                            }
+                        }
+
                         case OPTNUM_ENEMY_HP:
-                        case OPTNUM_ENEMY_ATK: {
+                        case OPTNUM_ENEMY_ATK:
+                        case OPTNUM_COIN_PRICES: {
                             // Randomize w/ ~triangle distribution over 5%-200%.
                             int32_t value = state.Rand(20) + state.Rand(21) + 1;
                             state.SetOption(option, value * 5);
@@ -646,12 +660,21 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
             // If partners are disabled, their max HP setting is irrelevant.
             if (state.CheckOptionValue(OPTVAL_NO_PARTNERS)) return 0;
             return (5 - state.GetOption(option)) * 5;
+        case OPT_STARTING_STAT_LEVEL:
+            switch (state.GetOptionValue(option)) {
+                case OPTVAL_STARTING_STAT_3:  return -40;
+                case OPTVAL_STARTING_STAT_2:  return -10;
+                case OPTVAL_STARTING_STAT_1:  return 10;
+                case OPTVAL_STARTING_STAT_0:  return 40;
+            }
+            break;
         case OPT_INVENTORY_SACK_SIZE:
             return (2 - state.GetOption(option)) * 10;
         case OPT_AC_DIFFICULTY:
             return (state.GetOption(option) - 3) * 5;
         case OPTNUM_ENEMY_HP:
-        case OPTNUM_ENEMY_ATK: {
+        case OPTNUM_ENEMY_ATK:
+        case OPTNUM_COIN_PRICES: {
             int32_t value = Clamp(state.GetOption(option), 0, 200);
             if (value > 100) {
                 return (value - 100) * 2 / 5;
@@ -736,8 +759,8 @@ bool OptionsManager::NoIntensityReduction() {
 }
 
 const char* OptionsManager::GetEncodedOptions() {
-    static char encoding_str[28] = { 0 };
-    int8_t encoding_bytes[28] = { 0 };
+    static char encoding_str[32] = { 0 };
+    int8_t encoding_bytes[32] = { 0 };
     // Start with version encoding, then period as separator from main encoding.
     encoding_bytes[0] = g_Mod->state_.version_ - 10;
     encoding_bytes[1] = 99;
@@ -788,23 +811,49 @@ const char* OptionsManager::GetEncodedOptions() {
         EncodeOption(encoding_bytes, encoded_bit_count, data.option);
     }
 
+    // Convert bytes into base-64 encoding with basic run-length encryption.
+    int32_t run = 0;
+    int32_t value = 0;
+    int32_t out_ptr = 0;
     const int32_t kEncodedByteCount = (encoded_bit_count + 5) / 6;
-    for (int32_t i = 0; i < kEncodedByteCount; ++i) {
-        if (encoding_bytes[i] < 26) {
-            encoding_str[i] = 'A' + encoding_bytes[i];
-        } else if (encoding_bytes[i] < 52) {
-            encoding_str[i] = 'a' + encoding_bytes[i] - 26;
-        } else if (encoding_bytes[i] < 62) {
-            encoding_str[i] = '0' + encoding_bytes[i] - 52;
-        } else if (encoding_bytes[i] == 62) {
-            encoding_str[i] = '!';
-        } else if (encoding_bytes[i] == 63) {
-            encoding_str[i] = '?';
-        } else {
-            encoding_str[i] = '.';
+    for (int32_t i = 0; i < kEncodedByteCount; ) {
+        // Get the number of occurrences of the next byte in the array.
+        run = 1;
+        value = encoding_bytes[i++];
+        while (true) {
+            if (i < kEncodedByteCount && encoding_bytes[i] == value) {
+                ++run;
+                ++i;
+            } else {
+                break;
+            }
+        }
+
+        // If run of same byte is at least 3, shorten it to ".(num)(char)",
+        // otherwise print the character N times.
+        if (run > 2) {
+            encoding_str[out_ptr++] = '.';
+            encoding_str[out_ptr++] = run < 10 ? '0' + run : 'A' + run - 10;
+            run = 1;
+        }
+        for (int32_t r = 0; r < run; ++r) {
+            if (value < 26) {
+                encoding_str[out_ptr++] = 'A' + value;
+            } else if (value < 52) {
+                encoding_str[out_ptr++] = 'a' + value - 26;
+            } else if (value < 62) {
+                encoding_str[out_ptr++] = '0' + value - 52;
+            } else if (value == 62) {
+                encoding_str[out_ptr++] = '!';
+            } else if (value == 63) {
+                encoding_str[out_ptr++] = '?';
+            } else {
+                // Should only be hit by the dummy separator at the start.
+                encoding_str[out_ptr++] = ':';
+            }
         }
     }
-    encoding_str[kEncodedByteCount] = 0;
+    encoding_str[out_ptr] = 0;
 
     return encoding_str;
 }

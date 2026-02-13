@@ -124,6 +124,7 @@ OptionMenuData g_OptionMenuData[] = {
     { OPTVAL_CHEST_REROLL_REFILL, "tot_optr_chestch_rollr", nullptr, 143, false, false },
     { OPTVAL_CHEST_REVEAL_FIXED, "tot_optr_chestch_revf", nullptr, 144, false, false },
     { OPTVAL_CHEST_REVEAL_REFILL, "tot_optr_chestch_revr", nullptr, 145, false, false },
+    { OPTNUM_COIN_PRICES, "tot_optr_coinprice", "tot_opth_coinprice", 150, true, false },
     { OPT_MIDBOSSES, "tot_optr_midboss", "tot_opth_midboss", 160, true, false },
     { OPTVAL_MIDBOSSES_DEFAULT, "tot_optr_midboss_default", nullptr, 161, false, false },
     { OPTVAL_MIDBOSSES_RANDOM, "tot_optr_midboss_random", nullptr, 162, false, false },
@@ -172,21 +173,27 @@ OptionMenuData g_OptionMenuData[] = {
     { OPT_MARIO_BP, "tot_optr_mbp", "tot_opth_mbp", 262, true, false },
     { OPTVAL_INFINITE_BP, "tot_optr_mbp_inf", nullptr, 263, false, false },
     { OPT_PARTNER_HP, "tot_optr_php", "tot_opth_php", 264, true, false },
-    { OPT_INVENTORY_SACK_SIZE, "tot_optr_itemgain", "tot_opth_itemgain", 265, true, false },
-    { OPTNUM_ENEMY_HP, "tot_optr_ehp", "tot_opth_ehp", 266, true, false },
-    { OPTNUM_ENEMY_ATK, "tot_optr_eatk", "tot_opth_eatk", 267, true, false },
-    { OPTNUM_SUPERGUARD_SP_COST, "tot_optr_supercost", "tot_opth_supercost", 270, true, false },
-    { OPT_AC_DIFFICULTY, "tot_optr_ac", "tot_opth_ac", 280, true, false },
-    { OPTVAL_AC_3_SIMP, "tot_optr_ac_0", nullptr, 281, false, false },
-    { OPTVAL_AC_2_SIMP, "tot_optr_ac_1", nullptr, 282, false, false },
-    { OPTVAL_AC_1_SIMP, "tot_optr_ac_2", nullptr, 283, false, false },
-    { OPTVAL_AC_DEFAULT, "tot_optr_ac_3", nullptr, 284, false, false },
-    { OPTVAL_AC_1_UNSIMP, "tot_optr_ac_4", nullptr, 285, false, false },
-    { OPTVAL_AC_2_UNSIMP, "tot_optr_ac_5", nullptr, 286, false, false },
-    { OPTVAL_AC_3_UNSIMP, "tot_optr_ac_6", nullptr, 287, false, false },
-    { OPT_RUN_AWAY, "tot_optr_runaway", "tot_opth_runaway", 290, true, false },
-    { OPTVAL_RUN_AWAY_DEFAULT, "tot_optr_runaway_off", nullptr, 291, false, false },
-    { OPTVAL_RUN_AWAY_GUARANTEED, "tot_optr_runaway_on", nullptr, 292, false, false },
+    { OPT_STARTING_STAT_LEVEL, "tot_optr_sstats", "tot_opth_sstats", 270, true, false },
+    { OPTVAL_STARTING_STAT_DEFAULT, "tot_optr_sstats_default", nullptr, 271, false, false },
+    { OPTVAL_STARTING_STAT_3, "tot_optr_sstats_3", nullptr, 272, false, false },
+    { OPTVAL_STARTING_STAT_2, "tot_optr_sstats_2", nullptr, 273, false, false },
+    { OPTVAL_STARTING_STAT_1, "tot_optr_sstats_1", nullptr, 274, false, false },
+    { OPTVAL_STARTING_STAT_0, "tot_optr_sstats_0", nullptr, 275, false, false },
+    { OPT_INVENTORY_SACK_SIZE, "tot_optr_itemgain", "tot_opth_itemgain", 280, true, false },
+    { OPTNUM_ENEMY_HP, "tot_optr_ehp", "tot_opth_ehp", 290, true, false },
+    { OPTNUM_ENEMY_ATK, "tot_optr_eatk", "tot_opth_eatk", 291, true, false },
+    { OPTNUM_SUPERGUARD_SP_COST, "tot_optr_supercost", "tot_opth_supercost", 292, true, false },
+    { OPT_AC_DIFFICULTY, "tot_optr_ac", "tot_opth_ac", 300, true, false },
+    { OPTVAL_AC_3_SIMP, "tot_optr_ac_0", nullptr, 301, false, false },
+    { OPTVAL_AC_2_SIMP, "tot_optr_ac_1", nullptr, 302, false, false },
+    { OPTVAL_AC_1_SIMP, "tot_optr_ac_2", nullptr, 303, false, false },
+    { OPTVAL_AC_DEFAULT, "tot_optr_ac_3", nullptr, 304, false, false },
+    { OPTVAL_AC_1_UNSIMP, "tot_optr_ac_4", nullptr, 305, false, false },
+    { OPTVAL_AC_2_UNSIMP, "tot_optr_ac_5", nullptr, 306, false, false },
+    { OPTVAL_AC_3_UNSIMP, "tot_optr_ac_6", nullptr, 307, false, false },
+    { OPT_RUN_AWAY, "tot_optr_runaway", "tot_opth_runaway", 310, true, false },
+    { OPTVAL_RUN_AWAY_DEFAULT, "tot_optr_runaway_off", nullptr, 311, false, false },
+    { OPTVAL_RUN_AWAY_GUARANTEED, "tot_optr_runaway_on", nullptr, 312, false, false },
     { OPT_STAGE_HAZARDS, "tot_optr_stageh", "tot_opth_stageh", 400, true, false },
     { OPTVAL_STAGE_HAZARDS_NORMAL, "tot_optr_stageh_n", nullptr, 401, false, false },
     { OPTVAL_STAGE_HAZARDS_HIGH, "tot_optr_stageh_h", nullptr, 402, false, false },
@@ -819,8 +826,7 @@ void DispMainWindow(WinMgrEntry* entry) {
                 // For Charlieton, scale based on tower progress.
                 switch (sel_entry->type) {
                     case MenuType::TOT_CHARLIETON_SHOP:
-                        value = itemDataTable[row.value].buy_price * 
-                            GetBuyPriceScale() / 100;
+                        value = GetScaledPrice(itemDataTable[row.value].buy_price);
                         break;
                     case MenuType::HUB_ITEM_SHOP:
                         value = itemDataTable[row.value].buy_price * 2;
@@ -2639,8 +2645,7 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
         case MenuType::TOT_CHARLIETON_SHOP:
             evt->lwData[1] = value;
             evt->lwData[2] = PTR(msgSearch(itemDataTable[value].name));
-            evt->lwData[3] = 
-                itemDataTable[value].buy_price * GetBuyPriceScale() / 100;
+            evt->lwData[3] = GetScaledPrice(itemDataTable[value].buy_price);
             evt->lwData[4] = itemDataTable[value].bp_cost;
             break;
         case MenuType::COSMETICS_SHOP_ATTACK_FX:

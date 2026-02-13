@@ -24,8 +24,9 @@ int32_t TypeSortOrderComparator(int16_t* lhs, int16_t* rhs);
 // Returns a pointer to Charlieton's item inventory.
 // Holds up to 20 items + a '-1' terminator.
 int16_t* GetCharlietonInventoryPtr();
-// Returns the multiplier for item buy price (out of 100) on the current floor.
-int32_t GetBuyPriceScale();
+// Returns the price for an item or NPC service, scaled based on tower progress
+// and the overall coin price scaling option.
+int32_t GetScaledPrice(int32_t base_price);
     
 // Obfuscates or un-obfuscates the appearance and description of items.
 void ObfuscateItems(bool enable);

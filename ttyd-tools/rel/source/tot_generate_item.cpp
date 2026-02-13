@@ -161,10 +161,14 @@ int16_t* GetCharlietonInventoryPtr() {
     return g_CharlietonInventory;
 }
 
-int32_t GetBuyPriceScale() {
+int32_t GetScaledPrice(int32_t base_price) {
     // 20% for first shop, 30% for second, etc.
     int32_t shop_index = (g_Mod->state_.floor_ + 1) / 8;
-    return (shop_index + 1) * 10;
+    int32_t progress_scale = (shop_index + 1) * 10;
+
+    return Clamp(
+        base_price * progress_scale * 
+        g_Mod->state_.GetOption(OPTNUM_COIN_PRICES) / 10000, 1, 999);
 }
 
 void ObfuscateItems(bool enable) {

@@ -1449,7 +1449,7 @@ EVT_DEFINE_USER_FUNC(evtTot_DowngradeStat) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_GetChetCost) {
-    evtSetValue(evt, evt->evtArguments[0], 50 * GetBuyPriceScale() / 100);
+    evtSetValue(evt, evt->evtArguments[0], GetScaledPrice(50));
     return 2;
 }
 
@@ -1460,6 +1460,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetDazzleCost) {
         // First one's on the house
         evtSetValue(evt, evt->evtArguments[0], 0);
     } else {
+        // Note: cost is not scaled with OPTNUM_COIN_PRICES.
         int32_t num_sp_bought = state.GetOption(STAT_RUN_NPC_SP_PURCHASED);
         evtSetValue(evt, evt->evtArguments[0], (num_sp_bought + 1) * 10);
     }
@@ -1481,9 +1482,9 @@ EVT_DEFINE_USER_FUNC(evtTot_GetWonkyTrades) {
 
 EVT_DEFINE_USER_FUNC(evtTot_GetMoverCost) {
     if (evtGetValue(evt, evt->evtArguments[0]) == 0) {
-        evtSetValue(evt, evt->evtArguments[1], 100 * GetBuyPriceScale() / 100);
+        evtSetValue(evt, evt->evtArguments[1], GetScaledPrice(100));
     } else {
-        evtSetValue(evt, evt->evtArguments[1], 200 * GetBuyPriceScale() / 100);
+        evtSetValue(evt, evt->evtArguments[1], GetScaledPrice(200));
     }
     return 2;
 }
@@ -1519,7 +1520,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetMerlonCost) {
     }
 
     int32_t price = 100 + 50 * g_Mod->state_.GetOption(STAT_RUN_NPC_MERLON_COMBO);
-    evtSetValue(evt, evt->evtArguments[0], price * GetBuyPriceScale() / 100);
+    evtSetValue(evt, evt->evtArguments[0], GetScaledPrice(price));
     return 2;
 }
 
@@ -1569,7 +1570,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetRecipeOptionsString) {
             g_RecipeModes[num_options++] = RecipeMode::SINGLE_ITEM;
             p_buf += sprintf(
                 p_buf, "\nRegular recipe (%" PRId32 " coins)",
-                25 * GetBuyPriceScale() / 100);
+                GetScaledPrice(25));
             break;
         }
     }
@@ -1587,7 +1588,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetRecipeOptionsString) {
             g_RecipeModes[num_options++] = RecipeMode::DOUBLE_ITEM;
             p_buf += sprintf(
                 p_buf, "\nSpecialty recipe (%" PRId32 " coins)",
-                50 * GetBuyPriceScale() / 100);
+                GetScaledPrice(50));
             break;
         }
     }
@@ -1615,10 +1616,10 @@ EVT_DEFINE_USER_FUNC(evtTot_GetSelectedRecipeMode) {
     evtSetValue(evt, evt->evtArguments[1], g_RecipeModes[index]);
     switch(g_RecipeModes[index]) {
         case RecipeMode::SINGLE_ITEM:
-            evtSetValue(evt, evt->evtArguments[2], 25 * GetBuyPriceScale() / 100);
+            evtSetValue(evt, evt->evtArguments[2], GetScaledPrice(25));
             break;
         case RecipeMode::DOUBLE_ITEM:
-            evtSetValue(evt, evt->evtArguments[2], 50 * GetBuyPriceScale() / 100);
+            evtSetValue(evt, evt->evtArguments[2], GetScaledPrice(50));
             break;
         default:
             evtSetValue(evt, evt->evtArguments[2], 0);

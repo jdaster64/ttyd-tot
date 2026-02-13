@@ -487,9 +487,17 @@ enum Options : uint32_t {
     OPTVAL_CHEST_REVEAL_FIXED   = 0x558'3'00'03,
     OPTVAL_CHEST_REVEAL_REFILL  = 0x558'3'00'04,
 
+    // Whether to start with a different number of stat levels.
+    OPT_STARTING_STAT_LEVEL     = 0x45c'3'00'04,
+    OPTVAL_STARTING_STAT_DEFAULT= 0x55c'3'00'00,    // 2 in HPs, 1 in FP and BP
+    OPTVAL_STARTING_STAT_3      = 0x55c'3'00'01,    // 3, etc. in all stats
+    OPTVAL_STARTING_STAT_2      = 0x55c'3'00'02,
+    OPTVAL_STARTING_STAT_1      = 0x55c'3'00'03,
+    OPTVAL_STARTING_STAT_0      = 0x55c'3'00'04,
+
     // Whether to enable Merlee curses (not supported).
-    OPT_MERLEE_CURSE            = 0x45c'1'00'01,
-    // Next: 0x45c
+    OPT_MERLEE_CURSE            = 0x45f'1'00'01,
+    // Next: 0x45f
     
     // Internal options; are not automatically reset between runs.
     OPT_RUN_STARTED             = 0x4c0'1'00'01,
@@ -510,7 +518,9 @@ enum Options : uint32_t {
     OPTNUM_ENEMY_ATK            = 0x601'1'05'c8,
     // Superguard SP cost (0.00 ~ 1.00 in increments of 0.01).
     OPTNUM_SUPERGUARD_SP_COST   = 0x602'0'01'64,
-    // Next: 0x603
+    // Global coin price scaling (0.05x ~ 10.00x in increments of 0.05).
+    OPTNUM_COIN_PRICES          = 0x603'1'05'c8,
+    // Next: 0x604
     
     // Different types of boolean tracking flags.
     // Can only be set to true; bitwise OR the value or just use 'value' param.
