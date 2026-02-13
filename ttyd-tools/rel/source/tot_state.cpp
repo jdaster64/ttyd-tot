@@ -338,6 +338,9 @@ bool StateManager::Load(TotSaveSlot* save) {
     if (previous_version <= 12) {
         // Set coin price scaling to its default value.
         SetOption(OPTNUM_COIN_PRICES, 100);
+
+        // Re-run special file setup to collect new achievements, options, etc.
+        DebugManager::SpecialFileSetup();
     }
     
     return true;
@@ -427,41 +430,6 @@ void StateManager::ResetOptions() {
     SetOption(OPTVAL_PRESET_DEFAULT);
     SetOption(OPTVAL_DIFFICULTY_HALF);
     OptionsManager::ApplyCurrentPresetOptions(true);
-    
-    // Set stat upgrades to base # of levels.
-    switch (GetOptionValue(OPT_STARTING_STAT_LEVEL)) {
-        case OPTVAL_STARTING_STAT_DEFAULT:
-            hp_level_ = 2;
-            hp_p_level_ = 2;
-            fp_level_ = 1;
-            bp_level_ = 1;
-            break;
-        case OPTVAL_STARTING_STAT_3:
-            hp_level_ = 3;
-            hp_p_level_ = 3;
-            fp_level_ = 3;
-            bp_level_ = 3;
-            break;
-        case OPTVAL_STARTING_STAT_2:
-            hp_level_ = 2;
-            hp_p_level_ = 2;
-            fp_level_ = 2;
-            bp_level_ = 2;
-            break;
-        case OPTVAL_STARTING_STAT_1:
-            hp_level_ = 1;
-            hp_p_level_ = 1;
-            fp_level_ = 1;
-            bp_level_ = 1;
-            break;
-        case OPTVAL_STARTING_STAT_0:
-            hp_level_ = 0;
-            hp_p_level_ = 0;
-            fp_level_ = 0;
-            bp_level_ = 0;
-            break;
-    }
-    max_inventory_ = 6;
 
     // Clear seed information, and reset all RNG states.
     seed_ = 0;

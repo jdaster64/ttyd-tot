@@ -588,7 +588,7 @@ int32_t* DebugManager::GetEnemies() {
 void DebugManager::SpecialFileSetup() {
     switch (g_Mod->state_.GetOptionValue(OPT_SPECIAL_FILE_MODE)) {
         case OPTVAL_RACE_MODE_ENABLED:
-            _CompleteAllLogs(100);
+            _CompleteAllLogs();
             _CompleteTutorialFlags();
             _PurchaseAllItems();
             _PurchaseAllCosmetics();

@@ -175,7 +175,6 @@ bool AchievementsManager::CheckOptionUnlocked(uint32_t option) {
     // Always treat options as unlocked on special files.
     switch (g_Mod->state_.GetOptionValue(OPT_SPECIAL_FILE_MODE)) {
         case OPTVAL_RACE_MODE_ENABLED:
-            return option != OPT_SECRET_BOSS;
         case OPTVAL_100_MODE_ENABLED:
             return true;
     }

@@ -136,7 +136,51 @@ int32_t GetBaseStat(uint32_t option, int32_t party = 0) {
 }
 
 void SetBaseStats() {
+    auto& state = g_Mod->state_;
     auto& pouch = *ttyd::mario_pouch::pouchGetPtr();
+    
+    // Set stat upgrades to base # of levels.
+    switch (state.GetOptionValue(OPT_STARTING_STAT_LEVEL)) {
+        case OPTVAL_STARTING_STAT_DEFAULT:
+            state.hp_level_ = 2;
+            state.hp_p_level_ = 2;
+            state.fp_level_ = 1;
+            state.bp_level_ = 1;
+            break;
+        case OPTVAL_STARTING_STAT_3:
+            state.hp_level_ = 3;
+            state.hp_p_level_ = 3;
+            state.fp_level_ = 3;
+            state.bp_level_ = 3;
+            break;
+        case OPTVAL_STARTING_STAT_2:
+            state.hp_level_ = 2;
+            state.hp_p_level_ = 2;
+            state.fp_level_ = 2;
+            state.bp_level_ = 2;
+            break;
+        case OPTVAL_STARTING_STAT_1:
+            state.hp_level_ = 1;
+            state.hp_p_level_ = 1;
+            state.fp_level_ = 1;
+            state.bp_level_ = 1;
+            break;
+        case OPTVAL_STARTING_STAT_0:
+            state.hp_level_ = 0;
+            state.hp_p_level_ = 0;
+            state.fp_level_ = 0;
+            state.bp_level_ = 0;
+            break;
+    }
+
+    // Make levels for disabled / infinite stats 0 / 99 respectively.
+    if (state.GetOption(OPT_MARIO_HP) == 0) state.hp_level_ = 0;
+    if (state.GetOption(OPT_MARIO_FP) == 0) state.fp_level_ = 0;
+    if (state.GetOption(OPT_MARIO_BP) == 0) state.bp_level_ = 0;
+    if (state.GetOption(OPT_PARTNER_HP) == 0) state.hp_p_level_ = 0;
+    if (state.CheckOptionValue(OPTVAL_INFINITE_BP)) state.bp_level_ = 99;
+
+    state.max_inventory_ = 6;
     
     // Set starting HP, FP, BP.
     const int32_t hp = GetBaseStat(OPT_MARIO_HP);
@@ -1072,13 +1116,6 @@ void OptionsManager::OnRunStart() {
         default:
             break;
     }
-
-    // Make levels for disabled / infinite stats 0 / 99 respectively.
-    if (state.GetOption(OPT_MARIO_HP) == 0) state.hp_level_ = 0;
-    if (state.GetOption(OPT_MARIO_FP) == 0) state.fp_level_ = 0;
-    if (state.GetOption(OPT_MARIO_BP) == 0) state.bp_level_ = 0;
-    if (state.GetOption(OPT_PARTNER_HP) == 0) state.hp_p_level_ = 0;
-    if (state.CheckOptionValue(OPTVAL_INFINITE_BP)) state.bp_level_ = 99;
 
     // Set starting HP, FP, BP.
     SetBaseStats();
