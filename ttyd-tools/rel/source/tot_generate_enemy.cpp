@@ -1216,8 +1216,9 @@ EVT_DEFINE_USER_FUNC(evtTot_GetEnemyNpcInfo) {
     BuildBattle(
         battle_db, npc_setup, &npc_tribe_description, &lead_enemy_type);
     
-    int32_t x_pos = ttyd::system::irand(100) + 20;
-    int32_t z_pos = ttyd::system::irand(200) - 100;
+    // Random spawn position, slightly biased towards the back right.
+    int32_t x_pos = ttyd::system::irand(80) - 10;
+    int32_t z_pos = ttyd::system::irand(140) - 80;
     int32_t y_pos = kEnemyInfo[lead_enemy_type].field_y_pos;
     
     if (lead_enemy_type == BattleUnitType::PIDER ||
