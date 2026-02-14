@@ -732,6 +732,8 @@ void DispMainWindow(WinMgrEntry* entry) {
             switch (sel_entry->type) {
                 case MenuType::CUSTOM_START:
                 case MenuType::TOT_CHARLIETON_SHOP:
+                case MenuType::TOT_WONKY_ITEMS:
+                case MenuType::TOT_WONKY_BADGES:
                 case MenuType::HUB_ITEM_SHOP: {
                     entry_icon = itemDataTable[row.value].icon_id;
                     entry_text = msgSearch(itemDataTable[row.value].name);
@@ -807,6 +809,14 @@ void DispMainWindow(WinMgrEntry* entry) {
                 x_pos += 25.0f;
             }
             
+            // For Wonky's badge dialog only, draw the 'equipped badge' icons.
+            if (sel_entry->type == MenuType::TOT_WONKY_BADGES && (
+                row.flags & WinMgrSelectEntryRow_Flags::HAS_BADGE_EQUIPPED)) {
+                gc::vec3 pos = { entry->x + 15.0f, y_trans, 0.0f };
+                gc::vec3 scale = { 0.6f, 0.6f, 0.6f };
+                ttyd::win_main::winIconSet(IconType::AC_LIGHT_GREEN, &pos, &scale, &kWhite);
+            }
+        
             ttyd::win_main::winFontInit();
             gc::vec3 text_pos = { x_pos, y_trans + 12.0f, 0.0f };
             gc::vec3 text_scale = { 1.0f, 1.0f, 1.0f };
@@ -817,6 +827,8 @@ void DispMainWindow(WinMgrEntry* entry) {
         switch (sel_entry->type) {
             case MenuType::CUSTOM_START:
             case MenuType::TOT_CHARLIETON_SHOP:
+            case MenuType::TOT_WONKY_ITEMS:
+            case MenuType::TOT_WONKY_BADGES:
             case MenuType::HUB_ITEM_SHOP:
             case MenuType::COSMETICS_SHOP_ATTACK_FX:
             case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
@@ -827,6 +839,13 @@ void DispMainWindow(WinMgrEntry* entry) {
                 switch (sel_entry->type) {
                     case MenuType::TOT_CHARLIETON_SHOP:
                         value = GetScaledPrice(itemDataTable[row.value].buy_price);
+                        break;
+                    case MenuType::TOT_WONKY_ITEMS:
+                    case MenuType::TOT_WONKY_BADGES:
+                        value = itemDataTable[row.value].sell_price;
+                        if (g_Mod->state_.GetOption(OPTNUM_COIN_PRICES) < 100) {
+                            value = GetScaledPrice(value, false);
+                        }
                         break;
                     case MenuType::HUB_ITEM_SHOP:
                         value = itemDataTable[row.value].buy_price * 2;
@@ -1026,7 +1045,11 @@ void DispMainWindow(WinMgrEntry* entry) {
             break;
         case MenuType::TOT_CHARLIETON_SHOP:
         case MenuType::HUB_ITEM_SHOP:
+        case MenuType::TOT_WONKY_ITEMS:
             title = msgSearch("msg_window_title_1");  // "Items"
+            break;
+        case MenuType::TOT_WONKY_BADGES:
+            title = msgSearch("msg_window_title_2");  // "Badges"
             break;
         case MenuType::COSMETICS_SHOP_ATTACK_FX:
             title = msgSearch("tot_winsel_titleattackfx");
@@ -1074,6 +1097,8 @@ void DispMainWindow(WinMgrEntry* entry) {
     switch (sel_entry->type) {
         case MenuType::CUSTOM_START:
         case MenuType::TOT_CHARLIETON_SHOP:
+        case MenuType::TOT_WONKY_ITEMS:
+        case MenuType::TOT_WONKY_BADGES:
         case MenuType::HUB_ITEM_SHOP:
             currency_icon = IconType::COIN;
             break;
@@ -1146,6 +1171,10 @@ void DispWindow2(WinMgrEntry* entry) {
         case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
             msg = msgSearch("msg_window_select_6");     // "Buy which one?"
             break;
+        case MenuType::TOT_WONKY_ITEMS:
+        case MenuType::TOT_WONKY_BADGES:
+            msg = msgSearch("msg_window_select_2");     // "Sell which one?"
+            break;
         case MenuType::TOT_CHET_RIPPO_TRADE:
             msg = msgSearch("tot_winsel_tradewhichstat");
             break;
@@ -1195,6 +1224,8 @@ void DispSelectionHelp(WinMgrEntry* entry) {
                 help_msg = msgSearch("in_konran_hammer");
                 break;
             case MenuType::TOT_CHARLIETON_SHOP:
+            case MenuType::TOT_WONKY_ITEMS:
+            case MenuType::TOT_WONKY_BADGES:
             case MenuType::HUB_ITEM_SHOP:
                 help_msg = msgSearch(itemDataTable[value].description);
                 break;
@@ -2321,6 +2352,12 @@ void* InitNewSelectDescTable() {
     g_SelectDescList[MenuType::TOT_CHARLIETON_SHOP] = WinMgrSelectDescList{ 
         .num_descs = 3, .descs = &g_CustomDescs[0]
     };
+    g_SelectDescList[MenuType::TOT_WONKY_ITEMS] = WinMgrSelectDescList{ 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
+    };
+    g_SelectDescList[MenuType::TOT_WONKY_BADGES] = WinMgrSelectDescList{ 
+        .num_descs = 3, .descs = &g_CustomDescs[0]
+    };
     g_SelectDescList[MenuType::COSMETICS_SHOP_ATTACK_FX] = WinMgrSelectDescList{ 
         .num_descs = 3, .descs = &g_CustomDescs[0]
     };
@@ -2370,6 +2407,8 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
         case MenuType::CUSTOM_START:
         case MenuType::HUB_ITEM_SHOP:
         case MenuType::TOT_CHARLIETON_SHOP:
+        case MenuType::TOT_WONKY_ITEMS:
+        case MenuType::TOT_WONKY_BADGES:
         case MenuType::COSMETICS_SHOP_ATTACK_FX:
         case MenuType::COSMETICS_SHOP_MARIO_COSTUME:
         case MenuType::COSMETICS_SHOP_YOSHI_COSTUME:
@@ -2457,6 +2496,48 @@ WinMgrSelectEntry* HandleSelectWindowEntry(int32_t type, int32_t new_item) {
                 sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
             for (int32_t i = 0; i < num_items; ++i) {
                 sel_entry->row_data[i].value = inventory[i];
+            }
+            break;
+        }
+        case MenuType::TOT_WONKY_ITEMS: {
+            const auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+            int32_t num_items = 0;
+            for (int32_t i = 0; i < 20; ++i) {
+                if (!pouch->items[i]) break;
+                ++num_items;
+            }
+            sel_entry->num_rows = num_items;
+            sel_entry->row_data = 
+                (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
+                    0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+            memset(
+                sel_entry->row_data, 0,
+                sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+            for (int32_t i = 0; i < num_items; ++i) {
+                sel_entry->row_data[i].value = pouch->items[i];
+            }
+            break;
+        }
+        case MenuType::TOT_WONKY_BADGES: {
+            const auto* pouch = ttyd::mario_pouch::pouchGetPtr();
+            int32_t num_badges = 0;
+            for (int32_t i = 0; i < 200; ++i) {
+                if (!pouch->badges[i]) break;
+                ++num_badges;
+            }
+            sel_entry->num_rows = num_badges;
+            sel_entry->row_data = 
+                (WinMgrSelectEntryRow*)ttyd::memory::__memAlloc(
+                    0, sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+            memset(
+                sel_entry->row_data, 0,
+                sel_entry->num_rows * sizeof(WinMgrSelectEntryRow));
+            for (int32_t i = 0; i < num_badges; ++i) {
+                sel_entry->row_data[i].value = pouch->badges[i];
+                if (pouch->equipped_badges[i]) {
+                    sel_entry->row_data[i].flags |= 
+                        WinMgrSelectEntryRow_Flags::HAS_BADGE_EQUIPPED;
+                }
             }
             break;
         }
@@ -2647,6 +2728,20 @@ int32_t HandleSelectWindowOther(WinMgrSelectEntry* sel_entry, EvtEntry* evt) {
             evt->lwData[2] = PTR(msgSearch(itemDataTable[value].name));
             evt->lwData[3] = GetScaledPrice(itemDataTable[value].buy_price);
             evt->lwData[4] = itemDataTable[value].bp_cost;
+            break;
+        case MenuType::TOT_WONKY_ITEMS:
+        case MenuType::TOT_WONKY_BADGES:
+            evt->lwData[1] = value;
+            evt->lwData[2] = PTR(msgSearch(itemDataTable[value].name));
+            evt->lwData[4] = sel_entry->cursor_index;
+            if (g_Mod->state_.GetOption(OPTNUM_COIN_PRICES) >= 100) {
+                evt->lwData[3] = itemDataTable[value].sell_price;
+                // Whether price was reduced.
+                evt->lwData[5] = 0;
+            } else {
+                evt->lwData[3] = GetScaledPrice(itemDataTable[value].sell_price, false);
+                evt->lwData[5] = 1;
+            } 
             break;
         case MenuType::COSMETICS_SHOP_ATTACK_FX:
             evt->lwData[1] = value;

@@ -24,6 +24,9 @@ namespace MenuType {
         HUB_ITEM_SHOP,
         // Charlieton.
         TOT_CHARLIETON_SHOP,
+        // Wonky sell dialogues.
+        TOT_WONKY_ITEMS,
+        TOT_WONKY_BADGES,
         // Cosmetics shops.
         COSMETICS_SHOP_ATTACK_FX,
         COSMETICS_SHOP_MARIO_COSTUME,
