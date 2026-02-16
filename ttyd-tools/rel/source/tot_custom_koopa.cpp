@@ -1149,7 +1149,7 @@ EVT_END()
 
 EVT_BEGIN(unitParatroopa_init_event)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType,
-        (int32_t)BattleUnitType::KOOPA_TROOPA)
+        (int32_t)BattleUnitType::PARATROOPA)
     RUN_CHILD_EVT(unitParatroopa_common_init_event)
     RETURN()
 EVT_END()

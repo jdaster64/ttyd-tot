@@ -1937,13 +1937,13 @@ g_GlobalStrings = {
         b"inflict 5-Turn Poison, for 6 FP.",
     b"tot_movelog_d851":
         b"\nLv. 1: Deals 5 damage, and\n"
-        b"3-turn, -1 DEF Soft for 6 FP.",
+        b"3-turn, -2 DEF Soft for 6 FP.",
     b"tot_movelog_d852":
         b"\nLv. 2: Deals 7 damage, and\n"
-        b"3-turn, -2 DEF Soft for 8 FP.",
+        b"3-turn, -3 DEF Soft for 8 FP.",
     b"tot_movelog_d853":
         b"\nLv. 3: Deals 9 damage, and\n"
-        b"3-turn, -3 DEF Soft for 10 FP.",
+        b"3-turn, -4 DEF Soft for 10 FP.",
     b"tot_movelog_d861":
         b"\nDeals up to 20 damage to all\n"
         b"combatants for 10 FP.",

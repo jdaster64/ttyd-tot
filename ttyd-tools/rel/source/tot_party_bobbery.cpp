@@ -98,7 +98,7 @@ EVT_DEFINE_USER_FUNC(evtTot_SetBobombastStatus) {
     int32_t move_level = MoveManager::GetSelectedLevel(MoveType::BOBBERY_BOBOMBAST);
 
     weapon->def_change_chance = 100;
-    weapon->def_change_strength = -move_level;
+    weapon->def_change_strength = -(move_level + 1);
     weapon->def_change_time = 3;
     
     return 2;

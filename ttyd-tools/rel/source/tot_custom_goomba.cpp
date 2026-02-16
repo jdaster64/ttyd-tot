@@ -261,7 +261,8 @@ BattleWeapon unitGoomba_weaponCharge = {
     .ac_help_msg = nullptr,
     .special_property_flags =
         AttackSpecialProperty_Flags::CANNOT_MISS |
-        AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE,
+        AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE |
+        AttackSpecialProperty_Flags::UNGUARDABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags = 0,
         
