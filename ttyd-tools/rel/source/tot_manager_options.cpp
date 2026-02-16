@@ -980,8 +980,8 @@ bool OptionsManager::SaveOrLoadUserPreset(bool save, int32_t slot) {
 
     if (save) {
         int32_t offset = 0;
-        // Mark preset as saved.
-        state.SetOption(option, 1, offset++);
+        // Mark preset as saved (v13 onwards: with version number, prior = 1)
+        state.SetOption(option, state.version_, offset++);
 
         // Save basic options.
         for (int32_t i = 0; i < 8; ++i) {
@@ -1025,7 +1025,8 @@ bool OptionsManager::SaveOrLoadUserPreset(bool save, int32_t slot) {
     } else {
         int32_t offset = 0;
         // Check that a preset was previously saved in this slot.
-        if (!state.GetOption(option, offset++)) return false;
+        const int32_t version = state.GetOption(option, offset++);
+        if (!version) return false;
 
         // Load basic options.
         for (int32_t i = 0; i < 8; ++i) {
@@ -1065,6 +1066,11 @@ bool OptionsManager::SaveOrLoadUserPreset(bool save, int32_t slot) {
         for (int32_t i = 0; i < 6; ++i) {
             state.SetOption(
                 STAT_PERM_MOVE_LOADOUT, state.GetOption(option, offset++), i);
+        }
+
+        // Update changes to option format / defaults since the saved version.
+        if (version <= 12) {
+            state.SetOption(OPTNUM_COIN_PRICES, 100);
         }
     }
 
