@@ -689,22 +689,19 @@ EVT_BEGIN(unitBandit_common_init_event)
 EVT_END()
 
 EVT_BEGIN(unitBandit_init_event)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType,
-        (int32_t)BattleUnitType::BANDIT)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType, (int32_t)BattleUnitType::BANDIT)
     RUN_CHILD_EVT(unitBandit_common_init_event)
     RETURN()
 EVT_END()
 
 EVT_BEGIN(unitBigBandit_init_event)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType,
-        (int32_t)BattleUnitType::BANDIT)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType, (int32_t)BattleUnitType::BIG_BANDIT)
     RUN_CHILD_EVT(unitBandit_common_init_event)
     RETURN()
 EVT_END()
 
 EVT_BEGIN(unitBadgeBandit_init_event)
-    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType,
-        (int32_t)BattleUnitType::BANDIT)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType, (int32_t)BattleUnitType::BADGE_BANDIT)
     RUN_CHILD_EVT(unitBandit_common_init_event)
     RETURN()
 EVT_END()

@@ -1573,16 +1573,16 @@ EVT_END()
 EVT_BEGIN(unitParabuzzy_init_event)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType,
         (int32_t)BattleUnitType::PARABUZZY)
-    RUN_CHILD_EVT(unitParabuzzy_common_init_event)
     USER_FUNC(btlevtcmd_AnimeSetPoseSoundTable, -2, 1, PTR(&unitParabuzzy_pose_sound_timing_table))
+    RUN_CHILD_EVT(unitParabuzzy_common_init_event)
     RETURN()
 EVT_END()
 
 EVT_BEGIN(unitSpikyParabuzzy_init_event)
     USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_BattleUnitType,
         (int32_t)BattleUnitType::SPIKY_PARABUZZY)
-    RUN_CHILD_EVT(unitParabuzzy_common_init_event)
     USER_FUNC(btlevtcmd_AnimeSetPoseSoundTable, -2, 1, PTR(&unitSpikyParabuzzy_pose_sound_timing_table))
+    RUN_CHILD_EVT(unitParabuzzy_common_init_event)
     RETURN()
 EVT_END()
 

@@ -259,7 +259,6 @@ BattleWeapon unitCleft_weaponCharge = {
     .special_property_flags =
         AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE |
         AttackSpecialProperty_Flags::CANNOT_MISS |
-        // To prevent storing guards / Superguards if Infatuated.
         AttackSpecialProperty_Flags::UNGUARDABLE,
     .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
     .target_weighting_flags = 0,
