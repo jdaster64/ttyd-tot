@@ -24,6 +24,7 @@ using ::ttyd::battle_database_common::BattleUnitSetup;
 using ::ttyd::battle_database_common::BattleWeapon;
 using ::ttyd::battle::BattleWork;
 using ::ttyd::battle::BattleWorkCommand;
+using ::ttyd::battle::BattleWorkWeaponTargets;
 using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_unit::BattleWorkUnit;
 using ::ttyd::battle_unit::BattleWorkUnitPart;
@@ -114,6 +115,8 @@ void (*g_BattleCheckPikkyoro_trampoline)(BattleWeapon*, uint32_t*) = nullptr;
 void (*g_BattleDamageDirect_trampoline)(
     int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
     uint32_t, uint32_t, uint32_t) = nullptr;
+// battle_detect.o  800ff684
+void (*g__btlSamplingEnemy_trampoline)(BattleWorkWeaponTargets*) = nullptr;
 // battle_event_cmd.o  801054e8
 int32_t (*g_btlevtcmd_WeaponAftereffect_trampoline)(EvtEntry*, bool) = nullptr;
 // battle_event_cmd.o  801056f4

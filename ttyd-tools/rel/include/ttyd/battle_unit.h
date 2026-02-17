@@ -595,7 +595,7 @@ void BtlUnit_GetHomePos(BattleWorkUnit* unit, float* x, float* y, float* z);
 // BtlUnit_SetHitOffset
 void BtlUnit_GetHitPos(
     BattleWorkUnit* unit, BattleWorkUnitPart* part, float* x, float* y, float* z);
-// BtlUnit_GetPartsWorldPos
+void BtlUnit_GetPartsWorldPos(BattleWorkUnitPart* part, float* x, float* y, float* z);
 // BtlUnit_AddPartsPos
 void BtlUnit_SetPartsPos(BattleWorkUnitPart* part, float x, float y, float z);
 void BtlUnit_GetPartsPos(BattleWorkUnitPart* part, float* x, float* y, float* z);

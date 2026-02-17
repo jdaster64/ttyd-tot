@@ -50,7 +50,8 @@ struct BattleWorkWeaponTargets {
     int8_t              target_indices[74];
     int8_t              current_target;
     int32_t             attacker_idx;
-    int32_t             attacker_enemy_belong;
+    int8_t              attacker_enemy_belong;
+    int8_t              pad_0xabd[3];
     uint32_t            weapon_target_class_flags;
     uint32_t            weapon_target_property_flags;
     int32_t             attacking_direction;

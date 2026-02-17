@@ -1,6 +1,7 @@
 #include "tot_custom_rel.h"     // For externed unit definitions.
 
 #include "evt_cmd.h"
+#include "tot_custom_common.h"
 
 #include <gc/mtx.h>
 #include <gc/types.h>
@@ -354,7 +355,8 @@ BattleWeapon unitRuffPuff_weaponSpecial = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_CENTER,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::ELECTRIC,
@@ -409,7 +411,8 @@ BattleWeapon unitIcePuff_weaponSpecial = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_CENTER,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::JUMPLIKE,
@@ -467,7 +470,8 @@ BattleWeapon unitPoisonPuff_weaponSpecial = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_CENTER,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
@@ -1057,8 +1061,8 @@ EVT_BEGIN(unitRuffPuff_special_attack_event)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("A_3B"))
     USER_FUNC(btlevtcmd_OffPartsCounterAttribute, -2, 1, (int32_t)PartsCounterAttribute_Flags::ELECTRIC)
     BROTHER_EVT()
-        USER_FUNC(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
-        IF_EQUAL(LW(10), 0)
+        USER_FUNC(evtTot_CheckSpeciesIsEnemy, LW(3), LW(10))
+        IF_EQUAL(LW(10), 1)
             SET(LW(10), 125)
         ELSE()
             SET(LW(10), -125)
@@ -1200,8 +1204,8 @@ EVT_BEGIN(unitIcePuff_special_attack_event)
     MULF(LW(6), FLOAT(5.0))
     ADD(LW(1), LW(6))
     MULF(LW(5), FLOAT(2.0))
-    USER_FUNC(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
-    IF_EQUAL(LW(10), 0)
+    USER_FUNC(evtTot_CheckSpeciesIsEnemy, LW(3), LW(10))
+    IF_EQUAL(LW(10), 1)
         USER_FUNC(evt_eff64, PTR(""), PTR("kumokumo_n64"), 4, LW(0), LW(1), LW(2), 0, 0, LW(5), 140, 0, 0, 0, 0)
     ELSE()
         USER_FUNC(evt_eff64, PTR(""), PTR("kumokumo_n64"), 4, LW(0), LW(1), LW(2), 180, 0, LW(5), 140, 0, 0, 0, 0)
@@ -1298,8 +1302,8 @@ EVT_BEGIN(unitPoisonPuff_special_attack_event)
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(btlevtcmd_OffPartsCounterAttribute, -2, 1, (int32_t)PartsCounterAttribute_Flags::POISON_STATUS)
     BROTHER_EVT()
-        USER_FUNC(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
-        IF_EQUAL(LW(10), 0)
+        USER_FUNC(evtTot_CheckSpeciesIsEnemy, LW(3), LW(10))
+        IF_EQUAL(LW(10), 1)
             DO(20)
                 USER_FUNC(eff_poison_breath, 1)
                 WAIT_FRM(3)

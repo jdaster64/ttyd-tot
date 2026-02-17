@@ -385,7 +385,8 @@ BattleWeapon unitEmber_weaponFlamethrower = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_CENTER,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::FIRE,
@@ -560,7 +561,8 @@ BattleWeapon unitPhantomEmber_weaponFlamethrower = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_CENTER,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::FIRE,

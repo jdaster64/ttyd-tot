@@ -23,10 +23,12 @@
 #include <ttyd/battle_break_slot.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_damage.h>
+#include <ttyd/battle_detect.h>
 #include <ttyd/battle_disp.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_item_data.h>
 #include <ttyd/battle_message.h>
+#include <ttyd/battle_monosiri.h>
 #include <ttyd/battle_pad.h>
 #include <ttyd/battle_seq_command.h>
 #include <ttyd/battle_status_effect.h>
@@ -141,9 +143,14 @@ namespace {
 using namespace ::ttyd::battle_database_common;
 using namespace ::ttyd::battle_unit;
 
+using ::ttyd::battle::BattleGetUnitPartsPtr;
+using ::ttyd::battle::BattleGetUnitPtr;
 using ::ttyd::battle::BattleWork;
 using ::ttyd::battle::BattleWorkAudience;
 using ::ttyd::battle::BattleWorkCommand;
+using ::ttyd::battle::BattleWorkTarget;
+using ::ttyd::battle::BattleWorkWeaponTargets;
+using ::ttyd::battle::g_BattleWork;
 using ::ttyd::battle::SpBonusInfo;
 using ::ttyd::battle_damage::CounterattackWork;
 using ::ttyd::eff_gonbaba_breath::EffGonbabaBreathWork;
@@ -186,6 +193,7 @@ extern void (*g_BattleCheckPikkyoro_trampoline)(BattleWeapon*, uint32_t*);
 extern void (*g_BattleDamageDirect_trampoline)(
     int32_t, BattleWorkUnit*, BattleWorkUnitPart*, int32_t, int32_t,
     uint32_t, uint32_t, uint32_t);
+extern void (*g__btlSamplingEnemy_trampoline)(BattleWorkWeaponTargets*);
 extern int32_t (*g_btlevtcmd_CommandGetWeaponAddress_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_GetSelectEnemy_trampoline)(EvtEntry*, bool);
 extern int32_t (*g_btlevtcmd_ChangeParty_trampoline)(EvtEntry*, bool);
@@ -1251,6 +1259,374 @@ void SpendAndIncrementPartySwitchCost() {
     }
 }
 
+bool IsTargetValid(BattleWorkWeaponTargets* tw, BattleWorkTarget* target) {    
+    auto* unit = BattleGetUnitPtr(g_BattleWork, target->unit_idx);
+    auto* part = BattleGetUnitPartsPtr(target->unit_idx, target->part_idx);
+    
+    const auto& cf = tw->weapon_target_class_flags;
+    if ((cf & AttackTargetClass_Flags::NO_TARGETS))
+        return false;
+    if ((cf & AttackTargetClass_Flags::ONLY_TARGET_MARIO) &&
+        unit->current_kind != BattleUnitType::MARIO)
+        return false;
+    if ((cf & AttackTargetClass_Flags::ONLY_TARGET_TREE_OR_SWITCH) && !(
+        unit->current_kind == BattleUnitType::UNUSED_TREE ||
+        unit->current_kind == BattleUnitType::UNUSED_SWITCH))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_MARIO) && (
+        unit->current_kind == BattleUnitType::MARIO ||
+        unit->current_kind == BattleUnitType::SHELL_SHIELD))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_PARTNER) && (
+        unit->current_kind >= BattleUnitType::GOOMBELLA &&
+        unit->current_kind <= BattleUnitType::MS_MOWZ))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_ENEMY) && (
+        unit->current_kind >= BattleUnitType::GOOMBA &&
+        unit->current_kind < BattleUnitType::UNUSED_TREE))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH) && (
+        unit->current_kind == BattleUnitType::UNUSED_TREE ||
+        unit->current_kind == BattleUnitType::UNUSED_SWITCH))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS) && (
+        unit->current_kind >= BattleUnitType::UNUSED_TESTNPC &&
+        unit->current_kind <= BattleUnitType::PROLOGUE_GOOMBELLA))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_SELF) && (
+        unit->unit_id == tw->attacker_idx))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_OPPOSING_ALLIANCE) && !(
+        unit->alliance != tw->attacker_enemy_belong))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE) && !(
+        unit->alliance == tw->attacker_enemy_belong ||
+        unit->alliance == 2))
+        return false;
+    if ((cf & AttackTargetClass_Flags::CANNOT_TARGET_SAME_SPECIES) && !(
+        unit->unit_id == tw->attacker_idx ||
+        unit->current_kind != 
+        BattleGetUnitPtr(g_BattleWork, tw->attacker_idx)->current_kind))
+        return false;
+    if ((cf & AttackTargetClass_Flags::ONLY_TARGET_SELF) && (
+        unit->unit_id != tw->attacker_idx))
+        return false;
+    if ((cf & AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS) && !((
+        part->part_attribute_flags & (
+            PartsAttribute_Flags::MAIN_TARGET |
+            PartsAttribute_Flags::PREFERRED_TARGET
+        )) && !(part->part_attribute_flags & PartsAttribute_Flags::UNK_40000)))
+        return false;
+    if ((cf & AttackTargetClass_Flags::ONLY_TARGET_SELECT_PARTS) && !((
+        part->part_attribute_flags & (
+            PartsAttribute_Flags::MAIN_TARGET |
+            PartsAttribute_Flags::PREFERRED_TARGET |
+            PartsAttribute_Flags::SELECT_TARGET
+        )) && !(part->part_attribute_flags & (
+            PartsAttribute_Flags::UNK_10 |
+            PartsAttribute_Flags::UNK_40000
+        ))))
+        return false;
+        
+    const auto& pf = tw->weapon_target_property_flags;
+    if (pf & AttackTargetProperty_Flags::TATTLE_LIKE) {
+        if (part->part_attribute_flags & PartsAttribute_Flags::UNTATTLEABLE)
+            return false;
+        auto* tattle_data = ttyd::battle_monosiri::battleGetUnitMonosiriPtr(
+            unit->current_kind);
+        if (!tattle_data->unit_name || !tattle_data->battle_tattle)
+            return false;
+    }
+    if ((pf & AttackTargetProperty_Flags::UNKNOWN_0x2) &&
+        (unit->attribute_flags & BattleUnitAttribute_Flags::UNQUAKEABLE))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::CANNOT_TARGET_CEILING) &&
+        (unit->attribute_flags & BattleUnitAttribute_Flags::OUT_OF_REACH))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::CANNOT_TARGET_FLOATING) &&
+        (unit->attribute_flags & BattleUnitAttribute_Flags::UNQUAKEABLE))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::CANNOT_TARGET_GROUNDED) && !(
+        (unit->attribute_flags & BattleUnitAttribute_Flags::OUT_OF_REACH) ||
+        (unit->attribute_flags & BattleUnitAttribute_Flags::UNQUAKEABLE)))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::JUMPLIKE) &&
+        (part->part_attribute_flags & PartsAttribute_Flags::JUMPLIKE_CANNOT_TARGET))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::HAMMERLIKE) &&
+        (part->part_attribute_flags & PartsAttribute_Flags::HAMMERLIKE_CANNOT_TARGET) &&
+        !((pf & AttackTargetProperty_Flags::RECOIL_DAMAGE) && unit->unit_id == tw->attacker_idx))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::SHELL_TOSS_LIKE) &&
+        (part->part_attribute_flags & PartsAttribute_Flags::SHELLTOSSLIKE_CANNOT_TARGET))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::UNKNOWN_0x8000) && !(
+        part->part_attribute_flags & PartsAttribute_Flags::SHELLTOSSLIKE_CANNOT_TARGET))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::UNKNOWN_0x200_0000) &&
+        (unit->attribute_flags & BattleUnitAttribute_Flags::SHELL_SHIELDED))
+        return false;
+    if ((pf & AttackTargetProperty_Flags::UNKNOWN_0x400_0000) &&
+        (part->part_attribute_flags & PartsAttribute_Flags::UNK_200_0000))
+        return false;
+    
+    return true;
+}
+
+int32_t GetTargetSortPosition(BattleWorkWeaponTargets* tw, BattleWorkTarget* target) {
+    int32_t position = target->hit_cursor_pos_x + target->addl_offset_x * 10;
+    return tw->attacking_direction < 0 ? -position : position;
+}
+
+int32_t GetRelativePosition(BattleWorkWeaponTargets* tw, BattleWorkTarget* target, int32_t position) {
+    return target->hit_cursor_pos_x + target->addl_offset_x * 10 - position;
+}
+
+// Replaces logic from _btlSamplingEnemy; should be ~1:1 aside from new filters.
+void BattleSelectValidTargets(BattleWorkWeaponTargets* tw) {
+    const auto& cf = tw->weapon_target_class_flags;
+    const auto& pf = tw->weapon_target_property_flags;
+    
+    if (cf & AttackTargetClass_Flags::NO_TARGETS) {
+        tw->num_targets = -1;
+        return;
+    }
+    
+    tw->num_targets = 0;
+    tw->current_target = 0;
+    {
+        auto* target = &tw->targets[0];
+        for (int32_t i = 0; i < 64; ++i) {
+            auto* unit = ttyd::battle::BattleGetUnitPtr(g_BattleWork, i);
+            
+            if (!unit || BtlUnit_CheckStatus(unit, StatusEffectType::OHKO) ||
+                (unit->attribute_flags & BattleUnitAttribute_Flags::UNTARGETABLE_40))
+                continue;
+            
+            // Loop through all unit's parts and find candidate targets.
+            for (auto* part = unit->parts; part != nullptr; part = part->next_part) {
+                if ((part->part_attribute_flags & PartsAttribute_Flags::NEVER_TARGETABLE))
+                    continue;
+                    
+                int32_t face_direction = part->movement_params.face_direction;
+                
+                gc::vec3 world_pos;
+                BtlUnit_GetPartsWorldPos(part, &world_pos.x, &world_pos.y, &world_pos.z);
+                if (!(unit->attribute_flags & BattleUnitAttribute_Flags::OUT_OF_REACH)) {
+                    world_pos.y += part->position_offset.y * unit->unk_scale;
+                }
+                
+                target->unit_idx = i;
+                target->part_idx = part->kind_part_params->index;
+                
+                target->hit_cursor_pos_x =
+                    world_pos.x + 
+                    face_direction * unit->unk_scale * part->hit_cursor_base_position.x + 
+                    part->hit_cursor_offset.x;
+                target->hit_cursor_pos_y =
+                    world_pos.y + 
+                    unit->unk_scale * part->hit_cursor_base_position.y + 
+                    part->hit_cursor_offset.y;
+                target->hit_cursor_pos_z =
+                    world_pos.z + 
+                    unit->unk_scale * part->hit_cursor_base_position.z + 
+                    part->hit_cursor_offset.z;
+                    
+                target->addl_offset_x = 0;
+                target->unk_20 = -1;
+                if ((unit->attribute_flags & BattleUnitAttribute_Flags::UNK_1) &&
+                    !(part->part_attribute_flags & PartsAttribute_Flags::UNK_20000)) {
+                    target->addl_offset_x += tw->attacking_direction * 300;
+                }
+                target->addl_offset_x += face_direction * part->addl_target_offset_x;
+                
+                target->final_pos_x = world_pos.x + target->addl_offset_x;
+                target->final_pos_y = world_pos.y;
+                target->final_pos_z = world_pos.z + 5.0f;
+                
+                // TODO: is this even used?  It could be misleading
+                // if the attack direction changes later.
+                target->forward_distance = ttyd::battle_sub::BtlCompForwardLv(
+                    target->final_pos_x, tw->attacking_direction);
+                
+                target->fg_or_bg_layer = target->final_pos_z >= -30;
+                
+                ++tw->num_targets;
+                ++target;
+            }
+        }
+    }
+    
+    // Check all targets against attack's targeting restrictions.
+    for (int32_t i = 0; i < tw->num_targets; ++i) {
+        auto* target = &tw->targets[i];
+        
+        bool is_valid_target = IsTargetValid(tw, target);
+        
+        if (!is_valid_target) {
+            // Delete this target's data, shifting later target data back.
+            for (int32_t j = i; j < tw->num_targets - 1; ++j) {
+                memcpy(target, target + 1, sizeof(BattleWorkTarget));
+                ++target;
+            }
+            // Update count of targets and current position in array.
+            --tw->num_targets;
+            --i;
+        }
+    }
+    
+    // Remove secondary parts if corresponding main parts are targetable.
+    if (cf & AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS) {
+        for (int32_t i = 0; i < tw->num_targets; ++i) {
+            auto* target = &tw->targets[i];
+            auto* part = BattleGetUnitPartsPtr(target->unit_idx, target->part_idx);
+            
+            if (!(part->part_attribute_flags & PartsAttribute_Flags::PREFERRED_TARGET))
+                continue;
+            
+            bool is_valid_target = true;
+            
+            for (int32_t j = 0; j < tw->num_targets; ++j) {
+                auto* target2 = &tw->targets[j];
+                if (i != j && target->unit_idx == target2->unit_idx) {
+                    auto* part2 = BattleGetUnitPartsPtr(target2->unit_idx, target2->part_idx);
+                    if (part2->part_attribute_flags & PartsAttribute_Flags::MAIN_TARGET) {
+                        is_valid_target = false;
+                        break;
+                    }
+                }
+            }
+            
+            if (!is_valid_target) {
+                // Delete this target's data, shifting later target data back.
+                for (int32_t j = i; j < tw->num_targets - 1; ++j) {
+                    memcpy(target, target + 1, sizeof(BattleWorkTarget));
+                    ++target;
+                }
+                // Update count of targets and current position in array.
+                --tw->num_targets;
+                --i;
+            }
+        }
+    }
+    
+    // TOT-specific: Filter to only targets on one side of an enemy attacker.
+    if ((cf & AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME) ||
+        (cf & AttackTargetClass_Flags::ENEMY_SELECT_SIDE_CENTER)) {
+        int32_t reference_pos = 0;
+        if (cf & AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME) {
+            reference_pos = static_cast<int32_t>(
+                BattleGetUnitPtr(g_BattleWork, tw->attacker_idx)->home_position.x);
+        }
+        
+        int32_t pos_targets = 0;
+        int32_t neg_targets = 0;
+        for (int32_t i = 0; i < tw->num_targets; ++i) {
+            if (GetRelativePosition(tw, &tw->targets[i], reference_pos) < 0) {
+                ++neg_targets;
+            } else {
+                ++pos_targets;
+            }
+        }
+        
+        if (pos_targets > 0 && neg_targets > 0) {
+            // Weighted roll to determine which side's targets to keep.
+            int32_t r = ttyd::system::irand(pos_targets + neg_targets);
+            bool keep_positive = r < pos_targets;
+            
+            // Remove targets on the side not selected.
+            for (int32_t i = 0; i < tw->num_targets; ++i) {
+                auto* target = &tw->targets[i];
+                const int32_t relative_position =
+                    GetRelativePosition(tw, target, reference_pos);
+                
+                if ((relative_position < 0 && !keep_positive) ||
+                    (relative_position >= 0 && keep_positive))
+                    continue;
+                
+                // Delete this target's data, shifting later target data back.
+                for (int32_t j = i; j < tw->num_targets - 1; ++j) {
+                    memcpy(target, target + 1, sizeof(BattleWorkTarget));
+                    ++target;
+                }
+                // Update count of targets and current position in array.
+                --tw->num_targets;
+                --i;
+            }
+        
+            // Override attack direction to direction chosen, to make sure
+            // 'front-only' logic works as expected.
+            tw->attacking_direction = keep_positive ? 1 : -1;
+        }
+    }
+    
+    // Front-target-only logic.
+    if (pf & AttackTargetProperty_Flags::ONLY_FRONT) {
+        for (int32_t i = 0; i < tw->num_targets; ++i) {
+            auto* target = &tw->targets[i];
+            auto* part = BattleGetUnitPartsPtr(target->unit_idx, target->part_idx);
+            
+            if (part->part_attribute_flags & PartsAttribute_Flags::UNK_40)
+                continue;
+            
+            bool is_valid_target = true;
+            
+            for (int32_t j = 0; j < tw->num_targets; ++j) {
+                auto* target2 = &tw->targets[j];
+                if (i != j && target->fg_or_bg_layer == target2->fg_or_bg_layer) {
+                    int32_t xpos1 = target->final_pos_x;
+                    int32_t xpos2 = target2->final_pos_x;
+                    if (tw->attacking_direction < 0) {
+                        xpos1 = -xpos1;
+                        xpos2 = -xpos2;
+                    }
+                    if (xpos2 < xpos1) {
+                        auto* part2 = BattleGetUnitPartsPtr(target2->unit_idx, target2->part_idx);
+                        if (!(part2->part_attribute_flags & (
+                                PartsAttribute_Flags::SHELLTOSSLIKE_CANNOT_TARGET |
+                                PartsAttribute_Flags::UNK_40
+                            ))) {
+                            if (!(
+                                BattleGetUnitPtr(g_BattleWork, tw->attacker_idx)->token_flags &
+                                BattleUnitToken_Flags::CONFUSE_PROC) ||
+                                tw->attacker_idx != target2->unit_idx) {
+                                is_valid_target = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!is_valid_target) {
+                // Delete this target's data, shifting later target data back.
+                for (int32_t j = i; j < tw->num_targets - 1; ++j) {
+                    memcpy(target, target + 1, sizeof(BattleWorkTarget));
+                    ++target;
+                }
+                // Update count of targets and current position in array.
+                --tw->num_targets;
+                --i;
+            }
+        }
+    }
+    
+    // All targets filtered; sort list of indices by position.
+    for (int32_t i = 0; i < tw->num_targets; ++i) {
+        tw->target_indices[i] = i;
+    }
+    for (int32_t i = 0; i < tw->num_targets - 1; ++i) {
+        for (int32_t j = i + 1; j < tw->num_targets; ++j) {
+            if (GetTargetSortPosition(tw, &tw->targets[j]) <
+                GetTargetSortPosition(tw, &tw->targets[i])) {
+                int32_t tmp = tw->target_indices[i];
+                tw->target_indices[i] = tw->target_indices[j];
+                tw->target_indices[j] = tmp;
+            }
+        }
+    }
+}
+
 void ReorderAndFilterWeaponTargets() {
     auto& twork = ttyd::battle::g_BattleWork->weapon_targets_work;
 
@@ -1908,6 +2284,15 @@ void ApplyFixedPatches() {
                     (const char*)evtGetValue(evt, evt->evtArguments[3]));
             }
             return result;
+        });
+
+    // Replace logic from _btlSamplingEnemy entirely, to allow for new types of
+    // target filtering.
+    g__btlSamplingEnemy_trampoline = mod::hookFunction(
+        ttyd::battle_detect::_btlSamplingEnemy,
+        [](BattleWorkWeaponTargets* targets_work) {
+            // Replace original logic entirely.
+            BattleSelectValidTargets(targets_work);
         });
 
     // Handle target selection for moves that can select between sides.

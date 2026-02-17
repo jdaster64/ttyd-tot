@@ -1,6 +1,7 @@
 #include "tot_custom_rel.h"     // For externed unit definitions.
 
 #include "evt_cmd.h"
+#include "tot_custom_common.h"
 
 #include <gc/mtx.h>
 #include <gc/types.h>
@@ -244,7 +245,8 @@ BattleWeapon unitXNautPhD_weaponTiny = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_CENTER,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
     .element = AttackElement::NORMAL,
@@ -601,8 +603,8 @@ EVT_BEGIN(unitXNautPhD_attack_common_event1)
     USER_FUNC(btlevtcmd_WaitGuardMove)
     USER_FUNC(btlevtcmd_PayWeaponCost, -2, LW(9))
     IF_EQUAL(LW(9), PTR(&unitXNautPhD_weaponTiny))
-        USER_FUNC(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
-        IF_EQUAL(LW(10), 0)
+        USER_FUNC(evtTot_CheckSpeciesIsEnemy, LW(3), LW(10))
+        IF_EQUAL(LW(10), 1)
             SET(LW(10), 125)
         ELSE()
             SET(LW(10), -125)
@@ -971,8 +973,8 @@ EVT_BEGIN(unitXNautPhD_tiny_potion_event)
     END_BROTHER()
     USER_FUNC(btlevtcmd_OffPartsAttribute, -2, 2, 0x100'0000)
     USER_FUNC(btlevtcmd_OffPartsAttribute, -2, 2, 0x200'0000)
-    USER_FUNC(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
-    IF_EQUAL(LW(10), 0)
+    USER_FUNC(evtTot_CheckSpeciesIsEnemy, LW(3), LW(10))
+    IF_EQUAL(LW(10), 1)
         SET(LW(10), 125)
     ELSE()
         SET(LW(10), -125)

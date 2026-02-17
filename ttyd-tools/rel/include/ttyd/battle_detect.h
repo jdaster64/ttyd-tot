@@ -14,7 +14,7 @@ extern "C" {
 // BattleChoiceSamplingEnemy
 // BattleSamplingEnemyUpdate
 // BattleSamplingEnemy
-void _btlSamplingEnemy(BattleWorkWeaponTargets* twork);
+void _btlSamplingEnemy(battle::BattleWorkWeaponTargets* targets_work);
 
 }
 

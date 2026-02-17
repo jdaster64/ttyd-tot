@@ -2504,7 +2504,10 @@
 80363e60:defaultWeapon_Dummy_NoItem
 
 // battle_sub.o
+80125398:btlsubResetMoveColorLvAll
 801253ec:BattleTransID
+801254a0:BtlCompForwardLv
+801254f4:intpl_sub
 80125b70:btlMovePos
 
 // battle_unit.o
