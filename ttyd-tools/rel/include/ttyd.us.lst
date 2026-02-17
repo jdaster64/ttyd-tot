@@ -1913,6 +1913,13 @@
 800fde2c:BattleCheckPikkyoro
 800fdfd4:BattleDamageDirect
 
+// battle_detect.o
+800feaf8:BattleGetFirstAttackUnit
+800febc8:BattleChoiceSamplingEnemy
+800ff5a0:BattleSamplingEnemyUpdate
+800ff5c0:BattleSamplingEnemy
+800ff684:_btlSamplingEnemy
+
 // battle_disp.o
 80100258:_btlStockExpDisp
 8010045c:BattleStockExpDisp
