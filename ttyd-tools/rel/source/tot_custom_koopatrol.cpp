@@ -275,7 +275,8 @@ BattleWeapon unitKoopatrol_weaponPowerShell = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::SHELL_TOSS_LIKE |
@@ -442,7 +443,8 @@ BattleWeapon unitDarkKoopatrol_weaponPowerShell = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::SHELL_TOSS_LIKE |
@@ -1192,15 +1194,32 @@ EVT_BEGIN(unitKoopatrol_power_attack_event)
             WAIT_FRM(3)
         WHILE()
     END_BROTHER()
-    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(12.0))
-    USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    USER_FUNC(btlevtcmd_GetPos, -2, EVT_NULLPTR, LW(5), EVT_NULLPTR)
-    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(5), LW(2), 0, 0, 0)
+    
+    BROTHER_EVT_ID(LW(11))
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_FaceDirectionAdd, -2, LW(0), 500)
+        USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(12.0))
+        USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
+        WAIT_MSEC(500)
+    END_BROTHER()
+
+    // Only check for guard result at most once.
     SET(LW(6), 0)
+
 LBL(10)
-    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(12.0))
-    USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    USER_FUNC(btlevtcmd_GetPos, -2, EVT_NULLPTR, LW(5), EVT_NULLPTR)
+    // Process each hit only once the Koopatrol passes by.
+    DO(0)
+        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), EVT_NULLPTR, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(1), EVT_NULLPTR, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_GetFaceDirection, -2, LW(2))
+        MUL(LW(0), LW(2))
+        MUL(LW(1), LW(2))
+        IF_LARGE_EQUAL(LW(1), LW(0))
+            DO_BREAK()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+
     USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR(4)
@@ -1224,8 +1243,6 @@ LBL(10)
             CASE_END()
     END_SWITCH()
 LBL(90)
-    USER_FUNC(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 100)
-    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(5), LW(2), 0, 0, 0)
     GOTO(97)
 LBL(91)
     IF_EQUAL(LW(6), 0)
@@ -1239,13 +1256,19 @@ LBL(97)
     IF_NOT_EQUAL(LW(3), -1)
         GOTO(10)
     END_IF()
-    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    USER_FUNC(btlevtcmd_FaceDirectionAdd, -2, LW(0), 500)
-    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(12.0))
-    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
-    WAIT_MSEC(500)
-    USER_FUNC(btlevtcmd_SetPos, -2, 250, LW(1), LW(2))
+
+    // Wait for the above move event to end.
+    DO(0)
+        CHK_EVT(LW(11), LW(0))
+        IF_EQUAL(LW(0), 0)
+            DO_BREAK()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+
 LBL(98)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_SetPos, -2, 250, LW(1), LW(2))
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_TOGENOKO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(12.0))
     USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
