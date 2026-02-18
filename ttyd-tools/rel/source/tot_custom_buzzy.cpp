@@ -495,7 +495,9 @@ BattleWeapon unitBuzzyBeetle_weaponPara = {
         AttackCounterResistance_Flags::FIERY |
         AttackCounterResistance_Flags::EXPLOSIVE |
         AttackCounterResistance_Flags::VOLATILE_EXPLOSIVE |
-        AttackCounterResistance_Flags::HOLD_FAST,
+        AttackCounterResistance_Flags::HOLD_FAST |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM,

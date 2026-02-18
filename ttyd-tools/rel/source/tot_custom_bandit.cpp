@@ -167,7 +167,10 @@ BattleWeapon unitBandit_weapon = {
     .unk_6f = 2,
     .ac_help_msg = nullptr,
     .special_property_flags = AttackSpecialProperty_Flags::ALL_BUFFABLE,
-    .counter_resistance_flags = AttackCounterResistance_Flags::TOP_SPIKY,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::TOP_SPIKY |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::PREFER_FRONT |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |

@@ -173,7 +173,9 @@ BattleWeapon unitFuzzy_weapon = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,
@@ -229,7 +231,9 @@ BattleWeapon unitGreenFlowerFuzzy_weapon = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
@@ -286,7 +290,9 @@ BattleWeapon unitFlowerFuzzy_weaponFpDrain = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::DEFENSE_PIERCING,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |

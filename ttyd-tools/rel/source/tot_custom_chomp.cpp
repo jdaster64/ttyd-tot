@@ -165,7 +165,9 @@ BattleWeapon unitChainChomp_weapon = {
         AttackCounterResistance_Flags::TOP_SPIKY |
         AttackCounterResistance_Flags::FIERY |
         AttackCounterResistance_Flags::ICY |
-        AttackCounterResistance_Flags::POISON,
+        AttackCounterResistance_Flags::POISON |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::PREFER_FRONT,

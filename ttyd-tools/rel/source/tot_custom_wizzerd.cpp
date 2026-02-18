@@ -214,7 +214,10 @@ BattleWeapon unitWizzerd_weaponPunch = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
-    .counter_resistance_flags = AttackCounterResistance_Flags::TOP_SPIKY,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::TOP_SPIKY |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags = AttackTargetWeighting_Flags::PREFER_FRONT,
         
     // status chances

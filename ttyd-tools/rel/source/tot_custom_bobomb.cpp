@@ -144,7 +144,11 @@ BattleWeapon unitBobOmb_weapon = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Why was this not already a thing?
+        AttackCounterResistance_Flags::TOP_SPIKY |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::PREFER_FRONT |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000,

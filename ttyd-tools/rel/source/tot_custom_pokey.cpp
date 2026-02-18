@@ -229,7 +229,9 @@ BattleWeapon unitPokey_weaponTall = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
@@ -288,7 +290,9 @@ BattleWeapon unitPokey_weaponShort = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
@@ -348,7 +352,9 @@ BattleWeapon unitPokey_weaponHead = {
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::FLIPS_SHELLED,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
@@ -462,7 +468,9 @@ BattleWeapon unitPoisonPokey_weaponTall = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
@@ -524,7 +532,9 @@ BattleWeapon unitPoisonPokey_weaponShort = {
     .special_property_flags =
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
@@ -587,7 +597,9 @@ BattleWeapon unitPoisonPokey_weaponHead = {
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::FLIPS_SHELLED,
-    .counter_resistance_flags = 0,
+    .counter_resistance_flags =
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |

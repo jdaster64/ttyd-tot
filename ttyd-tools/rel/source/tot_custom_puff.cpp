@@ -193,7 +193,10 @@ BattleWeapon unitRuffPuff_weaponNormal = {
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED,
-    .counter_resistance_flags = AttackCounterResistance_Flags::ELECTRIC,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ELECTRIC |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
@@ -251,7 +254,10 @@ BattleWeapon unitIcePuff_weaponNormal = {
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED,
-    .counter_resistance_flags = AttackCounterResistance_Flags::ICY,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ICY |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
@@ -310,7 +316,10 @@ BattleWeapon unitPoisonPuff_weaponNormal = {
         AttackSpecialProperty_Flags::FREEZE_BREAK |
         AttackSpecialProperty_Flags::FLIPS_SHELLED |
         AttackSpecialProperty_Flags::GROUNDS_WINGED,
-    .counter_resistance_flags = AttackCounterResistance_Flags::POISON,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::POISON |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
         AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
