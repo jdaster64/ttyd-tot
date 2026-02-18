@@ -94,7 +94,7 @@ StatusVulnerability unitEmber_status = {
 StatusVulnerability unitPhantomEmber_status = {
      40,  80, 100, 100,  65, 100,   0,  40,
     100,  80, 100,  80, 100,  90,  65,  40,
-     80, 100,  65, 100, 100,  90,
+     80, 100,  65, 100, 100,  80,
 };
 
 PoseTableEntry unitEmber_pose_table[] = {

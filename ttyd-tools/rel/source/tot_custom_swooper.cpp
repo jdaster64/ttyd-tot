@@ -99,7 +99,7 @@ StatusVulnerability unitSwoopula_status = {
 StatusVulnerability unitSwampire_status = {
      50,  55,  90, 100,  50, 100, 100,  50,
     100,  75, 100,  75, 100,  80,  50,  50,
-     75, 100,  50, 100, 100,  20,
+     75, 100,  50, 100, 100,  60,
 };
 
 // Swampire uses Swooper's pose tables.

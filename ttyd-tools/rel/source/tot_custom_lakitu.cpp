@@ -108,7 +108,7 @@ StatusVulnerability unitLakitu_status = {
 StatusVulnerability unitDarkLakitu_status = {
      60,  70,  95, 100,  60, 100, 100,  80,
     100,  85, 100,  85, 100,  90,  60,  70,
-     80, 100,  60, 100, 100,  50,
+     80, 100,  60, 100, 100,  80,
 };
 StatusVulnerability unitSpiny_status = {
      80,  90,  80, 100,  80, 100, 100,  70,
@@ -118,7 +118,7 @@ StatusVulnerability unitSpiny_status = {
 StatusVulnerability unitSkyBlueSpiny_status = {
      60,  70,  60, 100,  60, 100, 100,  50,
     100,  85, 100,  85, 100,  90,  70,  80,
-     10, 100,  70, 100, 100,  50,
+     10, 100,  70, 100, 100,  80,
 };
 StatusVulnerability unitSpiny_flip_status = {
     100, 100, 100, 100, 100, 100, 100, 100,

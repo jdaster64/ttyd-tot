@@ -119,17 +119,17 @@ int8_t unitWizzerd_defense_attr[] = { 0, 0, 0, 0, 0 };
 StatusVulnerability unitWizzerd_status = {
      10,  50,  90, 100,  40, 100, 100,  50,
     100,  85, 100,  85, 100,  90,  40,  30,
-     85, 100,  40, 100, 100,  40,
+     85, 100,  40, 100, 100,  75,
 };
 StatusVulnerability unitDarkWizzerd_status = {
      10,  50,  90, 100,  40, 100, 100,  50,
     100,  85, 100,  85, 100,  90,  40,  30,
-     85, 100,  40, 100, 100,  90,
+     85, 100,  40, 100, 100,  75,
 };
 StatusVulnerability unitEliteWizzerd_status = {
       0,  30,  80, 100,  20, 100, 100,  40,
     100,  75, 100,  75, 100,  80,  20,  10,
-     75, 100,  20, 100, 100,  20,
+     75, 100,  20, 100, 100,  60,
 };
 StatusVulnerability unitWizzerdClone_status = {
       0,   0,   0,   0,   0,   0,   0,   0,

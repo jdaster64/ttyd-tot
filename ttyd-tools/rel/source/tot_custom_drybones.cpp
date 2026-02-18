@@ -85,22 +85,22 @@ int8_t unitDryBones_defense_attr[] = { 0, 0, 0, 0, 0 };
 StatusVulnerability unitDullBones_status = {
       0,  95,  50,   0,  50, 100, 100,  90,
     100, 100, 100, 100, 100,  95,  90,  10,
-     90, 100,  90, 100, 100,  50,
+     90, 100,  90, 100, 100,  80,
 };
 StatusVulnerability unitRedBones_status = {
       0,  85,  40,   0,  40, 100,  90,  80,
     100,  90, 100,  90, 100,  90,  80,   0,
-     80, 100,  80, 100, 100,   0,
+     80, 100,  80, 100, 100,  50,
 };
 StatusVulnerability unitDryBones_status = {
       0,  75,  30,   0,  30, 100, 100,  70,
     100,  90, 100,  90, 100,  85,  70,   0,
-     70, 100,  70, 100, 100,  90,
+     70, 100,  70, 100, 100,  50,
 };
 StatusVulnerability unitDarkBones_status = {
       0,  65,  20,   0,  20, 100, 100,  60,
     100,  80, 100,  80, 100,  80,  60,   0,
-     60, 100,  60, 100, 100,  85,
+     60, 100,  60, 100, 100,  50,
 };
 
 PoseTableEntry unitDryBones_pose_table[] = {

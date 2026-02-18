@@ -83,7 +83,7 @@ StatusVulnerability unitBigBandit_status = {
 StatusVulnerability unitBadgeBandit_status = {
      80,  70,  50, 100,  80, 100, 100,  50,
     100,  85, 100,  85, 100,  90,  80,  75,
-     60, 100,  70, 100, 100,  60,
+     60, 100,  70, 100, 100,  80,
 };
 
 PoseTableEntry unitBandit_pose_table[] = {

@@ -326,17 +326,17 @@ StatusVulnerability unitXYux_status = {
 StatusVulnerability unitMiniYux_status = {
      80, 100, 100,   0,  90, 100,   0,   0,
     100,  90, 100,  90, 100,  95,  90,   0,
-    100, 100,  90, 100, 100, 100,
+    100, 100,  90, 100, 100, 125,
 };
 StatusVulnerability unitMiniZYux_status = {
      70,  90,  95,   0,  80, 100, 100,   0,
     100,  85, 100,  85, 100,  90,  80,   0,
-     95, 100,  80, 100, 100, 100,
+     95, 100,  80, 100, 100, 125,
 };
 StatusVulnerability unitMiniXYux_status = {
      70,  90,  90,   0,  10, 100, 100,   0,
     100,  80, 100,  80, 100,  85,  80,   0,
-     90, 100,  80, 100, 100,  25,
+     90, 100,  80, 100, 100, 125,
 };
 
 PoseTableEntry unitYux_pose_table[] = {

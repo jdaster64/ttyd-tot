@@ -82,7 +82,7 @@ StatusVulnerability unitBulkyBobOmb_status = {
 StatusVulnerability unitBobUlk_status = {
     70,  55,  50, 100,  50, 100, 100,  90,
    100,  70, 100,  70, 100,  85,  50,  60,
-    10, 100,  50, 100, 100,  20,
+    10, 100,  50, 100, 100,  60,
 };
 
 PoseTableEntry unitBulkyBobOmb_pose_table_3[] = {

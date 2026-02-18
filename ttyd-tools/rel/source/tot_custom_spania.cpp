@@ -75,7 +75,7 @@ StatusVulnerability unitSpania_status = {
 StatusVulnerability unitSpunia_status = {
      70,  90,  70, 150,  70, 150, 150,  70,
     150,  90, 150,  90, 150,  90,  70,  80,
-     80, 150,  70,   0,   0,  30,
+     80, 150,  70,   0,   0,  70,
 };
 
 PoseTableEntry unitSpania_pose_table[] = {

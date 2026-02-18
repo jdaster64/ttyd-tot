@@ -78,12 +78,12 @@ StatusVulnerability unitPutridPiranha_status = {
 StatusVulnerability unitFrostPiranha_status = {
     105,  80,  50, 100,  90, 100, 100,   0,
     100,  90, 100,  90, 100,  90,  90,  20, 
-     40, 100,  80, 100, 100,  95
+     40, 100,  80, 100, 100,  90
 };
 StatusVulnerability unitFirePiranha_status = {
     100,  70,  40, 100,  80, 100, 100,  60,
     100,  85, 100,  85, 100,  85,  70,  10, 
-     30, 100,  70, 100, 100,  30
+     30, 100,  70, 100, 100,  70
 };
 
 PoseTableEntry unitPiranha_pose_table[] = {

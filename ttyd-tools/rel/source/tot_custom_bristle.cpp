@@ -75,7 +75,7 @@ StatusVulnerability unitBristle_status = {
 StatusVulnerability unitDarkBristle_status = {
     20,  80,  20, 100,  20, 100,   0,  40,
    100,  50, 100,  50, 100, 100,  40,  30,
-    20, 100,  40, 100, 100,  30,
+    20, 100,  40, 100, 100,  60,
 };
 
 PoseTableEntry unitBristle_pose_table[] = {

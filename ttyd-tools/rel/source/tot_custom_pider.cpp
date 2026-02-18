@@ -123,7 +123,7 @@ StatusVulnerability unitPider_status = {
 StatusVulnerability unitArantula_status = {
      70,  70,  30, 100,  70, 100, 100,  70,
     100,  80, 100,  80, 100,  85,  70,  80,
-     30, 100,  70, 100, 100,  30,
+     30, 100,  70, 100, 100,  70,
 };
 
 PoseTableEntry unitPider_pose_table[] = {

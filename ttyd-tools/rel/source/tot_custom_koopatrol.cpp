@@ -88,7 +88,7 @@ StatusVulnerability unitKoopatrol_status = {
 StatusVulnerability unitDarkKoopatrol_status = {
      60,  65,  65, 100,  65, 100, 100,  60,
     100,  85, 100,  85, 100,  90,  70,  60,
-     60, 100,  70, 100, 100,  95,
+     60, 100,  70, 100, 100,  80,
 };
 StatusVulnerability unitKoopatrol_flip_status = {
     100, 100, 100, 100, 100, 100, 100, 100,
