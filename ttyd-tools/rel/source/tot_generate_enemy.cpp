@@ -280,7 +280,7 @@ const EnemyTypeInfo kEnemyInfo[] = {
     { &custom::unit_Gloomba, 1, MinionType::GOOMBA, 220, 0x04, 7, 20, 6, 0, 1, 1, 5, 10, 0, 0, 0, 0 },
     { &custom::unit_Paragloomba, 1, MinionType::GOOMBA, 222, 0x06, 8, 20, 6, 0, 1, 1, 6, 10, 0, 0, 40, 50 },
     { &custom::unit_SpikyGloomba, 1, MinionType::GOOMBA, 221, 0x04, 9, 20, 6, 0, 1, 2, 6, 10, 0, 0, 0, 0 },
-    { &custom::unit_DarkKoopa, 1, MinionType::SHELLED, 244, 0x07, 16, 20, 8, 3, 2, 1, 7, 8, 0, 0, 0, 0 },
+    { &custom::unit_DarkKoopa, 1, MinionType::SHELLED, 244, 0x07, 16, 20, 8, 3, 2, 1, 8, 8, 0, 0, 0, 0 },
     { &custom::unit_DarkParatroopa, 1, MinionType::SHELLED, 245, 0x08, 17, 20, 8, 3, 2, 1, 8, 8, 0, 0, 40, 50 },
     { &custom::unit_BadgeBandit, 0, 0, 275, 0x04, 43, 18, 6, 0, 3, 2, 6, 5, 0, 0, 0, 0 },
     { &custom::unit_DarkLakitu, 1, MinionType::CLOUDY, 281, 0x24, 28, 19, 9, 0, 5, 0, 8, -1, 2, 0, 40, 20 },

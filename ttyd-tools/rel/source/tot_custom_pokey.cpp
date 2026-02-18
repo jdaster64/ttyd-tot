@@ -216,7 +216,8 @@ BattleWeapon unitPokey_weaponTall = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::ONLY_FRONT |
@@ -276,7 +277,8 @@ BattleWeapon unitPokey_weaponShort = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::ONLY_FRONT |
@@ -337,7 +339,8 @@ BattleWeapon unitPokey_weaponHead = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::ONLY_FRONT |
@@ -455,7 +458,8 @@ BattleWeapon unitPoisonPokey_weaponTall = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::ONLY_FRONT |
@@ -518,7 +522,8 @@ BattleWeapon unitPoisonPokey_weaponShort = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::ONLY_FRONT |
@@ -582,7 +587,8 @@ BattleWeapon unitPoisonPokey_weaponHead = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::ONLY_FRONT |
