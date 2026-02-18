@@ -848,7 +848,7 @@ uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
                 // Note: update this to intentionally shuffle enemy types when
                 // introducing seed-breaking enemy level changes.
                 const int32_t kEnemySeedVer = 1;
-                data[1] = floor_ & (kEnemySeedVer << 16);
+                data[1] = floor_ | (kEnemySeedVer << 16);
                 break;
             }
             case RNG_ENEMY_ITEM:
