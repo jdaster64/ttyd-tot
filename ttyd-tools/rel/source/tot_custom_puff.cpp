@@ -84,7 +84,7 @@ EVT_DECLARE_USER_FUNC(eff_poison_breath, 1);
 // Unit data.
 
 int8_t unitDarkPuff_defense[] = { 0, 0, 0, 0, 0 };
-int8_t unitDarkPuff_defense_attr[] = { 0, 0, 0, 0, 0 };
+int8_t unitDarkPuff_defense_attr[] = { 0, 0, 3, 0, 3 };
 int8_t unitRuffPuff_defense[] = { 0, 0, 0, 0, 0 };
 int8_t unitRuffPuff_defense_attr[] = { 0, 0, 0, 0, 3 };
 int8_t unitIcePuff_defense[] = { 0, 0, 0, 0, 0 };
@@ -93,17 +93,17 @@ int8_t unitPoisonPuff_defense[] = { 0, 0, 0, 0, 0 };
 int8_t unitPoisonPuff_defense_attr[] = { 0, 0, 0, 0, 0 };
 
 StatusVulnerability unitDarkPuff_status = {
-     95,  95, 105, 100,  90, 100, 100, 100,
+     95,  95, 105, 100,  90, 100, 100,   0,
     100,  95, 100,  95, 100,  95,  80,  90,
     105, 100,  90, 100, 100,  95,
 };
 StatusVulnerability unitRuffPuff_status = {
-     75,  75, 100, 100,  70,   0, 100, 100,
+     75,  75, 100, 100,  70, 100, 100, 100,
     100,  90, 100,  90, 100,  90,  60,  70,
      95, 100,  70, 100, 100,  95,
 };
 StatusVulnerability unitIcePuff_status = {
-     65,  65,  95, 100,  60,   0, 100,   0,
+     65,  65,  95, 100,  60, 100, 100,   0,
     100,  75, 100,  75, 100,  90,  65,  70,
      85, 100,  65, 100, 100,  95,
 };
@@ -154,6 +154,69 @@ DataTableEntry unitPoisonPuff_data_table[] = {
     0, nullptr,
 };
 
+BattleWeapon unitDarkPuff_weaponNormal = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    
+    .superguards_allowed = 1,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 1,
+    .unk_1b = 1,
+    .damage_function = (void*)ttyd::battle_weapon_power::weaponGetPowerDefault,
+    .damage_function_params = { 4, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::ALL_BUFFABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK |
+        AttackSpecialProperty_Flags::FLIPS_SHELLED |
+        AttackSpecialProperty_Flags::GROUNDS_WINGED,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ELECTRIC |
+        AttackCounterResistance_Flags::ICY |
+        AttackCounterResistance_Flags::POISON |
+        // Added to make sure that front-spiky counter functions properly.
+        AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
 BattleWeapon unitRuffPuff_weaponNormal = {
     .name = nullptr,
     .icon = 0,
@@ -1407,9 +1470,16 @@ EVT_BEGIN(unitPuff_attack_event)
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL((int32_t)BattleUnitType::DARK_PUFF)
-            USER_FUNC(btlevtcmd_DrawLots, LW(0), 2, 50, 50)
-            SET(LW(9), PTR(&unitRuffPuff_weaponNormal))
-            SET(LW(10), (int32_t)PartsCounterAttribute_Flags::ELECTRIC)
+            USER_FUNC(btlevtcmd_DrawLots, LW(0), 4, 40, 10, 10, 10)
+            SET(LW(9), PTR(&unitDarkPuff_weaponNormal))
+            SWITCH(LW(0))
+                CASE_EQUAL(1)
+                    SET(LW(10), (int32_t)PartsCounterAttribute_Flags::ELECTRIC)
+                CASE_EQUAL(2)
+                    SET(LW(10), (int32_t)PartsCounterAttribute_Flags::ICY)
+                CASE_ETC()
+                    SET(LW(10), (int32_t)PartsCounterAttribute_Flags::POISON_STATUS)
+            END_SWITCH()
 
         CASE_EQUAL((int32_t)BattleUnitType::RUFF_PUFF)
             USER_FUNC(btlevtcmd_DrawLots, LW(0), 2, 60, 40)
@@ -1493,6 +1563,9 @@ EVT_BEGIN(unitPuff_unison_phase_event)
     SET(LW(1), 50)
     IF_EQUAL(LW(0), (int32_t)BattleUnitType::POISON_PUFF)
         SET(LW(1), 25)
+    END_IF()
+    IF_EQUAL(LW(0), (int32_t)BattleUnitType::DARK_PUFF)
+        SET(LW(1), 33)
     END_IF()
     USER_FUNC(evt_sub_random, 99, LW(0))
     

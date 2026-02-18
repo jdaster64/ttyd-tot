@@ -239,6 +239,126 @@ BattleWeapon unitKoopa_weaponGround = {
     .ceiling_fall_chance = 0,
     .object_fall_chance = 0,
 };
+BattleWeapon unitKoopa_weaponPowerShell = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    
+    .superguards_allowed = 1,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 1,
+    .unk_1b = 1,
+    .damage_function = (void*)ttyd::battle_weapon_power::weaponGetPowerDefault,
+    .damage_function_params = { 3, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::SHELL_TOSS_LIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 8,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::ALL_BUFFABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::PAYBACK,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000,
+        
+    // status chances
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+BattleWeapon unitKoopa_weaponPowerShellDizzy = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    
+    .superguards_allowed = 1,
+    .unk_14 = 1.0,
+    .stylish_multiplier = 1,
+    .unk_19 = 1,
+    .bingo_card_chance = 1,
+    .unk_1b = 1,
+    .damage_function = (void*)ttyd::battle_weapon_power::weaponGetPowerDefault,
+    .damage_function_params = { 3, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    
+    .target_class_flags =
+        AttackTargetClass_Flags::MULTIPLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_PREFERRED_PARTS |
+        AttackTargetClass_Flags::CANNOT_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
+        AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
+        AttackTargetProperty_Flags::SHELL_TOSS_LIKE |
+        AttackTargetProperty_Flags::CANNOT_TARGET_CEILING,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 8,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::ALL_BUFFABLE |
+        AttackSpecialProperty_Flags::FREEZE_BREAK,
+    .counter_resistance_flags =
+        AttackCounterResistance_Flags::ALL &
+        ~AttackCounterResistance_Flags::PAYBACK,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000,
+        
+    // status chances
+    .dizzy_chance = 75,
+    .dizzy_time = 3,
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
 BattleWeapon unitKoopa_weaponPara = {
     .name = nullptr,
     .icon = 0,
@@ -727,23 +847,10 @@ EVT_BEGIN(unitKoopa_wakeup_event)
     RETURN()
 EVT_END()
 
-EVT_BEGIN(unitKoopa_attack_event)
-    USER_FUNC(btlevtcmd_GetOverTurnCount, -2, LW(0))
-    IF_LARGE_EQUAL(LW(0), 1)
-        RUN_CHILD_EVT(PTR(&unitKoopa_wakeup_event))
-        RETURN()
-    END_IF()
-    USER_FUNC(btlevtcmd_check_battleflag, LW(0), 2)
+EVT_BEGIN(unitKoopa_normal_attack_event)
     IF_NOT_EQUAL(LW(0), 0)
         USER_FUNC(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
-        WAIT_FRM(30)
     ELSE()
-        USER_FUNC(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
-        IF_NOT_EQUAL(LW(0), 0)
-            RUN_CHILD_EVT(LW(0))
-            USER_FUNC(btlevtcmd_StartWaitEvent, -2)
-            RETURN()
-        END_IF()
         USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
         USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&unitKoopa_weaponGround))
         USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, PTR(&unitKoopa_weaponGround), LW(3), LW(4))
@@ -870,6 +977,201 @@ LBL(98)
 LBL(99)
     USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
     USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitKoopa_power_attack_event)
+    USER_FUNC(btlevtcmd_GetEnemyBelong, -2, LW(0))
+    USER_FUNC(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    USER_FUNC(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    IF_EQUAL(LW(3), -1)
+        USER_FUNC(btlevtcmd_CheckToken, -2, 16, LW(0))
+        IF_NOT_EQUAL(LW(0), 0)
+            RUN_CHILD_EVT(PTR(&subsetevt_confuse_flustered))
+            RETURN()
+        END_IF()
+        GOTO(99)
+    END_IF()
+    USER_FUNC(evt_btl_camera_set_mode, 0, 8)
+    USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    USER_FUNC(evt_btl_camera_set_zoom, 0, 200)
+    USER_FUNC(btlevtcmd_WeaponAftereffect, LW(9))
+    USER_FUNC(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    USER_FUNC(btlevtcmd_WaitGuardMove)
+    USER_FUNC(btlevtcmd_PayWeaponCost, -2, LW(9))
+    USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
+    USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    WAIT_MSEC(100)
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_TOGENOKO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0), FLOAT(0.7))
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_TOGENOKO_SHELL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("NKT_A_1"))
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_TOGENOKO_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Rotate, 0)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_RotateSpeed, 10)
+    BROTHER_EVT()
+        DO(0)
+            USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_Rotate, LW(15))
+            IF_EQUAL(LW(15), 1)
+                USER_FUNC(btlevtcmd_SetRotate, -2, 0, 0, 0)
+                DO_BREAK()
+            END_IF()
+            WAIT_FRM(1)
+            USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_RotateSpeed, LW(14))
+            USER_FUNC(btlevtcmd_AddRotate, -2, 0, LW(14), 0)
+        WHILE()
+    END_BROTHER()
+    WAIT_MSEC(200)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_RotateSpeed, 20)
+    WAIT_MSEC(200)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_RotateSpeed, 40)
+    WAIT_MSEC(200)
+    USER_FUNC(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    BROTHER_EVT_ID(LW(13))
+        DO(0)
+            USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            ADD(LW(1), 10)
+            USER_FUNC(evt_eff, PTR(""), PTR("kemuri_test"), 0, LW(0), LW(1), LW(2), FLOAT(0.3), 0, 0, 0, 0, 0, 0, 0)
+            WAIT_FRM(3)
+        WHILE()
+    END_BROTHER()
+    
+    BROTHER_EVT_ID(LW(11))
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_FaceDirectionAdd, -2, LW(0), 500)
+        USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
+        USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
+        WAIT_MSEC(500)
+    END_BROTHER()
+
+    // Only check for guard result at most once.
+    SET(LW(6), 0)
+
+LBL(10)
+    // Process each hit only once the Koopa passes by.
+    DO(0)
+        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), EVT_NULLPTR, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(1), EVT_NULLPTR, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_GetFaceDirection, -2, LW(2))
+        MUL(LW(0), LW(2))
+        MUL(LW(1), LW(2))
+        IF_LARGE_EQUAL(LW(1), LW(0))
+            DO_BREAK()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+
+    USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_OR(4)
+            GOTO(90)
+            CASE_END()
+        CASE_EQUAL(3)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 38)
+            GOTO(90)
+            CASE_END()
+        CASE_EQUAL(6)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 39)
+            GOTO(90)
+        CASE_EQUAL(2)
+            USER_FUNC(btlevtcmd_StartAvoid, LW(3), 40)
+            GOTO(90)
+        CASE_EQUAL(1)
+            GOTO(91)
+            CASE_END()
+        CASE_ETC()
+            GOTO(98)
+            CASE_END()
+    END_SWITCH()
+LBL(90)
+    GOTO(97)
+LBL(91)
+    IF_EQUAL(LW(6), 0)
+        USER_FUNC(btlevtcmd_ResultACDefence, LW(3), LW(9))
+        SET(LW(6), 1)
+    END_IF()
+    USER_FUNC(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    GOTO(97)
+LBL(97)
+    USER_FUNC(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
+    IF_NOT_EQUAL(LW(3), -1)
+        GOTO(10)
+    END_IF()
+
+    // Wait for the above move event to end.
+    DO(0)
+        CHK_EVT(LW(11), LW(0))
+        IF_EQUAL(LW(0), 0)
+            DO_BREAK()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+
+LBL(98)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_SetPos, -2, 250, LW(1), LW(2))
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_TOGENOKO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
+    USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
+    DELETE_EVT(LW(13))
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_TOGENOKO_SHELL2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_TOGENOKO_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    USER_FUNC(btlevtcmd_JumpSetting, -2, 20, FLOAT(10.0), FLOAT(0.4))
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
+    USER_FUNC(btlevtcmd_SetUnitWork, -2, UW_Rotate, 1)
+    WAIT_FRM(3)
+LBL(99)
+    USER_FUNC(btlevtcmd_ResetFaceDirection, -2)
+    USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(unitKoopa_attack_event)
+    USER_FUNC(btlevtcmd_GetOverTurnCount, -2, LW(0))
+    IF_LARGE_EQUAL(LW(0), 1)
+        RUN_CHILD_EVT(PTR(&unitKoopa_wakeup_event))
+        RETURN()
+    END_IF()
+
+    USER_FUNC(btlevtcmd_check_battleflag, LW(0), 2)
+    IF_NOT_EQUAL(LW(0), 0)
+        WAIT_FRM(30)
+        RUN_CHILD_EVT(PTR(&unitKoopa_normal_attack_event))
+        RETURN()
+    END_IF()
+    
+    USER_FUNC(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    IF_NOT_EQUAL(LW(0), 0)
+        RUN_CHILD_EVT(LW(0))
+        USER_FUNC(btlevtcmd_StartWaitEvent, -2)
+        RETURN()
+    END_IF()
+
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL((int32_t)BattleUnitType::KP_KOOPA)
+            USER_FUNC(btlevtcmd_DrawLots, LW(0), 2, 70, 30)
+            SET(LW(9), PTR(&unitKoopa_weaponPowerShell))
+        CASE_EQUAL((int32_t)BattleUnitType::DARK_KOOPA)
+            USER_FUNC(btlevtcmd_DrawLots, LW(0), 2, 70, 30)
+            SET(LW(9), PTR(&unitKoopa_weaponPowerShellDizzy))
+        CASE_ETC()
+            SET(LW(0), 0)
+    END_SWITCH()
+
+    IF_EQUAL(LW(0), 0)
+        RUN_CHILD_EVT(PTR(&unitKoopa_normal_attack_event))
+    ELSE()
+        RUN_CHILD_EVT(PTR(&unitKoopa_power_attack_event))
+    END_IF()
+    
     RETURN()
 EVT_END()
 
@@ -1034,7 +1336,15 @@ EVT_BEGIN(unitKoopa_flip_event)
     USER_FUNC(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&unitKoopa_flip_defense))
     USER_FUNC(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(&unitKoopa_flip_pose_table))
     USER_FUNC(btlevtcmd_OnStatusFlag, LW(10), 1)
-    USER_FUNC(btlevtcmd_SetOverTurnCount, LW(10), 2)
+
+    // Dark Koopas get up instantly.
+    USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(0))
+    IF_EQUAL(LW(0), (int32_t)BattleUnitType::DARK_KOOPA)
+        USER_FUNC(btlevtcmd_SetOverTurnCount, LW(10), 1)
+    ELSE()
+        USER_FUNC(btlevtcmd_SetOverTurnCount, LW(10), 2)
+    END_IF()
+
     USER_FUNC(btlevtcmd_AnimeChangePose, LW(10), LW(11), PTR("NKT_D_1"))
     WAIT_FRM(2)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)

@@ -844,12 +844,18 @@ uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
         data[0] = (*seq_val)++ | (sequence << 16);
         switch (sequence) {
             case RNG_ENEMY:
+            case RNG_MIDBOSS_MOB: {
+                // Note: update this to intentionally shuffle enemy types when
+                // introducing seed-breaking enemy level changes.
+                const int32_t kEnemySeedVer = 1;
+                data[1] = floor_ & (kEnemySeedVer << 16);
+                break;
+            }
             case RNG_ENEMY_ITEM:
             case RNG_ENEMY_CONDITION:
             case RNG_ENEMY_CONDITION_ITEM:
             case RNG_NPC_TYPE:
             case RNG_NPC_OPTIONS:
-            case RNG_MIDBOSS_MOB:
             case RNG_REWARD: {
                 data[1] = floor_;
                 break;

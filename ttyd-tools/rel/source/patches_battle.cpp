@@ -1557,6 +1557,9 @@ void BattleSelectValidTargets(BattleWorkWeaponTargets* tw) {
             // Override attack direction to direction chosen, to make sure
             // 'front-only' logic works as expected.
             tw->attacking_direction = keep_positive ? 1 : -1;
+        } else if (pos_targets > 0 || neg_targets > 0) {
+            // Force attacking direction even if all targets were on same side.
+            tw->attacking_direction = pos_targets > 0 ? 1 : -1;
         }
     }
     

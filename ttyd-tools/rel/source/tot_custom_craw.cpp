@@ -227,8 +227,9 @@ BattleWeapon unitCraw_weaponMultiRam = {
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
     .counter_resistance_flags = 
-        // No longer weak to pre-emptive spiky since it didn't function anyway.
-        AttackCounterResistance_Flags::ALL,
+        AttackCounterResistance_Flags::ALL &
+        // Only multi-attack weak to front-spiky since they run through enemies.
+        ~AttackCounterResistance_Flags::FRONT_SPIKY,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000,
         

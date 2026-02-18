@@ -3038,9 +3038,14 @@ g_GlobalStrings = {
         b'<k>\n'
         b'%s'
         b'<p>\n'
-        b'Looks like its abilities are\n'
-        b'just like any Koopa...<wait 250> So he\n'
-        b'oughta be a piece of cake!\n'
+        b'It can attack the front like\n'
+        b'a regular Koopa, or use its\n'
+        b'Power Shell to hit us both!\n'
+        b'<k>\n'
+        b'<p>\n'
+        b"Other than that, it's a\n"
+        b'regular, run-of-the-mill Koopa,\n'
+        b"so beating it'll be no biggie!\n"
         b'<k>\n'
         b'<p>\n'
         b"Don't go easy just because\n"
@@ -3120,9 +3125,7 @@ g_GlobalStrings = {
         b'to do is just beat it quickly\n'
         b'after we flip it.\n'
         b'<k>',
-
-
-
+        
     b'btl_hlp_yami_noko':
         b"That's a Dark Koopa.\n"
         b'<wait 250>\n'
@@ -3131,7 +3134,12 @@ g_GlobalStrings = {
         b'<k>\n'
         b'%s'
         b'<p>\n'
-        b"It's a bit tougher than a\n"
+        b"It'll usually attack who's in\n"
+        b"front like other Koopas, <wait 150>but it\n"
+        b"can also try to dizzy us both.\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"It's a lot tougher than a\n"
         b"regular Koopa, so you won't\n"
         b'be able to beat it easily.\n'
         b'<k>\n'
@@ -3140,6 +3148,10 @@ g_GlobalStrings = {
         b'weakness as a regular Koopa.\n'
         b'<wait 250>\n'
         b"Flip it over and it's helpless.\n"
+        b'<k>\n'
+        b'<p>\n'
+        b'It can also get up faster,\n'
+        b'though, so keep on your toes!\n'
         b'<k>\n'
         b'<p>\n'
         b'Why do you think it needs\n'
@@ -4239,28 +4251,30 @@ g_GlobalStrings = {
     b'btl_hlp_monochrome_kurokumorn':
         b"That's a Dark Puff.\n"
         b'<wait 250>\n'
-        b"It's basically a tiny, mean\n"
-        b'thunderhead.\n'
+        b'Oh, <wait 200>like a little storm cloud,\n'
+        b'I guess. <wait 250>Sure, why not?\n'
         b'<k>\n'
         b'%s'
-        b'<p>\n'
-        b"Sometimes it'll charge itself\n"
-        b"with electricity. <wait 250>Don't touch\n"
-        b'it when it does! <wait 250>Yowch!\n'
-        b'<k>\n'
-        b'<p>\n'
-        b'You know what I mean, right?\n'
-        b'<shake>Brzzzzzzzzzzzzzzzzzzzzzzzzt!\n'
-        b'</shake>\n'
-        b'<wait 250>\n'
-        b'Shocking!\n'
-        b'<k>\n'
-        b'<p>\n'
-        b"After it charges itself, it'll\n"
-        b'totally zap you with lightning.\n'
-        b'<wait 250>\n'
-        b'Beat it as fast as you can.\n'
-        b'<k>',
+        b"<p>\n"
+        b"They're elemental masters,\n"
+        b"able to use thunder, ice,\n"
+        b"and even poison attacks!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"If it charges, pay attention\n"
+        b"to its barrier to know what\n"
+        b"kind of attack's coming!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"It also says here that they\n"
+        b"soak up electrical and icy\n"
+        b"attacks like nothing. Yow!\n"
+        b"<k>\n"
+        b"<p>\n"
+        b"These guys might look weak,\n"
+        b"but they're actually the\n"
+        b"strongest Puffs out there!\n"
+        b"<k>",
 
     b'btl_hlp_kurokumorn':
         b'This is a Ruff Puff.\n'
