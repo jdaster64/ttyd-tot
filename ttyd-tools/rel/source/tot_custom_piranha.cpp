@@ -2,6 +2,7 @@
 
 #include "evt_cmd.h"
 #include "patches_battle.h"
+#include "tot_custom_common.h"
 
 #include <gc/types.h>
 #include <ttyd/battle.h>
@@ -211,7 +212,8 @@ BattleWeapon unitPiranha_weaponBreath = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_CENTER,
     .target_property_flags =
         AttackTargetProperty_Flags::JUMPLIKE |
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR,
@@ -566,11 +568,11 @@ EVT_BEGIN(unitPiranha_breath_attack_event)
 
     // Visual effects.
     BROTHER_EVT()
-        USER_FUNC(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
+        USER_FUNC(evtTot_CheckSpeciesIsEnemy, LW(3), LW(10))
         SWITCH(LW(11))
             CASE_EQUAL((int32_t)BattleUnitType::PUTRID_PIRANHA)
                 WAIT_MSEC(600)
-                IF_EQUAL(LW(10), 0)
+                IF_EQUAL(LW(10), 1)
                     DO(20)
                         USER_FUNC(evtTot_PiranhaSpawnPoisonEffect, 1)
                         WAIT_FRM(3)
