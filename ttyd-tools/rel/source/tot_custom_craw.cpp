@@ -169,8 +169,8 @@ BattleWeapon unitCraw_weaponRam = {
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
     .counter_resistance_flags = 
-        AttackCounterResistance_Flags::ALL &
-        ~AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+        // No longer weak to pre-emptive spiky since it didn't function anyway.
+        AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::PREFER_FRONT |
         AttackTargetWeighting_Flags::UNKNOWN_0x2000,
@@ -213,7 +213,8 @@ BattleWeapon unitCraw_weaponMultiRam = {
         AttackTargetClass_Flags::CANNOT_TARGET_SELF |
         AttackTargetClass_Flags::CANNOT_TARGET_SAME_ALLIANCE |
         AttackTargetClass_Flags::CANNOT_TARGET_SYSTEM_UNITS |
-        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH |
+        AttackTargetClass_Flags::ENEMY_SELECT_SIDE_HOME,
     .target_property_flags =
         AttackTargetProperty_Flags::TARGET_OPPOSING_ALLIANCE_DIR |
         AttackTargetProperty_Flags::HAMMERLIKE,
@@ -226,8 +227,8 @@ BattleWeapon unitCraw_weaponMultiRam = {
         AttackSpecialProperty_Flags::ALL_BUFFABLE |
         AttackSpecialProperty_Flags::FREEZE_BREAK,
     .counter_resistance_flags = 
-        AttackCounterResistance_Flags::ALL &
-        ~AttackCounterResistance_Flags::PREEMPTIVE_SPIKY,
+        // No longer weak to pre-emptive spiky since it didn't function anyway.
+        AttackCounterResistance_Flags::ALL,
     .target_weighting_flags =
         AttackTargetWeighting_Flags::UNKNOWN_0x2000,
         
@@ -408,10 +409,8 @@ EVT_BEGIN(unitCraw_multi_attack_event)
     USER_FUNC(btlevtcmd_PayWeaponCost, -2, LW(9))
     USER_FUNC(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
     USER_FUNC(btlevtcmd_ChangeFaceDirection, -2, LW(15))
-    USER_FUNC(evt_btl_camera_set_mode, 0, 8)
-    USER_FUNC(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
-    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    USER_FUNC(evt_btl_camera_set_zoom, 0, 250)
+    USER_FUNC(evt_btl_camera_set_mode, 0, 0)
+    USER_FUNC(evt_btl_camera_set_moveSpeedLv, 0, 2)
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_MONBAN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     USER_FUNC(btlevtcmd_AnimeChangePose, -2, 1, PTR("A_1"))
     WAIT_FRM(20)
@@ -432,18 +431,38 @@ EVT_BEGIN(unitCraw_multi_attack_event)
     USER_FUNC(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), 0, -1)
     
     USER_FUNC(btlevtcmd_snd_se, -2, PTR("SFX_ENM_MONBAN_MOVE3"), EVT_NULLPTR, 0, LW(15))
-    USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    SET(LW(5), 30)
-    USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(6))
-    MULF(LW(5), LW(6))
-    USER_FUNC(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(5))
-    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
-    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, -1, 0)
-    // For tracking defensive AC check.
+    
+    BROTHER_EVT_ID(LW(11))
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        USER_FUNC(btlevtcmd_FaceDirectionAdd, -2, LW(0), 500)
+        USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
+        USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
+        WAIT_MSEC(500)
+    END_BROTHER()
+
+    // Only check for guard result at most once.
     SET(LW(13), 0)
+
 LBL(10)
-    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
-    USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    // Process each hit only once the Craw's spear contacts the target.
+    DO(0)
+        USER_FUNC(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), EVT_NULLPTR, EVT_NULLPTR)
+        // Offset the hit position to account for the spear's length.
+        SET(LW(1), 30)
+        USER_FUNC(btlevtcmd_GetStatusMg, -2, LW(2))
+        MULF(LW(1), LW(2))
+        USER_FUNC(btlevtcmd_FaceDirectionSub, -2, LW(0), LW(1))
+
+        USER_FUNC(btlevtcmd_GetPos, -2, LW(1), EVT_NULLPTR, EVT_NULLPTR)
+        USER_FUNC(btlevtcmd_GetFaceDirection, -2, LW(2))
+        MUL(LW(0), LW(2))
+        MUL(LW(1), LW(2))
+        IF_LARGE_EQUAL(LW(1), LW(0))
+            DO_BREAK()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+
     USER_FUNC(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR(4)
@@ -467,8 +486,6 @@ LBL(10)
             CASE_END()
     END_SWITCH()
 LBL(90)
-    USER_FUNC(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 100)
-    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, 0, 0)
     GOTO(97)
 LBL(91)    
     IF_EQUAL(LW(13), 0)
@@ -481,13 +498,19 @@ LBL(97)
     IF_NOT_EQUAL(LW(3), -1)
         GOTO(10)
     END_IF()
-    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    USER_FUNC(btlevtcmd_FaceDirectionAdd, -2, LW(0), 500)
-    USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
-    USER_FUNC(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 0)
-    WAIT_MSEC(300)
-    USER_FUNC(btlevtcmd_SetPos, -2, 250, LW(1), LW(2))
+
+    // Wait for the above move event to end.
+    DO(0)
+        CHK_EVT(LW(11), LW(0))
+        IF_EQUAL(LW(0), 0)
+            DO_BREAK()
+        END_IF()
+        WAIT_FRM(1)
+    WHILE()
+    
 LBL(98)
+    USER_FUNC(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    USER_FUNC(btlevtcmd_SetPos, -2, 250, LW(1), LW(2))
     USER_FUNC(evt_btl_camera_set_mode, 0, 0)
     USER_FUNC(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
     USER_FUNC(btlevtcmd_SetMoveSpeed, -2, FLOAT(10.0))
@@ -613,7 +636,7 @@ EVT_BEGIN(unitCraw_attack_event)
     END_IF()
     USER_FUNC(btlevtcmd_GetUnitWork, -2, UW_BattleUnitType, LW(0))
     IF_EQUAL(LW(0), (int32_t)BattleUnitType::DARK_CRAW)
-        SET(LW(0), 50 + 50 + 20 - 1)
+        SET(LW(0), 50 + 50 + 30 - 1)
     ELSE()
         SET(LW(0), 50 + 50 - 1)
     END_IF()
