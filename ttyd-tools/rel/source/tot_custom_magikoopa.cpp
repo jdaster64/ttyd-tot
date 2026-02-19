@@ -958,7 +958,7 @@ BattleUnitKind unit_MagikoopaClone = {
     .fire_damage_sfx_name = "SFX_BTL_DAMAGE_FIRE1",
     .ice_damage_sfx_name = "SFX_BTL_DAMAGE_ICE1",
     .explosion_damage_sfx_name = "SFX_BTL_DAMAGE_BIRIBIRI1",
-    .attribute_flags = 0,
+    .attribute_flags = BattleUnitAttribute_Flags::UNK_40_0000,
     .status_vulnerability = &unitMagikoopaClone_status,
     .num_parts = 2,
     .parts = unitMagikoopa_parts,
@@ -1010,8 +1010,6 @@ BattleUnitKind unit_RedMagikoopa = {
     .init_evt_code = (void*)unitRedMagikoopa_init_event,
     .data_table = unitMagikoopa_data_table,
 };
-
-// magikoopa_2   unit_kamec_red_bunsin unit_kamec_red.o
 BattleUnitKind unit_RedMagikoopaClone = {
     .unit_type = BattleUnitType::RED_MAGIKOOPA_CLONE,
     .unit_name = "btl_un_kamec_red_bunsin",
@@ -1050,15 +1048,13 @@ BattleUnitKind unit_RedMagikoopaClone = {
     .fire_damage_sfx_name = "SFX_BTL_DAMAGE_FIRE1",
     .ice_damage_sfx_name = "SFX_BTL_DAMAGE_ICE1",
     .explosion_damage_sfx_name = "SFX_BTL_DAMAGE_BIRIBIRI1",
-    .attribute_flags = 0,
+    .attribute_flags = BattleUnitAttribute_Flags::UNK_40_0000,
     .status_vulnerability = &unitMagikoopaClone_status,
     .num_parts = 2,
     .parts = unitRedMagikoopa_parts,
     .init_evt_code = (void*)unitRedMagikoopa_init_event,
     .data_table = unitMagikoopaClone_data_table,
 };
-
-// magikoopa_3   unit_kamec_white unit_kamec_white.o
 BattleUnitKind unit_WhiteMagikoopa = {
     .unit_type = BattleUnitType::WHITE_MAGIKOOPA,
     .unit_name = "btl_un_kamec_white",
@@ -1104,8 +1100,6 @@ BattleUnitKind unit_WhiteMagikoopa = {
     .init_evt_code = (void*)unitWhiteMagikoopa_init_event,
     .data_table = unitMagikoopa_data_table,
 };
-
-// magikoopa_3   unit_kamec_white_bunsin unit_kamec_white.o
 BattleUnitKind unit_WhiteMagikoopaClone = {
     .unit_type = BattleUnitType::WHITE_MAGIKOOPA_CLONE,
     .unit_name = "btl_un_kamec_white_bunsin",
@@ -1144,7 +1138,7 @@ BattleUnitKind unit_WhiteMagikoopaClone = {
     .fire_damage_sfx_name = "SFX_BTL_DAMAGE_FIRE1",
     .ice_damage_sfx_name = "SFX_BTL_DAMAGE_ICE1",
     .explosion_damage_sfx_name = "SFX_BTL_DAMAGE_BIRIBIRI1",
-    .attribute_flags = 0,
+    .attribute_flags = BattleUnitAttribute_Flags::UNK_40_0000,
     .status_vulnerability = &unitMagikoopaClone_status,
     .num_parts = 2,
     .parts = unitWhiteMagikoopa_parts,
@@ -1234,7 +1228,7 @@ BattleUnitKind unit_GreenMagikoopaClone = {
     .fire_damage_sfx_name = "SFX_BTL_DAMAGE_FIRE1",
     .ice_damage_sfx_name = "SFX_BTL_DAMAGE_ICE1",
     .explosion_damage_sfx_name = "SFX_BTL_DAMAGE_BIRIBIRI1",
-    .attribute_flags = 0,
+    .attribute_flags = BattleUnitAttribute_Flags::UNK_40_0000,
     .status_vulnerability = &unitMagikoopaClone_status,
     .num_parts = 2,
     .parts = unitGreenMagikoopa_parts,

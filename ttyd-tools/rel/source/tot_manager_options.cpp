@@ -443,6 +443,7 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
                                 value = state.Rand((option & 0xff) + 1);
                                 state.SetOption(option, value);
                             }
+                            return true;
                         }
 
                         case OPTNUM_ENEMY_HP:
@@ -507,18 +508,20 @@ bool OptionsManager::RandomizeOption(uint32_t option, bool explicitly) {
                 }
                 break;
             case OPT_STARTER_ITEMS:
-                // If "custom" starting items isn't unlocked, retry.
-                if (state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) &&
+                // If custom starting items aren't unlocked, or if that setting
+                // wasn't a result of explicit randomization, retry.
+                if (state.CheckOptionValue(OPTVAL_STARTER_ITEMS_CUSTOM) && (
                     !AchievementsManager::CheckOptionUnlocked(
-                        OPTVAL_STARTER_ITEMS_CUSTOM)) {
+                        OPTVAL_STARTER_ITEMS_CUSTOM) || !explicitly)) {
                     successful = false;
                 }
                 break;
             case OPT_MOVE_AVAILABILITY:
-                // If custom moves key item isn't unlocked, retry.
-                if (state.CheckOptionValue(OPTVAL_MOVES_CUSTOM) &&
+                // If custom moves key item isn't unlocked, or if that setting
+                // wasn't a result of explicit randomization, retry.
+                if (state.CheckOptionValue(OPTVAL_MOVES_CUSTOM) && (
                     !ttyd::mario_pouch::pouchCheckItem(
-                        ItemType::TOT_KEY_MOVE_SELECTOR)) {
+                        ItemType::TOT_KEY_MOVE_SELECTOR) || !explicitly)) {
                     successful = false;
                 }
                 // If partners disabled, retry on +1 move on pickup.
@@ -686,6 +689,7 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
         case OPT_BATTLE_DROPS:
             switch (state.GetOptionValue(option)) {
                 case OPTVAL_DROP_HELD_FROM_BONUS:
+                    return 20;
                 case OPTVAL_DROP_NO_HELD_W_BONUS:
                     return 10;
                 case OPTVAL_DROP_ALL_HELD:
@@ -758,7 +762,8 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
             }
             break;
         case OPT_MOVE_LIMIT:
-            // Adds 5% per additional level of restriction.
+            // Adds 5% per level of restriction, +5% extra for 0.
+            if (state.CheckOptionValue(OPTVAL_MOVE_LIMIT_0)) return 30;
             return state.GetOption(option) * 5;
         case OPT_CHEST_CHOICE:
             switch (state.GetOptionValue(option)) {
@@ -767,7 +772,7 @@ int32_t OptionsManager::GetIntensity(uint32_t option) {
                 case OPTVAL_CHEST_REROLL_REFILL:
                     return -20;
                 case OPTVAL_CHEST_REVEAL_FIXED:
-                    if (!state.CheckOptionValue(OPTVAL_CHESTS_1)) return 20;
+                    if (!state.CheckOptionValue(OPTVAL_CHESTS_1)) return 15;
                     break;
                 case OPTVAL_CHEST_REVEAL_REFILL:
                     if (!state.CheckOptionValue(OPTVAL_CHESTS_1)) return 15;

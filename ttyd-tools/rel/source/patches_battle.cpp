@@ -1620,8 +1620,8 @@ void BattleSelectValidTargets(BattleWorkWeaponTargets* tw) {
     }
     for (int32_t i = 0; i < tw->num_targets - 1; ++i) {
         for (int32_t j = i + 1; j < tw->num_targets; ++j) {
-            if (GetTargetSortPosition(tw, &tw->targets[j]) <
-                GetTargetSortPosition(tw, &tw->targets[i])) {
+            if (GetTargetSortPosition(tw, &tw->targets[tw->target_indices[j]]) <
+                GetTargetSortPosition(tw, &tw->targets[tw->target_indices[i]])) {
                 int32_t tmp = tw->target_indices[i];
                 tw->target_indices[i] = tw->target_indices[j];
                 tw->target_indices[j] = tmp;

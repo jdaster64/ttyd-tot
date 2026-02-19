@@ -1091,7 +1091,9 @@ BattleUnitKind unit_DarkWizzerdClone = {
     .fire_damage_sfx_name = "SFX_BTL_DAMAGE_FIRE1",
     .ice_damage_sfx_name = "SFX_BTL_DAMAGE_ICE1",
     .explosion_damage_sfx_name = "SFX_BTL_DAMAGE_BIRIBIRI1",
-    .attribute_flags = BattleUnitAttribute_Flags::UNQUAKEABLE,
+    .attribute_flags =
+        BattleUnitAttribute_Flags::UNQUAKEABLE |
+        BattleUnitAttribute_Flags::UNK_40_0000,
     .status_vulnerability = &unitWizzerdClone_status,
     .num_parts = 5,
     .parts = unitDarkWizzerd_parts,
@@ -1181,7 +1183,9 @@ BattleUnitKind unit_EliteWizzerdClone = {
     .fire_damage_sfx_name = "SFX_BTL_DAMAGE_FIRE1",
     .ice_damage_sfx_name = "SFX_BTL_DAMAGE_ICE1",
     .explosion_damage_sfx_name = "SFX_BTL_DAMAGE_BIRIBIRI1",
-    .attribute_flags = BattleUnitAttribute_Flags::UNQUAKEABLE,
+    .attribute_flags =
+        BattleUnitAttribute_Flags::UNQUAKEABLE |
+        BattleUnitAttribute_Flags::UNK_40_0000,
     .status_vulnerability = &unitWizzerdClone_status,
     .num_parts = 5,
     .parts = unitEliteWizzerd_parts,
