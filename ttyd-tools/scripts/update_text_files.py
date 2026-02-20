@@ -6337,6 +6337,11 @@ g_TowerStrings = {
         b"cook that right up for you\n"
         b"for %d coins.<wait 250> OK?\n<o>",
         
+    b"tot_zess_confirmcost2":
+        b"All right, Tootsies, I'll whip up\n"
+        b"a couple of my specials for you\n"
+        b"for %d coins.<wait 250> OK?\n<o>",
+        
     b"tot_zess_declinecost":
         b"<p>\nHmph, <wait 150>my art isn't free.\n"
         b"<wait 250>Come back if you change\n"

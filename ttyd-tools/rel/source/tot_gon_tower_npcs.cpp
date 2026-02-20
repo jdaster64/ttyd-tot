@@ -1009,7 +1009,13 @@ LBL(60)
     IF_LARGE(LW(5), 0)
         // Prompt with coin cost.
         USER_FUNC(evt_win_coin_on, 0, LW(12))
-        USER_FUNC(evt_msg_print_insert, 0, PTR("tot_zess_confirmcost"), 0, PTR("me"), LW(5))
+
+        IF_EQUAL(LW(14), (int32_t)RecipeMode::DOUBLE_ITEM)
+            USER_FUNC(evt_msg_print_insert, 0, PTR("tot_zess_confirmcost2"), 0, PTR("me"), LW(5))
+        ELSE()
+            USER_FUNC(evt_msg_print_insert, 0, PTR("tot_zess_confirmcost"), 0, PTR("me"), LW(5))
+        END_IF()
+
         USER_FUNC(evt_msg_select, 0, PTR("tot_npc_yesnoopt"))
         IF_EQUAL(LW(0), 1)
             USER_FUNC(evt_msg_print_add, 0, PTR("tot_zess_declinecost"))
@@ -1043,9 +1049,16 @@ LBL(60)
     // Remove items LW(8) and LW(9) if set, give item LW(11).
     USER_FUNC(evt_pouch_remove_item, LW(8), LW(0))
     USER_FUNC(evt_pouch_remove_item, LW(9), LW(0))
-    USER_FUNC(evtTot_GetUniqueItemName, LW(0))
-    USER_FUNC(evt_item_entry, LW(0), LW(11), FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
-    USER_FUNC(evt_item_get_item, LW(0))
+    SET(LW(7), 1)
+    IF_EQUAL(LW(14), (int32_t)RecipeMode::DOUBLE_ITEM)
+        // Give two copies of specialty recipe items.
+        SET(LW(7), 2)
+    END_IF()
+    DO(LW(7))
+        USER_FUNC(evtTot_GetUniqueItemName, LW(0))
+        USER_FUNC(evt_item_entry, LW(0), LW(11), FLOAT(0.0), FLOAT(-999.0), FLOAT(0.0), 17, -1, 0)
+        USER_FUNC(evt_item_get_item, LW(0))
+    WHILE()
     USER_FUNC(evtTot_EnableNpcEffect, (int32_t)SecondaryNpcType::ZESS_T)
 
     SWITCH(LW(14))
@@ -1561,8 +1574,8 @@ EVT_DEFINE_USER_FUNC(evtTot_GetRecipeOptionsString) {
             }
             g_RecipeModes[num_options++] = RecipeMode::DOUBLE_ITEM;
             p_buf += sprintf(
-                p_buf, "\nSpecialty recipe (%" PRId32 " coins)",
-                GetScaledPrice(50));
+                p_buf, "\nSpecialty recipes (%" PRId32 " coins)",
+                GetScaledPrice(75));
             break;
         }
     }
@@ -1593,7 +1606,7 @@ EVT_DEFINE_USER_FUNC(evtTot_GetSelectedRecipeMode) {
             evtSetValue(evt, evt->evtArguments[2], GetScaledPrice(25));
             break;
         case RecipeMode::DOUBLE_ITEM:
-            evtSetValue(evt, evt->evtArguments[2], GetScaledPrice(50));
+            evtSetValue(evt, evt->evtArguments[2], GetScaledPrice(75));
             break;
         default:
             evtSetValue(evt, evt->evtArguments[2], 0);

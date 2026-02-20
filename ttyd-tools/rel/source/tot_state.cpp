@@ -842,13 +842,15 @@ uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
         // different sequences can't end up identical.
         // (e.g. chest random badge rewards + first floor's enemy items)
         data[0] = (*seq_val)++ | (sequence << 16);
+        // Include the tower difficulty setting, to make seeds more distinct.
+        data[1] = GetOption(OPT_DIFFICULTY) << 24;
         switch (sequence) {
             case RNG_ENEMY:
             case RNG_MIDBOSS_MOB: {
                 // Note: update this to intentionally shuffle enemy types when
                 // introducing seed-breaking enemy level changes.
                 const int32_t kEnemySeedVer = 1;
-                data[1] = floor_ | (kEnemySeedVer << 16);
+                data[1] |= (floor_ | (kEnemySeedVer << 16));
                 break;
             }
             case RNG_ENEMY_ITEM:
@@ -857,7 +859,7 @@ uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
             case RNG_NPC_TYPE:
             case RNG_NPC_OPTIONS:
             case RNG_REWARD: {
-                data[1] = floor_;
+                data[1] |= floor_;
                 break;
             }
             default:
