@@ -690,10 +690,7 @@ EVT_DEFINE_USER_FUNC(unitKoopatrol_GetAlliesCount) {
     int32_t count = 0;
     for (int32_t i = 0; i < 64; ++i) {
         auto* unit = g_BattleWork->battle_units[i];
-        if (unit && unit->alliance == 1 && (
-            unit->current_kind == BattleUnitType::KOOPATROL ||
-            unit->current_kind == BattleUnitType::DARK_KOOPATROL))
-            ++count;        
+        if (unit && unit->alliance == 1) ++count;        
     }
     evtSetValue(evt, evt->evtArguments[0], count);
     return 2;
@@ -818,7 +815,7 @@ LBL(10)
 LBL(11)
     // Can't spawn an ally, pick a normal attack or guard.
     IF_EQUAL(LW(15), (int32_t)BattleUnitType::KOOPATROL)
-        USER_FUNC(btlevtcmd_DrawLots, LW(0), 4, 25, 25, 25, 25)
+        USER_FUNC(btlevtcmd_DrawLots, LW(0), 4, 25, 25, 25, 15)
         SET(LW(10), PTR(&unitKoopatrol_weaponNormal))
         SET(LW(11), PTR(&unitKoopatrol_weaponPowerShell))
         SET(LW(12), PTR(&unitKoopatrol_weaponCharge))
