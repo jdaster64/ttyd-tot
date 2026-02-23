@@ -242,7 +242,7 @@ bool StateManager::Load(TotSaveSlot* save) {
 
         // Previously secret achievement got moved to a new id.
         if (GetOption(FLAGS_ACHIEVEMENT, AchievementId::SECRET_BADGE_COMBO)) {
-            AchievementsManager::MarkCompleted(AchievementId::V3_RUN_INFATUATE);
+            AchievementsManager::MarkCompleted(AchievementId::V3_MISC_INFATUATE_DAMAGE);
         }
 
         // Revert achievements that are no longer true.

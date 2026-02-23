@@ -337,8 +337,10 @@ EVT_DEFINE_USER_FUNC(evtTot_TrackCompletedRun) {
         AchievementsManager::MarkCompleted(AchievementId::SECRET_DAMAGE);
     }
     
+    // Check at the end of a run for safety, but as of v4.00, this achievement
+    // should be awarded immediately on hitting the threshold instead.
     if (state.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 500) {
-        AchievementsManager::MarkCompleted(AchievementId::V3_RUN_INFATUATE);
+        AchievementsManager::MarkCompleted(AchievementId::V3_MISC_INFATUATE_DAMAGE);
     }
 
     // Achievements that require default settings.

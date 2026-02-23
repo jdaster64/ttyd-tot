@@ -559,12 +559,17 @@ uint32_t GetStatusDamageFromWeapon(
             // Make midbosses and bosses receive Slow status in place of Stop.
             int32_t actual_type = type;
             if (type == StatusEffectType::STOP) {
-                switch (target->current_kind) {
+                switch (target->true_kind) {
                     case BattleUnitType::HOOKTAIL:
                     case BattleUnitType::GLOOMTAIL:
                     case BattleUnitType::BONETAIL:
                     case BattleUnitType::ATOMIC_BOO:
                     case BattleUnitType::TOT_COSMIC_BOO:
+                    case BattleUnitType::GOLD_FUZZY:
+                    case BattleUnitType::FUZZY_HORDE:
+                    case BattleUnitType::BOWSER_CH_8:
+                    case BattleUnitType::KAMMY_KOOPA:
+                    case BattleUnitType::DOOPLISS_CH_8:
                         actual_type = StatusEffectType::SLOW;
                         break;
                 }
@@ -1904,6 +1909,11 @@ void ApplyFixedPatches() {
                         <= BattleUnitType::BONETAIL) {
                     g_Mod->state_.ChangeOption(
                         STAT_RUN_INFATUATE_DAMAGE, damage);
+                    // New to v4.00 onward; mark off immediately.
+                    if (g_Mod->state_.GetOption(STAT_RUN_INFATUATE_DAMAGE) >= 500) {
+                        AchievementsManager::MarkCompleted(
+                            AchievementId::V3_MISC_INFATUATE_DAMAGE);
+                    }
                 }
 
                 // Check for Superguarded dragon bites.

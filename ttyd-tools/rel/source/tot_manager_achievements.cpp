@@ -508,7 +508,7 @@ void AchievementsManager::GetProgress(
 
     switch (ach) {
         // Single-run progression achievements.
-        case AchievementId::V3_RUN_INFATUATE: {
+        case AchievementId::V3_MISC_INFATUATE_DAMAGE: {
             if (!state.GetOption(OPT_RUN_STARTED)) break;
             progress = state.GetOption(STAT_RUN_INFATUATE_DAMAGE);
             total = 500;

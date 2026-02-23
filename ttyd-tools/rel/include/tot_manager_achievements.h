@@ -104,7 +104,7 @@ namespace AchievementId {
         V3_RUN_RANDOM_INTENSITY,
         V3_AGG_MIDBOSS_TYPES_ALL,
         V3_RUN_GRUBBA,
-        V3_RUN_INFATUATE,
+        V3_MISC_INFATUATE_DAMAGE,
         V3_AGG_BOSS_ALL_EX,
         V3_RUN_ITEMS_FULL,
         V3_RUN_BOSS_SIMULTANEOUS,
