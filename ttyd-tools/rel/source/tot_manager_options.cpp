@@ -53,7 +53,7 @@ RunOptionMetadata g_OptionMetadata[] = {
     { OPT_MARIO_FP, 0, 5, true, true, 2 },
     { OPT_MARIO_BP, 0, 5, true, true, 2 },
     { OPT_PARTNER_HP, 0, 5, true, true, 2 },
-    { OPT_STARTING_STAT_LEVEL, OPTVAL_STARTING_STAT_DEFAULT, -1, true, false, 2 },
+    { OPT_STARTING_STAT_LEVEL, OPTVAL_STARTING_STAT_DEFAULT, -1, true, true, 2 },
     { OPT_INVENTORY_SACK_SIZE, 0, 2, true, false, 2 },
     { OPTNUM_ENEMY_HP, 0, 100, true, false, 2 },
     { OPTNUM_ENEMY_ATK, 0, 100, true, false, 2 },
@@ -634,6 +634,7 @@ bool OptionsManager::AllDefault() {
         // Always allow changing secret boss option.
         if (data.option == OPT_SECRET_BOSS)
             continue;
+        // Otherwise, fall through to regular default check.
         if (g_Mod->state_.GetOption(data.option) != GetDefaultValue(data.option))
             return false;
     }
@@ -647,9 +648,14 @@ bool OptionsManager::AllDefaultExceptZeroStatLevels() {
         // Always allow changing secret boss option.
         if (data.option == OPT_SECRET_BOSS)
             continue;
-        // Allow stats to be set to zero.
-        if (data.check_for_default_stat && !g_Mod->state_.GetOption(data.option))
-            continue;
+        // Allow stats to be set to zero per level, or starting at zero.
+        if (data.check_for_default_stat) {
+            if (g_Mod->state_.GetOption(data.option) == 0) continue;
+            if (data.option == OPT_STARTING_STAT_LEVEL &&
+                g_Mod->state_.CheckOptionValue(OPTVAL_STARTING_STAT_0)) 
+                continue;
+        }
+        // Otherwise, fall through to regular default check.
         if (g_Mod->state_.GetOption(data.option) != GetDefaultValue(data.option))
             return false;
     }
