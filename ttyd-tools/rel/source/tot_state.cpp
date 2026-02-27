@@ -462,7 +462,7 @@ void StateManager::HashSeedName() {
     } else {
         // Hash the seed name into a numeric seed.
         seed_ = third_party::fasthash64(
-            seed_name_, sizeof(seed_name_), 417) % 999'999'999 + 1;
+            seed_name_, strlen(seed_name_), 417) % 999'999'999 + 1;
     }
 }
 
