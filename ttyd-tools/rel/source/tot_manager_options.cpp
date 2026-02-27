@@ -1083,6 +1083,9 @@ bool OptionsManager::SaveOrLoadUserPreset(bool save, int32_t slot) {
         if (version <= 12) {
             state.SetOption(OPTNUM_COIN_PRICES, 100);
         }
+
+        // Refresh total intensity value.
+        state.SetOption(STAT_RUN_INTENSITY, OptionsManager::GetTotalIntensity());
     }
 
     return true;
