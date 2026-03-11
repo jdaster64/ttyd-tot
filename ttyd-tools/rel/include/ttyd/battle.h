@@ -613,7 +613,7 @@ void BtlUnit_EquipItem(
 // BattleGetPartnerPtr
 battle_unit::BattleWorkUnit* BattleGetPartyPtr(BattleWork* battleWork);
 battle_unit::BattleWorkUnit* BattleGetMarioPtr(BattleWork* battleWork);
-// BattleGetSystemPtr
+battle_unit::BattleWorkUnit* BattleGetSystemPtr(BattleWork* battleWork);
 battle_unit::BattleWorkUnitPart* BattleGetUnitPartsPtr(
     int32_t unit_idx, int32_t part_idx);
 // BattleSetUnitPtr

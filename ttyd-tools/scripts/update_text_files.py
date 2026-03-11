@@ -1003,7 +1003,7 @@ g_GlobalStrings = {
         
     b"tot_sp_regen_effect":
         b"Star Power will regenerate\n"
-        b"over a few turns.",
+        b"briefly.",
         
     b"tot_ptr1_scope_out_effect_msg1":
         b"Scoped! The next attack is\n"

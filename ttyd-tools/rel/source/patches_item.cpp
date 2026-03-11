@@ -1,5 +1,6 @@
 #include "patches_item.h"
 
+#include "common_functions.h"
 #include "evt_cmd.h"
 #include "mod.h"
 #include "patch.h"
@@ -12,6 +13,7 @@
 
 #include <ttyd/battle.h>
 #include <ttyd/battle_camera.h>
+#include <ttyd/battle_damage.h>
 #include <ttyd/battle_database_common.h>
 #include <ttyd/battle_event_cmd.h>
 #include <ttyd/battle_event_default.h>
@@ -20,6 +22,8 @@
 #include <ttyd/battle_sub.h>
 #include <ttyd/battle_unit.h>
 #include <ttyd/battle_weapon_power.h>
+#include <ttyd/eff_nice.h>
+#include <ttyd/effdrv.h>
 #include <ttyd/evt_eff.h>
 #include <ttyd/evt_snd.h>
 #include <ttyd/evt_sub.h>
@@ -29,6 +33,7 @@
 #include <ttyd/item_data.h>
 #include <ttyd/itemdrv.h>
 #include <ttyd/mario_pouch.h>
+#include <ttyd/pmario_sound.h>
 #include <ttyd/swdrv.h>
 #include <ttyd/system.h>
 
@@ -92,6 +97,7 @@ extern const int32_t g_btlevtcmd_ConsumeItem_Patch_RefundBase;
 extern const int32_t g_btlevtcmd_ConsumeItemReserve_Patch_RefundBase;
 extern const int32_t g_BattleDamageDirect_Patch_AddTotalDamage;
 extern const int32_t g_BattleDamageDirect_Patch_PityFlowerChance;
+extern const int32_t g_battle_sub_nanika_luck_event_SetEffectHook;
 
 // Assembly patch functions.
 extern "C" {
@@ -130,8 +136,9 @@ namespace {
 EVT_DECLARE_USER_FUNC(ToggleCookingItemTypeToHeldItem, 1)
 EVT_DECLARE_USER_FUNC(evtTot_GetDummyPoisonShroomWeapon, 1)
 EVT_DECLARE_USER_FUNC(evtTot_RecoverStarPower, 0)
-EVT_DECLARE_USER_FUNC(evtTot_StoreGradualStarPower, 0)
+EVT_DECLARE_USER_FUNC(evtTot_StoreGradualStarPower, 1)
 EVT_DECLARE_USER_FUNC(evtTot_PickRandomStatus, 1)
+EVT_DECLARE_USER_FUNC(evtTot_HandleLuckyStartEffect, 1)
 
 // Mystic Egg event; Recovers 1/3 of max SP.
 EVT_BEGIN(MysticEggAttackEvent)
@@ -232,7 +239,7 @@ EVT_BEGIN(MeteorMealAttackEvent)
         CASE_EQUAL(1)
             USER_FUNC(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
             USER_FUNC(evt_eff, PTR(""), PTR("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
-            USER_FUNC(evtTot_StoreGradualStarPower)
+            USER_FUNC(evtTot_StoreGradualStarPower, 3)
             USER_FUNC(patch::battle::evtTot_ApplyCustomStatus,
                 LW(10), LW(11), 0,
                 /* splash colors */ 0xccf4ff, 0xffa0ff,
@@ -303,6 +310,30 @@ EVT_BEGIN(TradeOffPatch)
     RETURN()
 EVT_END()
 
+// New patch hooked into Lucky Start event.
+EVT_BEGIN(HandleLuckyStartEvt)
+    USER_FUNC(evtTot_HandleLuckyStartEffect, LW(0))
+    IF_EQUAL(LW(0), 1)
+        // Handle Star Power generation effect specially.
+        USER_FUNC(btlevtcmd_GetUnitId, -3, LW(10))
+        USER_FUNC(btlevtcmd_GetBodyId, -3, LW(11))
+        USER_FUNC(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+        USER_FUNC(evt_eff, PTR(""), PTR("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
+        USER_FUNC(evtTot_StoreGradualStarPower, 1)
+        USER_FUNC(patch::battle::evtTot_ApplyCustomStatus,
+            LW(10), LW(11), 0,
+            /* splash colors */ 0xccf4ff, 0xffa0ff,
+            PTR("SFX_CONDITION_REST_HP_SLOW1"), 
+            PTR("tot_sp_regen_effect"))
+    END_IF()
+    RETURN()
+EVT_END()
+
+EVT_BEGIN(HandleLuckyStartEvtHook)
+    RUN_CHILD_EVT(HandleLuckyStartEvt)
+    RETURN()
+EVT_END()
+
 // Toggles on/off setting CookingItem's item type to the attacker's held item.
 // This allows, e.g., target weighting for pure-FP items to be properly used.
 EVT_DEFINE_USER_FUNC(ToggleCookingItemTypeToHeldItem) {
@@ -346,7 +377,8 @@ EVT_DEFINE_USER_FUNC(evtTot_RecoverStarPower) {
 }
 
 EVT_DEFINE_USER_FUNC(evtTot_StoreGradualStarPower) {
-    patch::battle_seq::StoreGradualSpRegenEffect();
+    int32_t turn_count = evtGetValue(evt, evt->evtArguments[0]);
+    patch::battle_seq::StoreGradualSpRegenEffect(turn_count);
     return 2;
 }
 
@@ -415,6 +447,132 @@ EVT_DEFINE_USER_FUNC(evtTot_PickRandomStatus) {
             break;
         }
     }
+    return 2;
+} 
+
+const BattleWeapon weapon_LuckyStartBase = {
+    .name = nullptr,
+    .icon = 0,
+    .item_id = 0,
+    .description = nullptr,
+    .base_accuracy = 100,
+    .base_fp_cost = 0,
+    .base_sp_cost = 0,
+    
+    .superguards_allowed = 0,
+    .unk_14 = 0.0,
+    .stylish_multiplier = 0,
+    .unk_19 = 0,
+    .bingo_card_chance = 0,
+    .unk_1b = 0,
+    .damage_function = nullptr,
+    .damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .fp_damage_function = nullptr,
+    .fp_damage_function_params = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    
+    .target_class_flags =
+        AttackTargetClass_Flags::SINGLE_TARGET |
+        AttackTargetClass_Flags::ONLY_TARGET_SELF |
+        AttackTargetClass_Flags::CANNOT_TARGET_TREE_OR_SWITCH,
+    .target_property_flags =
+        AttackTargetProperty_Flags::TARGET_SAME_ALLIANCE_DIR,
+    .element = AttackElement::NORMAL,
+    .damage_pattern = 0,
+    .weapon_ac_level = 3,
+    .unk_6f = 2,
+    .ac_help_msg = nullptr,
+    .special_property_flags =
+        AttackSpecialProperty_Flags::CANNOT_MISS |
+        AttackSpecialProperty_Flags::IGNORES_STATUS_CHANCE |
+        AttackSpecialProperty_Flags::UNGUARDABLE,
+    .counter_resistance_flags = AttackCounterResistance_Flags::ALL,
+    .target_weighting_flags =
+        AttackTargetWeighting_Flags::UNKNOWN_0x2000 |
+        AttackTargetWeighting_Flags::WEIGHTED_RANDOM |
+        AttackTargetWeighting_Flags::PREFER_FRONT,
+        
+    // status chances (to be filled in dynamically)
+    
+    .attack_evt_code = nullptr,
+    .bg_a1_a2_fall_weight = 0,
+    .bg_a1_fall_weight = 0,
+    .bg_a2_fall_weight = 0,
+    .bg_no_a_fall_weight = 100,
+    .bg_b_fall_weight = 0,
+    .nozzle_turn_chance = 0,
+    .nozzle_fire_chance = 0,
+    .ceiling_fall_chance = 0,
+    .object_fall_chance = 0,
+};
+
+EVT_DEFINE_USER_FUNC(evtTot_HandleLuckyStartEffect) {
+    auto& state = g_Mod->state_;
+    auto* battleWork = ttyd::battle::g_BattleWork;
+    auto* mario = ttyd::battle::BattleGetMarioPtr(battleWork);
+
+    if (mario != nullptr && mario->badges_equipped.lucky_start &&
+        state.GetOption(STAT_RUN_LUCKY_START_FLOOR) < state.floor_) {
+            
+        static BattleWeapon weapon_LuckyStartCopy;
+        memcpy(&weapon_LuckyStartCopy, &weapon_LuckyStartBase, sizeof(BattleWeapon));
+
+        bool restore_sp = false;
+        switch (state.Rand(6, RNG_LUCKY_START)) {
+            case 0:
+                weapon_LuckyStartCopy.atk_change_strength = 3;
+                weapon_LuckyStartCopy.atk_change_chance = 100;
+                weapon_LuckyStartCopy.atk_change_time = 2;
+                break;
+            case 1:
+                weapon_LuckyStartCopy.def_change_strength = 3;
+                weapon_LuckyStartCopy.def_change_chance = 100;
+                weapon_LuckyStartCopy.def_change_time = 2;
+                break;
+            case 2:
+                weapon_LuckyStartCopy.fast_chance = 100;
+                weapon_LuckyStartCopy.fast_time = 2;
+                break;
+            case 3:
+                // Restore 25% of maximum HP immediately.
+                weapon_LuckyStartCopy.hp_regen_strength =
+                    Max((mario->max_hp + 2) / 4, 1);
+                weapon_LuckyStartCopy.hp_regen_time = 1;
+                break;
+            case 4:
+                // Restore 25% of maximum FP immediately.
+                weapon_LuckyStartCopy.fp_regen_strength =
+                    Max((mario->max_fp + 2) / 4, 1);
+                weapon_LuckyStartCopy.fp_regen_time = 1;
+                break;
+            case 5:
+                // Restore 1/3 of max SP immediately (handle in event).
+                restore_sp = true;
+                break;
+        }
+
+        if (!restore_sp) {
+            auto* part = ttyd::battle_unit::BtlUnit_GetPartsPtr(mario, 1);
+            auto* system = ttyd::battle::BattleGetSystemPtr(battleWork);
+
+            ttyd::battle_damage::BattleSetStatusDamageFromWeapon(
+                system, mario, part, &weapon_LuckyStartCopy, 0x100);
+
+            evtSetValue(evt, evt->evtArguments[0], 0);
+        } else {
+            evtSetValue(evt, evt->evtArguments[0], 1);
+        }
+            
+        gc::vec3 pos;
+        ttyd::battle_unit::BtlUnit_GetPos(mario, &pos.x, &pos.y, &pos.z);
+        auto* eff = ttyd::eff_nice::effNiceEntry(
+            pos.x - 45.0f, pos.y + 60.f, pos.z, 6);
+        *(float*)((uintptr_t)eff->eff_work + 0x1c) = 0.75f;
+
+        ttyd::pmario_sound::psndSFXOn("SFX_SYSTEM_LUCKY1");
+
+        state.SetOption(STAT_RUN_LUCKY_START_FLOOR, state.floor_);
+    }
+
     return 2;
 }
 
@@ -1096,6 +1254,11 @@ void ApplyFixedPatches() {
         reinterpret_cast<void*>(g_BattleDamageDirect_Patch_AddTotalDamage),
         0x60000000U /* nop */);
 
+    // Replace Lucky Start event with one that checks only for Mario,
+    // and gives stronger, first-turn only effects.
+    mod::writePatch(
+        reinterpret_cast<void*>(g_battle_sub_nanika_luck_event_SetEffectHook),
+        HandleLuckyStartEvtHook, sizeof(HandleLuckyStartEvtHook));
 
     // General hooks...
     

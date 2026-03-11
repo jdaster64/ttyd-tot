@@ -2436,10 +2436,13 @@
 8011a48c:BattlePadInit
 
 // battle_seq.o
+// .text
 8011aa34:BattleCheckConcluded
 8011ace8:BattleWaitAllActiveEvtEnd
 8011c350:_rule_disp
 8011edb8:_GetFirstAttackWeapon
+// .data
+80416d40:nanika_luck_event
 
 // battle_seq_command.o
 // .text
@@ -2906,6 +2909,15 @@
 8014375c:effMissStarDisp
 80143a84:effMissStarMain
 80143c80:effMissStarEntry
+
+// eff_nice.o
+80143f28:effAcrobatDisp
+80144300:acrobatMain
+8014473c:effNiceDisp
+801448b0:effNiceMain
+80144acc:effNiceEntry
+80144cc4:rendermodeFunc
+80144d44:effNiceAsync
 
 // unit_mario.o
 // .text

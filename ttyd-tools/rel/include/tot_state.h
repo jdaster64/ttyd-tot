@@ -259,8 +259,11 @@ enum RngSequence {
     RNG_MYSTERY_COOK_RESULT     = 34,
     RNG_ALTERNATE_BOSS          = 35,
     RNG_MIDBOSS_SELECT          = 36,
+
+    // Used for consistent Lucky Start effects; determined only by floor.
+    RNG_LUCKY_START             = 37,
     
-    RNG_SEQUENCE_MAX            = 37,
+    RNG_SEQUENCE_MAX            = 38,
 };
 
 // Different types of option values (see below for descriptions of each).
@@ -604,7 +607,9 @@ enum Options : uint32_t {
     // Number of conditions met since last Grubba taken.
     STAT_RUN_NPC_GRUBBA_COMBO   = 0x070'0'00'00,
     STAT_RUN_CONDITIONS_FAILED  = 0x071'0'00'00,
-    // Next: 0x072
+    // Used to track whether Lucky Start effect has been spent this floor.
+    STAT_RUN_LUCKY_START_FLOOR  = 0x072'0'00'00,
+    // Next: 0x073
 
     // Stats that persist across runs.
     // Bitfields / arrays for permanent progression. 

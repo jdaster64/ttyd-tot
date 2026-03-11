@@ -13,6 +13,7 @@ namespace ttyd::battle_seq {
 
 extern "C" {
 
+// .text
 // _set_haikei_entry_scale
 // _mapobj_data_touch_scale
 uint32_t BattleCheckConcluded(ttyd::battle::BattleWork* battleWork);
@@ -35,6 +36,9 @@ ttyd::battle_database_common::BattleWeapon* _GetFirstAttackWeapon(
 // btlseqInit
 // BattleCheckAllPinchStatus
 // BattleSequenceManager
+
+// .data
+extern int32_t nanika_luck_event[1];
 
 }
 

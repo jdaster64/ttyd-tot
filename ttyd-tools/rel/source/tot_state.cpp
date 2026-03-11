@@ -862,6 +862,11 @@ uint32_t StateManager::Rand(uint32_t range, int32_t sequence) {
                 data[1] |= floor_;
                 break;
             }
+            case RNG_LUCKY_START: {
+                // Only seed the floor number, not the sequence value.
+                data[0] = floor_;
+                break;
+            }
             default:
                 break;
         }
