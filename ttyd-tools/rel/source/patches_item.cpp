@@ -644,7 +644,7 @@ void ApplyFixedPatches() {
     };
     static const constexpr uint32_t kBpCost[] = {
         0x11111111, 0x33111111, 0x22552211, 0x22111144, 0x11224411,
-        0x33331441, 0x12225220, 0x52211111, 0x40032215, 0x00000004,
+        0x13331441, 0x12225220, 0x52211111, 0x40032215, 0x00000004,
         0x03110001, 0x22220100, 0x00000112,
     };
     static const constexpr int8_t kSortOrders[] = {
