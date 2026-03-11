@@ -636,7 +636,7 @@ void ApplyFixedPatches() {
         // Badges.
         0xb8a88dbb, 0xdd9d8a8b, 0xeeddcccc, 0xcceeffff, 0xbbccccdd,
         0xbbbebeeb, 0xb999bdfc, 0xdaaccddb, 0xd00edd7d, 0x0000000d,
-        0x0a770007, 0xdbee0000, 0x00000bbd,
+        0x0b770007, 0xdbee0000, 0x00000bbd,
     };
     // Prices corresponding to the price tiers in the above array.
     static const constexpr uint8_t kPrices[] = {
